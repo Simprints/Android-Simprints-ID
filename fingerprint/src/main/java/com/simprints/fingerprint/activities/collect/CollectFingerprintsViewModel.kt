@@ -113,6 +113,22 @@ class CollectFingerprintsViewModel(
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
+
+//        awaitingCapture()
+    }
+
+    private fun awaitingCapture() {
+        // todo: check vero2 with latest protocol
+        // todo: set state that we're awaiting scan? i.e. perhaps we can have an enum {AWAITING_SCAN, NOT_AWAITING_SCAN} which is listened to and activates particular functions?
+        scannerManager.onScanner { startLiveFeedback() }
+    }
+
+    private fun justBeforeCapture() {
+        scannerManager.onScanner { pauseLiveFeedback() }
+    }
+
+    private fun justAfterCapture() {
+        scannerManager.onScanner { clearLiveFeedback() }
     }
 
     private fun setStartingState() {
@@ -148,6 +164,7 @@ class CollectFingerprintsViewModel(
         if (fingerState is CaptureState.Collected && fingerState.scanResult.isGoodScan()
             && !state().isAskingRescan) {
             updateState { isAskingRescan = true }
+            awaitingCapture()
         } else {
             updateState { isAskingRescan = false }
             if (!isBusyForScanning()) {
@@ -163,7 +180,10 @@ class CollectFingerprintsViewModel(
 
     private fun toggleScanning() {
         when (state().currentCaptureState()) {
-            is CaptureState.Scanning -> cancelScanning()
+            is CaptureState.Scanning -> {
+                cancelScanning()
+                awaitingCapture()
+            }
             is CaptureState.TransferringImage -> { /* do nothing */
             }
             is CaptureState.NotCollected,
@@ -177,9 +197,11 @@ class CollectFingerprintsViewModel(
         updateCaptureState { toNotCollected() }
         scanningTask?.dispose()
         imageTransferTask?.dispose()
+//        awaitingCapture()
     }
 
     private fun startScanning() {
+        justBeforeCapture()
         updateCaptureState { toScanning() }
         lastCaptureStartedAt = timeHelper.now()
         scanningTask?.dispose()
@@ -200,15 +222,18 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
+
         val scanResult = ScanResult(captureFingerprintResponse.imageQualityScore, captureFingerprintResponse.template, null, fingerprintPreferencesManager.qualityThreshold)
         vibrate.postEvent()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
+            justAfterCapture()
             updateCaptureState { toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
             updateCaptureState { toCollected(scanResult) }
             handleCaptureFinished()
         }
+//        awaitingCapture()
     }
 
     private fun shouldProceedToImageTransfer(quality: Int) =
@@ -235,6 +260,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureFinished() {
+        awaitingCapture()
         with(state()) {
             logUiMessageForCrashReport("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
             addCaptureEventInSession()
@@ -279,6 +305,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun goToNextCaptureForSameFinger() {
+        awaitingCapture()
         with(state().currentFingerState()) {
             if (currentCaptureIndex < captures.size - 1) {
                 timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
@@ -292,18 +319,21 @@ class CollectFingerprintsViewModel(
     private fun resolveFingerTerminalConditionTriggered() {
         with(state()) {
             if (isScanningEndStateAchieved()) {
+                justAfterCapture()
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
             } else if (currentCaptureState().let {
                     it is CaptureState.Collected && it.scanResult.isGoodScan()
                 }) {
                 nudgeToNextFinger()
+                awaitingCapture()
             } else {
                 if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
                     showSplashAndNudge(addNewFinger = true)
                 } else if (!isOnLastFinger()) {
                     showSplashAndNudge(addNewFinger = false)
                 }
+//                awaitingCapture()
             }
         }
     }
@@ -313,6 +343,7 @@ class CollectFingerprintsViewModel(
         timeHelper.newTimer().schedule(TRY_DIFFERENT_FINGER_SPLASH_DELAY) {
             if (addNewFinger) handleAutoAddFinger()
             nudgeToNextFinger()
+            awaitingCapture()
         }
     }
 
@@ -329,12 +360,16 @@ class CollectFingerprintsViewModel(
         when (e) {
             is ScannerOperationInterruptedException -> {
                 updateCaptureState { toNotCollected() }
+
             }
             is ScannerDisconnectedException -> {
                 updateCaptureState { toNotCollected() }
                 launchReconnect.postEvent()
             }
-            is NoFingerDetectedException -> handleNoFingerDetected()
+            is NoFingerDetectedException -> {
+                handleNoFingerDetected()
+                awaitingCapture()
+            }
             else -> {
                 updateCaptureState { toNotCollected() }
                 crashReportManager.logExceptionOrSafeException(e)
@@ -342,6 +377,7 @@ class CollectFingerprintsViewModel(
                 launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
             }
         }
+//        awaitingCapture()
     }
 
     private fun handleNoFingerDetected() {
@@ -453,18 +489,22 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleRestart() {
+        awaitingCapture()
         setStartingState()
     }
 
     fun handleOnResume() {
+        awaitingCapture()
         scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnPause() {
+        justAfterCapture()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
+        justAfterCapture()
         if (state().currentCaptureState().isCommunicating()) {
             cancelScanning()
         }

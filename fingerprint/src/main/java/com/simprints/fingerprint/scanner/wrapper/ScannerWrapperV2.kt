@@ -84,6 +84,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         liveFeedbackTask?.dispose()
         liveFeedbackTask =
             scannerV2.setScannerLedStateOn()
+                //todo record state of un20 led locally
                 .andThen(
                     scannerV2
                         .getImageQualityPreview()
@@ -101,12 +102,21 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     }
 
     @SuppressLint("CheckResult")
-    override fun stopLiveFeedback() {
-        liveFeedbackTask?.dispose()
+    override fun clearLiveFeedback() {
+        pauseLiveFeedback()
         scannerV2.setScannerLedStateDefault()
-            .andThen(
-                scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribeBy(
+                onComplete = {},
+                onError = { Timber.e(it) }
             )
+    }
+
+    @SuppressLint("CheckResult")
+    override fun pauseLiveFeedback() {
+        liveFeedbackTask?.dispose()
+        scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .subscribeBy(
