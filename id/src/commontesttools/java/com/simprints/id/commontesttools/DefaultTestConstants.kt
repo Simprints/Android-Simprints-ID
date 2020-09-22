@@ -3,6 +3,7 @@ package com.simprints.id.commontesttools
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
+import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
@@ -51,4 +52,6 @@ object DefaultTestConstants {
         listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
         DEFAULT_MODES
     )
+
+    val defaultSubject = Subject(GUID1, DEFAULT_PROJECT_ID, GUID2, DEFAULT_MODULE_ID)
 }
