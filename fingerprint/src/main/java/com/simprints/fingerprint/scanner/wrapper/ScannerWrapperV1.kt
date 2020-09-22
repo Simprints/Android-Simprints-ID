@@ -94,7 +94,11 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
     }
 
-    override fun stopLiveFeedback() {
+    override fun clearLiveFeedback() {
+        throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
+    }
+
+    override fun pauseLiveFeedback() {
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
     }
 
