@@ -3,7 +3,7 @@ package com.simprints.id.network
 import com.google.gson.Gson
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.extensions.trace
 import kotlinx.coroutines.Dispatchers
