@@ -314,8 +314,9 @@ open class AppModule {
     @Provides
     open fun provideGuidFetchGuidHelper(downSyncHelper: EventDownSyncHelper,
                                         subjectRepository: SubjectRepository,
-                                        preferencesManager: PreferencesManager): FetchGuidHelper =
-        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager)
+                                        preferencesManager: PreferencesManager,
+                                        crashReportManager: CrashReportManager): FetchGuidHelper =
+        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
 
     @Provides
     open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
