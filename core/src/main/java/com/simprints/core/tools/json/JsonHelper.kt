@@ -1,13 +1,11 @@
 package com.simprints.core.tools.json
 
-import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
-@Keep
 class JsonHelper {
 
     val jackson: ObjectMapper by lazy {
@@ -27,5 +25,9 @@ class JsonHelper {
 
     inline fun <reified T> fromJson(json: String): T {
         return jackson.readValue(json, T::class.java)
+    }
+
+    fun validateJsonOrThrow(json: String) {
+        jackson.readTree(json)
     }
 }
