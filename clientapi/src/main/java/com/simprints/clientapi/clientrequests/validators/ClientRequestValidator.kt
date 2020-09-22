@@ -40,14 +40,12 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
                 throw InvalidMetadataException("Invalid Metadata")
     }
 
-    // TODO: inject gson dependency
     private fun hasValidMetadata(): Boolean = try {
-        JsonHelper().fromJson<Any>(extractor.getMetadata())
+        JsonHelper().validJsonOrThrow(extractor.getMetadata())
         true
     } catch (t: Throwable) {
         false
     }
-
 }
 
 

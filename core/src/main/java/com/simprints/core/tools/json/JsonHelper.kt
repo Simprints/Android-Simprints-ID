@@ -28,4 +28,8 @@ class JsonHelper {
     inline fun <reified T> fromJson(json: String): T {
         return jackson.readValue(json, T::class.java)
     }
+
+    fun validJsonOrThrow(json: String) {
+        JsonHelper().fromJson<Any>(json)
+    }
 }
