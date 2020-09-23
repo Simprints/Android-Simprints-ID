@@ -116,16 +116,19 @@ class CollectFingerprintsViewModel(
     }
 
     private fun awaitingCapture() {
+        Timber.d("awaitingCapture")
         // todo: check vero2 with latest protocol
         // todo: set state that we're awaiting scan? i.e. perhaps we can have an enum {AWAITING_SCAN, NOT_AWAITING_SCAN} which is listened to and activates particular functions?
         scannerManager.onScanner { startLiveFeedback() }
     }
 
     private fun justBeforeCapture() {
+        Timber.d("justBeforeCapture")
         scannerManager.onScanner { pauseLiveFeedback() }
     }
 
     private fun justAfterCapture() {
+        Timber.d("justAfterCapture")
         scannerManager.onScanner { clearLiveFeedback() }
     }
 
@@ -225,7 +228,7 @@ class CollectFingerprintsViewModel(
         val scanResult = ScanResult(captureFingerprintResponse.imageQualityScore, captureFingerprintResponse.template, null, fingerprintPreferencesManager.qualityThreshold)
         vibrate.postEvent()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
-            justAfterCapture()
+            justAfterCapture() // TODO: is there any way to ensure this is completed, then to proceed to ImageTransfer? rather than setting up these tasks in parallel?
             updateCaptureState { toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
@@ -242,6 +245,7 @@ class CollectFingerprintsViewModel(
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager())
 
     private fun proceedToImageTransfer() {
+        Timber.d("proceedToImageTransfer")
         imageTransferTask?.dispose()
         imageTransferTask = scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
             .subscribeOn(Schedulers.io())
