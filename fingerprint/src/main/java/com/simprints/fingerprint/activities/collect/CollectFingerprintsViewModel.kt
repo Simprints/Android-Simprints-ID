@@ -230,6 +230,7 @@ class CollectFingerprintsViewModel(
             updateCaptureState { toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
+            awaitingCapture()
             updateCaptureState { toCollected(scanResult) }
             handleCaptureFinished()
         }
@@ -260,7 +261,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureFinished() {
-        awaitingCapture()
+//        awaitingCapture()
         with(state()) {
             logUiMessageForCrashReport("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
             addCaptureEventInSession()
@@ -271,6 +272,8 @@ class CollectFingerprintsViewModel(
                 } else {
                     goToNextCaptureForSameFinger()
                 }
+            } else {
+                awaitingCapture()
             }
         }
     }

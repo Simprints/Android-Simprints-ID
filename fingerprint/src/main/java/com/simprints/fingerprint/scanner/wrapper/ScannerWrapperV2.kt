@@ -103,8 +103,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     @SuppressLint("CheckResult")
     override fun clearLiveFeedback() {
-        pauseLiveFeedback()
-        scannerV2.setScannerLedStateDefault()
+        liveFeedbackTask?.dispose()
+        scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+            .andThen(scannerV2.setScannerLedStateDefault())
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .subscribeBy(
