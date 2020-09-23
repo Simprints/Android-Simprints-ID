@@ -47,6 +47,8 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
     private var liveFeedbackTask: Disposable? = null
+    private var pausingLiveFeedbackTask: Disposable? = null
+    private var clearingLiveFeedbackTask: Disposable? = null
 
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
@@ -104,7 +106,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     @SuppressLint("CheckResult")
     override fun clearLiveFeedback() {
         liveFeedbackTask?.dispose()
-        scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+        pausingLiveFeedbackTask?.dispose()
+        clearingLiveFeedbackTask?.dispose()
+        clearingLiveFeedbackTask =
+            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
             .andThen(scannerV2.setScannerLedStateDefault())
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
@@ -117,7 +122,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     @SuppressLint("CheckResult")
     override fun pauseLiveFeedback() {
         liveFeedbackTask?.dispose()
-        scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+        pausingLiveFeedbackTask?.dispose()
+        pausingLiveFeedbackTask =
+            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .subscribeBy(
