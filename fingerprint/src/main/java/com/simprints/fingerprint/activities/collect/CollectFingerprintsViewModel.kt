@@ -113,8 +113,6 @@ class CollectFingerprintsViewModel(
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
-
-//        awaitingCapture()
     }
 
     private fun awaitingCapture() {
@@ -189,7 +187,10 @@ class CollectFingerprintsViewModel(
             is CaptureState.NotCollected,
             is CaptureState.Skipped,
             is CaptureState.NotDetected,
-            is CaptureState.Collected -> startScanning()
+            is CaptureState.Collected -> {
+                justBeforeCapture()
+                startScanning()
+            }
         }
     }
 
@@ -197,11 +198,9 @@ class CollectFingerprintsViewModel(
         updateCaptureState { toNotCollected() }
         scanningTask?.dispose()
         imageTransferTask?.dispose()
-//        awaitingCapture()
     }
 
     private fun startScanning() {
-        justBeforeCapture()
         updateCaptureState { toScanning() }
         lastCaptureStartedAt = timeHelper.now()
         scanningTask?.dispose()
@@ -234,7 +233,6 @@ class CollectFingerprintsViewModel(
             updateCaptureState { toCollected(scanResult) }
             handleCaptureFinished()
         }
-//        awaitingCapture()
     }
 
     private fun shouldProceedToImageTransfer(quality: Int) =
@@ -261,7 +259,6 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureFinished() {
-//        awaitingCapture()
         with(state()) {
             logUiMessageForCrashReport("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
             addCaptureEventInSession()
@@ -336,7 +333,6 @@ class CollectFingerprintsViewModel(
                 } else if (!isOnLastFinger()) {
                     showSplashAndNudge(addNewFinger = false)
                 }
-//                awaitingCapture()
             }
         }
     }
@@ -380,7 +376,6 @@ class CollectFingerprintsViewModel(
                 launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
             }
         }
-//        awaitingCapture()
     }
 
     private fun handleNoFingerDetected() {
