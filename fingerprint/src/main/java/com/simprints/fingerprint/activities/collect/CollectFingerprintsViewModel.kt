@@ -118,24 +118,23 @@ class CollectFingerprintsViewModel(
     private var liveFeedbackTask: Disposable? = null
     private var stopLiveFeedbackTask: Disposable? = null
 
-    private fun awaitingCapture() {
-        Timber.d("awaitingCapture")
+    private fun startLiveFeedback() : Completable {
+        Timber.d("startLiveFeedback")
         liveFeedbackTask?.dispose()
         // todo: check vero2 with latest protocol
-        // todo: set state that we're awaiting scan? i.e. perhaps we can have an enum {AWAITING_SCAN, NOT_AWAITING_SCAN} which is listened to and activates particular functions?
-        liveFeedbackTask = scannerManager.scanner { startLiveFeedback() }.doInBackground()
+        return scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
     }
 
-    private fun justBeforeCapture() {
-        Timber.d("justBeforeCapture")
+    private fun pauseLiveFeedback() {
+        Timber.d("pauseLiveFeedback")
         liveFeedbackTask?.dispose()
     }
 
-    private fun endOfWorkflow() {
-        Timber.d("endOfWorkflow")
+    private fun stopLiveFeedback() : Completable {
+        Timber.d("stopLiveFeedback")
         liveFeedbackTask?.dispose()
         stopLiveFeedbackTask?.dispose()
-        stopLiveFeedbackTask = scannerManager.scanner { stopLiveFeedback() }.doInBackground()
+        return scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
     }
 
     private fun setStartingState() {
@@ -171,7 +170,7 @@ class CollectFingerprintsViewModel(
         if (fingerState is CaptureState.Collected && fingerState.scanResult.isGoodScan()
             && !state().isAskingRescan) {
             updateState { isAskingRescan = true }
-            awaitingCapture()
+            startLiveFeedback().doInBackground()
         } else {
             updateState { isAskingRescan = false }
             if (!isBusyForScanning()) {
@@ -189,7 +188,7 @@ class CollectFingerprintsViewModel(
         when (state().currentCaptureState()) {
             is CaptureState.Scanning -> {
                 cancelScanning()
-                awaitingCapture()
+                startLiveFeedback().doInBackground()
             }
             is CaptureState.TransferringImage -> { /* do nothing */
             }
@@ -197,7 +196,7 @@ class CollectFingerprintsViewModel(
             is CaptureState.Skipped,
             is CaptureState.NotDetected,
             is CaptureState.Collected -> {
-                justBeforeCapture()
+                pauseLiveFeedback()
                 startScanning()
             }
         }
@@ -237,7 +236,7 @@ class CollectFingerprintsViewModel(
             updateCaptureState { toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
-            awaitingCapture()
+            startLiveFeedback().doInBackground()
             updateCaptureState { toCollected(scanResult) }
             handleCaptureFinished()
         }
@@ -252,7 +251,11 @@ class CollectFingerprintsViewModel(
     private fun proceedToImageTransfer() {
         Timber.d("proceedToImageTransfer")
         imageTransferTask?.dispose()
-        imageTransferTask = scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
+        liveFeedbackTask?.dispose()
+        stopLiveFeedbackTask?.dispose()
+        imageTransferTask =
+            scannerManager.scanner { stopLiveFeedback() }
+            .andThen(scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -279,7 +282,7 @@ class CollectFingerprintsViewModel(
                     goToNextCaptureForSameFinger()
                 }
             } else {
-                awaitingCapture()
+                startLiveFeedback().doInBackground()
             }
         }
     }
@@ -314,7 +317,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun goToNextCaptureForSameFinger() {
-        awaitingCapture()
+        startLiveFeedback().doInBackground()
         with(state().currentFingerState()) {
             if (currentCaptureIndex < captures.size - 1) {
                 timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
@@ -326,24 +329,27 @@ class CollectFingerprintsViewModel(
     }
 
     private fun resolveFingerTerminalConditionTriggered() {
-        with(state()) {
+        state().apply {
             if (isScanningEndStateAchieved()) {
-                endOfWorkflow()
+                stopLiveFeedback().doInBackground()
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
-            } else if (currentCaptureState().let {
-                    it is CaptureState.Collected && it.scanResult.isGoodScan()
-                }) {
-                nudgeToNextFinger()
-                awaitingCapture()
             } else {
-                if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
-                    showSplashAndNudge(addNewFinger = true)
-                } else if (!isOnLastFinger()) {
-                    showSplashAndNudge(addNewFinger = false)
+                if (currentCaptureState().let {
+                        it is CaptureState.Collected && it.scanResult.isGoodScan()
+                    }) {
+                    nudgeToNextFinger()
+                    startLiveFeedback().doInBackground()
+                } else {
+                    if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
+                        showSplashAndNudge(addNewFinger = true)
+                    } else if (!isOnLastFinger()) {
+                        showSplashAndNudge(addNewFinger = false)
+                    }
                 }
             }
         }
+
     }
 
     private fun showSplashAndNudge(addNewFinger: Boolean) {
@@ -351,7 +357,7 @@ class CollectFingerprintsViewModel(
         timeHelper.newTimer().schedule(TRY_DIFFERENT_FINGER_SPLASH_DELAY) {
             if (addNewFinger) handleAutoAddFinger()
             nudgeToNextFinger()
-            awaitingCapture()
+            startLiveFeedback().doInBackground()
         }
     }
 
@@ -376,7 +382,7 @@ class CollectFingerprintsViewModel(
             }
             is NoFingerDetectedException -> {
                 handleNoFingerDetected()
-                awaitingCapture()
+                startLiveFeedback().doInBackground()
             }
             else -> {
                 updateCaptureState { toNotCollected() }
@@ -496,22 +502,22 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleRestart() {
-        awaitingCapture()
+        startLiveFeedback().doInBackground()
         setStartingState()
     }
 
     fun handleOnResume() {
-        awaitingCapture()
+        startLiveFeedback().doInBackground()
         scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnPause() {
-        endOfWorkflow()
+        stopLiveFeedback().doInBackground()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
-        endOfWorkflow()
+        stopLiveFeedback().doInBackground()
         if (state().currentCaptureState().isCommunicating()) {
             cancelScanning()
         }
