@@ -18,7 +18,8 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
                                                     private val deviceId: String,
                                                     private val authToken: String? = null,
                                                     private val performanceTracer: FirebasePerformanceTraceFactory,
-                                                    private val jsonHelper: JsonHelper) : SimApiClient<T> {
+                                                    private val jsonHelper: JsonHelper,
+                                                    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()) : SimApiClient<T> {
 
     override val api: T by lazy {
         retrofit.create(service.java)
@@ -33,7 +34,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        DefaultOkHttpClientBuilder().get(authToken, deviceId)
+        okHttpClientBuilder.get(authToken, deviceId)
     }
 
     override suspend fun <V> executeCall(traceName: String?,
