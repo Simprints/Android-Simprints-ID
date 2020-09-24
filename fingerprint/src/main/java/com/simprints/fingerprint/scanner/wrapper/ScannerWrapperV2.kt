@@ -106,31 +106,31 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     @SuppressLint("CheckResult")
     override fun clearLiveFeedback() {
         liveFeedbackTask?.dispose()
-        pausingLiveFeedbackTask?.dispose()
-        clearingLiveFeedbackTask?.dispose()
-        clearingLiveFeedbackTask =
-            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-            .andThen(scannerV2.setScannerLedStateDefault())
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribeBy(
-                onComplete = {},
-                onError = { Timber.e(it) }
-            )
+//        pausingLiveFeedbackTask?.dispose()
+//        clearingLiveFeedbackTask?.dispose()
+//        clearingLiveFeedbackTask =
+//            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+//            .andThen(scannerV2.setScannerLedStateDefault())
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(Schedulers.io())
+//            .subscribeBy(
+//                onComplete = {},
+//                onError = { Timber.e(it) }
+//            )
     }
 
     @SuppressLint("CheckResult")
     override fun pauseLiveFeedback() {
         liveFeedbackTask?.dispose()
-        pausingLiveFeedbackTask?.dispose()
-        pausingLiveFeedbackTask =
-            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribeBy(
-                onComplete = {},
-                onError = { Timber.e(it) }
-            )
+//        pausingLiveFeedbackTask?.dispose()
+//        pausingLiveFeedbackTask =
+//            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(Schedulers.io())
+//            .subscribeBy(
+//                onComplete = {},
+//                onError = { Timber.e(it) }
+//            )
     }
 
     private fun ScannerV2.ensureUn20State(desiredState: Boolean): Completable =
