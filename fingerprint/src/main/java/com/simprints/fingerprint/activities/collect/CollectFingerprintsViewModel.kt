@@ -115,26 +115,27 @@ class CollectFingerprintsViewModel(
         setStartingState()
     }
 
+    private var liveFeedbackTask: Disposable? = null
+    private var stopLiveFeedbackTask: Disposable? = null
+
     private fun awaitingCapture() {
         Timber.d("awaitingCapture")
+        liveFeedbackTask?.dispose()
         // todo: check vero2 with latest protocol
         // todo: set state that we're awaiting scan? i.e. perhaps we can have an enum {AWAITING_SCAN, NOT_AWAITING_SCAN} which is listened to and activates particular functions?
-        scannerManager.onScanner { startLiveFeedback() }
+        liveFeedbackTask = scannerManager.scanner { startLiveFeedback() }.doInBackground()
     }
 
     private fun justBeforeCapture() {
         Timber.d("justBeforeCapture")
-        scannerManager.onScanner { pauseLiveFeedback() }
-    }
-
-    private fun justAfterCapture() {
-        Timber.d("justAfterCapture")
-        scannerManager.onScanner { clearLiveFeedback() }
+        liveFeedbackTask?.dispose()
     }
 
     private fun endOfWorkflow() {
         Timber.d("endOfWorkflow")
-        scannerManager.onScanner { stopLiveFeedback() }
+        liveFeedbackTask?.dispose()
+        stopLiveFeedbackTask?.dispose()
+        stopLiveFeedbackTask = scannerManager.scanner { stopLiveFeedback() }.doInBackground()
     }
 
     private fun setStartingState() {
@@ -233,7 +234,6 @@ class CollectFingerprintsViewModel(
         val scanResult = ScanResult(captureFingerprintResponse.imageQualityScore, captureFingerprintResponse.template, null, fingerprintPreferencesManager.qualityThreshold)
         vibrate.postEvent()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
-            justAfterCapture() // TODO: is there any way to ensure this is completed, then to proceed to ImageTransfer? rather than setting up these tasks in parallel?
             updateCaptureState { toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
@@ -328,7 +328,6 @@ class CollectFingerprintsViewModel(
     private fun resolveFingerTerminalConditionTriggered() {
         with(state()) {
             if (isScanningEndStateAchieved()) {
-//                justAfterCapture()
                 endOfWorkflow()
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
@@ -507,12 +506,12 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnPause() {
-        justAfterCapture()
+        endOfWorkflow()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
-        justAfterCapture()
+        endOfWorkflow()
         if (state().currentCaptureState().isCommunicating()) {
             cancelScanning()
         }

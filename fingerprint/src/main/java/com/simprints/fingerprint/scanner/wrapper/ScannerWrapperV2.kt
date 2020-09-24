@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import android.annotation.SuppressLint
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
@@ -25,10 +24,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
-import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.io.IOException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
@@ -46,10 +42,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
-    private var liveFeedbackTask: Disposable? = null
-    private var pausingLiveFeedbackTask: Disposable? = null
-    private var clearingLiveFeedbackTask: Disposable? = null
-    private var stoppingLiveFeedbackTask: Disposable? = null
 
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
@@ -83,9 +75,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             .ensureUn20State(false)
             .wrapErrorsFromScanner()
 
-    override fun startLiveFeedback() {
-        liveFeedbackTask?.dispose()
-        liveFeedbackTask =
+    override fun startLiveFeedback() : Completable =
             scannerV2.setScannerLedStateOn()
                 //todo record state of un20 led locally
                 .andThen(
@@ -96,58 +86,11 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                         }
                         .repeat()
                 )
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribeBy(
-                    onComplete = {},
-                    onError = { Timber.e(it) }
-                )
-    }
 
-    @SuppressLint("CheckResult")
-    override fun clearLiveFeedback() {
-        liveFeedbackTask?.dispose()
-//        pausingLiveFeedbackTask?.dispose()
-//        clearingLiveFeedbackTask?.dispose()
-//        clearingLiveFeedbackTask =
-//            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-//            .andThen(scannerV2.setScannerLedStateDefault())
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(Schedulers.io())
-//            .subscribeBy(
-//                onComplete = {},
-//                onError = { Timber.e(it) }
-//            )
-    }
-
-    @SuppressLint("CheckResult")
-    override fun stopLiveFeedback() {
-        liveFeedbackTask?.dispose()
-        stoppingLiveFeedbackTask?.dispose()
-        stoppingLiveFeedbackTask =
+    override fun stopLiveFeedback() : Completable =
             scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-            .andThen(scannerV2.setScannerLedStateDefault())
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribeBy(
-                onComplete = {},
-                onError = { Timber.e(it) }
-            )
-    }
+                .andThen(scannerV2.setScannerLedStateDefault())
 
-    @SuppressLint("CheckResult")
-    override fun pauseLiveFeedback() {
-        liveFeedbackTask?.dispose()
-//        pausingLiveFeedbackTask?.dispose()
-//        pausingLiveFeedbackTask =
-//            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(Schedulers.io())
-//            .subscribeBy(
-//                onComplete = {},
-//                onError = { Timber.e(it) }
-//            )
-    }
 
     private fun ScannerV2.ensureUn20State(desiredState: Boolean): Completable =
         getUn20Status().flatMapCompletable { actualState ->
