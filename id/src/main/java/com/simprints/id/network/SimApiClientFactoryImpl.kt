@@ -10,7 +10,8 @@ class SimApiClientFactoryImpl(
     val deviceId: String,
     private val remoteDbManager: RemoteDbManager,
     private val performanceTracer: FirebasePerformanceTraceFactory,
-    private val jsonHelper: JsonHelper
+    private val jsonHelper: JsonHelper,
+    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
 ): SimApiClientFactory {
 
     // Not using `inline fun <reified T : SimRemoteInterface>` because it's not possible to
@@ -23,7 +24,8 @@ class SimApiClientFactoryImpl(
             deviceId,
             remoteDbManager.getCurrentToken(),
             performanceTracer,
-            jsonHelper
+            jsonHelper,
+            okHttpClientBuilder
         )
     }
 
@@ -34,7 +36,8 @@ class SimApiClientFactoryImpl(
             deviceId,
             null,
             performanceTracer,
-            jsonHelper
+            jsonHelper,
+            okHttpClientBuilder
         )
     }
 }
