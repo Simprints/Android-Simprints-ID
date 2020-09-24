@@ -67,7 +67,6 @@ import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
@@ -409,10 +408,10 @@ open class AppModule {
     fun provideEnrolmentHelper(
         subjectRepository: SubjectRepository,
         eventRepository: EventRepository,
-        eventSyncManager: EventSyncManager,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, eventSyncManager, preferencesManager, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
 
     @Provides
     open fun provideEnrolLastBiometricsViewModel(

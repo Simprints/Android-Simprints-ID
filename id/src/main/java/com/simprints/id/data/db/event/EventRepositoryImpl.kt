@@ -12,6 +12,7 @@ import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.A
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.models.isNotASubjectEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -150,7 +151,9 @@ open class EventRepositoryImpl(
             } catch (t: Throwable) {
                 Timber.d(t)
                 if (t.isClientAndCloudIntegrationIssue()) {
-                    deleteEventsFromDb(events.map { it.id })
+                    crashReportManager.logException(t)
+                    //We do not delete subject events (pokodex) since they are important.
+                    deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
                 }
             }
             this.emit(events.size)

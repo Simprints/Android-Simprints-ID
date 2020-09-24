@@ -218,7 +218,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun uploadSucceeds_shouldDeleteEvents() {
+    fun upload_succeeds_shouldDeleteEvents() {
         runBlocking {
             val events =
                 mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
@@ -235,7 +235,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldEmitProgress() {
+    fun upload_inProgress_shouldEmitProgress() {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
@@ -248,7 +248,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldDeleteUploadedEvents() {
+    fun upload_succeeds_shouldDeleteUploadedEvents() {
         runBlocking {
             val events =
                 mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
@@ -263,7 +263,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldNotDeleteEventsAfterNetworkIssues() {
+    fun upload_fails_shouldNotDeleteEventsAfterNetworkIssues() {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
@@ -275,15 +275,20 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldDeleteEventsAfterIntegrationIssues() {
+    fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
             val events = mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
+            val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
             eventRepo.uploadEvents(LocalEventQuery()).toList()
 
             for (event in events) {
                 coVerify { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
+            }
+
+            for (event in subjectEvents) {
+                coVerify(exactly = 0) { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
             }
         }
     }

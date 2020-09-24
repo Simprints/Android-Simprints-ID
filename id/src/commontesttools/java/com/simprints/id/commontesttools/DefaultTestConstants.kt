@@ -19,6 +19,7 @@ object DefaultTestConstants {
     const val DEFAULT_PROJECT_SECRET = "3xDCW0IL/m7nNBWPlVQljh4RzZgcho3Gp7WEj07YqgSER6ESXeY8tVczlNsxubug7co45/PsfG7JiC9oo/U54w=="
     const val DEFAULT_METADATA = "DEFAULT_METADATA"
 
+    val STATIC_GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
     val GUID1 = UUID.randomUUID().toString()
     val GUID2 = UUID.randomUUID().toString()
     val GUID3 = UUID.randomUUID().toString()
