@@ -49,6 +49,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     private var liveFeedbackTask: Disposable? = null
     private var pausingLiveFeedbackTask: Disposable? = null
     private var clearingLiveFeedbackTask: Disposable? = null
+    private var stoppingLiveFeedbackTask: Disposable? = null
 
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
@@ -117,6 +118,21 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 //                onComplete = {},
 //                onError = { Timber.e(it) }
 //            )
+    }
+
+    @SuppressLint("CheckResult")
+    override fun stopLiveFeedback() {
+        liveFeedbackTask?.dispose()
+        stoppingLiveFeedbackTask?.dispose()
+        stoppingLiveFeedbackTask =
+            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+            .andThen(scannerV2.setScannerLedStateDefault())
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribeBy(
+                onComplete = {},
+                onError = { Timber.e(it) }
+            )
     }
 
     @SuppressLint("CheckResult")

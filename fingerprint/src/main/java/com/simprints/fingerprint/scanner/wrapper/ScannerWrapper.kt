@@ -24,6 +24,7 @@ interface ScannerWrapper {
     fun startLiveFeedback()
     fun pauseLiveFeedback()
     fun clearLiveFeedback()
+    fun stopLiveFeedback()
 
     fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse>
     fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse>

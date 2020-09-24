@@ -132,6 +132,11 @@ class CollectFingerprintsViewModel(
         scannerManager.onScanner { clearLiveFeedback() }
     }
 
+    private fun endOfWorkflow() {
+        Timber.d("endOfWorkflow")
+        scannerManager.onScanner { stopLiveFeedback() }
+    }
+
     private fun setStartingState() {
         state.value = CollectFingerprintsState(
             startingStateDeterminer.determineStartingFingerStates(originalFingerprintsToCapture)
@@ -323,7 +328,8 @@ class CollectFingerprintsViewModel(
     private fun resolveFingerTerminalConditionTriggered() {
         with(state()) {
             if (isScanningEndStateAchieved()) {
-                justAfterCapture()
+//                justAfterCapture()
+                endOfWorkflow()
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
             } else if (currentCaptureState().let {
