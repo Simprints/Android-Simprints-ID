@@ -90,21 +90,13 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }))
     }
 
-    override fun startLiveFeedback() {
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
-    }
+    override fun startLiveFeedback(): Completable = Completable.error(
+        UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
+    )
 
-    override fun clearLiveFeedback() {
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
-    }
-
-    override fun stopLiveFeedback() {
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
-    }
-
-    override fun pauseLiveFeedback() {
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
-    }
+    override fun stopLiveFeedback(): Completable = Completable.error(
+        UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
+    )
 
     override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         Single.create<CaptureFingerprintResponse> { emitter ->
