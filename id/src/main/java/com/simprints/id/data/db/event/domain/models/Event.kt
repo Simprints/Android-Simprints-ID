@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
@@ -101,3 +102,8 @@ abstract class Event {
     abstract var labels: EventLabels
     abstract val payload: EventPayload
 }
+
+fun EventType.isNotASubjectEvent() =
+    this != ENROLMENT_RECORD_CREATION &&
+        this != ENROLMENT_RECORD_MOVE &&
+        this != ENROLMENT_RECORD_DELETION
