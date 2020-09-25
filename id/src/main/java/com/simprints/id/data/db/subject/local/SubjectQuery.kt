@@ -7,5 +7,4 @@ import java.io.Serializable
 data class SubjectQuery(val projectId: String? = null,
                         val subjectId: String? = null,
                         val attendantId: String? = null,
-                        val moduleId: String? = null,
-                        val toSync: Boolean? = null) : Serializable
+                        val moduleId: String? = null) : Serializable

@@ -209,22 +209,6 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByToSyncShouldReturnTheRightPeople() = runBlocking {
-        saveFakePeople(realm, getRandomPeople(20, toSync = true))
-
-        val people = subjectLocalDataSource.load(SubjectQuery(toSync = true)).toList()
-        assertThat(people.size).isEqualTo(20)
-    }
-
-    @Test
-    fun givenManyPeopleSaved_loadByToNoSyncShouldReturnTheRightPeople() = runBlocking {
-        saveFakePeople(realm, getRandomPeople(20, toSync = true))
-
-        val people = subjectLocalDataSource.load(SubjectQuery(toSync = false)).toList()
-        assertThat(people.size).isEqualTo(0)
-    }
-
-    @Test
     fun shouldDeleteSubject() = runBlocking {
         val subject1 = getFakePerson()
         val subject2 = getFakePerson()
