@@ -62,7 +62,7 @@ open class EventSyncMasterWorker(private val appContext: Context,
                 getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
                 //Requests timestamp now as device is surely ONLINE,
-                //so if needed the NTP cache gets refreshed.
+                //so if needed, the NTP has a chance to get refreshed.
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
