@@ -9,7 +9,6 @@ import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.GRACE_PERIOD
-import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -34,13 +33,13 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
     val oldOpenSession = createSessionCaptureEvent(id).openSession()
     coEvery { eventLocalDataSource.count(any()) } returns 1
     // Mock query for session by id
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE, id = id)) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, id = id)) } returns flowOf(oldOpenSession)
 
     // Mock query for events by session id
     coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) } returns flowOf(oldOpenSession)
 
     // Mock query for open sessions
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(0, 0))) } returns flowOf(oldOpenSession)
 
     return oldOpenSession
 }
@@ -64,7 +63,7 @@ fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(sessionId: String, nEv
 
 fun EventRepositoryImplTest.assertANewSessionCaptureWasAdded(event: Event): Boolean =
     event is SessionCaptureEvent &&
-        event.payload.projectId == PROJECT_ID_FOR_NOT_SIGNED_IN &&
+        event.payload.projectId == DEFAULT_PROJECT_ID &&
         event.payload.createdAt == EventRepositoryImplTest.NOW &&
         event.payload.modalities == listOf(Modes.FACE, FINGERPRINT) &&
         event.payload.appVersionName == EventRepositoryImplTest.APP_VERSION_NAME &&
@@ -117,7 +116,7 @@ suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecord
     }
 
     coEvery {
-        eventLocalDataSource.load(DbLocalEventQuery())
+        eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID))
     } returns events.asFlow()
 
     return events.toList()

@@ -17,6 +17,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -105,4 +106,8 @@ class SecurityStateRemoteDataSourceImplTest {
         const val DEVICE_ID = "mock-device-id"
     }
 
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
 }
