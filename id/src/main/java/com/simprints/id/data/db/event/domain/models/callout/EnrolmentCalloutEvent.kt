@@ -3,11 +3,9 @@ package com.simprints.id.data.db.event.domain.models.callout
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_ENROLMENT
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -24,9 +22,10 @@ data class EnrolmentCalloutEvent(
         userId: String,
         moduleId: String,
         metadata: String?,
-        labels: EventLabels = EventLabels()
+        labels: EventLabels = EventLabels(),
+        id: String = UUID.randomUUID().toString()
     ) : this(
-        UUID.randomUUID().toString(),
+        id,
         labels,
         EnrolmentCalloutPayload(createdAt, EVENT_VERSION, projectId, userId, moduleId, metadata),
         CALLOUT_ENROLMENT)

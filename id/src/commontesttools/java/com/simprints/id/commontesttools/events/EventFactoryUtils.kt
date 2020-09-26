@@ -82,7 +82,7 @@ fun createVerificationCallbackEvent(): VerificationCallbackEvent {
 
 fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2, eventLabels)
 
-fun createEnrolmentCalloutEvent() = EnrolmentCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
+fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(CREATED_AT, projectId, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels, projectId)
 
 fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
 
@@ -103,7 +103,10 @@ fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, 
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 
-fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT): SessionCaptureEvent {
+fun createSessionCaptureEvent(id: String = GUID1,
+                              createdAt: Long = CREATED_AT,
+                              projectId: String = DEFAULT_PROJECT_ID): SessionCaptureEvent {
+
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
     val languageArg = "language"
@@ -117,7 +120,7 @@ fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT):
 
     return SessionCaptureEvent(
         id,
-        DEFAULT_PROJECT_ID,
+        projectId,
         createdAt,
         listOf(FINGERPRINT, FACE),
         appVersionNameArg,
