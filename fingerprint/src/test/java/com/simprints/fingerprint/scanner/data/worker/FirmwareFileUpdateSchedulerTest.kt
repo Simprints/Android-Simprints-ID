@@ -4,6 +4,7 @@ import androidx.work.WorkManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import io.mockk.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -48,5 +49,10 @@ class FirmwareFileUpdateSchedulerTest {
         firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
 
         verifySequence { workManagerMock.cancelUniqueWork(any()) }
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 }

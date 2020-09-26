@@ -1,31 +1,37 @@
 package com.simprints.id.orchestrator
 
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.STATIC_GUID
 import com.simprints.id.commontesttools.DefaultTestConstants.defaultSubject
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.time.TimeHelper
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
 class EnrolmentHelperImplTest {
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     @MockK lateinit var subjectRepository: SubjectRepository
     @MockK lateinit var eventRepository: EventRepository
-    @MockK lateinit var eventSyncManager: EventSyncManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var timeHelper: TimeHelper
@@ -39,6 +45,7 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
         coEvery { preferencesManager.modalities } returns listOf(FINGER)
+        every { loginInfoManager getProperty "signedInProjectId" } returns DEFAULT_PROJECT_ID
 
         mockkStatic(UUID::class)
         val guid = mockk<UUID>()
@@ -49,6 +56,7 @@ class EnrolmentHelperImplTest {
     @Test
     fun enrol_shouldRegisterEnrolmentEvents() {
         runBlocking {
+
             enrolmentHelper.enrol(defaultSubject)
 
             val expectedEnrolmentEvent = EnrolmentEvent(CREATED_AT, defaultSubject.subjectId)
@@ -62,7 +70,7 @@ class EnrolmentHelperImplTest {
                 EnrolmentRecordCreationEvent.buildBiometricReferences(defaultSubject.fingerprintSamples, defaultSubject.faceSamples))
 
 
-            coVerifySequence {
+            coVerify {
                 eventRepository.addEventToCurrentSession(expectedEnrolmentEvent)
 
                 eventRepository.addEventToCurrentSession(expectedEnrolmentRecordCreationEvent)
@@ -82,13 +90,18 @@ class EnrolmentHelperImplTest {
     }
 
     @Test
-    fun enrol_shouldPerformTheSync() {
+    fun enrol_shouldPerformUpload() {
         runBlocking {
             enrolmentHelper.enrol(defaultSubject)
 
             coVerify(exactly = 1) {
-                eventSyncManager.sync()
+                eventRepository.uploadEvents(LocalEventQuery(projectId = DEFAULT_PROJECT_ID))
             }
         }
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 }

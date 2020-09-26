@@ -34,6 +34,7 @@ import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAsserti
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -753,5 +754,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
         val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().templateBytes
 
         val IMAGE = byteArrayOf(0x05, 0x06, 0x07, 0x08)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 }
