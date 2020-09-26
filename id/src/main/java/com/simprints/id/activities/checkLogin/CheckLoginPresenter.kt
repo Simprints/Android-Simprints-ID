@@ -61,7 +61,7 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    protected open suspend fun handleSignedInUser() {
+    open suspend fun handleSignedInUser() {
         CoroutineScope(Dispatchers.Main).launch {
             setLanguageInHelper()
             checkStatusForDeviceAndProject()
