@@ -193,6 +193,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
         super.handleSignedInUser()
+        Timber.d("[CHECK_LOGIN] User is signed in")
+
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User
          *  Because we move ConfirmIdentity behind the login check, some integration
@@ -205,24 +207,33 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
-        ignoreException {
-            updateProjectInInCurrentSession()
-            updateAnalyticsIdInCurrentSession()
-            updateDatabaseCountsInCurrentSession()
+        updateProjectInInCurrentSession()
 
-            addAuthorizedEventInCurrentSession()
-            initAnalyticsKeyInCrashManager()
+        inBackground {
+            ignoreException {
+                Timber.d("[CHECK_LOGIN] Updating events")
+
+                updateDatabaseCountsInCurrentSession()
+                addAuthorizedEventInCurrentSession()
+                initAnalyticsKeyInCrashManager()
+                updateAnalyticsIdInCurrentSession()
+            }
         }
 
+        Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
+
+        Timber.d("[CHECK_LOGIN] Moving to orchestrator")
         view.openOrchestratorActivity(appRequest)
     }
 
     private suspend fun addAuthorizedEventInCurrentSession() {
         eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
+        Timber.d("[CHECK_LOGIN] Added authorised event")
     }
 
     private suspend fun updateProjectInInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         currentSessionEvent.updateProjectId(projectId)
         eventRepository.addEvent(currentSessionEvent)
@@ -233,7 +244,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             eventRepository.addEvent(it)
         }
 
-        Timber.d("[CHECK_LOGIN] Update projectId in current session $currentSessionEvent")
+        Timber.d("[CHECK_LOGIN] Updated projectId in current session")
     }
 
     private suspend fun updateDatabaseCountsInCurrentSession() {
@@ -243,6 +254,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         payload.databaseInfo.recordCount =  subjectLocalDataSource.count()
 
         eventRepository.addEvent(currentSessionEvent)
+        Timber.d("[CHECK_LOGIN] Updated Database count in current session")
     }
 
     private fun initAnalyticsKeyInCrashManager() {
@@ -253,12 +265,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             setDownSyncTriggersCrashlyticsKey(preferencesManager.eventDownSyncSetting)
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerprintsToCollect)
         }
+        Timber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 
     private suspend fun updateAnalyticsIdInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
         currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
         eventRepository.addEvent(currentSessionEvent)
+        Timber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 
     private fun buildAuthorizationEvent(result: AuthorizationResult) =
