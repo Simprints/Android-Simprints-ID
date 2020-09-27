@@ -24,7 +24,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -59,7 +59,7 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         when {
             potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
             appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(appErrorResponseForLoginScreen)
-            else -> lifecycleScope.launch {
+            else -> runBlocking {
                 viewPresenter.checkSignedInStateIfPossible()
             }
         }

@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator
 
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
@@ -27,7 +28,9 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
     override suspend fun enrol(subject: Subject) {
         registerEvent(subject)
         subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
-        eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.signedInProjectId))
+        inBackground {
+            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.signedInProjectId))
+        }
     }
 
     private suspend fun registerEvent(subject: Subject) {

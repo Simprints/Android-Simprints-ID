@@ -87,7 +87,7 @@ open class EventRepositoryImpl(
                     deviceId),
                 DatabaseInfo(count))
 
-            closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(currentProject), NEW_SESSION)
+            closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(), NEW_SESSION)
             addEvent(sessionCaptureEvent)
         }
     }
@@ -120,7 +120,11 @@ open class EventRepositoryImpl(
     override suspend fun addEvent(event: Event) {
         ignoreException {
             reportExceptionIfNeeded {
-                event.labels = event.labels.appendLabelsForAllEvents()
+                if (event.type.isNotASubjectEvent()) {
+                    event.labels = event.labels.appendLabelsForAllSessionEvents()
+                } else {
+                    event.labels = event.labels.appendProjectIdLabel()
+                }
                 eventLocalDataSource.insertOrUpdate(event)
             }
         }
@@ -223,21 +227,9 @@ open class EventRepositoryImpl(
 
     }
 
-    private suspend fun loadCloseSessions(query: LocalEventQuery): Flow<Event> {
-        val queryForOldOpenSessions = query.copy(
-            type = SESSION_CAPTURE,
-            endTime = LongRange(1, Long.MAX_VALUE),
-            projectId = query.projectId)
-            .fromDomainToDb()
-
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading close sessions for query $queryForOldOpenSessions")
-
-        return eventLocalDataSource.load(queryForOldOpenSessions)
-    }
-
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
         reportExceptionIfNeeded {
-            loadOpenSessions(currentProject).first()
+            loadOpenSessions().first()
         }
 
 
@@ -263,24 +255,24 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun signOut() {
-        loadCloseSessions(currentProject).collect {
+        loadCloseSessions(LocalEventQuery(projectId = currentProject)).collect {
             eventLocalDataSource.delete(DbLocalEventQuery(sessionId = it.id))
         }
     }
 
-    private suspend fun loadOpenSessions(projectId: String) =
-        eventLocalDataSource.load(getDbQueryForOpenSession(projectId).fromDomainToDb()).map { it as SessionCaptureEvent }
+    private suspend fun loadOpenSessions(query: LocalEventQuery = LocalEventQuery()) =
+        eventLocalDataSource.load(query.appendQueryForOpenSession().fromDomainToDb()).map { it as SessionCaptureEvent }
 
-    private suspend fun loadCloseSessions(projectId: String) =
-        eventLocalDataSource.load(getDbQueryForCloseSession(projectId).fromDomainToDb()).map { it as SessionCaptureEvent }
+    private suspend fun loadCloseSessions(query: LocalEventQuery = LocalEventQuery()) =
+        eventLocalDataSource.load(query.appendQueryForCloseSession().fromDomainToDb()).map { it as SessionCaptureEvent }
 
-    private fun getDbQueryForOpenSession(projectId: String) =
-        LocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0), projectId = projectId)
+    private fun LocalEventQuery.appendQueryForOpenSession() =
+        this.copy(type = SESSION_CAPTURE, endTime = LongRange(0, 0))
 
-    private fun getDbQueryForCloseSession(projectId: String) =
-        LocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE), projectId = projectId)
+    private fun LocalEventQuery.appendQueryForCloseSession() =
+        this.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))
 
-    private fun EventLabels.appendLabelsForAllEvents() =
+    private fun EventLabels.appendLabelsForAllSessionEvents() =
         this.appendProjectIdLabel().appendDeviceIdLabel()
 
     private fun EventLabels.appendProjectIdLabel(): EventLabels {
@@ -295,11 +287,12 @@ open class EventRepositoryImpl(
         try {
             block()
         } catch (t: Throwable) {
+            Timber.d(t)
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }
 
-    private fun checkQueryProjectIsIsSignedIn(projectId: String) {
+    private fun checkQueryProjectIsIsSignedIn(projectId: String?) {
         if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
             throw Throwable("Only events for the signed in project can be uploaded").also {
                 crashReportManager.logException(it)
