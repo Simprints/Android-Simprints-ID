@@ -61,9 +61,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     override fun onResume() {
         super.onResume()
-        clearValues()
         setFocusOnDefaultModulesTab()
-        viewModel.updateSyncInfo()
     }
 
     private fun setTextInLayout() {
@@ -146,7 +144,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun observeUi() {
         viewModel.getViewStateLiveData().observe(this, Observer {
             when(it) {
-                Syncing, Calculating -> showProgressOverlayIfNecessary(it as ViewState.LoadingState)
+                Syncing, Calculating -> showProgressOverlayAndClearValuesIfNecessary(it as ViewState.LoadingState)
                 is ViewState.SyncDataFetched -> hideProgressAndShowSyncData(it)
             }
         })
@@ -158,13 +156,14 @@ class SyncInformationActivity : BaseSplitActivity() {
         progressBar.setOnTouchListener { _, _ -> true }
     }
 
-    private fun showProgressOverlayIfNecessary(loadingState: ViewState.LoadingState) {
+    private fun showProgressOverlayAndClearValuesIfNecessary(loadingState: ViewState.LoadingState) {
         progress_sync_overlay.text = when (loadingState) {
             Syncing -> getString(R.string.progress_sync_overlay)
             Calculating -> getString(R.string.calculating_overlay)
         }
 
         if (!isProgressOverlayVisible()) {
+            clearValues()
             group_progress_overlay.visibility = View.VISIBLE
         }
     }

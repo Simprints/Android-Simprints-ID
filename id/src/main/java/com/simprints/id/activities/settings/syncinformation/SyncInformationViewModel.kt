@@ -26,11 +26,7 @@ class SyncInformationViewModel(private val subjectRepository: SubjectRepository,
                                private val imageRepository: ImageRepository,
                                private val subjectsSyncManager: SubjectsSyncManager) : ViewModel() {
 
-    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> = viewStateLiveData
-
-    private val viewStateLiveData = MediatorLiveData<SyncInformationActivity.ViewState>()
-
-    fun updateSyncInfo() {
+    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> =
         subjectsSyncManager.getLastSyncState().map { it.isRunning() }.switchMap { isRunning ->
             MutableLiveData<SyncInformationActivity.ViewState>().apply {
                 viewModelScope.launch {
@@ -43,7 +39,6 @@ class SyncInformationViewModel(private val subjectRepository: SubjectRepository,
                 }
             }
         }
-    }
 
     private suspend fun fetchRecords(): SyncDataFetched {
         val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
