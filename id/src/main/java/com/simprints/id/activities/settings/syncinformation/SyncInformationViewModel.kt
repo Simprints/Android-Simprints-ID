@@ -1,6 +1,7 @@
 package com.simprints.id.activities.settings.syncinformation
 
 import androidx.lifecycle.*
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.common.models.SubjectsCount
@@ -15,6 +16,7 @@ import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDo
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SyncInformationViewModel(private val subjectRepository: SubjectRepository,
                                private val subjectLocalDataSource: SubjectLocalDataSource,
@@ -29,31 +31,29 @@ class SyncInformationViewModel(private val subjectRepository: SubjectRepository,
     private val viewStateLiveData = MediatorLiveData<SyncInformationActivity.ViewState>()
 
     fun updateSyncInfo() {
-        viewStateLiveData.addSource(subjectsSyncManager.getLastSyncState().map { it.isRunning() }) {
-            viewModelScope.launch {
-                if (it) {
-                    viewStateLiveData.value = SyncInformationActivity.ViewState.LoadingState.Syncing
-                } else {
-                    viewStateLiveData.value = SyncInformationActivity.ViewState.LoadingState.Calculating
-                    viewStateLiveData.value = fetchRecords()
+        subjectsSyncManager.getLastSyncState().map { it.isRunning() }.switchMap { isRunning ->
+            MutableLiveData<SyncInformationActivity.ViewState>().apply {
+                viewModelScope.launch {
+                    if (isRunning) {
+                        value = LoadingState.Syncing
+                    } else {
+                        value = LoadingState.Calculating
+                        value = fetchRecords()
+                    }
                 }
             }
         }
     }
 
     private suspend fun fetchRecords(): SyncDataFetched {
-        val recordsInLocalCount = fetchLocalRecordCount()
-        val imagesToUploadCount = fetchAndUpdateImagesToUploadCount()
-        val recordsToUpSyncCount = fetchAndUpdateRecordsToUpSyncCount()
-        val modulesCount = fetchAndUpdateSelectedModulesCount()
         val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
         return SyncDataFetched(
-            recordsInLocal = recordsInLocalCount,
+            recordsInLocal = fetchLocalRecordCount(),
             recordsToDownSync = subjectCounts?.created,
-            recordsToUpSync = recordsToUpSyncCount,
+            recordsToUpSync = fetchAndUpdateRecordsToUpSyncCount(),
             recordsToDelete = subjectCounts?.deleted,
-            imagesToUpload = imagesToUploadCount,
-            moduleCounts = modulesCount
+            imagesToUpload = fetchAndUpdateImagesToUploadCount(),
+            moduleCounts = fetchAndUpdateSelectedModulesCount()
         )
     }
 
@@ -82,7 +82,7 @@ class SyncInformationViewModel(private val subjectRepository: SubjectRepository,
             val downSyncScope = subjectsDownSyncScopeRepository.getDownSyncScope()
             subjectRepository.countToDownSync(downSyncScope)
         } catch (t: Throwable) {
-            t.printStackTrace()
+            Timber.e(t)
             null
         }
     }
