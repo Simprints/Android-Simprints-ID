@@ -53,9 +53,7 @@ class FrameProcessor(private val libYuvJni: LibYuvJni) {
             cameraFrame.format,
             facingFront,
             croppedFrameBytes
-        ).also {
-            cameraFrame.release()
-        }
+        )
     }
 
     private fun getCroppedFrameAndBytes(

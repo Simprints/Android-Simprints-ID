@@ -12,7 +12,7 @@ import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.subjects.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.subjects.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType.Companion.tagForType

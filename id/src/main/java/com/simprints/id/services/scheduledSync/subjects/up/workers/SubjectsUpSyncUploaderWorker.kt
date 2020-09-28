@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.services.scheduledSync.subjects.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.subjects.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.subjects.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
