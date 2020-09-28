@@ -1,10 +1,12 @@
 package com.simprints.id.activities.settings.syncinformation
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.asLiveData
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.common.models.SubjectsCount
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -22,25 +24,24 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.Dispatchers
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
-import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.io.IOException
 
-@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationViewModelTest {
+
+    @get:Rule val rule = InstantTaskExecutorRule()
 
     @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
     @MockK lateinit var preferencesManagerMock: PreferencesManager
@@ -49,7 +50,7 @@ class SyncInformationViewModelTest {
     @MockK lateinit var subjectsSyncManagerMock: SubjectsSyncManager
     private lateinit var subjectRepositoryMock: SubjectRepository
 
-    private val projectId = "projectId"
+    private val projectId = DEFAULT_PROJECT_ID
     private lateinit var viewModel: SyncInformationViewModel
 
     @ExperimentalCoroutinesApi
@@ -58,19 +59,20 @@ class SyncInformationViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         UnitTestConfig(this).coroutinesMainThread()
         subjectRepositoryMock = mockk()
-        viewModel = spyk(SyncInformationViewModel(subjectRepositoryMock, subjectLocalDataSourceMock,
+        viewModel = SyncInformationViewModel(subjectRepositoryMock, subjectLocalDataSourceMock,
             preferencesManagerMock, projectId, subjectsDownSyncScopeRepositoryMock,
-            imageRepositoryMock, subjectsSyncManagerMock))
+            imageRepositoryMock, subjectsSyncManagerMock)
     }
 
     @Test
     fun syncInProgress_shouldHaveSyncingViewState() {
-        every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Running)).asLiveData()
+        runBlocking {
+            every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Running)).asLiveData()
 
-        viewModel.updateSyncInfo()
-        val testObserver = viewModel.getViewStateLiveData().testObserver()
+            val testObserver = viewModel.getViewStateLiveData().testObserver()
 
-        assertThat(testObserver.observedValues.last()).isEqualTo(SyncInformationActivity.ViewState.LoadingState.Syncing)
+            assertThat(testObserver.observedValues.last()).isEqualTo(SyncInformationActivity.ViewState.LoadingState.Syncing)
+        }
     }
 
     @Test
@@ -82,7 +84,7 @@ class SyncInformationViewModelTest {
         val countInRemoteForMove = 0
         val subjectsCount = SubjectsCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
 
-        val moduleName = "module1"
+        val moduleName = DEFAULT_MODULE_ID
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.ON
@@ -92,7 +94,6 @@ class SyncInformationViewModelTest {
         every { imageRepositoryMock.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { subjectRepositoryMock.countToDownSync(any()) } returns subjectsCount
 
-        viewModel.updateSyncInfo()
         val testObserver = viewModel.getViewStateLiveData().testObserver()
 
         assertThat(testObserver.observedValues.last()).isEqualTo(
@@ -112,7 +113,7 @@ class SyncInformationViewModelTest {
         val localCount = 322
         val imagesToUpload = 12
 
-        val moduleName = "module1"
+        val moduleName = DEFAULT_MODULE_ID
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.OFF
@@ -121,7 +122,6 @@ class SyncInformationViewModelTest {
         coEvery { subjectLocalDataSourceMock.count(any()) } returns localCount
         every { imageRepositoryMock.getNumberOfImagesToUpload() } returns imagesToUpload
 
-        viewModel.updateSyncInfo()
         val testObserver = viewModel.getViewStateLiveData().testObserver()
 
         assertThat(testObserver.observedValues.last()).isEqualTo(
@@ -151,7 +151,6 @@ class SyncInformationViewModelTest {
         every { imageRepositoryMock.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { subjectRepositoryMock.countToDownSync(any()) } throws IOException()
 
-        viewModel.updateSyncInfo()
         val testObserver = viewModel.getViewStateLiveData().testObserver()
 
         assertThat(testObserver.observedValues.last()).isEqualTo(
