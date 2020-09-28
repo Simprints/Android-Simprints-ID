@@ -14,7 +14,7 @@ import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.toMode
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.channel.testChannel
 import com.simprints.testtools.common.syntax.assertThrows

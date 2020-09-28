@@ -5,7 +5,7 @@ import com.simprints.uicomponents.models.PreviewFrame
 
 interface FaceDetector {
 
-    suspend fun analyze(previewFrame: PreviewFrame): Face?
+    fun analyze(previewFrame: PreviewFrame): Face?
 
     suspend fun analyze(bitmap: Bitmap): Face?
 }

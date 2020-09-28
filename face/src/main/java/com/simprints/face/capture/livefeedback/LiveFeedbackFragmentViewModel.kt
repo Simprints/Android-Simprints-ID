@@ -18,7 +18,6 @@ import com.simprints.face.models.SymmetricTarget
 import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
-import kotlinx.coroutines.channels.Channel
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LiveFeedbackFragmentViewModel(
@@ -42,13 +41,7 @@ class LiveFeedbackFragmentViewModel(
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
-    val frameChannel = Channel<Frame>(Channel.CONFLATED)
-
-    suspend fun process(
-        frame: Frame,
-        faceRectF: RectF,
-        size: Size
-    ) {
+    fun process(frame: Frame, faceRectF: RectF, size: Size) {
         val captureStartTime = faceTimeHelper.now()
         val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
 
@@ -70,15 +63,11 @@ class LiveFeedbackFragmentViewModel(
             }
         }
 
-        currentDetection.value = faceDetection
+        currentDetection.postValue(faceDetection)
     }
 
     fun startCapture() {
         capturingState.value = CapturingState.CAPTURING
-    }
-
-    fun handlePreviewFrame(frame: Frame) {
-        frameChannel.offer(frame)
     }
 
     /**
@@ -92,7 +81,7 @@ class LiveFeedbackFragmentViewModel(
 
         sendAllCaptureEvents()
 
-        capturingState.value = CapturingState.FINISHED
+        capturingState.postValue(CapturingState.FINISHED)
         mainVM.captureFinished(sortedQualifyingCaptures)
     }
 
