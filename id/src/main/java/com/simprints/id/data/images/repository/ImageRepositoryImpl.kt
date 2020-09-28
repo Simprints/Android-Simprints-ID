@@ -24,6 +24,8 @@ class ImageRepositoryImpl internal constructor(
         return localDataSource.encryptAndStoreImage(imageBytes, relativePath)
     }
 
+    override fun getNumberOfImagesToUpload(): Int = localDataSource.listImages().count()
+
     override suspend fun uploadStoredImagesAndDelete(): Boolean {
         val uploads = uploadImages()
         return getOperationResult(uploads)
