@@ -234,13 +234,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private suspend fun updateProjectInInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-        currentSessionEvent.updateProjectId(projectId)
-        eventRepository.addEvent(currentSessionEvent)
+        val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        if (signedProjectId != currentSessionEvent.payload.projectId) {
+            currentSessionEvent.updateProjectId(signedProjectId)
+            eventRepository.addEvent(currentSessionEvent)
+        }
 
         val associatedEvents = eventRepository.loadEvents(currentSessionEvent.id)
         associatedEvents.collect {
-            it.labels = it.labels.copy(projectId = projectId)
+            it.labels = it.labels.copy(projectId = signedProjectId)
             eventRepository.addEvent(it)
         }
 
@@ -251,7 +253,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
         val payload = currentSessionEvent.payload
-        payload.databaseInfo.recordCount =  subjectLocalDataSource.count()
+        payload.databaseInfo.recordCount = subjectLocalDataSource.count()
 
         eventRepository.addEvent(currentSessionEvent)
         Timber.d("[CHECK_LOGIN] Updated Database count in current session")
