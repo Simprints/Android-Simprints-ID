@@ -45,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
@@ -264,9 +265,9 @@ class CollectFingerprintsViewModel(
         imageTransferTask?.dispose()
         liveFeedbackTask?.dispose()
         stopLiveFeedbackTask?.dispose()
+        pauseLiveFeedback()
         imageTransferTask =
-            scannerManager.scanner { stopLiveFeedback() }
-            .andThen(scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) })
+            scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -343,6 +344,7 @@ class CollectFingerprintsViewModel(
         state().apply {
             if (isScanningEndStateAchieved()) {
                 stopLiveFeedback().doInBackground()
+//                pauseLiveFeedback()
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
             } else {
@@ -513,7 +515,9 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleRestart() {
-        startLiveFeedback().doInBackground()
+        Completable.complete().delay(100, TimeUnit.MILLISECONDS)
+            .andThen(startLiveFeedback())
+            .doInBackground()
         setStartingState()
     }
 
@@ -523,12 +527,14 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnPause() {
-        stopLiveFeedback().doInBackground()
+//        stopLiveFeedback().doInBackground()
+        pauseLiveFeedback()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
-        stopLiveFeedback().doInBackground()
+//        stopLiveFeedback().doInBackground()
+        pauseLiveFeedback()
         if (state().currentCaptureState().isCommunicating()) {
             cancelScanning()
         }
