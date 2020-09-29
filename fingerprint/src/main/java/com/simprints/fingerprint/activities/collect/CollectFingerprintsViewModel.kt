@@ -114,6 +114,25 @@ class CollectFingerprintsViewModel(
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
+        startObserverForLiveFeedback()
+    }
+
+    fun startObserverForLiveFeedback() {
+        state.observeForever {
+            when(it.currentCaptureState()) {
+                CaptureState.NotCollected,
+                CaptureState.Skipped,
+                is CaptureState.NotDetected,
+                is CaptureState.Collected -> {
+//                    if (it.isShowingConfirmDialog || it.isShowingSplashScreen)
+//                            stopLiveFeedback().doInBackground()
+//                        else
+//                            startLiveFeedback().doInBackground()
+                }
+                is CaptureState.Scanning,
+                is CaptureState.TransferringImage -> pauseLiveFeedback()
+            }
+        }
     }
 
     private var liveFeedbackTask: Disposable? = null
@@ -263,7 +282,6 @@ class CollectFingerprintsViewModel(
     private fun proceedToImageTransfer() {
         Timber.d("proceedToImageTransfer")
         imageTransferTask?.dispose()
-        liveFeedbackTask?.dispose()
         stopLiveFeedbackTask?.dispose()
         pauseLiveFeedback()
         imageTransferTask =
@@ -527,14 +545,14 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnPause() {
-//        stopLiveFeedback().doInBackground()
-        pauseLiveFeedback()
+        stopLiveFeedback().doInBackground()
+//        pauseLiveFeedback()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
 //        stopLiveFeedback().doInBackground()
-        pauseLiveFeedback()
+//        pauseLiveFeedback()
         if (state().currentCaptureState().isCommunicating()) {
             cancelScanning()
         }
