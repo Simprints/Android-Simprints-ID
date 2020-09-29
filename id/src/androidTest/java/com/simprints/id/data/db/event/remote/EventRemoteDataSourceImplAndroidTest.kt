@@ -102,7 +102,7 @@ class EventRemoteDataSourceImplAndroidTest {
             super.get(authToken, deviceId).apply {
                 addNetworkInterceptor {
                     var request = it.request()
-                    val url: HttpUrl = request.url.newBuilder().addQueryParameter("preventDumpingEvents", "true").build()
+                    val url: HttpUrl = request.url.newBuilder().addQueryParameter("acceptInvalidEvents", "false").build()
                     request = request.newBuilder().url(url).build()
                     return@addNetworkInterceptor it.proceed(request)
                 }
