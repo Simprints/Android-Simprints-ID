@@ -98,6 +98,8 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
     )
 
+    override fun isLiveFeedbackAvailable(): Boolean = false
+
     override fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         Single.create<CaptureFingerprintResponse> { emitter ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, emitter))

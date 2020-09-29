@@ -21,6 +21,7 @@ interface ScannerWrapper {
     fun sensorWakeUp(): Completable
     fun sensorShutDown(): Completable
 
+    fun isLiveFeedbackAvailable(): Boolean
     fun startLiveFeedback(): Completable
     fun stopLiveFeedback(): Completable
 
