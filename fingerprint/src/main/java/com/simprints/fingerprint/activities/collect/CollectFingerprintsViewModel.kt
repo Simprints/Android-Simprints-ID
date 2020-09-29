@@ -121,8 +121,11 @@ class CollectFingerprintsViewModel(
     private fun startLiveFeedback() : Completable {
         Timber.d("startLiveFeedback")
         liveFeedbackTask?.dispose()
-        // todo: check vero2 with latest protocol
-        return scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
+
+        return if (scannerManager.onScanner { isLiveFeedbackAvailable() } )
+            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
+        else
+            Completable.complete()
     }
 
     private fun pauseLiveFeedback() {
@@ -134,7 +137,11 @@ class CollectFingerprintsViewModel(
         Timber.d("stopLiveFeedback")
         liveFeedbackTask?.dispose()
         stopLiveFeedbackTask?.dispose()
-        return scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
+
+        return if (scannerManager.onScanner { isLiveFeedbackAvailable() } )
+            scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
+        else
+            Completable.complete()
     }
 
     private fun setStartingState() {

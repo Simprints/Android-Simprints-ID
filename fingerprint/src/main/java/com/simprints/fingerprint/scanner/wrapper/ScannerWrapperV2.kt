@@ -8,6 +8,7 @@ import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
+import com.simprints.fingerprint.scanner.domain.versions.ChipApiVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -74,6 +75,9 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         scannerV2
             .ensureUn20State(false)
             .wrapErrorsFromScanner()
+
+    override fun isLiveFeedbackAvailable(): Boolean =
+        scannerVersion?.api?.un20 ?: ChipApiVersion.UNKNOWN >= LIVE_FEEDBACK_UN20_API_MIN
 
     override fun startLiveFeedback() : Completable =
             scannerV2.setScannerLedStateOn()
@@ -252,5 +256,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     companion object {
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD = 10 // The image quality at which we decide a fingerprint wasn't detected
+        private val LIVE_FEEDBACK_UN20_API_MIN = ChipApiVersion(1, 1)
     }
 }
