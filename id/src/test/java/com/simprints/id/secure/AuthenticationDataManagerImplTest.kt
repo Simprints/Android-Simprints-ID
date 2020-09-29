@@ -9,7 +9,6 @@ import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.SimApiClientImpl
-import com.simprints.id.secure.SecureApiInterface.Companion.API_KEY
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
@@ -39,7 +38,7 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
-    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?deviceId=$DEVICE_ID&key=$API_KEY"
+    private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?deviceId=$DEVICE_ID"
 
     @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
     @MockK lateinit var mockRemoteDbManager: RemoteDbManager
