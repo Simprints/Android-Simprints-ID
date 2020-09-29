@@ -118,11 +118,15 @@ class CollectFingerprintsViewModel(
     private var liveFeedbackTask: Disposable? = null
     private var stopLiveFeedbackTask: Disposable? = null
 
+    private fun shouldWeDoLiveFeedback() : Boolean =
+        scannerManager.onScanner { isLiveFeedbackAvailable() } &&
+            fingerprintPreferencesManager.liveFeedbackOn
+
     private fun startLiveFeedback() : Completable {
         Timber.d("startLiveFeedback")
         liveFeedbackTask?.dispose()
 
-        return if (scannerManager.onScanner { isLiveFeedbackAvailable() } )
+        return if (shouldWeDoLiveFeedback())
             scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
         else
             Completable.complete()
@@ -138,7 +142,7 @@ class CollectFingerprintsViewModel(
         liveFeedbackTask?.dispose()
         stopLiveFeedbackTask?.dispose()
 
-        return if (scannerManager.onScanner { isLiveFeedbackAvailable() } )
+        return if (shouldWeDoLiveFeedback() )
             scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
         else
             Completable.complete()

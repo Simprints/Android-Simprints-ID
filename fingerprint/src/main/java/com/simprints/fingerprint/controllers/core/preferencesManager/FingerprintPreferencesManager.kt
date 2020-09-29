@@ -12,4 +12,5 @@ interface FingerprintPreferencesManager {
     val saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     val scannerGenerations: List<ScannerGeneration>
     val qualityThreshold: Int
+    val liveFeedbackOn: Boolean
 }
