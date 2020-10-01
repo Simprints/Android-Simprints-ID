@@ -124,10 +124,10 @@ class CollectFingerprintsViewModel(
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
-//                    if (it.isShowingConfirmDialog || it.isShowingSplashScreen)
-////                        stopLiveFeedback().doInBackground()
+                    if (it.isShowingConfirmDialog)
+                        stopLiveFeedback().doInBackground()
 //                    else
-//                          startLiveFeedback().doInBackground()
+//                        startLiveFeedback().doInBackground()
                 }
                 is CaptureState.Scanning,
                 is CaptureState.TransferringImage -> pauseLiveFeedback()
@@ -144,6 +144,7 @@ class CollectFingerprintsViewModel(
 
     private fun startLiveFeedback() : Completable {
         Timber.d("startLiveFeedback")
+        stopLiveFeedbackTask?.dispose()
 
         return if (liveFeedbackTask?.isDisposed != false && shouldWeDoLiveFeedback())
             Completable.complete().delay(100, TimeUnit.MILLISECONDS)
@@ -160,10 +161,10 @@ class CollectFingerprintsViewModel(
     private fun stopLiveFeedback() : Completable {
         Timber.d("stopLiveFeedback")
         liveFeedbackTask?.dispose()
-        stopLiveFeedbackTask?.dispose()
 
-        return if (shouldWeDoLiveFeedback() )
-            scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
+        return if (stopLiveFeedbackTask?.isDisposed != false && shouldWeDoLiveFeedback())
+            Completable.complete().delay(100, TimeUnit.MILLISECONDS)
+                .andThen(scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it })
         else
             Completable.complete()
     }
@@ -227,7 +228,6 @@ class CollectFingerprintsViewModel(
             is CaptureState.Skipped,
             is CaptureState.NotDetected,
             is CaptureState.Collected -> {
-//                pauseLiveFeedback()
                 startScanning()
             }
         }
@@ -282,8 +282,6 @@ class CollectFingerprintsViewModel(
     private fun proceedToImageTransfer() {
         Timber.d("proceedToImageTransfer")
         imageTransferTask?.dispose()
-        stopLiveFeedbackTask?.dispose()
-//        pauseLiveFeedback()
         imageTransferTask =
             scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
             .subscribeOn(Schedulers.io())
@@ -361,8 +359,6 @@ class CollectFingerprintsViewModel(
     private fun resolveFingerTerminalConditionTriggered() {
         state().apply {
             if (isScanningEndStateAchieved()) {
-                stopLiveFeedback().doInBackground()
-//                pauseLiveFeedback()
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
             } else {
@@ -544,13 +540,10 @@ class CollectFingerprintsViewModel(
 
     fun handleOnPause() {
         stopLiveFeedback().doInBackground()
-//        pauseLiveFeedback()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
-//        stopLiveFeedback().doInBackground()
-//        pauseLiveFeedback()
         if (state().currentCaptureState().isCommunicating()) {
             cancelScanning()
         }
