@@ -117,7 +117,7 @@ class CollectFingerprintsViewModel(
         startObserverForLiveFeedback()
     }
 
-    fun startObserverForLiveFeedback() {
+    private fun startObserverForLiveFeedback() {
         state.observeForever {
             when(it.currentCaptureState()) {
                 CaptureState.NotCollected,
@@ -126,8 +126,6 @@ class CollectFingerprintsViewModel(
                 is CaptureState.Collected -> {
                     if (it.isShowingConfirmDialog)
                         stopLiveFeedback().doInBackground()
-//                    else
-//                        startLiveFeedback().doInBackground()
                 }
                 is CaptureState.Scanning,
                 is CaptureState.TransferringImage -> pauseLiveFeedback()
@@ -149,6 +147,7 @@ class CollectFingerprintsViewModel(
         return if (liveFeedbackTask?.isDisposed != false && shouldWeDoLiveFeedback())
             Completable.complete().delay(100, TimeUnit.MILLISECONDS)
                 .andThen(scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it })
+                .delay(100, TimeUnit.MILLISECONDS)
         else
             Completable.complete()
     }
@@ -165,6 +164,7 @@ class CollectFingerprintsViewModel(
         return if (stopLiveFeedbackTask?.isDisposed != false && shouldWeDoLiveFeedback())
             Completable.complete().delay(100, TimeUnit.MILLISECONDS)
                 .andThen(scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it })
+                .delay(100, TimeUnit.MILLISECONDS)
         else
             Completable.complete()
     }
@@ -267,7 +267,6 @@ class CollectFingerprintsViewModel(
             updateCaptureState { toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
-            startLiveFeedback().doInBackground()
             updateCaptureState { toCollected(scanResult) }
             handleCaptureFinished()
         }
