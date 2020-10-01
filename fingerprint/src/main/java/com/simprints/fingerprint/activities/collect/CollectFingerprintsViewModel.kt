@@ -227,7 +227,7 @@ class CollectFingerprintsViewModel(
             is CaptureState.Skipped,
             is CaptureState.NotDetected,
             is CaptureState.Collected -> {
-                pauseLiveFeedback()
+//                pauseLiveFeedback()
                 startScanning()
             }
         }
@@ -283,7 +283,7 @@ class CollectFingerprintsViewModel(
         Timber.d("proceedToImageTransfer")
         imageTransferTask?.dispose()
         stopLiveFeedbackTask?.dispose()
-        pauseLiveFeedback()
+//        pauseLiveFeedback()
         imageTransferTask =
             scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
             .subscribeOn(Schedulers.io())
