@@ -39,6 +39,7 @@ import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -67,6 +68,8 @@ import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -330,11 +333,19 @@ open class AppModule {
         subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        downSyncScopeRepository: EventDownSyncScopeRepository
+        eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+        imageRepository: ImageRepository,
+        eventSyncManager: EventSyncManager
     ) =
         SyncInformationViewModelFactory(
-            downySyncHelper, subjectRepository, eventRepository, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
+            downySyncHelper,
+            eventRepository,
+            subjectRepository,
+            preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            eventDownSyncScopeRepository,
+            imageRepository,
+            eventSyncManager
         )
 
     @Provides

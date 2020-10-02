@@ -54,7 +54,7 @@ open class EventRepositoryImpl(
     companion object {
         // When the sync starts, any open activeSession started GRACE_PERIOD ms
         // before it will be considered closed
-        const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
+        const val GRACE_PERIOD: Long = 1000 * 60 * 60 // 60 minutes
 
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
         const val SESSION_BATCH_SIZE = 20
@@ -245,18 +245,22 @@ open class EventRepositoryImpl(
 
     private suspend fun closeSessionsAndAddArtificialTerminationEvent(openSessions: Flow<Event>,
                                                                       reason: ArtificialTerminationPayload.Reason) {
-        openSessions.collect { session ->
+        openSessions.collect { sessionEvent ->
             val artificialTerminationEvent = ArtificialTerminationEvent(
                 timeHelper.now(),
                 reason
             )
-            artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendSessionId(session.id)
+            artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendSessionId(sessionEvent.id)
 
             addEvent(artificialTerminationEvent)
 
-            (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()
-            addEvent(session)
+            closeSession(sessionEvent)
+            addEvent(sessionEvent)
         }
+    }
+
+    private fun closeSession(session: Event) {
+        (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()
     }
 
     override suspend fun signOut() {

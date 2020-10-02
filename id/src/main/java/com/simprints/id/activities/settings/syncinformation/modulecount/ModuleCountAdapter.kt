@@ -2,16 +2,20 @@ package com.simprints.id.activities.settings.syncinformation.modulecount
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 
 open class ModuleCountAdapter : RecyclerView.Adapter<ModuleCountViewHolder>() {
 
-    private var list = emptyList<ModuleCount>()
+    private val originalModuleCount = arrayListOf<ModuleCount>()
 
-    fun submitList(list: List<ModuleCount>) {
-        this.list = list
-        notifyDataSetChanged()
+    fun submitList(updatedModuleCount: List<ModuleCount>) {
+        val diffResult = DiffUtil.calculateDiff(ModuleCountDiffCallback(originalModuleCount, updatedModuleCount))
+        originalModuleCount.clear()
+        originalModuleCount.addAll(updatedModuleCount)
+
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleCountViewHolder {
@@ -20,12 +24,26 @@ open class ModuleCountAdapter : RecyclerView.Adapter<ModuleCountViewHolder>() {
         return ModuleCountViewHolder(itemView)
     }
 
-    override fun getItemCount(): Int = list.size
+    override fun getItemCount(): Int = originalModuleCount.size
 
     override fun onBindViewHolder(holder: ModuleCountViewHolder, position: Int) {
-        val moduleCount = list[position]
+        val moduleCount = originalModuleCount[position]
         holder.bind(moduleCount, position == 0)
     }
 
+    class ModuleCountDiffCallback(private val oldModules: List<ModuleCount>,
+                                  private val newModules: List<ModuleCount>): DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldModules[oldItemPosition].name == newModules[newItemPosition].name
+        }
+
+        override fun getOldListSize(): Int  =oldModules.size
+
+        override fun getNewListSize(): Int = newModules.size
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldModules[oldItemPosition] == newModules[newItemPosition]
+        }
+    }
 
 }

@@ -275,8 +275,10 @@
     <string name="sync_info_selected_modules">Selected modules</string>
     <string name="sync_info_unselected_modules">Unselected modules</string>
     <string name="sync_info_total_records">Total records</string>
+    <string name="sync_info_images_to_upload">Images to upload</string>
 
     <string name="progress_sync_overlay">Syncing…</string>
+    <string name="calculating_overlay">Calculating…</string>
 
     <!--Exit form-->
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
