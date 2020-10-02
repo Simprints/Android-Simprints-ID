@@ -14,6 +14,8 @@ import kotlin.experimental.and
 class RankOneFaceDetector : FaceDetector {
     private val maxFaces = 1
     private val falseDetectionRate = 0.1f
+    private val relativeMinSize = 0.2f
+    private val absoluteMinSize = 36L
 
     data class ROCFace(
         var face: roc_detection,
@@ -29,10 +31,10 @@ class RankOneFaceDetector : FaceDetector {
         }
     }
 
-    override suspend fun analyze(previewFrame: PreviewFrame): Face? = withContext(Dispatchers.Default) {
+    override fun analyze(previewFrame: PreviewFrame): Face? {
         val bytes = yuv420ToY888(previewFrame.bytes, previewFrame.width, previewFrame.height)
         val rocImage = getRocImage(bytes, previewFrame.width, previewFrame.height)
-        return@withContext analyze(rocImage, previewFrame.width, previewFrame.height)
+        return analyze(rocImage, previewFrame.width, previewFrame.height)
     }
 
     override suspend fun analyze(bitmap: Bitmap): Face? = withContext(Dispatchers.Default) {
@@ -62,7 +64,7 @@ class RankOneFaceDetector : FaceDetector {
     private fun analyze(rocImage: roc_image, imageWidth: Int, imageHeight: Int): Face? {
         val rocFace = ROCFace(
             roc_detection(),
-            roc.new_uint8_t_array(roc.ROC_FR_FAST_FV_SIZE.toInt()),
+            roc.new_uint8_t_array(roc.ROC_FAST_FV_SIZE.toInt()),
             roc.new_float(),
             roc.new_float()
         )
@@ -91,7 +93,7 @@ class RankOneFaceDetector : FaceDetector {
             yawValue,
             rocFace.face.rotation,
             qualityValue,
-            roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FR_FAST_FV_SIZE.toInt())
+            roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt())
         )
 
         // Free all resources after getting the face
@@ -140,7 +142,13 @@ class RankOneFaceDetector : FaceDetector {
     private fun getRocTemplateFromImage(image: roc_image, rocFace: ROCFace): Boolean {
         val adaptiveMinimumSize = roc.new_size_t()
         roc.roc_ensure(
-            roc.roc_adaptive_minimum_size(image, 0.2f, 36, adaptiveMinimumSize)
+            roc.roc_adaptive_minimum_size(
+                image.width,
+                image.height,
+                relativeMinSize,
+                absoluteMinSize,
+                adaptiveMinimumSize
+            )
         )
 
         val n = roc.new_size_t()
@@ -193,6 +201,10 @@ class RankOneFaceDetector : FaceDetector {
                     chin,
                     rocFace.template,
                     rocFace.quality,
+                    null,
+                    null,
+                    null,
+                    null,
                     null,
                     null,
                     null,

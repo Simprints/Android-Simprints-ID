@@ -6,7 +6,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.otaliastudios.cameraview.frame.FrameProcessor
@@ -17,8 +16,6 @@ import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.uicomponents.models.Size
 import kotlinx.android.synthetic.main.fragment_live_feedback.*
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.isActive
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -31,10 +28,20 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        startCamera()
+        face_capture_camera.setLifecycleOwner(viewLifecycleOwner)
         bindViewModel()
         capture_feedback_txt_title.setOnClickListener { vm.startCapture() }
         capture_progress.max = mainVm.samplesToCapture
+    }
+
+    override fun onResume() {
+        face_capture_camera.addFrameProcessor(this)
+        super.onResume()
+    }
+
+    override fun onStop() {
+        face_capture_camera.removeFrameProcessor(this)
+        super.onStop()
     }
 
     private fun bindViewModel() {
@@ -55,31 +62,6 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_retryFragment)
             }
         })
-
-        lifecycleScope.launchWhenResumed {
-            for (frame in vm.frameChannel) {
-                if (this.isActive)
-                    try {
-                        vm.process(
-                            frame,
-                            capture_overlay.rectInCanvas,
-                            Size(capture_overlay.width, capture_overlay.height)
-                        )
-                    } catch (t: CancellationException) {
-                        Timber.e(t) // This is expected when the lifecycle finishes, read the class
-                    } catch (t: Throwable) {
-                        Timber.e(t)
-                        mainVm.submitError(t)
-                    }
-            }
-        }
-    }
-
-    private fun startCamera() {
-        face_capture_camera.let {
-            it.setLifecycleOwner(viewLifecycleOwner)
-            it.addFrameProcessor(this)
-        }
     }
 
     /**
@@ -89,9 +71,10 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
      */
     override fun process(frame: Frame) {
         try {
-            vm.handlePreviewFrame(frame.freeze())
+            vm.process(frame, capture_overlay.rectInCanvas, Size(capture_overlay.width, capture_overlay.height))
         } catch (t: Throwable) {
             Timber.e(t)
+            mainVm.submitError(t)
         }
     }
 

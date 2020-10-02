@@ -7,14 +7,11 @@ import com.simprints.face.capture.livefeedback.tools.CameraTargetOverlay
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.uicomponents.models.PreviewFrame
-import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 class MockFaceDetector : FaceDetector {
     private val mockDelay = 200L
-    override suspend fun analyze(previewFrame: PreviewFrame): Face? {
-        delay(mockDelay)
-
+    override fun analyze(previewFrame: PreviewFrame): Face? {
         return Face(
             previewFrame.width,
             previewFrame.height,

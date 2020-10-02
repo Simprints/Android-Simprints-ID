@@ -7,8 +7,8 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter

@@ -32,4 +32,6 @@ interface ImageRepository {
      */
     fun deleteStoredImages()
 
+    fun getNumberOfImagesToUpload(): Int
+
 }

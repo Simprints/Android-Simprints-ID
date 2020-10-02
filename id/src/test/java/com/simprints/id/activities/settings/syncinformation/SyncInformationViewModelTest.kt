@@ -1,190 +1,189 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.asLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
+import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Running
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Succeeded
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
+import java.io.IOException
 
-@RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationViewModelTest {
 
-    @MockK lateinit var subjectRepository: SubjectRepository
+    @get:Rule val rule = InstantTaskExecutorRule()
 
-    @MockK lateinit var preferencesManagerMock: PreferencesManager
-    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
-    @MockK lateinit var downSyncHelper: EventDownSyncHelper
+    @MockK lateinit var downySyncHelper: EventDownSyncHelper
     @MockK lateinit var eventRepository: EventRepository
+    @MockK lateinit var subjectRepository: SubjectRepository
+    @MockK lateinit var preferencesManager: PreferencesManager
+    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var imageRepository: ImageRepository
+    @MockK lateinit var eventSyncManager: EventSyncManager
+    private lateinit var subjectRepositoryMock: SubjectRepository
 
-    private val projectId = "projectId"
+    private val projectId = DEFAULT_PROJECT_ID
     private lateinit var viewModel: SyncInformationViewModel
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = SyncInformationViewModel(downSyncHelper, eventRepository, subjectRepository, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
+        UnitTestConfig(this).coroutinesMainThread()
+        subjectRepositoryMock = mockk()
+        viewModel = SyncInformationViewModel(
+            downySyncHelper,
+            eventRepository,
+            subjectRepository,
+            preferencesManager,
+            projectId,
+            eventDownSyncScopeRepository,
+            imageRepository,
+            eventSyncManager)
     }
 
     @Test
-    fun fetchCountFromLocal_shouldUpdateValue() = runBlocking {
-        val totalRecordsInLocal = 322
-        mockSubjectLocalDataSourceCount(totalRecordsInLocal)
+    fun syncInProgress_shouldHaveSyncingViewState() {
+        runBlocking {
+            every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Running)).asLiveData()
 
-        viewModel.fetchAndUpdateLocalRecordCount()
+            val testObserver = viewModel.getViewStateLiveData().testObserver()
 
-        assertThat(viewModel.localRecordCountLiveData.value).isEqualTo(totalRecordsInLocal)
+            assertThat(testObserver.observedValues.last()).isEqualTo(SyncInformationActivity.ViewState.LoadingState.Syncing)
+        }
     }
 
     @Test
-    fun fetchCountFromRemote_shouldUpdateValue() = runBlockingTest {
+    fun syncComplete_fetchFromRemoteAndLocalSucceeds_shouldHaveCorrectViewState() {
+        val localCount = 322
+        val imagesToUpload = 12
         val countInRemoteForCreate = 123
-        val countInRemoteForMove = 0
         val countInRemoteForDelete = 22
+        val countInRemoteForMove = 0
 
-        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
-        coEvery { downSyncHelper.countForDownSync(any()) } returns
-            listOf(
-                EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
-                EventCount(ENROLMENT_RECORD_DELETION, countInRemoteForDelete),
-                EventCount(ENROLMENT_RECORD_MOVE, countInRemoteForMove))
+        val moduleName = DEFAULT_MODULE_ID
+        val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
+        every { preferencesManager.eventDownSyncSetting } returns ON
+        every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { subjectRepository.count(any()) } returns localCount
+        every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
+        coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
+            EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
+            EventCount(ENROLMENT_RECORD_DELETION, countInRemoteForDelete),
+            EventCount(ENROLMENT_RECORD_MOVE, countInRemoteForMove)
+        )
 
-        assertThat(viewModel.recordsToDownSyncCountLiveData.value).isEqualTo(countInRemoteForCreate)
-        assertThat(viewModel.recordsToDeleteCountLiveData.value).isEqualTo(countInRemoteForDelete)
+        val testObserver = viewModel.getViewStateLiveData().testObserver()
+
+        assertThat(testObserver.observedValues.last()).isEqualTo(
+            SyncDataFetched(
+                recordsInLocal = localCount,
+                recordsToDownSync = countInRemoteForCreate,
+                recordsToUpSync = localCount,
+                recordsToDelete = countInRemoteForDelete,
+                imagesToUpload = imagesToUpload,
+                moduleCounts = moduleCount
+            )
+        )
     }
 
     @Test
-    fun fetchRecordsToUpSyncCount_shouldUpdateValue() = runBlockingTest {
-        val recordsToUpSyncCount = 123
-        mockSubjectLocalDataSourceCount(recordsToUpSyncCount)
+    fun syncComplete_DownSyncIsOff_shouldHaveCorrectViewState() {
+        val localCount = 322
+        val imagesToUpload = 12
 
-        viewModel.fetchAndUpdateRecordsToUpSyncCount()
+        val moduleName = DEFAULT_MODULE_ID
+        val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        assertThat(viewModel.recordsToUpSyncCountLiveData.value).isEqualTo(recordsToUpSyncCount)
+        every { preferencesManager.eventDownSyncSetting } returns OFF
+        every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { subjectRepository.count(any()) } returns localCount
+        every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
+
+        val testObserver = viewModel.getViewStateLiveData().testObserver()
+
+        assertThat(testObserver.observedValues.last()).isEqualTo(
+            SyncDataFetched(
+                recordsInLocal = localCount,
+                recordsToDownSync = null,
+                recordsToUpSync = localCount,
+                recordsToDelete = null,
+                imagesToUpload = imagesToUpload,
+                moduleCounts = moduleCount
+            )
+        )
     }
 
     @Test
-    fun fetchSelectedModulesCount_shouldUpdateValue() = runBlockingTest {
+    fun syncComplete_FetchFromRemoteFails_shouldHaveCorrectViewState() {
+        val localCount = 322
+        val imagesToUpload = 12
+
         val moduleName = "module1"
-        val countForModule = 123
-        every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
-        mockSubjectLocalDataSourceCount(countForModule)
+        val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        viewModel.fetchAndUpdateSelectedModulesCount()
+        every { preferencesManager.eventDownSyncSetting } returns ON
+        every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { subjectRepository.count(any()) } returns localCount
+        every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
+        coEvery { subjectRepositoryMock.count(any()) } throws IOException()
 
-        with(viewModel.selectedModulesCountLiveData.value?.first()) {
-            assertThat(this?.name).isEqualTo(moduleName)
-            assertThat(this?.count).isEqualTo(countForModule)
-        }
-    }
+        val testObserver = viewModel.getViewStateLiveData().testObserver()
 
-    @Test
-    fun withUnselectedModules_shouldUpdateValue() = runBlockingTest {
-        val selectedModuleName = "module1"
-        val unselectedModuleName = "module2"
-        val recordWithSelectedModule = Subject(
-            randomUUID(),
-            projectId,
-            "some_user_id",
-            selectedModuleName
+        assertThat(testObserver.observedValues.last()).isEqualTo(
+            SyncDataFetched(
+                recordsInLocal = localCount,
+                recordsToDownSync = null,
+                recordsToUpSync = localCount,
+                recordsToDelete = null,
+                imagesToUpload = imagesToUpload,
+                moduleCounts = moduleCount
+            )
         )
+    }
 
-        val recordWithUnselectedModule = recordWithSelectedModule.copy(
-            moduleId = unselectedModuleName
+    private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =
+        EventSyncState(
+            syncId = "sync_id", progress = 1, total = 20,
+            upSyncWorkersInfo = listOf(),
+            downSyncWorkersInfo = listOf(
+                SyncWorkerInfo(
+                    DOWNLOADER, syncWorkerState
+                )
+            )
         )
-
-        val subjectsRecords = flowOf(
-            recordWithSelectedModule,
-            recordWithUnselectedModule,
-            recordWithUnselectedModule
-        )
-        val selectedModuleSet = setOf(selectedModuleName)
-
-        coEvery { subjectRepository.load(any()) } returns subjectsRecords
-        every { preferencesManagerMock.selectedModules } returns selectedModuleSet
-
-        viewModel.fetchAndUpdatedUnselectedModulesCount()
-
-        with(viewModel.unselectedModulesCountLiveData.value?.first()) {
-            assertThat(this?.name).isEqualTo(unselectedModuleName)
-            assertThat(this?.count).isEqualTo(2)
-        }
-    }
-
-    @Test
-    fun withNoUnselectedModules_shouldUpdateValueAsEmptyList() = runBlockingTest {
-        val selectedModuleName = "module1"
-        val recordWithSelectedModule = Subject(
-            randomUUID(),
-            projectId,
-            "some_user_id",
-            selectedModuleName
-        )
-        val subjectsRecords = flowOf(recordWithSelectedModule, recordWithSelectedModule)
-        val selectedModuleSet = setOf(selectedModuleName)
-
-        coEvery { subjectRepository.load(any()) } returns subjectsRecords
-        every { preferencesManagerMock.selectedModules } returns selectedModuleSet
-
-        viewModel.fetchAndUpdatedUnselectedModulesCount()
-
-        assertThat(viewModel.unselectedModulesCountLiveData.value).isEmpty()
-    }
-
-    @Test
-    fun downSyncSettingIsOn_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.ON
-
-        viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
-
-        coVerify(exactly = 1) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
-    }
-
-    @Test
-    fun downSyncSettingIsExtra_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
-
-        viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
-
-        coVerify(exactly = 1) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
-    }
-
-    @Test
-    fun downSyncSettingIsOffShouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.OFF
-
-        viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
-
-        coVerify(exactly = 0) { viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount() }
-    }
-
-    private fun mockSubjectLocalDataSourceCount(recordCount: Int) {
-        coEvery { eventRepository.localCount(any()) } returns recordCount
-        coEvery { subjectRepository.count(any()) } returns recordCount
-    }
-
 }

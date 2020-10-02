@@ -2,7 +2,7 @@ package com.simprints.id.network
 
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import kotlinx.coroutines.Dispatchers

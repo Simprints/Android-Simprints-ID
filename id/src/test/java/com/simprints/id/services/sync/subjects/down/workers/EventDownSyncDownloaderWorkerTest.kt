@@ -13,7 +13,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
+import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
