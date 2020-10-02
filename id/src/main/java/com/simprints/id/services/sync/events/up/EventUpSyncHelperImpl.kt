@@ -22,7 +22,7 @@ class EventUpSyncHelperImpl(
 ) : EventUpSyncHelper {
 
     override suspend fun countForUpSync(operation: EventUpSyncOperation): Int =
-        eventRepository.countEventsToUpload(operation.queryEvent)
+        eventRepository.localCount(operation.queryEvent)
 
     override suspend fun upSync(scope: CoroutineScope, operation: EventUpSyncOperation): ReceiveChannel<EventUpSyncProgress> =
         scope.produce {

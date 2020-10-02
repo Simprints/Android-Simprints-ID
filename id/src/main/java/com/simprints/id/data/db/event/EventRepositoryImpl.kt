@@ -130,10 +130,8 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun countEventsToUpload(query: LocalEventQuery): Int {
-        checkQueryProjectIsIsSignedIn(query.projectId)
-        return createBatches(query).sumBy { it.events.size }
-    }
+    override suspend fun localCount(query: LocalEventQuery): Int =
+        eventLocalDataSource.count(query.fromDomainToDb())
 
     override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
         eventRemoteDataSource.count(query.fromDomainToApi())
