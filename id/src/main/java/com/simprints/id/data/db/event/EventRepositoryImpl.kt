@@ -140,6 +140,8 @@ open class EventRepositoryImpl(
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
     override suspend fun uploadEvents(query: LocalEventQuery): Flow<Int> = flow {
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading")
+
         if (query.projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
             throw Throwable("Only events for the signed in project can be uploaded").also {
                 crashReportManager.logException(it)
@@ -176,16 +178,21 @@ open class EventRepositoryImpl(
     }
 
     @VisibleForTesting
-    suspend fun createBatches(query: LocalEventQuery): List<Batch> =
-        createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
+    suspend fun createBatches(query: LocalEventQuery): List<Batch> {
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
+        return createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
+    }
 
     private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
         val events = eventLocalDataSource.load(query.fromDomainToDb()).filter { it.labels.sessionId == null }.toList()
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
+
         return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.toMutableList()) }
     }
 
     private suspend fun createBatchesForEventsInSessions(query: LocalEventQuery): List<Batch> {
         val sessionsToUpload = merge(loadCloseSessions(query), markAndLoadOldOpenSessions(query))
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
 
         return sessionsToUpload.fold(mutableListOf()) { batches, session ->
             val lastBatch = batches.lastOrNull()

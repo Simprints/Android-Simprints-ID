@@ -17,8 +17,11 @@ import com.simprints.id.domain.modality.toMode
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.tools.time.TimeHelper
+import kotlinx.coroutines.flow.collect
+import timber.log.Timber
 import java.util.*
 
+private const val TAG = "ENROLMENT"
 class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
                           private val eventRepository: EventRepository,
                           private val preferencesManager: PreferencesManager,
@@ -26,19 +29,28 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
                           private val timeHelper: TimeHelper) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
+        Timber.tag(TAG).d("Enrolment in progress")
         registerEvent(subject)
+
+        Timber.tag(TAG).d("Create a subject record")
         subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
+
+        Timber.tag(TAG).d("Up-syncing")
         inBackground {
-            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.signedInProjectId))
+            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.getSignedInProjectIdOrEmpty())).collect {  }
         }
+
+        Timber.tag(TAG).d("Done!")
     }
 
     private suspend fun registerEvent(subject: Subject) {
+        Timber.tag(TAG).d("Register events for enrolments")
+
         eventRepository.addEventToCurrentSession(
             EnrolmentEvent(timeHelper.now(), subject.subjectId)
         )
 
-        eventRepository.addEventToCurrentSession(
+        eventRepository.addEvent(
             EnrolmentRecordCreationEvent(
                 timeHelper.now(),
                 subject.subjectId,
