@@ -120,12 +120,14 @@ class CollectFingerprintsViewModel(
     private fun startObserverForLiveFeedback() {
         state.observeForever {
             when(it.currentCaptureState()) {
-                CaptureState.NotCollected -> startLiveFeedback().doInBackground()
+                CaptureState.NotCollected,
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
                     if (it.isShowingConfirmDialog)
                         stopLiveFeedback().doInBackground()
+                    else
+                        startLiveFeedback().doInBackground()
                 }
                 is CaptureState.Scanning,
                 is CaptureState.TransferringImage -> pauseLiveFeedback()
@@ -146,10 +148,14 @@ class CollectFingerprintsViewModel(
         return if (!isLiveFeedbackStarted && shouldWeDoLiveFeedback()) {
             Timber.d("startLiveFeedback subscribed")
             isLiveFeedbackStarted = true
-            isLiveFeedbackStopped = false
+
             stopLiveFeedbackTask?.dispose()
-            Completable.complete().delay(100, TimeUnit.MILLISECONDS)
-                .andThen(scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it })
+            Timber.d("startLiveFeedback disposed stopLiveFeedbackTask")
+            isLiveFeedbackStopped = false
+
+            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it
+                    Timber.d("startLiveFeedback created liveFeedbackTask")
+                }
         } else {
             Timber.d("startLiveFeedback ignored")
             Completable.complete()
@@ -167,11 +173,18 @@ class CollectFingerprintsViewModel(
     private fun stopLiveFeedback() : Completable {
         return if (!isLiveFeedbackStopped && shouldWeDoLiveFeedback()) {
             Timber.d("stopLiveFeedback subscribed")
-            isLiveFeedbackStarted = false
             isLiveFeedbackStopped = true
+
             liveFeedbackTask?.dispose()
-            Completable.complete().delay(100, TimeUnit.MILLISECONDS)
-                .andThen(scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it })
+            Timber.d("stopLiveFeedback disposed liveFeedbackTask")
+            isLiveFeedbackStarted = false
+
+            scannerManager.scanner { stopLiveFeedback() }
+                .doOnSubscribe {
+                    stopLiveFeedbackTask = it
+                    Timber.d("stopLiveFeedback created stopLiveFeedbackTask")
+                }.doOnComplete { Timber.d("stopLiveFeedback completed")
+            }
         } else {
             Timber.d("stopLiveFeedback ignored")
             Completable.complete()
