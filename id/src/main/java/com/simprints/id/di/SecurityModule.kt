@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -30,11 +31,11 @@ import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourc
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import dagger.Module
 import dagger.Provides
@@ -47,23 +48,23 @@ open class SecurityModule {
     @Provides
     @Singleton
     open fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        subjectsSyncManager: SubjectsSyncManager,
-        syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler,
-        longConsentRepository: LongConsentRepository,
-        eventRepository: EventRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
+            projectRepository: ProjectRepository,
+            remoteDbManager: RemoteDbManager,
+            loginInfoManager: LoginInfoManager,
+            preferencesManager: PreferencesManager,
+            eventSyncManager: EventSyncManager,
+            syncManager: SyncManager,
+            securityStateScheduler: SecurityStateScheduler,
+            longConsentRepository: LongConsentRepository,
+            eventRepository: EventRepository,
+            baseUrlProvider: BaseUrlProvider,
+            remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
-        subjectsSyncManager,
+        eventSyncManager,
         syncManager,
         securityStateScheduler,
         longConsentRepository,
@@ -74,8 +75,9 @@ open class SecurityModule {
 
     @Provides
     open fun provideLoginActivityHelper(
-        securityStateRepository: SecurityStateRepository
-    ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository)
+        securityStateRepository: SecurityStateRepository,
+        jsonHelper: JsonHelper
+    ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository, jsonHelper)
 
     @Provides
     open fun provideLoginViewModelFactory(

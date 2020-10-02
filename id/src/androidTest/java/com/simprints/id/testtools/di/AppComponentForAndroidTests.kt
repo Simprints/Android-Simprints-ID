@@ -7,7 +7,6 @@ import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImplTest
 import com.simprints.id.di.*
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventSyncManagerImplAndroidTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -45,7 +44,6 @@ interface AppComponentForAndroidTests : AppComponent {
 
     fun inject(loginActivityAndroidTest: LoginActivityAndroidTest)
     fun inject(legacyLocalDbKeyProviderImplTest: LegacyLocalDbKeyProviderImplTest)
-    fun inject(sessionEventsSyncManagerImplTest: SessionEventSyncManagerImplAndroidTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
     fun inject(qrCaptureActivityAndroidTest: QrCaptureActivityAndroidTest)

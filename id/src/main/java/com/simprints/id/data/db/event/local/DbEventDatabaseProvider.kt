@@ -18,13 +18,19 @@ class DbEventDatabaseFactoryImpl(
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun build(): EventRoomDatabase {
-        val key = getOrCreateKey(DB_NAME)
+        try {
+            //val key = getOrCreateKey(DB_NAME)
+            val key = "test".toCharArray()
 
-        val passphrase: ByteArray = getBytes(key)
-        val factory = SupportFactory(passphrase)
-        return Room.databaseBuilder(ctx, EventRoomDatabase::class.java, DB_NAME)
-            .openHelperFactory(factory)
-            .build()
+            val passphrase: ByteArray = getBytes(key)
+            val factory = SupportFactory(passphrase)
+            return Room.databaseBuilder(ctx, EventRoomDatabase::class.java, DB_NAME)
+                .openHelperFactory(factory)
+                .build()
+        } catch (t: Throwable) {
+            Timber.e(t)
+            throw t
+        }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -32,13 +38,13 @@ class DbEventDatabaseFactoryImpl(
         return try {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         } catch (t: Throwable) {
-            Timber.e(t)
+            Timber.d(t.message)
             secureLocalDbKeyProvider.setLocalDatabaseKey(dbName)
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         }.value.decodeToString().toCharArray()
     }
 
     companion object {
-        private const val DB_NAME = "db_events.room"
+        private const val DB_NAME = "dbevents"
     }
 }

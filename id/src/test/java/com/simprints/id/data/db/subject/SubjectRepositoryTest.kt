@@ -9,7 +9,7 @@
 //import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 //import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 //import com.simprints.id.data.db.SubjectFetchResult
-//import com.simprints.id.data.db.common.models.EventCount
+//import com.simprints.id.data.db.event.domain.EventCount
 //import com.simprints.id.data.db.event.domain.events.*
 //import com.simprints.id.data.db.subject.domain.FaceSample
 //import com.simprints.id.data.db.subject.domain.FingerprintSample
@@ -17,7 +17,7 @@
 //import com.simprints.id.data.db.event.domain.events.EventPayloadType.ENROLMENT_RECORD_CREATION
 //import com.simprints.id.data.db.event.domain.events.subject.*
 //import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-//import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
+//import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 //import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 //import com.simprints.id.data.db.subjects_sync.down.domain.SubjectsDownSyncScope
 //import com.simprints.id.services.scheduledSync.subjects.up.controllers.SubjectsUpSyncExecutor

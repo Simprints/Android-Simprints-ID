@@ -67,7 +67,7 @@ def support = [
     material: "com.google.android.material:material:1.1.0-alpha03"
 ]
 
-def work_version = "2.3.0-beta01"
+def work_version = "2.4.0"
 def arch_components = [
     work: "androidx.work:work-runtime-ktx:$work_version"
 ]
@@ -100,16 +100,10 @@ def okttp_version = "4.2.2"
 def retrofit = [
     core            : "com.squareup.retrofit2:retrofit:$retrofit_version",
     adapter         : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
-    convertergson   : "com.squareup.retrofit2:converter-gson:$retrofit_version",
+    jackson         : "com.squareup.retrofit2:converter-jackson:$retrofit_version",
     converterScalars: "com.squareup.retrofit2:converter-scalars:$retrofit_version",
     logging         : "com.squareup.okhttp3:logging-interceptor:$okttp_version",
     okhttp          : "com.squareup.okhttp3:okhttp:$okttp_version",
-]
-
-def gson_version = "2.8.6"
-def gson = [
-    core  : "com.google.code.gson:gson:$gson_version",
-    extras: "org.danilopianini:gson-extras:0.2.1"
 ]
 
 def jackson_version = "2.11.1"
@@ -221,6 +215,12 @@ def commons_io = [
     commons_io: "commons-io:commons-io:$commons_io_version"
 ]
 
+// For NTP time
+def kronos_version = "0.0.1-alpha09"
+def kronos = [
+    kronos: "com.lyft.kronos:kronos-android:$kronos_version"
+]
+
 ext.deps = [
     kotlin         : kotlin,
     dagger         : dagger,
@@ -232,7 +232,6 @@ ext.deps = [
     playcore       : playcore,
     firebase       : firebase,
     retrofit       : retrofit,
-    gson           : gson,
     jackson        : jackson,
     timber         : timber,
     rxjava2        : rxjava2,
@@ -242,5 +241,6 @@ ext.deps = [
     fuzzywuzzy     : fuzzywuzzy,
     rootbeer       : rootbeer,
     cameraView     : cameraView,
-    circleImageView: circleImageView
+    circleImageView: circleImageView,
+    kronos         : kronos
 ]

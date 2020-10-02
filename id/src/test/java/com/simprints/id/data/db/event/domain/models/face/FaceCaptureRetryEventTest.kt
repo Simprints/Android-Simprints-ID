@@ -2,20 +2,19 @@ package com.simprints.id.data.db.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.ENDED_AT
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_RETRY
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent.Companion.EVENT_VERSION
-import com.simprints.id.orchestrator.SOME_GUID1
 import org.junit.Test
 
 @Keep
 class FaceCaptureRetryEventTest {
     @Test
     fun create_FaceCaptureRetryEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

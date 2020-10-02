@@ -15,7 +15,7 @@ import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 

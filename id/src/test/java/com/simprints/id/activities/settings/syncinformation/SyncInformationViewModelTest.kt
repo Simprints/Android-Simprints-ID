@@ -3,17 +3,22 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
-import com.simprints.id.data.db.common.models.SubjectsCount
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
+import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -27,10 +32,12 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationViewModelTest {
 
-    @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
+    @MockK lateinit var subjectRepository: SubjectRepository
+
     @MockK lateinit var preferencesManagerMock: PreferencesManager
-    @MockK lateinit var subjectsDownSyncScopeRepositoryMock: SubjectsDownSyncScopeRepository
-    private lateinit var subjectRepositoryMock: SubjectRepository
+    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var downSyncHelper: EventDownSyncHelper
+    @MockK lateinit var upSyncHelper: EventUpSyncHelper
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
@@ -38,8 +45,7 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        subjectRepositoryMock = mockk()
-        viewModel = SyncInformationViewModel(subjectRepositoryMock, subjectLocalDataSourceMock, preferencesManagerMock, projectId, subjectsDownSyncScopeRepositoryMock)
+        viewModel = SyncInformationViewModel(downSyncHelper, upSyncHelper, subjectRepository, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
     }
 
     @Test
@@ -57,10 +63,13 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForMove = 0
         val countInRemoteForDelete = 22
-        val subjectsCount = SubjectsCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
 
-        every { subjectsDownSyncScopeRepositoryMock.getDownSyncScope() } returns projectSyncScope
-        coEvery { subjectRepositoryMock.countToDownSync(any()) } returns subjectsCount
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
+        coEvery { downSyncHelper.countForDownSync(any()) } returns
+            listOf(
+                EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
+                EventCount(ENROLMENT_RECORD_DELETION, countInRemoteForDelete),
+                EventCount(ENROLMENT_RECORD_MOVE, countInRemoteForMove))
 
         viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
@@ -115,7 +124,7 @@ class SyncInformationViewModelTest {
         )
         val selectedModuleSet = setOf(selectedModuleName)
 
-        coEvery { subjectLocalDataSourceMock.load(any()) } returns subjectsRecords
+        coEvery { subjectRepository.load(any()) } returns subjectsRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -138,7 +147,7 @@ class SyncInformationViewModelTest {
         val subjectsRecords = flowOf(recordWithSelectedModule, recordWithSelectedModule)
         val selectedModuleSet = setOf(selectedModuleName)
 
-        coEvery { subjectLocalDataSourceMock.load(any()) } returns subjectsRecords
+        coEvery { subjectRepository.load(any()) } returns subjectsRecords
         every { preferencesManagerMock.selectedModules } returns selectedModuleSet
 
         viewModel.fetchAndUpdatedUnselectedModulesCount()
@@ -148,7 +157,7 @@ class SyncInformationViewModelTest {
 
     @Test
     fun downSyncSettingIsOn_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.ON
+        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.ON
 
         viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
 
@@ -157,7 +166,7 @@ class SyncInformationViewModelTest {
 
     @Test
     fun downSyncSettingIsExtra_shouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.EXTRA
+        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
 
         viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
 
@@ -166,7 +175,7 @@ class SyncInformationViewModelTest {
 
     @Test
     fun downSyncSettingIsOffShouldRequestRecordsToDownloadAndDeleteCount() = runBlockingTest {
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.OFF
+        every { preferencesManagerMock.eventDownSyncSetting } returns EventDownSyncSetting.OFF
 
         viewModel.fetchRecordsToUpdateAndDeleteCountIfNecessary()
 
@@ -174,7 +183,8 @@ class SyncInformationViewModelTest {
     }
 
     private fun mockSubjectLocalDataSourceCount(recordCount: Int) {
-        coEvery { subjectLocalDataSourceMock.count(any()) } returns recordCount
+        coEvery { upSyncHelper.countForUpSync(any()) } returns recordCount
+        coEvery { subjectRepository.count(any()) } returns recordCount
     }
 
 }

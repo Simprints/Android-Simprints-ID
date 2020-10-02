@@ -13,7 +13,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
@@ -33,7 +33,7 @@ class TestPreferencesModule(
         groupSerializer: Serializer<GROUP>,
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-        subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
+        eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
         modalitiesSerializer: Serializer<List<Modality>>,
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -48,7 +48,7 @@ class TestPreferencesModule(
             groupSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
-            subjectsDownSyncSettingSerializer,
+            eventDownSyncSettingSerializer,
             modalitiesSerializer,
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,

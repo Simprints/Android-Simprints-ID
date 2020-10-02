@@ -20,7 +20,7 @@ data class FaceOnboardingCompleteEvent(
     constructor(
         startTime: Long,
         endTime: Long,
-        labels: EventLabels = EventLabels()//StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
@@ -36,6 +36,6 @@ data class FaceOnboardingCompleteEvent(
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

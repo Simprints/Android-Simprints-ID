@@ -1,7 +1,8 @@
 package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
-import com.google.gson.JsonObject
+import com.fasterxml.jackson.databind.JsonNode
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
@@ -14,7 +15,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery
 import io.mockk.every
-import io.reactivex.Completable
 import java.math.BigInteger
 
 object RobolectricTestMocker {
@@ -32,7 +32,8 @@ object RobolectricTestMocker {
             "some_bucket_url"
         )
 
-        val projectSettings: JsonObject = JsonObject().apply { addProperty("key", "value") }
+        val projectSettings: JsonNode = JsonHelper().jackson.createObjectNode().apply { put("key", "value") }
+
         coEvery { projectLocalDataSource.load(any()) } returns project
         coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project
         coEvery { projectLocalDataSource.save(any()) } returns Unit

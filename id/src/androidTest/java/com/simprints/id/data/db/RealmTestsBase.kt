@@ -3,10 +3,10 @@ package com.simprints.id.data.db
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
-import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.secure.LocalDbKey
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -46,7 +46,6 @@ open class RealmTestsBase {
         this.projectId != other.projectId -> false
         this.attendantId != other.attendantId -> false
         this.moduleId != other.moduleId -> false
-        this.toSync != other.toSync -> false
         this.createdAt != other.createdAt -> false
         this.updatedAt != other.updatedAt -> false
         else -> true

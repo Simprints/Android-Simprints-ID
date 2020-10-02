@@ -32,10 +32,10 @@ object SetupActivityHelper {
             val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
             locationsFlow.collect { locations ->
                 val lastLocation = locations.last()
-                eventRepository.updateCurrentSession {
-                    Timber.d("Saving user's location into the current session")
-                    it.payload.location = Location(lastLocation.latitude, lastLocation.longitude)
-                }
+                val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+                currentSession.payload.location = Location(lastLocation.latitude, lastLocation.longitude)
+                eventRepository.addEventToCurrentSession(currentSession)
+                Timber.d("Saving user's location into the current session")
             }
         } catch (t: Throwable) {
             crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))

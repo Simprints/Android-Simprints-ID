@@ -10,6 +10,7 @@ import android.widget.TabHost
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
@@ -32,7 +33,7 @@ import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.tools.LocationManager
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
 
@@ -50,6 +51,7 @@ class ConsentActivity : BaseSplitActivity() {
     @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var jsonHelper: JsonHelper
 
     private var startConsentEventTime: Long = 0
 
@@ -92,9 +94,9 @@ class ConsentActivity : BaseSplitActivity() {
 
         with(preferencesManager) {
             generalConsentTextView.text =
-                buildGeneralConsentText(generalConsentOptionsJson, programName, organizationName, modalities)
+                buildGeneralConsentText(generalConsentOptionsJson, programName, organizationName, modalities, jsonHelper)
             parentalConsentTextView.text =
-                buildParentalConsentText(parentalConsentOptionsJson, programName, organizationName, modalities)
+                buildParentalConsentText(parentalConsentOptionsJson, programName, organizationName, modalities, jsonHelper)
         }
 
     }
@@ -102,21 +104,25 @@ class ConsentActivity : BaseSplitActivity() {
     private fun buildGeneralConsentText(generalConsentOptionsJson: String,
                                         programName: String,
                                         organizationName: String,
-                                        modalities: List<Modality>) =
+                                        modalities: List<Modality>,
+                                        jsonHelper: JsonHelper) =
         GeneralConsentTextHelper(
             generalConsentOptionsJson,
             programName, organizationName, modalities,
-            crashReportManager
+            crashReportManager,
+            jsonHelper
         ).assembleText(askConsentRequestReceived, this)
 
     private fun buildParentalConsentText(parentalConsentOptionsJson: String,
                                          programName: String,
                                          organizationName: String,
-                                         modalities: List<Modality>) =
+                                         modalities: List<Modality>,
+                                         jsonHelper: JsonHelper) =
         ParentalConsentTextHelper(
             parentalConsentOptionsJson,
             programName, organizationName, modalities,
-            crashReportManager
+            crashReportManager,
+            jsonHelper
         ).assembleText(askConsentRequestReceived, this)
 
     private fun setupTabs() {
@@ -191,9 +197,9 @@ class ConsentActivity : BaseSplitActivity() {
 
     private fun deleteLocationInfoFromSession() {
         inBackground {
-            eventRepository.updateCurrentSession {
-                it.payload.location = null
-            }
+            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+            currentSessionEvent.payload.location = null
+            eventRepository.addEventToCurrentSession(currentSessionEvent)
         }
     }
 

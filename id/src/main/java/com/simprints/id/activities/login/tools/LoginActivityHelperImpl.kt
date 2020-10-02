@@ -7,7 +7,8 @@ import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 
 class LoginActivityHelperImpl(
-    private val securityStateRepository: SecurityStateRepository
+    private val securityStateRepository: SecurityStateRepository,
+    private val jsonHelper: JsonHelper
 ) : LoginActivityHelper {
 
     override fun areMandatoryCredentialsPresent(
@@ -29,7 +30,7 @@ class LoginActivityHelperImpl(
 
     override fun tryParseQrCodeResponse(response: Intent): QrCodeResponse {
         val qrValue = response.getStringExtra(EXTRA_SCAN_RESULT)
-        return JsonHelper.fromJson(qrValue)
+        return qrValue?.let { jsonHelper.fromJson<QrCodeResponse>(it) } ?: throw Throwable("qrValue null")
     }
 
     override fun isSecurityStatusRunning(): Boolean {

@@ -1,9 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-
 import com.simprints.id.data.db.event.domain.models.EventType.COMPLETION_CHECK
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -17,7 +15,7 @@ data class CompletionCheckEvent(
     constructor(
         createdAt: Long,
         completed: Boolean,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
@@ -33,6 +31,6 @@ data class CompletionCheckEvent(
         override val endedAt: Long = 0) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

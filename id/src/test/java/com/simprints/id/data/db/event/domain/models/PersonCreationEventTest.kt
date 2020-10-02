@@ -1,21 +1,22 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent.Companion.EVENT_VERSION
-import com.simprints.id.orchestrator.SOME_GUID1
-import com.simprints.id.orchestrator.SOME_GUID2
 import org.junit.Test
 
 class PersonCreationEventTest {
 
     @Test
     fun create_PersonCreationEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
-        val fingerprintCaptureEventIds = listOf(SOME_GUID1)
-        val faceCaptureEventIds = listOf(SOME_GUID2)
-        val event = PersonCreationEvent(CREATED_AT, fingerprintCaptureEventIds, faceCaptureEventIds, labels)
+        val labels = EventLabels(sessionId = GUID1)
+        val fingerprintCaptureEventIds = listOf(GUID1)
+        val faceCaptureEventIds = listOf(GUID2)
+        val event = PersonCreationEvent(CREATED_AT, fingerprintCaptureEventIds, GUID1, faceCaptureEventIds, GUID2, labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
@@ -26,7 +27,9 @@ class PersonCreationEventTest {
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(PERSON_CREATION)
             assertThat(fingerprintCaptureIds).isEqualTo(fingerprintCaptureEventIds)
+            assertThat(fingerprintReferenceId).isEqualTo(GUID1)
             assertThat(faceCaptureEventIds).isEqualTo(faceCaptureEventIds)
+            assertThat(faceReferenceId).isEqualTo(GUID2)
         }
     }
 }

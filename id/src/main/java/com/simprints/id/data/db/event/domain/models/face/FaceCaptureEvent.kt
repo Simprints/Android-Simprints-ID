@@ -27,16 +27,18 @@ data class FaceCaptureEvent(
         result: FaceCapturePayload.Result,
         isFallback: Boolean,
         face: Face?,
-        labels: EventLabels = EventLabels()//StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels(),
+        id: String = UUID.randomUUID().toString()
     ) : this(
-        UUID.randomUUID().toString(),
+        id,
         labels,
-        FaceCapturePayload(startTime, endTime, EVENT_VERSION, attemptNb, qualityThreshold, result, isFallback, face),
+        FaceCapturePayload(id, startTime, endTime, EVENT_VERSION, attemptNb, qualityThreshold, result, isFallback, face),
         FACE_CAPTURE)
 
 
     @Keep
     data class FaceCapturePayload(
+        val id: String,
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int,
@@ -67,6 +69,6 @@ data class FaceCaptureEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

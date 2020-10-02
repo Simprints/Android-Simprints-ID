@@ -1,37 +1,6 @@
 //package com.simprints.id.data.db.subject
 //
-//import androidx.test.ext.junit.runners.AndroidJUnit4
-//import com.google.common.truth.Truth.assertThat
-//import com.simprints.core.tools.EncodingUtils
-//import com.simprints.id.data.db.event.domain.events.*
-//import com.simprints.id.data.db.event.domain.events.subject.*
-//import com.simprints.id.data.db.subject.domain.FaceSample
-//import com.simprints.id.data.db.subject.domain.FingerIdentifier
-//import com.simprints.id.data.db.subject.domain.FingerprintSample
-//import com.simprints.id.data.db.subject.domain.Subject
-//import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-//import com.simprints.id.data.db.subject.remote.EventRemoteDataSource
-//import com.simprints.id.data.db.subjects_sync.up.SubjectsUpSyncScopeRepository
-//import com.simprints.id.data.loginInfo.LoginInfoManager
-//import com.simprints.id.domain.modality.Modality
-//import com.simprints.id.domain.modality.toMode
-//import com.simprints.id.exceptions.safe.sync.SyncCloudIntegrationException
-//import com.simprints.id.testtools.UnitTestConfig
-//import com.simprints.testtools.common.channel.testChannel
-//import com.simprints.testtools.common.syntax.assertThrows
-//import io.mockk.*
-//import io.mockk.impl.annotations.RelaxedMockK
-//import kotlinx.coroutines.Dispatchers
-//import kotlinx.coroutines.ExperimentalCoroutinesApi
-//import kotlinx.coroutines.flow.asFlow
-//import kotlinx.coroutines.runBlocking
-//import kotlinx.coroutines.withContext
-//import org.junit.Before
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import java.util.*
-
-// StopShip: to fix once the event remote data source is sorted
+//
 //@RunWith(AndroidJUnit4::class)
 //@ExperimentalCoroutinesApi
 //class SubjectRepositoryUpSyncHelperImplTest {
@@ -68,7 +37,6 @@
 //        subjectRepositoryUpSyncHelper = spyk(SubjectRepositoryUpSyncHelperImpl(loginInfoManager,
 //            subjectLocalDataSource, eventRemoteDataSource, subjectsUpSyncScopeRepository, modalities))
 //        setupBatchSize()
-//        mockHelperToGenerateSameUuidForEvents()
 //    }
 //
 //    @Test
@@ -163,10 +131,6 @@
 //        every { subjectRepositoryUpSyncHelper.batchSize } returns batchSize
 //    }
 //
-//    private fun mockHelperToGenerateSameUuidForEvents() {
-//        every { subjectRepositoryUpSyncHelper.getRandomUuid() } returns "random_uuid"
-//    }
-//
 //    private fun testSuccessfulUpSync(
 //        localQueryResults: Array<List<Subject>>,
 //        expectedUploadBatches: Array<Events>,
@@ -195,13 +159,13 @@
 //    private fun createEventFromSubject(subject: Subject): Event =
 //        with(subject) {
 //            Event(
-//                    "random_uuid",
-//                    listOf(projectId),
-//                    listOf(subjectId),
-//                    listOf(attendantId),
-//                    listOf(moduleId),
-//                    modalities.map { it.toMode() },
-//                    createPayload(subject)
+//                subjectId,
+//                listOf(projectId),
+//                listOf(subjectId),
+//                listOf(attendantId),
+//                listOf(moduleId),
+//                modalities.map { it.toMode() },
+//                createPayload(subject)
 //            )
 //        }
 //
@@ -261,5 +225,3 @@
 //        }
 //    }
 //}
-
-            })

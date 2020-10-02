@@ -7,14 +7,16 @@ import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Compa
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
-import com.simprints.id.orchestrator.SOME_GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import org.junit.Test
 
 class Vero2InfoSnapshotEventTest {
 
     @Test
     fun create_Vero2InfoSnapshotEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val versionArg = Vero2Version(0, "cypressApp", "cypressApi", "stmApp", "stpApi", "un20App", "un20Api")
         val batteryArg = BatteryInfo(0, 1, 2, 3)
         val event = Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg, labels)

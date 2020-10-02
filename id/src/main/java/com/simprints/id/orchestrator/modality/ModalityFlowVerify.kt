@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -23,7 +23,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 
 class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                              private val faceStepProcessor: FaceStepProcessor,
@@ -87,21 +87,21 @@ ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProces
 
     private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
         if (result is FingerprintCaptureResponse) {
-            val query = Query(subjectId = appRequest.verifyGuid)
+            val query = SubjectQuery(subjectId = appRequest.verifyGuid)
             addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
             extractFingerprintAndAddPersonCreationEvent(result)
         } else if (result is FaceCaptureResponse) {
-            val query = Query(subjectId = appRequest.verifyGuid)
+            val query = SubjectQuery(subjectId = appRequest.verifyGuid)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
             extractFaceAndAddPersonCreationEvent(result)
         }
     }
 
-    private fun addMatchingStep(probeSamples: List<FingerprintCaptureSample>, query: Query) {
+    private fun addMatchingStep(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
     }
 
-    private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: Query) {
+    private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {
         steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
     }
 

@@ -21,7 +21,7 @@ data class FaceCaptureRetryEvent(
     constructor(
         startTime: Long,
         endTime: Long,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
@@ -37,6 +37,6 @@ data class FaceCaptureRetryEvent(
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

@@ -5,6 +5,9 @@ import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.SubjectAction
+import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
+import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
@@ -70,7 +73,7 @@ class SubjectLocalDataSourceImpl(
         }
     }
 
-    override suspend fun load(query: SubjectLocalDataSource.Query?): Flow<Subject> =
+    override suspend fun load(query: SubjectQuery?): Flow<Subject> =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
                 it.buildRealmQueryForSubject(query)
@@ -82,7 +85,7 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
-        if (query is SubjectLocalDataSource.Query) {
+        if (query is SubjectQuery) {
             load(query).map { subject ->
                 FingerprintIdentity(subject.subjectId, subject.fingerprintSamples)
             }
@@ -91,7 +94,7 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun loadFaceIdentities(query: Serializable): Flow<FaceIdentity> =
-        if (query is SubjectLocalDataSource.Query) {
+        if (query is SubjectQuery) {
             load(query).map { subject ->
                 FaceIdentity(subject.subjectId, subject.faceSamples)
             }
@@ -99,7 +102,7 @@ class SubjectLocalDataSourceImpl(
             throw InvalidQueryToLoadRecordsException()
         }
 
-    override suspend fun delete(queries: List<SubjectLocalDataSource.Query>) {
+    override suspend fun delete(queries: List<SubjectQuery>) {
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realmInstance ->
                 realmInstance.transactAwait { realm ->
@@ -114,10 +117,10 @@ class SubjectLocalDataSourceImpl(
     }
 
     override suspend fun deleteAll() {
-        delete(listOf(SubjectLocalDataSource.Query()))
+        delete(listOf(SubjectQuery()))
     }
 
-    override suspend fun count(query: SubjectLocalDataSource.Query): Int =
+    override suspend fun count(query: SubjectQuery): Int =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realm ->
                 realm.buildRealmQueryForSubject(query)
@@ -126,7 +129,28 @@ class SubjectLocalDataSourceImpl(
             }
         }
 
-    private fun Realm.buildRealmQueryForSubject(query: SubjectLocalDataSource.Query?): RealmQuery<DbSubject> =
+    override suspend fun performActions(actions: List<SubjectAction>) {
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use {
+                it.transactAwait { realm ->
+                    actions.forEach { action ->
+                        when(action) {
+                           is Creation -> {
+                               realm.insertOrUpdate(action.subject.fromDomainToDb())
+                           }
+                            is Deletion -> {
+                                realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                                    .findAll()
+                                    .deleteAllFromRealm()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun Realm.buildRealmQueryForSubject(query: SubjectQuery?): RealmQuery<DbSubject> =
         where(DbSubject::class.java)
             .apply {
                 query?.let { query ->

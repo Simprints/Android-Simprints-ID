@@ -7,6 +7,8 @@ import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.tools.ignoreException
 import io.reactivex.Completable
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
 import com.simprints.id.data.db.event.domain.models.Event as CoreEvent
 
@@ -15,7 +17,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
     override fun addEventInBackground(event: Event) {
         inBackground {
             fromDomainToCore(event)?.let {
-                eventRepository.addEvent(it)
+                eventRepository.addEventToCurrentSession(it)
             }
         }
     }
@@ -25,7 +27,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
             ignoreException {
                 fromDomainToCore(event)?.let {
                     runBlocking {
-                        eventRepository.addEvent(it)
+                        eventRepository.addEventToCurrentSession(it)
                     }
                 }
             }
@@ -34,10 +36,9 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         runBlocking {
             ignoreException {
-                eventRepository.updateCurrentSession { session ->
-                    val scannerConnectivityEvents = eventRepository.load().filterIsInstance(ScannerConnectionEvent::class.java)
-                    scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
-                }
+                val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+                val scannerConnectivityEvents = eventRepository.loadEvents(currentSession.id).filterIsInstance<ScannerConnectionEvent>()
+                scannerConnectivityEvents.collect { it.scannerInfo.hardwareVersion = hardwareVersion }
             }
         }
     }
@@ -49,7 +50,6 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
             ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
             REFUSAL -> (event as RefusalEvent).fromDomainToCore()
-            PERSON_CREATION -> (event as PersonCreationEvent).fromDomainToCore()
             SCANNER_CONNECTION -> (event as ScannerConnectionEvent).fromDomainToCore()
             ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
             ALERT_SCREEN_WITH_SCANNER_ISSUE -> (event as AlertScreenEventWithScannerIssue).fromDomainToCore()

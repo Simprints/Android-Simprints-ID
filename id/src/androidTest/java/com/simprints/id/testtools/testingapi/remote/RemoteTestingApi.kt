@@ -3,12 +3,11 @@ package com.simprints.id.testtools.testingapi.remote
 import com.simprints.id.BuildConfig
 import com.simprints.id.network.SimRemoteInterface
 import com.simprints.id.testtools.testingapi.models.*
-import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
 
-interface RemoteTestingApi: SimRemoteInterface {
+interface RemoteTestingApi : SimRemoteInterface {
 
     companion object {
         const val baseUrl = "https://dev.simprints-apis.com/androidapi/v2/"
@@ -27,11 +26,7 @@ interface RemoteTestingApi: SimRemoteInterface {
     fun generateFirebaseToken(@Body testFirebaseTokenParameters: TestFirebaseTokenParameters,
                               @Query("key") key: String = apiKey): Single<TestFirebaseToken>
 
-    @GET("projects/{projectId}/sessions")
-    fun getSessionSignatures(@Path("projectId") projectId: String,
-                             @Query("key") key: String = apiKey): Observable<TestSessionSignature>
-
-    @GET("projects/{projectId}/sessions/count")
-    fun getSessionCount(@Path("projectId") projectId: String,
-                        @Query("key") key: String = apiKey): Single<TestSessionCount>
+    @GET("projects/{projectId}/events/count")
+    fun getEventCount(@Path("projectId") projectId: String,
+                      @Query("key") key: String = apiKey): Single<TestEventCount>
 }

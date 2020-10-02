@@ -10,12 +10,13 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
+class FetchGuidViewModel(private val fetchGuidHelper: FetchGuidHelper,
                          private val deviceManager: DeviceManager,
                          private val eventRepository: EventRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
@@ -32,7 +33,9 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
     }
 
     private suspend fun getSubjectFetchResult(projectId: String, verifyGuid: String) = try {
-        subjectRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
+        withContext(Dispatchers.IO) {
+            fetchGuidHelper.loadFromRemoteIfNeeded(this, projectId, verifyGuid)
+        }
     } catch (t: Throwable) {
         getSubjectFetchResultForError()
     }
@@ -48,7 +51,7 @@ class FetchGuidViewModel(private val subjectRepository: SubjectRepository,
                                               subjectFetchStartTime: Long,
                                               verifyGuid: String) {
         inBackground {
-            eventRepository.addEvent(getCandidateReadEvent(subjectFetchResult, subjectFetchStartTime, verifyGuid))
+            eventRepository.addEventToCurrentSession(getCandidateReadEvent(subjectFetchResult, subjectFetchStartTime, verifyGuid))
         }
     }
 

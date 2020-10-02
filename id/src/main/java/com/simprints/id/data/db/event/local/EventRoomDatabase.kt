@@ -6,10 +6,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.simprints.id.data.db.common.room.Converters
 import com.simprints.id.data.db.event.local.models.DbEvent
 
 @Database(entities = [DbEvent::class], version = 1, exportSchema = false)
-@TypeConverters(DbEvent.Converters::class)
+@TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
 
