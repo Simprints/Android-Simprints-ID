@@ -49,7 +49,7 @@ class EventUpSyncHelperImplTest {
         runBlockingTest {
             eventUpSyncHelper.countForUpSync(op)
 
-            coVerify { eventRepository.countEventsToUpload(op.queryEvent) }
+            coVerify { eventRepository.localCount(op.queryEvent) }
         }
     }
 

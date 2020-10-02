@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
@@ -15,13 +15,12 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
-import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
-                               private val upSyncHelper: EventUpSyncHelper,
+                               private val eventRepository: EventRepository,
                                private val subjectRepository: SubjectRepository,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
@@ -50,7 +49,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
     internal suspend fun fetchAndUpdateRecordsToUpSyncCount() {
         recordsToUpSyncCountLiveData.value =
-            upSyncHelper.countForUpSync(EventUpSyncOperation(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION)))
+            eventRepository.localCount(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION))
     }
 
     internal suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary() {

@@ -67,7 +67,6 @@ import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -327,14 +326,14 @@ open class AppModule {
     @Provides
     open fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
-        upSyncHelper: EventUpSyncHelper,
+        eventRepository: EventRepository,
         subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         downSyncScopeRepository: EventDownSyncScopeRepository
     ) =
         SyncInformationViewModelFactory(
-            downySyncHelper, subjectRepository, upSyncHelper, preferencesManager,
+            downySyncHelper, subjectRepository, eventRepository, preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
         )
 

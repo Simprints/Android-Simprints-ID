@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
@@ -12,7 +13,6 @@ import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
@@ -37,7 +37,7 @@ class SyncInformationViewModelTest {
     @MockK lateinit var preferencesManagerMock: PreferencesManager
     @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
     @MockK lateinit var downSyncHelper: EventDownSyncHelper
-    @MockK lateinit var upSyncHelper: EventUpSyncHelper
+    @MockK lateinit var eventRepository: EventRepository
 
     private val projectId = "projectId"
     private lateinit var viewModel: SyncInformationViewModel
@@ -45,7 +45,7 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = SyncInformationViewModel(downSyncHelper, upSyncHelper, subjectRepository, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
+        viewModel = SyncInformationViewModel(downSyncHelper, eventRepository, subjectRepository, preferencesManagerMock, projectId, eventDownSyncScopeRepository)
     }
 
     @Test
@@ -183,7 +183,7 @@ class SyncInformationViewModelTest {
     }
 
     private fun mockSubjectLocalDataSourceCount(recordCount: Int) {
-        coEvery { upSyncHelper.countForUpSync(any()) } returns recordCount
+        coEvery { eventRepository.localCount(any()) } returns recordCount
         coEvery { subjectRepository.count(any()) } returns recordCount
     }
 
