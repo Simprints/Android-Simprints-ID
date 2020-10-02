@@ -144,11 +144,12 @@ class CollectFingerprintsViewModel(
 
     private fun startLiveFeedback() : Completable {
         return if (!isLiveFeedbackStarted && shouldWeDoLiveFeedback()) {
-            isLiveFeedbackStarted = true
             Timber.d("startLiveFeedback subscribed")
+            isLiveFeedbackStarted = true
+            isLiveFeedbackStopped = false
             stopLiveFeedbackTask?.dispose()
-            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
-                    .delay(100, TimeUnit.MILLISECONDS)
+            Completable.complete().delay(100, TimeUnit.MILLISECONDS)
+                .andThen(scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it })
         } else {
             Timber.d("startLiveFeedback ignored")
             Completable.complete()
@@ -156,22 +157,25 @@ class CollectFingerprintsViewModel(
     }
 
     private fun pauseLiveFeedback() {
-        isLiveFeedbackStarted = false
         Timber.d("pauseLiveFeedback")
+        isLiveFeedbackStarted = false
         liveFeedbackTask?.dispose()
     }
 
-    private fun stopLiveFeedback() : Completable {
-        isLiveFeedbackStarted = false
-        Timber.d("stopLiveFeedback")
-        liveFeedbackTask?.dispose()
+    var isLiveFeedbackStopped : Boolean = false
 
-        return if (stopLiveFeedbackTask?.isDisposed != false && shouldWeDoLiveFeedback())
+    private fun stopLiveFeedback() : Completable {
+        return if (!isLiveFeedbackStopped && shouldWeDoLiveFeedback()) {
+            Timber.d("stopLiveFeedback subscribed")
+            isLiveFeedbackStarted = false
+            isLiveFeedbackStopped = true
+            liveFeedbackTask?.dispose()
             Completable.complete().delay(100, TimeUnit.MILLISECONDS)
                 .andThen(scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it })
-                .delay(100, TimeUnit.MILLISECONDS)
-        else
+        } else {
+            Timber.d("stopLiveFeedback ignored")
             Completable.complete()
+        }
     }
 
     private fun setStartingState() {
