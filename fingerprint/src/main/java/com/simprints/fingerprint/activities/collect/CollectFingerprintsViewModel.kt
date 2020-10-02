@@ -224,7 +224,6 @@ class CollectFingerprintsViewModel(
         if (fingerState is CaptureState.Collected && fingerState.scanResult.isGoodScan()
             && !state().isAskingRescan) {
             updateState { isAskingRescan = true }
-            startLiveFeedback().doInBackground()
         } else {
             updateState { isAskingRescan = false }
             if (!isBusyForScanning()) {
@@ -242,7 +241,6 @@ class CollectFingerprintsViewModel(
         when (state().currentCaptureState()) {
             is CaptureState.Scanning -> {
                 cancelScanning()
-                startLiveFeedback().doInBackground()
             }
             is CaptureState.TransferringImage -> { /* do nothing */
             }
@@ -330,8 +328,6 @@ class CollectFingerprintsViewModel(
                 } else {
                     goToNextCaptureForSameFinger()
                 }
-            } else {
-                startLiveFeedback().doInBackground()
             }
         }
     }
@@ -366,7 +362,6 @@ class CollectFingerprintsViewModel(
     }
 
     private fun goToNextCaptureForSameFinger() {
-        startLiveFeedback().doInBackground()
         with(state().currentFingerState()) {
             if (currentCaptureIndex < captures.size - 1) {
                 timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
@@ -387,7 +382,6 @@ class CollectFingerprintsViewModel(
                         it is CaptureState.Collected && it.scanResult.isGoodScan()
                     }) {
                     nudgeToNextFinger()
-                    startLiveFeedback().doInBackground()
                 } else {
                     if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
                         showSplashAndNudge(addNewFinger = true)
@@ -405,7 +399,6 @@ class CollectFingerprintsViewModel(
         timeHelper.newTimer().schedule(TRY_DIFFERENT_FINGER_SPLASH_DELAY) {
             if (addNewFinger) handleAutoAddFinger()
             nudgeToNextFinger()
-            startLiveFeedback().doInBackground()
         }
     }
 
@@ -430,7 +423,6 @@ class CollectFingerprintsViewModel(
             }
             is NoFingerDetectedException -> {
                 handleNoFingerDetected()
-                startLiveFeedback().doInBackground()
             }
             else -> {
                 updateCaptureState { toNotCollected() }
@@ -550,7 +542,6 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleRestart() {
-        startLiveFeedback().doInBackground()
         setStartingState()
     }
 
