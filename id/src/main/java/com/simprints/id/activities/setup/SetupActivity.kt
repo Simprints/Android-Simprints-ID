@@ -49,8 +49,8 @@ class SetupActivity: BaseSplitActivity() {
 
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
+    @Inject lateinit var eventRepository: EventRepository
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
@@ -120,16 +120,16 @@ class SetupActivity: BaseSplitActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSIONS_REQUEST_CODE -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    lifecycleScope.launch {
+        lifecycleScope.launch {
+            when (requestCode) {
+                PERMISSIONS_REQUEST_CODE -> {
+                    if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                         storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
                     }
                 }
             }
+            setResultAndFinish(SETUP_COMPLETE_FLAG)
         }
-        setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
@@ -147,8 +147,8 @@ class SetupActivity: BaseSplitActivity() {
         lifecycleScope.launch {
             Timber.d("Adding location to session")
             storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+            setResultAndFinish(SETUP_COMPLETE_FLAG)
         }
-        setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
     private fun setResultAndFinish(setupCompleteFlag: Boolean) {

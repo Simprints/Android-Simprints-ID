@@ -73,6 +73,16 @@ internal class ImageRepositoryImplTest {
         verify(exactly = 5) { localDataSource.deleteImage(any()) }
     }
 
+    @Test
+    fun shouldGetImagesCount() {
+        val nImagesInLocal = 5
+        configureLocalImageFiles(numberOfValidFiles = nImagesInLocal, includeInvalidFile = false)
+
+        val imageCount = repository.getNumberOfImagesToUpload()
+
+        assertThat(imageCount).isEqualTo(nImagesInLocal)
+    }
+
     private fun initialiseMocks() {
         val validImage = mockValidImage()
         val invalidImage = mockInvalidImage()
