@@ -1,6 +1,5 @@
 package com.simprints.id.tools.time
 
-import com.simprints.id.Application
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -13,9 +12,4 @@ interface TimeHelper {
     fun getCurrentDateAsString(): String
     fun todayInMillis(): Long
     fun tomorrowInMillis(): Long
-
-    companion object {
-        fun build(app: Application): TimeHelper =
-            app.component.getTimeHelper()
-    }
 }
