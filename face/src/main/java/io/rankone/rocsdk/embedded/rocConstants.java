@@ -14,12 +14,17 @@ public interface rocConstants {
   public final static int ROC_VERSION_PATCH = rocJNI.ROC_VERSION_PATCH_get();
   public final static String ROC_VERSION_STRING = rocJNI.ROC_VERSION_STRING_get();
   public final static String ROC_COPYRIGHT = rocJNI.ROC_COPYRIGHT_get();
+  public final static float ROC_SUGGESTED_RELATIVE_MIN_SIZE = rocJNI.ROC_SUGGESTED_RELATIVE_MIN_SIZE_get();
+  public final static long ROC_SUGGESTED_ABSOLUTE_MIN_SIZE = rocJNI.ROC_SUGGESTED_ABSOLUTE_MIN_SIZE_get();
+  public final static float ROC_SUGGESTED_FALSE_DETECTION_RATE = rocJNI.ROC_SUGGESTED_FALSE_DETECTION_RATE_get();
   public final static java.math.BigInteger ROC_NO_TIMESTAMP = rocJNI.ROC_NO_TIMESTAMP_get();
-  public final static long ROC_FR_FV_SIZE = rocJNI.ROC_FR_FV_SIZE_get();
-  public final static long ROC_FR_FAST_FV_SIZE = rocJNI.ROC_FR_FAST_FV_SIZE_get();
-  public final static long ROC_FR_PERIOCULAR_FV_SIZE = rocJNI.ROC_FR_PERIOCULAR_FV_SIZE_get();
+  public final static long ROC_STANDARD_FV_SIZE = rocJNI.ROC_STANDARD_FV_SIZE_get();
+  public final static long ROC_FAST_FV_SIZE = rocJNI.ROC_FAST_FV_SIZE_get();
+  public final static long ROC_PERIOCULAR_FV_SIZE = rocJNI.ROC_PERIOCULAR_FV_SIZE_get();
   public final static long ROC_TATTOO_FV_SIZE = rocJNI.ROC_TATTOO_FV_SIZE_get();
   public final static float ROC_MAX_SIMILARITY = rocJNI.ROC_MAX_SIMILARITY_get();
   public final static float ROC_MIN_SIMILARITY = rocJNI.ROC_MIN_SIMILARITY_get();
   public final static float ROC_INVALID_SIMILARITY = rocJNI.ROC_INVALID_SIMILARITY_get();
+  public final static float ROC_DEFAULT_SEARCH_THRESHOLD = rocJNI.ROC_DEFAULT_SEARCH_THRESHOLD_get();
+  public final static float ROC_DEFAULT_VERIFICATION_THRESHOLD = rocJNI.ROC_DEFAULT_VERIFICATION_THRESHOLD_get();
 }

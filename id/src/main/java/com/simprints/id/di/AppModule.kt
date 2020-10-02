@@ -39,6 +39,7 @@ import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -323,11 +324,19 @@ open class AppModule {
         subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        downSyncScopeRepository: EventDownSyncScopeRepository
+        eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+        imageRepository: ImageRepository,
+        eventSyncManager: EventSyncManager
     ) =
         SyncInformationViewModelFactory(
-            downySyncHelper, subjectRepository, upSyncHelper, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), downSyncScopeRepository
+            downySyncHelper,
+            upSyncHelper,
+            subjectRepository,
+            preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            eventDownSyncScopeRepository,
+            imageRepository,
+            eventSyncManager
         )
 
     @Provides

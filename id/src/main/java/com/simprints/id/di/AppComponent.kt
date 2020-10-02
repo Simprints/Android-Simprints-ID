@@ -126,7 +126,6 @@ interface AppComponent {
     fun inject(eventDownSyncCountWorker: EventDownSyncCountWorker)
     fun inject(eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker)
     fun inject(eventSyncMasterWorker: EventSyncMasterWorker)
-    fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(eventUpSyncCountWorker: EventUpSyncCountWorker)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
@@ -136,6 +135,7 @@ interface AppComponent {
     fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
     fun inject(setupActivity: SetupActivity)
     fun inject(securityStateWorker: SecurityStateWorker)
+    fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
 
     fun getSessionEventsManager(): EventRepository
     fun getCrashReportManager(): CoreCrashReportManager
