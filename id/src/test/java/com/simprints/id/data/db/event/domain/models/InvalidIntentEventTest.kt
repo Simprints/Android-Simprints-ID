@@ -5,14 +5,16 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.event.domain.models.EventType.INVALID_INTENT
 import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
-import com.simprints.id.orchestrator.SOME_GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import org.junit.Test
 
 class InvalidIntentEventTest {
 
     @Test
     fun create_InvalidIntentEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val extras = mapOf("extra_key" to "value")
         val event = InvalidIntentEvent(CREATED_AT, "REGISTER", extras, labels)
 

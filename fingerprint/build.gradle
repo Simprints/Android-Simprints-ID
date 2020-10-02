@@ -153,7 +153,6 @@ dependencies {
     // Retrofit
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
-    implementation deps.retrofit.convertergson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
 

@@ -9,8 +9,10 @@ class SessionCaptureEventValidator : EventValidator {
 
     override fun validate(currentEvents: List<Event>, eventToAdd: Event) {
         if (eventToAdd is SessionCaptureEvent) {
-            if(currentEvents.any { it.payload.type == SESSION_CAPTURE }) {
-                throw SessionEventCaptureAlreadyExists("The session already got a SessionCaptureEvent")
+            currentEvents.filter { it.payload.type == SESSION_CAPTURE }.forEach {
+                if (it.id != eventToAdd.id) {
+                    throw SessionEventCaptureAlreadyExists("The session already got a SessionCaptureEvent")
+                }
             }
         }
     }

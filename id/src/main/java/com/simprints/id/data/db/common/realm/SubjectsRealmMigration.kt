@@ -22,7 +22,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     class SubjectsModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 10
+        const val REALM_SCHEMA_VERSION: Long = 11
 
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
         const val SYNC_INFO_TABLE: String = "DbSyncInfo"

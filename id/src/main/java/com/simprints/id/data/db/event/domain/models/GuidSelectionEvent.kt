@@ -1,9 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-
 import com.simprints.id.data.db.event.domain.models.EventType.GUID_SELECTION
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -17,7 +15,7 @@ data class GuidSelectionEvent(
     constructor(
         createdAt: Long,
         selectedId: String,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
@@ -32,6 +30,6 @@ data class GuidSelectionEvent(
                                     override val endedAt: Long = 0) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

@@ -15,7 +15,7 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import timber.log.Timber
 import java.io.IOException
 
@@ -97,6 +97,6 @@ class AuthenticationHelperImpl(
             UserInfo(projectId, userId),
             result
         )
-        inBackground { eventRepository.addEvent(event) }
+        inBackground { eventRepository.addEventToCurrentSession(event) }
     }
 }

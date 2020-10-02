@@ -35,6 +35,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="PROJECT_ENDED"/>
+
+        <Button
+            android:id="@+id/printRoomDb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PRINT_ROOM_DB"/>
     </LinearLayout>
 
     <LinearLayout

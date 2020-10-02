@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
@@ -27,7 +27,7 @@ class FaceStepProcessorImpl(
             buildStep(CAPTURE, this)
         }
 
-    override fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: SubjectLocalDataSource.Query): Step =
+    override fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: SubjectQuery): Step =
         faceRequestFactory.buildFaceMatchRequest(probeFaceSample, query).run {
             buildStep(MATCH, this)
         }

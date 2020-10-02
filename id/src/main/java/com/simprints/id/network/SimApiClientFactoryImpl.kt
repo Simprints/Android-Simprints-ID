@@ -1,6 +1,5 @@
 package com.simprints.id.network
 
-import com.google.gson.Gson
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
 import kotlin.reflect.KClass
@@ -9,7 +8,7 @@ class SimApiClientFactoryImpl(
     val baseUrlProvider: BaseUrlProvider,
     val deviceId: String,
     private val remoteDbManager: RemoteDbManager,
-    private val jsonAdapter: Gson = JsonHelper.gson
+    private val jsonHelper: JsonHelper
 ): SimApiClientFactory {
 
     // Not using `inline fun <reified T : SimRemoteInterface>` because it's not possible to
@@ -21,7 +20,7 @@ class SimApiClientFactoryImpl(
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
             remoteDbManager.getCurrentToken(),
-            jsonAdapter
+            jsonHelper
         )
     }
 
@@ -31,7 +30,7 @@ class SimApiClientFactoryImpl(
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
             null,
-            jsonAdapter
+            jsonHelper
         )
     }
 }

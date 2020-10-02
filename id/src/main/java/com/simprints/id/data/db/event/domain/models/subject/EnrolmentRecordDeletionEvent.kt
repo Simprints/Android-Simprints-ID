@@ -6,7 +6,6 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep
@@ -23,10 +22,10 @@ data class EnrolmentRecordDeletionEvent(
         projectId: String,
         moduleId: String,
         attendantId: String,
-        labels: EventLabels = EventLabels() //StopShip
+        extraLabels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
+        extraLabels.copy(subjectId = subjectId, projectId = projectId, moduleIds = listOf(moduleId), attendantId = attendantId),
         EnrolmentRecordDeletionPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId),
         ENROLMENT_RECORD_DELETION)
 
@@ -42,6 +41,6 @@ data class EnrolmentRecordDeletionEvent(
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 0
     }
 }

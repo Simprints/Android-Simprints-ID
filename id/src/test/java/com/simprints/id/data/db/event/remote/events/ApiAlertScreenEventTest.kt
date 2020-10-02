@@ -1,13 +1,7 @@
-//package com.simprints.id.data.db.event.remote.events
-//
-//import com.google.common.truth.Truth.assertThat
-//import com.simprints.id.data.db.event.domain.events.AlertScreenEvent
-//import com.simprints.id.data.db.event.remote.events.ApiAlertScreenEvent.ApiAlertScreenEvent.Companion.fromDomainToApi
-//import org.junit.Test
+package com.simprints.id.data.db.event.remote.events
 
-// StopShip: to fix once the event remote data source is sorted
-//class ApiAlertScreenEventTest {
-//
+class ApiAlertScreenEventTest {
+
 //    @Test
 //    fun differentProjectId_fromDomainToApi() {
 //        val domain = AlertScreenEvent.AlertScreenEventType.DIFFERENT_PROJECT_ID
@@ -167,5 +161,5 @@
 //
 //        assertThat(fromDomainToApi(domain)).isEqualTo(api)
 //    }
-//
-//}
+
+}

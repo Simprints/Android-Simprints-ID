@@ -18,7 +18,7 @@ data class RefusalEvent(
         endTime: Long,
         reason: RefusalPayload.Answer,
         otherText: String,
-        labels: EventLabels = EventLabels() //StopShip: to change in PAS-993
+        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
@@ -48,6 +48,6 @@ data class RefusalEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = DEFAULT_EVENT_VERSION
+        const val EVENT_VERSION = 1
     }
 }

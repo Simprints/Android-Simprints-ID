@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource.Query
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 /**
@@ -13,7 +13,7 @@ interface FingerprintStepProcessor {
 
     fun buildStepToCapture(): Step
 
-    fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: Query): Step
+    fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery): Step
 
     fun processResult(requestCode: Int,
                       resultCode: Int,

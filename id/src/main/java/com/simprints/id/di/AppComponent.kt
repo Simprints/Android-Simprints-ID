@@ -45,18 +45,17 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
-import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
-import com.simprints.id.services.scheduledSync.sessionSync.UpSessionEventsWorker
-import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncCountWorker
-import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncDownloaderWorker
-import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsEndSyncReporterWorker
-import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsStartSyncReporterWorker
-import com.simprints.id.services.scheduledSync.subjects.master.workers.SubjectsSyncMasterWorker
-import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncCountWorker
-import com.simprints.id.services.scheduledSync.subjects.up.workers.SubjectsUpSyncUploaderWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.services.sync.SyncSchedulerImpl
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
+import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker
+import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
+import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
+import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
+import com.simprints.id.tools.time.TimeHelper
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -109,7 +108,6 @@ interface AppComponent {
     fun inject(alertPresenter: AlertPresenter)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
-    fun inject(sessionsSyncWorkerUp: UpSessionEventsWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
@@ -125,15 +123,15 @@ interface AppComponent {
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
     fun inject(debugActivity: DebugActivity)
-    fun inject(subjectsDownSyncCountWorker: SubjectsDownSyncCountWorker)
-    fun inject(subjectsDownSyncDownloaderWorker: SubjectsDownSyncDownloaderWorker)
-    fun inject(subjectsSyncMasterWorker: SubjectsSyncMasterWorker)
-    fun inject(subjectsUpSyncUploaderWorker: SubjectsUpSyncUploaderWorker)
-    fun inject(subjectsUpSyncCountWorker: SubjectsUpSyncCountWorker)
+    fun inject(eventDownSyncCountWorker: EventDownSyncCountWorker)
+    fun inject(eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker)
+    fun inject(eventSyncMasterWorker: EventSyncMasterWorker)
+    fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
+    fun inject(eventUpSyncCountWorker: EventUpSyncCountWorker)
     fun inject(imageUpSyncWorker: ImageUpSyncWorker)
     fun inject(syncInformationActivity: SyncInformationActivity)
-    fun inject(subjectsEndSyncReporterWorker: SubjectsEndSyncReporterWorker)
-    fun inject(subjectsStartSyncWorker: SubjectsStartSyncReporterWorker)
+    fun inject(eventEndSyncReporterWorker: EventEndSyncReporterWorker)
+    fun inject(eventStartSyncWorker: EventStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
     fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
     fun inject(setupActivity: SetupActivity)

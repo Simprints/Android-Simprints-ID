@@ -1,21 +1,21 @@
 package com.simprints.id.data.db.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.CREATED_AT
-import com.simprints.id.data.db.event.domain.models.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
-import com.simprints.id.orchestrator.SOME_GUID1
+import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import org.junit.Test
 
 class ErrorCallbackEventTest {
 
     @Test
     fun create_ErrorCallbackEvent() {
-        val labels = EventLabels(sessionId = SOME_GUID1)
+        val labels = EventLabels(sessionId = GUID1)
         val event = ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJECT_ID_SIGNED_IN, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

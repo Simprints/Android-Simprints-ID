@@ -58,8 +58,8 @@ dependencies {
     implementation deps.timber.core
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
-    implementation deps.retrofit.convertergson
-    implementation deps.gson.extras
+    implementation deps.retrofit.jackson
+    implementation deps.jackson.core
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.androidx.security
@@ -73,6 +73,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation deps.testing.mockk.core
     testImplementation deps.testing.coroutines_test
+    testImplementation deps.testing.kotlin
     testImplementation project(':testtools')
 
     androidTestImplementation deps.testing.androidx.core_testing

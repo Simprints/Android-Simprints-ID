@@ -47,7 +47,7 @@ class ClientApiEventRepositoryImplTest {
 
             coVerify { coreEventEventsMgrMock.createSession(any()) }
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEvent(withArg {
+                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
                     Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java)
                     Truth.assertThat((it.payload as IntentParsingPayload).integration).isEqualTo(CoreIntegrationInfo.ODK)
                 })
@@ -62,7 +62,7 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addAlertScreenEvent(clientApiAlert)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEvent(withArg {
+                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
                     Truth.assertThat(it).isInstanceOf(AlertScreenEvent::class.java)
                     Truth.assertThat((it.payload as AlertScreenPayload).alertType).isEqualTo(AlertScreenEventType.INVALID_PROJECT_ID)
                 })
@@ -77,7 +77,7 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addSuspiciousIntentEvent(unexpectedKey)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEvent(withArg {
+                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
                     Truth.assertThat(it).isInstanceOf(SuspiciousIntentEvent::class.java)
                     Truth.assertThat((it.payload as SuspiciousIntentPayload).unexpectedExtras).isEqualTo(unexpectedKey)
                 })
@@ -93,7 +93,7 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addInvalidIntentEvent(action, wrongKey)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEvent(withArg {
+                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
                     Truth.assertThat(it).isInstanceOf(InvalidIntentEvent::class.java)
                     Truth.assertThat((it as InvalidIntentEvent).payload.action).isEqualTo(action)
                     Truth.assertThat(it.payload.extras).isEqualTo(wrongKey)

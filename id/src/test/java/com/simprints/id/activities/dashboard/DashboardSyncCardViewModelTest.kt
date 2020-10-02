@@ -30,7 +30,7 @@
 //import com.simprints.id.testtools.TestApplication
 //import com.simprints.id.testtools.UnitTestConfig
 //import com.simprints.id.testtools.state.RobolectricTestMocker
-//import com.simprints.id.tools.TimeHelper
+//import com.simprints.id.tools.time.TimeHelper
 //import com.simprints.testtools.common.di.DependencyRule
 //import com.simprints.testtools.common.di.DependencyRule.MockRule
 //import com.simprints.testtools.common.di.DependencyRule.SpyRule

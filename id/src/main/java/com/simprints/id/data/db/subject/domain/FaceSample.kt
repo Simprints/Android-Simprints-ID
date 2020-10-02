@@ -27,3 +27,16 @@ open class FaceSample(
             FaceSample(EncodingUtils.base64ToBytes(template.template))
     }
 }
+
+// Generates a unique id for a list of samples.
+// It concats the templates (sorted by quality score) and creates a UUID from that.
+fun List<FaceSample>.uniqueId() =
+    UUID.nameUUIDFromBytes(
+        concatTemplates()
+    ).toString()
+
+private fun List<FaceSample>.concatTemplates(): ByteArray {
+    return this.sortedBy { it.template.hashCode() }.fold(byteArrayOf(), { acc, sample ->
+        acc + sample.template
+    })
+}

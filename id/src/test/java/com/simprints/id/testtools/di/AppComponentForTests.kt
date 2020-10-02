@@ -11,8 +11,8 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectSecretManagerTest
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorkerTest
-import com.simprints.id.services.scheduledSync.subjects.down.workers.SubjectsDownSyncCountWorkerTest
+import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
+import com.simprints.id.services.sync.subjects.down.workers.EventDownSyncCountWorkerTest
 import dagger.BindsInstance
 import dagger.Component
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -54,7 +54,7 @@ interface AppComponentForTests : AppComponent {
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
-    fun inject(subjectsDownSyncCountWorkerTest: SubjectsDownSyncCountWorkerTest)
+    fun inject(subjectsDownSyncCountWorkerTest: EventDownSyncCountWorkerTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
     fun inject(settingsPreferencePresenterTest: SettingsPreferencePresenterTest)
 
