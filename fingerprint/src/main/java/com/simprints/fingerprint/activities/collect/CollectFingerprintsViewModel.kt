@@ -120,7 +120,7 @@ class CollectFingerprintsViewModel(
     private fun startObserverForLiveFeedback() {
         state.observeForever {
             when(it.currentCaptureState()) {
-                CaptureState.NotCollected,
+                CaptureState.NotCollected -> startLiveFeedback().doInBackground()
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
@@ -140,24 +140,29 @@ class CollectFingerprintsViewModel(
         scannerManager.onScanner { isLiveFeedbackAvailable() } &&
             fingerprintPreferencesManager.liveFeedbackOn
 
-    private fun startLiveFeedback() : Completable {
-        Timber.d("startLiveFeedback")
-        stopLiveFeedbackTask?.dispose()
+    var isLiveFeedbackStarted : Boolean = false
 
-        return if (liveFeedbackTask?.isDisposed != false && shouldWeDoLiveFeedback())
-            Completable.complete().delay(100, TimeUnit.MILLISECONDS)
-                .andThen(scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it })
-                .delay(100, TimeUnit.MILLISECONDS)
-        else
+    private fun startLiveFeedback() : Completable {
+        return if (!isLiveFeedbackStarted && shouldWeDoLiveFeedback()) {
+            isLiveFeedbackStarted = true
+            Timber.d("startLiveFeedback subscribed")
+            stopLiveFeedbackTask?.dispose()
+            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
+                    .delay(100, TimeUnit.MILLISECONDS)
+        } else {
+            Timber.d("startLiveFeedback ignored")
             Completable.complete()
+        }
     }
 
     private fun pauseLiveFeedback() {
+        isLiveFeedbackStarted = false
         Timber.d("pauseLiveFeedback")
         liveFeedbackTask?.dispose()
     }
 
     private fun stopLiveFeedback() : Completable {
+        isLiveFeedbackStarted = false
         Timber.d("stopLiveFeedback")
         liveFeedbackTask?.dispose()
 
