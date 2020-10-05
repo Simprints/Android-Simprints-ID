@@ -9,7 +9,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
@@ -95,6 +95,7 @@ class CollectFingerprintsViewModel(
     private var lastCaptureStartedAt: Long = 0
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
+    private var liveFeedbackState : LiveFeedbackState? = null
 
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
@@ -141,11 +142,11 @@ class CollectFingerprintsViewModel(
         scannerManager.onScanner { isLiveFeedbackAvailable() } &&
             fingerprintPreferencesManager.liveFeedbackOn
 
-    var isLiveFeedbackStarted : Boolean = false
+    var liveFeedbackState : LiveFeedbackState? = null
 
     private fun startLiveFeedback() : Completable {
-        return if (!isLiveFeedbackStarted && shouldWeDoLiveFeedback()) {
-            isLiveFeedbackStarted = true
+        return if (liveFeedbackState != LiveFeedbackState.Start && shouldWeDoLiveFeedback()) {
+            liveFeedbackState = LiveFeedbackState.Start
             stopLiveFeedbackTask?.dispose()
             isLiveFeedbackStopped = false
             scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
@@ -155,17 +156,17 @@ class CollectFingerprintsViewModel(
     }
 
     private fun pauseLiveFeedback() {
-        isLiveFeedbackStarted = false
+        liveFeedbackState = LiveFeedbackState.Pause
         liveFeedbackTask?.dispose()
     }
 
     var isLiveFeedbackStopped : Boolean = false
 
     private fun stopLiveFeedback() : Completable {
-        return if (!isLiveFeedbackStopped && shouldWeDoLiveFeedback()) {
-            isLiveFeedbackStopped = true
+        return if (liveFeedbackState != LiveFeedbackState.Stop && shouldWeDoLiveFeedback()) {
+            liveFeedbackState = LiveFeedbackState.Stop
             liveFeedbackTask?.dispose()
-            isLiveFeedbackStarted = false
+            scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
             scannerManager.scanner { stopLiveFeedback() }
                 .doOnSubscribe { stopLiveFeedbackTask = it }
         } else {
