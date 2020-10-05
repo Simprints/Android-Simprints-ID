@@ -45,7 +45,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
@@ -146,24 +145,16 @@ class CollectFingerprintsViewModel(
 
     private fun startLiveFeedback() : Completable {
         return if (!isLiveFeedbackStarted && shouldWeDoLiveFeedback()) {
-            Timber.d("startLiveFeedback subscribed")
             isLiveFeedbackStarted = true
-
             stopLiveFeedbackTask?.dispose()
-            Timber.d("startLiveFeedback disposed stopLiveFeedbackTask")
             isLiveFeedbackStopped = false
-
-            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it
-                    Timber.d("startLiveFeedback created liveFeedbackTask")
-                }
+            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
         } else {
-            Timber.d("startLiveFeedback ignored")
             Completable.complete()
         }
     }
 
     private fun pauseLiveFeedback() {
-        Timber.d("pauseLiveFeedback")
         isLiveFeedbackStarted = false
         liveFeedbackTask?.dispose()
     }
@@ -172,21 +163,12 @@ class CollectFingerprintsViewModel(
 
     private fun stopLiveFeedback() : Completable {
         return if (!isLiveFeedbackStopped && shouldWeDoLiveFeedback()) {
-            Timber.d("stopLiveFeedback subscribed")
             isLiveFeedbackStopped = true
-
             liveFeedbackTask?.dispose()
-            Timber.d("stopLiveFeedback disposed liveFeedbackTask")
             isLiveFeedbackStarted = false
-
             scannerManager.scanner { stopLiveFeedback() }
-                .doOnSubscribe {
-                    stopLiveFeedbackTask = it
-                    Timber.d("stopLiveFeedback created stopLiveFeedbackTask")
-                }.doOnComplete { Timber.d("stopLiveFeedback completed")
-            }
+                .doOnSubscribe { stopLiveFeedbackTask = it }
         } else {
-            Timber.d("stopLiveFeedback ignored")
             Completable.complete()
         }
     }
@@ -239,17 +221,13 @@ class CollectFingerprintsViewModel(
 
     private fun toggleScanning() {
         when (state().currentCaptureState()) {
-            is CaptureState.Scanning -> {
-                cancelScanning()
-            }
+            is CaptureState.Scanning -> cancelScanning()
             is CaptureState.TransferringImage -> { /* do nothing */
             }
             is CaptureState.NotCollected,
             is CaptureState.Skipped,
             is CaptureState.NotDetected,
-            is CaptureState.Collected -> {
-                startScanning()
-            }
+            is CaptureState.Collected -> startScanning()
         }
     }
 
@@ -280,7 +258,6 @@ class CollectFingerprintsViewModel(
     }
 
     private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
-
         val scanResult = ScanResult(captureFingerprintResponse.imageQualityScore, captureFingerprintResponse.template, null, fingerprintPreferencesManager.qualityThreshold)
         vibrate.postEvent()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
@@ -299,10 +276,8 @@ class CollectFingerprintsViewModel(
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager())
 
     private fun proceedToImageTransfer() {
-        Timber.d("proceedToImageTransfer")
         imageTransferTask?.dispose()
-        imageTransferTask =
-            scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
+        imageTransferTask = scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -373,25 +348,22 @@ class CollectFingerprintsViewModel(
     }
 
     private fun resolveFingerTerminalConditionTriggered() {
-        state().apply {
+        with(state()) {
             if (isScanningEndStateAchieved()) {
                 logUiMessageForCrashReport("Confirm fingerprints dialog shown")
                 updateState { isShowingConfirmDialog = true }
+            } else if (currentCaptureState().let {
+                    it is CaptureState.Collected && it.scanResult.isGoodScan()
+                }) {
+                nudgeToNextFinger()
             } else {
-                if (currentCaptureState().let {
-                        it is CaptureState.Collected && it.scanResult.isGoodScan()
-                    }) {
-                    nudgeToNextFinger()
-                } else {
-                    if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
-                        showSplashAndNudge(addNewFinger = true)
-                    } else if (!isOnLastFinger()) {
-                        showSplashAndNudge(addNewFinger = false)
-                    }
+                if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
+                    showSplashAndNudge(addNewFinger = true)
+                } else if (!isOnLastFinger()) {
+                    showSplashAndNudge(addNewFinger = false)
                 }
             }
         }
-
     }
 
     private fun showSplashAndNudge(addNewFinger: Boolean) {
@@ -415,15 +387,12 @@ class CollectFingerprintsViewModel(
         when (e) {
             is ScannerOperationInterruptedException -> {
                 updateCaptureState { toNotCollected() }
-
             }
             is ScannerDisconnectedException -> {
                 updateCaptureState { toNotCollected() }
                 launchReconnect.postEvent()
             }
-            is NoFingerDetectedException -> {
-                handleNoFingerDetected()
-            }
+            is NoFingerDetectedException -> handleNoFingerDetected()
             else -> {
                 updateCaptureState { toNotCollected() }
                 crashReportManager.logExceptionOrSafeException(e)
