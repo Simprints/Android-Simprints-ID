@@ -77,7 +77,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             .wrapErrorsFromScanner()
 
     override fun isLiveFeedbackAvailable(): Boolean =
-        true//scannerVersion?.api?.un20 ?: ChipApiVersion.UNKNOWN >= LIVE_FEEDBACK_UN20_API_MIN //STOPSHIP
+        scannerVersion?.api?.un20 ?: ChipApiVersion.UNKNOWN >= LIVE_FEEDBACK_UN20_API_MIN
 
     override fun startLiveFeedback() : Completable =
             scannerV2.setScannerLedStateOn()
@@ -85,7 +85,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                     scannerV2
                         .getImageQualityPreview()
                         .flatMapCompletable { quality ->
-                            Timber.d("livefeedback quality: $quality")
                             scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
                          }
                         .repeat()
