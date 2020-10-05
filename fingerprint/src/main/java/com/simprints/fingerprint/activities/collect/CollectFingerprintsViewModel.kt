@@ -568,7 +568,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun Completable.doInBackground() =
-        subscribeOn(Schedulers.io()).subscribeBy(onComplete = {}, onError = {})
+        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = {})
 
     fun logUiMessageForCrashReport(message: String) {
         Timber.d(message)
