@@ -438,7 +438,7 @@ open class SettingsPreferencesManagerImpl(
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
 
-        const val FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT = true //STOPSHIP
+        const val FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT = false
         const val FINGERPRINT_LIVE_FEEDBACK_ON_KEY = "FingerprintLiveFeedbackOn"
 
         const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60

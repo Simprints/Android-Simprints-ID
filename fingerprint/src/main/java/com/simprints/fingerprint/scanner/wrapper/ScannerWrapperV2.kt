@@ -222,7 +222,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         when (this) {
             SaveFingerprintImagesStrategy.NEVER -> null
             SaveFingerprintImagesStrategy.WSQ_15,
-            SaveFingerprintImagesStrategy.WSQ_15_EAGER -> ImageFormatData.WSQ(15)
+            SaveFingerprintImagesStrategy.WSQ_15_EAGER-> ImageFormatData.WSQ(15)
         }
 
     private fun Completable.wrapErrorsFromScanner() =
