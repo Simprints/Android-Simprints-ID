@@ -142,7 +142,6 @@ class CollectFingerprintsViewModel(
         scannerManager.onScanner { isLiveFeedbackAvailable() } &&
             fingerprintPreferencesManager.liveFeedbackOn
 
-    var liveFeedbackState : LiveFeedbackState? = null
 
     private fun startLiveFeedback() : Completable {
         return if (liveFeedbackState != LiveFeedbackState.Start && shouldWeDoLiveFeedback()) {
