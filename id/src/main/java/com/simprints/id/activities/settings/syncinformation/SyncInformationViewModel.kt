@@ -78,7 +78,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
         }
 
 
-    internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
             val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope()
             var creationsToDownload = 0
@@ -86,10 +86,8 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
             downSyncScope.operations.forEach {
                 val counts = downySyncHelper.countForDownSync(it)
-                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count
-                    ?: 0
-                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count
-                    ?: 0
+                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count ?: 0
+                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count ?: 0
             }
 
             DownSyncCounts(creationsToDownload, deletionsToDownload)

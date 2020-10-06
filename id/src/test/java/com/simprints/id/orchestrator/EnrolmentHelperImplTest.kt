@@ -45,7 +45,7 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
         coEvery { preferencesManager.modalities } returns listOf(FINGER)
-        every { loginInfoManager getProperty "signedInProjectId" } returns DEFAULT_PROJECT_ID
+        every { loginInfoManager.getSignedInProjectIdOrEmpty()  } returns DEFAULT_PROJECT_ID
 
         mockkStatic(UUID::class)
         val guid = mockk<UUID>()
@@ -73,7 +73,7 @@ class EnrolmentHelperImplTest {
             coVerify {
                 eventRepository.addEventToCurrentSession(expectedEnrolmentEvent)
 
-                eventRepository.addEventToCurrentSession(expectedEnrolmentRecordCreationEvent)
+                eventRepository.addEvent(expectedEnrolmentRecordCreationEvent)
             }
         }
     }
