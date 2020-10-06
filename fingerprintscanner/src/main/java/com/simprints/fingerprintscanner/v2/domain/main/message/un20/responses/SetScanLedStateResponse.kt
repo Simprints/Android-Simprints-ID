@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20M
 
 class SetScanLedStateResponse(val operationResultCode: OperationResultCode) : Un20Response(Un20MessageType.SetScanLedState) {
 
+    override fun getDataBytes(): ByteArray = byteArrayOf(operationResultCode.byte)
+
     companion object {
         fun fromBytes(data: ByteArray) = SetScanLedStateResponse(OperationResultCode.fromBytes(data))
     }

@@ -92,6 +92,8 @@ class CollectFingerprintsViewModel(
     private var lastCaptureStartedAt: Long = 0
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
+    private var liveFeedbackTask: Disposable? = null
+    private var stopLiveFeedbackTask: Disposable? = null
     private var liveFeedbackState : LiveFeedbackState? = null
 
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
@@ -132,37 +134,35 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private var liveFeedbackTask: Disposable? = null
-    private var stopLiveFeedbackTask: Disposable? = null
-
     private fun shouldWeDoLiveFeedback() : Boolean = true //STOPSHIP
 //        scannerManager.onScanner { isLiveFeedbackAvailable() } &&
 //            fingerprintPreferencesManager.liveFeedbackOn
 
-    private fun startLiveFeedback() : Completable {
-        return if (liveFeedbackState != LiveFeedbackState.Start && shouldWeDoLiveFeedback()) {
-            liveFeedbackState = LiveFeedbackState.Start
+    private fun startLiveFeedback() : Completable =
+        if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback()) {
+            logScannerMessageForCrashReport("startLiveFeedback")
+            liveFeedbackState = LiveFeedbackState.START
             stopLiveFeedbackTask?.dispose()
             scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
         } else {
             Completable.complete()
         }
-    }
 
     private fun pauseLiveFeedback() {
-        liveFeedbackState = LiveFeedbackState.Pause
+        logScannerMessageForCrashReport("pauseLiveFeedback")
+        liveFeedbackState = LiveFeedbackState.PAUSE
         liveFeedbackTask?.dispose()
     }
 
-    private fun stopLiveFeedback() : Completable {
-        return if (liveFeedbackState != LiveFeedbackState.Stop && shouldWeDoLiveFeedback()) {
-            liveFeedbackState = LiveFeedbackState.Stop
+    private fun stopLiveFeedback() : Completable =
+        if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback()) {
+            logScannerMessageForCrashReport("stopLiveFeedback")
+            liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.dispose()
             scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
         } else {
             Completable.complete()
         }
-    }
 
     private fun setStartingState() {
         state.value = CollectFingerprintsState(
@@ -528,7 +528,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun Completable.doInBackground() =
-        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = {})
+        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Timber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
         Timber.d(message)

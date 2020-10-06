@@ -15,6 +15,8 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2Feature
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
@@ -80,19 +82,27 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         scannerVersion?.api?.un20 ?: ChipApiVersion.UNKNOWN >= LIVE_FEEDBACK_UN20_API_MIN
 
     override fun startLiveFeedback() : Completable =
+        if (isLiveFeedbackAvailable()) {
             scannerV2.setScannerLedStateOn()
                 .andThen(
                     scannerV2
                         .getImageQualityPreview()
                         .flatMapCompletable { quality ->
                             scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
-                         }
+                        }
                         .repeat()
                 )
+        } else {
+            Completable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK))
+        }
 
     override fun stopLiveFeedback() : Completable =
+        if (isLiveFeedbackAvailable()) {
             scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
                 .andThen(scannerV2.setScannerLedStateDefault())
+        } else {
+            Completable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK))
+        }
 
 
     private fun ScannerV2.ensureUn20State(desiredState: Boolean): Completable =
