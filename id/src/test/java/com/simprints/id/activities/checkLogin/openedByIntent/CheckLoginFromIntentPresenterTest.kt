@@ -35,6 +35,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.secure.models.SecurityState.Status
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -72,6 +73,7 @@ class CheckLoginFromIntentPresenterTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        UnitTestConfig(this).coroutinesMainThread()
 
         presenter = CheckLoginFromIntentPresenter(view, DEFAULT_DEVICE_ID, appComponent).apply {
             remoteConfigFetcher = remoteConfigFetcherMock
@@ -254,7 +256,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_signedIn_updateCurrentSession() {
-        runBlockingTest {
+        runBlocking {
             val subjectCount = 3
             val analyticsId = "analyticsId"
             val projectId = DEFAULT_PROJECT_ID
@@ -263,7 +265,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
             coEvery { eventRepositoryMock.loadEvents(any()) } returns emptyFlow()
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
-            coEvery { analyticsManagerMock.getAnalyticsId() } returns analyticsId
+            coEvery { analyticsManagerMock.getAnalyticsId() } returns GUID1
             coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
 
             presenter.handleSignedInUser()
@@ -289,7 +291,7 @@ class CheckLoginFromIntentPresenterTest {
                 deviceArg,
                 databaseInfoArg).apply {
                     payload.location = locationArg
-                    payload.analyticsId = analyticsId
+                    payload.analyticsId = GUID1
                     payload.endedAt = ENDED_AT
                 }
 

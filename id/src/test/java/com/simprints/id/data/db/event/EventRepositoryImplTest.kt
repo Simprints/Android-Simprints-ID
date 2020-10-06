@@ -61,7 +61,7 @@ class EventRepositoryImplTest {
         every { preferencesManager.language } returns LANGUAGE
 
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        queryToLoadOpenSessions = DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, endTime = LongRange(0, 0))
+        queryToLoadOpenSessions = DbLocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))
         queryToLoadOldOpenSessions = DbLocalEventQuery(
             type = SESSION_CAPTURE,
             endTime = LongRange(0, 0),

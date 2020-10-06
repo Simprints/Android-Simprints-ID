@@ -7,6 +7,7 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
@@ -96,7 +97,9 @@ class SyncInformationViewModelTest {
 
         every { preferencesManager.eventDownSyncSetting } returns ON
         every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
@@ -130,6 +133,7 @@ class SyncInformationViewModelTest {
         every { preferencesManager.eventDownSyncSetting } returns OFF
         every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
         every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
@@ -158,6 +162,7 @@ class SyncInformationViewModelTest {
         every { preferencesManager.eventDownSyncSetting } returns ON
         every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
         every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { subjectRepositoryMock.count(any()) } throws IOException()
