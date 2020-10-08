@@ -506,7 +506,7 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnResume() {
-        startLiveFeedback().doInBackground()
+        updateState { /* refresh */ }
         scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
     }
 
