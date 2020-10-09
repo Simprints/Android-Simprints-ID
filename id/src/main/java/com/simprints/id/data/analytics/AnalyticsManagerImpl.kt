@@ -50,11 +50,11 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         logGuidSelectionWorker(projectId, sessionId, selectedGuid, callbackSent, deviceId)
     }
 
-    private fun logGuidSelectionWorker(apiKey: String, sessionId: String,
+    private fun logGuidSelectionWorker(projectId: String, sessionId: String,
                                        selectedGuid: String, callbackSent: Boolean, androidId: String) {
         Timber.d("AnalyticsManagerImpl.logGuidSelectionWorker(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
         val bundle = Bundle()
-        bundle.putString("api_key", apiKey)
+        bundle.putString("api_key", projectId)
         bundle.putString("selected_guid", selectedGuid)
         bundle.putString("android_id", androidId)
         bundle.putString("session_id", sessionId)
