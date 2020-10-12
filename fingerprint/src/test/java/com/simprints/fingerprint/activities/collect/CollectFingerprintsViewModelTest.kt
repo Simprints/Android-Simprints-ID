@@ -717,8 +717,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
         mockScannerSetUiIdle()
         captureFingerprintResponses(NEVER_RETURNS)
         setupLiveFeedbackOn()
-        vm.start(TWO_FINGERS_IDS)
 
+        vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
@@ -729,8 +729,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
         mockScannerSetUiIdle()
         captureFingerprintResponses(GOOD_SCAN)
         setupLiveFeedbackOn()
-        vm.start(TWO_FINGERS_IDS)
 
+        vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         verify { scanner.startLiveFeedback() }
@@ -742,8 +742,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
         mockScannerSetUiIdle()
         captureFingerprintResponses(BAD_SCAN)
         setupLiveFeedbackOn()
-        vm.start(TWO_FINGERS_IDS)
 
+        vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         verify { scanner.startLiveFeedback() }
@@ -755,10 +755,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
         mockScannerSetUiIdle()
         captureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
         setupLiveFeedbackOn()
+
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         mockTimer.executeAllTasks()
-
         vm.handleScanButtonPressed()
 
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
@@ -779,8 +779,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
     fun whenRestart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
         mockScannerSetUiIdle()
         setupLiveFeedbackOn()
-        vm.start(TWO_FINGERS_IDS)
 
+        vm.start(TWO_FINGERS_IDS)
         vm.handleRestart()
 
         verify { scanner.startLiveFeedback() }
@@ -790,8 +790,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
     @Test
     fun whenPause_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
         setupLiveFeedbackOn()
-        vm.start(TWO_FINGERS_IDS)
 
+        vm.start(TWO_FINGERS_IDS)
         vm.handleOnPause()
 
         verify { scanner.stopLiveFeedback() }
@@ -801,9 +801,9 @@ class CollectFingerprintsViewModelTest : KoinTest {
     @Test
     fun whenResume_AndLiveFeedbackWasStarted_liveFeedbackIsStarted() {
         setupLiveFeedbackOn()
+
         vm.start(TWO_FINGERS_IDS)
         vm.handleOnPause()
-
         vm.handleOnResume()
 
         verify { scanner.startLiveFeedback() }
@@ -814,9 +814,9 @@ class CollectFingerprintsViewModelTest : KoinTest {
     fun whenResume_AndLiveFeedbackWasStopped_liveFeedbackIsStopped() {
         mockScannerSetUiIdle()
         setupLiveFeedbackOn()
+
         getToEndOfWorkflow()
         vm.handleOnPause()
-
         vm.handleOnResume()
 
         verify { scanner.stopLiveFeedback() }
