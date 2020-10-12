@@ -94,7 +94,7 @@ class CollectFingerprintsViewModel(
     private var imageTransferTask: Disposable? = null
     private var liveFeedbackTask: Disposable? = null
     private var stopLiveFeedbackTask: Disposable? = null
-    private var liveFeedbackState : LiveFeedbackState? = null
+    var liveFeedbackState : LiveFeedbackState? = null
 
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
@@ -134,9 +134,9 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun shouldWeDoLiveFeedback() : Boolean = true //STOPSHIP
-//        scannerManager.onScanner { isLiveFeedbackAvailable() } &&
-//            fingerprintPreferencesManager.liveFeedbackOn
+    private fun shouldWeDoLiveFeedback() : Boolean =
+        scannerManager.onScanner { isLiveFeedbackAvailable() } &&
+            fingerprintPreferencesManager.liveFeedbackOn
 
     private fun startLiveFeedback() : Completable =
         if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback()) {
