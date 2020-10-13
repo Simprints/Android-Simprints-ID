@@ -7,7 +7,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.events_sync.EventSyncStatusDatabase
@@ -24,7 +24,7 @@ import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
 import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
-import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManagerImpl
+import com.simprints.id.data.db.subject.migration.SubjectToEventDbMigrationManagerImpl
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -135,10 +135,10 @@ open class DataModule {
 
     @Provides
     open fun provideSubjectToEventMigrationManager(loginInfoManager: LoginInfoManager,
-                                                   eventRepository: EventRepository,
+                                                   eventLocal: EventLocalDataSource,
                                                    timeHelper: TimeHelper,
                                                    crashReportManager: CrashReportManager,
                                                    preferencesManager: PreferencesManager,
-                                                   localDataSource: SubjectLocalDataSource): SubjectToEventMigrationManager =
-        SubjectToEventMigrationManagerImpl(loginInfoManager, eventRepository, timeHelper, crashReportManager, preferencesManager, localDataSource)
+                                                   subjectLocal: SubjectLocalDataSource): SubjectToEventMigrationManager =
+        SubjectToEventDbMigrationManagerImpl(loginInfoManager, eventLocal, timeHelper, crashReportManager, preferencesManager, subjectLocal)
 }
