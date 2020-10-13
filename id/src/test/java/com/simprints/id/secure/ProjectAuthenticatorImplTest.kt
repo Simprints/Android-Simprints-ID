@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
@@ -17,10 +17,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.io.IOException
 
-@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 class ProjectAuthenticatorImplTest {
 
@@ -36,15 +34,18 @@ class ProjectAuthenticatorImplTest {
     @MockK private lateinit var attestationManagerMock: AttestationManager
     @MockK private lateinit var authManagerMock: AuthManager
 
+    private lateinit var authenticator: ProjectAuthenticator
+    
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         mockManagers()
+
+        authenticator = buildProjectAuthenticator()
     }
 
     @Test
     fun successfulResponse_userShouldSignIn() = runBlockingTest {
-        val authenticator = buildProjectAuthenticator()
 
         authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
     }
@@ -53,8 +54,6 @@ class ProjectAuthenticatorImplTest {
     fun offline_authenticationShouldThrowException() = runBlockingTest {
         coEvery { authManagerMock.requestAuthToken(any()) } throws IOException()
 
-        val authenticator = buildProjectAuthenticator()
-
         assertThrows<IOException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
@@ -62,7 +61,6 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun authenticate_invokeAuthenticationDataManagerCorrectly() = runBlockingTest {
-        val authenticator = buildProjectAuthenticator()
 
         authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
@@ -71,7 +69,6 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun authenticate_invokeSignerManagerCorrectly() = runBlockingTest {
-        val authenticator = buildProjectAuthenticator()
 
         authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
@@ -80,7 +77,6 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun authenticate_invokeSecureDataManagerCorrectly() = runBlockingTest {
-        val authenticator = buildProjectAuthenticator()
 
         authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
@@ -91,8 +87,6 @@ class ProjectAuthenticatorImplTest {
     @Test
     fun safetyNetFailed_shouldThrowRightException() = runBlockingTest {
         every { attestationManagerMock.requestAttestation(any(), any()) } throws SafetyNetException("", SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
-
-        val authenticator = buildProjectAuthenticator()
 
         assertThrows<SafetyNetException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
@@ -122,6 +116,7 @@ class ProjectAuthenticatorImplTest {
         coEvery { projectRemoteDataSourceMock.loadProjectRemoteConfigSettingsJsonString(any()) } returns mockk()
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
         every { attestationManagerMock.requestAttestation(any(), any()) } returns AttestToken("google_attestation")
+        LanguageHelper.prefs = mockk(relaxed = true)
     }
 
     private companion object {

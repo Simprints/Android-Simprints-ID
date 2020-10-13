@@ -3,8 +3,8 @@ package com.simprints.id.network
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
-import com.simprints.id.tools.extensions.trace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -17,7 +17,9 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
                                                     private val url: String,
                                                     private val deviceId: String,
                                                     private val authToken: String? = null,
-                                                    private val jsonHelper: JsonHelper) : SimApiClient<T> {
+                                                    private val performanceTracer: FirebasePerformanceTraceFactory,
+                                                    private val jsonHelper: JsonHelper,
+                                                    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()) : SimApiClient<T> {
 
     override val api: T by lazy {
         retrofit.create(service.java)
@@ -32,14 +34,14 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        DefaultOkHttpClientBuilder().get(authToken, deviceId)
+        okHttpClientBuilder.get(authToken, deviceId)
     }
 
     override suspend fun <V> executeCall(traceName: String?,
                                          networkBlock: suspend (T) -> V): V {
 
         val trace = if (traceName != null) {
-            trace(traceName)
+            performanceTracer.newTrace(traceName)
         } else null
 
         trace?.start()

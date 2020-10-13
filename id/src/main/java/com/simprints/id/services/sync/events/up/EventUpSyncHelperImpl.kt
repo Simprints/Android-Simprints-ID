@@ -22,7 +22,7 @@ class EventUpSyncHelperImpl(
 ) : EventUpSyncHelper {
 
     override suspend fun countForUpSync(operation: EventUpSyncOperation): Int =
-        eventRepository.countEventsToUpload(operation.queryEvent)
+        eventRepository.localCount(operation.queryEvent)
 
     override suspend fun upSync(scope: CoroutineScope, operation: EventUpSyncOperation): ReceiveChannel<EventUpSyncProgress> =
         scope.produce {
@@ -44,7 +44,7 @@ class EventUpSyncHelperImpl(
                 Timber.d(t)
                 lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timerHelper.now())
                 emitProgress(lastOperation, count)
-                close(t)
+                close()
             }
         }
 

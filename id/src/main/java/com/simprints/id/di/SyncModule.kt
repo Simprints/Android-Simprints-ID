@@ -12,6 +12,8 @@ import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepositoryImpl
 import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.SubjectFactory
+import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
@@ -37,6 +39,8 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.tools.time.TimeHelper
+import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.id.tools.utils.EncodingUtilsImpl
 import dagger.Module
 import dagger.Provides
 
@@ -109,11 +113,19 @@ open class SyncModule {
         )
 
     @Provides
+    open fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl()
+
+    @Provides
+    open fun provideSubjectFactory(encodingUtils: EncodingUtils): SubjectFactory =
+        SubjectFactoryImpl(encodingUtils)
+
+    @Provides
     open fun provideEventDownSyncHelper(subjectRepository: SubjectRepository,
                                         eventRepository: EventRepository,
                                         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+                                        subjectFactory: SubjectFactory,
                                         timeHelper: TimeHelper): EventDownSyncHelper =
-        EventDownSyncHelperImpl(subjectRepository, eventRepository, eventDownSyncScopeRepository, timeHelper)
+        EventDownSyncHelperImpl(subjectRepository, eventRepository, eventDownSyncScopeRepository, subjectFactory, timeHelper)
 
     @Provides
     open fun provideEventUpSyncHelper(eventRepository: EventRepository,

@@ -1,5 +1,6 @@
 package com.simprints.id.services.sync.events.down
 
+import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
@@ -11,8 +12,10 @@ import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
+import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
+import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
+import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +29,7 @@ import timber.log.Timber
 class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                               val eventRepository: EventRepository,
                               private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+                              private val subjectFactory: SubjectFactory,
                               val timeHelper: TimeHelper) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
@@ -69,7 +73,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
                 lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
-                close(t)
+                close()
             }
 
         }
@@ -117,31 +121,34 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
         }
     }
 
-    private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
-        val subject = Subject.buildSubjectFromCreationPayload(event.payload)
+    @VisibleForTesting
+    fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
+        val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
         return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-            listOf(SubjectAction.Creation(subject))
+            listOf(Creation(subject))
         } else {
             emptyList()
         }
     }
 
-    private fun handleSubjectMoveEvent(event: EnrolmentRecordMoveEvent): List<SubjectAction> =
+    @VisibleForTesting
+    fun handleSubjectMoveEvent(event: EnrolmentRecordMoveEvent): List<SubjectAction> =
         mutableListOf<SubjectAction>().apply {
             event.payload.enrolmentRecordCreation?.let {
-                val subject = Subject.buildSubjectFromCreationPayload(it)
+                val subject = subjectFactory.buildSubjectFromMovePayload(it)
                 if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-                    add(SubjectAction.Creation(subject))
+                    add(Creation(subject))
                 }
             }
 
-            add(SubjectAction.Deletion(event.payload.enrolmentRecordDeletion.subjectId))
+            add(Deletion(event.payload.enrolmentRecordDeletion.subjectId))
         }
 
-    private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
-        listOf(SubjectAction.Deletion(event.payload.subjectId))
+    @VisibleForTesting
+    fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
+        listOf(Deletion(event.payload.subjectId))
 
     companion object {
-        private const val EVENTS_BATCH_SIZE = 200
+        const val EVENTS_BATCH_SIZE = 200
     }
 }

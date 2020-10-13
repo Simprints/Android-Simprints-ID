@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import com.simprints.id.services.sync.events.common.getAllSubjectsSyncWorkersInfo
-import com.simprints.id.services.sync.events.common.getUniqueSyncId
-import com.simprints.id.services.sync.events.common.sortByScheduledTime
+import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
@@ -16,6 +13,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -62,13 +60,19 @@ open class EventSyncMasterWorker(private val appContext: Context,
                 getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
                 //Requests timestamp now as device is surely ONLINE,
-                //so if needed the NTP cache gets refreshed.
+                //so if needed, the NTP has a chance to get refreshed.
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
                     val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                    val upSyncWorkers = upSyncWorkersChain(uniqueSyncId)
-                    val downSyncWorkers = downSyncWorkersChain(uniqueSyncId)
+                    val upSyncWorkers = upSyncWorkersChain(uniqueSyncId).also {
+                        Timber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
+                    }
+
+                    val downSyncWorkers = downSyncWorkersChain(uniqueSyncId).also {
+                        Timber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
+                    }
+
                     val chain = upSyncWorkers + downSyncWorkers
                     val endSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
                     wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()

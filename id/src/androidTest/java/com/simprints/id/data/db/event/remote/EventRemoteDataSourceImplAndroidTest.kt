@@ -15,6 +15,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
@@ -42,15 +43,17 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.subject.*
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.DefaultOkHttpClientBuilder
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.testtools.testingapi.TestProjectRule
@@ -64,11 +67,14 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class EventRemoteDataSourceImplAndroidTest {
@@ -90,6 +96,19 @@ class EventRemoteDataSourceImplAndroidTest {
     @MockK
     var remoteDbManager = mockk<RemoteDbManager>()
 
+    private val okHttpClientBuilder = object : DefaultOkHttpClientBuilder() {
+        override fun get(authToken: String?,
+                         deviceId: String): OkHttpClient.Builder =
+            super.get(authToken, deviceId).apply {
+                addNetworkInterceptor {
+                    var request = it.request()
+                    val url: HttpUrl = request.url.newBuilder().addQueryParameter("acceptInvalidEvents", "false").build()
+                    request = request.newBuilder().url(url).build()
+                    return@addNetworkInterceptor it.proceed(request)
+                }
+            }
+    }
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -100,7 +119,7 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager, JsonHelper()),
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device", remoteDbManager, mockk(relaxed = true), JsonHelper(), okHttpClientBuilder),
             JsonHelper()
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100
@@ -451,20 +470,6 @@ class EventRemoteDataSourceImplAndroidTest {
         add(ConfirmationCalloutEvent(DEFAULT_TIME, testProject.id, randomUUID(), randomUUID(), eventLabels))
     }
 
-    private fun buildFakeBiometricReferences(): List<BiometricReference> {
-        val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-        val faceReference = FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())))
-        return listOf(fingerprintReference, faceReference)
-    }
-
-    private fun buildFakeFingerprintTemplate() = EncodingUtils.byteArrayToBase64(
-        SubjectsGeneratorUtils.getRandomFingerprintSample().template
-    )
-
-    private fun buildFakeFaceTemplate() = EncodingUtils.byteArrayToBase64(
-        SubjectsGeneratorUtils.getRandomFaceSample().template
-    )
-
     // Never invoked, but used to enforce that the implementation of a test for every event class
     fun MutableList<Event>.addEventFor(type: EventType) {
 
@@ -514,3 +519,4 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
 }
+

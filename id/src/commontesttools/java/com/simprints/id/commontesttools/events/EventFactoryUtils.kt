@@ -8,6 +8,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
+import com.simprints.id.commontesttools.encodingUtilsForTests
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -80,7 +82,7 @@ fun createVerificationCallbackEvent(): VerificationCallbackEvent {
 
 fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2, eventLabels)
 
-fun createEnrolmentCalloutEvent() = EnrolmentCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
+fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(CREATED_AT, projectId, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels, projectId)
 
 fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
 
@@ -101,7 +103,10 @@ fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, 
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 
-fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT): SessionCaptureEvent {
+fun createSessionCaptureEvent(id: String = GUID1,
+                              createdAt: Long = CREATED_AT,
+                              projectId: String = DEFAULT_PROJECT_ID): SessionCaptureEvent {
+
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
     val languageArg = "language"
@@ -115,7 +120,7 @@ fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT):
 
     return SessionCaptureEvent(
         id,
-        DEFAULT_PROJECT_ID,
+        projectId,
         createdAt,
         listOf(FINGERPRINT, FACE),
         appVersionNameArg,
@@ -127,12 +132,6 @@ fun createSessionCaptureEvent(id: String = GUID1, createdAt: Long = CREATED_AT):
             payload.analyticsId = GUID1
             payload.endedAt = ENDED_AT
         }
-}
-
-private fun buildFakeBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, "fake_template", LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(GUID2, listOf(FaceTemplate("fake_template")))
-    return listOf(fingerprintReference, faceReference)
 }
 
 fun createEnrolmentRecordCreationEvent() =
@@ -151,6 +150,20 @@ fun createEnrolmentRecordMoveEvent() =
         EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
         EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+
+fun buildFakeBiometricReferences(): List<BiometricReference> {
+    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
+    val faceReference = FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())))
+    return listOf(fingerprintReference, faceReference)
+}
+
+fun buildFakeFingerprintTemplate() = encodingUtilsForTests.byteArrayToBase64(
+    SubjectsGeneratorUtils.getRandomFingerprintSample().template
+)
+
+private fun buildFakeFaceTemplate() = encodingUtilsForTests.byteArrayToBase64(
+    SubjectsGeneratorUtils.getRandomFaceSample().template
+)
 
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 

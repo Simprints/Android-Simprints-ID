@@ -4,10 +4,10 @@ import androidx.lifecycle.*
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
@@ -19,12 +19,11 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
-                               private val upSyncHelper: EventUpSyncHelper,
+                               private val eventRepository: EventRepository,
                                private val subjectRepository: SubjectRepository,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
@@ -64,7 +63,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        upSyncHelper.countForUpSync(EventUpSyncOperation(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION)))
+        eventRepository.localCount(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION))
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
         if (isDownSyncAllowed()) {
@@ -79,7 +78,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
         }
 
 
-    internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
             val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope()
             var creationsToDownload = 0
