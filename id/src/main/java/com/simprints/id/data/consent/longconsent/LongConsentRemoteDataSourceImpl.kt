@@ -20,7 +20,7 @@ class LongConsentRemoteDataSourceImpl(private val loginInfoManager: LoginInfoMan
 
     override suspend fun downloadLongConsent(language: String): LongConsentRemoteDataSource.Stream =
         getFileDownloadTask(language).awaitTask().let {
-            LongConsentRemoteDataSource.Stream(it.stream, it.bytesTransferred)
+            LongConsentRemoteDataSource.Stream(it.stream, it.totalByteCount)
         }
 
     private fun getFileDownloadTask(language: String): StreamDownloadTask =

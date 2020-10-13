@@ -1,19 +1,16 @@
 package com.simprints.id.data.consent.longconsent
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewState.ConsentAvailable
-import io.mockk.MockKAnnotations
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
-import org.junit.Before
+import kotlinx.coroutines.CoroutineDispatcher
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class LongConsentRepositoryImplTest {
 
     companion object {
@@ -22,31 +19,50 @@ class LongConsentRepositoryImplTest {
         private const val LONG_CONSENT_TEXT = "long consent text"
     }
 
-    @MockK lateinit var longConsentLocalDataSourceMock: LongConsentLocalDataSource
-    @MockK lateinit var longConsentRemoteDataSourceMock: LongConsentRemoteDataSource
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
 
-    @Before
-    fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
     }
 
+    private val longConsentLocalDataSourceMock: LongConsentLocalDataSource = mockk(relaxed = true)
+    private val longConsentRemoteDataSourceMock: LongConsentRemoteDataSource = mockk(relaxed = true)
+
+    private val longConsentRepository = LongConsentRepositoryImpl(
+        longConsentLocalDataSourceMock,
+        longConsentRemoteDataSourceMock,
+        mockk(),
+        testDispatcherProvider
+    )
+
     @Test
-    fun download_consentInLocal_shouldReturnTheLocalCopy() {
-        runBlocking {
-            every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns LONG_CONSENT_TEXT
-            val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, longConsentRemoteDataSourceMock, mockk())
+    fun download_consentInLocal_shouldReturnTheLocalCopy() = testCoroutineRule.runBlockingTest {
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns LONG_CONSENT_TEXT
 
-            val states = longConsentRepository.downloadLongConsent(arrayOf(DEFAULT_LANGUAGE))
-
-            assertThat(states.poll()).isEqualTo(mapOf(DEFAULT_LANGUAGE to ConsentAvailable(DEFAULT_LANGUAGE, LONG_CONSENT_TEXT)))
-            verify(exactly = 1) { longConsentLocalDataSourceMock.getLongConsentText(DEFAULT_LANGUAGE) }
+        val states = mutableListOf<Map<String, LongConsentFetchResult>>()
+        for (consent in longConsentRepository.downloadLongConsent(arrayOf(DEFAULT_LANGUAGE))) {
+            states.add(consent)
         }
+
+        assertThat(states).isEqualTo(
+            mapOf(
+                DEFAULT_LANGUAGE to ConsentAvailable(
+                    DEFAULT_LANGUAGE,
+                    LONG_CONSENT_TEXT
+                )
+            )
+        )
+        verify(exactly = 1) { longConsentLocalDataSourceMock.getLongConsentText(DEFAULT_LANGUAGE) }
     }
 
     @Test
     fun deleteLongConsents_shouldDeleteLongConsentsFromRepository() {
-        val longConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSourceMock, longConsentRemoteDataSourceMock, mockk())
-
         longConsentRepository.deleteLongConsents()
 
         verify(exactly = 1) { longConsentLocalDataSourceMock.deleteLongConsents() }
