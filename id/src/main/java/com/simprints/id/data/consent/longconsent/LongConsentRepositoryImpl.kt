@@ -4,8 +4,10 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -20,35 +22,36 @@ class LongConsentRepositoryImpl(
         const val DEFAULT_SIZE = 1024
     }
 
-    override suspend fun fetchLongConsent(language: String): String? =
-        longConsentLocalDataSource.getLongConsentText(language)
+    override fun getLongConsentForLanguages(languages: Array<String>): Flow<Map<String, LongConsentFetchResult>> =
+        flow {
+
+        }
+
+    override fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult> =
+        flow<LongConsentFetchResult> {
+            try {
+                val localConsent = longConsentLocalDataSource.getLongConsentText(language)
+                if (localConsent.isNotEmpty()) {
+                    emit(Succeed(language, localConsent))
+                } else {
+                    downloadLongConsentFromFirebaseStorage(this, language)
+                }
+            } catch (t: Throwable) {
+                crashReportManager.logExceptionOrSafeException(t)
+                emit(Failed(language, t))
+            }
+        }
+
+    override suspend fun fetchLongConsent(language: String): String? = null
 
     override suspend fun downloadLongConsent(languages: Array<String>): ReceiveChannel<Map<String, LongConsentFetchResult>> =
         withContext(dispatcherProvider.io()) {
             return@withContext produce<Map<String, LongConsentFetchResult>> {
-                val downloadState = createDownloadState(languages)
-                try {
-                    languages.forEach { language ->
-                        val localConsent = longConsentLocalDataSource.getLongConsentText(language)
-                        if (localConsent.isNotEmpty()) {
-                            updateStateAndEmit(this.channel, downloadState, Succeed(language, localConsent))
-                        } else {
-                            downloadLongConsentFromFirebaseStorage(this.channel, downloadState, language)
-                        }
-                    }
-                } catch (t: Throwable) {
-                    crashReportManager.logExceptionOrSafeException(t)
-                }
             }
         }
 
-    private fun createDownloadState(languages: Array<String>) =
-        languages.map { it to Progress(it, 0F) as LongConsentFetchResult }.toMap().toMutableMap()
-
-
     private suspend fun downloadLongConsentFromFirebaseStorage(
-        downloadStateChannel: SendChannel<Map<String, LongConsentFetchResult>>,
-        downloadState: MutableMap<String, LongConsentFetchResult>,
+        flowCollector: FlowCollector<LongConsentFetchResult>,
         language: String
     ) {
         try {
@@ -63,9 +66,7 @@ class LongConsentRepositoryImpl(
                 while (bytesToWrite >= 0) {
                     file.writeBytes(buffer)
                     bytesCopied += bytesToWrite
-                    updateStateAndEmit(
-                        downloadStateChannel,
-                        downloadState,
+                    flowCollector.emit(
                         Progress(language, (bytesCopied / stream.total).toFloat())
                     )
                     Timber.d("$language: Stored $bytesCopied / ${stream.total}")
@@ -73,35 +74,7 @@ class LongConsentRepositoryImpl(
                 }
             }
         } catch (t: Throwable) {
-            updateStateAndEmit(downloadStateChannel, downloadState, Failed(language, t))
-        }
-    }
-
-    private suspend fun updateStateAndEmit(
-        downloadStateChannel: SendChannel<Map<String, LongConsentFetchResult>>,
-        downloadState: MutableMap<String, LongConsentFetchResult>,
-        newResult: LongConsentFetchResult
-    ) {
-        try {
-            if (downloadState[newResult.language] != newResult) {
-                downloadState[newResult.language] = newResult
-                sendState(downloadStateChannel, downloadState)
-            }
-        } catch (t: Throwable) {
-            Timber.d(t)
-        }
-    }
-
-    private suspend fun sendState(
-        downloadStateChannel: SendChannel<Map<String, LongConsentFetchResult>>,
-        downloadState: MutableMap<String, LongConsentFetchResult>
-    ) {
-        if (!downloadStateChannel.isClosedForSend) {
-            downloadStateChannel.send(downloadState)
-        }
-
-        if (!downloadState.values.any { it is Progress }) {
-            downloadStateChannel.close()
+            flowCollector.emit(Failed(language, t))
         }
     }
 
