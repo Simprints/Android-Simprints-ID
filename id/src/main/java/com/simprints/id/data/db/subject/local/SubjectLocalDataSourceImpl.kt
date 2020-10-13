@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.subject.local
 
 import android.content.Context
-import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -11,6 +10,7 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
+import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
@@ -39,6 +39,7 @@ class SubjectLocalDataSourceImpl(
 
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
+        const val SYNC_FIELD = "toSync"
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
@@ -133,10 +134,10 @@ class SubjectLocalDataSourceImpl(
             Realm.getInstance(config).use {
                 it.transactAwait { realm ->
                     actions.forEach { action ->
-                        when(action) {
-                           is Creation -> {
-                               realm.insertOrUpdate(action.subject.fromDomainToDb())
-                           }
+                        when (action) {
+                            is Creation -> {
+                                realm.insertOrUpdate(action.subject.fromDomainToDb())
+                            }
                             is Deletion -> {
                                 realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
                                     .findAll()
@@ -148,6 +149,18 @@ class SubjectLocalDataSourceImpl(
             }
         }
     }
+
+    override suspend fun subjectsThatRequireMigration() =
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use {
+                it.where(DbSubject::class.java).let { query ->
+                    query.equalTo(SYNC_FIELD, true)
+                }.await()
+                    ?.map { dbSubject -> dbSubject.fromDbToDomain() }
+                    ?.asFlow()
+                    ?: flowOf()
+            }
+        }
 
     private fun Realm.buildRealmQueryForSubject(query: SubjectQuery?): RealmQuery<DbSubject> =
         where(DbSubject::class.java)
