@@ -7,6 +7,7 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreat
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
@@ -66,7 +67,7 @@ class SubjectToEventDbMigrationManagerImplTest {
 
             migrationManager.migrateSubjectToSyncToEventsDb()
 
-            coVerify(exactly = 1) { subjectLocal.load(any()) }
+            coVerify(exactly = 1) { subjectLocal.load(DbSubject(toSync = true)) }
         }
     }
 
