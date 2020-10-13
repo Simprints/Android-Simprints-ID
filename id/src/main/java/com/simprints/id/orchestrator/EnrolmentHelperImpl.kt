@@ -37,7 +37,7 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
 
         Timber.tag(TAG).d("Up-syncing")
         inBackground {
-            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.getSignedInProjectIdOrEmpty())).collect {  }
+            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.getSignedInProjectIdOrEmpty())).collect()
         }
 
         Timber.tag(TAG).d("Done!")

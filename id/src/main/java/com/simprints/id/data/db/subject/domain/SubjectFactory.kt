@@ -48,7 +48,7 @@ class SubjectFactoryImpl(private val encodingUtils: EncodingUtils) : SubjectFact
     }
 
     private fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
-        biometricReferences?.filterIsInstance(FaceReference::class.java)
+        biometricReferences?.filterIsInstance<FaceReference>()
             ?.firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
 
     private fun buildFaceSample(template: FaceTemplate) =
