@@ -393,8 +393,9 @@ open class AppModule {
     @Provides
     open fun providePrivacyNoticeViewModelFactory(
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager
-    ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager)
+        preferencesManager: PreferencesManager,
+        dispatcherProvider: DispatcherProvider
+    ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager, dispatcherProvider)
 
     @Provides
     fun provideHotCache(

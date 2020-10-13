@@ -49,7 +49,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         longConsent_downloadButton.text = getString(R.string.long_consent_download_button_text)
         longConsent_downloadButton.setOnClickListener {
             if (deviceManager.isConnected()) {
-                viewModel.downloadLongConsent()
+//                viewModel.downloadLongConsent()
             } else {
                 showUserOfflineToast()
             }

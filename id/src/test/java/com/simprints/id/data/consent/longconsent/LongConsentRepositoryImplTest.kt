@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.toCollection
 import org.junit.Rule
 import org.junit.Test
 
@@ -45,19 +46,13 @@ class LongConsentRepositoryImplTest {
     fun download_consentInLocal_shouldReturnTheLocalCopy() = testCoroutineRule.runBlockingTest {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns LONG_CONSENT_TEXT
 
-        val states = mutableListOf<Map<String, LongConsentFetchResult>>()
-        for (consent in longConsentRepository.downloadLongConsent(arrayOf(DEFAULT_LANGUAGE))) {
-            states.add(consent)
-        }
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
-        assertThat(states).isEqualTo(
-            mapOf(
-                DEFAULT_LANGUAGE to ConsentAvailable(
-                    DEFAULT_LANGUAGE,
-                    LONG_CONSENT_TEXT
-                )
-            )
-        )
+        with(states) {
+            assertThat(size).isEqualTo(1)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.Succeed(DEFAULT_LANGUAGE, LONG_CONSENT_TEXT))
+        }
         verify(exactly = 1) { longConsentLocalDataSourceMock.getLongConsentText(DEFAULT_LANGUAGE) }
     }
 
