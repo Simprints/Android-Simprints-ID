@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -213,7 +215,13 @@ open class AppModule {
         sessionRealmConfigBuilder: SessionRealmConfigBuilder,
         sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
     ): SessionLocalDataSource =
-        SessionLocalDataSourceImpl(ctx, secureDataManager, timeHelper, sessionRealmConfigBuilder, sessionEventValidatorsBuilder.build())
+        SessionLocalDataSourceImpl(
+            ctx,
+            secureDataManager,
+            timeHelper,
+            sessionRealmConfigBuilder,
+            sessionEventValidatorsBuilder.build()
+        )
 
     @Provides
     @Singleton
@@ -308,10 +316,12 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: SubjectRepository,
-                                              deviceManager: DeviceManager,
-                                              sessionRepository: SessionRepository,
-                                              timeHelper: TimeHelper) =
+    open fun provideFetchGuidViewModelFactory(
+        personRepository: SubjectRepository,
+        deviceManager: DeviceManager,
+        sessionRepository: SessionRepository,
+        timeHelper: TimeHelper
+    ) =
         FetchGuidViewModelFactory(personRepository, deviceManager, sessionRepository, timeHelper)
 
     @Provides
@@ -415,5 +425,8 @@ open class AppModule {
         deviceManager: DeviceManager,
         crashReportManager: CrashReportManager
     ) = SetupViewModelFactory(deviceManager, crashReportManager)
+
+    @Provides
+    open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
 }
 

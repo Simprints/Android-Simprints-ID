@@ -1,8 +1,8 @@
 package com.simprints.id.data.consent.longconsent
 
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
@@ -12,9 +12,9 @@ import timber.log.Timber
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
     private val longConsentRemoteDataSource: LongConsentRemoteDataSource,
-    private val crashReportManager: CrashReportManager
+    private val crashReportManager: CrashReportManager,
+    private val dispatcherProvider: DispatcherProvider
 ) : LongConsentRepository {
-
 
     companion object {
         const val DEFAULT_SIZE = 1024
@@ -24,7 +24,7 @@ class LongConsentRepositoryImpl(
         longConsentLocalDataSource.getLongConsentText(language)
 
     override suspend fun downloadLongConsent(languages: Array<String>): ReceiveChannel<Map<String, LongConsentFetchResult>> =
-        withContext(Dispatchers.IO) {
+        withContext(dispatcherProvider.io()) {
             return@withContext produce<Map<String, LongConsentFetchResult>> {
                 val downloadState = createDownloadState(languages)
                 try {
@@ -51,27 +51,30 @@ class LongConsentRepositoryImpl(
         downloadState: MutableMap<String, LongConsentFetchResult>,
         language: String
     ) {
-//        try {
-//            val stream = longConsentRemoteDataSource.downloadLongConsent(language)
-//            val bufferedStream = stream.inputStream.buffered(DEFAULT_SIZE)
-//            val file = longConsentLocalDataSource.createFileForLanguage(language)
-//            var count = 0
-//            Timber.d("$language: Ready to download ${stream.total} bytes")
-//
-//            while (stream.) {
-//                val bytes = bufferedStream.readBytes()
-//                file.writeBytes(bytes)
-//                updateStateAndEmit(
-//                    downloadStateChannel,
-//                    downloadState,
-//                    Progress(language, (bytes.size / totalToDownload).toFloat())
-//                )
-//                count += bytes.size
-//                Timber.d("$language: Stored ${bytes.size} / $totalToDownload")
-//            }
-//        } catch (t: Throwable) {
-//            updateStateAndEmit(downloadStateChannel, downloadState, Failed(language, t))
-//        }
+        try {
+            val stream = longConsentRemoteDataSource.downloadLongConsent(language)
+            val file = longConsentLocalDataSource.createFileForLanguage(language)
+            Timber.d("$language: Ready to download ${stream.total} bytes")
+
+            stream.inputStream.use {
+                var bytesCopied: Long = 0
+                val buffer = ByteArray(DEFAULT_SIZE)
+                var bytesToWrite = it.read(buffer)
+                while (bytesToWrite >= 0) {
+                    file.writeBytes(buffer)
+                    bytesCopied += bytesToWrite
+                    updateStateAndEmit(
+                        downloadStateChannel,
+                        downloadState,
+                        Progress(language, (bytesCopied / stream.total).toFloat())
+                    )
+                    Timber.d("$language: Stored $bytesCopied / ${stream.total}")
+                    bytesToWrite = it.read(buffer)
+                }
+            }
+        } catch (t: Throwable) {
+            updateStateAndEmit(downloadStateChannel, downloadState, Failed(language, t))
+        }
     }
 
     private suspend fun updateStateAndEmit(
