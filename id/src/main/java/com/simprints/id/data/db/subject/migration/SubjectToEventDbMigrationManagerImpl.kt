@@ -6,6 +6,7 @@ import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
@@ -25,7 +26,7 @@ class SubjectToEventDbMigrationManagerImpl(
     override suspend fun migrateSubjectToSyncToEventsDb() {
         try {
             if (loginInfoManager.getSignedInProjectIdOrEmpty().isNotEmpty()) {
-                val subjectsToSync = subjectLocal.load().toList()
+                val subjectsToSync = subjectLocal.load(SubjectQuery(toSync = true)).toList()
                 if (subjectsToSync.isNotEmpty()) {
 
                     for (subject in subjectsToSync) {

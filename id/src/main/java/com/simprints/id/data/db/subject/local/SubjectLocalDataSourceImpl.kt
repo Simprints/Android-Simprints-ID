@@ -170,6 +170,7 @@ class SubjectLocalDataSourceImpl(
                     query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
                     query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
+                    query.toSync?.let { this.equalTo(SYNC_FIELD, it) }
                 }
             }
 
