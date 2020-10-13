@@ -32,7 +32,7 @@ class PrivacyNoticeViewModel(
                     it.printStackTrace()
                     PrivacyNoticeViewState.ConsentNotAvailable(language)
                 }
-                .collect { privacyNoticeViewState.postValue(it) }
+                .collect { privacyNoticeViewState.value = it }
         }
     }
 

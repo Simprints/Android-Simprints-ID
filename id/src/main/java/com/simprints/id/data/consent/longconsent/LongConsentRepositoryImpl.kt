@@ -59,20 +59,23 @@ class LongConsentRepositoryImpl(
             val file = longConsentLocalDataSource.createFileForLanguage(language)
             Timber.d("$language: Ready to download ${stream.total} bytes")
 
-            stream.inputStream.use {
-                var bytesCopied: Long = 0
-                val buffer = ByteArray(DEFAULT_SIZE)
-                var bytesToWrite = it.read(buffer)
-                while (bytesToWrite >= 0) {
-                    file.writeBytes(buffer)
-                    bytesCopied += bytesToWrite
-                    flowCollector.emit(
-                        Progress(language, (bytesCopied / stream.total).toFloat())
-                    )
-                    Timber.d("$language: Stored $bytesCopied / ${stream.total}")
-                    bytesToWrite = it.read(buffer)
+            stream.inputStream.use { input ->
+                file.outputStream().use { output ->
+                    var bytesCopied: Long = 0
+                    val buffer = ByteArray(DEFAULT_SIZE)
+                    var bytesToWrite = input.read(buffer)
+                    while (bytesToWrite >= 0) {
+                        output.write(buffer, 0, bytesToWrite)
+                        bytesCopied += bytesToWrite
+                        flowCollector.emit(
+                            Progress(language, bytesCopied / stream.total.toFloat())
+                        )
+                        Timber.d("$language: Stored $bytesCopied / ${stream.total}")
+                        bytesToWrite = input.read(buffer)
+                    }
                 }
             }
+
         } catch (t: Throwable) {
             flowCollector.emit(Failed(language, t))
         }
