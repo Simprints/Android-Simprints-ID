@@ -35,7 +35,7 @@ class EnrolmentHelperImplTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var timeHelper: TimeHelper
 
-    lateinit var enrolmentHelper: EnrolmentHelper
+    private lateinit var enrolmentHelper: EnrolmentHelper
 
     @Before
     fun setUp() {
