@@ -7,6 +7,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.db.events_sync.EventSyncStatusDatabase
@@ -22,12 +23,16 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
+import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
+import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManagerImpl
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
+import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -127,4 +132,13 @@ open class DataModule {
     @Singleton
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
+
+    @Provides
+    open fun provideSubjectToEventMigrationManager(loginInfoManager: LoginInfoManager,
+                                                   eventRepository: EventRepository,
+                                                   timeHelper: TimeHelper,
+                                                   crashReportManager: CrashReportManager,
+                                                   preferencesManager: PreferencesManager,
+                                                   localDataSource: SubjectLocalDataSource): SubjectToEventMigrationManager =
+        SubjectToEventMigrationManagerImpl(loginInfoManager, eventRepository, timeHelper, crashReportManager, preferencesManager, localDataSource)
 }

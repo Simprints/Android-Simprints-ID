@@ -13,4 +13,6 @@ data class Subject(
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
     var fingerprintSamples: List<FingerprintSample> = emptyList(),
-    var faceSamples: List<FaceSample> = emptyList()) : Parcelable
+    var faceSamples: List<FaceSample> = emptyList(),
+    @Deprecated("Required to migrate to the new Events Architecture. Not used any more for the sync.")
+    val toSync: Boolean = false) : Parcelable

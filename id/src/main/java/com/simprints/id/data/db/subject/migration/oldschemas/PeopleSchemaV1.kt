@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.common.realm.oldschemas
+package com.simprints.id.data.db.subject.migration.oldschemas
 
 object PeopleSchemaV1 {
     const val PERSON_TABLE = "rl_Person"
