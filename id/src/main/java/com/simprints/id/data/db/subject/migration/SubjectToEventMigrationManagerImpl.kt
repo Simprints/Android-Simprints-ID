@@ -25,24 +25,26 @@ class SubjectToEventMigrationManagerImpl(
         try {
             if (loginInfoManager.getSignedInProjectIdOrEmpty().isNotEmpty()) {
                 val subjectsToSync = localDataSource.load().toList()
-                for (subject in subjectsToSync) {
-                    eventRepository.addEvent(
-                        EnrolmentRecordCreationEvent(
-                            timeHelper.now(),
-                            subject.subjectId,
-                            subject.projectId,
-                            subject.moduleId,
-                            subject.attendantId,
-                            preferencesManager.modalities.map { it.toMode() },
-                            EnrolmentRecordCreationEvent.buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+                if (subjectsToSync.isNotEmpty()) {
+                    for (subject in subjectsToSync) {
+                        eventRepository.addEvent(
+                            EnrolmentRecordCreationEvent(
+                                timeHelper.now(),
+                                subject.subjectId,
+                                subject.projectId,
+                                subject.moduleId,
+                                subject.attendantId,
+                                preferencesManager.modalities.map { it.toMode() },
+                                EnrolmentRecordCreationEvent.buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+                            )
                         )
-                    )
-                }
+                    }
 
-                localDataSource.performActions(subjectsToSync.map {
-                    //It overrides the original subject since the subjectId is the same
-                    SubjectAction.Creation(it.copy(toSync = false))
-                })
+                    localDataSource.performActions(subjectsToSync.map {
+                        //It overrides the original subject since the subjectId is the same
+                        SubjectAction.Creation(it.copy(toSync = false))
+                    })
+                }
             }
         } catch (t: Throwable) {
             Timber.e(t)
