@@ -24,7 +24,7 @@ class AttestationManagerImpl: AttestationManager {
 
     internal fun getSafetyNetAttestationResponse(safetyNetClient: SafetyNetClient, nonce: Nonce): SafetyNetApi.AttestationResponse {
         return try {
-            Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, Base64.NO_WRAP), BuildConfig.ANDROID_AUTH_API_KEY))
+            Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, Base64.NO_WRAP), BuildConfig.SAFETYNET_API_KEY))
         } catch (e: Throwable) {
             throw SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
         }
