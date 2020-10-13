@@ -4,6 +4,6 @@ import androidx.annotation.Keep
 
 @Keep
 sealed class SubjectAction {
-    class Creation(val subject: Subject): SubjectAction()
-    class Deletion(val subjectId: String): SubjectAction()
+    data class Creation(val subject: Subject): SubjectAction()
+    data class Deletion(val subjectId: String): SubjectAction()
 }

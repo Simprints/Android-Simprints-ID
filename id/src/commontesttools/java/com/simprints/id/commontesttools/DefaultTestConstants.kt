@@ -3,10 +3,12 @@ package com.simprints.id.commontesttools
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
+import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 
 object DefaultTestConstants {
+    const val DEFAULT_DEVICE_ID = "device_id"
     const val DEFAULT_PROJECT_ID = "vkbpRLfHvpQqaeoxZgyx"
     const val DEFAULT_MODULE_ID = "the_one_and_only_module"
     const val DEFAULT_MODULE_ID_2 = "the_one_and_only_module2"
@@ -17,6 +19,7 @@ object DefaultTestConstants {
     const val DEFAULT_PROJECT_SECRET = "3xDCW0IL/m7nNBWPlVQljh4RzZgcho3Gp7WEj07YqgSER6ESXeY8tVczlNsxubug7co45/PsfG7JiC9oo/U54w=="
     const val DEFAULT_METADATA = "DEFAULT_METADATA"
 
+    val STATIC_GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
     val GUID1 = UUID.randomUUID().toString()
     val GUID2 = UUID.randomUUID().toString()
     val GUID3 = UUID.randomUUID().toString()
@@ -51,4 +54,6 @@ object DefaultTestConstants {
         listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
         DEFAULT_MODES
     )
+
+    val defaultSubject = Subject(GUID1, DEFAULT_PROJECT_ID, GUID2, DEFAULT_MODULE_ID)
 }

@@ -124,10 +124,10 @@ class EventRepositoryImplTest {
     @Test
     fun addEventIntoASession_shouldStoreItIntoTheDbWithRightLabels() {
         runBlocking {
-            mockDbToHaveOneOpenSession()
+            val session = mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
 
-            eventRepo.addEvent(newEvent, GUID1)
+            eventRepo.addEventToSession(newEvent, session)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
@@ -169,13 +169,14 @@ class EventRepositoryImplTest {
     fun createBatches_shouldSplitEventsCorrectlyIntoBatches() {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
+            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE + 10)
 
-            val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery())
+            val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery(DEFAULT_PROJECT_ID))
 
             assertThat(bathes[0].events.size).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(bathes[1].events.size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(bathes[2].events.size).isEqualTo(SESSION_BATCH_SIZE / 2)
+            assertThat(bathes[2].events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(bathes[3].events.size).isEqualTo(10)
         }
     }
 
@@ -184,7 +185,7 @@ class EventRepositoryImplTest {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE, GUID1, GUID2)
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID1)) }
             coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID2)) }
@@ -197,7 +198,7 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadOpenSession(GUID3)
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             verifySessionHasNotGotUploaded(GUID3)
         }
@@ -209,7 +210,7 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadOldOpenSession(GUID3)
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             verifySessionHasGotUploaded(GUID3)
             verifyArtificialEventWasAdded(GUID3, TIMED_OUT)
@@ -217,13 +218,13 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun uploadSucceeds_shouldDeleteEvents() {
+    fun upload_succeeds_shouldDeleteEvents() {
         runBlocking {
             val events =
                 mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             events.forEach {
                 coVerify {
@@ -234,12 +235,12 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldEmitProgress() {
+    fun upload_inProgress_shouldEmitProgress() {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            val progress = eventRepo.uploadEvents(LocalEventQuery()).toList()
+            val progress = eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
@@ -247,13 +248,13 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldDeleteUploadedEvents() {
+    fun upload_succeeds_shouldDeleteUploadedEvents() {
         runBlocking {
             val events =
                 mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             for (event in events) {
                 coVerify { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
@@ -262,27 +263,32 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_shouldNotDeleteEventsAfterNetworkIssues() {
+    fun upload_fails_shouldNotDeleteEventsAfterNetworkIssues() {
         runBlocking {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             coVerify(exactly = 0) { eventLocalDataSource.delete(any()) }
         }
     }
 
     @Test
-    fun upload_shouldDeleteEventsAfterIntegrationIssues() {
+    fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
             val events = mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
+            val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(LocalEventQuery()).toList()
+            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             for (event in events) {
                 coVerify { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
+            }
+
+            for (event in subjectEvents) {
+                coVerify(exactly = 0) { eventLocalDataSource.delete(DbLocalEventQuery(id = event.id)) }
             }
         }
     }

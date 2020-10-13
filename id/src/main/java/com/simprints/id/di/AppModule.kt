@@ -80,6 +80,8 @@ import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
@@ -185,15 +187,21 @@ open class AppModule {
     )
 
     @Provides
+    open fun provideFirebasePerformanceTraceFactory(): FirebasePerformanceTraceFactory =
+        FirebasePerformanceTraceFactoryImpl()
+
+    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
+        performanceTracer: FirebasePerformanceTraceFactory,
         jsonHelper: JsonHelper
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         remoteDbManager,
+        performanceTracer,
         jsonHelper
     )
 
@@ -307,8 +315,9 @@ open class AppModule {
     @Provides
     open fun provideGuidFetchGuidHelper(downSyncHelper: EventDownSyncHelper,
                                         subjectRepository: SubjectRepository,
-                                        preferencesManager: PreferencesManager): FetchGuidHelper =
-        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager)
+                                        preferencesManager: PreferencesManager,
+                                        crashReportManager: CrashReportManager): FetchGuidHelper =
+        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
 
     @Provides
     open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
@@ -320,7 +329,7 @@ open class AppModule {
     @Provides
     open fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
-        upSyncHelper: EventUpSyncHelper,
+        eventRepository: EventRepository,
         subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
@@ -330,7 +339,7 @@ open class AppModule {
     ) =
         SyncInformationViewModelFactory(
             downySyncHelper,
-            upSyncHelper,
+            eventRepository,
             subjectRepository,
             preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
@@ -409,10 +418,10 @@ open class AppModule {
     fun provideEnrolmentHelper(
         subjectRepository: SubjectRepository,
         eventRepository: EventRepository,
-        eventSyncManager: EventSyncManager,
         preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, eventSyncManager, preferencesManager, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
 
     @Provides
     open fun provideEnrolLastBiometricsViewModel(

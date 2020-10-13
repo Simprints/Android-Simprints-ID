@@ -10,9 +10,7 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CONFIGURATION
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
@@ -135,5 +133,6 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     @After
     fun tearDown() {
         stopKoin()
+        unmockkAll()
     }
 }

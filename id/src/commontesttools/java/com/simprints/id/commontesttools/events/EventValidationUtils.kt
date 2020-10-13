@@ -322,7 +322,7 @@ fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
         assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
-        assertThat(this.getJSONArray("mode").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("mode").length()).isEqualTo(2)
         assertThat(this.length()).isEqualTo(5)
     }
     with(json.getJSONObject("payload")) {
@@ -331,7 +331,7 @@ fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(3)
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(0)
         assertThat(getString("subjectId")).isNotEmpty()
         assertThat(getString("projectId")).isNotEmpty()
         assertThat(getString("moduleId")).isNotEmpty()
@@ -348,7 +348,7 @@ fun validateEnrolmentRecordMoveEventApiModel(json: JSONObject) {
         assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
-        assertThat(this.getJSONArray("mode").length()).isEqualTo(1)
+        assertThat(this.getJSONArray("mode").length()).isEqualTo(2)
         assertThat(this.length()).isEqualTo(5)
     }
     with(json.getJSONObject("payload")) {

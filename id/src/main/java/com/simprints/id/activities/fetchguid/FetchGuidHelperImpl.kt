@@ -1,5 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
@@ -17,38 +18,45 @@ import timber.log.Timber
 
 class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
                           val subjectRepository: SubjectRepository,
-                          val preferencesManager: PreferencesManager) : FetchGuidHelper {
+                          val preferencesManager: PreferencesManager,
+                          val crashReportManager: CrashReportManager) : FetchGuidHelper {
 
     override suspend fun loadFromRemoteIfNeeded(coroutineScope: CoroutineScope, projectId: String, subjectId: String): SubjectFetchResult {
-        val subjectResultFromDB = fetchFromLocalDb(projectId, subjectId)
-        Timber.d("[FETCH_GUID] Fetching $subjectId")
-        return if (subjectResultFromDB != null) {
-            Timber.d("[FETCH_GUID] Guid found in Local")
+        return try {
+            val subjectResultFromDB = fetchFromLocalDb(projectId, subjectId)
+            Timber.d("[FETCH_GUID] Fetching $subjectId")
+            return if (subjectResultFromDB != null) {
+                Timber.d("[FETCH_GUID] Guid found in Local")
 
-            subjectResultFromDB
-        } else {
-            val op = EventDownSyncOperation(
-                RemoteEventQuery(
-                    projectId,
-                    subjectId = subjectId,
-                    modes = preferencesManager.modalities.map { it.toMode() },
-                    types = EventDownSyncScope.subjectEvents))
-
-            downSyncHelper.downSync(coroutineScope, op).consumeAsFlow().toList()
-
-            Timber.d("[FETCH_GUID] Network request done")
-
-            val subjectResult = fetchFromLocalDb(projectId, subjectId)
-
-            if (subjectResult != null) {
-                Timber.d("[FETCH_GUID] Guid found in Remote")
-
-                SubjectFetchResult(subjectResult.subject, REMOTE)
+                subjectResultFromDB
             } else {
-                Timber.d("[FETCH_GUID] Guid found not")
+                val op = EventDownSyncOperation(
+                    RemoteEventQuery(
+                        projectId,
+                        subjectId = subjectId,
+                        modes = preferencesManager.modalities.map { it.toMode() },
+                        types = EventDownSyncScope.subjectEvents))
 
-                SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+                downSyncHelper.downSync(coroutineScope, op).consumeAsFlow().toList()
+
+                Timber.d("[FETCH_GUID] Network request done")
+
+                val subjectResult = fetchFromLocalDb(projectId, subjectId)
+
+                if (subjectResult != null) {
+                    Timber.d("[FETCH_GUID] Guid found in Remote")
+
+                    SubjectFetchResult(subjectResult.subject, REMOTE)
+                } else {
+                    Timber.d("[FETCH_GUID] Guid found not")
+
+                    SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+                }
             }
+        } catch (t: Throwable) {
+            Timber.e(t)
+            crashReportManager.logException(t)
+            SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         }
     }
 

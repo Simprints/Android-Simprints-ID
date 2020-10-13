@@ -11,7 +11,8 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
-import com.simprints.id.tools.extensions.trace
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import timber.log.Timber
 import java.io.IOException
 
@@ -20,7 +21,10 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
     abstract val tag: String
     var resultSetter: WorkerResultSetter = WorkerResultSetterImpl()
+    var firebasePerformanceTraceFactory: FirebasePerformanceTraceFactory = FirebasePerformanceTraceFactoryImpl()
+
     abstract var crashReportManager: CrashReportManager
+
     private var workerTrace: Trace? = null
 
     protected inline fun <reified T> getComponent(block: (component: AppComponent) -> Unit) {
@@ -31,7 +35,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     }
 
     protected fun traceWorkerPerformance() {
-        workerTrace = trace("${tag}Trace")
+        workerTrace = firebasePerformanceTraceFactory.newTrace("${tag}Trace")
         workerTrace?.start()
     }
 

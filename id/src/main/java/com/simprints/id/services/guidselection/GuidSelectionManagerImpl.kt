@@ -8,9 +8,8 @@ import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.ignoreException
-import io.reactivex.Completable
+import com.simprints.id.tools.time.TimeHelper
 import timber.log.Timber
 
 class GuidSelectionManagerImpl(val deviceId: String,
@@ -26,14 +25,14 @@ class GuidSelectionManagerImpl(val deviceId: String,
             saveGuidSelectionEvent(request)
             reportToAnalytics(request, true)
         } catch (t: Throwable) {
-            Timber.e(t)
+            Timber.d(t)
             crashReportManager.logExceptionOrSafeException(t)
             reportToAnalytics(request, false)
         }
     }
 
-    private fun checkRequest(request: GuidSelectionRequest): Completable = Completable.fromCallable {
-        checkProjectId(request.projectId)
+    private fun checkRequest(request: GuidSelectionRequest) {
+        if (!loginInfoManager.isProjectIdSignedIn(request.projectId)) throw NotSignedInException()
     }
 
     private suspend fun saveGuidSelectionEvent(request: GuidSelectionRequest) =
@@ -50,8 +49,4 @@ class GuidSelectionManagerImpl(val deviceId: String,
             deviceId,
             request.selectedGuid,
             callbackSent)
-
-    private fun checkProjectId(projectId: String) {
-        if (!loginInfoManager.isProjectIdSignedIn(projectId)) throw NotSignedInException()
-    }
 }

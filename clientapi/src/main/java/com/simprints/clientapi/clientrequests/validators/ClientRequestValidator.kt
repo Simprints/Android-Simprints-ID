@@ -46,7 +46,6 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
     } catch (ex: Throwable) {
         false
     }
-
 }
 
 

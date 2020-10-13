@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import androidx.room.Room
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
@@ -29,7 +28,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -128,6 +126,5 @@ open class DataModule {
     @Provides
     @Singleton
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
-        Room.databaseBuilder(ctx, EventSyncStatusDatabase::class.java, EventSyncStatusDatabase.ROOM_DB_NAME)
-            .build()
+        EventSyncStatusDatabase.getDatabase(ctx)
 }

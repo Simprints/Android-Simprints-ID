@@ -42,7 +42,6 @@ class SubjectLocalDataSourceImpl(
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
-        const val TO_SYNC_FIELD = "toSync"
     }
 
     val config: RealmConfiguration by lazy {
@@ -158,7 +157,6 @@ class SubjectLocalDataSourceImpl(
                     query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
                     query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                    query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
                 }
             }
 
