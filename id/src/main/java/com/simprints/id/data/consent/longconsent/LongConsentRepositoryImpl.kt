@@ -1,18 +1,15 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.flow
 
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
     private val longConsentRemoteDataSource: LongConsentRemoteDataSource,
-    private val crashReportManager: CrashReportManager,
-    private val dispatcherProvider: DispatcherProvider
+    private val crashReportManager: CrashReportManager
 ) : LongConsentRepository {
 
     companion object {
@@ -32,14 +29,6 @@ class LongConsentRepositoryImpl(
             emit(Failed(language, t))
         }
     }
-
-    override suspend fun fetchLongConsent(language: String): String? = null
-
-    override suspend fun downloadLongConsent(languages: Array<String>): ReceiveChannel<Map<String, LongConsentFetchResult>> =
-        withContext(dispatcherProvider.io()) {
-            return@withContext produce<Map<String, LongConsentFetchResult>> {
-            }
-        }
 
     private suspend fun downloadLongConsentFromFirebaseStorage(
         flowCollector: FlowCollector<LongConsentFetchResult>,
