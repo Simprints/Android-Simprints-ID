@@ -43,6 +43,7 @@ interface SettingsPreferencesManager {
     var captureFingerprintStrategy: CaptureFingerprintStrategy
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
+    var fingerprintLiveFeedbackOn: Boolean
     var fingerprintQualityThreshold: Int
     var apiBaseUrl: String
 
