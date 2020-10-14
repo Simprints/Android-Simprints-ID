@@ -39,7 +39,10 @@ class SubjectLocalDataSourceImpl(
 
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
+
+        @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
         const val SYNC_FIELD = "toSync"
+
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"

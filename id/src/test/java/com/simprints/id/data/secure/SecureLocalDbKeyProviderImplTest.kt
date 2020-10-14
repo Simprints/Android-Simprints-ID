@@ -10,7 +10,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.RandomGenerator
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.every
 import io.mockk.mockk
@@ -18,9 +20,11 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SecureLocalDbKeyProviderImplTest {
 
     companion object {

@@ -28,7 +28,7 @@ open class DbSubject(
 
     var updatedAt: Date? = null,
 
-    @Deprecated("See Subject.toSync doc")
+    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
     var toSync: Boolean = false,
 
     var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),

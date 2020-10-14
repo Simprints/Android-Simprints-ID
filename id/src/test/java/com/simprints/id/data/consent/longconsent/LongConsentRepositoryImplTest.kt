@@ -3,6 +3,8 @@ package com.simprints.id.data.consent.longconsent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -11,8 +13,10 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LongConsentRepositoryImplTest {
 
     companion object {

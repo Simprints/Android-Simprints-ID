@@ -14,7 +14,6 @@ data class Subject(
     val updatedAt: Date? = null,
     var fingerprintSamples: List<FingerprintSample> = emptyList(),
     var faceSamples: List<FaceSample> = emptyList(),
-    @Deprecated("" +
-        "Required to migrate from 2020.3.2. It can removed when 2020.3.2 is not supported anymore." +
-        " After 2020.3.2, subjects are not synced anymore. Only events are synced.")
+
+    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
     val toSync: Boolean = false) : Parcelable
