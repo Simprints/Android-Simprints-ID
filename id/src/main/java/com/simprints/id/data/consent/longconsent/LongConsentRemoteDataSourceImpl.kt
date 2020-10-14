@@ -1,8 +1,8 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StreamDownloadTask
-import com.google.firebase.storage.ktx.storage
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.tools.extensions.awaitTask
 
@@ -13,7 +13,7 @@ class LongConsentRemoteDataSourceImpl(private val loginInfoManager: LoginInfoMan
     }
 
     private val firebaseStorage by lazy {
-        Firebase.storage.apply {
+        FirebaseStorage.getInstance(BuildConfig.LONG_CONSENT_BUCKET).apply {
             maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
         }
     }
