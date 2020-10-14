@@ -21,20 +21,19 @@ class PrivacyNoticeViewModel(
 ) : ViewModel() {
 
     private val privacyNoticeViewState = MutableLiveData<PrivacyNoticeViewState>()
-    val privateNoticeViewStateLiveData: LiveData<PrivacyNoticeViewState> = privacyNoticeViewState
+    fun getPrivacyNoticeViewStateLiveData(): LiveData<PrivacyNoticeViewState> = privacyNoticeViewState
 
-    init {
-        viewModelScope.launch {
-            longConsentRepository.getLongConsentForLanguage(language)
-                .flowOn(dispatcherProvider.io())
-                .map { it.toPrivacyNoticeViewState() }
-                .catch {
-                    it.printStackTrace()
-                    PrivacyNoticeViewState.ConsentNotAvailable(language)
-                }
-                .collect { privacyNoticeViewState.value = it }
-        }
+    fun retrievePrivacyNotice() = viewModelScope.launch {
+        longConsentRepository.getLongConsentForLanguage(language)
+            .flowOn(dispatcherProvider.io())
+            .map { it.toPrivacyNoticeViewState() }
+            .catch {
+                it.printStackTrace()
+                PrivacyNoticeViewState.ConsentNotAvailable(language)
+            }
+            .collect { privacyNoticeViewState.value = it }
     }
+
 
     private fun LongConsentFetchResult.toPrivacyNoticeViewState(): PrivacyNoticeViewState =
         when (this) {
