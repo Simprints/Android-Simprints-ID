@@ -26,15 +26,6 @@ class LongConsentRepositoryImplTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
 
     private val longConsentLocalDataSourceMock: LongConsentLocalDataSource = mockk(relaxed = true)
     private val longConsentRemoteDataSourceMock: LongConsentRemoteDataSource = mockk(relaxed = true)
@@ -42,8 +33,7 @@ class LongConsentRepositoryImplTest {
     private val longConsentRepository = LongConsentRepositoryImpl(
         longConsentLocalDataSourceMock,
         longConsentRemoteDataSourceMock,
-        mockk(),
-        testDispatcherProvider
+        mockk()
     )
 
     @Test

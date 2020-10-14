@@ -1,7 +1,6 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRemoteDataSource
@@ -145,15 +144,13 @@ class TestDataModule(
     override fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
         longConsentRemoteDataSource: LongConsentRemoteDataSource,
-        crashReportManager: CrashReportManager,
-        dispatcherProvider: DispatcherProvider
+        crashReportManager: CrashReportManager
     ): LongConsentRepository =
         longConsentRepositoryRule.resolveDependency {
             super.provideLongConsentRepository(
                 longConsentLocalDataSource,
                 longConsentRemoteDataSource,
-                crashReportManager,
-                dispatcherProvider
+                crashReportManager
             )
         }
 

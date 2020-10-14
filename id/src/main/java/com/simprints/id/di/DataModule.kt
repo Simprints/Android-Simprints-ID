@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.*
 import com.simprints.id.data.db.project.ProjectRepository
@@ -163,13 +162,11 @@ open class DataModule {
     open fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
         longConsentRemoteDataSource: LongConsentRemoteDataSource,
-        crashReportManager: CrashReportManager,
-        dispatcherProvider: DispatcherProvider
+        crashReportManager: CrashReportManager
     ): LongConsentRepository = LongConsentRepositoryImpl(
         longConsentLocalDataSource,
         longConsentRemoteDataSource,
-        crashReportManager,
-        dispatcherProvider
+        crashReportManager
     )
 
 }
