@@ -57,7 +57,6 @@ class LongConsentRepositoryImpl(
         try {
             val stream = longConsentRemoteDataSource.downloadLongConsent(language)
             val file = longConsentLocalDataSource.createFileForLanguage(language)
-            Timber.d("$language: Ready to download ${stream.total} bytes")
 
             stream.inputStream.use { input ->
                 file.outputStream().use { output ->
@@ -70,7 +69,6 @@ class LongConsentRepositoryImpl(
                         flowCollector.emit(
                             Progress(language, bytesCopied / stream.total.toFloat())
                         )
-                        Timber.d("$language: Stored $bytesCopied / ${stream.total}")
                         bytesToWrite = input.read(buffer)
                     }
                 }

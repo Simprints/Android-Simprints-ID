@@ -15,8 +15,11 @@ import javax.inject.Inject
 
 class PrivacyNoticeActivity : BaseSplitActivity() {
 
-    @Inject lateinit var viewModelFactory: PrivacyNoticeViewModelFactory
-    @Inject lateinit var deviceManager: DeviceManager
+    @Inject
+    lateinit var viewModelFactory: PrivacyNoticeViewModelFactory
+
+    @Inject
+    lateinit var deviceManager: DeviceManager
 
     private lateinit var viewModel: PrivacyNoticeViewModel
 
@@ -33,6 +36,8 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
 
         initInUi()
         observeUi()
+
+        viewModel.retrievePrivacyNotice()
     }
 
     private fun initActionBar() {
@@ -49,7 +54,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         longConsent_downloadButton.text = getString(R.string.long_consent_download_button_text)
         longConsent_downloadButton.setOnClickListener {
             if (deviceManager.isConnected()) {
-//                viewModel.downloadLongConsent()
+                viewModel.retrievePrivacyNotice()
             } else {
                 showUserOfflineToast()
             }
@@ -62,7 +67,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.privateNoticeViewStateLiveData.observe(this@PrivacyNoticeActivity, Observer {
+        viewModel.getPrivacyNoticeViewStateLiveData().observe(this@PrivacyNoticeActivity, Observer {
             when (it) {
                 is PrivacyNoticeViewState.ConsentAvailable -> handleSucceedDownload(it)
                 is PrivacyNoticeViewState.ConsentNotAvailable -> handleFailedDownload()
