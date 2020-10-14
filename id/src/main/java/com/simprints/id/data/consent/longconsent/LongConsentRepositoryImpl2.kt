@@ -22,11 +22,6 @@ class LongConsentRepositoryImpl2(
         const val DEFAULT_SIZE = 1024
     }
 
-    override fun getLongConsentForLanguages(languages: Array<String>): Flow<Map<String, LongConsentFetchResult>> =
-        flow {
-
-        }
-
     override fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult> = flow {
 
     }

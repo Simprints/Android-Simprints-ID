@@ -3,6 +3,7 @@ package com.simprints.id.data.consent.longconsent
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -10,12 +11,17 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.toCollection
 import org.junit.Rule
 import org.junit.Test
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.IOException
+import java.nio.charset.Charset
 import kotlin.random.Random
 
 class LongConsentRepositoryImplTest {
 
     companion object {
         const val DEFAULT_LANGUAGE = "en"
+        const val DEFAULT_LONG_CONSENT_TEXT = "Very long consent indeed"
     }
 
     @get:Rule
@@ -32,7 +38,6 @@ class LongConsentRepositoryImplTest {
 
     private val longConsentLocalDataSourceMock: LongConsentLocalDataSource = mockk(relaxed = true)
     private val longConsentRemoteDataSourceMock: LongConsentRemoteDataSource = mockk(relaxed = true)
-    private val consentText = Random.nextBytes(1024).toString()
 
     private val longConsentRepository = LongConsentRepositoryImpl(
         longConsentLocalDataSourceMock,
@@ -42,23 +47,61 @@ class LongConsentRepositoryImplTest {
     )
 
     @Test
-    fun download_consentInLocal_shouldReturnTheLocalCopy() = testCoroutineRule.runBlockingTest {
-        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns consentText
+    fun `Delete all consents`() {
+        longConsentRepository.deleteLongConsents()
+
+        verify(exactly = 1) { longConsentLocalDataSourceMock.deleteLongConsents() }
+    }
+
+    @Test
+    fun `Return local consent`() = testCoroutineRule.runBlockingTest {
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns DEFAULT_LONG_CONSENT_TEXT
 
         val states = mutableListOf<LongConsentFetchResult>()
         longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
             assertThat(size).isEqualTo(1)
-            assertThat(get(0)).isEqualTo(LongConsentFetchResult.Succeed(DEFAULT_LANGUAGE, consentText))
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.Succeed(DEFAULT_LANGUAGE, DEFAULT_LONG_CONSENT_TEXT))
         }
-        verify(exactly = 1) { longConsentLocalDataSourceMock.getLongConsentText(DEFAULT_LANGUAGE) }
     }
 
     @Test
-    fun deleteLongConsents_shouldDeleteLongConsentsFromRepository() {
-        longConsentRepository.deleteLongConsents()
+    fun `Download the consent in multiple parts`() = testCoroutineRule.runBlockingTest {
+        val bytesSize = 2048
+        val consentBytes = Random.nextBytes(bytesSize)
+        val consentText = consentBytes.toString(Charset.defaultCharset())
+        val byteArrayInputStream = ByteArrayInputStream(consentBytes)
 
-        verify(exactly = 1) { longConsentLocalDataSourceMock.deleteLongConsents() }
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
+        every { longConsentLocalDataSourceMock.createFileForLanguage(any()) } returns File.createTempFile("test", null)
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } returns LongConsentRemoteDataSource.Stream(
+            byteArrayInputStream,
+            bytesSize.toLong()
+        )
+
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+
+        with(states) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.Progress(DEFAULT_LANGUAGE, 0.5f))
+            assertThat(get(1)).isEqualTo(LongConsentFetchResult.Progress(DEFAULT_LANGUAGE, 1f))
+            assertThat(get(2)).isEqualTo(LongConsentFetchResult.Succeed(DEFAULT_LANGUAGE, consentText))
+        }
+    }
+
+    @Test
+    fun `Return error on something wrong`() = testCoroutineRule.runBlockingTest {
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws IOException()
+
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+
+        with(states) {
+            assertThat(size).isEqualTo(1)
+            assertThat(get(0)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+        }
     }
 }

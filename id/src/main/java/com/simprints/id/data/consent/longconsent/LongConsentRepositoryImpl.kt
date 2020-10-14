@@ -5,9 +5,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 
 class LongConsentRepositoryImpl(
@@ -20,11 +18,6 @@ class LongConsentRepositoryImpl(
     companion object {
         const val DEFAULT_SIZE = 1024
     }
-
-    override fun getLongConsentForLanguages(languages: Array<String>): Flow<Map<String, LongConsentFetchResult>> =
-        flow {
-
-        }
 
     override fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult> = flow {
         try {

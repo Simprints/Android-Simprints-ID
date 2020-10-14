@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface LongConsentRepository {
 
-    fun getLongConsentForLanguages(languages: Array<String>): Flow<Map<String, LongConsentFetchResult>>
-
     fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult>
 
     suspend fun fetchLongConsent(language: String): String?
