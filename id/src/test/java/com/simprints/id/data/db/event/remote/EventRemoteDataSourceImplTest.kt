@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.event.remote
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
@@ -19,7 +18,6 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.testtools.UnitTestConfig
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -28,11 +26,9 @@ import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
 typealias CountInvocation<T, V> = suspend (T) -> V
 
-@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class EventRemoteDataSourceImplTest {
 
@@ -55,7 +51,6 @@ class EventRemoteDataSourceImplTest {
     @ExperimentalCoroutinesApi
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig(this).setupFirebase()
 
         coEvery { simApiClient.executeCall<Int>(any(), any()) } coAnswers {
             val args = this.args

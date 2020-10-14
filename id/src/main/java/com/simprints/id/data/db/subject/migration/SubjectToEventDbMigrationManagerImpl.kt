@@ -15,6 +15,13 @@ import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.flow.toList
 import timber.log.Timber
 
+@Deprecated("To be removed once 2020.3.2 is not supported anymore.")
+/**
+ * Since 2020.4.0, events are up-synced, not subjects as it was before.
+ * Thus, when SID gets updates to 2020.4.0, the subjects in the 2020.3.2 db ready for up-synced
+ * need to be converted into events, so they can be up-synced from 2020.4.0.
+ * When 2020.3.2 gets unsupported, SubjectToEventDbMigrationManager and Subject.toSync can be removed.
+ * */
 class SubjectToEventDbMigrationManagerImpl(
     val loginInfoManager: LoginInfoManager,
     private val eventLocal: EventLocalDataSource,

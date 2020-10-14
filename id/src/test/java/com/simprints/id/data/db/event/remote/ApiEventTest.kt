@@ -9,11 +9,15 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ApiEventTest {
 
     private val jackson = JsonHelper().jackson
