@@ -3,6 +3,7 @@ package com.simprints.id.activities.longConsent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -67,7 +68,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.getPrivacyNoticeViewStateLiveData().observe(this@PrivacyNoticeActivity, Observer {
+        viewModel.getPrivacyNoticeViewStateLiveData().observe(this, Observer {
             when (it) {
                 is PrivacyNoticeViewState.ConsentAvailable -> handleSucceedDownload(it)
                 is PrivacyNoticeViewState.ConsentNotAvailable -> handleFailedDownload()
@@ -94,34 +95,27 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun setLongConsentText(text: String) {
+        longConsent_TextView.isVisible = true
         longConsent_TextView.text = text
         longConsent_TextView.movementMethod = ScrollingMovementMethod()
-        longConsent_downloadButton.visibility = View.GONE
-        longConsent_noPrivacyNoticeText.visibility = View.GONE
-        longConsent_downloadProgressBar.visibility = View.GONE
-        longConsent_TextView.visibility = View.VISIBLE
+
+        longConsent_downloadButton.isVisible = false
+        longConsent_noPrivacyNoticeText.isVisible = false
+        longConsent_downloadProgressBar.isVisible = false
     }
 
     private fun setNoPrivacyNoticeFound() {
-        longConsent_TextView.visibility = View.GONE
-        longConsent_downloadButton.visibility = View.VISIBLE
+        longConsent_TextView.isVisible = false
+        longConsent_downloadButton.isVisible = true
         longConsent_downloadButton.isEnabled = true
-        longConsent_noPrivacyNoticeText.visibility = View.VISIBLE
-        longConsent_downloadProgressBar.visibility = View.INVISIBLE
+        longConsent_noPrivacyNoticeText.isVisible = true
+        longConsent_downloadProgressBar.isVisible = false
     }
 
     private fun setDownloadProgress(progress: Int) {
         longConsent_downloadButton.isEnabled = false
-        hideProgressBarIfNecessary(progress)
+        longConsent_downloadProgressBar.isVisible = progress != PROGRESS_COMPLETE
         longConsent_downloadProgressBar.progress = progress
-    }
-
-    private fun hideProgressBarIfNecessary(progress: Int) {
-        if (progress == PROGRESS_COMPLETE) {
-            longConsent_downloadProgressBar.visibility = View.INVISIBLE
-        } else {
-            longConsent_downloadProgressBar.visibility = View.VISIBLE
-        }
     }
 
     private fun showDownloadErrorToast() {

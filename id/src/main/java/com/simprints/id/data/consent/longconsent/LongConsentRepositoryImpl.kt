@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
@@ -73,6 +72,8 @@ class LongConsentRepositoryImpl(
                     }
                 }
             }
+
+            flowCollector.emit(Succeed(language, file.readText()))
 
         } catch (t: Throwable) {
             flowCollector.emit(Failed(language, t))
