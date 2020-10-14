@@ -26,20 +26,19 @@ class LongConsentRepositoryImpl(
 
         }
 
-    override fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult> =
-        flow<LongConsentFetchResult> {
-            try {
-                val localConsent = longConsentLocalDataSource.getLongConsentText(language)
-                if (localConsent.isNotEmpty()) {
-                    emit(Succeed(language, localConsent))
-                } else {
-                    downloadLongConsentFromFirebaseStorage(this, language)
-                }
-            } catch (t: Throwable) {
-                crashReportManager.logExceptionOrSafeException(t)
-                emit(Failed(language, t))
+    override fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult> = flow {
+        try {
+            val localConsent = longConsentLocalDataSource.getLongConsentText(language)
+            if (localConsent.isNotEmpty()) {
+                emit(Succeed(language, localConsent))
+            } else {
+                downloadLongConsentFromFirebaseStorage(this, language)
             }
+        } catch (t: Throwable) {
+            crashReportManager.logExceptionOrSafeException(t)
+            emit(Failed(language, t))
         }
+    }
 
     override suspend fun fetchLongConsent(language: String): String? = null
 

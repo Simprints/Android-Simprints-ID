@@ -2,7 +2,6 @@ package com.simprints.id.activities.longConsent
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -52,7 +51,6 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun initInUi() {
-        longConsent_downloadButton.text = getString(R.string.long_consent_download_button_text)
         longConsent_downloadButton.setOnClickListener {
             if (deviceManager.isConnected()) {
                 viewModel.retrievePrivacyNotice()
@@ -70,14 +68,14 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     private fun observeUi() {
         viewModel.getPrivacyNoticeViewStateLiveData().observe(this, Observer {
             when (it) {
-                is PrivacyNoticeViewState.ConsentAvailable -> handleSucceedDownload(it)
-                is PrivacyNoticeViewState.ConsentNotAvailable -> handleFailedDownload()
-                is PrivacyNoticeViewState.DownloadInProgress -> handleProgressDownload(it)
+                is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
+                is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
+                is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress(it)
             }
         })
     }
 
-    private fun handleSucceedDownload(consentAvailableState: PrivacyNoticeViewState.ConsentAvailable) {
+    private fun setConsentAvailable(consentAvailableState: PrivacyNoticeViewState.ConsentAvailable) {
         val consent = consentAvailableState.consent
         if (consent.isEmpty()) {
             setNoPrivacyNoticeFound()
@@ -86,35 +84,41 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         }
     }
 
-    private fun handleFailedDownload() {
+    private fun setConsentNotAvailable() {
+        setNoPrivacyNoticeFound()
         showDownloadErrorToast()
     }
 
-    private fun handleProgressDownload(downloadInProgressState: PrivacyNoticeViewState.DownloadInProgress) {
+    private fun setDownloadProgress(downloadInProgressState: PrivacyNoticeViewState.DownloadInProgress) {
         setDownloadProgress(downloadInProgressState.progress)
     }
 
     private fun setLongConsentText(text: String) {
+        longConsent_downloadButton.isVisible = false
+        longConsent_header.isVisible = false
+        longConsent_downloadProgressBar.isVisible = false
+
         longConsent_TextView.isVisible = true
         longConsent_TextView.text = text
         longConsent_TextView.movementMethod = ScrollingMovementMethod()
-
-        longConsent_downloadButton.isVisible = false
-        longConsent_noPrivacyNoticeText.isVisible = false
-        longConsent_downloadProgressBar.isVisible = false
     }
 
     private fun setNoPrivacyNoticeFound() {
         longConsent_TextView.isVisible = false
-        longConsent_downloadButton.isVisible = true
-        longConsent_downloadButton.isEnabled = true
-        longConsent_noPrivacyNoticeText.isVisible = true
         longConsent_downloadProgressBar.isVisible = false
+        longConsent_header.isVisible = false
+
+        longConsent_downloadButton.isVisible = true
     }
 
     private fun setDownloadProgress(progress: Int) {
-        longConsent_downloadButton.isEnabled = false
-        longConsent_downloadProgressBar.isVisible = progress != PROGRESS_COMPLETE
+        longConsent_downloadButton.isVisible = false
+        longConsent_TextView.isVisible = false
+
+        longConsent_header.isVisible = true
+        longConsent_header.text = getString(R.string.long_consent_downloading)
+
+        longConsent_downloadProgressBar.isVisible = true
         longConsent_downloadProgressBar.progress = progress
     }
 
@@ -126,7 +130,4 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         showToast(R.string.login_no_network)
     }
 
-    companion object {
-        private const val PROGRESS_COMPLETE = 100
-    }
 }

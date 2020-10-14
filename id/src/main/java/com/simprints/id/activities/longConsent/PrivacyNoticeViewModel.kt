@@ -47,34 +47,4 @@ class PrivacyNoticeViewModel(
                 (progress * 100).toInt()
             )
         }
-
-
-    fun downloadLongConsent() {
-        viewModelScope.launch {
-            try {
-                val downloadProgressChannel = longConsentRepository.downloadLongConsent(arrayOf(language))
-                for (downloadState in downloadProgressChannel) {
-                    when (val languageDownloadState = downloadState[language]) {
-                        is LongConsentFetchResult.Progress -> PrivacyNoticeViewState.DownloadInProgress(
-                            language,
-                            (languageDownloadState.progress * 100).toInt()
-                        )
-                        is LongConsentFetchResult.Succeed -> PrivacyNoticeViewState.ConsentAvailable(
-                            language,
-                            languageDownloadState.consent
-                        )
-                        is LongConsentFetchResult.Failed -> PrivacyNoticeViewState.ConsentNotAvailable(language)
-                        else -> null
-                    }.also {
-                        it?.let { viewState ->
-                            privacyNoticeViewState.postValue(viewState)
-                        }
-                    }
-                }
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                PrivacyNoticeViewState.ConsentNotAvailable(language)
-            }
-        }
-    }
 }
