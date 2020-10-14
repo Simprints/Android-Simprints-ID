@@ -102,3 +102,9 @@
 -dontwarn com.simprints.id.activities.settings.syncinformation.**
 -dontwarn com.simprints.id.activities.consent.**
 -dontwarn com.simprints.id.data.db.session.**
+
+# https://github.com/Kotlin/kotlinx.coroutines/issues/2046
+-dontwarn java.lang.instrument.ClassFileTransformer
+-dontwarn sun.misc.SignalHandler
+-dontwarn java.lang.instrument.Instrumentation
+-dontwarn sun.misc.Signal

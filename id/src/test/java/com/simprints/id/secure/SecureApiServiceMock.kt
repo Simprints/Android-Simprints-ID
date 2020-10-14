@@ -19,17 +19,15 @@ class SecureApiServiceMock(
     override suspend fun requestAuthenticationData(
         projectId: String,
         userId: String,
-        deviceId: String,
-        key: String
+        deviceId: String
     ): Response<ApiAuthenticationData> = delegate.returning(
         buildSuccessResponseWith(getApiAuthenticationData())
-    ).requestAuthenticationData(projectId, userId, deviceId, key)
+    ).requestAuthenticationData(projectId, userId, deviceId)
 
     override suspend fun requestCustomTokens(
         projectId: String,
         userId: String,
-        credentials: AuthRequestBody,
-        key: String
+        credentials: AuthRequestBody
     ): Response<ApiToken> = delegate.returning(
         buildSuccessResponseWith(getApiToken())
     ).requestCustomTokens(projectId, userId, credentials)
