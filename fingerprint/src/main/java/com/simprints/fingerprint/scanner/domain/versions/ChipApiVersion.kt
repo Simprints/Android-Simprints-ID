@@ -4,7 +4,7 @@ data class ChipApiVersion(val major: Int, val minor: Int) {
 
     fun combined(): Int = (major shl 16) + minor.toShort()
 
-    operator fun compareTo(other: ChipFirmwareVersion) = this.combined() - other.combined()
+    operator fun compareTo(other: ChipApiVersion) = this.combined() - other.combined()
 
     override fun toString() = "$major.$minor"
 

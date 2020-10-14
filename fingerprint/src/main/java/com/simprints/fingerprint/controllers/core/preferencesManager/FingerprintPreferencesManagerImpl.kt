@@ -50,4 +50,7 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) :
 
     override val qualityThreshold: Int
         get() = prefs.fingerprintQualityThreshold
+
+    override val liveFeedbackOn: Boolean
+        get() = prefs.fingerprintLiveFeedbackOn
 }
