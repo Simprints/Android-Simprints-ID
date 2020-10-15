@@ -237,9 +237,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             currentSessionEvent.updateProjectId(signedProjectId)
+            currentSessionEvent.updateModalities(preferencesManager.modalities)
             eventRepository.addEvent(currentSessionEvent)
         }
-
         val associatedEvents = eventRepository.loadEvents(currentSessionEvent.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)
