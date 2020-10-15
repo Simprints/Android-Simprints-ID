@@ -58,12 +58,8 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         require(appRequest is AppIdentifyRequest)
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
-            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data).also {
-                addEventIfFingerprintCaptureResponse(it)
-            }
-            isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data).also {
-                addEventIfFaceCaptureResponse(it)
-            }
+            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
+            isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
@@ -77,17 +73,6 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                 buildQueryAndAddMatchingStepIfRequired(result, projectId, userId, moduleId)
             }
         }
-    }
-
-    private suspend fun addEventIfFingerprintCaptureResponse(it: Step.Result?) {
-        if (it is FingerprintCaptureResponse) {
-            extractFingerprintAndAddPersonCreationEvent(it)
-        }
-    }
-
-    private suspend fun addEventIfFaceCaptureResponse(response: Step.Result?) {
-        if (response is FaceCaptureResponse)
-            extractFaceAndAddPersonCreationEvent(response)
     }
 
     private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, projectId: String, userId: String, moduleId: String) {

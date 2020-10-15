@@ -61,6 +61,8 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
+import com.simprints.id.orchestrator.PersonCreationEventHelper
+import com.simprints.id.orchestrator.PersonCreationEventHelperImpl
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
@@ -69,7 +71,6 @@ import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -86,6 +87,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.id.tools.time.TimeHelper
+import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -422,6 +424,13 @@ open class AppModule {
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper
     ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
+
+    @Provides
+    fun providePersonCreationEventHelper(
+        eventRepository: EventRepository,
+        timeHelper: TimeHelper,
+        encodingUtils: EncodingUtils
+    ): PersonCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
 
     @Provides
     open fun provideEnrolLastBiometricsViewModel(
