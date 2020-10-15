@@ -85,15 +85,13 @@ ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProces
         }
     }
 
-    private suspend fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
+    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
         if (result is FingerprintCaptureResponse) {
             val query = SubjectQuery(subjectId = appRequest.verifyGuid)
             addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
-            extractFingerprintAndAddPersonCreationEvent(result)
         } else if (result is FaceCaptureResponse) {
             val query = SubjectQuery(subjectId = appRequest.verifyGuid)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
-            extractFaceAndAddPersonCreationEvent(result)
         }
     }
 

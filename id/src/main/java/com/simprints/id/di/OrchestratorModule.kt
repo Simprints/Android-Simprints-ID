@@ -27,8 +27,8 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -181,28 +181,30 @@ class OrchestratorModule {
         modalityFlowFactory: ModalityFlowFactory,
         appResponseFactory: AppResponseFactory,
         hotCache: HotCache,
-        dashboardDailyActivityRepository: DashboardDailyActivityRepository
+        dashboardDailyActivityRepository: DashboardDailyActivityRepository,
+        personCreationEventHelper: PersonCreationEventHelper
     ): OrchestratorManagerImpl = OrchestratorManagerImpl(
         modalityFlowFactory,
         appResponseFactory,
         hotCache,
-        dashboardDailyActivityRepository
+        dashboardDailyActivityRepository,
+        personCreationEventHelper
     )
 
     @Provides
     fun provideOrchestratorEventsHelper(
-            eventRepository: EventRepository,
-            timeHelper: TimeHelper
+        eventRepository: EventRepository,
+        timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
         OrchestratorEventsHelperImpl(eventRepository, timeHelper)
 
     @Provides
     fun provideOrchestratorViewModelFactory(
-            orchestratorManager: OrchestratorManager,
-            orchestratorEventsHelper: OrchestratorEventsHelper,
-            preferenceManager: PreferencesManager,
-            eventRepository: EventRepository,
-            crashReportManager: CrashReportManager
+        orchestratorManager: OrchestratorManager,
+        orchestratorEventsHelper: OrchestratorEventsHelper,
+        preferenceManager: PreferencesManager,
+        eventRepository: EventRepository,
+        crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
