@@ -262,7 +262,7 @@ class CollectFingerprintsViewModel(
                 }
             )
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
-            sessionEventsManager.addEventInBackground(captureEvent)
+            sessionEventsManager.addEvent(captureEvent)
         }
     }
 
