@@ -156,7 +156,7 @@ class LiveFeedbackFragmentViewModel(
         val faceCaptureEvent =
             faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
 
-        faceSessionEventsManager.addEventInBackground(faceCaptureEvent)
+        faceSessionEventsManager.addEvent(faceCaptureEvent)
 
         faceDetection.id = faceCaptureEvent.id
     }
