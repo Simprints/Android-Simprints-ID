@@ -12,7 +12,8 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 class RefusalPresenter(private val view: RefusalContract.View,
                        private val crashReportManager: FingerprintCrashReportManager,
@@ -81,19 +82,24 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
         logAsMalfunctionInCrashReportIfAppNotWorking(refusalText)
 
-        addRefusalEventInSession(reason, refusalText).doFinally {
-            setResultAndFinishInView(refusalText)
-        }.subscribeBy(onError = {
-            crashReportManager.logExceptionOrSafeException(it)
-        })
+        addRefusalEventInSession(reason, refusalText)
+        setResultAndFinishInView(refusalText)
     }
 
-    private fun addRefusalEventInSession(refusalReason: RefusalFormReason, refusalText: String) =
-        sessionEventsManager.addEvent(RefusalEvent(
-            refusalStartTime,
-            timeHelper.now(),
-            RefusalAnswer.fromRefusalFormReason(refusalReason),
-            refusalText))
+    private fun addRefusalEventInSession(refusalReason: RefusalFormReason, refusalText: String) {
+        runBlocking {
+            try {
+                sessionEventsManager.addEvent(RefusalEvent(
+                    refusalStartTime,
+                    timeHelper.now(),
+                    RefusalAnswer.fromRefusalFormReason(refusalReason),
+                    refusalText))
+            } catch (t: Throwable) {
+                Timber.d(t)
+                crashReportManager.logExceptionOrSafeException(t)
+            }
+        }
+    }
 
 
     private fun setResultAndFinishInView(refusalText: String) {

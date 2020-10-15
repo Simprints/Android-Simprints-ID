@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator
 
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
@@ -83,7 +84,7 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
         captureEvents
             .filter {
                 personTemplates?.contains(it.payload.fingerprint?.template) ?: false
-                    && it.payload.result != FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+                    && it.payload.result != SKIPPED
             }.map { it.id }
 
     private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
