@@ -6,7 +6,9 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.domain.modality.toMode
 import java.util.*
 
 @Keep
@@ -53,7 +55,7 @@ data class SessionCaptureEvent(
         val id: String,
         var projectId: String,
         override val createdAt: Long,
-        val modalities: List<Modes>,
+        var modalities: List<Modes>,
         val appVersionName: String,
         val libVersionName: String,
         val language: String,
@@ -73,5 +75,9 @@ data class SessionCaptureEvent(
     fun updateProjectId(projectId: String) {
         payload.projectId = projectId
         labels = labels.copy(projectId = projectId)
+    }
+
+    fun updateModalities(modalities: List<Modality>) {
+        payload.modalities = modalities.map { it.toMode() }
     }
 }
