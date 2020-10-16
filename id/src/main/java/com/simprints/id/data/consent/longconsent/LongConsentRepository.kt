@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LongConsentRepository {
 
-    fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult>
+    fun getLongConsentResultForLanguage(language: String): Flow<LongConsentFetchResult>
 
     fun deleteLongConsents()
 }

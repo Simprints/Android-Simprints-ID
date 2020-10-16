@@ -1,13 +1,11 @@
 package com.simprints.id.data.consent.longconsent
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.toCollection
 import org.junit.Rule
 import org.junit.Test
@@ -48,7 +46,7 @@ class LongConsentRepositoryImplTest {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns DEFAULT_LONG_CONSENT_TEXT
 
         val states = mutableListOf<LongConsentFetchResult>()
-        longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
             assertThat(size).isEqualTo(1)
@@ -71,7 +69,7 @@ class LongConsentRepositoryImplTest {
         )
 
         val states = mutableListOf<LongConsentFetchResult>()
-        longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
             assertThat(size).isEqualTo(3)
@@ -87,7 +85,7 @@ class LongConsentRepositoryImplTest {
         coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws IOException()
 
         val states = mutableListOf<LongConsentFetchResult>()
-        longConsentRepository.getLongConsentForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
             assertThat(size).isEqualTo(1)

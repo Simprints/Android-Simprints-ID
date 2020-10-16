@@ -115,6 +115,6 @@ class ProjectAuthenticatorImpl(
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {
         longConsentRepository.deleteLongConsents()
-        forEach { longConsentRepository.getLongConsentForLanguage(it).collect() }
+        forEach { longConsentRepository.getLongConsentResultForLanguage(it).collect() }
     }
 }
