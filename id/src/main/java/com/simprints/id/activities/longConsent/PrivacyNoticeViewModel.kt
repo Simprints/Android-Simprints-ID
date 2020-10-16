@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+private const val PROGRESS_MULTIPLIER = 100
 
 class PrivacyNoticeViewModel(
     private val longConsentRepository: LongConsentRepository,
@@ -44,7 +45,7 @@ class PrivacyNoticeViewModel(
             is LongConsentFetchResult.Failed -> PrivacyNoticeViewState.ConsentNotAvailable(language)
             is LongConsentFetchResult.Progress -> PrivacyNoticeViewState.DownloadInProgress(
                 language,
-                (progress * 100).toInt()
+                (progress * PROGRESS_MULTIPLIER).toInt()
             )
         }
 }
