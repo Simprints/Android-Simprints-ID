@@ -9,7 +9,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import timber.log.Timber
 
 class ProjectAuthenticatorImpl(
     private val authManager: AuthManager,
@@ -115,6 +117,6 @@ class ProjectAuthenticatorImpl(
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {
         longConsentRepository.deleteLongConsents()
-        forEach { longConsentRepository.getLongConsentResultForLanguage(it).collect() }
+        forEach { longConsentRepository.getLongConsentResultForLanguage(it).catch { Timber.e(it) }.collect() }
     }
 }
