@@ -5,6 +5,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
@@ -26,6 +27,7 @@ class LongConsentRepositoryImpl(
             }
         } catch (t: Throwable) {
             crashReportManager.logExceptionOrSafeException(t)
+            Timber.d(t)
             emit(Failed(language, t))
         }
     }
@@ -57,6 +59,8 @@ class LongConsentRepositoryImpl(
             flowCollector.emit(Succeed(language, file.readText()))
 
         } catch (t: Throwable) {
+            crashReportManager.logExceptionOrSafeException(t)
+            Timber.d(t)
             flowCollector.emit(Failed(language, t))
         }
     }
