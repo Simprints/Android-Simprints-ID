@@ -8,6 +8,9 @@ sealed class LongConsentFetchResult(open val language: String) {
     data class Failed(override val language: String,
                       val error: Throwable) : LongConsentFetchResult(language)
 
+    /**
+     * @param progress Progress from 0.0 to 1.0
+     */
     data class Progress(override val language: String,
                         val progress: Float) : LongConsentFetchResult(language)
 }
