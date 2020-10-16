@@ -25,7 +25,7 @@ class PrivacyNoticeViewModel(
     fun getPrivacyNoticeViewStateLiveData(): LiveData<PrivacyNoticeViewState> = privacyNoticeViewState
 
     fun retrievePrivacyNotice() = viewModelScope.launch {
-        longConsentRepository.getLongConsentForLanguage(language)
+        longConsentRepository.getLongConsentResultForLanguage(language)
             .flowOn(dispatcherProvider.io())
             .map { it.toPrivacyNoticeViewState() }
             .catch {

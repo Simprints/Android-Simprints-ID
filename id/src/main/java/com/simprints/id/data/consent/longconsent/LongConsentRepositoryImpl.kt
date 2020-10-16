@@ -17,7 +17,7 @@ class LongConsentRepositoryImpl(
         const val DEFAULT_SIZE = 1024
     }
 
-    override fun getLongConsentForLanguage(language: String): Flow<LongConsentFetchResult> = flow {
+    override fun getLongConsentResultForLanguage(language: String): Flow<LongConsentFetchResult> = flow {
         try {
             val localConsent = longConsentLocalDataSource.getLongConsentText(language)
             if (localConsent.isNotEmpty()) {
