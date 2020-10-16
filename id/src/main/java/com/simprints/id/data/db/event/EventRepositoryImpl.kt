@@ -156,7 +156,8 @@ open class EventRepositoryImpl(
             Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading ${events.size} events in a batch")
 
             try {
-                eventRemoteDataSource.post(query.projectId, events)
+                uploadEvents(events, query.projectId)
+
                 deleteEventsFromDb(events.map { it.id })
             } catch (t: Throwable) {
                 Timber.d(t)
@@ -168,6 +169,13 @@ open class EventRepositoryImpl(
             }
             this.emit(events.size)
         }
+    }
+
+    private suspend fun uploadEvents(events: MutableList<Event>, projectId: String) {
+        events.filterIsInstance<SessionCaptureEvent>().forEach {
+            it.payload.uploadedAt = timeHelper.now()
+        }
+        eventRemoteDataSource.post(projectId, events)
     }
 
     private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
