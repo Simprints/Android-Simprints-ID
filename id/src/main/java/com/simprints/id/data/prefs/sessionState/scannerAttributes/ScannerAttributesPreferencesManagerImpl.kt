@@ -33,8 +33,8 @@ class ScannerAttributesPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
         by PrimitivePreference(prefs, SCANNER_ID_KEY, SCANNER_ID_DEFAULT)
 
     override fun resetScannerAttributes() {
-        macAddress = ScannerAttributesPreferencesManagerImpl.MAC_ADDRESS_DEFAULT
-        hardwareVersion = ScannerAttributesPreferencesManagerImpl.HARDWARE_VERSION_DEFAULT
-        scannerId = ScannerAttributesPreferencesManagerImpl.SCANNER_ID_DEFAULT
+        macAddress = MAC_ADDRESS_DEFAULT
+        hardwareVersion = HARDWARE_VERSION_DEFAULT
+        scannerId = SCANNER_ID_DEFAULT
     }
 }
