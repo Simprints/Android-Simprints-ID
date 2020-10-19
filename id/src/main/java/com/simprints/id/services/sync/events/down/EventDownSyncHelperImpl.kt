@@ -8,6 +8,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
@@ -51,13 +52,13 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                     count++
                     //We immediately process the first event to initialise a progress
                     if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                        lastOperation = processBatchedEvents(batchOfEventsToProcess, lastOperation)
+                        lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                         emitProgress(lastOperation, count)
                         batchOfEventsToProcess.clear()
                     }
                 }
 
-                lastOperation = processBatchedEvents(batchOfEventsToProcess, lastOperation)
+                lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                 emitProgress(lastOperation, count)
 
                 lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
@@ -68,7 +69,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
             } catch (t: Throwable) {
                 Timber.d(t)
 
-                lastOperation = processBatchedEvents(batchOfEventsToProcess, lastOperation)
+                lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                 emitProgress(lastOperation, count)
 
                 lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
@@ -78,10 +79,13 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
         }
 
-    private suspend fun processBatchedEvents(batchOfEventsToProcess: MutableList<Event>,
+    private suspend fun processBatchedEvents(operation: EventDownSyncOperation,
+                                             batchOfEventsToProcess: MutableList<Event>,
                                              lastOperation: EventDownSyncOperation): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
+            Timber.d("[DOWN_SYNC_HELPER] Event Processed ${event.type}")
+
             return@map when (event.type) {
                 ENROLMENT_RECORD_CREATION -> {
                     handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
@@ -90,7 +94,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                     handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
                 }
                 ENROLMENT_RECORD_MOVE -> {
-                    handleSubjectMoveEvent(event as EnrolmentRecordMoveEvent)
+                    handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
                 }
                 else -> {
                     emptyList()
@@ -132,16 +136,50 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
     }
 
     @VisibleForTesting
-    fun handleSubjectMoveEvent(event: EnrolmentRecordMoveEvent): List<SubjectAction> =
-        mutableListOf<SubjectAction>().apply {
-            event.payload.enrolmentRecordCreation?.let {
-                val subject = subjectFactory.buildSubjectFromMovePayload(it)
-                if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-                    add(Creation(subject))
+    fun handleSubjectMoveEvent(operation: EventDownSyncOperation,
+                               event: EnrolmentRecordMoveEvent): List<SubjectAction> {
+        val modulesIdsToSync = operation.queryEvent.moduleIds
+        val attendantIdToSync = operation.queryEvent.attendantId
+        val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
+        val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
+
+        val actions = mutableListOf<SubjectAction>()
+        when {
+            modulesIdsToSync != null && modulesIdsToSync.isNotEmpty() -> {
+                if (modulesIdsToSync.contains(enrolmentRecordDeletion.moduleId)) {
+                    actions.add(Deletion(enrolmentRecordDeletion.subjectId))
+                }
+
+                if (modulesIdsToSync.contains(enrolmentRecordCreation?.moduleId)) {
+                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
+            attendantIdToSync != null -> {
+                if (attendantIdToSync == enrolmentRecordDeletion.attendantId) {
+                    actions.add(Deletion(enrolmentRecordDeletion.subjectId))
+                }
 
-            add(Deletion(event.payload.enrolmentRecordDeletion.subjectId))
+                if (attendantIdToSync == enrolmentRecordCreation?.attendantId) {
+                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
+                }
+            }
+            else -> {
+                actions.add(Deletion(enrolmentRecordDeletion.subjectId))
+                createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
+            }
+        }
+
+        return actions
+    }
+
+    private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
+        enrolmentRecordCreation?.let {
+            val subject = subjectFactory.buildSubjectFromMovePayload(it)
+            if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+                Creation(subject)
+            } else {
+                null
+            }
         }
 
     @VisibleForTesting
