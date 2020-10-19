@@ -27,6 +27,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
@@ -267,6 +269,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
             coEvery { analyticsManagerMock.getAnalyticsId() } returns GUID1
             coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
+            every { preferencesManagerMock.modalities } returns listOf(FINGER, Modality.FACE)
 
             presenter.handleSignedInUser()
 

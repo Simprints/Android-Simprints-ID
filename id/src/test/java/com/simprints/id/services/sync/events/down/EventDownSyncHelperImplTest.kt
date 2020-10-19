@@ -140,7 +140,7 @@ class EventDownSyncHelperImplTest {
 
             eventDownSyncHelper.downSync(this, op).consumeAsFlow().toList()
 
-            coVerify { subjectRepository.performActions((eventDownSyncHelper as EventDownSyncHelperImpl).handleSubjectMoveEvent(event)) }
+            coVerify { subjectRepository.performActions((eventDownSyncHelper as EventDownSyncHelperImpl).handleSubjectMoveEvent(op, event)) }
         }
     }
 
