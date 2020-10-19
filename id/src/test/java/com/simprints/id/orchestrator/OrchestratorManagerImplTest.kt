@@ -54,6 +54,7 @@ class OrchestratorManagerImplTest {
     @MockK private lateinit var modalityFlowMock: ModalityFlow
     @MockK private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
     @MockK private lateinit var hotCache: HotCache
+    @MockK private lateinit var personCreationEventHelper: PersonCreationEventHelper
 
     private lateinit var orchestrator: OrchestratorManager
     private val mockSteps = mutableListOf<Step>()
@@ -174,7 +175,8 @@ class OrchestratorManagerImplTest {
             modalityFlowFactoryMock,
             appResponseFactoryMock,
             hotCache,
-            dashboardDailyActivityRepositoryMock
+            dashboardDailyActivityRepositoryMock,
+            personCreationEventHelper
         )
     }
 

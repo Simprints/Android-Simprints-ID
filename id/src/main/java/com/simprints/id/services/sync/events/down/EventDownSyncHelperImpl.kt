@@ -9,6 +9,7 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreat
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
@@ -17,6 +18,7 @@ import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactory
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +33,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                               val eventRepository: EventRepository,
                               private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
                               private val subjectFactory: SubjectFactory,
+                              private val preferencesManager: PreferencesManager,
                               val timeHelper: TimeHelper) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
@@ -138,28 +141,41 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
     @VisibleForTesting
     fun handleSubjectMoveEvent(operation: EventDownSyncOperation,
                                event: EnrolmentRecordMoveEvent): List<SubjectAction> {
-        val modulesIdsToSync = operation.queryEvent.moduleIds
-        val attendantIdToSync = operation.queryEvent.attendantId
+        val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
+        val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
 
         val actions = mutableListOf<SubjectAction>()
         when {
-            modulesIdsToSync != null && modulesIdsToSync.isNotEmpty() -> {
-                if (modulesIdsToSync.contains(enrolmentRecordDeletion.moduleId)) {
+            modulesIdsUnderSyncing != null && modulesIdsUnderSyncing.isNotEmpty() -> {
+
+                /**
+                 * The deletion part of a move is executed if:
+                 * 1) the deletion is part of the EventDownSyncOperation (deletion.moduleId == op.moduleId)
+                 * AND
+                 * 2) the creation is null OR the creation is not synced by other workers (because the
+                 * workers run in parallel, the worker may execute the deletion after other worker has done the
+                 * creation. So the final subject is not moved, but actually deleted. So if another worker
+                 * is going to create the subject for a different module, then the deletion will be ignored and
+                 * a the update is executed.)
+                 */
+                if (enrolmentRecordDeletion.isUnderSyncingByCurrentDownSyncOperation(operation) &&
+                    (enrolmentRecordCreation == null || !enrolmentRecordCreation.isUnderOverallSyncing())) {
+
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
-                if (modulesIdsToSync.contains(enrolmentRecordCreation?.moduleId)) {
+                if (enrolmentRecordCreation != null && enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
-            attendantIdToSync != null -> {
-                if (attendantIdToSync == enrolmentRecordDeletion.attendantId) {
+            attendantUnderSyncing != null -> {
+                if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId) {
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
-                if (attendantIdToSync == enrolmentRecordCreation?.attendantId) {
+                if (attendantUnderSyncing == enrolmentRecordCreation?.attendantId) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
@@ -181,6 +197,23 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                 null
             }
         }
+
+
+    private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
+        op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
+
+    private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
+        op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
+
+    private fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
+        moduleId.partOf(preferencesManager.selectedModules.toList())
+
+    private fun EnrolmentRecordDeletionInMove.isUnderOverallSyncing() =
+        moduleId.partOf(preferencesManager.selectedModules.toList())
+
+    private fun String.partOf(modules: List<String>) = modules.contains(this)
+    private fun String.notPartOf(modules: List<String>) = !modules.contains(this)
+
 
     @VisibleForTesting
     fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
