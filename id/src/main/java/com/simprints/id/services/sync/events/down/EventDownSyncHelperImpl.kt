@@ -138,7 +138,6 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
         }
     }
 
-    @VisibleForTesting
     fun handleSubjectMoveEvent(operation: EventDownSyncOperation,
                                event: EnrolmentRecordMoveEvent): List<SubjectAction> {
         val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
@@ -151,14 +150,18 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
             modulesIdsUnderSyncing != null && modulesIdsUnderSyncing.isNotEmpty() -> {
 
                 /**
+                 * handleSubjectMoveEvent is executed by each worker to process a new moveEvent.
                  * The deletion part of a move is executed if:
                  * 1) the deletion is part of the EventDownSyncOperation (deletion.moduleId == op.moduleId)
                  * AND
-                 * 2) the creation is null OR the creation is not synced by other workers (because the
-                 * workers run in parallel, the worker may execute the deletion after other worker has done the
-                 * creation. So the final subject is not moved, but actually deleted. So if another worker
-                 * is going to create the subject for a different module, then the deletion will be ignored and
-                 * a the update is executed.)
+                 * 2) the creation is not synced by other workers.
+                 * Let's assume that SID is syncing by module1 (by worker1) and module2 (by worker2) and a subjectA
+                 * is moved from module1 to module2.
+                 * Both workers will receive a move event (worker1 to delete subjectA and worker2 to create subjectA), but
+                 * because workers run in parallel, the worker1 may execute the deletion after worker2 has done the
+                 * creation. So finally the subject is not moved, but actually deleted.
+                 * So if another worker is going to create (insertOrUpdate) the subject for a different module,
+                 * then the deletion will be ignored and a the update is executed.)
                  */
                 if (enrolmentRecordDeletion.isUnderSyncingByCurrentDownSyncOperation(operation) &&
                     (!enrolmentRecordCreation.isUnderOverallSyncing())) {
@@ -210,7 +213,6 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
     private fun String.partOf(modules: List<String>) = modules.contains(this)
 
-    @VisibleForTesting
     fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
 
