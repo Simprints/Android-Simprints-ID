@@ -161,12 +161,12 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                  * a the update is executed.)
                  */
                 if (enrolmentRecordDeletion.isUnderSyncingByCurrentDownSyncOperation(operation) &&
-                    (enrolmentRecordCreation == null || !enrolmentRecordCreation.isUnderOverallSyncing())) {
+                    (!enrolmentRecordCreation.isUnderOverallSyncing())) {
 
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
-                if (enrolmentRecordCreation != null && enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
+                if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
@@ -175,7 +175,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
-                if (attendantUnderSyncing == enrolmentRecordCreation?.attendantId) {
+                if (attendantUnderSyncing == enrolmentRecordCreation.attendantId) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
@@ -208,12 +208,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
     private fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
         moduleId.partOf(preferencesManager.selectedModules.toList())
 
-    private fun EnrolmentRecordDeletionInMove.isUnderOverallSyncing() =
-        moduleId.partOf(preferencesManager.selectedModules.toList())
-
     private fun String.partOf(modules: List<String>) = modules.contains(this)
-    private fun String.notPartOf(modules: List<String>) = !modules.contains(this)
-
 
     @VisibleForTesting
     fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =

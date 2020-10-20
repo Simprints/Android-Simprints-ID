@@ -15,7 +15,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
 data class ApiEnrolmentRecordMovePayload(
     @JsonIgnore override val startTime: Long = 0, //Not added on down-sync API yet
     override val version: Int,
-    val enrolmentRecordCreation: ApiEnrolmentRecordCreationInMove?,
+    val enrolmentRecordCreation: ApiEnrolmentRecordCreationInMove,
     val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionInMove
 ) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordMove, version, startTime) {
 
@@ -37,7 +37,7 @@ data class ApiEnrolmentRecordMovePayload(
     constructor(payload: EnrolmentRecordMovePayload) : this(
         payload.createdAt,
         payload.eventVersion,
-        payload.enrolmentRecordCreation?.let {
+        payload.enrolmentRecordCreation.let {
             ApiEnrolmentRecordCreationInMove(it.subjectId, it.projectId, it.moduleId, it.attendantId, it.biometricReferences?.map { it.fromDomainToApi() })
         },
         payload.enrolmentRecordDeletion.let {
