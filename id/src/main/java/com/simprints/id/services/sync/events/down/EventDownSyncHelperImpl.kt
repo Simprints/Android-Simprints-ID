@@ -155,6 +155,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                  * 1) the deletion is part of the EventDownSyncOperation (deletion.moduleId == op.moduleId)
                  * AND
                  * 2) the creation is not synced by other workers.
+                 * Required to avoid a Race Condition:
                  * Let's assume that SID is syncing by module1 (by worker1) and module2 (by worker2) and a subjectA
                  * is moved from module1 to module2.
                  * Both workers will receive a move event (worker1 to delete subjectA and worker2 to create subjectA), but
