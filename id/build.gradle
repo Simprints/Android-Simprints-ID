@@ -64,7 +64,10 @@ android {
             testCoverageEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
+            FirebasePerformance {
+                instrumentationEnabled false
+            }
             signingConfig signingConfigs.debug
             buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
