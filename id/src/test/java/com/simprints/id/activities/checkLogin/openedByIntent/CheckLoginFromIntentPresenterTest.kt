@@ -293,10 +293,10 @@ class CheckLoginFromIntentPresenterTest {
                 languageArg,
                 deviceArg,
                 databaseInfoArg).apply {
-                    payload.location = locationArg
-                    payload.analyticsId = GUID1
-                    payload.endedAt = ENDED_AT
-                }
+                payload.location = locationArg
+                payload.analyticsId = GUID1
+                payload.endedAt = ENDED_AT
+            }
 
             coVerify {
                 eventRepositoryMock.addEvent(expected)

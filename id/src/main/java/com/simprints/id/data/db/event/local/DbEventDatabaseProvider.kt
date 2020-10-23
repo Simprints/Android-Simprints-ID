@@ -11,16 +11,16 @@ interface EventDatabaseFactory {
     fun build(): EventRoomDatabase
 }
 
+@OptIn(ExperimentalStdlibApi::class)
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
     private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider
 ) : EventDatabaseFactory {
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun build(): EventRoomDatabase {
         try {
-            //val key = getOrCreateKey(DB_NAME)
-            val key = "test".toCharArray()
+            val key = getOrCreateKey(DB_NAME)
+            //val key = "test".toCharArray() //Use com.amitshekhar.android:debug-db
 
             val passphrase: ByteArray = getBytes(key)
             val factory = SupportFactory(passphrase)
@@ -33,7 +33,6 @@ class DbEventDatabaseFactoryImpl(
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun getOrCreateKey(dbName: String): CharArray {
         return try {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)

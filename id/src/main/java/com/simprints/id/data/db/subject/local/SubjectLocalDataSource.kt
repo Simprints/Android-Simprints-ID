@@ -13,6 +13,4 @@ interface SubjectLocalDataSource : FaceIdentityLocalDataSource, FingerprintIdent
     suspend fun count(query: SubjectQuery = SubjectQuery()): Int
 
     suspend fun performActions(actions: List<SubjectAction>)
-
-    suspend fun subjectsThatRequireMigration(): Flow<Subject>
 }
