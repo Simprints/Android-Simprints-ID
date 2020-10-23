@@ -4,6 +4,7 @@ import android.net.NetworkInfo.DetailedState.CONNECTED
 import android.os.Build
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
@@ -147,7 +148,7 @@ fun createEnrolmentRecordDeletionEvent() =
 fun createEnrolmentRecordMoveEvent() =
     EnrolmentRecordMoveEvent(
         CREATED_AT,
-        EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
+        EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, DEFAULT_USER_ID, buildFakeBiometricReferences()),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
         EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
 

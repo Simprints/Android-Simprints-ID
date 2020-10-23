@@ -124,8 +124,9 @@ open class SyncModule {
                                         eventRepository: EventRepository,
                                         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
                                         subjectFactory: SubjectFactory,
+                                        preferencesManager: PreferencesManager,
                                         timeHelper: TimeHelper): EventDownSyncHelper =
-        EventDownSyncHelperImpl(subjectRepository, eventRepository, eventDownSyncScopeRepository, subjectFactory, timeHelper)
+        EventDownSyncHelperImpl(subjectRepository, eventRepository, eventDownSyncScopeRepository, subjectFactory, preferencesManager, timeHelper)
 
     @Provides
     open fun provideEventUpSyncHelper(eventRepository: EventRepository,

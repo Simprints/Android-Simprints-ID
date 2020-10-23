@@ -1,7 +1,6 @@
 package com.simprints.id.data.images.local
 
 import android.app.Application
-import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -47,8 +46,6 @@ class ImageLocalDataSourceImplTest {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, path)
         require(securedImageRef != null)
 
-        Log.d("TEST2", securedImageRef.toString())
-
         val encryptedInputStream = imageLocalDataSource.decryptImage(securedImageRef)
         assertThat(encryptedInputStream?.readBytes()).isEqualTo(byteArray)
     }
@@ -87,13 +84,10 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun shouldDeleteImageFiles() {
         val files = createImageFiles(3)
-        files.forEach { Log.d("TEST2", it.relativePath.toString()) }
 
         val fileToDelete = files.first()
         imageLocalDataSource.deleteImage(fileToDelete)
         val remainingFiles = imageLocalDataSource.listImages()
-
-        remainingFiles.forEach { Log.d("TEST2", it.relativePath.toString()) }
 
         assertThat(remainingFiles.none { it.relativePath == fileToDelete.relativePath }).isTrue()
         assertThat(remainingFiles.size).isEqualTo(2)

@@ -18,8 +18,10 @@ import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveData
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.START_SYNC_REPORTER
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -28,9 +30,11 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventSyncStateProcessorImplTest {
 
     companion object {

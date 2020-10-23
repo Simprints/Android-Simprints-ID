@@ -20,7 +20,9 @@ import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.time.TimeHelper
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
@@ -28,9 +30,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventRoomDaoTest {
 
     val event = DbEvent(GUID1,

@@ -12,7 +12,6 @@ class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataPro
 
     private val wm = WorkManager.getInstance(ctx)
 
-
     override fun getStartSyncReportersLiveData(): LiveData<List<WorkInfo>> =
         wm.getWorkInfosByTagLiveData((tagForType(EventSyncWorkerType.START_SYNC_REPORTER)))
 

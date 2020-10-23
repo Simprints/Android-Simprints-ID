@@ -1,9 +1,11 @@
 package com.simprints.id.data.secure
 
 import android.util.Base64
+import android.util.Log
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import java.math.BigInteger
 
 @Deprecated("Use SecureLocalDbKeyProviderImpl")
 open class LegacyLocalDbKeyProviderImpl(private val keystoreManager: KeystoreManager,
@@ -20,6 +22,7 @@ open class LegacyLocalDbKeyProviderImpl(private val keystoreManager: KeystoreMan
         val realmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
             ?: throw MissingLocalDatabaseKeyException()
 
+        Log.d("TEST_FABIO", "key: ${BigInteger(1, Base64.decode(realmKey, Base64.DEFAULT)).toString(16)}")
         return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT))
     }
 

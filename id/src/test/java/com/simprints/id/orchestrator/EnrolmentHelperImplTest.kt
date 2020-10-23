@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.STATIC_GUID
 import com.simprints.id.commontesttools.DefaultTestConstants.defaultSubject
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.data.db.event.EventRepository
@@ -14,6 +13,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.id.tools.mockUUID
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -23,7 +23,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
 
 class EnrolmentHelperImplTest {
 
@@ -47,10 +46,7 @@ class EnrolmentHelperImplTest {
         coEvery { preferencesManager.modalities } returns listOf(FINGER)
         every { loginInfoManager.getSignedInProjectIdOrEmpty()  } returns DEFAULT_PROJECT_ID
 
-        mockkStatic(UUID::class)
-        val guid = mockk<UUID>()
-        every { guid.toString() } returns STATIC_GUID
-        every { UUID.randomUUID() } returns guid
+        mockUUID()
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.simprints.id.secure.securitystate.remote
 
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface

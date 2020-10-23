@@ -2,7 +2,7 @@ package com.simprints.id.data.db
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
+import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb

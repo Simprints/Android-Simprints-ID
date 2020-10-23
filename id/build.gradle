@@ -71,7 +71,7 @@ android {
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
 
-            resValue("string", "DB_PASSWORD_DBEVENTS", "test") //STOPSHIP
+            //resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
         }
 
         staging {
@@ -192,7 +192,7 @@ dependencies {
     implementation deps.jackson.core
 
     //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
-    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
+    //debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
@@ -231,7 +231,7 @@ dependencies {
     api deps.androidx.sqlite
     api deps.sqlcipher.core
 
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6' //STOPSHIP
+    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 
     // ######################################################
     //                      Unit test

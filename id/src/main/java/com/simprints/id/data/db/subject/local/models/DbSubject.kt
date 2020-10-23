@@ -28,6 +28,9 @@ open class DbSubject(
 
     var updatedAt: Date? = null,
 
+    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
+    var toSync: Boolean = false,
+
     var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),
 
     var faceSamples: RealmList<DbFaceSample> = RealmList()
@@ -42,6 +45,7 @@ fun DbSubject.fromDbToDomain(): Subject =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        toSync = toSync,
         fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
         faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain)
     )
@@ -54,6 +58,7 @@ fun Subject.fromDomainToDb(): DbSubject =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        toSync = toSync,
         fingerprintSamples = fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList(),
         faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
     )

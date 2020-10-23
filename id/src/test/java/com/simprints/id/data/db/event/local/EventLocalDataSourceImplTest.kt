@@ -14,6 +14,8 @@ import com.simprints.id.commontesttools.events.CREATED_AT_RANGE
 import com.simprints.id.commontesttools.events.ENDED_AT_RANGE
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
@@ -21,9 +23,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase
