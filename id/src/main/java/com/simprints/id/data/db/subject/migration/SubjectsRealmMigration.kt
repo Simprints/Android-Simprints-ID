@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.common.realm
+package com.simprints.id.data.db.subject.migration
 
-import com.simprints.id.data.db.common.realm.oldschemas.*
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.subject.local.models.DbFaceSample
 import com.simprints.id.data.db.subject.local.models.DbFingerprintSample
 import com.simprints.id.data.db.subject.local.models.DbSubject
+import com.simprints.id.data.db.subject.migration.oldschemas.*
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.FieldAttribute.REQUIRED
@@ -22,7 +22,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     class SubjectsModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 11
+        const val REALM_SCHEMA_VERSION: Long = 10
 
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
         const val SYNC_INFO_TABLE: String = "DbSyncInfo"

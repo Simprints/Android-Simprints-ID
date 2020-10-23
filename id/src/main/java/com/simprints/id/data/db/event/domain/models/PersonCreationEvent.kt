@@ -46,45 +46,6 @@ data class PersonCreationEvent(
     ) : EventPayload()
 
     companion object {
-        fun build(
-            timeHelper: TimeHelper,
-            faceCaptureEvents: List<FaceCaptureEvent>,
-            fingerprintCaptureEvents: List<FingerprintCaptureEvent>,
-            faceSamplesForPersonCreation: List<FaceSample>?,
-            fingerprintSamplesForPersonCreation: List<FingerprintSample>?
-        ) = PersonCreationEvent(
-            startTime = timeHelper.now(),
-            fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-                fingerprintCaptureEvents,
-                fingerprintSamplesForPersonCreation?.map { EncodingUtils.byteArrayToBase64(it.template) }
-            ),
-            fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
-            faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
-                faceCaptureEvents,
-                faceSamplesForPersonCreation?.map { EncodingUtils.byteArrayToBase64(it.template) }
-            ),
-            faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
-        )
-
-        private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-            captureEvents: List<FingerprintCaptureEvent>,
-            personTemplates: List<String>?
-        ): List<String> =
-            captureEvents
-                .filter {
-                    personTemplates?.contains(it.payload.fingerprint?.template) ?: false
-                        && it.payload.result != FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
-                }.map { it.id }
-
-        private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
-            captureEvents: List<FaceCaptureEvent>,
-            personTemplates: List<String>?
-        ): List<String> =
-            captureEvents
-                .filter {
-                    personTemplates?.contains(it.payload.face?.template) ?: false
-                }.map { it.id }
-
         const val EVENT_VERSION = 1
     }
 }

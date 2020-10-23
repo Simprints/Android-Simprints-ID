@@ -5,6 +5,7 @@ import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
 import com.google.android.play.core.splitcompat.SplitCompat
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.LoggingConfigHelper
@@ -43,6 +44,13 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
             .serializerModule(SerializerModule())
             .syncModule(SyncModule())
             .build()
+
+        // Create events for the subjects that are stored in the subjects (old architecture)
+        // and they still need to be uploaded. The new architecture uploads only events.
+        // The operation is not trivial for SID usage, so it can be performed in background.
+        inBackground {
+            component.getSubjectToEventMigrationManager().migrateSubjectToSyncToEventsDb()
+        }
     }
 
     open fun createOrchestratorComponent() {

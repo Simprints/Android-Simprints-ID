@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.Authenti
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason

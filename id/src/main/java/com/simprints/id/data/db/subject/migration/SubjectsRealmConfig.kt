@@ -1,6 +1,7 @@
-package com.simprints.id.data.db.common.realm
+package com.simprints.id.data.db.subject.migration
 
-import com.simprints.id.data.db.common.realm.SubjectsRealmMigration.Companion.REALM_SCHEMA_VERSION
+import com.simprints.id.data.db.subject.migration.SubjectsRealmMigration
+import com.simprints.id.data.db.subject.migration.SubjectsRealmMigration.Companion.REALM_SCHEMA_VERSION
 import io.realm.RealmConfiguration
 
 object SubjectsRealmConfig {

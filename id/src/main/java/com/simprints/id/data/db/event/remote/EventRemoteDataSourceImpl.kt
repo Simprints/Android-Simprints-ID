@@ -90,7 +90,9 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
 
     override suspend fun post(projectId: String, events: List<Event>) {
         executeCall("EventUpload") {
-            it.uploadEvents(projectId, ApiUploadEventsBody(events.map { it.fromDomainToApi() }))
+            it.uploadEvents(projectId, ApiUploadEventsBody(events.map {
+                it.fromDomainToApi()
+            }))
         }
     }
 

@@ -18,7 +18,7 @@ data class EnrolmentRecordMoveEvent(
 
     constructor(
         createdAt: Long,
-        enrolmentRecordCreation: EnrolmentRecordCreationInMove?,
+        enrolmentRecordCreation: EnrolmentRecordCreationInMove,
         enrolmentRecordDeletion: EnrolmentRecordDeletionInMove,
         labels: EventLabels = EventLabels()
     ) : this(
@@ -30,7 +30,7 @@ data class EnrolmentRecordMoveEvent(
     data class EnrolmentRecordMovePayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val enrolmentRecordCreation: EnrolmentRecordCreationInMove?,
+        val enrolmentRecordCreation: EnrolmentRecordCreationInMove,
         val enrolmentRecordDeletion: EnrolmentRecordDeletionInMove,
         override val type: EventType = ENROLMENT_RECORD_MOVE,
         override val endedAt: Long = 0

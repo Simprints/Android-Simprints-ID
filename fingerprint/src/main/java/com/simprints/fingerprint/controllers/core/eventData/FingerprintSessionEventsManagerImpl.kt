@@ -1,12 +1,10 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
-import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.tools.ignoreException
-import io.reactivex.Completable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
@@ -22,16 +20,15 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         }
     }
 
-    override fun addEvent(event: Event): Completable =
-        completableWithSuspend {
-            ignoreException {
-                fromDomainToCore(event)?.let {
-                    runBlocking {
-                        eventRepository.addEventToCurrentSession(it)
-                    }
+    override suspend fun addEvent(event: Event) {
+        ignoreException {
+            fromDomainToCore(event)?.let {
+                runBlocking {
+                    eventRepository.addEventToCurrentSession(it)
                 }
             }
         }
+    }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         runBlocking {
