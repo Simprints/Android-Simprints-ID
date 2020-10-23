@@ -12,7 +12,8 @@ data class ScannerState(
     var batteryPercentCharge: Int?,
     var batteryVoltageMilliVolts: Int?,
     var batteryCurrentMilliAmps: Int?,
-    var batteryTemperatureDeciKelvin: Int?
+    var batteryTemperatureDeciKelvin: Int?,
+    var scanLedState: Boolean? //FALSE = Default
 )
 
 fun disconnectedScannerState() =
@@ -25,4 +26,5 @@ fun disconnectedScannerState() =
         batteryPercentCharge = null,
         batteryVoltageMilliVolts = null,
         batteryCurrentMilliAmps = null,
-        batteryTemperatureDeciKelvin = null)
+        batteryTemperatureDeciKelvin = null,
+        scanLedState = null)

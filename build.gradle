@@ -69,6 +69,12 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+task runAllJacocoTests(type: GradleBuild) {
+    tasks = ['clientapi:jacocoTestReportStandardDebug', 'core:jacocoTestReportDebug',
+             'id:jacocoTestReportStandardDebug', 'face:jacocoTestReportStandardDebug',
+             'fingerprint:jacocoTestReportStandardDebug', 'fingerprintscanner:jacocoTestReportDebug']
+}
+
 //to check newer dependencies: ./gradlew dependencyUpdates
 apply plugin: "com.github.ben-manes.versions"
 apply plugin: "android-reporting"

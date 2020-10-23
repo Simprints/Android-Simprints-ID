@@ -14,7 +14,6 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
@@ -42,6 +41,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.DigitalValue as Un20DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue as StmDigitalValue
 
 /**
  * Methods in this class can throw various subclasses of these exceptions:
@@ -204,17 +205,17 @@ class Scanner(
             sendMainModeCommandAndReceiveResponse<GetUn20OnResponse>(
                 GetUn20OnCommand()
             ))
-            .map { it.value == DigitalValue.TRUE }
+            .map { it.value == StmDigitalValue.TRUE }
             .doOnSuccess { state.un20On = it }
 
     fun turnUn20OnAndAwaitStateChangeEvent(): Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
-                SetUn20OnCommand(DigitalValue.TRUE)
+                SetUn20OnCommand(StmDigitalValue.TRUE)
             ).completeOnceReceived()
                 .doSimultaneously(
                     mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
-                        withPredicate = { it.value == DigitalValue.TRUE }
+                        withPredicate = { it.value == StmDigitalValue.TRUE }
                     )).handleErrorsWith(responseErrorHandler))
             .completeOnceReceived()
             .doOnComplete { state.un20On = true }
@@ -222,10 +223,10 @@ class Scanner(
     fun turnUn20OffAndAwaitStateChangeEvent(): Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
-                SetUn20OnCommand(DigitalValue.FALSE)
+                SetUn20OnCommand(StmDigitalValue.FALSE)
             ).completeOnceReceived()
                 .doSimultaneously(mainMessageChannel.incoming.receiveResponse<Un20StateChangeEvent>(
-                    withPredicate = { it.value == DigitalValue.FALSE }
+                    withPredicate = { it.value == StmDigitalValue.FALSE }
                 )).handleErrorsWith(responseErrorHandler))
             .completeOnceReceived()
             .doOnComplete { state.un20On = false }
@@ -235,13 +236,13 @@ class Scanner(
             sendMainModeCommandAndReceiveResponse<GetTriggerButtonActiveResponse>(
                 GetTriggerButtonActiveCommand()
             ))
-            .map { it.value == DigitalValue.TRUE }
+            .map { it.value == StmDigitalValue.TRUE }
             .doOnSuccess { state.triggerButtonActive = it }
 
     fun activateTriggerButton(): Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetTriggerButtonActiveResponse>(
-                SetTriggerButtonActiveCommand(DigitalValue.TRUE)
+                SetTriggerButtonActiveCommand(StmDigitalValue.TRUE)
             ))
             .completeOnceReceived()
             .doOnComplete { state.triggerButtonActive = true }
@@ -249,7 +250,7 @@ class Scanner(
     fun deactivateTriggerButton(): Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(
             sendMainModeCommandAndReceiveResponse<SetTriggerButtonActiveResponse>(
-                SetTriggerButtonActiveCommand(DigitalValue.FALSE)
+                SetTriggerButtonActiveCommand(StmDigitalValue.FALSE)
             ))
             .completeOnceReceived()
             .doOnComplete { state.triggerButtonActive = false }
@@ -329,6 +330,29 @@ class Scanner(
                 CaptureFingerprintCommand(dpi)
             ))
             .map { it.captureFingerprintResult }
+
+    fun setScannerLedStateOn() : Completable =
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
+            sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
+                SetScanLedStateCommand(Un20DigitalValue.TRUE)
+            ))
+            .completeOnceReceived()
+            .doOnComplete { state.scanLedState = true }
+
+    fun setScannerLedStateDefault() : Completable =
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
+            sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
+                SetScanLedStateCommand(Un20DigitalValue.FALSE)
+            ))
+            .completeOnceReceived()
+            .doOnComplete { state.scanLedState = false }
+
+    fun getImageQualityPreview() : Maybe<Int> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
+            sendMainModeCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
+                GetImageQualityPreviewCommand()
+            ))
+            .mapToMaybeEmptyIfNull { it.imageQualityScore }
 
     fun getSupportedTemplateTypes(): Single<Set<TemplateType>> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(

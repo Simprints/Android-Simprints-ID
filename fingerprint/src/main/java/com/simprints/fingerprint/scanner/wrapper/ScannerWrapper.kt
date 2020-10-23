@@ -21,6 +21,10 @@ interface ScannerWrapper {
     fun sensorWakeUp(): Completable
     fun sensorShutDown(): Completable
 
+    fun isLiveFeedbackAvailable(): Boolean
+    fun startLiveFeedback(): Completable
+    fun stopLiveFeedback(): Completable
+
     fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse>
     fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse>
 
