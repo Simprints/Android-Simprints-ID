@@ -64,10 +64,15 @@ class ProjectAuthenticatorImpl(
         authenticationDataManager.requestAuthenticationData(projectId, userId)
 
     private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String =
-        projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret,
-            authenticationData.publicKeyString)
+        projectSecretManager.encryptAndStoreAndReturnProjectSecret(
+            projectSecret,
+            authenticationData.publicKeyString
+        )
 
-    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationData: AuthenticationData): AttestToken =
+    private fun getGoogleAttestation(
+        safetyNetClient: SafetyNetClient,
+        authenticationData: AuthenticationData
+    ): AttestToken =
         attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
 
     private fun buildAuthRequest(
@@ -108,6 +113,7 @@ class ProjectAuthenticatorImpl(
     }
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {
-        longConsentRepository.downloadLongConsentForLanguages(this)
+        longConsentRepository.deleteLongConsents()
+        forEach { longConsentRepository.getLongConsentResultForLanguage(it).catch { Timber.e(it) }.collect() }
     }
 }

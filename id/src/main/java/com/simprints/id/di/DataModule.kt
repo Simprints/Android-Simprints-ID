@@ -121,12 +121,21 @@ open class DataModule {
         LongConsentLocalDataSourceImpl(context.filesDir.absolutePath, loginInfoManager)
 
     @Provides
+    open fun provideLongConsentRemoteDataSource(
+        loginInfoManager: LoginInfoManager
+    ): LongConsentRemoteDataSource =
+        LongConsentRemoteDataSourceImpl(loginInfoManager)
+
+    @Provides
     open fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
-        loginInfoManager: LoginInfoManager,
+        longConsentRemoteDataSource: LongConsentRemoteDataSource,
         crashReportManager: CrashReportManager
-    ): LongConsentRepository = LongConsentRepositoryImpl(longConsentLocalDataSource,
-        loginInfoManager, crashReportManager)
+    ): LongConsentRepository = LongConsentRepositoryImpl(
+        longConsentLocalDataSource,
+        longConsentRemoteDataSource,
+        crashReportManager
+    )
 
     @Provides
     @Singleton

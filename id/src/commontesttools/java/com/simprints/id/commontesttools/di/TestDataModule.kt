@@ -3,6 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
@@ -80,12 +81,29 @@ class TestDataModule(
         super.provideImageRepository(context, baseUrlProvider)
     }
 
-    override fun provideLongConsentLocalDataSource(context: Context, loginInfoManager: LoginInfoManager): LongConsentLocalDataSource =
-        longConsentLocalDataSourceRule.resolveDependency { super.provideLongConsentLocalDataSource(context, loginInfoManager) }
+    override fun provideLongConsentLocalDataSource(
+        context: Context,
+        loginInfoManager: LoginInfoManager
+    ): LongConsentLocalDataSource =
+        longConsentLocalDataSourceRule.resolveDependency {
+            super.provideLongConsentLocalDataSource(
+                context,
+                loginInfoManager
+            )
+        }
 
-    override fun provideLongConsentRepository(longConsentLocalDataSource: LongConsentLocalDataSource, loginInfoManager: LoginInfoManager,
-                                              crashReportManager: CrashReportManager): LongConsentRepository =
-        longConsentRepositoryRule.resolveDependency { super.provideLongConsentRepository(longConsentLocalDataSource, loginInfoManager, crashReportManager) }
+    override fun provideLongConsentRepository(
+        longConsentLocalDataSource: LongConsentLocalDataSource,
+        longConsentRemoteDataSource: LongConsentRemoteDataSource,
+        crashReportManager: CrashReportManager
+    ): LongConsentRepository =
+        longConsentRepositoryRule.resolveDependency {
+            super.provideLongConsentRepository(
+                longConsentLocalDataSource,
+                longConsentRemoteDataSource,
+                crashReportManager
+            )
+        }
 
     @FlowPreview
     override fun providePersonLocalDataSource(

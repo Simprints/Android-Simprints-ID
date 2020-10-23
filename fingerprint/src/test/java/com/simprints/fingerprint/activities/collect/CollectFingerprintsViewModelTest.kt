@@ -6,10 +6,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
@@ -59,8 +56,11 @@ class CollectFingerprintsViewModelTest : KoinTest {
     private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
         every { qualityThreshold } returns 60
+        every { liveFeedbackOn } returns false
     }
-    private val scanner: ScannerWrapper = mockk(relaxUnitFun = true)
+    private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
+        every { isLiveFeedbackAvailable() } returns false
+    }
     private val scannerManager: ScannerManager = ScannerManagerImpl(mockk(), mockk(), mockk(), mockk()).also {
         it.scanner = scanner
     }
@@ -696,6 +696,143 @@ class CollectFingerprintsViewModelTest : KoinTest {
         verify { scanner.unregisterTriggerListener(any()) }
     }
 
+    @Test
+    fun whenStart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenStart_AndLiveFeedbackIsNotEnabled_liveFeedbackIsNotStarted() {
+        vm.start(TWO_FINGERS_IDS)
+
+        verify (exactly = 0) { scanner.startLiveFeedback() }
+    }
+
+    @Test
+    fun whenScanButtonPressed_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(NEVER_RETURNS)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
+    }
+
+    @Test
+    fun whenGoodScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenBadScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(BAD_SCAN)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenSecondScan_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
+    }
+
+    @Test
+    fun whenEndOfWorkflow_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
+        mockScannerSetUiIdle()
+        setupLiveFeedbackOn()
+
+        getToEndOfWorkflow()
+
+        verify { scanner.stopLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
+    }
+
+    @Test
+    fun whenRestart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        mockScannerSetUiIdle()
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleRestart()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenPause_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnPause()
+
+        verify { scanner.stopLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
+    }
+
+    @Test
+    fun whenResume_AndLiveFeedbackWasStarted_liveFeedbackIsStarted() {
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnPause()
+        vm.handleOnResume()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenResume_AndLiveFeedbackWasStopped_liveFeedbackIsStopped() {
+        mockScannerSetUiIdle()
+        setupLiveFeedbackOn()
+
+        getToEndOfWorkflow()
+        vm.handleOnPause()
+        vm.handleOnResume()
+
+        verify { scanner.stopLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
+    }
+
+    private fun getToEndOfWorkflow() {
+        captureFingerprintResponses(GOOD_SCAN)
+        vm.start(TWO_FINGERS_IDS)
+        repeat(2) {
+            vm.handleScanButtonPressed()
+            mockTimer.executeAllTasks()
+        }
+    }
+
     private fun noImageTransfer() {
         every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
     }
@@ -732,6 +869,11 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 MockAcquireImageResult.NEVER_RETURNS -> Single.never()
             }
         }
+    }
+
+    private fun setupLiveFeedbackOn() {
+        every { scanner.isLiveFeedbackAvailable() }.returns(true)
+        every { preferencesManager.liveFeedbackOn }.returns(true)
     }
 
     private enum class MockCaptureFingerprintResponse {

@@ -284,6 +284,14 @@ open class SettingsPreferencesManagerImpl(
             scannerGenerationsSerializer
         )
 
+    override var fingerprintLiveFeedbackOn: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FINGERPRINT_LIVE_FEEDBACK_ON_KEY,
+            FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT
+        )
+
     override var fingerprintQualityThreshold: Int
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -429,6 +437,9 @@ open class SettingsPreferencesManagerImpl(
 
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
+
+        const val FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT = false
+        const val FINGERPRINT_LIVE_FEEDBACK_ON_KEY = "FingerprintLiveFeedbackOn"
 
         const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60
         const val FINGERPRINT_QUALITY_THRESHOLD_KEY = "FingerprintQualityThreshold"

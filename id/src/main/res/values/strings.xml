@@ -148,17 +148,8 @@
 
     <!-- Long Consent Activity : the screen where the user can find the long consent form -->
     <string name="long_consent_download_button_text">Download Privacy Notice</string>
+    <string name="long_consent_downloading">Downloading Privacy Notice</string>
     <string name="long_consent_failed_to_download">Failed to download privacy notice.</string>
-    <!-- Long Consent -->
-
-
-    <!-- Notifications -->
-    <!-- Channel -->
-    <!-- SyncerSync Notifications -->
-
-    <!-- Long Consent Download Notifications -->
-
-    <!-- File Provider Authority Information -->
 
     <!-- LoginActivity -->
     <!-- TODO: what about translation? -->
