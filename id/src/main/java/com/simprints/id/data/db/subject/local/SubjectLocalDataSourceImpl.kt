@@ -153,18 +153,6 @@ class SubjectLocalDataSourceImpl(
         }
     }
 
-    override suspend fun subjectsThatRequireMigration() =
-        withContext(Dispatchers.Main) {
-            Realm.getInstance(config).use {
-                it.where(DbSubject::class.java).let { query ->
-                    query.equalTo(SYNC_FIELD, true)
-                }.await()
-                    ?.map { dbSubject -> dbSubject.fromDbToDomain() }
-                    ?.asFlow()
-                    ?: flowOf()
-            }
-        }
-
     private fun Realm.buildRealmQueryForSubject(query: SubjectQuery?): RealmQuery<DbSubject> =
         where(DbSubject::class.java)
             .apply {
