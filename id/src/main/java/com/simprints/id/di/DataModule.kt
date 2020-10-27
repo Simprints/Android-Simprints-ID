@@ -3,10 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
-import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSourceImpl
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
+import com.simprints.id.data.consent.longconsent.*
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
@@ -23,8 +20,8 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
-import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.db.subject.migration.SubjectToEventDbMigrationManagerImpl
+import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
