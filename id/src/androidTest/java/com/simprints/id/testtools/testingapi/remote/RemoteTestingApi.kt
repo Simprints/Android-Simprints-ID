@@ -22,6 +22,5 @@ interface RemoteTestingApi : SimRemoteInterface {
     fun generateFirebaseToken(@Body testFirebaseTokenParameters: TestFirebaseTokenParameters): Single<TestFirebaseToken>
 
     @GET("projects/{projectId}/events/count")
-    fun getEventCount(@Path("projectId") projectId: String,
-                      @Query("key") key: String = apiKey): Single<TestEventCount>
+    fun getEventCount(@Path("projectId") projectId: String): Single<TestEventCount>
 }
