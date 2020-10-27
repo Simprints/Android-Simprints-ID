@@ -5,34 +5,34 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent
 import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent
 import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.testtools.unit.BaseUnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.*
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
 
 class ClientApiEventRepositoryImplTest {
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     private lateinit var coreEventEventsMgrMock: EventRepository
     private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManagerImpl
 
     @Before
     fun setup() {
-        BaseUnitTestConfig().coroutinesMainThread().rescheduleRxMainThread()
-
         coreEventEventsMgrMock = mockk(relaxed = true)
         clientSessionEventsMgr = ClientApiSessionEventsManagerImpl(coreEventEventsMgrMock, mockk(relaxed = true))
     }
@@ -47,9 +47,8 @@ class ClientApiEventRepositoryImplTest {
 
             coVerify { coreEventEventsMgrMock.createSession(any()) }
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
-                    Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java)
-                    Truth.assertThat((it.payload as IntentParsingPayload).integration).isEqualTo(CoreIntegrationInfo.ODK)
+                coreEventEventsMgrMock.addEventToCurrentSession(match {
+                    it is IntentParsingEvent && it.payload.integration == CoreIntegrationInfo.ODK
                 })
             }
         }
@@ -62,9 +61,8 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addAlertScreenEvent(clientApiAlert)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
-                    Truth.assertThat(it).isInstanceOf(AlertScreenEvent::class.java)
-                    Truth.assertThat((it.payload as AlertScreenPayload).alertType).isEqualTo(AlertScreenEventType.INVALID_PROJECT_ID)
+                coreEventEventsMgrMock.addEventToCurrentSession(match {
+                    it is AlertScreenEvent && it.payload.alertType == AlertScreenEventType.INVALID_PROJECT_ID
                 })
             }
         }
