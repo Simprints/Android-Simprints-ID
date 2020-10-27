@@ -142,7 +142,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         mockTimer.executeNextTask()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -157,7 +157,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60)))
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
 
         mockTimer.executeNextTask()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
@@ -174,7 +174,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -188,7 +188,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -202,7 +202,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotDetected())
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -255,7 +255,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
         verify(exactly = 1) { scanner.acquireImage(any()) }
-        verify(exactly = 3) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 3) { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -280,7 +280,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 12) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 12) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 4) { imageManager.save(any(), any(), any()) }
@@ -315,7 +315,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 2) { imageManager.save(any(), any(), any()) }
@@ -349,7 +349,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 0) { imageManager.save(any(), any(), any()) }
@@ -385,7 +385,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().isAskingRescan).isFalse()
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, null, 60)))
 
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -402,7 +402,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().isShowingSplashScreen).isFalse()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -422,7 +422,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 4) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
 
@@ -487,7 +487,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 14) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 14) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 3) { imageManager.save(any(), any(), any()) }
@@ -553,7 +553,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 14) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 14) { sessionEventsManager.addEvent(any()) }
 
         // If eager, expect that images were saved before confirm was pressed, including bad scans
         coVerify(exactly = 8) { imageManager.save(any(), any(), any()) }
