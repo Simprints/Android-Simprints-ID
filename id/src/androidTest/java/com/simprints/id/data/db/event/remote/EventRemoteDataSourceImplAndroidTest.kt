@@ -56,6 +56,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
+import com.simprints.id.network.TimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -70,6 +71,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
+import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -100,6 +102,9 @@ class EventRemoteDataSourceImplAndroidTest {
         override fun get(authToken: String?,
                          deviceId: String): OkHttpClient.Builder =
             super.get(authToken, deviceId).apply {
+                addInterceptor(HttpLoggingInterceptor(TimberLogger()).apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                })
                 addNetworkInterceptor {
                     var request = it.request()
                     val url: HttpUrl = request.url.newBuilder().addQueryParameter("acceptInvalidEvents", "false").build()
@@ -394,6 +399,9 @@ class EventRemoteDataSourceImplAndroidTest {
 
         event.payload.location = Location(0.0, 0.0)
         event.payload.analyticsId = "analyticsId"
+        event.payload.uploadedAt = 1
+        event.payload.endedAt = 1
+
         add(event)
     }
 
