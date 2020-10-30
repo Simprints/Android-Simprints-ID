@@ -64,7 +64,7 @@ class OrchestratorManagerImplTest {
         "some_project_id",
         "some_user_id",
         "some_module_id",
-        "some_metadata"
+        "{\"key\": \"some_metadata\"}"
     )
 
     @Before
