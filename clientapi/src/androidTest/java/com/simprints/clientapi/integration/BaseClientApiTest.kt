@@ -27,7 +27,7 @@ open class BaseClientApiTest : KoinTest {
     internal val projectIdField = "projectId" to "some_project"
     internal val userIdField = "userId" to "some_user_id"
     internal val moduleIdField = "moduleId" to "some_module_id"
-    internal val metadataField = "metadata" to "some_metadata"
+    internal val metadataField = "metadata" to "{\"key\": \"some_metadata\"}"
     internal val verifyGuidField = "verifyGuid" to "8b3f577c-b6c7-4677-9af2-b08cd7f71b79"
     internal val sessionIdField = "sessionId" to "some_sessionid"
     internal val selectedGuidField = "selectedGuid" to "8b3f577c-b6c7-4677-9af2-b08cd7f71b79"

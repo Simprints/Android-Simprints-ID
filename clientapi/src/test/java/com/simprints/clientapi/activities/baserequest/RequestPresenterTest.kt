@@ -24,7 +24,7 @@ class RequestPresenterTest {
     private val projectIdField = "some_project_id"
     private val moduleIdField = "some_module_id"
     private val userIdField = "some_user_id"
-    private val metadataField = "some_metadata"
+    private val metadataField = "{\"key\": \"some_metadata\"}"
     private val extraField = mapOf("extraField" to "someExtraField")
 
     lateinit var clientApiSessionEventsManagerMock: ClientApiSessionEventsManager
