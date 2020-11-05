@@ -188,7 +188,7 @@ open class EventRepositoryImpl(
     @VisibleForTesting
     suspend fun createBatches(query: LocalEventQuery): List<Batch> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
-        return createBatchesForEventsInSessions(query) + createBatchesForEventsNotInSessions(query)
+        return createBatchesForEventsNotInSessions(query) + createBatchesForEventsInSessions(query)
     }
 
     private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
