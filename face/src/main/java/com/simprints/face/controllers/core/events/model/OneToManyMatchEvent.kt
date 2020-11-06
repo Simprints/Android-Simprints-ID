@@ -1,11 +1,11 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import java.io.Serializable
-import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent as CoreOneToManyMatchEvent
-import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPool as CoreMatchPool
-import com.simprints.id.data.db.session.domain.models.events.OneToManyMatchEvent.MatchPoolType as CoreMatchPoolType
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent as CoreOneToManyMatchEvent
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
+import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
 
 @Keep
 class OneToManyMatchEvent(
@@ -20,15 +20,15 @@ class OneToManyMatchEvent(
     fun fromDomainToCore() = CoreOneToManyMatchEvent(
         startTime,
         endTime,
-        (query as SubjectLocalDataSource.Query).asCoreMatchPool(count),
+        (query as SubjectQuery).asCoreMatchPool(count),
         matcher.fromDomainToCore(),
         result?.map { it.fromDomainToCore() }
     )
 
-    private fun SubjectLocalDataSource.Query.asCoreMatchPool(count: Int) =
+    private fun SubjectQuery.asCoreMatchPool(count: Int) =
         CoreMatchPool(this.parseQueryAsCoreMatchPoolType(), count)
 
-    private fun SubjectLocalDataSource.Query.parseQueryAsCoreMatchPoolType(): CoreMatchPoolType =
+    private fun SubjectQuery.parseQueryAsCoreMatchPoolType(): CoreMatchPoolType =
         when {
             this.attendantId != null -> CoreMatchPoolType.USER
             this.moduleId != null -> CoreMatchPoolType.MODULE

@@ -13,7 +13,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 
-@RunWith(AndroidJUnit4::class)
 class DbSubjectTest {
 
     @Test
@@ -22,7 +21,7 @@ class DbSubjectTest {
         val faceSample = getRandomFaceSample()
 
         val domainSubject = Subject(
-            "guid", DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, Date(0), Date(1), true,
+            "guid", DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, Date(0), Date(1),
             listOf(fingerprintSample),
             listOf(faceSample)
         )
@@ -38,7 +37,6 @@ class DbSubjectTest {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(fingerprintSamples.first()?.id).isEqualTo(fingerprintSample.id)
             assertThat(faceSamples.first()?.id).isEqualTo(faceSample.id)
-            assertThat(toSync).isTrue()
         }
     }
 }

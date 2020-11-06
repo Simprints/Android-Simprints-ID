@@ -10,7 +10,7 @@ import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolAdjudicationAction
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelper
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 
 class AppResponseFactoryImpl(
     private val enrolmentHelper: EnrolmentHelper,

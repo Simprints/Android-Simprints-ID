@@ -3,7 +3,6 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -11,7 +10,7 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.sync.SyncManager
 import javax.inject.Inject
 
 class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.View,

@@ -4,8 +4,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.SecureApiInterface
@@ -15,6 +17,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -43,7 +46,10 @@ class SecurityStateRemoteDataSourceImplTest {
         } returns SimApiClientImpl(
             SecureApiInterface::class,
             mockWebServer.url("/").toString(),
-            DEVICE_ID
+            DEVICE_ID,
+            randomUUID(),
+            mockk(),
+            JsonHelper()
         )
 
         every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
@@ -100,4 +106,8 @@ class SecurityStateRemoteDataSourceImplTest {
         const val DEVICE_ID = "mock-device-id"
     }
 
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
 }

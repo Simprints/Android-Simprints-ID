@@ -73,6 +73,8 @@ android {
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+
+            //resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
         }
 
         staging {
@@ -171,13 +173,13 @@ dependencies {
     implementation deps.androidx.camerax.lifecycle
     implementation deps.androidx.camerax.view
     implementation deps.support.material
-    implementation deps.arch_components.work
+    api  deps.arch_components.work
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
-    implementation deps.retrofit.convertergson
+    implementation deps.retrofit.jackson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.rxjava2.android
@@ -189,6 +191,11 @@ dependencies {
     implementation deps.koin.android
     implementation deps.fuzzywuzzy.core
     implementation deps.rxjava2.tasks
+    implementation deps.kronos.kronos
+    implementation deps.jackson.core
+
+    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    //debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
@@ -202,8 +209,7 @@ dependencies {
     api deps.firebase.mlkit
     api deps.firebase.mlkit_barcode
     api deps.firebase.crashlytics
-    api deps.gson.core
-    api deps.gson.extras
+
     api deps.timber.core
     api deps.androidx.core
     api deps.androidx.multidex
@@ -225,6 +231,10 @@ dependencies {
     api deps.koin.viewmodel
     api deps.playcore.core
     api deps.playcore.core_ktx
+    api deps.androidx.sqlite
+    api deps.sqlcipher.core
+
+    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 
     // ######################################################
     //                      Unit test
@@ -312,6 +322,7 @@ dependencies {
 }
 
 kapt {
+    useBuildCache = true
     arguments {
         arg("realm.ignoreKotlinNullability", true)
     }

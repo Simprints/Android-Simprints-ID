@@ -3,13 +3,16 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.gson.Gson
+import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
+import com.simprints.id.activities.fetchguid.FetchGuidHelper
+import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
@@ -26,21 +29,18 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.EventRepositoryImpl
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactoryImpl
+import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
+import com.simprints.id.data.db.event.local.EventDatabaseFactory
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.SessionRepositoryImpl
-import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
-import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilderImpl
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
-import com.simprints.id.data.db.session.local.SessionLocalDataSourceImpl
-import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
-import com.simprints.id.data.db.session.local.SessionRealmConfigBuilderImpl
-import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
-import com.simprints.id.data.db.session.remote.SessionRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -63,28 +63,39 @@ import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
+import com.simprints.id.orchestrator.PersonCreationEventHelper
+import com.simprints.id.orchestrator.PersonCreationEventHelperImpl
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.tools.*
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
+import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
+import com.simprints.id.tools.LocationManager
+import com.simprints.id.tools.LocationManagerImpl
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
+import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
+import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.id.tools.time.TimeHelper
+import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -180,86 +191,76 @@ open class AppModule {
     )
 
     @Provides
+    open fun provideFirebasePerformanceTraceFactory(): FirebasePerformanceTraceFactory =
+        FirebasePerformanceTraceFactoryImpl()
+
+    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
-        gson: Gson
+        performanceTracer: FirebasePerformanceTraceFactory,
+        jsonHelper: JsonHelper
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         remoteDbManager,
-        gson
+        performanceTracer,
+        jsonHelper
     )
 
     @Provides
     @Singleton
-    fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
+    // https://github.com/lyft/Kronos-Android
+    fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
+        AndroidClockFactory.createKronosClock(
+            app,
+            requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),
+            minWaitTimeBetweenSyncMs = TimeUnit.MINUTES.toMillis(30),
+            cacheExpirationMs = TimeUnit.MINUTES.toMillis(30)
+        )
+    )
+
 
     @Provides
-    open fun provideSessionRealmConfigBuilder(): SessionRealmConfigBuilder =
-        SessionRealmConfigBuilderImpl()
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
+        SessionEventValidatorsFactoryImpl()
 
     @Provides
-    @Singleton
-    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsBuilder =
-        SessionEventValidatorsBuilderImpl()
-
+    open fun provideDbEventDatabaseFactory(ctx: Context,
+                                           secureDataManager: SecureLocalDbKeyProvider): EventDatabaseFactory =
+        DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
-        ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
-    ): SessionLocalDataSource =
-        SessionLocalDataSourceImpl(
-            ctx,
-            secureDataManager,
-            timeHelper,
-            sessionRealmConfigBuilder,
-            sessionEventValidatorsBuilder.build()
-        )
+        factory: EventDatabaseFactory
+    ): EventLocalDataSource =
+        EventLocalDataSourceImpl(factory)
 
     @Provides
     @Singleton
-    open fun provideSessionEventsRemoteDbManager(
-        simApiClientFactory: SimApiClientFactory
-    ): SessionRemoteDataSource = SessionRemoteDataSourceImpl(
-        simApiClientFactory
-    )
-
-    @Provides
-    @Singleton
-    open fun provideSessionEventsManager(
+    open fun provideEventRepository(
         ctx: Context,
-        sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionLocalDataSource: SessionLocalDataSource,
-        sessionRemoteDataSource: SessionRemoteDataSource,
+        eventLocalDataSource: EventLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager
-    ): SessionRepository =
-        SessionRepositoryImpl(
+        crashReportManager: CrashReportManager,
+        validatorFactory: SessionEventValidatorsFactory
+    ): EventRepository =
+        EventRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            sessionEventsSyncManager,
-            sessionLocalDataSource,
-            sessionRemoteDataSource,
+            loginInfoManager,
+            eventLocalDataSource,
+            eventRemoteDataSource,
             preferencesManager,
             crashReportManager,
-            timeHelper
+            timeHelper,
+            validatorFactory
         )
-
-    @Provides
-    @Singleton
-    open fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
-        SubjectsSyncStatusDatabase.getDatabase(ctx)
-
 
     @Provides
     fun provideModuleViewModelFactory(repository: ModuleRepository) =
@@ -269,11 +270,11 @@ open class AppModule {
     fun provideModuleRepository(
         preferencesManager: PreferencesManager,
         crashReportManager: CrashReportManager,
-        subjectLocalDataSource: SubjectLocalDataSource
+        subjectRepository: SubjectRepository
     ): ModuleRepository = ModuleRepositoryImpl(
         preferencesManager,
         crashReportManager,
-        subjectLocalDataSource
+        subjectRepository
     )
 
     @Provides
@@ -283,7 +284,7 @@ open class AppModule {
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
-        sessionRepository: SessionRepository
+        eventRepository: EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
@@ -291,7 +292,7 @@ open class AppModule {
             analyticsManager,
             crashReportManager,
             timeHelper,
-            sessionRepository
+            eventRepository
         )
 
     @Provides
@@ -301,43 +302,55 @@ open class AppModule {
     ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
-    open fun provideConsentViewModelFactory(sessionRepository: SessionRepository) =
-        ConsentViewModelFactory(sessionRepository)
+    open fun provideConsentViewModelFactory(eventRepository: EventRepository) =
+        ConsentViewModelFactory(eventRepository)
 
     @Provides
-    open fun provideCoreExitFormViewModelFactory(sessionRepository: SessionRepository) =
-        CoreExitFormViewModelFactory(sessionRepository)
+    open fun provideCoreExitFormViewModelFactory(eventRepository: EventRepository) =
+        CoreExitFormViewModelFactory(eventRepository)
 
     @Provides
-    open fun provideFingerprintExitFormViewModelFactory(sessionRepository: SessionRepository) =
-        FingerprintExitFormViewModelFactory(sessionRepository)
+    open fun provideFingerprintExitFormViewModelFactory(eventRepository: EventRepository) =
+        FingerprintExitFormViewModelFactory(eventRepository)
 
     @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(
-        personRepository: SubjectRepository,
-        deviceManager: DeviceManager,
-        sessionRepository: SessionRepository,
-        timeHelper: TimeHelper
-    ) =
-        FetchGuidViewModelFactory(personRepository, deviceManager, sessionRepository, timeHelper)
+    open fun provideGuidFetchGuidHelper(downSyncHelper: EventDownSyncHelper,
+                                        subjectRepository: SubjectRepository,
+                                        preferencesManager: PreferencesManager,
+                                        crashReportManager: CrashReportManager): FetchGuidHelper =
+        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
+
+    @Provides
+    open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
+                                              deviceManager: DeviceManager,
+                                              eventRepository: EventRepository,
+                                              timeHelper: TimeHelper) =
+        FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
-        personRepository: SubjectRepository,
-        subjectLocalDataSource: SubjectLocalDataSource,
+        downySyncHelper: EventDownSyncHelper,
+        eventRepository: EventRepository,
+        subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository,
+        eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        subjectsSyncManager: SubjectsSyncManager
-    ) = SyncInformationViewModelFactory(
-        personRepository, subjectLocalDataSource, preferencesManager,
-        loginInfoManager.getSignedInProjectIdOrEmpty(), subjectsDownSyncScopeRepository,
-        imageRepository, subjectsSyncManager
-    )
+        eventSyncManager: EventSyncManager
+    ) =
+        SyncInformationViewModelFactory(
+            downySyncHelper,
+            eventRepository,
+            subjectRepository,
+            preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            eventDownSyncScopeRepository,
+            imageRepository,
+            eventSyncManager
+        )
 
     @Provides
     open fun provideFingerSelectionViewModelFactory(
@@ -408,10 +421,19 @@ open class AppModule {
 
     @Provides
     fun provideEnrolmentHelper(
-        repository: SubjectRepository,
-        sessionRepository: SessionRepository,
+        subjectRepository: SubjectRepository,
+        eventRepository: EventRepository,
+        preferencesManager: PreferencesManager,
+        loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionRepository, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
+
+    @Provides
+    fun providePersonCreationEventHelper(
+        eventRepository: EventRepository,
+        timeHelper: TimeHelper,
+        encodingUtils: EncodingUtils
+    ): PersonCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
 
     @Provides
     open fun provideEnrolLastBiometricsViewModel(

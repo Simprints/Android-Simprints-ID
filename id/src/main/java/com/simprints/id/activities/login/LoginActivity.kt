@@ -20,7 +20,8 @@ import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.session.domain.models.events.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -92,15 +93,15 @@ class LoginActivity : BaseSplitActivity() {
         })
     }
 
-    private fun handleSignInResult(result: AuthenticationEvent.Result) {
+    private fun handleSignInResult(result: Result) {
         when (result) {
-            AuthenticationEvent.Result.AUTHENTICATED -> handleSignInSuccess()
-            AuthenticationEvent.Result.OFFLINE -> handleSignInFailedNoConnection()
-            AuthenticationEvent.Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
-            AuthenticationEvent.Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
-            AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM,
-            AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
-            AuthenticationEvent.Result.UNKNOWN -> handleSignInFailedUnknownReason()
+            Result.AUTHENTICATED -> handleSignInSuccess()
+            Result.OFFLINE -> handleSignInFailedNoConnection()
+            Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
+            Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
+            Result.SAFETYNET_INVALID_CLAIM,
+            Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
+            Result.UNKNOWN -> handleSignInFailedUnknownReason()
         }
     }
 

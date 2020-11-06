@@ -12,15 +12,19 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.mock.mockTemplate
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class StepEncoderImplTest {
 
     private val fakeSample = FingerprintGeneratorUtils.generateRandomFingerprint()

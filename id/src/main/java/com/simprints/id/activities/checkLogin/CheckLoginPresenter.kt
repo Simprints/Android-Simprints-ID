@@ -13,8 +13,8 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,7 +61,7 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    protected open suspend fun handleSignedInUser() {
+    open suspend fun handleSignedInUser() {
         CoroutineScope(Dispatchers.Main).launch {
             setLanguageInHelper()
             checkStatusForDeviceAndProject()

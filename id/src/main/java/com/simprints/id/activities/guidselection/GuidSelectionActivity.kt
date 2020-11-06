@@ -9,19 +9,19 @@ import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
 class GuidSelectionActivity : BaseSplitActivity() {
 
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var timeHelper: TimeHelper
     private lateinit var guildSelectionRequest: GuidSelectionRequest
 

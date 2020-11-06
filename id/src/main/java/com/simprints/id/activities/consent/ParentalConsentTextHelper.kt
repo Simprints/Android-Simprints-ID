@@ -1,7 +1,6 @@
 package com.simprints.id.activities.consent
 
 import android.content.Context
-import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -14,7 +13,8 @@ data class ParentalConsentTextHelper(val parentalConsentOptionsJson: String,
                                      val programName: String,
                                      val organizationName: String,
                                      val modalities: List<Modality>,
-                                     val crashReportManager: CrashReportManager) {
+                                     val crashReportManager: CrashReportManager,
+                                     val jsonHelper: JsonHelper) {
 
     private val parentalConsentOptions by lazy {
         buildParentalConsentOptions()
@@ -111,8 +111,8 @@ data class ParentalConsentTextHelper(val parentalConsentOptionsJson: String,
     private fun isSingleModality() = modalities.size == 1
 
     private fun buildParentalConsentOptions() = try {
-        JsonHelper.gson.fromJson(parentalConsentOptionsJson, ParentalConsentOptions::class.java)
-    } catch (e: JsonSyntaxException) {
+        jsonHelper.fromJson<ParentalConsentOptions>(parentalConsentOptionsJson)
+    } catch (e: Throwable) {
         crashReportManager.logExceptionOrSafeException(Exception("Malformed Parental Consent Text Error", e))
         ParentalConsentOptions()
     }

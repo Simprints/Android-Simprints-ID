@@ -23,7 +23,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.tools.Chip
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
@@ -38,7 +38,7 @@ class ModuleSelectionFragment(
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var eventSyncManager: EventSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -77,7 +77,7 @@ class ModuleSelectionFragment(
     }
 
     private fun refreshSyncWorkers() {
-        with(subjectsSyncManager) {
+        with(eventSyncManager) {
             stop()
             sync()
         }

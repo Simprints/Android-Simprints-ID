@@ -311,7 +311,11 @@ class CollectFingerprintsViewModel(
                 }
             )
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
-            sessionEventsManager.addEventInBackground(captureEvent)
+
+            //It can not be done in background because then id won't find the last capture event id
+            runBlocking {
+                sessionEventsManager.addEvent(captureEvent)
+            }
         }
     }
 

@@ -9,8 +9,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.simprints.clientapi.di.KoinInjector
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.session.SessionEvents
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.moduleapi.app.responses.IAppResponse
 import io.mockk.coEvery
 import io.mockk.every
@@ -27,7 +27,7 @@ open class BaseClientApiTest : KoinTest {
     internal val projectIdField = "projectId" to "some_project"
     internal val userIdField = "userId" to "some_user_id"
     internal val moduleIdField = "moduleId" to "some_module_id"
-    internal val metadataField = "metadata" to "some_metadata"
+    internal val metadataField = "metadata" to "{\"key\": \"some_metadata\"}"
     internal val verifyGuidField = "verifyGuid" to "8b3f577c-b6c7-4677-9af2-b08cd7f71b79"
     internal val sessionIdField = "sessionId" to "some_sessionid"
     internal val selectedGuidField = "selectedGuid" to "8b3f577c-b6c7-4677-9af2-b08cd7f71b79"
@@ -60,11 +60,11 @@ open class BaseClientApiTest : KoinTest {
         }
     }
 
-    private fun buildDummySessionEventsManagerMock(): SessionRepository {
-        val sessionMock = mockk<SessionEvents>(relaxed = true)
+    private fun buildDummySessionEventsManagerMock(): EventRepository {
+        val sessionMock = mockk<SessionCaptureEvent>(relaxed = true)
         every { sessionMock.id } returns ""
-        val repo = mockk<SessionRepository>(relaxed = true)
-        coEvery { repo.getCurrentSession() } returns sessionMock
+        val repo = mockk<EventRepository>(relaxed = true)
+        coEvery { repo.getCurrentCaptureSessionEvent() } returns sessionMock
         return repo
     }
 

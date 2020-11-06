@@ -21,7 +21,7 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.SimulationMode
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
@@ -99,7 +99,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun setupDbManagerMock() {
         with(dbManagerMock) {
             whenThis { loadPeople(anyNotNull()) } then {
-                val query = it.arguments[0] as SubjectLocalDataSource.Query
+                val query = it.arguments[0] as SubjectQuery
                 val numberOfPeopleToLoad = if (query.subjectId == null) NUMBER_OF_PEOPLE_IN_DB else 1
                 Single.just(
                     FingerprintGenerator.generateRandomFingerprintRecords(numberOfPeopleToLoad)
@@ -152,7 +152,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun assertIdentifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
             FingerprintGenerator.generateRandomFingerprints(2),
-            SubjectLocalDataSource.Query(projectId = DEFAULT_PROJECT_ID)
+            SubjectQuery(projectId = DEFAULT_PROJECT_ID)
         ))
 
         with(scenario.result) {
@@ -167,7 +167,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun assertVerifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
             FingerprintGenerator.generateRandomFingerprints(2),
-            SubjectLocalDataSource.Query(subjectId = UUID.randomUUID().toString())
+            SubjectQuery(subjectId = UUID.randomUUID().toString())
         ))
 
         with(scenario.result) {

@@ -2,14 +2,15 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -21,10 +22,10 @@ import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,38 +41,39 @@ class TestSecurityModule(
 ) : SecurityModule() {
 
     override fun provideSignerManager(
-        projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        subjectsSyncManager: SubjectsSyncManager,
-        syncManager: SyncManager,
-        securityStateScheduler: SecurityStateScheduler,
-        longConsentRepository: LongConsentRepository,
-        sessionRepository: SessionRepository,
-        baseUrlProvider: BaseUrlProvider,
-        remoteConfigWrapper: RemoteConfigWrapper
+            projectRepository: ProjectRepository,
+            remoteDbManager: RemoteDbManager,
+            loginInfoManager: LoginInfoManager,
+            preferencesManager: PreferencesManager,
+            eventSyncManager: EventSyncManager,
+            syncManager: SyncManager,
+            securityStateScheduler: SecurityStateScheduler,
+            longConsentRepository: LongConsentRepository,
+            eventRepository: EventRepository,
+            baseUrlProvider: BaseUrlProvider,
+            remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            subjectsSyncManager,
+            eventSyncManager,
             syncManager,
             securityStateScheduler,
             longConsentRepository,
-            sessionRepository,
+            eventRepository,
             baseUrlProvider,
             remoteConfigWrapper
         )
     }
 
     override fun provideLoginActivityHelper(
-        securityStateRepository: SecurityStateRepository
+        securityStateRepository: SecurityStateRepository,
+        jsonHelper: JsonHelper
     ): LoginActivityHelper {
         return loginActivityHelperRule.resolveDependency {
-            super.provideLoginActivityHelper(securityStateRepository)
+            super.provideLoginActivityHelper(securityStateRepository, jsonHelper)
         }
     }
 
@@ -120,11 +122,11 @@ class TestSecurityModule(
     }
 
     override fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
-        loginInfoManager: LoginInfoManager,
-        timeHelper: TimeHelper,
-        projectAuthenticator: ProjectAuthenticator,
-        sessionRepository: SessionRepository
+            crashReportManager: CrashReportManager,
+            loginInfoManager: LoginInfoManager,
+            timeHelper: TimeHelper,
+            projectAuthenticator: ProjectAuthenticator,
+            eventRepository: EventRepository
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(
@@ -132,7 +134,7 @@ class TestSecurityModule(
                 loginInfoManager,
                 timeHelper,
                 projectAuthenticator,
-                sessionRepository
+                eventRepository
             )
         }
     }

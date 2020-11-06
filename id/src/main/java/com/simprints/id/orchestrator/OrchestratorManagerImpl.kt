@@ -20,7 +20,8 @@ open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
     private val hotCache: HotCache,
-    private val dashboardDailyActivityRepository: DashboardDailyActivityRepository
+    private val dashboardDailyActivityRepository: DashboardDailyActivityRepository,
+    private val personCreationEventHelper: PersonCreationEventHelper
 ) : OrchestratorManager, FlowProvider {
 
     override val ongoingStep = MutableLiveData<Step?>()
@@ -70,7 +71,7 @@ open class OrchestratorManagerImpl(
             is AppEnrolRequest -> ENROL
             is AppIdentifyRequest -> IDENTIFY
             is AppVerifyRequest -> VERIFY
-            is AppEnrolLastBiometricsRequest ->throw IllegalStateException("Not running one of the main flows")
+            is AppEnrolLastBiometricsRequest -> throw IllegalStateException("Not running one of the main flows")
             is AppConfirmIdentityRequest -> throw IllegalStateException("Not running one of the main flows")
         }
 
@@ -100,6 +101,8 @@ open class OrchestratorManagerImpl(
         val appResponseToReturn = appResponseFactory.buildAppResponse(
             modalities, hotCache.appRequest, steps, sessionId
         )
+        personCreationEventHelper.addPersonCreationEventIfNeeded(steps.mapNotNull { it.getResult() })
+
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
         dashboardDailyActivityRepository.updateDailyActivity(appResponseToReturn)

@@ -3,17 +3,14 @@ package com.simprints.id.activities.setup
 import android.Manifest
 import com.google.android.gms.location.LocationRequest
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.session.Location
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
-import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.tools.LocationManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 object SetupActivityHelper {
@@ -26,8 +23,8 @@ object SetupActivityHelper {
         }
 
     internal suspend fun storeUserLocationIntoCurrentSession(locationManager: LocationManager,
-                                                     sessionRepository: SessionRepository,
-                                                     crashReportManager: CrashReportManager) {
+                                                             eventRepository: EventRepository,
+                                                             crashReportManager: CrashReportManager) {
         try {
             val locationRequest = LocationRequest().apply {
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -35,10 +32,10 @@ object SetupActivityHelper {
             val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
             locationsFlow.collect { locations ->
                 val lastLocation = locations.last()
-                sessionRepository.updateCurrentSession {
-                    Timber.d("Saving user's location into the current session")
-                    it.location = Location(lastLocation.latitude, lastLocation.longitude)
-                }
+                val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+                currentSession.payload.location = Location(lastLocation.latitude, lastLocation.longitude)
+                eventRepository.addEventToCurrentSession(currentSession)
+                Timber.d("Saving user's location into the current session")
             }
         } catch (t: Throwable) {
             crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))

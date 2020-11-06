@@ -1,55 +1,33 @@
 package com.simprints.core.tools.json
 
-import androidx.annotation.Keep
-import com.google.gson.*
-import com.simprints.libsimprints.FingerIdentifier
-import java.util.*
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
-@Keep
 class JsonHelper {
-    companion object {
-        val defaultBuilder by lazy {
-            GsonBuilder().apply {
-                registerDateAdapter(this)
-                registerFingerIdentifierAdapter(this)
-            }
-        }
 
-        val gson: Gson by lazy {
-            defaultBuilder.create()
-        }
+    val jackson: ObjectMapper by lazy {
+        ObjectMapper()
+            .registerKotlinModule()
+            .setSerializationInclusion(Include.NON_NULL)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
 
-        private fun registerFingerIdentifierAdapter(builder: GsonBuilder) {
-            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonDeserializer<FingerIdentifier> { json, _, _ ->
-                if (json.asJsonPrimitive.isNumber)
-                    FingerIdentifier.values()[json.asJsonPrimitive.asInt]
-                else FingerIdentifier.valueOf(json.asJsonPrimitive.asString)
-            })
+    fun toJson(any: Any): String {
+        return jackson.writeValueAsString(any)
+    }
 
-            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonSerializer<FingerIdentifier> { src, _, _ ->
-                JsonPrimitive(src.name)
-            })
-        }
+    inline fun <reified T> fromJson(json: String, type: TypeReference<T>): T {
+        return jackson.readValue(json, type)
+    }
 
-        private fun registerDateAdapter(builder: GsonBuilder) {
-            builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Date> { json, _, _ ->
-                if (json.asJsonPrimitive.isNumber)
-                    Date(json.asJsonPrimitive.asLong)
-                else 
-                    Date(json.asJsonPrimitive.asString) //TODO: find a replacement for deprecated method
-            })
+    inline fun <reified T> fromJson(json: String): T {
+        return jackson.readValue(json, T::class.java)
+    }
 
-            builder.registerTypeAdapter(Date::class.java, JsonSerializer<Date> { src, _, _ ->
-                JsonPrimitive(src.time)
-            })
-        }
-
-        fun toJson(any: Any): String {
-            return gson.toJson(any)
-        }
-
-        inline fun <reified T> fromJson(json: String): T {
-            return gson.fromJson(json, T::class.java)
-        }
+    fun validateJsonOrThrow(json: String) {
+        jackson.readTree(json)
     }
 }

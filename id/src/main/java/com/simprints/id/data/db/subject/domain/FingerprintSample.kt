@@ -1,37 +1,51 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
-import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.subject.domain.subjectevents.BiometricReference
-import com.simprints.id.data.db.subject.domain.subjectevents.FingerprintReference
-import com.simprints.id.data.db.subject.domain.subjectevents.FingerprintTemplate
-import com.simprints.id.data.db.subject.domain.subjectevents.fromEventToPerson
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-open class FingerprintSample(
-    open val fingerIdentifier: FingerIdentifier,
-    open val template: ByteArray,
-    open val templateQualityScore: Int) : Parcelable {
+data class FingerprintSample(
+    val fingerIdentifier: FingerIdentifier,
+    val template: ByteArray,
+    val templateQualityScore: Int) : Parcelable {
 
     @IgnoredOnParcel
-    open val id: String by lazy {
+    val id: String by lazy {
         UUID.nameUUIDFromBytes(template).toString()
     }
 
-    companion object {
-        fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
-            biometricReferences?.filterIsInstance(FingerprintReference::class.java)
-                ?.firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-        private fun buildFingerprintSample(template: FingerprintTemplate): FingerprintSample {
-            return FingerprintSample(
-                template.finger.fromEventToPerson(),
-                EncodingUtils.base64ToBytes(template.template),
-                template.quality
-            )
-        }
+        other as FingerprintSample
+
+        if (fingerIdentifier != other.fingerIdentifier) return false
+        if (!template.contentEquals(other.template)) return false
+        if (templateQualityScore != other.templateQualityScore) return false
+
+        return true
     }
+
+    override fun hashCode(): Int {
+        var result = fingerIdentifier.hashCode()
+        result = 31 * result + template.contentHashCode()
+        result = 31 * result + templateQualityScore
+        return result
+    }
+}
+
+// Generates a unique id for a list of samples.
+// It concats the templates (sorted by quality score) and creates a UUID from that.
+fun List<FingerprintSample>.uniqueId() =
+    UUID.nameUUIDFromBytes(
+        contactTemplates()
+    ).toString()
+
+private fun List<FingerprintSample>.contactTemplates(): ByteArray {
+    return this.sortedBy { it.templateQualityScore }.fold(byteArrayOf(), { acc, sample ->
+        acc + sample.template
+    })
 }

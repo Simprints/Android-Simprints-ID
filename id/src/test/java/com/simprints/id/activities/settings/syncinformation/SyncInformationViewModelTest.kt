@@ -7,23 +7,26 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.common.models.SubjectsCount
+import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.Running
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.Succeeded
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerType
-import com.simprints.id.testtools.TestApplication
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Running
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Succeeded
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -35,19 +38,19 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.robolectric.annotation.Config
 import java.io.IOException
 
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationViewModelTest {
 
     @get:Rule val rule = InstantTaskExecutorRule()
 
-    @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
-    @MockK lateinit var preferencesManagerMock: PreferencesManager
-    @MockK lateinit var subjectsDownSyncScopeRepositoryMock: SubjectsDownSyncScopeRepository
-    @MockK lateinit var imageRepositoryMock: ImageRepository
-    @MockK lateinit var subjectsSyncManagerMock: SubjectsSyncManager
+    @MockK lateinit var downySyncHelper: EventDownSyncHelper
+    @MockK lateinit var eventRepository: EventRepository
+    @MockK lateinit var subjectRepository: SubjectRepository
+    @MockK lateinit var preferencesManager: PreferencesManager
+    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var imageRepository: ImageRepository
+    @MockK lateinit var eventSyncManager: EventSyncManager
     private lateinit var subjectRepositoryMock: SubjectRepository
 
     private val projectId = DEFAULT_PROJECT_ID
@@ -59,15 +62,21 @@ class SyncInformationViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         UnitTestConfig(this).coroutinesMainThread()
         subjectRepositoryMock = mockk()
-        viewModel = SyncInformationViewModel(subjectRepositoryMock, subjectLocalDataSourceMock,
-            preferencesManagerMock, projectId, subjectsDownSyncScopeRepositoryMock,
-            imageRepositoryMock, subjectsSyncManagerMock)
+        viewModel = SyncInformationViewModel(
+            downySyncHelper,
+            eventRepository,
+            subjectRepository,
+            preferencesManager,
+            projectId,
+            eventDownSyncScopeRepository,
+            imageRepository,
+            eventSyncManager)
     }
 
     @Test
     fun syncInProgress_shouldHaveSyncingViewState() {
         runBlocking {
-            every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Running)).asLiveData()
+            every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Running)).asLiveData()
 
             val testObserver = viewModel.getViewStateLiveData().testObserver()
 
@@ -82,17 +91,22 @@ class SyncInformationViewModelTest {
         val countInRemoteForCreate = 123
         val countInRemoteForDelete = 22
         val countInRemoteForMove = 0
-        val subjectsCount = SubjectsCount(countInRemoteForCreate, countInRemoteForDelete, countInRemoteForMove)
 
         val moduleName = DEFAULT_MODULE_ID
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.ON
-        every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
-        every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
-        coEvery { subjectLocalDataSourceMock.count(any()) } returns localCount
-        every { imageRepositoryMock.getNumberOfImagesToUpload() } returns imagesToUpload
-        coEvery { subjectRepositoryMock.countToDownSync(any()) } returns subjectsCount
+        every { preferencesManager.eventDownSyncSetting } returns ON
+        every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
+        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { eventRepository.localCount(any()) } returns localCount
+        coEvery { subjectRepository.count(any()) } returns localCount
+        every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
+        coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
+            EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
+            EventCount(ENROLMENT_RECORD_DELETION, countInRemoteForDelete),
+            EventCount(ENROLMENT_RECORD_MOVE, countInRemoteForMove)
+        )
 
         val testObserver = viewModel.getViewStateLiveData().testObserver()
 
@@ -116,11 +130,12 @@ class SyncInformationViewModelTest {
         val moduleName = DEFAULT_MODULE_ID
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.OFF
-        every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
-        every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
-        coEvery { subjectLocalDataSourceMock.count(any()) } returns localCount
-        every { imageRepositoryMock.getNumberOfImagesToUpload() } returns imagesToUpload
+        every { preferencesManager.eventDownSyncSetting } returns OFF
+        every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { eventRepository.localCount(any()) } returns localCount
+        coEvery { subjectRepository.count(any()) } returns localCount
+        every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         val testObserver = viewModel.getViewStateLiveData().testObserver()
 
@@ -144,12 +159,13 @@ class SyncInformationViewModelTest {
         val moduleName = "module1"
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        every { preferencesManagerMock.subjectsDownSyncSetting } returns SubjectsDownSyncSetting.ON
-        every { subjectsSyncManagerMock.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
-        every { preferencesManagerMock.selectedModules } returns setOf(moduleName)
-        coEvery { subjectLocalDataSourceMock.count(any()) } returns localCount
-        every { imageRepositoryMock.getNumberOfImagesToUpload() } returns imagesToUpload
-        coEvery { subjectRepositoryMock.countToDownSync(any()) } throws IOException()
+        every { preferencesManager.eventDownSyncSetting } returns ON
+        every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
+        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        coEvery { eventRepository.localCount(any()) } returns localCount
+        coEvery { subjectRepository.count(any()) } returns localCount
+        every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
+        coEvery { subjectRepositoryMock.count(any()) } throws IOException()
 
         val testObserver = viewModel.getViewStateLiveData().testObserver()
 
@@ -165,12 +181,13 @@ class SyncInformationViewModelTest {
         )
     }
 
-    private fun buildSubjectsSyncState(syncWorkerState: SubjectsSyncWorkerState) =
-        SubjectsSyncState(syncId = "sync_id", progress = 1, total = 20,
+    private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =
+        EventSyncState(
+            syncId = "sync_id", progress = 1, total = 20,
             upSyncWorkersInfo = listOf(),
             downSyncWorkersInfo = listOf(
-                SubjectsSyncState.SyncWorkerInfo(
-                    SubjectsSyncWorkerType.DOWNLOADER, syncWorkerState
+                SyncWorkerInfo(
+                    DOWNLOADER, syncWorkerState
                 )
             )
         )
