@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.models.events.Matcher as CoreMatcher
+import com.simprints.id.data.db.event.domain.models.Matcher as CoreMatcher
 
 @Keep
 enum class Matcher {

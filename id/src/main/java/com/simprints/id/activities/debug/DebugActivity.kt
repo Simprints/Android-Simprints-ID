@@ -13,24 +13,32 @@ import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.subjects_sync.down.local.SubjectsDownSyncOperationLocalDataSource
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
+import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState.*
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import kotlinx.android.synthetic.main.activity_debug.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 class DebugActivity : BaseSplitActivity() {
 
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
-    @Inject lateinit var subjectsDownSyncOperationLocalDataSource: SubjectsDownSyncOperationLocalDataSource
+    @Inject lateinit var eventSyncManager: EventSyncManager
+    @Inject lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
     @Inject lateinit var securityStateRepository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
+    @Inject lateinit var eventLocalDataSource: EventLocalDataSource
+    @Inject lateinit var subjectRepository: SubjectRepository
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -42,12 +50,12 @@ class DebugActivity : BaseSplitActivity() {
 
         setContentView(R.layout.activity_debug)
 
-        subjectsSyncManager.getLastSyncState().observe(this, Observer {
+        eventSyncManager.getLastSyncState().observe(this, Observer {
             val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
                 "${it.syncId.takeLast(3)} - " +
-                "${states.toDebugActivitySyncState().name} - " +
-                "${it.progress}/${it.total}"
+                    "${states.toDebugActivitySyncState().name} - " +
+                    "${it.progress}/${it.total}"
 
             val ssb = SpannableStringBuilder(logs.text)
             ssb.append(coloredText(message + "\n", Color.parseColor(getRandomColor(it.syncId))))
@@ -56,23 +64,28 @@ class DebugActivity : BaseSplitActivity() {
         })
 
         syncSchedule.setOnClickListener {
-            subjectsSyncManager.scheduleSync()
+            eventSyncManager.scheduleSync()
         }
 
         syncStart.setOnClickListener {
-            subjectsSyncManager.sync()
+            eventSyncManager.sync()
         }
 
         syncStop.setOnClickListener {
-            subjectsSyncManager.stop()
+            eventSyncManager.stop()
         }
 
         cleanAll.setOnClickListener {
-            subjectsSyncManager.cancelScheduledSync()
-            subjectsSyncManager.stop()
-            wm.pruneWork()
-
-            subjectsDownSyncOperationLocalDataSource.deleteAll()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    eventSyncManager.cancelScheduledSync()
+                    eventSyncManager.stop()
+                    eventLocalDataSource.delete()
+                    dbEventDownSyncOperationStateDao.deleteAll()
+                    subjectRepository.deleteAll()
+                    wm.pruneWork()
+                }
+            }
         }
 
         securityStateCompromised.setOnClickListener {
@@ -82,6 +95,21 @@ class DebugActivity : BaseSplitActivity() {
         securityStateProjectEnded.setOnClickListener {
             setSecurityStatus(SecurityState.Status.PROJECT_ENDED)
         }
+
+        printRoomDb.setOnClickListener {
+            logs.text = ""
+            lifecycleScope.launch {
+                withContext(Dispatchers.Main) {
+                    logs.text = "${logs.text} ${subjectRepository.count()} \n"
+
+                    val events = eventLocalDataSource.load(DbLocalEventQuery()).toList().groupBy { it.type }
+                    events.forEach {
+                        logs.text = "${logs.text} ${it.key} ${it.value.size} \n"
+                    }
+                }
+            }
+        }
+
     }
 
     private fun getRandomColor(seed: String): String {
@@ -99,7 +127,7 @@ class DebugActivity : BaseSplitActivity() {
         return spannableString
     }
 
-    private fun List<SubjectsSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
+    private fun List<EventSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
         when {
             isEmpty() -> DebugActivitySyncState.NOT_RUNNING
             this.any { it is Running } -> DebugActivitySyncState.RUNNING

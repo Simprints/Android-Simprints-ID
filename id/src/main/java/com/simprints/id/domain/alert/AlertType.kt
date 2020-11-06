@@ -1,6 +1,6 @@
 package com.simprints.id.domain.alert
 
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import kotlin.reflect.jvm.internal.impl.descriptors.Modality
 
 enum class AlertType(val modalities: List<Modality>? = null) {

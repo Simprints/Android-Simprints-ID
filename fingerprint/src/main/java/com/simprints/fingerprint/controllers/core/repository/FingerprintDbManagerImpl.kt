@@ -8,6 +8,7 @@ import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import io.reactivex.Single
 import kotlinx.coroutines.flow.toList
+import timber.log.Timber
 import java.io.Serializable
 import com.simprints.id.data.db.subject.domain.FingerIdentifier as FingerIdentifierCore
 

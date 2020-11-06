@@ -7,15 +7,15 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
-class DefaultOkHttpClientBuilder {
+open class DefaultOkHttpClientBuilder {
 
     companion object {
         const val DEVICE_ID_HEADER = "X-Device-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
     }
 
-    fun get(authToken: String? = null,
-            deviceId: String): OkHttpClient.Builder =
+    open fun get(authToken: String? = null,
+                 deviceId: String): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)

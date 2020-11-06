@@ -18,20 +18,17 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 
 class SyncInformationActivity : BaseSplitActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: SyncInformationViewModelFactory
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-    @Inject
-    lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var eventSyncManager: EventSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
@@ -208,7 +205,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
+        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
     sealed class ViewState {

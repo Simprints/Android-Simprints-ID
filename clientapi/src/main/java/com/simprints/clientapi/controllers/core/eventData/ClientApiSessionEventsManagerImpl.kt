@@ -4,50 +4,57 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.*
-import com.simprints.id.data.db.session.domain.models.events.callout.EnrolmentCalloutEvent
-import com.simprints.id.data.db.session.domain.models.events.callout.IdentificationCalloutEvent
+import com.simprints.core.tools.extentions.inBackground
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.*
+import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.libsimprints.BuildConfig
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
-class ClientApiSessionEventsManagerImpl(private val coreSessionRepository: SessionRepository,
-                                        private val timeHelper: ClientApiTimeHelper) :
+class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRepository,
+                                        private val timeHelper: ClientApiTimeHelper,
+                                        private val dispatcher: CoroutineDispatcher = Dispatchers.IO) :
     ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         runBlocking {
-            coreSessionRepository.createSession(BuildConfig.VERSION_NAME)
+            coreEventRepository.createSession(BuildConfig.VERSION_NAME)
         }
 
-        coreSessionRepository.addEventToCurrentSessionInBackground(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore()))
+        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
 
-        return coreSessionRepository.getCurrentSession().id
+        return coreEventRepository.getCurrentCaptureSessionEvent().id
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
-        coreSessionRepository.addEventToCurrentSessionInBackground(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent()))
+        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())) }
     }
 
     override suspend fun addCompletionCheckEvent(complete: Boolean) {
-        coreSessionRepository.addEventToCurrentSessionInBackground(CompletionCheckEvent(timeHelper.now(), complete))
+        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(CompletionCheckEvent(timeHelper.now(), complete)) }
     }
 
     override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
-        coreSessionRepository.addEventToCurrentSessionInBackground(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
+        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras)) }
     }
 
     override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
-        coreSessionRepository.addEventToCurrentSessionInBackground(InvalidIntentEvent(timeHelper.now(), action, extras))
+        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(InvalidIntentEvent(timeHelper.now(), action, extras)) }
     }
 
-    override suspend fun getCurrentSessionId(): String = coreSessionRepository.getCurrentSession().id
+    override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
 
-    override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean =
-        coreSessionRepository.getCurrentSession().getEvents().any {
+    override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
+        val session = coreEventRepository.getCurrentCaptureSessionEvent()
+        return coreEventRepository.loadEvents(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
+    }
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =

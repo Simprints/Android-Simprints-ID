@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.google.gson.JsonElement
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -100,10 +100,10 @@ class ProjectAuthenticatorImpl(
         secureDataManager.setLocalDatabaseKey(projectId)
     }
 
-    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonElement =
+    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonNode =
         projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
 
-    private fun JsonElement.storeProjectRemoteConfigSettingsUpdateLanguageAndReturnProjectLanguages(): Array<String> {
+    private fun JsonNode.storeProjectRemoteConfigSettingsUpdateLanguageAndReturnProjectLanguages(): Array<String> {
         val jsonString = this.toString()
         remoteConfigWrapper.projectSettingsJsonString = jsonString
 
