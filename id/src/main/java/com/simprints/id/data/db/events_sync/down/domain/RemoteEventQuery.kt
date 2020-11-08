@@ -1,11 +1,13 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
+import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.remote.ApiRemoteEventQuery
 import com.simprints.id.data.db.event.remote.fromDomainToApi
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
 import com.simprints.id.domain.modality.Modes
 
+@Keep
 data class RemoteEventQuery(val projectId: String,
                             val attendantId: String? = null,
                             val moduleIds: List<String>? = null,
