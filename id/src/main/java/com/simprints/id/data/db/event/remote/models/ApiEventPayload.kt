@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.event.remote.models
 
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload
@@ -89,6 +90,7 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMo
     JsonSubTypes.Type(value = ApiCallbackPayload::class, name = Companion.CALLOUT_KEY),
     JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY)
 )
+@Keep
 abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
     open val version: Int,
