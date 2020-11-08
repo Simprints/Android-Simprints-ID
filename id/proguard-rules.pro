@@ -61,9 +61,11 @@
 -keep class com.simprints.libsimprints.** { *; }
 -keep class com.simprints.fingerprintmatcher.** { *; }
 -keep class com.simprints.id.data.db.event.remote.models.** { *; }
+-keep class com.simprints.id.data.db.event.domain.models.** { *; }
 -keep class com.simprints.id.data.db.event.local.** { *; }
 
 -dontwarn com.simprints.fingerprintmatcher.**
+
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
