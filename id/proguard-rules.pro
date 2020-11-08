@@ -60,6 +60,9 @@
 # These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
 -keep class com.simprints.fingerprintmatcher.** { *; }
+-keep class com.simprints.id.data.db.event.remote.models.** { *; }
+-keep class com.simprints.id.data.db.event.local.** { *; }
+
 -dontwarn com.simprints.fingerprintmatcher.**
 
 # Deobfuscations for Crashlytics:
@@ -121,3 +124,7 @@
 }
 -keepnames class com.fasterxml.jackson.** { *; }
 -dontwarn com.fasterxml.jackson.databind.**
+
+#net.zetetic:android-database-sqlcipher
+-keep class net.sqlcipher.** { *; }
+
