@@ -12,7 +12,9 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 
-internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDataSource {
+internal class ImageLocalDataSourceImpl(
+    private val ctx: Context
+) : ImageLocalDataSource {
 
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
 
@@ -53,7 +55,7 @@ internal class ImageLocalDataSourceImpl(private val ctx: Context) : ImageLocalDa
         return try {
             encryptedFile.openFileInput()
         } catch (t: Throwable) {
-            t.printStackTrace()
+            Timber.d(t)
             null
         }
     }
