@@ -16,11 +16,10 @@ import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprintmatcher.EVENT
-import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.fingerprintmatcher.Progress
+import com.simprints.fingerprintmatcher.old.EVENT
+import com.simprints.fingerprintmatcher.old.LibMatcher
+import com.simprints.fingerprintmatcher.old.Progress
 import sourceafis.MatcherEventListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -30,8 +29,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
-import com.simprints.fingerprintmatcher.Person as LibPerson
-import com.simprints.fingerprintmatcher.Person as MatcherPerson
+import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson as LibPerson
+import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson as MatcherPerson
 
 class MatchingViewModel(private val dbManager: FingerprintDbManager,
                         private val sessionEventsManager: FingerprintSessionEventsManager,

@@ -1,9 +1,7 @@
-package com.simprints.fingerprintmatcher;
+package com.simprints.fingerprintmatcher.algorithms.simafis.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.simprints.libsimprints.FingerIdentifier;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,8 +11,12 @@ import java.util.Random;
 
 import androidx.annotation.NonNull;
 
+import com.simprints.fingerprintmatcher.old.Utils;
+
+import org.jetbrains.annotations.NotNull;
+
 @SuppressWarnings("unused")
-public class Fingerprint implements Parcelable {
+public class SimAfisFingerprint implements Parcelable {
 
     private final static int ISO_FORMAT_ID = Integer.parseInt("464D5200", 16);     // 'F' 'M' 'R' 00hex
     private final static int ISO_2005_VERSION = Integer.parseInt("20323000", 16);  // ' ' '2' '0' 00hex
@@ -45,10 +47,10 @@ public class Fingerprint implements Parcelable {
     private final static int QUALITY_SHIFT = 5;          // SHORT
 
     private final static Random RANDOM_GENERATOR = new Random();
-    private final static FingerIdentifier[] FINGER_IDENTIFIERS = FingerIdentifier.values();
+    private final static SimAfisFingerIdentifier[] FINGER_IDENTIFIERS = SimAfisFingerIdentifier.values();
 
 
-    private final FingerIdentifier fingerId;
+    private final SimAfisFingerIdentifier fingerId;
     private final ByteBuffer template;
 
     /**
@@ -59,7 +61,7 @@ public class Fingerprint implements Parcelable {
      * @throws IllegalArgumentException If the bytes array specified is not a valid ISO 2005
      *                                  (2011 not supported yet) template containing only 1 fingerprint.
      */
-    public Fingerprint(@NonNull FingerIdentifier fingerId, @NonNull byte[] isoTemplateBytes)
+    public SimAfisFingerprint(@NonNull SimAfisFingerIdentifier fingerId, @NonNull byte[] isoTemplateBytes)
             throws IllegalArgumentException {
         this.fingerId = fingerId;
         //noinspection ConstantConditions
@@ -102,13 +104,13 @@ public class Fingerprint implements Parcelable {
      * @throws IllegalArgumentException If the string specified is not a valid base 64
      *                                  encoded ISO 2005 (2011 not supported yet) template containing only 1 fingerprint.
      */
-    public Fingerprint(@NonNull FingerIdentifier fingerId, @NonNull String isoBase64Template)
+    public SimAfisFingerprint(@NonNull SimAfisFingerIdentifier fingerId, @NonNull String isoBase64Template)
             throws IllegalArgumentException {
         this(fingerId, Utils.base64ToBytes(isoBase64Template));
     }
 
 
-    public FingerIdentifier getFingerId() {
+    public SimAfisFingerIdentifier getFingerId() {
         return fingerId;
     }
 
@@ -141,19 +143,19 @@ public class Fingerprint implements Parcelable {
 
 
     /**
-     * @return A random valid {@link Fingerprint} with a random {@link FingerIdentifier}
+     * @return A random valid {@link SimAfisFingerprint} with a random {@link SimAfisFingerIdentifier}
      */
-    public static Fingerprint generateRandomFingerprint() {
+    public static SimAfisFingerprint generateRandomFingerprint() {
         int fingerNo = RANDOM_GENERATOR.nextInt(FINGER_IDENTIFIERS.length);
-        FingerIdentifier fingerId = FINGER_IDENTIFIERS[fingerNo];
+        SimAfisFingerIdentifier fingerId = FINGER_IDENTIFIERS[fingerNo];
         return generateRandomFingerprint(fingerId);
     }
 
     /**
      * @param fingerId Finger identifier of the fingerprint
-     * @return A random valid {@link Fingerprint} with specified {@link FingerIdentifier}
+     * @return A random valid {@link SimAfisFingerprint} with specified {@link SimAfisFingerIdentifier}
      */
-    public static Fingerprint generateRandomFingerprint(@NonNull FingerIdentifier fingerId) {
+    public static SimAfisFingerprint generateRandomFingerprint(@NonNull SimAfisFingerIdentifier fingerId) {
         byte qualityScore = (byte) RANDOM_GENERATOR.nextInt(101);
         return generateRandomFingerprint(fingerId, qualityScore);
     }
@@ -162,10 +164,10 @@ public class Fingerprint implements Parcelable {
     /**
      * @param fingerId     Finger identifier of the fingerprint
      * @param qualityScore Quality score of the fingerprint
-     * @return A random valid {@link Fingerprint} with specified {@link FingerIdentifier}
+     * @return A random valid {@link SimAfisFingerprint} with specified {@link SimAfisFingerIdentifier}
      */
-    public static Fingerprint generateRandomFingerprint(@NonNull FingerIdentifier fingerId,
-                                                        byte qualityScore) {
+    public static SimAfisFingerprint generateRandomFingerprint(@NonNull SimAfisFingerIdentifier fingerId,
+                                                               byte qualityScore) {
         byte nbMinutiae = (byte) RANDOM_GENERATOR.nextInt(128);
         int length = HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE;
 
@@ -199,7 +201,7 @@ public class Fingerprint implements Parcelable {
         bb.position(0);
         byte[] templateBytes = new byte[bb.remaining()];
         bb.get(templateBytes);
-        return new Fingerprint(fingerId, templateBytes);
+        return new SimAfisFingerprint(fingerId, templateBytes);
     }
 
 
@@ -208,7 +210,7 @@ public class Fingerprint implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Fingerprint that = (Fingerprint) o;
+        SimAfisFingerprint that = (SimAfisFingerprint) o;
 
         return (fingerId.equals(that.fingerId) &&
                 Arrays.equals(this.getTemplateBytes(), that.getTemplateBytes()));
@@ -221,28 +223,29 @@ public class Fingerprint implements Parcelable {
         return result;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format(Locale.UK, "%s:%s", fingerId.toString(), Utils.byteArrayToBase64(getTemplateBytes()));
     }
 
-    protected Fingerprint(Parcel in) {
-        fingerId = FingerIdentifier.values()[in.readInt()];
+    protected SimAfisFingerprint(Parcel in) {
+        fingerId = SimAfisFingerIdentifier.values()[in.readInt()];
         byte[] temp = new byte[in.readInt()];
         in.readByteArray(temp);
         template = ByteBuffer.allocateDirect(temp.length);
         template.put(temp);
     }
 
-    public static final Creator<Fingerprint> CREATOR = new Creator<Fingerprint>() {
+    public static final Creator<SimAfisFingerprint> CREATOR = new Creator<SimAfisFingerprint>() {
         @Override
-        public Fingerprint createFromParcel(Parcel in) {
-            return new Fingerprint(in);
+        public SimAfisFingerprint createFromParcel(Parcel in) {
+            return new SimAfisFingerprint(in);
         }
 
         @Override
-        public Fingerprint[] newArray(int size) {
-            return new Fingerprint[size];
+        public SimAfisFingerprint[] newArray(int size) {
+            return new SimAfisFingerprint[size];
         }
     };
 

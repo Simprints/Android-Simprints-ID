@@ -17,9 +17,9 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprintmatcher.EVENT
-import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.fingerprintmatcher.Progress
+import com.simprints.fingerprintmatcher.old.EVENT
+import com.simprints.fingerprintmatcher.old.LibMatcher
+import com.simprints.fingerprintmatcher.old.Progress
 import sourceafis.MatcherEventListener
 import io.mockk.every
 import io.mockk.mockk
@@ -37,7 +37,7 @@ import org.koin.test.get
 import org.koin.test.mock.declareModule
 import java.io.Serializable
 import kotlin.random.Random
-import com.simprints.fingerprintmatcher.Person as LibPerson
+import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson as LibPerson
 
 @RunWith(AndroidJUnit4::class)
 class MatchingViewModelTest : KoinTest {
