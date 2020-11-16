@@ -1,7 +1,7 @@
 package sourceafis;
 
-import com.simprints.fingerprintmatcher.EVENT;
-import com.simprints.fingerprintmatcher.Progress;
+import com.simprints.fingerprintmatcher.old.EVENT;
+import com.simprints.fingerprintmatcher.old.Progress;
 
 public interface MatcherEventListener {
 

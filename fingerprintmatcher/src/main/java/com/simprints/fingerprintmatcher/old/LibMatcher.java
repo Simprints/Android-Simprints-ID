@@ -1,4 +1,4 @@
-package com.simprints.fingerprintmatcher;
+package com.simprints.fingerprintmatcher.old;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -10,6 +10,10 @@ import sourceafis.simple.SourceFinger;
 import sourceafis.simple.SourceFingerprint;
 import sourceafis.simple.SourcePerson;
 import sourceafis.templates.Template;
+
+import com.simprints.fingerprintmatcher.algorithms.simafis.JNILibAfis;
+import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerprint;
+import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson;
 import com.simprints.libsimprints.FingerIdentifier;
 
 import java.util.ArrayList;
@@ -36,8 +40,8 @@ public class LibMatcher {
         Log.d("LibMatcher", s);
     }
 
-    private final Person probe;
-    private final List<Person> candidates;
+    private final SimAfisPerson probe;
+    private final List<SimAfisPerson> candidates;
     private final MATCHER_TYPE matcherType;
     private final List<Float> scores;
     private final int updatePeriod;
@@ -45,7 +49,7 @@ public class LibMatcher {
     private MatchTask matchTask;
 
 
-    public LibMatcher(@NonNull Person probe, @NonNull List<Person> candidates,
+    public LibMatcher(@NonNull SimAfisPerson probe, @NonNull List<SimAfisPerson> candidates,
                       @NonNull MATCHER_TYPE matcherType, @NonNull List<Float> scores,
                       @Nullable MatcherEventListener listener, int updatePeriod)
     {
@@ -107,15 +111,15 @@ public class LibMatcher {
     }
 
 
-    private SourceFingerprint toSourceFingerprint(Fingerprint fp) {
+    private SourceFingerprint toSourceFingerprint(SimAfisFingerprint fp) {
         SourceFingerprint srcFp = new SourceFingerprint();
         srcFp.setIsoTemplate(fp.getTemplateBytes());
         srcFp.setFinger(fingerToSourceFinger.get(fp.getTemplateBytes()));
         return srcFp;
     }
 
-    private SourcePerson toSourcePerson(Person p) {
-        List<Fingerprint> fps = p.getFingerprints();
+    private SourcePerson toSourcePerson(SimAfisPerson p) {
+        List<SimAfisFingerprint> fps = p.getFingerprints();
         SourceFingerprint[] srcFps = new SourceFingerprint[fps.size()];
         for (int i = 0; i < fps.size(); i++) {
             srcFps[i] = toSourceFingerprint(fps.get(i));
@@ -188,15 +192,15 @@ public class LibMatcher {
                 }
 
                 case SIMAFIS_VERIFY: {
-                    List<Fingerprint> probeFingers = probe.getFingerprints();
+                    List<SimAfisFingerprint> probeFingers = probe.getFingerprints();
 
-                    Person candidate = candidates.get(0);
+                    SimAfisPerson candidate = candidates.get(0);
                     // Computes similarity scores of the fingerprints that the candidate has in common
                     // with the probe, using simAfis
                     int nbCommonFingers = 0;
                     float aggregateScore = 0;
-                    for (Fingerprint pFinger : probeFingers) {
-                        Fingerprint cFinger = candidate.getFingerprint(pFinger.getFingerId());
+                    for (SimAfisFingerprint pFinger : probeFingers) {
+                        SimAfisFingerprint cFinger = candidate.getFingerprint(pFinger.getFingerId());
                         if (cFinger != null) {
                             float libafisResult = JNILibAfis.verify(pFinger.getTemplateDirectBuffer(), cFinger.getTemplateDirectBuffer());
                             log(String.format(Locale.UK, "LibAfis returned a score of %.3f", libafisResult));

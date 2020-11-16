@@ -1,4 +1,6 @@
-package com.simprints.fingerprintmatcher;
+package com.simprints.fingerprintmatcher.algorithms.simafis;
+
+import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -14,7 +16,7 @@ public class JNILibAfis {
      * field offsets. This native function looks up and caches interesting
      * class/field/method IDs. Throws on failure.
      */
-    private static native void nativeInit();
+    private static native boolean nativeInit();
 
     static
     {
@@ -25,6 +27,6 @@ public class JNILibAfis {
 
     public static native float verify(ByteBuffer probe, ByteBuffer candidate);
 
-    public static native float[] identify(Person probe, List<Person> candidates, int nbThreads);
+    public static native float[] identify(SimAfisPerson probe, List<SimAfisPerson> candidates, int nbThreads);
 
 }

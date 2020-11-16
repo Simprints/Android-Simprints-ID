@@ -1,9 +1,7 @@
-package com.simprints.fingerprintmatcher;
+package com.simprints.fingerprintmatcher.algorithms.simafis.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.simprints.libsimprints.FingerIdentifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,27 +14,29 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 
+import org.jetbrains.annotations.NotNull;
+
 @SuppressWarnings("unused")
-public class Person implements Parcelable {
+public class SimAfisPerson implements Parcelable {
 
     private final static Random RANDOM_GENERATOR = new Random();
-    private final static FingerIdentifier[] FINGER_IDENTIFIERS = FingerIdentifier.values();
+    private final static SimAfisFingerIdentifier[] FINGER_IDENTIFIERS = SimAfisFingerIdentifier.values();
 
     private final String guid;
-    private final Map<FingerIdentifier, Fingerprint> fingerprints;
+    private final Map<SimAfisFingerIdentifier, SimAfisFingerprint> fingerprints;
 
     /**
      * Constructor without fingerprints
      * @param guid Global Unique Id of the person
      */
-    public Person(@NonNull String guid)
+    public SimAfisPerson(@NonNull String guid)
     {
-        this(guid, Collections.<Fingerprint>emptyList());
+        this(guid, Collections.<SimAfisFingerprint>emptyList());
     }
 
     /**
-     * Constructor with fingerprints, equivalent to calling {@link #Person(String)} then
-     * {@link #addFingerprint(Fingerprint)} for each fingerprint of the list
+     * Constructor with fingerprints, equivalent to calling {@link #SimAfisPerson(String)} then
+     * {@link #addFingerprint(SimAfisFingerprint)} for each fingerprint of the list
      *
      * Note: if the specified list of fingerprints contains several fingerprints of the same
      * finger, only the one with the highest score will be kept.
@@ -44,11 +44,11 @@ public class Person implements Parcelable {
      * @param guid          Global Unique Id of the person
      * @param fingerprints  Fingerprints of the person
      */
-    public Person(@NonNull String guid, @NonNull List<Fingerprint> fingerprints)
+    public SimAfisPerson(@NonNull String guid, @NonNull List<SimAfisFingerprint> fingerprints)
     {
         this.guid = guid;
         this.fingerprints = new HashMap<>();
-        for (Fingerprint print : fingerprints) {
+        for (SimAfisFingerprint print : fingerprints) {
             if (!hasBetterOrSameThan(print)) {
                 this.fingerprints.put(print.getFingerId(), print);
             }
@@ -58,13 +58,13 @@ public class Person implements Parcelable {
     /**
      * @param print A fingerprint
      *
-     * @return True if and only if this person has a {@link Fingerprint} for
-     * the {@link FingerIdentifier} of the specified {@link Fingerprint}, and its quality
+     * @return True if and only if this person has a {@link SimAfisFingerprint} for
+     * the {@link SimAfisFingerIdentifier} of the specified {@link SimAfisFingerprint}, and its quality
      * score is greater than or equal to the specified fingerprint's
      */
-    public boolean hasBetterOrSameThan(@NonNull Fingerprint print)
+    public boolean hasBetterOrSameThan(@NonNull SimAfisFingerprint print)
     {
-        Fingerprint currentPrint = fingerprints.get(print.getFingerId());
+        SimAfisFingerprint currentPrint = fingerprints.get(print.getFingerId());
         return (currentPrint != null &&
                 currentPrint.getQualityScore() >= print.getQualityScore());
     }
@@ -77,24 +77,24 @@ public class Person implements Parcelable {
     /**
      * @return A newly allocated list of the fingerprints of this Person
      */
-    public List<Fingerprint> getFingerprints()
+    public List<SimAfisFingerprint> getFingerprints()
     {
         return new ArrayList<>(fingerprints.values());
     }
 
     /**
-     * @param fingerId {@link FingerIdentifier} of the requested {@link Fingerprint}
+     * @param fingerId {@link SimAfisFingerIdentifier} of the requested {@link SimAfisFingerprint}
      *
-     * @return The {@link Fingerprint} of this person for the specified
-     * {@link FingerIdentifier} if it exists, null else
+     * @return The {@link SimAfisFingerprint} of this person for the specified
+     * {@link SimAfisFingerIdentifier} if it exists, null else
      *
      */
-    public Fingerprint getFingerprint(FingerIdentifier fingerId) {
+    public SimAfisFingerprint getFingerprint(SimAfisFingerIdentifier fingerId) {
         return fingerprints.get(fingerId);
     }
 
 
-    public void addFingerprint(@NonNull Fingerprint print)
+    public void addFingerprint(@NonNull SimAfisFingerprint print)
     {
         this.fingerprints.put(print.getFingerId(), print);
     }
@@ -102,21 +102,21 @@ public class Person implements Parcelable {
     /**
      * @return A person with a random global unique id and a random set of fingerprints
      */
-    static public Person generateRandomPerson()
+    static public SimAfisPerson generateRandomPerson()
     {
         String guid = UUID.randomUUID().toString();
         // Generate a random mask with one bit for each finger, to decide
         // if the Person should have a fingerprint for them or not
         int printsMask = RANDOM_GENERATOR.nextInt(1 << FINGER_IDENTIFIERS.length);
 
-        List<Fingerprint> prints = new ArrayList<>();
+        List<SimAfisFingerprint> prints = new ArrayList<>();
         for (int fingerNo = 0; fingerNo < FINGER_IDENTIFIERS.length; fingerNo++) {
             if ((printsMask & (1 << fingerNo)) != 0) {
-                prints.add(Fingerprint.generateRandomFingerprint(FINGER_IDENTIFIERS[fingerNo]));
+                prints.add(SimAfisFingerprint.generateRandomFingerprint(FINGER_IDENTIFIERS[fingerNo]));
             }
         }
 
-        return new Person(guid, prints);
+        return new SimAfisPerson(guid, prints);
     }
 
 
@@ -126,7 +126,7 @@ public class Person implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Person person = (Person) o;
+        SimAfisPerson person = (SimAfisPerson) o;
 
         return guid.equals(person.guid) && fingerprints.equals(person.fingerprints);
 
@@ -140,13 +140,14 @@ public class Person implements Parcelable {
         return result;
     }
 
+    @NotNull
     @Override
     public String toString()
     {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format(Locale.UK, "Person %s, Fingerprints:\n", guid));
 
-        for (FingerIdentifier fingerId : FINGER_IDENTIFIERS) {
+        for (SimAfisFingerIdentifier fingerId : FINGER_IDENTIFIERS) {
             if (fingerprints.containsKey(fingerId)) {
                 builder.append(String.format(Locale.UK, "%s\n", fingerprints.get(fingerId)));
             }
@@ -155,29 +156,31 @@ public class Person implements Parcelable {
         return builder.toString();
     }
 
-    protected Person(Parcel in)
+    protected SimAfisPerson(Parcel in)
     {
         guid = in.readString();
         int nbFingerprints = in.readInt();
         fingerprints = new HashMap<>(nbFingerprints);
         for (int i = 0; i < nbFingerprints; i++) {
-            Fingerprint fingerprint = in.readParcelable(Fingerprint.class.getClassLoader());
-            fingerprints.put(fingerprint.getFingerId(), fingerprint);
+            SimAfisFingerprint fingerprint = in.readParcelable(SimAfisFingerprint.class.getClassLoader());
+            if (fingerprint != null) {
+                fingerprints.put(fingerprint.getFingerId(), fingerprint);
+            }
         }
     }
 
-    public static final Creator<Person> CREATOR = new Creator<Person>()
+    public static final Creator<SimAfisPerson> CREATOR = new Creator<SimAfisPerson>()
     {
         @Override
-        public Person createFromParcel(Parcel in)
+        public SimAfisPerson createFromParcel(Parcel in)
         {
-            return new Person(in);
+            return new SimAfisPerson(in);
         }
 
         @Override
-        public Person[] newArray(int size)
+        public SimAfisPerson[] newArray(int size)
         {
-            return new Person[size];
+            return new SimAfisPerson[size];
         }
     };
 
@@ -192,7 +195,7 @@ public class Person implements Parcelable {
     {
         dest.writeString(guid);
         dest.writeInt(fingerprints.size());
-        for (Fingerprint fp : fingerprints.values()) {
+        for (SimAfisFingerprint fp : fingerprints.values()) {
             dest.writeParcelable(fp, flags);
         }
     }
