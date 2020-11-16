@@ -16,7 +16,6 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprintmatcher.old.LibMatcher
 import io.reactivex.Single
 import java.util.*
 

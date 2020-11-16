@@ -3,17 +3,12 @@ package com.simprints.fingerprintmatcher.algorithms.simafis.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Random;
-
-import androidx.annotation.NonNull;
-
-import com.simprints.fingerprintmatcher.old.Utils;
-
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class SimAfisFingerprint implements Parcelable {
@@ -95,20 +90,6 @@ public class SimAfisFingerprint implements Parcelable {
             throw new IllegalArgumentException("Invalid template: Processing byte[] failed");
         }
     }
-
-    /**
-     * ISO 2005 base 64 string constructor
-     *
-     * @param fingerId          Finger identifier of the fingerprint
-     * @param isoBase64Template Base64 encoded ISO 2005 fingerprint template
-     * @throws IllegalArgumentException If the string specified is not a valid base 64
-     *                                  encoded ISO 2005 (2011 not supported yet) template containing only 1 fingerprint.
-     */
-    public SimAfisFingerprint(@NonNull SimAfisFingerIdentifier fingerId, @NonNull String isoBase64Template)
-            throws IllegalArgumentException {
-        this(fingerId, Utils.base64ToBytes(isoBase64Template));
-    }
-
 
     public SimAfisFingerIdentifier getFingerId() {
         return fingerId;
@@ -221,12 +202,6 @@ public class SimAfisFingerprint implements Parcelable {
         int result = fingerId.hashCode();
         result = 31 * result + Arrays.hashCode(this.getTemplateBytes());
         return result;
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return String.format(Locale.UK, "%s:%s", fingerId.toString(), Utils.byteArrayToBase64(getTemplateBytes()));
     }
 
     protected SimAfisFingerprint(Parcel in) {

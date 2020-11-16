@@ -17,10 +17,6 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprintmatcher.old.EVENT
-import com.simprints.fingerprintmatcher.old.LibMatcher
-import com.simprints.fingerprintmatcher.old.Progress
-import sourceafis.MatcherEventListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -103,7 +99,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
     private fun MatchTask.matchCallback(
         emitter: SingleEmitter<MatchResult>,
         candidates: List<FingerprintIdentity>,
-        scores: List<Float>) = object : MatcherEventListener {
+        scores: List<Float>) = object {
 
         override fun onMatcherProgress(progress: Progress?) {
             progress?.progress?.let { onMatchProgressDo(it) }
