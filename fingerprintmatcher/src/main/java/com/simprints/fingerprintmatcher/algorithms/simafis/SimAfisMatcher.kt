@@ -1,13 +1,10 @@
 package com.simprints.fingerprintmatcher.algorithms.simafis
 
-import com.simprints.fingerprintmatcher.FingerIdentifier
-import com.simprints.fingerprintmatcher.FingerIdentifier.*
-import com.simprints.fingerprintmatcher.Fingerprint
-import com.simprints.fingerprintmatcher.FingerprintRecord
-import com.simprints.fingerprintmatcher.MatchResult
+import com.simprints.fingerprintmatcher.domain.FingerIdentifier.*
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerIdentifier
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerprint
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson
+import com.simprints.fingerprintmatcher.domain.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
@@ -38,8 +35,11 @@ internal class SimAfisMatcher {
     private fun FingerprintRecord.toSimAfisPerson(): SimAfisPerson =
         SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
 
-    private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint =
-        SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
+    private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
+        if (format != TemplateFormat.ISO_19794_2_2011)
+            throw IllegalArgumentException("Attempting to use $format template format for SimAfisMatcher which only accepts ${TemplateFormat.ISO_19794_2_2011}")
+        return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
+    }
 
     private fun FingerIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier =
         when (this) {
