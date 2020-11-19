@@ -7,8 +7,8 @@ import com.simprints.id.data.images.model.Path
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.data.images.remote.ImageRemoteDataSource
 import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
-import com.simprints.id.data.images.remote.UploadResult
 import com.simprints.id.network.BaseUrlProvider
+import timber.log.Timber
 
 class ImageRepositoryImpl internal constructor(
     private val localDataSource: ImageLocalDataSource,
@@ -27,8 +27,26 @@ class ImageRepositoryImpl internal constructor(
     override fun getNumberOfImagesToUpload(): Int = localDataSource.listImages().count()
 
     override suspend fun uploadStoredImagesAndDelete(): Boolean {
-        val uploads = uploadImages()
-        return getOperationResult(uploads)
+        var allImagesUploaded = true
+
+        val images = localDataSource.listImages()
+        images.forEach { imageRef ->
+            try {
+                localDataSource.decryptImage(imageRef)?.let { stream ->
+                    val uploadResult = remoteDataSource.uploadImage(stream, imageRef)
+                    if (uploadResult.isUploadSuccessful()) {
+                        localDataSource.deleteImage(imageRef)
+                    } else {
+                        allImagesUploaded = false
+                    }
+                }
+            } catch (t: Throwable) {
+                allImagesUploaded = false
+                Timber.d(t)
+            }
+        }
+
+        return allImagesUploaded
     }
 
     override fun deleteStoredImages() = with(localDataSource) {
@@ -36,33 +54,4 @@ class ImageRepositoryImpl internal constructor(
             deleteImage(it)
         }
     }
-
-    private suspend fun uploadImages(): List<UploadResult> {
-        val images = localDataSource.listImages()
-        return images.map { imageRef ->
-            localDataSource.decryptImage(imageRef)?.let { stream ->
-                remoteDataSource.uploadImage(stream, imageRef)
-            } ?: UploadResult(
-                imageRef,
-                UploadResult.Status.FAILED
-            )
-        }
-    }
-
-    private fun getOperationResult(uploads: List<UploadResult>): Boolean {
-        if (uploads.isEmpty())
-            return true
-
-        var allUploadsSuccessful = true
-
-        uploads.forEach { upload ->
-            if (upload.isSuccessful())
-                localDataSource.deleteImage(upload.image)
-            else
-                allUploadsSuccessful = false
-        }
-
-        return allUploadsSuccessful
-    }
-
 }
