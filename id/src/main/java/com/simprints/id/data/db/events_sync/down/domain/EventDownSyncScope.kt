@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.id.data.db.event.domain.models.EventType.*
@@ -14,8 +15,10 @@ import com.simprints.id.domain.modality.Modes
     JsonSubTypes.Type(value = SubjectUserScope::class),
     JsonSubTypes.Type(value = SubjectModuleScope::class)
 )
+@Keep
 sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation> = mutableListOf()) {
 
+    @Keep
     data class SubjectProjectScope(val projectId: String,
                                    val modes: List<Modes>) : EventDownSyncScope() {
 
@@ -23,6 +26,7 @@ sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation
             listOf(EventDownSyncOperation(RemoteEventQuery(projectId, modes = modes, types = subjectEvents)))
     }
 
+    @Keep
     data class SubjectUserScope(val projectId: String,
                                 val attendantId: String,
                                 val modes: List<Modes>) : EventDownSyncScope() {
@@ -31,6 +35,7 @@ sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation
             listOf(EventDownSyncOperation(RemoteEventQuery(projectId, attendantId = attendantId, modes = modes, types = subjectEvents)))
     }
 
+    @Keep
     data class SubjectModuleScope(val projectId: String,
                                   val moduleIds: List<String>,
                                   val modes: List<Modes>) : EventDownSyncScope() {
