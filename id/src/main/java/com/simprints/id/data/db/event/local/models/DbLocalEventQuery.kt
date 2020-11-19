@@ -1,8 +1,10 @@
 package com.simprints.id.data.db.event.local.models
 
+import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 
+@Keep
 data class DbLocalEventQuery(val id: String? = null,
                              val type: EventType? = null,
                              val projectId: String? = null,
