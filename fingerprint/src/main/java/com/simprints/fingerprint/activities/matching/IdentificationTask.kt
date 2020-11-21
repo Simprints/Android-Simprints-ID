@@ -11,64 +11,43 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import io.reactivex.Completable
-import io.reactivex.Single
-import java.util.*
 
 class IdentificationTask(private val viewModel: MatchingViewModel,
                          private val matchingRequest: MatchingTaskRequest,
-                         private val dbManager: FingerprintDbManager,
                          private val sessionEventsManager: FingerprintSessionEventsManager,
                          private val crashReportManager: FingerprintCrashReportManager,
                          private val timeHelper: FingerprintTimeHelper) : MatchTask {
 
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(): Single<List<FingerprintIdentity>> =
-        Completable.fromAction {
-            viewModel.hasLoadingBegun.postValue(true)
-            viewModel.progress.postValue(25)
-        }.andThen(
-            dbManager.loadPeople(matchingRequest.queryForCandidates)
-        )
+    override fun onBeginLoadCandidates() {
+        viewModel.hasLoadingBegun.postValue(true)
+        viewModel.progress.postValue(25)
+    }
 
-    override fun handlesCandidatesLoaded(candidates: List<FingerprintIdentity>) {
-        logMessageForCrashReport(String.format(Locale.UK,
-            "Successfully loaded %d candidates", candidates.size))
-        viewModel.matchBeginningSummary.postValue(MatchingViewModel.IdentificationBeginningSummary(candidates.size))
+    override fun onCandidatesLoaded(numberOfCandidates: Int) {
+        logMessageForCrashReport("Successfully loaded $numberOfCandidates candidates")
+        viewModel.matchBeginningSummary.postValue(MatchingViewModel.IdentificationBeginningSummary(numberOfCandidates))
         viewModel.progress.postValue(50)
     }
 
-    override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
+    override fun handleMatchResult(numberOfCandidates: Int, matchResults: List<MatchResult>) {
+        val topCandidates = extractTopCandidates(matchResults)
 
-    override fun onMatchProgressDo(progress: Int) {
-        // Progress mapped from 0 to 100 to be between 50 and 100
-        viewModel.progress.postValue(progress / 2 + 50)
-    }
-
-    override fun handleMatchResult(candidates: List<FingerprintIdentity>, scores: List<Float>) {
-        val topCandidates = extractTopCandidates(candidates, scores)
-
-        saveOneToManyMatchEvent(candidates.size, topCandidates)
+        saveOneToManyMatchEvent(numberOfCandidates, topCandidates)
 
         postMatchFinishedSummary(topCandidates)
         postFinalProgress()
         postResultData(topCandidates)
     }
 
-    private fun extractTopCandidates(candidates: List<FingerprintIdentity>, scores: List<Float>): List<MatchResult> =
-        candidates
-            .zip(scores)
-            .sortedByDescending { (_, score) -> score }
+    private fun extractTopCandidates(matchResults: List<MatchResult>): List<MatchResult> =
+        matchResults
+            .sortedByDescending { it.confidence }
             .take(returnIdCount)
-            .map { (candidate, score) ->
-                MatchResult(candidate.personId, score)
-            }
 
     private fun saveOneToManyMatchEvent(candidateSize: Int, topCandidates: List<MatchResult>) {
         sessionEventsManager.addEventInBackground(

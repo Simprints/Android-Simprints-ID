@@ -7,7 +7,6 @@ import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerprint as FingerprintMatcher
 
 @Parcelize
 class Fingerprint(val fingerId: FingerIdentifier,
@@ -80,6 +79,3 @@ class Fingerprint(val fingerId: FingerIdentifier,
         }
     }
 }
-
-fun Fingerprint.fromDomainToMatcher() =
-    FingerprintMatcher(fingerId.fromDomainToLibsimprints(), templateBytes)

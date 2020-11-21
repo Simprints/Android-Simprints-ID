@@ -11,42 +11,29 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import io.reactivex.Single
-import java.util.*
 
 class VerificationTask(private val viewModel: MatchingViewModel,
                        private val matchingRequest: MatchingTaskRequest,
-                       private val dbManager: FingerprintDbManager,
                        private val sessionEventsManager: FingerprintSessionEventsManager,
                        private val crashReportManager: FingerprintCrashReportManager,
                        private val timeHelper: FingerprintTimeHelper) : MatchTask {
 
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(): Single<List<FingerprintIdentity>> =
-        dbManager.loadPeople(matchingRequest.queryForCandidates)
-
-    override fun handlesCandidatesLoaded(candidates: List<FingerprintIdentity>) {
-        logMessageForCrashReport(String.format(Locale.UK,
-            "Successfully loaded %d candidates", candidates.size))
+    override fun onBeginLoadCandidates() {
     }
 
-    override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY
-
-    override fun onMatchProgressDo(progress: Int) {
-        viewModel.progress.postValue(100)
+    override fun onCandidatesLoaded(numberOfCandidates: Int) {
+        logMessageForCrashReport("Successfully loaded $numberOfCandidates candidates")
     }
 
-    override fun handleMatchResult(candidates: List<FingerprintIdentity>, scores: List<Float>) {
-        val candidate = candidates.first()
-        val score = scores.first()
+    override fun handleMatchResult(numberOfCandidates: Int, matchResults: List<MatchResult>) {
+        val matchResult = matchResults.first()
 
-        val verificationResult = MatchEntry(candidate.personId, score)
+        val verificationResult = MatchEntry(matchResult.guid, matchResult.confidence)
         sessionEventsManager.addEventInBackground(OneToOneMatchEvent(
             matchStartTime,
             timeHelper.now(),
@@ -55,7 +42,7 @@ class VerificationTask(private val viewModel: MatchingViewModel,
             verificationResult))
 
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
-            MatchingTaskResult(listOf(MatchResult(candidate.personId, score))))
+            MatchingTaskResult(listOf(matchResult)))
 
         viewModel.result.postValue(MatchingViewModel.FinishResult(ResultCode.OK, resultData, 0))
     }
