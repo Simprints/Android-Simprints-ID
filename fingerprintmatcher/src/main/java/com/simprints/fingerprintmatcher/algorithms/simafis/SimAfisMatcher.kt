@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.toList
 internal class SimAfisMatcher {
 
     suspend fun match(
-        probe: FingerprintRecord,
-        candidates: Flow<FingerprintRecord>
+        probe: FingerprintIdentity,
+        candidates: Flow<FingerprintIdentity>
     ): Flow<MatchResult> {
 
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }.toList()
@@ -28,11 +28,11 @@ internal class SimAfisMatcher {
         ) ?: floatArrayOf()
 
         return results.zip(simAfisCandidates).map { (score, candidate) ->
-            MatchResult(candidate.guid, score.toInt())
+            MatchResult(candidate.guid, score)
         }.asFlow()
     }
 
-    private fun FingerprintRecord.toSimAfisPerson(): SimAfisPerson =
+    private fun FingerprintIdentity.toSimAfisPerson(): SimAfisPerson =
         SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
 
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
