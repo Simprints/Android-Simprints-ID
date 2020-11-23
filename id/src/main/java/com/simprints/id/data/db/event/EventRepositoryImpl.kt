@@ -72,7 +72,7 @@ open class EventRepositoryImpl(
 
     override suspend fun createSession(libSimprintsVersionName: String) {
         reportExceptionIfNeeded {
-            val count = eventLocalDataSource.count()
+            val sessionCount = eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE))
             val sessionCaptureEvent = SessionCaptureEvent(
                 UUID.randomUUID().toString(),
                 currentProject,
@@ -85,7 +85,7 @@ open class EventRepositoryImpl(
                     VERSION.SDK_INT.toString(),
                     Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId),
-                DatabaseInfo(count))
+                DatabaseInfo(sessionCount))
 
             closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(), NEW_SESSION)
             addEvent(sessionCaptureEvent)

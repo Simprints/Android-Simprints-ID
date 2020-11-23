@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.event
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
@@ -13,6 +12,7 @@ import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.A
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
@@ -82,6 +82,22 @@ class EventRepositoryImplTest {
         runBlocking {
             coEvery { eventLocalDataSource.load(queryToLoadOldOpenSessions) } returns emptyFlow()
             mockDbToLoadPersonRecordEvents(0)
+        }
+    }
+
+    @Test
+    fun createSession_shouldHaveTheRightDbCount() {
+        runBlocking {
+            mockDbToHaveOneOpenSession()
+            coEvery { eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE)) } returns N_SESSIONS_DB
+
+            eventRepo.createSession(LIB_VERSION_NAME)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(match<SessionCaptureEvent> {
+                    it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
+                })
+            }
         }
     }
 
@@ -355,7 +371,7 @@ class EventRepositoryImplTest {
         const val LIB_VERSION_NAME = "LIB_VERSION_NAME"
         const val LANGUAGE = "en"
 
+        const val N_SESSIONS_DB = 3
         const val NOW = 1000L
-        private val ID = randomUUID()
     }
 }
