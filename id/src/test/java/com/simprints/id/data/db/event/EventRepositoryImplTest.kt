@@ -86,7 +86,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun createSession_shouldHaveTheRightDbCount() {
+    fun createSession_shouldHaveTheRightSessionCount() {
         runBlocking {
             mockDbToHaveOneOpenSession()
             coEvery { eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE)) } returns N_SESSIONS_DB
