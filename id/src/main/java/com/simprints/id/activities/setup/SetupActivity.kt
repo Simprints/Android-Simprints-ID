@@ -111,7 +111,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun launchAlertIfNecessary() {
         lifecycleScope.launchWhenResumed {
-            if(splitInstallManager.requestSessionStates().last().status() != REQUIRES_USER_CONFIRMATION) {
+            if(splitInstallManager.requestSessionStates().lastOrNull()?.status() != REQUIRES_USER_CONFIRMATION) {
                 launchAlert(this@SetupActivity, AlertType.OFFLINE_DURING_SETUP)
             }
         }
