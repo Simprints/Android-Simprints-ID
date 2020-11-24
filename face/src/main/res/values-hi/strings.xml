@@ -1,2 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली\?</string>
+    <string name="face_match_returned_results_other">%d परिणाम आए।</string>
+    <string name="face_match_tier4_matches_one">%d मेल</string>
+    <string name="face_match_tier4_matches_other">%d मेल खाते हैं</string>
+    <string name="error_licence_invalid_title">लाइसेंस अमान्य है</string>
+    <string name="error_licence_invalid_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
+    <string name="error_licence_missing_title">बायोमेट्रिक लाइसेंस नहीं है</string>
+    <string name="error_licence_missing_message">बायोमेट्रिक लाइसेंस नहीं है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
+    <string name="error_configuration_error_title">कॉन्फ़िगरेशन त्रुटि</string>
+    <string name="error_configuration_error_message">फेस के प्रकार को कॉन्फ़िगर करते समय त्रुटि हुई, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
+    <string name="face_configuration_started">चेहरे की प्रारूप को कॉन्फ़िगर करना</string>
+    <string name="face_configuration_downloading">आवश्यक फ़ाइलें डाउनलोड हो रही हैं</string>
+    <string name="error_unexpected_error_title">त्रुटि</string>
+    <string name="error_unexpected_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="error_close_button">बंद करें</string>
+    <string name="capture_title_howto">चेहरे को कैसे स्कैन करें</string>
+    <string name="capture_title_previewing">स्कैन करने के लिए तैयार हो रहा है</string>
+    <string name="capture_title_looks_good">स्कैन तैयार है!</string>
+    <string name="capture_error_no_face">सुनिश्चित करें कि चेहरा सर्कल फ्रेम में है</string>
+    <string name="capture_error_face_too_far">पास आएं</string>
+    <string name="capture_error_face_too_close">पीछे जाएँ</string>
+    <string name="capture_error_look_straight">सुनिश्चित करें कि व्यक्ति सीधे कैमरे में देख रहा है</string>
+    <string name="capture_ready">कैप्चर करने के लिए तैयार</string>
+    <string name="capture_prep_begin_btn">कैप्चर करने के लिए टैप करें</string>
+    <string name="capture_prep_begin_btn_capturing">कैप्चर हो रहा है....…</string>
+    <string name="capture_title_scan_progress">स्कैन प्रगति पर है</string>
+    <string name="capture_hold">अपनी जगह पर रहें</string>
+    <string name="captured_successfully">चेहरे को सफलतापूर्वक कैप्चर कर लिया गया है।</string>
+    <string name="title_confirmation">पुष्टीकरण</string>
+    <string name="title_capturing">लाइव कैप्चर</string>
+    <string name="title_preparation">तैयारी</string>
+    <string name="btn_recapture">फिर से कैप्चर करें</string>
+    <string name="btn_finish">जारी रखने के लिए टैप करें</string>
+    <string name="btn_capture_again">फिर से कैप्चर करें</string>
+    <string name="captured_unsuccessful">तकनीकी समस्या के कारण चेहरे को कैप्चर नहीं किया जा सकता।</string>
+    <string name="retry_tips">यहां बताया गया है कि आप इस परेशानी को कैसे ठीक कर सकते हैं: 
+\n1. सुनिश्चित करें कि आप अच्छे प्रकाश वाले स्थान पर हैं।
+\n2. सुनिश्चित करें कि व्यक्ति सीधा देख रहा है।
+\n3. अपनी जगह पर सीधे रहें।</string>
+    <string name="onboarding_light">अच्छी रोशनी वाली जगह पर जायें।</string>
+    <string name="onboarding_fill">चेहरा सर्कल फ्रेम में लें।</string>
+    <string name="onboarding_straight">सुनिश्चित करें कि व्यक्ति सीधा देख रहा है।</string>
+    <string name="onboarding_continue">जारी रखने के लिए कहीं भी टैप करें</string>
+    <string name="capture_title_look_straight">सीधे नहीं देख रहे</string>
+    <string name="capture_title_no_face">चेहरा नहीं दिख रहा</string>
+    <string name="capture_title_too_close">बहुत पास हैं</string>
+    <string name="capture_title_face_too_far">बहुत दूर हैं</string>
+    <string name="matching_x_records">% S रिकॉर्ड से मिलान</string>
+    <string name="face_match_matching_candidates">उम्मीदवार में से मिलान हो रहा हैं</string>
+    <string name="face_match_matched_candidates_one">"%d  उम्मीदवार से तुलना की गई"</string>
+    <string name="face_match_matched_candidates_other">"%d  उम्मीदवारों से तुलना की गई"</string>
+    <string name="face_match_returned_results_one">%d परिणाम आए।</string>
+    <string name="face_match_tier1or2_matches_zero">कोई बहुत अच्छा मेल नहीं है</string>
+    <string name="face_match_tier1or2_matches_one">%d बहुत अच्छा मेल</string>
+    <string name="face_match_tier1or2_matches_other">%d बहुत अच्छा मेल हैं</string>
+    <string name="face_match_tier3_matches_zero">कोई अच्छा मेल नहीं</string>
+    <string name="face_match_tier3_matches_one">%d अच्छा मेल है</string>
+    <string name="face_match_tier3_matches_other">%d अच्छे मेल हैं</string>
+    <string name="face_match_tier4_matches_zero">कोई मेल नही</string>
+</resources>
