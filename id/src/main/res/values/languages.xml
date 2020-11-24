@@ -49,6 +49,9 @@
         <item>
             Kiswahili
         </item>
+        <item>
+            Hindi
+        </item>
     </string-array>
     <string-array name="language_values">
         <item>
@@ -98,6 +101,9 @@
         </item>
         <item>
             sw-rTZ
+        </item>
+        <item>
+            hi
         </item>
     </string-array>
 
