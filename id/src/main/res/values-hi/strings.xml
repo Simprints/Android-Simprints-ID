@@ -19,6 +19,7 @@
     <string name="consent_parental_privacy_rights">"यदि आप अभी सहमति देते हैं, तो भी बाद में किसी भी समय अपनी  सहमति वापस ले सकते हैं और अपने बच्चे का डाटा मिटाने के लिए कह सकते हैं। "</string>
     <string name="consent_parental_confirmation">क्या हम आपके बच्चे के %1$s का उपयोग कर सकते हैं \? कृपया कहें \"मैं सहमत हूँ \", \"मैं सहमत नहीं हूँ \", or \"मेरे कुछ सवाल हैं.\"</string>
     <string name="consent_parental_title">अभिभावक की सहमति</string>
+    <string name="privacy_notice_text">गोपनीयता की सूचना</string>
     <string name="error_occurred_title">त्रुटि</string>
     <string name="different_projectId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (भिन्न प्रोजेक्ट ID), कृपया होम स्क्रीन से लॉग-आउट करें या अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="dashboard_label">डैशबोर्ड</string>
@@ -47,7 +48,7 @@
         <item quantity="one">विभिन्न सत्यापन</item>
         <item quantity="other"></item>
     </plurals>
-    <string name="exit_form_return_to_simprints">चेहरे की फ़ोटो लें</string>
+    <string name="exit_form_capture_face">चेहरे की फ़ोटो लें</string>
     <string name="fetch_guid_checking_person_in_database">व्यक्ति को डाटाबेस में खोजा जा रहा है</string>
     <string name="different_userId_message">एक कॉन्फ़िगरेशन त्रुटि हो रही है (भिन्न यूज़र ID), कृपया होम स्क्रीन से लॉग-आउट करें या अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="launch_consent_decline_button">असहमत</string>
