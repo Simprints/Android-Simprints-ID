@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली\?</string>
+    <string name="exit_form_return_to_face_capture">चेहरे की फ़ोटो लें</string>
     <string name="face_match_returned_results_other">%d परिणाम आए।</string>
     <string name="face_match_tier4_matches_one">%d मेल</string>
     <string name="face_match_tier4_matches_other">%d मेल खाते हैं</string>
