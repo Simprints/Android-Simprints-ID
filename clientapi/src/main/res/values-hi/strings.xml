@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invalid_projectId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य प्रोजेक्ट आईडी), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="invalid_selectedId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य आईडी का चुनाव), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="invalid_sessionId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य सत्र आईडी), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="invalid_intentAction_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य इंटेंट क्रिया), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="invalid_metadata_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य मेटाडाटा), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="invalid_userId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य यूज़र आईडी), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="invalid_moduleId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य मॉड्यूल आईडी), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="rooted_device_title">रूटेड डिवाइस का पता लगा है</string>
+    <string name="configuration_error_title">कॉन्फ़िगरेशन त्रुटि</string>
+    <string name="different_projectId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (भिन्न प्रोजेक्ट ID), कृपया होम स्क्रीन से लॉग-आउट करें या अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="different_userId_message">एक कॉन्फ़िगरेशन त्रुटि हो रही है (भिन्न यूज़र ID), कृपया होम स्क्रीन से लॉग-आउट करें या अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="close">बंद करें</string>
+    <string name="invalid_verifyId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य GUID), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="rooted_device_message">1. अपने सुपरवाइज़र से सम्पर्क करें - रूटेड डिवाइस मिली है 2. बंद करें पर क्लिक करें</string>
+    <string name="guid_selection_data_sent">डाटा भेजना सफल रहा</string>
+    <string name="guid_selection_result_sent">परिणाम भेजना सफल रहा</string>
+</resources>
