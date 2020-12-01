@@ -33,6 +33,7 @@ definitions:
         ######################################################################
         -   step: &run-id-unit-tests
                 name: "Run Id & Core unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
@@ -67,6 +68,7 @@ definitions:
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
