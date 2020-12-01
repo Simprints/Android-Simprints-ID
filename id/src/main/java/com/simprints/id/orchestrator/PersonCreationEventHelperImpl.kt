@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.toList
 
 class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
                                     val timeHelper: TimeHelper,
-                                    val encodingUtils: EncodingUtils) : PersonCreationEventHelper {
+                                    private val encodingUtils: EncodingUtils) : PersonCreationEventHelper {
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
         val faceCaptureResponses = steps.filterIsInstance<FaceCaptureResponse>()
@@ -80,19 +80,28 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
     private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
         captureEvents: List<FingerprintCaptureEvent>,
         personTemplates: List<String>?
-    ): List<String> =
+    ): List<String>? =
         captureEvents
             .filter {
                 personTemplates?.contains(it.payload.fingerprint?.template) ?: false
                     && it.payload.result != SKIPPED
             }.map { it.id }
+            .nullIfEmpty()
 
     private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
         captureEvents: List<FaceCaptureEvent>,
         personTemplates: List<String>?
-    ): List<String> =
+    ): List<String>? =
         captureEvents
             .filter {
                 personTemplates?.contains(it.payload.face?.template) ?: false
             }.map { it.id }
+            .nullIfEmpty()
+
+    private fun List<String>.nullIfEmpty() =
+        if (this.isNotEmpty()) {
+            this
+        } else {
+            null
+        }
 }
