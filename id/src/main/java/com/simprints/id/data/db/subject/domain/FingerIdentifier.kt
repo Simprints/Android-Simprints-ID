@@ -1,7 +1,9 @@
 package com.simprints.id.data.db.subject.domain
 
+import androidx.annotation.Keep
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
+@Keep
 enum class FingerIdentifier {
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,

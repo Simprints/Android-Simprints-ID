@@ -18,7 +18,7 @@ definitions:
         ######################################################################
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
-                max-time: 15
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -33,7 +33,8 @@ definitions:
         ######################################################################
         -   step: &run-id-unit-tests
                 name: "Run Id & Core unit tests"
-                max-time: 15
+                size: 2x
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -50,7 +51,7 @@ definitions:
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
-                max-time: 15
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -66,7 +67,8 @@ definitions:
         ######################################################################
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
@@ -82,7 +84,7 @@ definitions:
         ######################################################################
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
-                max-time: 15
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -99,7 +101,7 @@ definitions:
         # them to sonarcloud.io, and check that they pass the quality gateway.
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
-                max-time: 15
+                max-time: 30
                 name: "Upload scan and check quality gateway"
                 caches:
                     - gradle

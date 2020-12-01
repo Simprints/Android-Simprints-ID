@@ -68,7 +68,7 @@ data class EnrolmentRecordCreationEvent(
         private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
             if (fingerprintSamples.isNotEmpty()) {
                 FingerprintReference(
-                    fingerprintSamples.uniqueId(),
+                    fingerprintSamples.uniqueId() ?: "",
                     fingerprintSamples.map {
                         FingerprintTemplate(
                             it.templateQualityScore,
@@ -83,7 +83,7 @@ data class EnrolmentRecordCreationEvent(
         private fun buildFaceReference(faceSamples: List<FaceSample>) =
             if (faceSamples.isNotEmpty()) {
                 FaceReference(
-                    faceSamples.uniqueId(),
+                    faceSamples.uniqueId() ?: "",
                     faceSamples.map {
                         FaceTemplate(
                             EncodingUtils.byteArrayToBase64(it.template)
