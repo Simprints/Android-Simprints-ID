@@ -21,11 +21,17 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
                                     private val encodingUtils: EncodingUtils) : PersonCreationEventHelper {
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
-        val faceCaptureResponses = steps.filterIsInstance<FaceCaptureResponse>()
-        val fingerprintCaptureResponses = steps.filterIsInstance<FingerprintCaptureResponse>()
-        val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponses)
-        val faceSamples = extractFaceSamples(faceCaptureResponses)
-        addPersonCreationEvent(fingerprintSamples, faceSamples)
+        val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+        val personCreationEventInSession = eventRepository.loadEvents(currentSession.id).filterIsInstance<PersonCreationEvent>().toList()
+        // If a personCreationEvent is already in the current session,
+        // we don' want to add it again (the capture steps would still be the same)
+        if (personCreationEventInSession.isEmpty()) {
+            val faceCaptureResponses = steps.filterIsInstance<FaceCaptureResponse>()
+            val fingerprintCaptureResponses = steps.filterIsInstance<FingerprintCaptureResponse>()
+            val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponses)
+            val faceSamples = extractFaceSamples(faceCaptureResponses)
+            addPersonCreationEvent(fingerprintSamples, faceSamples)
+        }
     }
 
     private fun extractFingerprintSamples(responses: List<FingerprintCaptureResponse>) =

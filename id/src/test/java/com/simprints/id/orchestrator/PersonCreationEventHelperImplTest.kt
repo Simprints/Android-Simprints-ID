@@ -1,9 +1,7 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.createFaceCaptureEvent
-import com.simprints.id.commontesttools.events.createFingerprintCaptureEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.commontesttools.events.*
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
@@ -22,11 +20,13 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
 class PersonCreationEventHelperImplTest {
 
@@ -70,6 +70,7 @@ class PersonCreationEventHelperImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+        coEvery { eventRepository.loadEvents(any()) } returns emptyFlow()
         coEvery { timeHelper.now() } returns CREATED_AT
 
 
@@ -154,6 +155,19 @@ class PersonCreationEventHelperImplTest {
                         faceReferenceId = listOf(FaceSample(faceSample.template)).uniqueId()
                     ).copy(id = it.id)
                 })
+            }
+        }
+    }
+
+    @Test
+    fun personCreationEventAlreadyExistsInCurrentSession_nothingHappens() {
+        runBlocking {
+            coEvery { eventRepository.loadEvents(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent, createPersonCreationEvent())
+
+            personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(fingerprintCaptureResponse, faceCaptureResponse))
+
+            coVerify(exactly = 0) {
+                eventRepository.addEventToCurrentSession(any())
             }
         }
     }
