@@ -3,8 +3,8 @@
 # Thanks to https://gist.github.com/wenzhixin/43cf3ce909c24948c6e7
 # Execute this script in your home directory. Lines 17 and 21 will prompt you for a y/n
 
-
-echo $ANDROID_SDK_ROOT
+ANDROID_SDK_ROOT2=$(eval $ANDROID_SDK_ROOT)
+echo $ANDROID_SDK_ROOT2
 
 ANDROID_COMPILE_SDK=29
 ANDROID_BUILD_TOOLS=29.0.3
