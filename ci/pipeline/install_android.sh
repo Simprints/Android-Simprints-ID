@@ -12,11 +12,14 @@ apt-get install -y unzip make expect # NDK stuff
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
 echo "TEST:"
 ls ./android
+
+echo "TEST2:"
 ls ./
 
-if [ ! -d "./android" ] 
+if [ ! -d "./android" ] && [ -z "$(ls -A ./android)" ];
 then
 	echo "Android cache doesn't exist"
+	rm -r android
 	mkdir android
 	cd android
 	wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
