@@ -3,9 +3,9 @@
 # Thanks to https://gist.github.com/wenzhixin/43cf3ce909c24948c6e7
 # Execute this script in your home directory. Lines 17 and 21 will prompt you for a y/n
 
-$ANDROID_COMPILE_SDK: "29"
-$ANDROID_BUILD_TOOLS: "29.0.3"
-$ANDROID_SDK_TOOLS:   "6858069"
+export ANDROID_COMPILE_SDK: "29"
+export ANDROID_BUILD_TOOLS: "29.0.3"
+export ANDROID_SDK_TOOLS:   "6858069"
 
 apt-get install -y unzip make expect # NDK stuff
 
