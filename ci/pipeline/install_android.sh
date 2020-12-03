@@ -6,7 +6,6 @@
 ANDROID_COMPILE_SDK=29
 ANDROID_BUILD_TOOLS=29.0.3
 ANDROID_SDK_TOOLS=6858069
-ANDROID_NDK=21.0.6113669
 
 apt-get install -y unzip make expect # NDK stuff
 
@@ -21,8 +20,11 @@ else
 	echo "Android cache does exist"
 fi
 
+echo "Installing ndk${ANDROID_NDK}"
+
 echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
 echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
-sdkmanager --install "ndk${ANDROID_NDK}"
+echo y | sdkmanager ndk-bundle > /dev/null
+
 
 yes | sdkmanager --licenses
