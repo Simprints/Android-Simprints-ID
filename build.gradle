@@ -46,6 +46,8 @@ buildscript {
         // CI Scanning
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
         classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0"
+
+        classpath "com.github.triplet.gradle:play-publisher:2.3.0"
     }
 
 }

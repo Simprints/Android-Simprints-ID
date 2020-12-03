@@ -14,10 +14,10 @@ android {
         }
 
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['releaseKeyAlias']
+            keyPassword keystoreProperties['releaseKeyPassword']
+            storeFile file("${rootDir}/android-signing-keystore.jks")
+            storePassword keystoreProperties['releaseStorePassword']
         }
     }
 
