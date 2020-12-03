@@ -163,6 +163,39 @@ definitions:
                 artifacts:
                     - ci/pipeline/test-reports/**
 
+        ######################################################################
+        # Build a signed bundle with the Playstore upload key, and deploy it
+        # to the internal test track. Also upload the bundle and the relevant
+        # output files to artifacts.
+        ######################################################################
+        -   step: &sign-and-deploy-to-internal
+                name: "Sign & Deploy to Internal Track"
+                deployment: Internal
+                max-time: 30
+                trigger: manual
+                size: 2x
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - echo "$SIGNING_JKS_FILE" | base64 -di > android-signing-keystore.jks
+                    - echo $GOOGLE_API_KEY_JSON > google_api_key.json
+                    - ./gradlew clean bundleStandardRelease
+                    - ./gradlew id:publishStandardReleaseBundle
+                artifacts:
+                    - id/build/outputs/**
+
+        ######################################################################
+        # Debug empty step
+        ######################################################################
+        -   step: &debug_empty_step
+                name: "Debug Empty Step"
+                image: atlassian/default-image:2
+                max-time: 10
+                script:
+                    - echo "Debug Empty Step"
+
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
@@ -178,6 +211,21 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
+    -   flow: &deploy-flow
+            -   parallel:
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *build-and-sign-universal-apk
+            -   parallel:
+                    -   step: *upload-sonar-scan-and-check-quality-gate
+                    -   step: *run-all-android-tests
+            -   step: *sign-and-deploy-to-internal
+    -   flow: &ci-test
+            -   step: *debug_empty_step
+            -   step: *sign-and-deploy-to-internal
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -186,6 +234,7 @@ pipelines:
     branches:
         master: *main-flow
         develop: *main-flow
-        ci/*: *main-flow
+        release/*: *deploy-flow
+        ci/*: *deploy-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
