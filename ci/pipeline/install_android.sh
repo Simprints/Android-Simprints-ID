@@ -29,7 +29,7 @@ echo y | sdkmanager ndk-bundle
 echo "TEST:"
 
 ls $ANDROID_SDK_ROOT/
-ls $ANDROID_SDK_ROOT/bin
+ls $ANDROID_SDK_ROOT/tools
 
 
 yes | sdkmanager --licenses
