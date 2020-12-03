@@ -27,8 +27,6 @@ definitions:
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - . ./ci/pipeline/setup
-                    - ls $ANDROID_SDK_ROOT/sdks
-                    - ls $ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
@@ -44,6 +42,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportStandardDebug
@@ -61,6 +60,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew face:jacocoTestReportStandardDebug --no-daemon
                 artifacts:
@@ -78,6 +78,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew fingerprint:jacocoTestReportStandardDebug
                 artifacts:
@@ -94,6 +95,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     # Tests lock if gradle runs in parallel
                     - echo "org.gradle.parallel=false" >> gradle.properties
@@ -112,6 +114,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
@@ -127,6 +130,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     # Build ID Android Test APK
                     - ./gradlew id:assembleStandardDebugAndroidTest
@@ -161,6 +165,7 @@ definitions:
                 max-time: 60
                 image: google/cloud-sdk:slim
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup_gcloud
                     - mv ./*.apk ./ci/pipeline/
                     - cd ./ci/pipeline/
@@ -175,11 +180,11 @@ flows:
     -   flow: &main-flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
-                    # -   step: *run-id-unit-tests
-                    # -   step: *run-face-unit-tests
-                    # -   step: *run-fingerprint-unit-tests
-                    # -   step: *run-fingerprintscanner-unit-tests
-                    # -   step: *build-and-sign-universal-apk
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
