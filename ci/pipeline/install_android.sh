@@ -16,7 +16,7 @@ ls ./android
 echo "TEST2:"
 ls ./
 
-if [ ! -d "./android" ] && [ -z "$(ls -A ./android)" ];
+if [ ! -d "./android" ] || [ -z "$(ls -A ./android)" ];
 then
 	echo "Android cache doesn't exist"
 	rm -r android
