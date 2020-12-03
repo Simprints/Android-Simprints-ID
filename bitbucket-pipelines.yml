@@ -179,6 +179,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - bash ./ci/pipeline/release_setup
                     - echo "$SIGNING_JKS_FILE" | base64 -di > android-signing-keystore.jks
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - ./gradlew clean bundleStandardRelease
