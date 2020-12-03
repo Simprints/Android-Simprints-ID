@@ -20,6 +20,6 @@ echo "org.gradle.daemon=false" >>gradle.properties
 #########################################################################################
 # https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
 #########################################################################################
-echo "org.gradle.jvmargs=-Xmx6g"
+echo "org.gradle.jvmargs=-Xmx4g"
 
 touch /opt/atlassian/pipelines/agent/build/local.properties
