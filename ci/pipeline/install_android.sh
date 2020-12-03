@@ -22,9 +22,9 @@ fi
 
 echo "Installing ndk${ANDROID_NDK}"
 
-echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
-echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
-echo y | sdkmanager ndk-bundle > /dev/null
+echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}"
+echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
+echo y | sdkmanager ndk-bundle
 
 echo "TEST:"
 
