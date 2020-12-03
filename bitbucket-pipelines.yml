@@ -24,9 +24,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - export ANDROID_HOME=$PWD/cmdline-tools
-                    - export ANDROID_SDK_ROOT=$PWD/cmdline-tools
-                    - export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
+                    - export ANDROID_HOME=$PWD/cmdline-tools && export ANDROID_SDK_ROOT=$PWD/cmdline-tools && export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
                     - . ./ci/pipeline/setup
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
