@@ -14,7 +14,7 @@ apt-get install -y oracle-java8-installer
 apt-get install -y unzip make expect # NDK stuff
 
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
-wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+wget --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 unzip -d android-sdk-linux android-sdk.zip
 
 echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
@@ -27,3 +27,5 @@ export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/bin
 source ~/.bashrc
 
 yes | android-sdk-linux/tools/bin/sdkmanager --licenses
+
+echo $ANDROID_SDK_ROOT
