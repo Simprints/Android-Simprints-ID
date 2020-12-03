@@ -14,10 +14,13 @@ if [ ! -d "./android" ]
 then
 	echo "Android cache doesn't exist"
 	mkdir android
+	cd android
 	wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-	unzip -q -d android/cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-	mv android/cmdline-tools/cmdline-tools cmdline-tools/tools
-	mkdir android/sdks
+	unzip -q -d cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+	mv cmdline-tools/cmdline-tools cmdline-tools/tools
+	mkdir sdks
+
+	echo "Android sdks installed!"
 else 
 	echo "Android cache does exist"
 fi
