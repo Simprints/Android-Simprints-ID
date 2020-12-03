@@ -10,7 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        android: ~/cmdline-tools
+        android: ~/android
     steps:
 
         ######################################################################
@@ -27,11 +27,6 @@ definitions:
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/android-ndk-r21d
                     - . ./ci/pipeline/setup
-                    - ls $ANDROID_SDK_ROOT/
-                    - ls $ANDROID_SDK_ROOT/tools
-                    - ls $ANDROID_SDK_ROOT/tools/bin
-                    - ls $ANDROID_SDK_ROOT/tools/lib
-                    - ls ~/
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
