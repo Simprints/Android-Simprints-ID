@@ -29,6 +29,8 @@ definitions:
                     - . ./ci/pipeline/setup
                     - ls $ANDROID_SDK_ROOT/
                     - ls $ANDROID_SDK_ROOT/tools
+                    - ls $ANDROID_SDK_ROOT/tools/bin
+                    - ls $ANDROID_SDK_ROOT/tools/lib
                     - ls ~/
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
