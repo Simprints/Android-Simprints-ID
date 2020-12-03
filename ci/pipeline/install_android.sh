@@ -16,7 +16,7 @@ mv cmdline-tools/cmdline-tools cmdline-tools/tools
 
 export ANDROID_HOME=$PWD/cmdline-tools
 export ANDROID_SDK_ROOT=$PWD/cmdline-tools
-export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
+export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
 
 source ~/.bashrc
 
