@@ -20,6 +20,9 @@ echo 'export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin' >> ~/.bashrc
 
 source ~/.bashrc
 
+echo $PATH
+
+
 echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
 echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
 yes | sdkmanager --licenses
