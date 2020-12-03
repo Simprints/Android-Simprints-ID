@@ -14,11 +14,9 @@ wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDRO
 unzip -q -d cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 mv cmdline-tools/cmdline-tools cmdline-tools/tools
 
-echo 'export ANDROID_HOME=$PWD/cmdline-tools' >> ~/.bashrc
-echo 'export ANDROID_SDK_ROOT=$PWD/cmdline-tools' >> ~/.bashrc
-echo 'export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin' >> ~/.bashrc
-
-source ~/.bashrc
+export ANDROID_HOME=$PWD/cmdline-tools
+export ANDROID_SDK_ROOT=$PWD/cmdline-tools
+export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
 
 echo $PATH
 
