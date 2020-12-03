@@ -28,6 +28,7 @@ definitions:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - . ./ci/pipeline/setup
                     - ls $ANDROID_SDK_ROOT/sdks
+                    - ls $ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
