@@ -2,7 +2,8 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: circleci/android@sha256:d2d054238e1a7e9ab30dd9f6b44a06af8d41836e053ffc40707d75ba50bbe0bf
+image: atlassian/default-image:2
+
 clone:
     depth: full # SonarCloud scanner needs the full history to assign issues properly
 
