@@ -1,5 +1,8 @@
 #!/bin/bash
 
+pwd
+./ci/pipeline/install_android.sh
+
 git submodule init
 git submodule update
 
@@ -20,6 +23,3 @@ echo "org.gradle.daemon=false" >>gradle.properties
 echo "org.gradle.jvmargs=-Xmx4g"
 
 touch /opt/atlassian/pipelines/agent/build/local.properties
-
-pwd
-./ci/pipeline/install_android.sh
