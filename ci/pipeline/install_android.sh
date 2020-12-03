@@ -20,15 +20,13 @@ then
 	mv cmdline-tools/cmdline-tools cmdline-tools/tools
 	mkdir sdks
 
+	echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" --sdk_root="~/android/sdks"
+	echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" --sdk_root="~/android/sdks"
+	echo y | sdkmanager ndk-bundle --sdk_root="~/android/sdks"
+
+	yes | sdkmanager --licenses
+
 	echo "Android sdks installed!"
 else 
 	echo "Android cache does exist"
 fi
-
-echo "Installing ndk${ANDROID_NDK}"
-
-echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" --sdk_root="~/android/sdks"
-echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" --sdk_root="~/android/sdks"
-echo y | sdkmanager ndk-bundle --sdk_root="~/android/sdks"
-
-yes | sdkmanager --licenses
