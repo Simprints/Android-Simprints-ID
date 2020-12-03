@@ -24,8 +24,10 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - . ./ci/pipeline/setup && echo $ANDROID_SDK_ROOT
-                    - echo $ANDROID_SDK_ROOT
+                    - export ANDROID_HOME=$PWD/cmdline-tools
+                    - export ANDROID_SDK_ROOT=$PWD/cmdline-tools
+                    - export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
+                    - . ./ci/pipeline/setup
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
