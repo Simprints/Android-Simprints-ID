@@ -30,6 +30,6 @@ echo "TEST:"
 
 ls $ANDROID_SDK_ROOT/
 ls $ANDROID_SDK_ROOT/tools
-
+ls ~/
 
 yes | sdkmanager --licenses
