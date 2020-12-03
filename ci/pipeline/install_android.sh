@@ -26,10 +26,4 @@ echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}"
 echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
 echo y | sdkmanager ndk-bundle
 
-echo "TEST:"
-
-ls $ANDROID_SDK_ROOT/
-ls $ANDROID_SDK_ROOT/tools
-ls ~/
-
 yes | sdkmanager --licenses

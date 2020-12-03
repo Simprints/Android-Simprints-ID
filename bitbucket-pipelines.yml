@@ -27,6 +27,9 @@ definitions:
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/cmdline-tools && export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/android-ndk-r21d
                     - . ./ci/pipeline/setup
+                    - ls $ANDROID_SDK_ROOT/
+                    - ls $ANDROID_SDK_ROOT/tools
+                    - ls ~/
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
