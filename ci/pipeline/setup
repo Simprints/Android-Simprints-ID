@@ -21,4 +21,5 @@ echo "org.gradle.jvmargs=-Xmx4g"
 
 touch /opt/atlassian/pipelines/agent/build/local.properties
 
-./install_android.sh
+pwd
+./ci/pipeline/install_android.sh
