@@ -24,7 +24,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - . ./ci/pipeline/setup
                     - echo $ANDROID_SDK_ROOT && ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
