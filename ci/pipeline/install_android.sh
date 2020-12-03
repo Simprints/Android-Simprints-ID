@@ -11,12 +11,15 @@ ANDROID_NDK=21.0.6113669
 apt-get install -y unzip make expect # NDK stuff
 
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
-wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-unzip -q -d cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-mv cmdline-tools/cmdline-tools cmdline-tools/tools
-
-echo $PATH
-
+if [ ! -d "./cmdline-tools" ] 
+then
+	echo "Android cache doesn't exist"
+	wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+	unzip -q -d cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+	mv cmdline-tools/cmdline-tools cmdline-tools/tools
+else 
+	echo "Android cache does exist"
+fi
 
 echo y | sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
 echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null

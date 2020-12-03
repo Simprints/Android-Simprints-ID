@@ -10,7 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-
+        android: ~/cmdline-tools
     steps:
 
         ######################################################################
@@ -23,6 +23,7 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
+                    - android
                 script:
                     - export ANDROID_HOME=$PWD/cmdline-tools && export ANDROID_SDK_ROOT=$PWD/cmdline-tools && export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
                     - . ./ci/pipeline/setup
