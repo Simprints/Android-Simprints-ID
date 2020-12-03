@@ -20,3 +20,5 @@ echo "org.gradle.daemon=false" >>gradle.properties
 echo "org.gradle.jvmargs=-Xmx4g"
 
 touch /opt/atlassian/pipelines/agent/build/local.properties
+
+./install_android.sh
