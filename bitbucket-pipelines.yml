@@ -10,7 +10,7 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        android: android
+        android: /opt/atlassian/pipelines/agent/build/android
     steps:
 
         ######################################################################
