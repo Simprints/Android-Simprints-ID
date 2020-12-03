@@ -17,13 +17,25 @@ definitions:
         # Run the Client API unit tests with coverage and upload report to
         # artifacts.
         ######################################################################
+        -   step: &android-and-cache
+                name: "Install SDK and cache"
+                max-time: 30
+                caches:
+                    - gradle
+                    - gradlewrapper
+                    - android
+                script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
+                    - . ./ci/pipeline/setup
+                artifacts:
+                    - android
+
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
                 max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - . ./ci/pipeline/setup
@@ -41,7 +53,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -60,7 +71,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -79,7 +89,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -97,7 +106,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -117,7 +125,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -134,7 +141,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -184,6 +190,8 @@ definitions:
 ######################################################################
 flows:
     -   flow: &main-flow
+            - parallel:
+                    -   step: *android-and-cache
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
