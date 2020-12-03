@@ -7,15 +7,11 @@ $ANDROID_COMPILE_SDK: "29"
 $ANDROID_BUILD_TOOLS: "29.0.3"
 $ANDROID_SDK_TOOLS:   "6858069"
 
-# Install Oracle JDK 8
-add-apt-repository ppa:webupd8team/java
-apt-get update
-apt-get install -y oracle-java8-installer
 apt-get install -y unzip make expect # NDK stuff
 
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
-wget --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-unzip -d android-sdk-linux android-sdk.zip
+wget https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+unzip -d android-sdk-linux commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 
 echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
 echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
