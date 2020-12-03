@@ -10,7 +10,6 @@ clone:
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-        android: /opt/atlassian/pipelines/agent/build/android
     steps:
 
         ######################################################################
@@ -23,7 +22,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - echo $ANDROID_SDK_ROOT
@@ -42,7 +40,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -61,7 +58,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -80,7 +76,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -98,7 +93,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -118,7 +112,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
@@ -135,7 +128,6 @@ definitions:
                 caches:
                     - gradle
                     - gradlewrapper
-                    - android
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
