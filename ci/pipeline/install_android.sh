@@ -3,9 +3,6 @@
 # Thanks to https://gist.github.com/wenzhixin/43cf3ce909c24948c6e7
 # Execute this script in your home directory. Lines 17 and 21 will prompt you for a y/n
 
-ANDROID_SDK_ROOT2=$(eval $ANDROID_SDK_ROOT)
-echo $ANDROID_SDK_ROOT2
-
 ANDROID_COMPILE_SDK=29
 ANDROID_BUILD_TOOLS=29.0.3
 ANDROID_SDK_TOOLS=6858069
@@ -16,10 +13,6 @@ apt-get install -y unzip make expect # NDK stuff
 wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 unzip -q -d cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 mv cmdline-tools/cmdline-tools cmdline-tools/tools
-
-export ANDROID_HOME=$PWD/cmdline-tools
-export ANDROID_SDK_ROOT=$PWD/cmdline-tools
-export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
 
 echo $PATH
 
