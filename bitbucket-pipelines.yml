@@ -18,6 +18,7 @@ definitions:
         ######################################################################
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
@@ -53,6 +54,7 @@ definitions:
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
@@ -70,8 +72,8 @@ definitions:
         ######################################################################
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
-                max-time: 30
                 size: 2x
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -88,6 +90,7 @@ definitions:
         ######################################################################
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
@@ -106,6 +109,7 @@ definitions:
         # them to sonarcloud.io, and check that they pass the quality gateway.
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
+                size: 2x
                 max-time: 30
                 name: "Upload scan and check quality gateway"
                 caches:
@@ -123,6 +127,7 @@ definitions:
         ######################################################################
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
