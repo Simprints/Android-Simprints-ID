@@ -1,9 +1,5 @@
 #!/bin/bash
 
-export ANDROID_HOME=$PWD/cmdline-tools
-export ANDROID_SDK_ROOT=$PWD/cmdline-tools
-export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
-
 pwd
 ./ci/pipeline/install_android.sh
 
