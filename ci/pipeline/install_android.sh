@@ -10,6 +10,10 @@ ANDROID_SDK_TOOLS=6858069
 apt-get install -y unzip make expect # NDK stuff
 
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
+echo "TEST:"
+ls ./android
+ls ./
+
 if [ ! -d "./android" ] 
 then
 	echo "Android cache doesn't exist"
