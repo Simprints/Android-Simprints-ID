@@ -1,20 +1,10 @@
 #!/bin/bash
 
-# Thanks to https://gist.github.com/wenzhixin/43cf3ce909c24948c6e7
-# Execute this script in your home directory. Lines 17 and 21 will prompt you for a y/n
-
 ANDROID_COMPILE_SDK=29
 ANDROID_BUILD_TOOLS=29.0.3
 ANDROID_SDK_TOOLS=6858069
 
 apt-get install -y unzip make expect # NDK stuff
-
-# Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
-echo "TEST:"
-ls ./android
-
-echo "TEST2:"
-ls ./
 
 if [ ! -d "./android" ] || [ -z "$(ls -A ./android)" ];
 then
