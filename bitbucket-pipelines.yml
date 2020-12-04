@@ -19,6 +19,7 @@ definitions:
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
@@ -34,6 +35,7 @@ definitions:
         ######################################################################
         -   step: &run-id-unit-tests
                 name: "Run Id & Core unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
@@ -70,6 +72,7 @@ definitions:
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
@@ -87,6 +90,7 @@ definitions:
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
@@ -105,6 +109,7 @@ definitions:
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
                 max-time: 30
+                size: 2x
                 name: "Upload scan and check quality gateway"
                 caches:
                     - gradle
@@ -122,6 +127,7 @@ definitions:
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
