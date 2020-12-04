@@ -30,11 +30,17 @@ data class FaceSample(val template: ByteArray) : Parcelable {
 }
 
 // Generates a unique id for a list of samples.
-// It concats the templates (sorted by quality score) and creates a UUID from that.
-fun List<FaceSample>.uniqueId() =
-    UUID.nameUUIDFromBytes(
-        concatTemplates()
-    ).toString()
+// It concats the templates (sorted by quality score) and creates a UUID from that. Or null if there
+// are not templates
+fun List<FaceSample>.uniqueId(): String? {
+    return if (this.isNotEmpty()) {
+        UUID.nameUUIDFromBytes(
+            concatTemplates()
+        ).toString()
+    } else {
+       null
+    }
+}
 
 private fun List<FaceSample>.concatTemplates(): ByteArray {
     return this.sortedBy { it.template.hashCode() }.fold(byteArrayOf(), { acc, sample ->
