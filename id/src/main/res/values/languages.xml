@@ -52,6 +52,9 @@
         <item>
             Hindi
         </item>
+        <item>
+            Portuguese
+        </item>
     </string-array>
     <string-array name="language_values">
         <item>
@@ -104,6 +107,9 @@
         </item>
         <item>
             hi
+        </item>
+        <item>
+            pt
         </item>
     </string-array>
 
