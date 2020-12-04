@@ -1,13 +1,7 @@
 package com.simprints.id.data.db.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.domain.uniqueId
-import com.simprints.id.tools.time.TimeHelper
 import java.util.*
 
 @Keep
@@ -20,9 +14,9 @@ data class PersonCreationEvent(
 
     constructor(
         startTime: Long,
-        fingerprintCaptureIds: List<String>,
+        fingerprintCaptureIds: List<String>?,
         fingerprintReferenceId: String?,
-        faceCaptureIds: List<String>,
+        faceCaptureIds: List<String>?,
         faceReferenceId: String?,
         labels: EventLabels = EventLabels()
     ) : this(
@@ -37,9 +31,9 @@ data class PersonCreationEvent(
     data class PersonCreationPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val fingerprintCaptureIds: List<String>,
+        val fingerprintCaptureIds: List<String>?,
         val fingerprintReferenceId: String?,
-        val faceCaptureIds: List<String>,
+        val faceCaptureIds: List<String>?,
         val faceReferenceId: String?,
         override val type: EventType = PERSON_CREATION,
         override val endedAt: Long = 0

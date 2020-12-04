@@ -2,14 +2,14 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: circleci/android@sha256:d2d054238e1a7e9ab30dd9f6b44a06af8d41836e053ffc40707d75ba50bbe0bf
+image: atlassian/default-image:2
+
 clone:
     depth: full # SonarCloud scanner needs the full history to assign issues properly
 
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-
     steps:
 
         ######################################################################
@@ -18,12 +18,14 @@ definitions:
         ######################################################################
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
+                    - . ./ci/pipeline/setup
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
@@ -33,11 +35,13 @@ definitions:
         ######################################################################
         -   step: &run-id-unit-tests
                 name: "Run Id & Core unit tests"
-                max-time: 15
+                size: 2x
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportStandardDebug
@@ -50,11 +54,12 @@ definitions:
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
-                max-time: 15
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew face:jacocoTestReportStandardDebug --no-daemon
                 artifacts:
@@ -66,11 +71,13 @@ definitions:
         ######################################################################
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew fingerprint:jacocoTestReportStandardDebug
                 artifacts:
@@ -82,11 +89,13 @@ definitions:
         ######################################################################
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     # Tests lock if gradle runs in parallel
                     - echo "org.gradle.parallel=false" >> gradle.properties
@@ -99,12 +108,14 @@ definitions:
         # them to sonarcloud.io, and check that they pass the quality gateway.
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
-                max-time: 15
+                max-time: 30
+                size: 2x
                 name: "Upload scan and check quality gateway"
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
@@ -116,10 +127,12 @@ definitions:
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     # Build ID Android Test APK
                     - ./gradlew id:assembleStandardDebugAndroidTest
@@ -154,6 +167,7 @@ definitions:
                 max-time: 60
                 image: google/cloud-sdk:slim
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup_gcloud
                     - mv ./*.apk ./ci/pipeline/
                     - cd ./ci/pipeline/
