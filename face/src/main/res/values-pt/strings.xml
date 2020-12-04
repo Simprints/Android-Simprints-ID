@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="why_did_you_skip_face_capture">Por que pulou a captura de rosto\?</string>
+    <string name="exit_form_return_to_face_capture">Capturar rosto</string>
+    <string name="face_match_loading_candidates">Carregando candidatos…</string>
+    <string name="face_match_returned_results_other">Retornou %d resultados.</string>
+    <string name="face_match_please_wait">Espere enquanto procedemos com a identificação</string>
+    <string name="face_match_tier1or2_matches_one">%d combinação muito boa</string>
+    <string name="face_match_tier1or2_matches_other">%d combinações muito boas</string>
+    <string name="face_match_tier3_matches_zero">Sem boas combinações</string>
+    <string name="face_match_tier3_matches_one">%d boa combinação</string>
+    <string name="face_match_tier3_matches_other">%d boas combinações</string>
+    <string name="face_match_tier4_matches_zero">Sem combinações</string>
+    <string name="face_match_tier4_matches_one">%d combinação</string>
+    <string name="face_match_tier4_matches_other">%d combinações</string>
+    <string name="error_licence_invalid_title">Licença inválida</string>
+    <string name="error_licence_invalid_message">A licença facial é inválida, entre em contacto com o administrador do sistema</string>
+    <string name="error_licence_missing_title">Licença ausente</string>
+    <string name="error_licence_missing_message">Falta licença facial, entre em contacto com o administrador do sistema</string>
+    <string name="error_configuration_error_title">Erro de configuração</string>
+    <string name="error_configuration_error_message">Ocorreu um erro ao configurar a modalidade facial, entre em contacto com o administrador do sistema</string>
+    <string name="face_configuration_started">Configurando a modalidade facial</string>
+    <string name="face_configuration_downloading">Baixando arquivos necessários</string>
+    <string name="error_close_button">Fechar</string>
+    <string name="error_unexpected_error_title">Ocorreu um erro</string>
+    <string name="error_unexpected_error_message">Por favor, tente novamente e se o Simprints não funcionar entre em contacto com o administrador do sistema</string>
+    <string name="capture_title_howto">Como escanear um rosto</string>
+    <string name="capture_title_previewing">Preparando para digitalizar</string>
+    <string name="capture_title_looks_good">A digitalização está pronta!</string>
+    <string name="capture_error_no_face">Certifique-se de que o rosto preencha o círculo</string>
+    <string name="capture_error_face_too_far">Aproxime-se</string>
+    <string name="capture_error_face_too_close">Anda para trás</string>
+    <string name="capture_error_look_straight">Certifique-se que a pessoa está olhando directamente para a câmera</string>
+    <string name="capture_ready">Pronto para capturar</string>
+    <string name="capture_prep_begin_btn">Toque para capturar</string>
+    <string name="capture_prep_begin_btn_capturing">Capturando …</string>
+    <string name="capture_title_scan_progress">Digitalização em andamento</string>
+    <string name="capture_hold">Mantenha a posição …</string>
+    <string name="captured_successfully">O rosto foi capturado com sucesso.</string>
+    <string name="title_confirmation">Confirmação</string>
+    <string name="title_capturing">Captura ao Vivo</string>
+    <string name="title_preparation">Preparação</string>
+    <string name="btn_recapture">Recaptura</string>
+    <string name="btn_finish">Toque para continuar</string>
+    <string name="btn_capture_again">Capturar novamente</string>
+    <string name="captured_unsuccessful">Não foi possível capturar o rosto devido a um problema técnico.</string>
+    <string name="onboarding_light">Encontre um lugar bem iluminado.</string>
+    <string name="onboarding_fill">Preencha o rosto no círculo.</string>
+    <string name="onboarding_straight">Certifique-se de que a pessoa está olhando directamente.</string>
+    <string name="onboarding_continue">Toque em qualquer lugar para continuar</string>
+    <string name="capture_title_look_straight">Não olhando directamente</string>
+    <string name="capture_title_no_face">Nenhum rosto detectado</string>
+    <string name="capture_title_too_close">Muito perto</string>
+    <string name="capture_title_face_too_far">Muito longe</string>
+    <string name="matching_x_records">Comparando com %s registos</string>
+    <string name="face_match_matching_candidates">Candidatos correspondentes</string>
+    <string name="face_match_matched_candidates_one">Comparado com %d candidato.</string>
+    <string name="face_match_matched_candidates_other">Comparado com %d candidatos.</string>
+    <string name="face_match_returned_results_one">Retornou %d resultados.</string>
+    <string name="face_match_tier1or2_matches_zero">Sem combinações muito boas</string>
+    <string name="retry_tips">Veja como pode corrigir o problema:
+\n
+\n1. Certifique-se estar num espaço bem iluminado. 
+\n2. Certifique-se que a pessoa está olhando directamente. 
+\n3. Fique parado e mantenha a posição.</string>
+</resources>
