@@ -4,5 +4,6 @@ echo "releaseStorePassword=${SIGNING_KEYSTORE_PASSWORD}" >>keystore.properties
 echo "releaseKeyAlias=${SIGNING_KEY_ALIAS}" >>keystore.properties
 echo "releaseKeyPassword=${SIGNING_KEY_PASSWORD}" >>keystore.properties
 
+var_branch=$(BITBUCKET_BRANCH | sed 's:.*/::')
 echo "VERSION_CODE=${BITBUCKET_BUILD_NUMBER}" >>gradle.properties
-echo "VERSION_NAME=${BITBUCKET_BRANCH | sed 's:.*/::'}.${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>gradle.properties
+echo "VERSION_NAME=${var_branch}.${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>gradle.properties
