@@ -257,7 +257,7 @@ flows:
             -   step: *sign-and-deploy-to-internal
     -   flow: &ci-test
             -   parallel:
-                    -   step: *run-all-android-tests
+                    -   step: *run-all-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
