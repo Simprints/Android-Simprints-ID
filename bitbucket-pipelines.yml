@@ -222,19 +222,8 @@ definitions:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - echo "org.gradle.daemon=true" >>gradle.properties
-                    - ./gradlew clientapi:jacocoTestReportStandardDebug
-                    - ./gradlew core:jacocoTestReportDebug
-                    - ./gradlew id:jacocoTestReportStandardDebug
-                    - ./gradlew face:jacocoTestReportStandardDebug
-                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - ./gradlew jacocoTestReportStandardDebug
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
-                artifacts:
-                    - clientapi/build/reports/**
-                    - id/build/reports/**
-                    - core/build/reports/**
-                    - face/build/reports/**
-                    - fingerprintscanner/build/reports/**
-
 
 ######################################################################
 # Define the different pipelines flows as anchors.
