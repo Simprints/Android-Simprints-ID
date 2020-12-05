@@ -256,7 +256,11 @@ flows:
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
     -   flow: &ci-test
+            -   parallel:
+                    -   step: *run-all-android-tests
+                    -   step: *build-and-sign-universal-apk
             -   step: *run-all-android-tests
+            -   step: *sign-and-deploy-to-internal
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -266,6 +270,6 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         release/*: *deploy-flow
-        ci/*: *deploy-flow
+        ci/*: *ci-test
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
