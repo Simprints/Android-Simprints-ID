@@ -61,7 +61,7 @@ definitions:
                 script:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportStandardDebug --no-daemon
+                    - ./gradlew face:jacocoTestReportStandardDebug
                 artifacts:
                     - face/build/reports/**
 
@@ -210,6 +210,32 @@ definitions:
                 script:
                     - echo "Debug Empty Step"
 
+
+        -   step: &run-all-unit-tests
+                name: "Run all unit tests"
+                max-time: 30
+                size: 2x
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
+                    - bash ./ci/pipeline/setup
+                    - echo "org.gradle.daemon=true" >>gradle.properties
+                    - ./gradlew clientapi:jacocoTestReportStandardDebug
+                    - ./gradlew core:jacocoTestReportDebug
+                    - ./gradlew id:jacocoTestReportStandardDebug
+                    - ./gradlew face:jacocoTestReportStandardDebug
+                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
+                artifacts:
+                    - clientapi/build/reports/**
+                    - id/build/reports/**
+                    - core/build/reports/**
+                    - face/build/reports/**
+                    - fingerprintscanner/build/reports/**
+
+
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
@@ -233,13 +259,13 @@ flows:
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
+                    -   step: *run-all-unit-tests
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
     -   flow: &ci-test
-            -   step: *debug_empty_step
-            -   step: *sign-and-deploy-to-internal
+            -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
