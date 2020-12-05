@@ -184,7 +184,6 @@ definitions:
                 name: "Sign & Deploy to Internal Track"
                 deployment: Internal
                 max-time: 30
-                trigger: manual
                 size: 2x
                 caches:
                     - gradle
@@ -199,33 +198,6 @@ definitions:
                     - ./gradlew id:publishStandardReleaseBundle
                 artifacts:
                     - id/build/outputs/**
-
-        ######################################################################
-        # Debug empty step
-        ######################################################################
-        -   step: &debug_empty_step
-                name: "Debug Empty Step"
-                image: atlassian/default-image:2
-                max-time: 10
-                script:
-                    - echo "Debug Empty Step"
-
-
-        -   step: &run-all-unit-tests
-                name: "Run all unit tests"
-                max-time: 30
-                size: 2x
-                caches:
-                    - gradle
-                    - gradlewrapper
-                script:
-                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
-                    - bash ./ci/pipeline/setup
-                    - echo "org.gradle.daemon=true" >>gradle.properties
-                    # Fingerprint Scanner tests lock if gradle runs in parallel
-                    - echo "org.gradle.parallel=false" >> gradle.properties
-                    - ./gradlew jacocoTestReportStandardDebug
-                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -250,16 +222,11 @@ flows:
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *build-and-sign-universal-apk
-                    -   step: *run-all-unit-tests
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
     -   flow: &ci-test
-            -   parallel:
-                    -   step: *run-all-unit-tests
-                    -   step: *build-and-sign-universal-apk
-            -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
 
 ######################################################################
