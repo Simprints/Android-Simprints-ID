@@ -187,6 +187,7 @@ definitions:
                 deployment: Internal
                 max-time: 30
                 size: 2x
+                trigger: manual
                 caches:
                     - gradle
                     - gradlewrapper
@@ -239,6 +240,6 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         release/*: *deploy-flow
-        ci/*: *ci-test
+        ci/*: *deploy-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere

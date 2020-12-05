@@ -21,7 +21,7 @@ android {
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
         versionName VERSION_NAME
-        versionCode 300 //STOPSHIP
+        versionCode VERSION_CODE as Integer
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
