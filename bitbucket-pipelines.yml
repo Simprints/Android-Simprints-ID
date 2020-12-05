@@ -222,6 +222,8 @@ definitions:
                     - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - echo "org.gradle.daemon=true" >>gradle.properties
+                    # Fingerprint Scanner tests lock if gradle runs in parallel
+                    - echo "org.gradle.parallel=false" >> gradle.properties
                     - ./gradlew jacocoTestReportStandardDebug
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
