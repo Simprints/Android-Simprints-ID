@@ -5,7 +5,7 @@ echo "releaseKeyAlias=${SIGNING_KEY_ALIAS}" >>keystore.properties
 echo "releaseKeyPassword=${SIGNING_KEY_PASSWORD}" >>keystore.properties
 
 # Get the branch name after the last '/'. ex release/2020.4.0 = 2020.4.0
-var_branchSuffix=$($BITBUCKET_BRANCH | sed 's:.*/::')
+var_branchSuffix=$(echo "$BITBUCKET_BRANCH" | sed 's:.*/::')
 
 echo "VERSION_CODE=${BITBUCKET_BUILD_NUMBER}" >>gradle.properties
 echo "VERSION_NAME=${var_branchSuffix}.${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>gradle.properties
