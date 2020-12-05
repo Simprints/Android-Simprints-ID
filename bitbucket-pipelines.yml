@@ -190,6 +190,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
+                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
                     - echo "$SIGNING_JKS_FILE" | base64 -di > android-signing-keystore.jks
