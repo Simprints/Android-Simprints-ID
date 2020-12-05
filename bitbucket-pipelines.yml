@@ -179,6 +179,8 @@ definitions:
         # Build a signed bundle with the Playstore upload key, and deploy it
         # to the internal test track. Also upload the bundle and the relevant
         # output files to artifacts.
+        #
+        # Signing vars are only available on a deployment step.
         ######################################################################
         -   step: &sign-and-deploy-to-internal
                 name: "Sign & Deploy to Internal Track"
