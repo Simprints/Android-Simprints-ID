@@ -23,3 +23,5 @@ echo y | $SDK_MANAGER "build-tools;${ANDROID_BUILD_TOOLS}" --sdk_root="./sdks"
 echo y | $SDK_MANAGER ndk-bundle --sdk_root="./sdks"
 
 yes | $SDK_MANAGER --licenses
+
+ls /opt/atlassian/pipelines/agent/build/sdks/ndk-bundle
