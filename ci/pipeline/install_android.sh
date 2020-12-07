@@ -9,7 +9,7 @@ apt-get install -y unzip make expect # NDK stuff
 SDK_MANAGER="$PWD/android/cmdline-tools/tools/bin/sdkmanager"
 
 echo "sdk.dir=$PWD/android" > local.properties
-echo "ndk.dir=$PWD/sdks/ndk-bundle" >> local.properties
+echo "ndk.dir=$PWD/android/sdks/ndk-bundle" >> local.properties
 
 mkdir android
 cd android
@@ -24,4 +24,4 @@ echo y | $SDK_MANAGER ndk-bundle --sdk_root="./sdks"
 
 yes | $SDK_MANAGER --licenses
 
-ls /opt/atlassian/pipelines/agent/build/sdks/ndk-bundle
+ls /opt/atlassian/pipelines/agent/build/android/sdks/ndk-bundle
