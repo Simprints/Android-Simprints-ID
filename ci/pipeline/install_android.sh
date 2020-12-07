@@ -6,7 +6,7 @@ ANDROID_SDK_TOOLS=6858069
 
 apt-get install -y unzip make expect # NDK stuff
 
-SDK_MANAGER="$ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager"
+SDK_MANAGER="$PWD/android/cmdline-tools/tools/bin/sdkmanager"
 
 echo "sdk.dir=$PWD/android" > local.properties
 echo "ndk.dir=$PWD/sdks/ndk-bundle" >> local.properties
