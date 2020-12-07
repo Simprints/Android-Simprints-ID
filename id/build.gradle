@@ -20,7 +20,7 @@ android {
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
         versionName "2020.4.0"
-        versionCode 671
+        versionCode 672
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
