@@ -8,7 +8,7 @@ apt-get install -y unzip make expect # NDK stuff
 
 SDK_MANAGER="$PWD/android/cmdline-tools/tools/bin/sdkmanager"
 
-echo "sdk.dir=$PWD/android" > local.properties
+echo "sdk.dir=$PWD/android" >> local.properties
 echo "ndk.dir=$PWD/android/sdks/ndk-bundle" >> local.properties
 
 mkdir android
