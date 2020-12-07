@@ -123,16 +123,14 @@ class SetupActivity : BaseSplitActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        lifecycleScope.launch {
-            when (requestCode) {
-                PERMISSIONS_REQUEST_CODE -> {
-                    if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                        collectLocationInBackground()
-                    }
+        when (requestCode) {
+            PERMISSIONS_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    collectLocationInBackground()
                 }
             }
-            setResultAndFinish(SETUP_COMPLETE_FLAG)
         }
+        setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
     private fun collectLocationInBackground() {
