@@ -25,6 +25,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - . ./ci/pipeline/setup
+                    - cat ./local.properties
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**

@@ -4,7 +4,7 @@ ANDROID_COMPILE_SDK=29
 ANDROID_BUILD_TOOLS=29.0.3
 ANDROID_SDK_TOOLS=6858069
 
-apt-get install -y unzip make expect # NDK stuff
+apt-get install -y unzip make expect # NDK stuff		
 
 SDK_MANAGER="$PWD/android/cmdline-tools/tools/bin/sdkmanager"
 
