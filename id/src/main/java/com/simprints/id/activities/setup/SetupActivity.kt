@@ -111,7 +111,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun launchAlertIfNecessary() {
         lifecycleScope.launchWhenResumed {
-            if(splitInstallManager.requestSessionStates().lastOrNull()?.status() != REQUIRES_USER_CONFIRMATION) {
+            if (splitInstallManager.requestSessionStates().lastOrNull()?.status() != REQUIRES_USER_CONFIRMATION) {
                 launchAlert(this@SetupActivity, AlertType.OFFLINE_DURING_SETUP)
             }
         }
@@ -124,7 +124,7 @@ class SetupActivity: BaseSplitActivity() {
             when (requestCode) {
                 PERMISSIONS_REQUEST_CODE -> {
                     if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                        storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+                        collectLocationInBackground()
                     }
                 }
             }
@@ -132,6 +132,15 @@ class SetupActivity: BaseSplitActivity() {
         }
     }
 
+    private fun collectLocationInBackground() {
+        inBackground(Dispatchers.Main) {
+            try {
+                storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+            } catch (t: Throwable) {
+                Timber.d(t)
+            }
+        }
+    }
     private fun askPermissionsOrPerformSpecificActions() {
         val permissions = extractPermissionsFromRequest(setupRequest)
 
