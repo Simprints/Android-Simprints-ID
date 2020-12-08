@@ -17,13 +17,17 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DashboardSyncCardDisplayerImplTest {
 
     private lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
@@ -40,7 +44,7 @@ class DashboardSyncCardDisplayerImplTest {
     fun setUp() {
         ctx = ApplicationProvider.getApplicationContext()
         syncCardRootLayout = LinearLayout(ctx)
-        syncCardDisplayer = DashboardSyncCardDisplayerImpl(TimeHelperImpl())
+        syncCardDisplayer = DashboardSyncCardDisplayerImpl(TestTimeHelperImpl())
         syncCardDisplayer.initRoot(syncCardRootLayout)
     }
 

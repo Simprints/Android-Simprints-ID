@@ -6,10 +6,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
@@ -34,6 +31,7 @@ import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAsserti
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,8 +56,11 @@ class CollectFingerprintsViewModelTest : KoinTest {
     private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
         every { qualityThreshold } returns 60
+        every { liveFeedbackOn } returns false
     }
-    private val scanner: ScannerWrapper = mockk(relaxUnitFun = true)
+    private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
+        every { isLiveFeedbackAvailable() } returns false
+    }
     private val scannerManager: ScannerManager = ScannerManagerImpl(mockk(), mockk(), mockk(), mockk()).also {
         it.scanner = scanner
     }
@@ -141,7 +142,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         mockTimer.executeNextTask()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -156,7 +157,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60)))
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
 
         mockTimer.executeNextTask()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
@@ -173,7 +174,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -187,7 +188,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60), 1))
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -201,7 +202,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotDetected())
         vm.vibrate.assertEventReceived()
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -254,7 +255,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
         verify(exactly = 1) { scanner.acquireImage(any()) }
-        verify(exactly = 3) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 3) { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -279,7 +280,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 12) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 12) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 4) { imageManager.save(any(), any(), any()) }
@@ -314,7 +315,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 2) { imageManager.save(any(), any(), any()) }
@@ -348,7 +349,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 0) { imageManager.save(any(), any(), any()) }
@@ -384,7 +385,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().isAskingRescan).isFalse()
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Collected(ScanResult(DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, null, 60)))
 
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -401,7 +402,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().isShowingSplashScreen).isFalse()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
-        verify { sessionEventsManager.addEventInBackground(any()) }
+        coVerify { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -421,7 +422,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 4) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
 
@@ -486,7 +487,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 14) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 14) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 3) { imageManager.save(any(), any(), any()) }
@@ -552,7 +553,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             isShowingConfirmDialog = true,
             isShowingSplashScreen = false
         ))
-        verify(exactly = 14) { sessionEventsManager.addEventInBackground(any()) }
+        coVerify(exactly = 14) { sessionEventsManager.addEvent(any()) }
 
         // If eager, expect that images were saved before confirm was pressed, including bad scans
         coVerify(exactly = 8) { imageManager.save(any(), any(), any()) }
@@ -695,6 +696,143 @@ class CollectFingerprintsViewModelTest : KoinTest {
         verify { scanner.unregisterTriggerListener(any()) }
     }
 
+    @Test
+    fun whenStart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenStart_AndLiveFeedbackIsNotEnabled_liveFeedbackIsNotStarted() {
+        vm.start(TWO_FINGERS_IDS)
+
+        verify (exactly = 0) { scanner.startLiveFeedback() }
+    }
+
+    @Test
+    fun whenScanButtonPressed_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(NEVER_RETURNS)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
+    }
+
+    @Test
+    fun whenGoodScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenBadScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(BAD_SCAN)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenSecondScan_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
+        mockScannerSetUiIdle()
+        captureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        mockTimer.executeAllTasks()
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
+    }
+
+    @Test
+    fun whenEndOfWorkflow_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
+        mockScannerSetUiIdle()
+        setupLiveFeedbackOn()
+
+        getToEndOfWorkflow()
+
+        verify { scanner.stopLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
+    }
+
+    @Test
+    fun whenRestart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+        mockScannerSetUiIdle()
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleRestart()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenPause_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnPause()
+
+        verify { scanner.stopLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
+    }
+
+    @Test
+    fun whenResume_AndLiveFeedbackWasStarted_liveFeedbackIsStarted() {
+        setupLiveFeedbackOn()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnPause()
+        vm.handleOnResume()
+
+        verify { scanner.startLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
+    }
+
+    @Test
+    fun whenResume_AndLiveFeedbackWasStopped_liveFeedbackIsStopped() {
+        mockScannerSetUiIdle()
+        setupLiveFeedbackOn()
+
+        getToEndOfWorkflow()
+        vm.handleOnPause()
+        vm.handleOnResume()
+
+        verify { scanner.stopLiveFeedback() }
+        assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
+    }
+
+    private fun getToEndOfWorkflow() {
+        captureFingerprintResponses(GOOD_SCAN)
+        vm.start(TWO_FINGERS_IDS)
+        repeat(2) {
+            vm.handleScanButtonPressed()
+            mockTimer.executeAllTasks()
+        }
+    }
+
     private fun noImageTransfer() {
         every { preferencesManager.saveFingerprintImagesStrategy } returns SaveFingerprintImagesStrategy.NEVER
     }
@@ -733,6 +871,11 @@ class CollectFingerprintsViewModelTest : KoinTest {
         }
     }
 
+    private fun setupLiveFeedbackOn() {
+        every { scanner.isLiveFeedbackAvailable() }.returns(true)
+        every { preferencesManager.liveFeedbackOn }.returns(true)
+    }
+
     private enum class MockCaptureFingerprintResponse {
         GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, UNKNOWN_ERROR, NEVER_RETURNS
     }
@@ -753,5 +896,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
         val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().templateBytes
 
         val IMAGE = byteArrayOf(0x05, 0x06, 0x07, 0x08)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 }

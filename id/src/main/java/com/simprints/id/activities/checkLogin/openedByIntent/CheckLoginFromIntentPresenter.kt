@@ -1,13 +1,15 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.AuthorizationEvent
-import com.simprints.id.data.db.session.domain.models.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.db.session.domain.models.events.Event
-import com.simprints.id.data.db.session.domain.models.events.callout.*
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
+import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.callout.*
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -24,9 +26,11 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.utils.SimNetworkUtils
+import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import com.simprints.id.data.db.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val deviceId: String,
@@ -39,7 +43,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionRepository: SessionRepository
+    @Inject lateinit var eventRepository: EventRepository
     @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
@@ -50,10 +54,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     override suspend fun setup() {
         try {
-            addAnalyticsInfoAndProjectId()
             parseAppRequest()
-            extractSessionParametersOrThrow()
             addCalloutAndConnectivityEventsInSession(appRequest)
+
+            extractSessionParametersForAnalyticsManager()
             setLastUser()
             setSessionIdCrashlyticsKey()
         } catch (t: Throwable) {
@@ -68,20 +72,16 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         appRequest = view.parseRequest()
     }
 
-    internal suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
+    private suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         ignoreException {
-            sessionRepository.updateCurrentSession { currentSession ->
-                with(currentSession) {
-                    if (appRequest !is AppRequest.AppRequestFollowUp) {
-                        addEvent(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
-                    }
-                    addEvent(buildRequestEvent(timeHelper.now(), appRequest))
-                }
+            if (appRequest !is AppRequest.AppRequestFollowUp) {
+                eventRepository.addEventToCurrentSession(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
             }
+            eventRepository.addEventToCurrentSession(buildRequestEvent(timeHelper.now(), appRequest))
         }
     }
 
-    internal fun buildRequestEvent(relativeStartTime: Long, request: AppRequest): Event =
+    private fun buildRequestEvent(relativeStartTime: Long, request: AppRequest): Event =
         when (request) {
             is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStartTime)
             is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStartTime)
@@ -90,7 +90,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppEnrolLastBiometricsRequest -> addEnrolLastBiometricsCalloutEvent(request, relativeStartTime)
         }
 
-    internal fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
+    private fun addEnrolLastBiometricsCalloutEvent(request: AppEnrolLastBiometricsRequest, relativeStarTime: Long) =
         EnrolmentLastBiometricsCalloutEvent(
             relativeStarTime,
             request.projectId,
@@ -99,21 +99,21 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             request.metadata,
             request.identificationSessionId)
 
-    internal fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStartTime: Long) =
+    private fun addConfirmationCalloutEvent(request: AppConfirmIdentityRequest, relativeStartTime: Long) =
         ConfirmationCalloutEvent(
             relativeStartTime,
             request.projectId,
             request.selectedGuid,
             request.sessionId)
 
-    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStartTime: Long) =
+    private fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStartTime: Long) =
         with(request) {
             IdentificationCalloutEvent(
                 relativeStartTime,
                 projectId, userId, moduleId, metadata)
         }
 
-    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStartTime: Long) =
+    private fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStartTime: Long) =
         with(request) {
             VerificationCalloutEvent(
                 relativeStartTime,
@@ -121,7 +121,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
 
-    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStartTime: Long) =
+    private fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStartTime: Long) =
         with(request) {
             EnrolmentCalloutEvent(
                 relativeStartTime,
@@ -151,7 +151,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         view.setResultErrorAndFinish(fromDomainToModuleApiAppErrorResponse(appErrorResponse))
     }
 
-    private fun extractSessionParametersOrThrow() =
+    private fun extractSessionParametersForAnalyticsManager() =
         with(appRequest) {
             if (this is AppRequestFlow) {
                 analyticsManager.logCallout(this)
@@ -163,7 +163,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            sessionRepository.addEventToCurrentSessionInBackground(buildAuthorizationEvent(AuthorizationEvent.Result.NOT_AUTHORIZED))
+            inBackground { eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -193,6 +193,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
         super.handleSignedInUser()
+        Timber.d("[CHECK_LOGIN] User is signed in")
+
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User
          *  Because we move ConfirmIdentity behind the login check, some integration
@@ -205,52 +207,82 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
-        ignoreException {
-            val peopleInDb = subjectLocalDataSource.count()
-            sessionRepository.updateCurrentSession { currentSession ->
-                val authorisationEvent = buildAuthorizationEvent(AuthorizationEvent.Result.AUTHORIZED)
+        updateProjectInInCurrentSession()
 
-                with(currentSession) {
-                    addEvent(authorisationEvent)
-                    projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                    databaseInfo.recordCount = peopleInDb
-                }
+        inBackground {
+            ignoreException {
+                Timber.d("[CHECK_LOGIN] Updating events")
+
+                updateDatabaseCountsInCurrentSession()
+                addAuthorizedEventInCurrentSession()
+                initAnalyticsKeyInCrashManager()
+                updateAnalyticsIdInCurrentSession()
             }
         }
 
+        Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
+
+        Timber.d("[CHECK_LOGIN] Moving to orchestrator")
         view.openOrchestratorActivity(appRequest)
-        initOrUpdateAnalyticsKeys()
     }
 
-    private fun initOrUpdateAnalyticsKeys() {
+    private suspend fun addAuthorizedEventInCurrentSession() {
+        eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
+        Timber.d("[CHECK_LOGIN] Added authorised event")
+    }
+
+    private suspend fun updateProjectInInCurrentSession() {
+        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+
+        val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        if (signedProjectId != currentSessionEvent.payload.projectId) {
+            currentSessionEvent.updateProjectId(signedProjectId)
+            currentSessionEvent.updateModalities(preferencesManager.modalities)
+            eventRepository.addEvent(currentSessionEvent)
+        }
+        val associatedEvents = eventRepository.loadEvents(currentSessionEvent.id)
+        associatedEvents.collect {
+            it.labels = it.labels.copy(projectId = signedProjectId)
+            eventRepository.addEvent(it)
+        }
+
+        Timber.d("[CHECK_LOGIN] Updated projectId in current session")
+    }
+
+    private suspend fun updateDatabaseCountsInCurrentSession() {
+        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+
+        val payload = currentSessionEvent.payload
+        payload.databaseInfo.recordCount = subjectLocalDataSource.count()
+
+        eventRepository.addEvent(currentSessionEvent)
+        Timber.d("[CHECK_LOGIN] Updated Database count in current session")
+    }
+
+    private fun initAnalyticsKeyInCrashManager() {
         crashReportManager.apply {
             setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
             setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
             setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-            setDownSyncTriggersCrashlyticsKey(preferencesManager.subjectsDownSyncSetting)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.eventDownSyncSetting)
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerprintsToCollect)
         }
+        Timber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 
-    internal suspend fun addAnalyticsInfoAndProjectId() {
-        ignoreException {
-            val analyticsId = analyticsManager.getAnalyticsId()
-            sessionRepository.updateCurrentSession { currentSession ->
-                val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
-                if (signedInProject.isNotEmpty()) {
-                    currentSession.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-                }
-                currentSession.analyticsId = analyticsId
-            }
-        }
+    private suspend fun updateAnalyticsIdInCurrentSession() {
+        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
+        currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
+        eventRepository.addEvent(currentSessionEvent)
+        Timber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 
-    private fun buildAuthorizationEvent(result: AuthorizationEvent.Result) =
+    private fun buildAuthorizationEvent(result: AuthorizationResult) =
         AuthorizationEvent(
             timeHelper.now(),
             result,
-            if (result == AuthorizationEvent.Result.AUTHORIZED) {
-                AuthorizationEvent.UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+            if (result == AuthorizationResult.AUTHORIZED) {
+                UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
             } else {
                 null
             }
@@ -260,7 +292,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
         ignoreException {
-            crashReportManager.setSessionIdCrashlyticsKey(sessionRepository.getCurrentSession().id)
+            crashReportManager.setSessionIdCrashlyticsKey(eventRepository.getCurrentCaptureSessionEvent().id)
         }
     }
 }

@@ -9,13 +9,12 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.id.data.db.event.local.EventDatabaseFactory
+import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.SessionEventValidatorsBuilder
-import com.simprints.id.data.db.session.local.SessionLocalDataSource
-import com.simprints.id.data.db.session.local.SessionRealmConfigBuilder
-import com.simprints.id.data.db.session.remote.SessionRemoteDataSource
-import com.simprints.id.data.db.subjects_sync.SubjectsSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
@@ -27,11 +26,9 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -118,51 +115,34 @@ class TestAppModule(
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
-    override fun provideSessionEventsManager(
+    override fun provideEventRepository(
         ctx: Context,
-        sessionEventsSyncManager: SessionEventsSyncManager,
-        sessionLocalDataSource: SessionLocalDataSource,
-        sessionRemoteDataSource: SessionRemoteDataSource,
+        eventLocalDataSource: EventLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager
-    ): SessionRepository = sessionEventsManagerRule.resolveDependency {
-        super.provideSessionEventsManager(
+        crashReportManager: CrashReportManager,
+        validatorFactory: SessionEventValidatorsFactory
+    ): EventRepository = sessionEventsManagerRule.resolveDependency {
+        super.provideEventRepository(
             ctx,
-            sessionEventsSyncManager,
-            sessionLocalDataSource,
-            sessionRemoteDataSource,
+            eventLocalDataSource,
+            eventRemoteDataSource,
             preferencesManager,
             loginInfoManager,
             timeHelper,
-            crashReportManager
+            crashReportManager,
+            validatorFactory
         )
     }
 
     override fun provideSessionEventsLocalDbManager(
-        ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
-        timeHelper: TimeHelper,
-        sessionRealmConfigBuilder: SessionRealmConfigBuilder,
-        sessionEventValidatorsBuilder: SessionEventValidatorsBuilder
-    ): SessionLocalDataSource =
+        factory: EventDatabaseFactory
+    ): EventLocalDataSource =
         sessionEventsLocalDbManagerRule.resolveDependency {
             super.provideSessionEventsLocalDbManager(
-                ctx,
-                secureDataManager,
-                timeHelper,
-                sessionRealmConfigBuilder,
-                sessionEventValidatorsBuilder
-            )
-        }
-
-    override fun provideSessionEventsRemoteDbManager(
-        simApiClientFactory: SimApiClientFactory
-    ): SessionRemoteDataSource =
-        sessionEventsRemoteDbManagerRule.resolveDependency {
-            super.provideSessionEventsRemoteDbManager(
-                simApiClientFactory
+                factory
             )
         }
 
@@ -173,9 +153,6 @@ class TestAppModule(
         locationManagerRule.resolveDependency {
             super.provideLocationManager(ctx)
         }
-
-    override fun provideSyncStatusDatabase(ctx: Context): SubjectsSyncStatusDatabase =
-        syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.
     override fun provideEncryptedSharedPreferencesBuilder(

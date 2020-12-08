@@ -3,14 +3,15 @@ package com.simprints.id.moduleselection
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 
 class ModuleRepositoryImpl(
     val preferencesManager: PreferencesManager,
     val crashReportManager: CrashReportManager,
-    private val subjectLocalDataSource: SubjectLocalDataSource
+    private val subjectRepository: SubjectRepository
 ): ModuleRepository {
 
     override fun getModules(): List<Module> = buildModulesList()
@@ -38,9 +39,9 @@ class ModuleRepositoryImpl(
 
     private suspend fun handleUnselectedModules(unselectedModules: List<Module>) {
         val queries = unselectedModules.map {
-            SubjectLocalDataSource.Query(moduleId = it.name)
+            SubjectQuery(moduleId = it.name)
         }
-        subjectLocalDataSource.delete(queries)
+        subjectRepository.delete(queries)
     }
 
     private fun setCrashlyticsKeyForModules() {

@@ -1,11 +1,11 @@
 package com.simprints.id.data.db.project.local
 
 import android.content.Context
-import com.simprints.id.data.db.common.realm.SubjectsRealmConfig
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDbToDomain
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
+import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider

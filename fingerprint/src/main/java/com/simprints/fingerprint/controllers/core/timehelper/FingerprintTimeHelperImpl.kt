@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.timehelper
 
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.time.TimeHelper
 import java.util.*
 import java.util.concurrent.TimeUnit
 

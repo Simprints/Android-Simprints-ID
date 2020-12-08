@@ -134,6 +134,8 @@ class SimulatedCommandInputStream {
                 when (Un20MessageProtocol.getMessageType(messageBytes)) {
                     Un20MessageType.GetUn20AppVersion -> GetUn20AppVersionCommand.fromBytes(data)
                     Un20MessageType.CaptureFingerprint -> CaptureFingerprintCommand.fromBytes(data)
+                    Un20MessageType.GetImageQualityPreview -> GetImageQualityPreviewCommand.fromBytes(data)
+                    Un20MessageType.SetScanLedState -> SetScanLedStateCommand.fromBytes(data)
                     Un20MessageType.GetSupportedTemplateTypes -> GetSupportedTemplateTypesCommand.fromBytes(data)
                     is Un20MessageType.GetTemplate -> GetTemplateCommand.fromBytes(minorTypeByte, data)
                     Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsCommand.fromBytes(data)

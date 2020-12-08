@@ -9,10 +9,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
@@ -95,6 +92,9 @@ class CollectFingerprintsViewModel(
     private var lastCaptureStartedAt: Long = 0
     private var scanningTask: Disposable? = null
     private var imageTransferTask: Disposable? = null
+    private var liveFeedbackTask: Disposable? = null
+    private var stopLiveFeedbackTask: Disposable? = null
+    var liveFeedbackState : LiveFeedbackState? = null
 
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
@@ -113,7 +113,56 @@ class CollectFingerprintsViewModel(
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
+        startObserverForLiveFeedback()
     }
+
+    private fun startObserverForLiveFeedback() {
+        state.observeForever {
+            when(it.currentCaptureState()) {
+                CaptureState.NotCollected,
+                CaptureState.Skipped,
+                is CaptureState.NotDetected,
+                is CaptureState.Collected -> {
+                    if (it.isShowingConfirmDialog)
+                        stopLiveFeedback().doInBackground()
+                    else
+                        startLiveFeedback().doInBackground()
+                }
+                is CaptureState.Scanning,
+                is CaptureState.TransferringImage -> pauseLiveFeedback()
+            }
+        }
+    }
+
+    private fun shouldWeDoLiveFeedback() : Boolean =
+        scannerManager.onScanner { isLiveFeedbackAvailable() } &&
+            fingerprintPreferencesManager.liveFeedbackOn
+
+    private fun startLiveFeedback() : Completable =
+        if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback()) {
+            logScannerMessageForCrashReport("startLiveFeedback")
+            liveFeedbackState = LiveFeedbackState.START
+            stopLiveFeedbackTask?.dispose()
+            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
+        } else {
+            Completable.complete()
+        }
+
+    private fun pauseLiveFeedback() {
+        logScannerMessageForCrashReport("pauseLiveFeedback")
+        liveFeedbackState = LiveFeedbackState.PAUSE
+        liveFeedbackTask?.dispose()
+    }
+
+    private fun stopLiveFeedback() : Completable =
+        if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback()) {
+            logScannerMessageForCrashReport("stopLiveFeedback")
+            liveFeedbackState = LiveFeedbackState.STOP
+            liveFeedbackTask?.dispose()
+            scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
+        } else {
+            Completable.complete()
+        }
 
     private fun setStartingState() {
         state.value = CollectFingerprintsState(
@@ -262,7 +311,11 @@ class CollectFingerprintsViewModel(
                 }
             )
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
-            sessionEventsManager.addEventInBackground(captureEvent)
+
+            //It can not be done in background because then id won't find the last capture event id
+            runBlocking {
+                sessionEventsManager.addEvent(captureEvent)
+            }
         }
     }
 
@@ -457,10 +510,12 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnResume() {
+        updateState { /* refresh */ }
         scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnPause() {
+        stopLiveFeedback().doInBackground()
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
@@ -477,7 +532,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun Completable.doInBackground() =
-        subscribeOn(Schedulers.io()).subscribeBy(onComplete = {}, onError = {})
+        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Timber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
         Timber.d(message)

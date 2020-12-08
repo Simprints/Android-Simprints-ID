@@ -8,7 +8,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 
@@ -36,13 +36,14 @@ interface SettingsPreferencesManager {
     var isEnrolmentPlus: Boolean
 
     var modalities: List<Modality>
-    var subjectsDownSyncSetting: SubjectsDownSyncSetting
+    var eventDownSyncSetting: EventDownSyncSetting
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
     var captureFingerprintStrategy: CaptureFingerprintStrategy
     var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
     var scannerGenerations: List<ScannerGeneration>
+    var fingerprintLiveFeedbackOn: Boolean
     var fingerprintQualityThreshold: Int
     var apiBaseUrl: String
 

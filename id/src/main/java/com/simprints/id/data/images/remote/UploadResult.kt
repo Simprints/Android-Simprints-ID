@@ -12,7 +12,7 @@ import com.simprints.id.data.images.model.SecuredImageRef
  */
 data class UploadResult(val image: SecuredImageRef, val status: Status) {
 
-    fun isSuccessful() = status == Status.SUCCESSFUL
+    fun isUploadSuccessful() = status == Status.SUCCESSFUL
 
     enum class Status {
         SUCCESSFUL,

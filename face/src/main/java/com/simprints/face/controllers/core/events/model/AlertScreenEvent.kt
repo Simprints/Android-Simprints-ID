@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.session.domain.models.events.AlertScreenEvent as CoreAlertScreenEvent
+import com.simprints.id.data.db.event.domain.models.AlertScreenEvent as CoreAlertScreenEvent
 
 @Keep
 class AlertScreenEvent(

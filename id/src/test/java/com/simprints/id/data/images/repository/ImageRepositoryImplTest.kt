@@ -47,12 +47,14 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun withNotAllFilesValid_shouldNotConsiderUploadOperationSuccessful() = runBlockingTest {
-        configureLocalImageFiles(includeInvalidFile = true)
+    fun shouldDeleteAnImageAfterTheUpload() = runBlockingTest {
+        configureLocalImageFiles(includeInvalidFile = false)
 
         val successful = repository.uploadStoredImagesAndDelete()
 
-        assertThat(successful).isFalse()
+        verify(exactly = 3) { localDataSource.decryptImage(any()) }
+        verify(exactly = 3) { localDataSource.deleteImage(any()) }
+        assertThat(successful).isTrue()
     }
 
     @Test
@@ -71,6 +73,16 @@ internal class ImageRepositoryImplTest {
         repository.deleteStoredImages()
 
         verify(exactly = 5) { localDataSource.deleteImage(any()) }
+    }
+
+    @Test
+    fun shouldGetImagesCount() {
+        val nImagesInLocal = 5
+        configureLocalImageFiles(numberOfValidFiles = nImagesInLocal, includeInvalidFile = false)
+
+        val imageCount = repository.getNumberOfImagesToUpload()
+
+        assertThat(imageCount).isEqualTo(nImagesInLocal)
     }
 
     private fun initialiseMocks() {

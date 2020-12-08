@@ -150,9 +150,11 @@ class CollectFingerprintsActivity : FingerprintActivity() {
                     vm.handleRestart()
                 })
                 .create().also { it.show() }
-        } else {
+        } else if (!isShowingConfirmDialog) {
             confirmDialog?.let { if (it.isShowing) it.dismiss() }
             null
+        } else {
+            confirmDialog
         }
     }
 

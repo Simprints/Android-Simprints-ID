@@ -4,5 +4,5 @@ data class TestProject(val id: String,
                        val name: String,
                        val description: String,
                        val creator: String,
-                       val legacyId: String,
+                       val imageBucket: String,
                        val secret: String)
