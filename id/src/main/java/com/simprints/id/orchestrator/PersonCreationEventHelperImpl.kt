@@ -18,14 +18,20 @@ import kotlinx.coroutines.flow.toList
 
 class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
                                     val timeHelper: TimeHelper,
-                                    val encodingUtils: EncodingUtils) : PersonCreationEventHelper {
+                                    private val encodingUtils: EncodingUtils) : PersonCreationEventHelper {
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
-        val faceCaptureResponses = steps.filterIsInstance<FaceCaptureResponse>()
-        val fingerprintCaptureResponses = steps.filterIsInstance<FingerprintCaptureResponse>()
-        val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponses)
-        val faceSamples = extractFaceSamples(faceCaptureResponses)
-        addPersonCreationEvent(fingerprintSamples, faceSamples)
+        val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+        val personCreationEventInSession = eventRepository.loadEvents(currentSession.id).filterIsInstance<PersonCreationEvent>().toList()
+        // If a personCreationEvent is already in the current session,
+        // we don' want to add it again (the capture steps would still be the same)
+        if (personCreationEventInSession.isEmpty()) {
+            val faceCaptureResponses = steps.filterIsInstance<FaceCaptureResponse>()
+            val fingerprintCaptureResponses = steps.filterIsInstance<FingerprintCaptureResponse>()
+            val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponses)
+            val faceSamples = extractFaceSamples(faceCaptureResponses)
+            addPersonCreationEvent(fingerprintSamples, faceSamples)
+        }
     }
 
     private fun extractFingerprintSamples(responses: List<FingerprintCaptureResponse>) =
@@ -80,19 +86,28 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
     private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
         captureEvents: List<FingerprintCaptureEvent>,
         personTemplates: List<String>?
-    ): List<String> =
+    ): List<String>? =
         captureEvents
             .filter {
                 personTemplates?.contains(it.payload.fingerprint?.template) ?: false
                     && it.payload.result != SKIPPED
             }.map { it.id }
+            .nullIfEmpty()
 
     private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
         captureEvents: List<FaceCaptureEvent>,
         personTemplates: List<String>?
-    ): List<String> =
+    ): List<String>? =
         captureEvents
             .filter {
                 personTemplates?.contains(it.payload.face?.template) ?: false
             }.map { it.id }
+            .nullIfEmpty()
+
+    private fun List<String>.nullIfEmpty() =
+        if (this.isNotEmpty()) {
+            this
+        } else {
+            null
+        }
 }

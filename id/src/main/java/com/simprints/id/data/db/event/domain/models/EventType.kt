@@ -1,5 +1,8 @@
 package com.simprints.id.data.db.event.domain.models
 
+import androidx.annotation.Keep
+
+@Keep
 enum class EventType {
 
     // a constant key is required to serialise/deserialize

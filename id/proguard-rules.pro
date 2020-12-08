@@ -60,7 +60,12 @@
 # These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
 -keep class com.simprints.fingerprintmatcher.** { *; }
+-keep class com.simprints.id.data.db.event.remote.models.** { *; }
+-keep class com.simprints.id.data.db.event.domain.models.** { *; }
+-keep class com.simprints.id.data.db.event.local.** { *; }
+
 -dontwarn com.simprints.fingerprintmatcher.**
+
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
@@ -108,3 +113,20 @@
 -dontwarn sun.misc.SignalHandler
 -dontwarn java.lang.instrument.Instrumentation
 -dontwarn sun.misc.Signal
+
+
+# Jackson
+# Proguard configuration for Jackson 2.x (fasterxml package instead of codehaus package)
+-keep class com.fasterxml.jackson.databind.ObjectMapper {
+    public <methods>;
+    protected <methods>;
+}
+-keep class com.fasterxml.jackson.databind.ObjectWriter {
+    public ** writeValueAsString(**);
+}
+-keepnames class com.fasterxml.jackson.** { *; }
+-dontwarn com.fasterxml.jackson.databind.**
+
+#net.zetetic:android-database-sqlcipher
+-keep class net.sqlcipher.** { *; }
+
