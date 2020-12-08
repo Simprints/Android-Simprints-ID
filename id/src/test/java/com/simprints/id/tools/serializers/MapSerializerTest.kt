@@ -1,6 +1,6 @@
 package com.simprints.id.tools.serializers
 
-import com.google.gson.Gson
+import com.simprints.core.tools.json.JsonHelper
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert
@@ -18,7 +18,7 @@ class MapSerializerTest {
 
     private val intSerializer: Serializer<Int> = mockIntSerializer()
     private val booleanSerializer: Serializer<Boolean> = mockBooleanSerializer()
-    private val mapSerializer = MapSerializer(intSerializer, booleanSerializer, Gson())
+    private val mapSerializer = MapSerializer(intSerializer, booleanSerializer, JsonHelper())
 
     private fun mockIntSerializer(): Serializer<Int> {
         val serializer = mockk<Serializer<Int>>()

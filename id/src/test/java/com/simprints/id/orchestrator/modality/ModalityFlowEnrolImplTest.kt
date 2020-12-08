@@ -2,10 +2,11 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.*
+import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -18,7 +19,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -44,7 +45,7 @@ class ModalityFlowEnrolImplTest {
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
-    private val timeHelper = TimeHelperImpl()
+    private val timeHelper = TestTimeHelperImpl()
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
@@ -52,7 +53,7 @@ class ModalityFlowEnrolImplTest {
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var consentStepMock: Step
     @MockK lateinit var setupStepMock: Step
-    @MockK lateinit var sessionRepository: SessionRepository
+    @MockK lateinit var eventRepository: EventRepository
 
     @Before
     fun setUp() {
@@ -211,7 +212,7 @@ class ModalityFlowEnrolImplTest {
                                        modalities: List<Modality>,
                                        isEnrolmentPlus: Boolean = false) {
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, sessionRepository, consentRequired, locationRequired = true,
+            coreStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired = true,
             modalities = modalities, projectId = PROJECT_ID, deviceId = "deviceId",
             isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
     }

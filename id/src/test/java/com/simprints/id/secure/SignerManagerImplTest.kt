@@ -4,16 +4,16 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.session.SessionRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
-import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
+import com.simprints.id.services.sync.SyncManager
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
@@ -30,10 +30,10 @@ class SignerManagerImplTest {
     @MockK lateinit var mockLoginInfoManager: LoginInfoManager
     @MockK lateinit var mockPreferencesManager: PreferencesManager
     @MockK lateinit var mockSyncManager: SyncManager
-    @MockK lateinit var mockSubjectsSyncManager: SubjectsSyncManager
+    @MockK lateinit var mockEventSyncManager: EventSyncManager
     @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
     @MockK lateinit var mockLongConsentRepository: LongConsentRepository
-    @MockK lateinit var mockSessionRepository: SessionRepository
+    @MockK lateinit var mockEventRepository: EventRepository
     @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
     @MockK lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
 
@@ -50,11 +50,11 @@ class SignerManagerImplTest {
             mockRemoteDbManager,
             mockLoginInfoManager,
             mockPreferencesManager,
-            mockSubjectsSyncManager,
+            mockEventSyncManager,
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
-            mockSessionRepository,
+            mockEventRepository,
             mockBaseUrlProvider,
             mockRemoteConfigWrapper
         )
@@ -191,7 +191,7 @@ class SignerManagerImplTest {
     fun signOut_sessionRepositorySignsOut() = runBlockingTest {
         signerManager.signOut()
 
-        coVerify(exactly = 1) { mockSessionRepository.signOut() }
+        coVerify(exactly = 1) { mockEventRepository.signOut() }
     }
 
     @Test
@@ -259,6 +259,6 @@ class SignerManagerImplTest {
     private fun verifyUpSyncGotPaused() = verify { mockSyncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() = verify { mockLoginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockSubjectsSyncManager.deleteSyncInfo() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 }

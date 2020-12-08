@@ -21,7 +21,7 @@ import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
 
 open class SettingsPreferencesManagerImpl(
@@ -31,7 +31,7 @@ open class SettingsPreferencesManagerImpl(
     modalitySerializer: Serializer<List<Modality>>,
     languagesStringArraySerializer: Serializer<Array<String>>,
     moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-    subjectsDownSyncSettingSerializer: Serializer<SubjectsDownSyncSetting>,
+    eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
@@ -231,13 +231,13 @@ open class SettingsPreferencesManagerImpl(
             modalitySerializer
         )
 
-    override var subjectsDownSyncSetting: SubjectsDownSyncSetting
+    override var eventDownSyncSetting: EventDownSyncSetting
         by RemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
             PEOPLE_DOWN_SYNC_SETTING_KEY,
             PEOPLE_DOWN_SYNC_SETTING_DEFAULT,
-            subjectsDownSyncSettingSerializer
+            eventDownSyncSettingSerializer
         )
 
     override var fingerprintsToCollect: List<FingerIdentifier>
@@ -282,6 +282,14 @@ open class SettingsPreferencesManagerImpl(
             SCANNER_GENERATIONS_KEY,
             SCANNER_GENERATIONS_DEFAULT,
             scannerGenerationsSerializer
+        )
+
+    override var fingerprintLiveFeedbackOn: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            FINGERPRINT_LIVE_FEEDBACK_ON_KEY,
+            FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT
         )
 
     override var fingerprintQualityThreshold: Int
@@ -392,10 +400,10 @@ open class SettingsPreferencesManagerImpl(
         const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
 
         const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
 
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
@@ -410,7 +418,7 @@ open class SettingsPreferencesManagerImpl(
         const val ENROLMENT_PLUS_DEFAULT = false
 
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
-        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = SubjectsDownSyncSetting.ON
+        val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
@@ -429,6 +437,9 @@ open class SettingsPreferencesManagerImpl(
 
         val SCANNER_GENERATIONS_DEFAULT = listOf(ScannerGeneration.VERO_1)
         const val SCANNER_GENERATIONS_KEY = "ScannerGenerations"
+
+        const val FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT = false
+        const val FINGERPRINT_LIVE_FEEDBACK_ON_KEY = "FingerprintLiveFeedbackOn"
 
         const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60
         const val FINGERPRINT_QUALITY_THRESHOLD_KEY = "FingerprintQualityThreshold"

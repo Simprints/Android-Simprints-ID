@@ -15,14 +15,14 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplay
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.internal.SubjectsSyncCache
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import dagger.Module
 import dagger.Provides
@@ -47,17 +47,17 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDashboardSyncCardStateRepository(
-        subjectsSyncManager: SubjectsSyncManager,
+        eventSyncManager: EventSyncManager,
         deviceManager: DeviceManager,
         preferencesManager: PreferencesManager,
-        syncScopeRepository: SubjectsDownSyncScopeRepository,
-        cacheSync: SubjectsSyncCache,
+        downSyncScopeRepository: EventDownSyncScopeRepository,
+        cacheSync: EventSyncCache,
         timeHelper: TimeHelper
     ): DashboardSyncCardStateRepository = DashboardSyncCardStateRepositoryImpl(
-        subjectsSyncManager,
+        eventSyncManager,
         deviceManager,
         preferencesManager,
-        syncScopeRepository,
+        downSyncScopeRepository,
         cacheSync,
         timeHelper
     )
@@ -96,8 +96,8 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDashboardSyncCardDisplayer(
-        timeHelper: TimeHelper,
-        ctx: Context
+            timeHelper: TimeHelper,
+            ctx: Context
     ): DashboardSyncCardDisplayer =
         DashboardSyncCardDisplayerImpl(timeHelper)
 

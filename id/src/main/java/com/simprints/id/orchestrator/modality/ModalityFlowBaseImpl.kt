@@ -1,15 +1,10 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.session.SessionRepository
-import com.simprints.id.data.db.session.domain.models.events.PersonCreationEvent
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -22,14 +17,13 @@ import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitForm
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.ignoreException
+import com.simprints.id.tools.time.TimeHelper
 
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
-                                    private val sessionRepository: SessionRepository,
+                                    private val eventRepository: EventRepository,
                                     private val consentRequired: Boolean,
                                     private val locationRequired: Boolean,
                                     private val modalities: List<Modality>,
@@ -115,48 +109,5 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun completeAllSteps() {
         steps.forEach { it.setStatus(Step.Status.COMPLETED) }
-    }
-    
-    suspend fun extractFingerprintAndAddPersonCreationEvent(fingerprintCaptureResponse: FingerprintCaptureResponse) {
-        val fingerprintSamples = extractFingerprintSamples(fingerprintCaptureResponse)
-        addPersonCreationEventForFingerprintSamples(fingerprintSamples)
-    }
-
-    suspend fun extractFaceAndAddPersonCreationEvent(faceCaptureResponse: FaceCaptureResponse) {
-        val faceSamples = extractFaceSamples(faceCaptureResponse)
-        addPersonCreationEventForFaceSamples(faceSamples)
-    }
-
-    private fun extractFingerprintSamples(result: FingerprintCaptureResponse) =
-        result.captureResult.mapNotNull { captureResult ->
-            val fingerId = captureResult.identifier
-            captureResult.sample?.let { sample ->
-                FingerprintSample(fingerId, sample.template, sample.templateQualityScore)
-            }
-        }
-
-    private fun extractFaceSamples(response: FaceCaptureResponse) =
-        response.capturingResult.mapNotNull { captureResult ->
-            captureResult.result?.let {
-                FaceSample(it.template)
-            }
-        }
-
-    private suspend fun addPersonCreationEventForFingerprintSamples(fingerprintSamples: List<FingerprintSample>) {
-        ignoreException {
-            sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples, faceSamples = null)
-                it.addEvent(event)
-            }
-        }
-    }
-
-    private suspend fun addPersonCreationEventForFaceSamples(faceSamples: List<FaceSample>) {
-        ignoreException {
-            sessionRepository.updateCurrentSession {
-                val event = PersonCreationEvent.build(timeHelper, it, fingerprintSamples = null, faceSamples = faceSamples)
-                it.addEvent(event)
-            }
-        }
     }
 }

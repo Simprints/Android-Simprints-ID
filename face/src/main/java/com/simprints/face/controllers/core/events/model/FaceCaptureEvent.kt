@@ -4,9 +4,9 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.detection.Face as DetectionFace
-import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent as CoreFaceCaptureEvent
-import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent.Face as CoreFaceCaptureEventFace
-import com.simprints.id.data.db.session.domain.models.events.FaceCaptureEvent.Result as CoreFaceCaptureEventResult
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
+import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
 
 @Keep
 class FaceCaptureEvent(

@@ -1,89 +1,117 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.subjects_sync.down.SubjectsDownSyncScopeRepository
+import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.toList
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class SyncInformationViewModel(private val personRepository: SubjectRepository,
-                               private val subjectLocalDataSource: SubjectLocalDataSource,
+class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
+                               private val eventRepository: EventRepository,
+                               private val subjectRepository: SubjectRepository,
                                private val preferencesManager: PreferencesManager,
                                private val projectId: String,
-                               private val subjectsDownSyncScopeRepository: SubjectsDownSyncScopeRepository) : ViewModel() {
+                               private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+                               private val imageRepository: ImageRepository,
+                               private val eventSyncManager: EventSyncManager) : ViewModel() {
 
-    val localRecordCountLiveData = MutableLiveData<Int>()
-    val recordsToUpSyncCountLiveData = MutableLiveData<Int>()
-    val recordsToDownSyncCountLiveData = MutableLiveData<Int>()
-    val recordsToDeleteCountLiveData = MutableLiveData<Int>()
-    val selectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
-    val unselectedModulesCountLiveData = MutableLiveData<List<ModuleCount>>()
-
-    fun fetchRecordsInfo() {
-        viewModelScope.launch {
-            fetchAndUpdateLocalRecordCount()
-            fetchAndUpdateRecordsToUpSyncCount()
-            fetchRecordsToUpdateAndDeleteCountIfNecessary()
-            fetchAndUpdateSelectedModulesCount()
-            fetchAndUpdatedUnselectedModulesCount()
+    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> =
+        eventSyncManager.getLastSyncState().map { it.isRunning() }.switchMap { isRunning ->
+            MutableLiveData<SyncInformationActivity.ViewState>().apply {
+                viewModelScope.launch {
+                    if (isRunning) {
+                        value = LoadingState.Syncing
+                    } else {
+                        value = LoadingState.Calculating
+                        value = fetchRecords()
+                    }
+                }
+            }
         }
+
+    private suspend fun fetchRecords(): SyncDataFetched {
+        val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
+        return SyncDataFetched(
+            recordsInLocal = fetchLocalRecordCount(),
+            recordsToDownSync = subjectCounts?.toCreate,
+            recordsToUpSync = fetchAndUpdateRecordsToUpSyncCount(),
+            recordsToDelete = subjectCounts?.toDelete,
+            imagesToUpload = fetchAndUpdateImagesToUploadCount(),
+            moduleCounts = fetchAndUpdateSelectedModulesCount()
+        )
     }
 
-    internal suspend fun fetchAndUpdateLocalRecordCount() {
-        localRecordCountLiveData.value = subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId))
-    }
+    private suspend fun fetchLocalRecordCount() =
+        subjectRepository.count(SubjectQuery(projectId = projectId))
 
-    internal suspend fun fetchAndUpdateRecordsToUpSyncCount() {
-        recordsToUpSyncCountLiveData.value = subjectLocalDataSource.count(SubjectLocalDataSource.Query(toSync = true))
-    }
+    private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
-    internal suspend fun fetchRecordsToUpdateAndDeleteCountIfNecessary() {
-        if(isDownSyncAllowed()) {
+    private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
+        eventRepository.localCount(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION))
+
+    private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
+        if (isDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
+        } else {
+            null
         }
-    }
 
-    private fun isDownSyncAllowed() = with(preferencesManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
-    }
+    private fun isDownSyncAllowed() =
+        with(preferencesManager) {
+            this.eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
+        }
 
-    internal suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() {
+
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
-            val downSyncScope = subjectsDownSyncScopeRepository.getDownSyncScope()
-            val counts = personRepository.countToDownSync(downSyncScope)
-            recordsToDownSyncCountLiveData.postValue(counts.created)
-            recordsToDeleteCountLiveData.postValue(counts.deleted)
+            val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope()
+            var creationsToDownload = 0
+            var deletionsToDownload = 0
+
+            downSyncScope.operations.forEach {
+                val counts = downySyncHelper.countForDownSync(it)
+                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count ?: 0
+                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count ?: 0
+            }
+
+            DownSyncCounts(creationsToDownload, deletionsToDownload)
+
         } catch (t: Throwable) {
-            t.printStackTrace()
+            Timber.d(t)
+            null
         }
-    }
 
-    internal suspend fun fetchAndUpdateSelectedModulesCount() {
-        selectedModulesCountLiveData.value = preferencesManager.selectedModules.map {
+    private suspend fun fetchAndUpdateSelectedModulesCount() =
+        preferencesManager.selectedModules.map {
             ModuleCount(it,
-                subjectLocalDataSource.count(SubjectLocalDataSource.Query(projectId = projectId, moduleId = it)))
+                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it)))
+        }
+
+
+    private fun EventSyncState.isRunning(): Boolean {
+        val downSyncStates = downSyncWorkersInfo
+        val upSyncStates = upSyncWorkersInfo
+        val allSyncStates = downSyncStates + upSyncStates
+        return allSyncStates.any {
+            it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued
         }
     }
 
-    internal suspend fun fetchAndUpdatedUnselectedModulesCount() {
-        val unselectedModules = subjectLocalDataSource.load(
-            SubjectLocalDataSource.Query(projectId = projectId)
-        ).filter { !preferencesManager.selectedModules.contains(it.moduleId) }
-            .toList()
-            .groupBy { it.moduleId }
-
-        val unselectedModulesWithCount = unselectedModules.map {
-            ModuleCount(it.key, it.value.size)
-        }
-
-        unselectedModulesCountLiveData.value = unselectedModulesWithCount
-    }
+    data class DownSyncCounts(val toCreate: Int, val toDelete: Int)
 }

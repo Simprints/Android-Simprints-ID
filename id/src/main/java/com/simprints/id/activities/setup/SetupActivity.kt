@@ -14,6 +14,7 @@ import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
@@ -24,18 +25,19 @@ import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
-import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_setup.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -45,12 +47,12 @@ import kotlin.concurrent.schedule
 import kotlin.math.min
 
 @ExperimentalCoroutinesApi
-class SetupActivity: BaseSplitActivity() {
+class SetupActivity : BaseSplitActivity() {
 
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
+    @Inject lateinit var eventRepository: EventRepository
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
@@ -64,7 +66,8 @@ class SetupActivity: BaseSplitActivity() {
         injectDependencies()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
-        setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE)
+            ?: throw InvalidAppRequest()
         splitInstallManager = SplitInstallManagerFactory.create(this)
 
         viewModel.start(splitInstallManager, getRequiredModules())
@@ -87,7 +90,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun observeViewState() {
         viewModel.getViewStateLiveData().observe(this, Observer {
-            when(it) {
+            when (it) {
                 StartingDownload -> updateUiForDownloadStarting()
                 is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(it.state)
                 is Downloading -> {
@@ -111,7 +114,7 @@ class SetupActivity: BaseSplitActivity() {
 
     private fun launchAlertIfNecessary() {
         lifecycleScope.launchWhenResumed {
-            if(splitInstallManager.requestSessionStates().last().status() != REQUIRES_USER_CONFIRMATION) {
+            if (splitInstallManager.requestSessionStates().lastOrNull()?.status() != REQUIRES_USER_CONFIRMATION) {
                 launchAlert(this@SetupActivity, AlertType.OFFLINE_DURING_SETUP)
             }
         }
@@ -120,16 +123,24 @@ class SetupActivity: BaseSplitActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
+        when (requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    lifecycleScope.launch {
-                        storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
-                    }
+                    collectLocationInBackground()
                 }
             }
         }
         setResultAndFinish(SETUP_COMPLETE_FLAG)
+    }
+
+    private fun collectLocationInBackground() {
+        inBackground(Dispatchers.Main) {
+            try {
+                storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+            } catch (t: Throwable) {
+                Timber.d(t)
+            }
+        }
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
@@ -146,9 +157,9 @@ class SetupActivity: BaseSplitActivity() {
     private fun performPermissionActionsAndFinish() {
         lifecycleScope.launch {
             Timber.d("Adding location to session")
-            storeUserLocationIntoCurrentSession(locationManager, sessionRepository, crashReportManager)
+            collectLocationInBackground()
+            setResultAndFinish(SETUP_COMPLETE_FLAG)
         }
-        setResultAndFinish(SETUP_COMPLETE_FLAG)
     }
 
     private fun setResultAndFinish(setupCompleteFlag: Boolean) {
@@ -161,7 +172,7 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     private fun updateUiForDownloadStarting() {
-        with(modalityDownloadText){
+        with(modalityDownloadText) {
             text = getString(R.string.modality_starting_download)
             isVisible = true
         }
@@ -199,7 +210,7 @@ class SetupActivity: BaseSplitActivity() {
     }
 
     private fun updateUiForDownloadTakingLonger() {
-        with(modalityDownloadText){
+        with(modalityDownloadText) {
             text = getString(R.string.modality_download_taking_longer)
             isVisible = true
         }
@@ -212,21 +223,21 @@ class SetupActivity: BaseSplitActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode) {
+        when (requestCode) {
             MODALITIES_DOWNLOAD_REQUEST_CODE -> handleModalityDownloadResult(resultCode)
             InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
         }
     }
 
     private fun handleModalityDownloadResult(resultCode: Int) {
-        if(resultCode == Activity.RESULT_CANCELED) {
+        if (resultCode == Activity.RESULT_CANCELED) {
             launchAlert(this, AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED)
         }
     }
 
     private fun handleAlertResponse(data: Intent?) {
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
-            when(it.buttonAction) {
+            when (it.buttonAction) {
                 CLOSE -> setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
                 TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(splitInstallManager, getRequiredModules())
             }
@@ -237,7 +248,7 @@ class SetupActivity: BaseSplitActivity() {
         min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
 
     private fun updateUiForModalitiesInstalling() {
-        with(modalityDownloadText){
+        with(modalityDownloadText) {
             text = getString(R.string.modality_installing)
             isVisible = true
         }
@@ -261,12 +272,12 @@ class SetupActivity: BaseSplitActivity() {
 
     sealed class ViewState {
         object StartingDownload : ViewState()
-        class RequiresUserConfirmationToDownload(val state: SplitInstallSessionState): ViewState()
-        class Downloading(val bytesDownloaded: Long, val totalBytesToDownload: Long): ViewState()
+        class RequiresUserConfirmationToDownload(val state: SplitInstallSessionState) : ViewState()
+        class Downloading(val bytesDownloaded: Long, val totalBytesToDownload: Long) : ViewState()
         object ModalitiesInstalling : ViewState()
         object ModalitiesInstalled : ViewState()
-        object DeviceOnline: ViewState()
-        object DeviceOffline: ViewState()
+        object DeviceOnline : ViewState()
+        object DeviceOffline : ViewState()
     }
 
     companion object {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="configuration_error_title">Erro de configuração</string>
+    <string name="invalid_projectId_message">Ocorreu um erro de configuração (ID do projeto inválido), entre em contacto com o administrador do sistema</string>
+    <string name="invalid_selectedId_message">Ocorreu um erro de configuração (ID selecionado inválido), entre em contacto com o administrador do sistema</string>
+    <string name="invalid_sessionId_message">Ocorreu um erro de configuração (ID de sessão inválida), entre em contacto com o administrador do sistema</string>
+    <string name="different_projectId_message">Ocorreu um erro de configuração (ID de projecto diferente), saia da tela inicial ou entre em contacto com o administrador do sistema</string>
+    <string name="different_userId_message">Ocorreu um erro de configuração (ID de usuário diferente), saia da tela inicial ou entre em contacto com o administrador do sistema</string>
+    <string name="invalid_intentAction_message">Ocorreu um erro de configuração (ação de intenção inválida), entre em contacto com o administrador do sistema</string>
+    <string name="invalid_metadata_message">Ocorreu um erro de configuração (metadados inválidos), entre em contacto com o administrador do sistema</string>
+    <string name="invalid_userId_message">Ocorreu um erro de configuração (ID de usuário inválido), entre em contacto com o administrador do sistema</string>
+    <string name="invalid_moduleId_message">Ocorreu um erro de configuração (ID do módulo inválido), entre em contacto com o administrador do sistema</string>
+    <string name="invalid_verifyId_message">Ocorreu um erro de configuração (inválido verificar GUID), entre em contacto com o administrador do sistema</string>
+    <string name="rooted_device_title">Dispositivo enraizado detectado</string>
+    <string name="guid_selection_data_sent">Dados enviados</string>
+    <string name="configuration_error_message">Ocorreu um erro de configuração (%1$s), entre em contacto com o administrador do sistema</string>
+    <string name="rooted_device_message">1. Contacte o seu supervisor - dispositivo enraizado detectado
+\n2. Toque em Fechar</string>
+    <string name="guid_selection_result_sent">Resultado enviado</string>
+    <string name="close">FECHAR</string>
+</resources>

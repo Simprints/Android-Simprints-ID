@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import com.simprints.face.exceptions.FaceUnexpectedException
-import com.simprints.id.data.db.session.domain.models.events.Matcher as CoreMatcher
+import com.simprints.id.data.db.event.domain.models.Matcher as CoreMatcher
 
 enum class Matcher {
     RANK_ONE, UNKNOWN;

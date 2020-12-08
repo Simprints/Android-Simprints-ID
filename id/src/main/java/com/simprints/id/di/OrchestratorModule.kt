@@ -6,7 +6,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -27,8 +27,8 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -88,7 +88,7 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         preferenceManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
@@ -98,7 +98,7 @@ class OrchestratorModule {
             faceStepProcessor,
             coreStepProcessor,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
             preferenceManager.modalities,
@@ -115,7 +115,7 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         preferenceManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
@@ -125,7 +125,7 @@ class OrchestratorModule {
             faceStepProcessor,
             coreStepProcessor,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
             preferenceManager.modalities,
@@ -141,7 +141,7 @@ class OrchestratorModule {
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
         prefs: PreferencesManager,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         loginInfoManager: LoginInfoManager,
         ctx: Context
     ): ModalityFlow =
@@ -151,7 +151,7 @@ class OrchestratorModule {
             coreStepProcessor,
             prefs.matchGroup,
             timeHelper,
-            sessionRepository,
+            eventRepository,
             prefs.consentRequired,
             prefs.locationPermissionRequired,
             prefs.modalities,
@@ -181,34 +181,36 @@ class OrchestratorModule {
         modalityFlowFactory: ModalityFlowFactory,
         appResponseFactory: AppResponseFactory,
         hotCache: HotCache,
-        dashboardDailyActivityRepository: DashboardDailyActivityRepository
+        dashboardDailyActivityRepository: DashboardDailyActivityRepository,
+        personCreationEventHelper: PersonCreationEventHelper
     ): OrchestratorManagerImpl = OrchestratorManagerImpl(
         modalityFlowFactory,
         appResponseFactory,
         hotCache,
-        dashboardDailyActivityRepository
+        dashboardDailyActivityRepository,
+        personCreationEventHelper
     )
 
     @Provides
     fun provideOrchestratorEventsHelper(
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
-        OrchestratorEventsHelperImpl(sessionRepository, timeHelper)
+        OrchestratorEventsHelperImpl(eventRepository, timeHelper)
 
     @Provides
     fun provideOrchestratorViewModelFactory(
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
         preferenceManager: PreferencesManager,
-        sessionRepository: SessionRepository,
+        eventRepository: EventRepository,
         crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
-            sessionRepository,
+            eventRepository,
             DomainToModuleApiAppResponse,
             crashReportManager
         )

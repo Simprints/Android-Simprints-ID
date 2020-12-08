@@ -12,15 +12,15 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState.Calculating
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState.Syncing
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.subjects.master.SubjectsSyncManager
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.EXTRA
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsDownSyncSetting.ON
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncState
-import com.simprints.id.services.scheduledSync.subjects.master.models.SubjectsSyncWorkerState
+import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 
@@ -28,14 +28,12 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var subjectsSyncManager: SubjectsSyncManager
+    @Inject lateinit var eventSyncManager: EventSyncManager
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
-    private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
 
     private lateinit var viewModel: SyncInformationViewModel
     private lateinit var selectedModulesTabSpec: TabHost.TabSpec
-    private lateinit var unselectedModulesTabSpec: TabHost.TabSpec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,9 +58,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     override fun onResume() {
         super.onResume()
-        clearValues()
         setFocusOnDefaultModulesTab()
-        fetchRecordsInfo()
     }
 
     private fun setTextInLayout() {
@@ -76,6 +72,7 @@ class SyncInformationActivity : BaseSplitActivity() {
             getString(R.string.sync_info_records_to_delete)
         totalRecordsOnDeviceText.text =
             getString(R.string.sync_info_total_records_on_device)
+        imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -93,6 +90,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         recordsToDownloadCount.text = getString(R.string.empty)
         totalRecordsCount.text = getString(R.string.empty)
         recordsToDeleteCount.text = getString(R.string.empty)
+        imagesToUploadCount.text = getString(R.string.empty)
     }
 
     private fun setFocusOnDefaultModulesTab() {
@@ -114,11 +112,6 @@ class SyncInformationActivity : BaseSplitActivity() {
             adapter = moduleCountAdapterForSelected
             layoutManager = LinearLayoutManager(applicationContext)
         }
-
-        with(unselectedModulesView) {
-            adapter = moduleCountAdapterForUnselected
-            layoutManager = LinearLayoutManager(applicationContext)
-        }
     }
 
     private fun isModuleSyncAndModuleIdOptionsNotEmpty() =
@@ -136,10 +129,6 @@ class SyncInformationActivity : BaseSplitActivity() {
             .setIndicator(getString(R.string.sync_info_selected_modules))
             .setContent(R.id.selectedModulesView)
 
-        unselectedModulesTabSpec = modulesTabHost.newTabSpec(UNSELECTED_MODULES_TAB_TAG)
-            .setIndicator(getString(R.string.sync_info_unselected_modules))
-            .setContent(R.id.unselectedModulesView)
-
         modulesTabHost.addTab(selectedModulesTabSpec)
     }
 
@@ -150,52 +139,10 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        observeLocalRecordCount()
-        observeUpSyncRecordCount()
-        observeDownSyncRecordCount()
-        observeDeleteRecordCount()
-        observeSelectedModules()
-        observeUnselectedModules()
-        observeForSyncState()
-    }
-
-    private fun observeLocalRecordCount() {
-        viewModel.localRecordCountLiveData.observe(this, Observer {
-            totalRecordsCount.text = it.toString()
-        })
-    }
-
-    private fun observeUpSyncRecordCount() {
-        viewModel.recordsToUpSyncCountLiveData.observe(this, Observer {
-            recordsToUploadCount.text = it.toString()
-        })
-    }
-
-    private fun observeDownSyncRecordCount() {
-        viewModel.recordsToDownSyncCountLiveData.observe(this, Observer {
-            recordsToDownloadCount.text = it.toString()
-        })
-    }
-
-    private fun observeDeleteRecordCount() {
-        viewModel.recordsToDeleteCountLiveData.observe(this, Observer {
-            recordsToDeleteCount.text = it.toString()
-        })
-    }
-
-    private fun observeSelectedModules() {
-        viewModel.selectedModulesCountLiveData.observe(this, Observer {
-            addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
-        })
-    }
-
-    private fun observeUnselectedModules() {
-        viewModel.unselectedModulesCountLiveData.observe(this, Observer {
-            if (it.isEmpty()) {
-                removeUnselectedModulesTab()
-            } else {
-                addUnselectedModulesTabIfNecessary()
-                addTotalRowAndSubmitList(it, moduleCountAdapterForUnselected)
+        viewModel.getViewStateLiveData().observe(this, Observer {
+            when(it) {
+                Syncing, Calculating -> showProgressOverlayAndClearValuesIfNecessary(it as ViewState.LoadingState)
+                is ViewState.SyncDataFetched -> hideProgressAndShowSyncData(it)
             }
         })
     }
@@ -203,14 +150,31 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun setupProgressOverlay() {
         progressOverlayBackground.setOnTouchListener { _, _ -> true }
         progress_sync_overlay.setOnTouchListener { _, _ -> true }
-        progress_sync_overlay.text = getString(R.string.progress_sync_overlay)
         progressBar.setOnTouchListener { _, _ -> true }
+    }
+
+    private fun showProgressOverlayAndClearValuesIfNecessary(loadingState: ViewState.LoadingState) {
+        progress_sync_overlay.text = when (loadingState) {
+            Syncing -> getString(R.string.progress_sync_overlay)
+            Calculating -> getString(R.string.calculating_overlay)
+        }
+
+        if (!isProgressOverlayVisible()) {
+            clearValues()
+            group_progress_overlay.visibility = View.VISIBLE
+        }
     }
 
     private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
 
-    private fun showProgressOverlay() {
-        group_progress_overlay.visibility = View.VISIBLE
+    private fun hideProgressAndShowSyncData(it: ViewState.SyncDataFetched) {
+        hideProgressOverlay()
+        totalRecordsCount.text = it.recordsInLocal.toString()
+        recordsToUploadCount.text = it.recordsToUpSync.toString()
+        recordsToDownloadCount.text = it.recordsToDownSync?.toString() ?: ""
+        recordsToDeleteCount.text = it.recordsToDelete?.toString() ?: ""
+        imagesToUploadCount.text = it.imagesToUpload.toString()
+        addTotalRowAndSubmitList(it.moduleCounts, moduleCountAdapterForSelected)
     }
 
     private fun hideProgressOverlay() {
@@ -233,58 +197,32 @@ class SyncInformationActivity : BaseSplitActivity() {
         moduleCountAdapter.submitList(moduleCountsArray)
     }
 
-    private fun removeUnselectedModulesTab() {
-        with(modulesTabHost.tabWidget) {
-            removeView(getChildTabViewAt(UNSELECTED_MODULES_TAB_INDEX))
-        }
-    }
-
-    private fun addUnselectedModulesTabIfNecessary() {
-        if (modulesTabHost.tabWidget.tabCount != MAX_MODULES_TAB_COUNT) {
-            modulesTabHost.addTab(unselectedModulesTabSpec)
-        }
-    }
-
-    private fun observeForSyncState() {
-        subjectsSyncManager.getLastSyncState().observe(this, Observer { syncState ->
-            if (syncState.isRunning() && !isProgressOverlayVisible()) {
-                showProgressOverlay()
-            } else if (!syncState.isRunning() && isProgressOverlayVisible()) {
-                hideProgressOverlay()
-                fetchRecordsInfo()
-            }
-        })
-    }
-
-    private fun fetchRecordsInfo() {
-        viewModel.fetchRecordsInfo()
-    }
-
     private fun setupRecordsCountCards() {
-        if(!isDownSyncAllowed()) {
+        if (!isDownSyncAllowed()) {
             recordsToDownloadCardView.visibility = View.GONE
             recordsToDeleteCardView.visibility = View.GONE
         }
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
-        subjectsDownSyncSetting == ON || subjectsDownSyncSetting == EXTRA
+        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
-    private fun SubjectsSyncState.isRunning(): Boolean {
-        val downSyncStates = downSyncWorkersInfo
-        val upSyncStates = upSyncWorkersInfo
-        val allSyncStates = downSyncStates + upSyncStates
-        return allSyncStates.any {
-            it.state is SubjectsSyncWorkerState.Running || it.state is SubjectsSyncWorkerState.Enqueued
+    sealed class ViewState {
+        sealed class LoadingState: ViewState() {
+            object Syncing : LoadingState()
+            object Calculating : LoadingState()
         }
+        data class SyncDataFetched(val recordsInLocal: Int,
+                                   val recordsToDownSync: Int?,
+                                   val recordsToUpSync: Int,
+                                   val recordsToDelete: Int?,
+                                   val imagesToUpload: Int,
+                                   val moduleCounts: List<ModuleCount>): ViewState()
     }
 
     companion object {
         private const val SELECTED_MODULES_TAB_TAG = "SelectedModules"
-        private const val UNSELECTED_MODULES_TAB_TAG = "UnselectedModules"
-        private const val UNSELECTED_MODULES_TAB_INDEX = 1
-        private const val MAX_MODULES_TAB_COUNT = 2
         private const val TOTAL_RECORDS_INDEX = 0
     }
 }

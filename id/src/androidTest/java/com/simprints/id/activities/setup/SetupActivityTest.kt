@@ -8,7 +8,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.session.SessionRepository
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
@@ -36,7 +37,7 @@ class SetupActivityTest {
         private const val ACCURACY = 3.0f
     }
 
-    @RelaxedMockK lateinit var mockSessionRepository: SessionRepository
+    @RelaxedMockK lateinit var mockEventRepository: EventRepository
     @RelaxedMockK lateinit var mockLocationManager: LocationManager
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
@@ -46,7 +47,7 @@ class SetupActivityTest {
     private val appModule by lazy {
         TestAppModule(app,
             sessionEventsManagerRule = DependencyRule.ReplaceRule {
-                mockSessionRepository
+                mockEventRepository
             },
             locationManagerRule = DependencyRule.ReplaceRule {
                 mockLocationManager
@@ -66,6 +67,8 @@ class SetupActivityTest {
 
     @Test
     fun launchSetupActivityWithLocationPermissions_shouldAddLocationToSession() {
+        coEvery { mockEventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+
         val request = SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
         val intent = Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
@@ -75,7 +78,8 @@ class SetupActivityTest {
 
         ActivityScenario.launch<SetupActivity>(intent)
 
-        coVerify(exactly = 1) { mockSessionRepository.updateCurrentSession(any())}
+        coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent()}
+        coVerify(exactly = 1) { mockEventRepository.addEventToCurrentSession(any())}
     }
 
     private fun buildFakeLocation() = Location(PROVIDER).apply {

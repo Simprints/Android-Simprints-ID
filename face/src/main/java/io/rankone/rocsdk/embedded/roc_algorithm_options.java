@@ -9,22 +9,23 @@
 package io.rankone.rocsdk.embedded;
 
 public final class roc_algorithm_options {
-  public final static int ROC_FRONTAL = rocJNI.ROC_FRONTAL_get();
-  public final static int ROC_FULL = rocJNI.ROC_FULL_get();
-  public final static int ROC_PERIOCULAR = rocJNI.ROC_PERIOCULAR_get();
-  public final static int ROC_MANUAL = rocJNI.ROC_MANUAL_get();
-  public final static int ROC_ROLL = rocJNI.ROC_ROLL_get();
-  public final static int ROC_FR = rocJNI.ROC_FR_get();
-  public final static int ROC_FR_FAST = rocJNI.ROC_FR_FAST_get();
-  public final static int ROC_FR_PERIOCULAR = rocJNI.ROC_FR_PERIOCULAR_get();
-  public final static int ROC_TATTOO = rocJNI.ROC_TATTOO_get();
+  public final static int ROC_NO_ALGORITHM_OPTIONS = rocJNI.ROC_NO_ALGORITHM_OPTIONS_get();
+  public final static int ROC_STANDARD_REPRESENTATION = rocJNI.ROC_STANDARD_REPRESENTATION_get();
+  public final static int ROC_FAST_REPRESENTATION = rocJNI.ROC_FAST_REPRESENTATION_get();
+  public final static int ROC_PERIOCULAR_REPRESENTATION = rocJNI.ROC_PERIOCULAR_REPRESENTATION_get();
+  public final static int ROC_TATTOO_REPRESENTATION = rocJNI.ROC_TATTOO_REPRESENTATION_get();
+  public final static int ROC_FRONTAL_DETECTION = rocJNI.ROC_FRONTAL_DETECTION_get();
+  public final static int ROC_FULL_DETECTION = rocJNI.ROC_FULL_DETECTION_get();
+  public final static int ROC_PERIOCULAR_DETECTION = rocJNI.ROC_PERIOCULAR_DETECTION_get();
+  public final static int ROC_ROLL_DETECTION = rocJNI.ROC_ROLL_DETECTION_get();
+  public final static int ROC_PREFER_LARGER_DETECTIONS = rocJNI.ROC_PREFER_LARGER_DETECTIONS_get();
+  public final static int ROC_MANUAL_DETECTION = rocJNI.ROC_MANUAL_DETECTION_get();
   public final static int ROC_PAD_LOGO = rocJNI.ROC_PAD_LOGO_get();
   public final static int ROC_PITCHYAW = rocJNI.ROC_PITCHYAW_get();
-  public final static int ROC_DEMOGRAPHICS = rocJNI.ROC_DEMOGRAPHICS_get();
+  public final static int ROC_ANALYTICS = rocJNI.ROC_ANALYTICS_get();
   public final static int ROC_LANDMARKS = rocJNI.ROC_LANDMARKS_get();
   public final static int ROC_LIPS = rocJNI.ROC_LIPS_get();
   public final static int ROC_THUMBNAIL = rocJNI.ROC_THUMBNAIL_get();
-  public final static int ROC_INVALID = rocJNI.ROC_INVALID_get();
   public final static int ROC_SPOOF_FF = rocJNI.ROC_SPOOF_FF_get();
   public final static int ROC_SPOOF_AF = rocJNI.ROC_SPOOF_AF_get();
   public final static int ROC_SERIAL = rocJNI.ROC_SERIAL_get();

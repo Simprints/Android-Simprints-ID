@@ -1,9 +1,6 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
-import com.simprints.id.data.db.subject.domain.FaceSample.Companion.extractFaceSamplesFromBiometricReferences
-import com.simprints.id.data.db.subject.domain.FingerprintSample.Companion.extractFingerprintSamplesFromBiometricReferences
-import com.simprints.id.data.db.subject.domain.subjectevents.EnrolmentRecordCreationPayload
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -15,21 +12,8 @@ data class Subject(
     val moduleId: String,
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
-    var toSync: Boolean = true,
     var fingerprintSamples: List<FingerprintSample> = emptyList(),
-    var faceSamples: List<FaceSample> = emptyList()) : Parcelable {
+    var faceSamples: List<FaceSample> = emptyList(),
 
-    companion object {
-        fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
-            Subject(
-                subjectId = subjectId,
-                projectId = projectId,
-                attendantId = attendantId,
-                moduleId = moduleId,
-                toSync = false,
-                fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
-                faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
-            )
-        }
-    }
-}
+    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
+    val toSync: Boolean = false) : Parcelable

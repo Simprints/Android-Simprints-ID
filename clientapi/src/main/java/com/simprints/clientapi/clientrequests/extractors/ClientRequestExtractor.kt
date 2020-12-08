@@ -27,6 +27,6 @@ abstract class ClientRequestExtractor(private val intent: Intent) {
     protected open fun Intent.extractString(key: String): String = this.getStringExtra(key) ?: ""
 
     open fun getUnknownExtras(): Map<String, Any?> =
-        intent.extras?.toMap()?.filter { !expectedKeys.contains(it.key) } ?: emptyMap()
-
+        (intent.extras?.toMap()?.filter { it.key.isNotBlank() && !expectedKeys.contains(it.key) }
+            ?: emptyMap())
 }

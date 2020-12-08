@@ -18,10 +18,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
+import io.mockk.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -108,5 +105,6 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     @After
     fun tearDown() {
         stopKoin()
+        unmockkAll()
     }
 }

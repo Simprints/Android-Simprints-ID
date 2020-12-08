@@ -29,6 +29,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class LiveFeedbackFragmentViewModelTest {
+
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -144,9 +145,7 @@ class LiveFeedbackFragmentViewModelTest {
         coEvery { faceDetector.analyze(previewFrameMock) } returns validFace
         val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
         every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
-        val eventCapture: MutableList<Event> = mutableListOf()
         every { faceTimeHelper.now() } returnsMany (0..100L).toList()
-        every { faceSessionEventsManager.addEventInBackground(capture(eventCapture)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
@@ -189,57 +188,68 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(get(1).isFallback).isEqualTo(false)
         }
 
-        verify(atMost = 4) { faceSessionEventsManager.addEventInBackground(any()) }
-        with(eventCapture) {
-            with(get(0) as FaceFallbackCaptureEvent) {
-                assertThat(startTime).isEqualTo(0)
-                assertThat(endTime).isEqualTo(1)
-            }
-            with(get(1) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(2)
-                assertThat(endTime).isEqualTo(3)
-                assertThat(isFallback).isEqualTo(false)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(validFace.quality)
-                    assertThat(it.yaw).isEqualTo(validFace.yaw)
-                    assertThat(it.yaw).isEqualTo(validFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+        verifySequence {
+            faceSessionEventsManager.addEventInBackground(match {
+                with(it as FaceFallbackCaptureEvent) {
+                    assertThat(startTime).isEqualTo(0)
+                    assertThat(endTime).isEqualTo(1)
                 }
-            }
-            with(get(2) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(4)
-                assertThat(endTime).isEqualTo(5)
-                assertThat(isFallback).isEqualTo(false)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(validFace.quality)
-                    assertThat(it.yaw).isEqualTo(validFace.yaw)
-                    assertThat(it.yaw).isEqualTo(validFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(2)
+                    assertThat(endTime).isEqualTo(3)
+                    assertThat(isFallback).isEqualTo(false)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(validFace.quality)
+                        assertThat(it.yaw).isEqualTo(validFace.yaw)
+                        assertThat(it.yaw).isEqualTo(validFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                    }
                 }
-            }
-            with(get(3) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(0)
-                assertThat(endTime).isEqualTo(1)
-                assertThat(isFallback).isEqualTo(true)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(validFace.quality)
-                    assertThat(it.yaw).isEqualTo(validFace.yaw)
-                    assertThat(it.yaw).isEqualTo(validFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(4)
+                    assertThat(endTime).isEqualTo(5)
+                    assertThat(isFallback).isEqualTo(false)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(validFace.quality)
+                        assertThat(it.yaw).isEqualTo(validFace.yaw)
+                        assertThat(it.yaw).isEqualTo(validFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                    }
                 }
-            }
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(0)
+                    assertThat(endTime).isEqualTo(1)
+                    assertThat(isFallback).isEqualTo(true)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(validFace.quality)
+                        assertThat(it.yaw).isEqualTo(validFace.yaw)
+                        assertThat(it.yaw).isEqualTo(validFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                    }
+                }
+                true
+            })
         }
     }
 
@@ -263,9 +273,7 @@ class LiveFeedbackFragmentViewModelTest {
         )
         val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
         every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
-        val eventCapture: MutableList<Event> = mutableListOf()
         every { faceTimeHelper.now() } returnsMany (0..100L).toList()
-        every { faceSessionEventsManager.addEventInBackground(capture(eventCapture)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
@@ -309,51 +317,58 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(get(0).isFallback).isEqualTo(false)
         }
 
-        verify(atMost = 4) { faceSessionEventsManager.addEventInBackground(any()) }
-        with(eventCapture) {
-            with(get(0) as FaceFallbackCaptureEvent) {
-                assertThat(startTime).isEqualTo(0)
-                assertThat(endTime).isEqualTo(1)
-            }
-            with(get(1) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(2)
-                assertThat(endTime).isEqualTo(3)
-                assertThat(isFallback).isEqualTo(false)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(validFace.quality)
-                    assertThat(it.yaw).isEqualTo(validFace.yaw)
-                    assertThat(it.yaw).isEqualTo(validFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+        verifySequence {
+            faceSessionEventsManager.addEventInBackground(match {
+                it is FaceFallbackCaptureEvent && it.startTime == 0L && it.endTime == 1L
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(2)
+                    assertThat(endTime).isEqualTo(3)
+                    assertThat(isFallback).isEqualTo(false)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(validFace.quality)
+                        assertThat(it.yaw).isEqualTo(validFace.yaw)
+                        assertThat(it.yaw).isEqualTo(validFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                    }
                 }
-            }
-            with(get(2) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(4)
-                assertThat(endTime).isEqualTo(5)
-                assertThat(isFallback).isEqualTo(false)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.INVALID)
-                assertThat(eventFace).isNull()
-            }
-            with(get(3) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(0)
-                assertThat(endTime).isEqualTo(1)
-                assertThat(isFallback).isEqualTo(true)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(validFace.quality)
-                    assertThat(it.yaw).isEqualTo(validFace.yaw)
-                    assertThat(it.yaw).isEqualTo(validFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(4)
+                    assertThat(endTime).isEqualTo(5)
+                    assertThat(isFallback).isEqualTo(false)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.INVALID)
+                    assertThat(eventFace).isNull()
                 }
-            }
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(0)
+                    assertThat(endTime).isEqualTo(1)
+                    assertThat(isFallback).isEqualTo(true)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(validFace.quality)
+                        assertThat(it.yaw).isEqualTo(validFace.yaw)
+                        assertThat(it.yaw).isEqualTo(validFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                    }
+                    true
+                }
+            })
         }
     }
 
@@ -382,9 +397,7 @@ class LiveFeedbackFragmentViewModelTest {
         )
         val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
         every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
-        val eventCapture: MutableList<Event> = mutableListOf()
         every { faceTimeHelper.now() } returnsMany (0..100L).toList()
-        every { faceSessionEventsManager.addEventInBackground(capture(eventCapture)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
@@ -418,52 +431,63 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(isFallback).isEqualTo(true)
         }
 
-        verify(atMost = 4) { faceSessionEventsManager.addEventInBackground(any()) }
-        with(eventCapture) {
-            with(get(0) as FaceFallbackCaptureEvent) {
-                assertThat(startTime).isEqualTo(0)
-                assertThat(endTime).isEqualTo(1)
-            }
-            with(get(1) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(2)
-                assertThat(endTime).isEqualTo(3)
-                assertThat(isFallback).isEqualTo(false)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.TOO_FAR)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(tooFarFace.quality)
-                    assertThat(it.yaw).isEqualTo(tooFarFace.yaw)
-                    assertThat(it.yaw).isEqualTo(tooFarFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(tooFarFace.template))
+        verifySequence {
+            faceSessionEventsManager.addEventInBackground(match {
+                with(it as FaceFallbackCaptureEvent) {
+                    assertThat(startTime).isEqualTo(0)
+                    assertThat(endTime).isEqualTo(1)
                 }
-            }
-            with(get(2) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(4)
-                assertThat(endTime).isEqualTo(5)
-                assertThat(isFallback).isEqualTo(false)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.INVALID)
-                assertThat(eventFace).isNull()
-            }
-            with(get(3) as FaceCaptureEvent) {
-                assertThat(startTime).isEqualTo(0)
-                assertThat(endTime).isEqualTo(1)
-                assertThat(isFallback).isEqualTo(true)
-                assertThat(attemptNb).isEqualTo(0)
-                assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
-                assertThat(eventFace).isNotNull()
-                eventFace?.let {
-                    assertThat(it.quality).isEqualTo(validFace.quality)
-                    assertThat(it.yaw).isEqualTo(validFace.yaw)
-                    assertThat(it.yaw).isEqualTo(validFace.roll)
-                    assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(2)
+                    assertThat(endTime).isEqualTo(3)
+                    assertThat(isFallback).isEqualTo(false)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.TOO_FAR)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(tooFarFace.quality)
+                        assertThat(it.yaw).isEqualTo(tooFarFace.yaw)
+                        assertThat(it.yaw).isEqualTo(tooFarFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(tooFarFace.template))
+                    }
+                    true
                 }
-            }
+            })
+
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(4)
+                    assertThat(endTime).isEqualTo(5)
+                    assertThat(isFallback).isEqualTo(false)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.INVALID)
+                    assertThat(eventFace).isNull()
+                }
+                true
+            })
+            faceSessionEventsManager.addEvent(match {
+                with(it as FaceCaptureEvent) {
+                    assertThat(startTime).isEqualTo(0)
+                    assertThat(endTime).isEqualTo(1)
+                    assertThat(isFallback).isEqualTo(true)
+                    assertThat(attemptNb).isEqualTo(0)
+                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
+                    assertThat(eventFace).isNotNull()
+                    eventFace?.let {
+                        assertThat(it.quality).isEqualTo(validFace.quality)
+                        assertThat(it.yaw).isEqualTo(validFace.yaw)
+                        assertThat(it.yaw).isEqualTo(validFace.roll)
+                        assertThat(it.template).isEqualTo(EncodingUtils.byteArrayToBase64(validFace.template))
+                    }
+                    true
+                }
+            })
         }
     }
-
 }

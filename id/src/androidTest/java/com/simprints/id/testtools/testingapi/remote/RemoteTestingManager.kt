@@ -15,6 +15,5 @@ interface RemoteTestingManager {
     fun generateFirebaseToken(projectId: String, userId: String = DEFAULT_USER_ID): TestFirebaseToken
     fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken
 
-    fun getSessionSignatures(projectId: String): List<TestSessionSignature>
-    fun getSessionCount(projectId: String): TestSessionCount
+    fun getEventCount(projectId: String): TestEventCount
 }
