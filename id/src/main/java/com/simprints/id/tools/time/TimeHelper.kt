@@ -1,8 +1,10 @@
 package com.simprints.id.tools.time
 
+import androidx.annotation.Keep
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+@Keep
 interface TimeHelper {
 
     fun now(): Long

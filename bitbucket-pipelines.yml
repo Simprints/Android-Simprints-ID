@@ -2,14 +2,14 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: circleci/android@sha256:d2d054238e1a7e9ab30dd9f6b44a06af8d41836e053ffc40707d75ba50bbe0bf
+image: atlassian/default-image:2
+
 clone:
     depth: full # SonarCloud scanner needs the full history to assign issues properly
 
 definitions:
     caches:
         gradlewrapper: ~/.gradle/wrapper
-
     steps:
 
         ######################################################################
@@ -18,12 +18,13 @@ definitions:
         ######################################################################
         -   step: &run-clientapi-unit-tests
                 name: "Run Clientapi unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - . ./ci/pipeline/setup
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
@@ -33,7 +34,8 @@ definitions:
         ######################################################################
         -   step: &run-id-unit-tests
                 name: "Run Id & Core unit tests"
-                max-time: 15
+                size: 2x
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -50,7 +52,7 @@ definitions:
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
-                max-time: 15
+                max-time: 30
                 caches:
                     - gradle
                     - gradlewrapper
@@ -66,7 +68,8 @@ definitions:
         ######################################################################
         -   step: &run-fingerprint-unit-tests
                 name: "Run Fingerprint unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
@@ -82,7 +85,8 @@ definitions:
         ######################################################################
         -   step: &run-fingerprintscanner-unit-tests
                 name: "Run Fingerprint Scanner unit tests"
-                max-time: 15
+                max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper
@@ -99,7 +103,8 @@ definitions:
         # them to sonarcloud.io, and check that they pass the quality gateway.
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
-                max-time: 15
+                max-time: 30
+                size: 2x
                 name: "Upload scan and check quality gateway"
                 caches:
                     - gradle
@@ -116,6 +121,7 @@ definitions:
         -   step: &build-and-sign-universal-apk
                 name: "Build universal & test APKs"
                 max-time: 30
+                size: 2x
                 caches:
                     - gradle
                     - gradlewrapper

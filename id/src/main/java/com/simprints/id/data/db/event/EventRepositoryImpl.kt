@@ -72,7 +72,7 @@ open class EventRepositoryImpl(
 
     override suspend fun createSession(libSimprintsVersionName: String) {
         reportExceptionIfNeeded {
-            val count = eventLocalDataSource.count()
+            val sessionCount = eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE))
             val sessionCaptureEvent = SessionCaptureEvent(
                 UUID.randomUUID().toString(),
                 currentProject,
@@ -85,7 +85,7 @@ open class EventRepositoryImpl(
                     VERSION.SDK_INT.toString(),
                     Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId),
-                DatabaseInfo(count))
+                DatabaseInfo(sessionCount))
 
             closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(), NEW_SESSION)
             addEvent(sessionCaptureEvent)
@@ -199,7 +199,11 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun createBatchesForEventsInSessions(query: LocalEventQuery): List<Batch> {
-        val sessionsToUpload = merge(loadCloseSessions(query), markAndLoadOldOpenSessions(query))
+
+        // We don't upload unsigned sessions because the back-end would reject them.
+        val sessionsToUpload =
+            merge(loadCloseSessions(query), markAndLoadOldOpenSessions(query)).filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
+
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
 
         return sessionsToUpload.fold(mutableListOf()) { batches, session ->

@@ -9,6 +9,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 import com.simprints.id.orchestrator.FlowProvider.FlowType.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
@@ -101,7 +102,13 @@ open class OrchestratorManagerImpl(
         val appResponseToReturn = appResponseFactory.buildAppResponse(
             modalities, hotCache.appRequest, steps, sessionId
         )
-        personCreationEventHelper.addPersonCreationEventIfNeeded(steps.mapNotNull { it.getResult() })
+
+        when(appResponseToReturn.type) {
+            AppResponseType.ENROL, AppResponseType.IDENTIFY, AppResponseType.VERIFY -> {
+                personCreationEventHelper.addPersonCreationEventIfNeeded(steps.mapNotNull { it.getResult() })
+            }
+            else -> {}
+        }
 
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
