@@ -2,6 +2,7 @@ package com.simprints.id.secure.models
 
 import androidx.annotation.Keep
 
+@Keep
 data class SecurityState(val deviceId: String, val status: Status) {
 
     @Keep
