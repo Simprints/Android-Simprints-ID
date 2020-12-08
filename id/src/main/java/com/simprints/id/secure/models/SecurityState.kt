@@ -1,7 +1,10 @@
 package com.simprints.id.secure.models
 
+import androidx.annotation.Keep
+
 data class SecurityState(val deviceId: String, val status: Status) {
 
+    @Keep
     enum class Status {
         RUNNING,
         COMPROMISED,
@@ -10,5 +13,4 @@ data class SecurityState(val deviceId: String, val status: Status) {
         fun isCompromisedOrProjectEnded(): Boolean = this == COMPROMISED || this == PROJECT_ENDED
 
     }
-
 }
