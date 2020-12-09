@@ -16,6 +16,7 @@ import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.Un20Res
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroEventParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.INTERVAL
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
@@ -29,8 +30,6 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 class MainMessageInputStreamTest {
-
-    private val interval = 1L
 
     private val packetRouter = mock<PacketRouter>()
     private val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
@@ -61,7 +60,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroServer]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -91,7 +90,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.Un20Server]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -123,7 +122,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroEvent]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitCount(numberOfEvents)
@@ -153,7 +152,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroServer]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!responseSubscriber.isTerminated)
 
         responseSubscriber.awaitAndAssertSuccess()
@@ -183,7 +182,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroServer]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -222,7 +221,7 @@ class MainMessageInputStreamTest {
         routes.values.forEach { it.connect() }
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!veroResponseTestSubscriber.isTerminated && !veroEventTestSubscriber.isTerminated && un20ResponseTestSubscriber.isTerminated)
 
         veroResponseTestSubscriber.awaitAndAssertSuccess()
