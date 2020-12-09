@@ -8,6 +8,7 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -59,7 +60,7 @@ class RootMessageInputStreamTest {
         packets.forEach { outputStream.write(it) }
 
         testResponseSubscriber.awaitAndAssertSuccess()
-        testStreamSubscriber.awaitCount(3)
+        testStreamSubscriber.awaitCount(3, TestWaitStrategy.SLEEP_1000MS, TIMEOUT)
         assertThat(testResponseSubscriber.values().first()).isInstanceOf(expectedResponse::class.java)
         assertThat(testStreamSubscriber.valueCount()).isEqualTo(3)
     }
@@ -84,7 +85,7 @@ class RootMessageInputStreamTest {
         packets.forEach { outputStream.write(it) }
 
         testResponseSubscriber.awaitAndAssertSuccess()
-        testStreamSubscriber.awaitCount(3)
+        testStreamSubscriber.awaitCount(3, TestWaitStrategy.SLEEP_1000MS, TIMEOUT)
         assertThat(testResponseSubscriber.values().first()).isInstanceOf(expectedResponse::class.java)
         assertThat(testStreamSubscriber.valueCount()).isEqualTo(3)
     }
