@@ -10,6 +10,10 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import java.io.InputStream
 
+/**
+ * Takes an InputStream and transforms it into a Flowable<CypressOtaResponse> for use while the Vero
+ * is in Cypress OTA Mode.
+ */
 class CypressOtaMessageInputStream(private val cypressOtaResponseParser: CypressOtaResponseParser) : MessageInputStream {
 
     var cypressOtaResponseStream: Flowable<CypressOtaResponse>? = null
