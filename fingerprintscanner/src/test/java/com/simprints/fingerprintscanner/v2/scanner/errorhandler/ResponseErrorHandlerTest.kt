@@ -2,6 +2,7 @@ package com.simprints.fingerprintscanner.v2.scanner.errorhandler
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
@@ -12,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class ResponseErrorHandlerTest {
 
-    private val timeout = 10L
     private val interval = 1L
 
     @Test
@@ -37,7 +37,7 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }.handleErrorsWith(responseErrorHandler).timeout(timeout, TimeUnit.SECONDS).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
             testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
@@ -70,7 +70,7 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }.handleErrorsWith(responseErrorHandler).timeout(timeout, TimeUnit.SECONDS).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
             testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
@@ -89,7 +89,7 @@ class ResponseErrorHandlerTest {
         val testSubscriber = Single
             .error<String>(thrownException)
             .handleErrorsWith(responseErrorHandler)
-            .timeout(timeout, TimeUnit.SECONDS)
+            .timeout(TIMEOUT, TimeUnit.SECONDS)
             .test()
 
         testSubscriber.await()
@@ -116,7 +116,7 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }.handleErrorsWith(responseErrorHandler).timeout(timeout, TimeUnit.SECONDS).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
             testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
