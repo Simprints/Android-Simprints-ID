@@ -12,7 +12,104 @@ package in anticipation for porting to another platform. It relies on
 the [Component abstractions](../component/bluetooth) for the bluetooth
 layer.
 
-## Vero 2.0 API
+## Using This Package
+The [`Scanner`](scanner/Scanner.kt) class is the single point of use of
+this package. The only other classes that should appear as imports
+outside of this package are some of the model classes which are taken as
+arguments and returned by the methods on Scanner.kt, as well as any
+custom exceptions.
+
+### Scanner Setup and Teardown
+Use the [`createScanner()`](scanner/CreateScanner.kt) helper function to
+build and instance of the `Scanner` class. No work is done on class
+instantiation so this class can be created at any time.
+
+To connect the scanner, an `InputStream` and an `OutputStream` are
+required. These refer to the streams that become available when
+connecting a Bluetooth socket through the Android OS, which should be
+performed via the [Component abstractions](../component/bluetooth) for
+ease in mocking.
+
+These are then passed into `scanner.connect(inputStream, outputStream)`
+to commence the machinery that controls these streams. After `connect`
+is called, IO threads will be running that handle stream reading,
+transforming, and buffering.
+
+Calling `scanner.disconnect()` causes all RxJava streams to be disposed
+and consequently for the threads to be released. The `disconnect` method
+does not disconnect the `InputStream` or `OutputStream` themselves, so
+disconnecting those will happen separately. The same scanner instance
+can be reconnected either with the same streams if they have not been
+disconnected, or fresh steams from a new `BluetoothSocket`.
+
+Note that when the scanner is first connected it is in Root Mode. The
+recommended flow after first connecting is to check the master version
+information to determine what functionality is available, as it is
+possible to call methods that would not be compatible with older
+versions of the firmware. Methods in `Scanner` or marked if they were
+introduced after API version 1.0. After the version number has been
+established, then Main Mode can be entered or OTA can be conducted as
+necessary.
+
+### Using The Scanner
+
+The scanner maintains its own `ScannerState`, which is updated
+appropriately as methods are called and as responses are received from
+the Vero. Calling methods on `Scanner` will initially begin with
+validating whether we are in the appropriate `state`, such as whether we
+are in the appropriate mode or whether the UN20 is on.
+
+If the scanner receives an invalid command it simply will not respond at
+all. The purpose of the state validation is to ensure that methods
+cannot be called out of order and to throw an exception instead of
+letting commands time-out.
+
+All commands have an appropriate time-out that will propagate in the
+`onError` if a response is not received within a certain amount of time.
+This can be configured with supplying an appropriate
+[`ResponseErrorHandlingStrategy`](scanner/errorhandler/ResponseErrorHandlingStrategy.kt).
+
+### Exceptions
+Use of the methods in [Scanner](scanner/Scanner.kt) can throw certain
+subclasses of certain stock exceptions in the `onError`:
+- `IOException` - in the case of the underlying Bluetooth stream losing
+  connection or a time-out when waiting for a response.
+- `IllegalStateException` - when methods on `Scanner.kt` are accessed
+  while in the incorrect mode or before connecting/disconnecting.
+- `IllegalArgumentException` - if calling methods with an invalid or
+  unsupported argument.
+
+Furthermore, there is a custom exception that can be thrown only whilst
+performing OTA, `OtaFailedException`, which is of type
+`RuntimeException`.
+
+Most exceptions are wrapped into the above cases but there could of
+course be unanticipated situations where different exceptions can occur,
+either propagated within the `onError` or thrown when the method is
+invoked.
+
+#### Undeliverable Exceptions
+
+Due to the nature of exception handling in RxJava 2.0,
+`io.reactivex.exceptions.UndeliverableException` may be thrown and cause
+issues. For this reason it is highly recommended to have an application
+level error handler set in place:
+```
+RxJavaPlugins.setErrorHandler {
+    if (e is UndeliverableException) {
+        ...
+    }
+}
+```
+In most situations you simply want to ignore undeliverable exceptions as
+they most commonly occur when a stream is disposed and then an
+`IOException` is thrown upon the scanner disconnecting.
+
+## Vero 2.0 Communication
+
+This section contains details on what the code in this package does, on
+how communication with Vero 2 is achieved, along with giving definitions
+of terms used throughout this package.
 
 ### Chips
 Vero 2.0 has three chips each with its own firmware and function.

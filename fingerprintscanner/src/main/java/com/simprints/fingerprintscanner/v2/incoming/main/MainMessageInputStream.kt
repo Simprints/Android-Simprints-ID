@@ -19,6 +19,12 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import java.io.InputStream
 
+/**
+ * Transforms each of the Flowable<Packet> streams exposed by [PacketRouter] into a
+ * Flowable<Message> for each [Route].
+ *
+ * The various routes are exposed for us
+ */
 class MainMessageInputStream(
     private val packetRouter: PacketRouter,
     private val veroResponseAccumulator: VeroResponseAccumulator,
