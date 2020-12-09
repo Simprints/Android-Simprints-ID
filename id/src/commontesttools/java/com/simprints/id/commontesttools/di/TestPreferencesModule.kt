@@ -10,6 +10,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.SyncLocationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -34,6 +35,7 @@ class TestPreferencesModule(
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
+        syncLocationSettingSerializer: Serializer<SyncLocationSetting>,
         modalitiesSerializer: Serializer<List<Modality>>,
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -49,6 +51,7 @@ class TestPreferencesModule(
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             eventDownSyncSettingSerializer,
+            syncLocationSettingSerializer,
             modalitiesSerializer,
             captureFingerprintStrategySerializer,
             saveFingerprintImagesStrategySerializer,
