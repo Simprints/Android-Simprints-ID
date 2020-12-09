@@ -29,6 +29,9 @@ import java.util.concurrent.TimeUnit
 
 class MainMessageInputStreamTest {
 
+    private val timeout = 10L
+    private val interval = 1L
+
     private val packetRouter = mock<PacketRouter>()
     private val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
     private val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
@@ -52,11 +55,14 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
+        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>()
+            .observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
-        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.value == it.value }
@@ -79,11 +85,14 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
+        val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>()
+            .observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.Un20Server]?.connect()
 
-        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.supportedTemplateTypes == it.supportedTemplateTypes }
@@ -101,17 +110,21 @@ class MainMessageInputStreamTest {
         val routes = mapOf(
             Route.Remote.VeroServer as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish(),
             Route.Remote.VeroEvent as Route to packets.toFlowable().observeOn(testScheduler).publish(),
-            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish())
+            Route.Remote.Un20Server as Route to Flowable.empty<Packet>().observeOn(testScheduler).publish()
+        )
 
         whenever(packetRouter) { incomingPacketRoutes } thenReturn routes
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
+        val testSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler)
+            .timeout(timeout, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroEvent]?.connect()
 
-        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitCount(numberOfEvents)
         testSubscriber.values().forEach { assertThat(it).isInstanceOf(expectedEvent::class.java) }
@@ -134,11 +147,14 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
+        val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>()
+            .observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
-        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!responseSubscriber.isTerminated)
 
         responseSubscriber.awaitAndAssertSuccess()
         responseSubscriber.assertValue { firstExpectedResponse.value == it.value }
@@ -161,11 +177,14 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
+        val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler)
+            .timeout(timeout, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
-        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue { expectedResponse.value == it.value }
@@ -196,13 +215,15 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).test()
-        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).test()
-        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).test()
+        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
+        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
+        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
 
         routes.values.forEach { it.connect() }
 
-        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!veroResponseTestSubscriber.isTerminated && !veroEventTestSubscriber.isTerminated && un20ResponseTestSubscriber.isTerminated)
 
         veroResponseTestSubscriber.awaitAndAssertSuccess()
         veroResponseTestSubscriber.assertValue { expectedVeroResponse.value == it.value }

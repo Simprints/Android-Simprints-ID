@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class ResponseErrorHandlerTest {
 
+    private val timeout = 10L
+    private val interval = 1L
+
     @Test
     fun handleError_timesOutThenSucceeds_retriesCorrectNumberOfTimesAndSucceeds() {
         val currentTry = AtomicInteger(0)
@@ -34,10 +37,11 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }
-                .handleErrorsWith(responseErrorHandler).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(timeout, TimeUnit.SECONDS).test()
 
-        testScheduler.advanceTimeBy(10000, TimeUnit.MILLISECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue(successValue)
@@ -66,10 +70,11 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }
-                .handleErrorsWith(responseErrorHandler).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(timeout, TimeUnit.SECONDS).test()
 
-        testScheduler.advanceTimeBy(10000, TimeUnit.MILLISECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
         testSubscriber.assertError(IOException::class.java)
@@ -84,6 +89,7 @@ class ResponseErrorHandlerTest {
         val testSubscriber = Single
             .error<String>(thrownException)
             .handleErrorsWith(responseErrorHandler)
+            .timeout(timeout, TimeUnit.SECONDS)
             .test()
 
         testSubscriber.await()
@@ -110,10 +116,11 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }
-                .handleErrorsWith(responseErrorHandler).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(timeout, TimeUnit.SECONDS).test()
 
-        testScheduler.advanceTimeBy(10000, TimeUnit.MILLISECONDS)
+        do {
+            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
         testSubscriber.assertValue(successValue)
