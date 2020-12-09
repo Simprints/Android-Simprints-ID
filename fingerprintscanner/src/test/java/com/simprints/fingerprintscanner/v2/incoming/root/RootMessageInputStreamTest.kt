@@ -2,6 +2,8 @@ package com.simprints.fingerprintscanner.v2.incoming.root
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -9,6 +11,7 @@ import com.simprints.testtools.unit.reactive.testSubscribe
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
+import java.util.concurrent.TimeUnit
 
 class RootMessageInputStreamTest {
 
@@ -27,7 +30,8 @@ class RootMessageInputStreamTest {
 
         rootMessageInputStream.connect(inputStream)
 
-        val testSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>().testSubscribe()
+        val testSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
+            .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
 
         packets.forEach { outputStream.write(it) }
 
@@ -47,8 +51,10 @@ class RootMessageInputStreamTest {
 
         rootMessageInputStream.connect(inputStream)
 
-        val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>().testSubscribe()
-        val testStreamSubscriber = rootMessageInputStream.rootResponseStream!!.testSubscribe()
+        val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
+            .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
+        val testStreamSubscriber = rootMessageInputStream.rootResponseStream!!
+            .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
 
         packets.forEach { outputStream.write(it) }
 
@@ -70,8 +76,10 @@ class RootMessageInputStreamTest {
 
         rootMessageInputStream.connect(inputStream)
 
-        val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>().testSubscribe()
-        val testStreamSubscriber = rootMessageInputStream.rootResponseStream!!.testSubscribe()
+        val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
+            .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
+        val testStreamSubscriber = rootMessageInputStream.rootResponseStream!!
+            .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
 
         packets.forEach { outputStream.write(it) }
 

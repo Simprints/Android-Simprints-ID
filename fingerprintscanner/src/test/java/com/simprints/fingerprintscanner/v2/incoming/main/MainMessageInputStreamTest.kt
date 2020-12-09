@@ -16,6 +16,7 @@ import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.Un20Res
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroEventParser
 import com.simprints.fingerprintscanner.v2.incoming.main.message.parsers.VeroResponseParser
 import com.simprints.fingerprintscanner.v2.incoming.main.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -29,7 +30,6 @@ import java.util.concurrent.TimeUnit
 
 class MainMessageInputStreamTest {
 
-    private val timeout = 10L
     private val interval = 1L
 
     private val packetRouter = mock<PacketRouter>()
@@ -56,7 +56,7 @@ class MainMessageInputStreamTest {
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>()
-            .observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
+            .observeOn(testScheduler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -86,7 +86,7 @@ class MainMessageInputStreamTest {
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>()
-            .observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
+            .observeOn(testScheduler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.Un20Server]?.connect()
 
@@ -118,7 +118,7 @@ class MainMessageInputStreamTest {
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler)
-            .timeout(timeout, TimeUnit.SECONDS).test()
+            .timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroEvent]?.connect()
 
@@ -148,7 +148,7 @@ class MainMessageInputStreamTest {
         messageInputStream.connect(mock())
 
         val responseSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>()
-            .observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
+            .observeOn(testScheduler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -178,7 +178,7 @@ class MainMessageInputStreamTest {
         messageInputStream.connect(mock())
 
         val testSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler)
-            .timeout(timeout, TimeUnit.SECONDS).test()
+            .timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         routes[Route.Remote.VeroServer]?.connect()
 
@@ -215,9 +215,9 @@ class MainMessageInputStreamTest {
 
         messageInputStream.connect(mock())
 
-        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
-        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
-        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).timeout(timeout, TimeUnit.SECONDS).test()
+        val veroResponseTestSubscriber = messageInputStream.receiveResponse<GetUn20OnResponse>().observeOn(testScheduler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
+        val veroEventTestSubscriber = messageInputStream.veroEvents!!.observeOn(testScheduler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
+        val un20ResponseTestSubscriber = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>().observeOn(testScheduler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         routes.values.forEach { it.connect() }
 
