@@ -2,6 +2,7 @@ package com.simprints.fingerprintscanner.v2.scanner.errorhandler
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.INTERVAL
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.reactivex.Single
@@ -12,8 +13,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 class ResponseErrorHandlerTest {
-
-    private val interval = 1L
 
     @Test
     fun handleError_timesOutThenSucceeds_retriesCorrectNumberOfTimesAndSucceeds() {
@@ -40,7 +39,7 @@ class ResponseErrorHandlerTest {
             }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -73,7 +72,7 @@ class ResponseErrorHandlerTest {
             }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
@@ -119,7 +118,7 @@ class ResponseErrorHandlerTest {
             }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
-            testScheduler.advanceTimeBy(interval, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
