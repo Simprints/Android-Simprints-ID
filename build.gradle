@@ -75,6 +75,15 @@ task runAllJacocoTests(type: GradleBuild) {
              'fingerprint:jacocoTestReportStandardDebug', 'fingerprintscanner:jacocoTestReportDebug']
 }
 
+/*
+Run tests in parallel to speed up tests
+https://docs.gradle.org/nightly/userguide/performance.html#suggestions_for_java_projects
+*/
+
+tasks.withType(Test).configureEach {
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+}
+
 //to check newer dependencies: ./gradlew dependencyUpdates
 apply plugin: "com.github.ben-manes.versions"
 apply plugin: "android-reporting"

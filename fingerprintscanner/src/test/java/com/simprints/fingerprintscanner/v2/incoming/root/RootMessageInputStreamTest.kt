@@ -60,7 +60,7 @@ class RootMessageInputStreamTest {
         packets.forEach { outputStream.write(it) }
 
         testResponseSubscriber.awaitAndAssertSuccess()
-        testStreamSubscriber.awaitCount(3, TestWaitStrategy.SLEEP_1000MS, TIMEOUT)
+        testStreamSubscriber.awaitCount(3, TestWaitStrategy.SLEEP_10MS, TIMEOUT)
         assertThat(testResponseSubscriber.values().first()).isInstanceOf(expectedResponse::class.java)
         assertThat(testStreamSubscriber.valueCount()).isEqualTo(3)
     }
@@ -85,7 +85,7 @@ class RootMessageInputStreamTest {
         packets.forEach { outputStream.write(it) }
 
         testResponseSubscriber.awaitAndAssertSuccess()
-        testStreamSubscriber.awaitCount(3, TestWaitStrategy.SLEEP_1000MS, TIMEOUT)
+        testStreamSubscriber.awaitCount(3, TestWaitStrategy.SLEEP_10MS, TIMEOUT)
         assertThat(testResponseSubscriber.values().first()).isInstanceOf(expectedResponse::class.java)
         assertThat(testStreamSubscriber.valueCount()).isEqualTo(3)
     }
