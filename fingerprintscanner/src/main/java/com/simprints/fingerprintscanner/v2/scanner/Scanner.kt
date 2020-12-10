@@ -365,6 +365,7 @@ class Scanner(
             ))
             .map { it.supportedTemplateTypes }
 
+    /** No value emitted if an image has not been captured */
     fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Maybe<TemplateData> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetTemplateResponse>(
