@@ -9,8 +9,8 @@ which allows access to all the functionality supported by Vero 2.
 It is written in Kotlin with heavy reliance on RxJava. Although it is
 written for Android, there are no Android dependencies throughout this
 package in anticipation for porting to another platform. It relies on
-the [Component abstractions](../component/bluetooth) for the bluetooth
-layer.
+being handed a `java.io.InputStream` and `java.io.OutputStream` after
+the Bluetooth socket is connected.
 
 ## Using This Package
 The [`Scanner`](scanner/Scanner.kt) class is the single point of use of
@@ -80,8 +80,8 @@ subclasses of certain stock exceptions in the `onError`:
   connection or a time-out when waiting for a response.
 - `IllegalStateException` - when methods on `Scanner.kt` are accessed
   while in the incorrect mode or before connecting/disconnecting.
-- `IllegalArgumentException` - if calling methods with an invalid or
-  unsupported argument.
+- `IllegalArgumentException` - malformed or invalid packets or messages
+  were received from the scanner.
 
 Furthermore, there is a custom exception that can be thrown only whilst
 performing OTA, `OtaFailedException`, which is of type
