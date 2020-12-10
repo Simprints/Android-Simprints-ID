@@ -60,7 +60,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroServer]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -90,7 +90,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.Un20Server]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -122,7 +122,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroEvent]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitCount(numberOfEvents)
@@ -152,7 +152,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroServer]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!responseSubscriber.isTerminated)
 
         responseSubscriber.awaitAndAssertSuccess()
@@ -182,7 +182,7 @@ class MainMessageInputStreamTest {
         routes[Route.Remote.VeroServer]?.connect()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -221,7 +221,7 @@ class MainMessageInputStreamTest {
         routes.values.forEach { it.connect() }
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!veroResponseTestSubscriber.isTerminated && !veroEventTestSubscriber.isTerminated && un20ResponseTestSubscriber.isTerminated)
 
         veroResponseTestSubscriber.awaitAndAssertSuccess()

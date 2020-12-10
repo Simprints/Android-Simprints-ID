@@ -39,7 +39,7 @@ class ResponseErrorHandlerTest {
             }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
@@ -72,7 +72,7 @@ class ResponseErrorHandlerTest {
             }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
@@ -118,7 +118,7 @@ class ResponseErrorHandlerTest {
             }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
         do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.SECONDS)
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
         } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
