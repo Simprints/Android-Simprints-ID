@@ -69,6 +69,10 @@ All commands have an appropriate time-out that will propagate in the
 This can be configured with supplying an appropriate
 [`ResponseErrorHandlingStrategy`](scanner/errorhandler/ResponseErrorHandlingStrategy.kt).
 
+Separate from the methods that send a command and await a response, one
+can register an observer that listens for trigger button presses on the
+Vero.
+
 ### Exceptions
 Use of the methods in [Scanner](scanner/Scanner.kt) can throw certain
 subclasses of certain stock exceptions in the `onError`:
