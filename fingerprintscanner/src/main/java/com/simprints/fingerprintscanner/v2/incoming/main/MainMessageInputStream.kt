@@ -23,7 +23,8 @@ import java.io.InputStream
  * Transforms each of the Flowable<Packet> streams exposed by [PacketRouter] into a
  * Flowable<Message> for each [Route].
  *
- * The various routes are exposed for us
+ * [receiveResponse] can be used to take a message from the [veroResponses] or [un20Responses]
+ * streams, while the [veroEvents] stream can be observed directly.
  */
 class MainMessageInputStream(
     private val packetRouter: PacketRouter,
