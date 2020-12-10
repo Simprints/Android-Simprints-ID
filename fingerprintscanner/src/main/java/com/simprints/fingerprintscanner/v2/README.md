@@ -76,6 +76,7 @@ Vero.
 ### Exceptions
 Use of the methods in [Scanner](scanner/Scanner.kt) can throw certain
 subclasses of certain stock exceptions in the `onError`:
+
 - `IOException` - in the case of the underlying Bluetooth stream losing
   connection or a time-out when waiting for a response.
 - `IllegalStateException` - when methods on `Scanner.kt` are accessed
@@ -117,6 +118,7 @@ of terms used throughout this package.
 
 ### Chips
 Vero 2.0 has three chips each with its own firmware and function.
+
 - **Cypress Bluetooth Module** - This is the Bluetooth chip that acts as
   the gateway for all communications between the client device. Its
   functionality is limited to establishing a handshake at the beginning
@@ -224,6 +226,7 @@ to affix a header with routing information, so they can be properly
 assembled at the opposite end without interleaving if messages happen to
 be sent over multiple routes simultaneously. The structure of a
 canonical packet contains the following:
+
 - Source of the packet Destination of the packet
 - Length of the packet
 - The packet payload
@@ -259,6 +262,7 @@ for use by the [Scanner](scanner/Scanner.kt) class.
 The following is the pipeline for receiving data over Bluetooth to an
 observer subscribing to the Main Mode message stream as found in the
 [incoming](./incoming) package:
+
 1. The stream is transformed into the RxJava world, so that
    `InputStream` becomes a `Flowable<ByteArray>`, where the `ByteArray`s
    are the bluetooth packets received ove the stream.
@@ -277,6 +281,7 @@ directly accumulated and parsed as messages.
 The [outgoing](./outgoing) package contains the pipeline for
 transmitting data over Bluetooth, with the following steps for the Main
 Mode message stream:
+
 1. The message to be sent is serialized by a `MessageSerializer`, which
    involves chunking the message for large messages
 2. The message chunks are then "canonized" inside a packet, with a
@@ -300,6 +305,7 @@ into messages without the routing/packet intermediate step.
 The list of commands available and their corresponding byte
 representation can be inferred from the [domain](./domain) package.
 Additionally, a complete tabulation can be found on Confluence:
+
 - [Root Mode API Specification](https://simprints.atlassian.net/wiki/spaces/F/pages/800555020/Vero+2.0+Root+Mode+API)
 - [Main Mode API Specification](https://simprints.atlassian.net/wiki/spaces/F/pages/746946567/Vero+2.0+Main+Mode+API)
 - [Cypress OTA Mode  API Specification](https://cypresssemiconductorco.github.io/btsdk-docs/BT-SDK/WICED-Firmware-Upgrade-Library.pdf)
