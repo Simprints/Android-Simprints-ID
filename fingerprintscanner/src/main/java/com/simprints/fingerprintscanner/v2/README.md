@@ -292,9 +292,12 @@ into messages without the routing/packet intermediate step.
 
 ![data_pipeline_diagram](../../../../../../../doc/data_pipeline_diagram.png)
 
-### API Specification
+### API Specifications
 The list of commands available and their corresponding byte
 representation can be inferred from the [domain](./domain) package.
 Additionally, a complete tabulation can be found on Confluence:
 - [Root Mode API Specification](https://simprints.atlassian.net/wiki/spaces/F/pages/800555020/Vero+2.0+Root+Mode+API)
 - [Main Mode API Specification](https://simprints.atlassian.net/wiki/spaces/F/pages/746946567/Vero+2.0+Main+Mode+API)
+- [Cypress OTA Mode  API Specification](https://cypresssemiconductorco.github.io/btsdk-docs/BT-SDK/WICED-Firmware-Upgrade-Library.pdf)
+  (pages 7-9)
+- [STM OTA API Specification](https://www.st.com/content/ccc/resource/technical/document/application_note/51/5f/03/1e/bd/9b/45/be/CD00264342.pdf/files/CD00264342.pdf/jcr:content/translations/en.CD00264342.pdf)

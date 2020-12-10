@@ -1,5 +1,9 @@
 package com.simprints.fingerprintscanner.v2.tools.crc
 
+/**
+ * Calculates the CRC checksum for given bytes using a popular standard [CRC32_TABLE].
+ * Used for verifying sent firmware for Cypress and UN20 OTA.
+ */
 class Crc32Calculator {
 
     fun calculateCrc32(bytes: ByteArray): Int {

@@ -11,6 +11,10 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
+/**
+ * For use in an Rx chain using [handleErrorsWith]. Adds a timeout and retries for incoming messages
+ * in accordance to a supplied [ResponseErrorHandlingStrategy].
+ */
 class ResponseErrorHandler(val strategy: ResponseErrorHandlingStrategy,
                            private val timeOutScheduler: Scheduler = Schedulers.io()) {
 
