@@ -8,7 +8,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.SyncLocationSetting
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -51,8 +51,8 @@ class SerializerModule {
 
     @Provides
     @Singleton
-    @Named("SyncLocationSettingSerializer")
-    fun provideSyncLocationSettingSerializer(): Serializer<SyncLocationSetting> = EnumSerializer(SyncLocationSetting::class.java)
+    @Named("SyncDestinationSettingSerializer")
+    fun provideSyncDestinationSettingSerializer(): Serializer<SyncDestinationSetting> = EnumSerializer(SyncDestinationSetting::class.java)
 
     @Provides
     @Singleton
