@@ -16,7 +16,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.SyncLocationSetting
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
@@ -39,7 +39,7 @@ open class SettingsPreferencesManagerImpl(
     private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
     fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
     faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>,
-    syncLocationSerializer: Serializer<SyncLocationSetting>
+    syncDestinationSerializer: Serializer<SyncDestinationSetting>
 ) : SettingsPreferencesManager {
 
     /**
@@ -242,13 +242,13 @@ open class SettingsPreferencesManagerImpl(
             eventDownSyncSettingSerializer
         )
 
-    override var syncLocationSetting: SyncLocationSetting
+    override var syncDestinationSetting: SyncDestinationSetting
         by RemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
-            SYNC_LOCATION_SETTING_KEY,
-            SYNC_LOCATION_SETTING_DEFAULT,
-            syncLocationSerializer
+            SYNC_DESTINATION_SETTING_KEY,
+            SYNC_DESTINATION_SETTING_DEFAULT,
+            syncDestinationSerializer
         )
 
     override var fingerprintsToCollect: List<FingerIdentifier>
@@ -431,8 +431,8 @@ open class SettingsPreferencesManagerImpl(
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
-        const val SYNC_LOCATION_SETTING_KEY = "SyncLocation"
-        val SYNC_LOCATION_SETTING_DEFAULT = SyncLocationSetting.SIMPRINTS
+        const val SYNC_DESTINATION_SETTING_KEY = "SyncDestination"
+        val SYNC_DESTINATION_SETTING_DEFAULT = SyncDestinationSetting.SIMPRINTS
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"

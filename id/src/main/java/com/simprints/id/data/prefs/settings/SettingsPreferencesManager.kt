@@ -5,7 +5,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.SyncLocationSetting
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -38,7 +38,7 @@ interface SettingsPreferencesManager {
 
     var modalities: List<Modality>
     var eventDownSyncSetting: EventDownSyncSetting
-    var syncLocationSetting: SyncLocationSetting
+    var syncDestinationSetting: SyncDestinationSetting
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean

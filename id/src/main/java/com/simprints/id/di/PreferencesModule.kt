@@ -21,7 +21,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.SyncLocationSetting
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -79,7 +79,7 @@ open class PreferencesModule {
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-        @Named("SyncLocationSettingSerializer") syncLocationSettingSerializer: Serializer<SyncLocationSetting>,
+        @Named("SyncDestinationSettingSerializer") syncDestinationSettingSerializer: Serializer<SyncDestinationSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -101,7 +101,7 @@ open class PreferencesModule {
         fingerprintsToCollectSerializer,
         fingerprintConfidenceThresholdsSerializer,
         faceConfidenceThresholdsSerializer,
-        syncLocationSettingSerializer
+        syncDestinationSettingSerializer
     )
 
     @Provides
