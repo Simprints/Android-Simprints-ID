@@ -6,6 +6,10 @@ import io.reactivex.Completable
 import java.io.IOException
 import java.io.OutputStream
 
+/**
+ * Class for sending any Iterable<ByteArray>, representing Bluetooth packets, out of the
+ * [outputStream]
+ */
 class OutputStreamDispatcher : OutgoingConnectable {
 
     private var outputStream: OutputStream? = null
