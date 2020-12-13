@@ -10,6 +10,10 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import java.io.InputStream
 
+/**
+ * Takes an InputStream and transforms it into a Flowable<StmOtaResponse> for use while the Vero is
+ * in STM OTA Mode.
+ */
 class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseParser) : MessageInputStream {
 
     var stmOtaResponseStream: Flowable<StmOtaResponse>? = null

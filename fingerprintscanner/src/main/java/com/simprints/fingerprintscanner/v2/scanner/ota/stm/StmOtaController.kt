@@ -18,6 +18,16 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
+/**
+ * Conducts OTA for the STM module in accordance to
+ * https://www.st.com/content/ccc/resource/technical/document/application_note/51/5f/03/1e/bd/9b/45/be/CD00264342.pdf/files/CD00264342.pdf/jcr:content/translations/en.CD00264342.pdf
+ *
+ * While in STM OTA Mode, all bytes are piped directly to the STM which is running custom Simprints
+ * bootloader - although the API was kept identical to the stock bootloader linked above.
+ *
+ * There are some particular memory address involved which reference specific parts in memory on
+ * the STM32 - [START_ADDRESS] and [GO_ADDRESS].
+ */
 class StmOtaController {
 
     private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(

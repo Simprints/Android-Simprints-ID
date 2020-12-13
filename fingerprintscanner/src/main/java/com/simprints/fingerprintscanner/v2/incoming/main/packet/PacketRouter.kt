@@ -10,6 +10,12 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.flowables.ConnectableFlowable
 import java.io.InputStream
 
+/**
+ * The PacketRouter takes an InputStream of bytes, converting it into a single stream of
+ * Flowable<Packet> containing all incoming packets. It reads the [Route] of each incoming packet,
+ * and forwards them to a separate Flowable<Packet> dedicated to that route, which is exposed
+ * in the map [incomingPacketRoutes].
+ */
 class PacketRouter(private val routes: List<Route>,
                    private inline val packetRouteDesignator: Packet.() -> Byte,
                    private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {

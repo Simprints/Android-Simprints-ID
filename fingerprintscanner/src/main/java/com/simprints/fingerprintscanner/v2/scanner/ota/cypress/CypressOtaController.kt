@@ -20,6 +20,11 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toObservable
 
+/**
+ * Conducts OTA for the Cypress module in accordance to
+ * https://cypresssemiconductorco.github.io/btsdk-docs/BT-SDK/WICED-Firmware-Upgrade-Library.pdf
+ * Pages 7-9
+ */
 class CypressOtaController(private val crc32Calculator: Crc32Calculator) {
 
     private inline fun <reified R : CypressOtaResponse> sendCypressOtaModeCommandAndReceiveResponse(
