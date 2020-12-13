@@ -6,6 +6,10 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import timber.log.Timber
 import java.io.File
 
+/**
+ * Handles reading and writing to local firmware files on the phone.
+ * Files are saved at the path /firmware/(chipname)/(majorversion)-(minorversion).bin
+ */
 class FirmwareLocalDataSource(private val context: Context) {
 
     fun getAvailableScannerFirmwareVersions(): ScannerFirmwareVersions =
