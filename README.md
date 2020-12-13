@@ -26,12 +26,12 @@ https://issuetracker.google.com/issues/125437348
 
 The following matrix shows the support for each type of test suites:
 
-| From/What                 | Android Studio  | ./gradlew* |  CI (Bitrise/FirebaseLab)  |
-|---------------------------|-----------------|------------|----------------------------|
-| DF (unit tests)           |       ✓         |     x      |             x              |
-| DF (android tests)        |       X         |     ✓      |             x              |
-| App Module (unit tests)   |       ✓         |     ✓      |             ✓              |
-| App Module (android tests)|       ✓         |     ✓      |             ✓              |
+| From/What                 | Android Studio  | ./gradlew* | CI (Firebase Test Lab) |
+|---------------------------|-----------------|------------|------------------------|
+| DF (unit tests)           |       ✓         |     x      |          x             |
+| DF (android tests)        |       X         |     ✓      |          x             |
+| App Module (unit tests)   |       ✓         |     ✓      |          ✓             |
+| App Module (android tests)|       ✓         |     ✓      |          ✓             |
 
 DF modules are: clientapi, fingeprint, face
 App module is: id
