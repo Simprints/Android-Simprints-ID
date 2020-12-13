@@ -1,8 +1,79 @@
-# Fingerprint Scanner Wrapper
+# Scanner Package
+
+This package provides a layer with which to interface with the
+[`fingerprintscanner`](../../../../../../../../fingerprintscanner)
+library.
 
 ### Scanner Wrapper
 
+The [`ScannerWrapper`](./wrapper/ScannerWrapper.kt) interface acts as a
+common abstraction behind different generations of the scanner. It has
+two implementations, [`ScannerWrapperV1`](./wrapper/ScannerWrapperV1.kt)
+corresponding to Vero 1 and
+[`ScannerWrapperV2`](./wrapper/ScannerWrapperV2.kt) for Vero 2. These
+implementations handle the adapting of the different `Scanner` objects
+in `fingerprintscanner` to conform to a common interface. For many
+methods, multiple calls to a `Scanner` object may be invoked for each
+single method on the `ScannerWrapper`.
+
+Many features, such as OTA and image transfer, are available for Vero 2
+but not Vero 1, so calling these will result in an
+`UnavailableVero2FeatureException`. Care must be taken to ensure a
+project is correctly configured so this cannot happen.
+
+Additionally, some features such as live feedback are only available on
+later versions of Vero 2 and thus careful checking e.g. with
+`scannerWrapper.isLiveFeedbackAvailable()` is needed to ensure these are
+not called on hardware that does not support the feature.
+
+### Scanner Manager
+
+The [`ScannerManager`](./ScannerManager.kt)'s primary purpose is the
+main class that is passed around the code via dependency injection. It's
+primary purpose is to act as a holder for the `ScannerWrapper`, and is
+designed to be a singleton so that the `ScannerWrapper` can be connected
+in one Activity, and used in another.
+
+It also instantiates the appropriate `ScannerWrapper` upon
+`scannerManager.initScanner()` based on currently paired MAC addresses.
+Not that this method does not connect the scanner, but simply creates
+the proper `ScannerWrapper` instance.
+
 ### Controllers and Helper Classes
+
+To avoid `ScannerWrapperV2` from growing too large, a lot of controlling
+logic for Vero 2 is factored into [other classes](./controllers/v2/):
+
+- [`ConnectionHelper`](./controllers/v2/ConnectionHelper.kt) - This is
+  for handling connecting and disconnecting to the scanner, as well as
+  holding the reference to the `ComponentBluetoothSocket`.
+- [`ScannerInitialSetupHelper`](./controllers/v2/ScannerInitialSetupHelper.kt)
+  \- This class is for handling the initial setup to the scanner upon
+  connection, such as retrieving and checking the firmware version and
+  battery level, and determining whether OTA is necessary (see
+  [Update Triggering](#update-triggering)).
+- OTA Update Helpers - These classes are for conducting the OTA steps
+  required for each of the three chips (see
+  [OTA Update Flow](#ota-update-flow)).
+
+In use by the `ScannerManager` and throughout other parts of the code
+are some helper classes and tools:
+
+- [`ScannerFactory`](./factory/ScannerFactory.kt) - For creating the
+  `ScannerWrapper` object itself once the MAC address to use has been
+  determined.
+- [`ScannerPairingManager`](./pairing/ScannerPairingManager.kt) - For
+  programmatic pairing of the scanner, helper functions for MAC
+  addresses, and callbacks for once the scanner is paired.
+- [`ScannerUiHelper`](./ui/ScannerUiHelper.kt) - (For Vero 2 only) For
+  determining the correct LED state to send to Vero 2 based on different
+  situations.
+- [`ScannerGenerationDeterminer`](./tools/ScannerGenerationDeterminer.kt)
+  \- Helper class for determining which generation of Vero a particular
+  MAC address corresponds to.
+- [`SerialNumberConverter`](./tools/SerialNumberConverter.kt) - Helper
+  class for converting back and forth between Vero serial numbers and
+  MAC addresses.
 
 ## Vero 2 Versioning and OTA
 
