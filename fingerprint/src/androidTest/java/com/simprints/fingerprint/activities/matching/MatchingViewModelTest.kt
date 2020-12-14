@@ -34,6 +34,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declareModule
 import java.io.Serializable
+import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
 @RunWith(AndroidJUnit4::class)
 class MatchingViewModelTest : KoinTest {
@@ -48,10 +49,10 @@ class MatchingViewModelTest : KoinTest {
 
     private fun mockSuccessfulMatcher() {
         coEvery { mockMatcher.match(any(), any(), any()) } coAnswers {
-            val probe = this.firstArg<com.simprints.fingerprintmatcher.domain.FingerprintIdentity>()
-            this.secondArg<Flow<com.simprints.fingerprintmatcher.domain.FingerprintIdentity>>()
+            val probe = this.firstArg<MatcherFingerprintIdentity>()
+            this.secondArg<Flow<MatcherFingerprintIdentity>>()
                 .map {
-                    MatchResult(it.id, if (probe.fingerprints == it.fingerprints) SUCCESSFUL_MATCH_SCORE else NOT_MATCH_SCORE)
+                    MatchResult(it.id, if (doFingerprintsMatch(probe, it)) SUCCESSFUL_MATCH_SCORE else NOT_MATCH_SCORE)
                 }
         }
     }
@@ -75,7 +76,7 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun identificationRequest_startedAndAwaitedWithSuccessfulMatch_finishesWithProbeInMatchResult() {
+    fun identifyRequest_startedAndAwaitedWithSuccessfulMatch_finishesWithProbeInMatchResult() {
         mockSuccessfulMatcher()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
@@ -95,7 +96,7 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun identificationRequest_startedAndAwaitedWithoutSuccessfulMatch_finishesWithoutProbeInMatchResult() {
+    fun identifyRequest_startedAndAwaitedWithoutSuccessfulMatch_finishesWithoutProbeInMatchResult() {
         mockSuccessfulMatcher()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithoutProbe)
@@ -113,7 +114,8 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun verificationRequest_startedAndAwaited_finishesWithCorrectResult() {
+    fun verifyRequest_startedAndAwaited_finishesWithCorrectResult() {
+        mockSuccessfulMatcher()
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
@@ -131,7 +133,8 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun identificationRequest_startedAndAwaited_updatesViewCorrectly() {
+    fun identifyRequest_startedAndAwaited_updatesViewCorrectly() {
+        mockSuccessfulMatcher()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
 
@@ -149,7 +152,8 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun verificationRequest_startedAndAwaited_updatesViewCorrectly() {
+    fun verifyRequest_startedAndAwaited_updatesViewCorrectly() {
+        mockSuccessfulMatcher()
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
@@ -201,6 +205,11 @@ class MatchingViewModelTest : KoinTest {
     private fun setupDbManagerLoadCandidates(candidates: List<FingerprintIdentity>) {
         coEvery { dbManagerMock.loadPeople(any()) } returns candidates.asFlow()
     }
+
+    private fun doFingerprintsMatch(probe: MatcherFingerprintIdentity, candidate: MatcherFingerprintIdentity) =
+        probe.fingerprints.map { it.template }
+            .zip(candidate.fingerprints.map {it.template})
+            .all { (first, second) -> first.zip(second).all { (a, b) -> a == b } }
 
     @After
     fun tearDown() {
