@@ -44,6 +44,7 @@ class VerificationTask(private val viewModel: MatchingViewModel,
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
             MatchingTaskResult(listOf(matchResult)))
 
+        viewModel.progress.postValue(100)
         viewModel.result.postValue(MatchingViewModel.FinishResult(ResultCode.OK, resultData, 0))
     }
 
