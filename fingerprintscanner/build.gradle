@@ -46,6 +46,9 @@ dependencies {
     // Android
     implementation deps.androidx.appcompat
 
+    // Logging
+    implementation deps.timber.core
+
     // RxJava
     implementation deps.rxjava2.core
     implementation deps.rxjava2.android
