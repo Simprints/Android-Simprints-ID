@@ -59,9 +59,6 @@ public class SimAfisFingerprint implements Parcelable {
     public SimAfisFingerprint(@NonNull SimAfisFingerIdentifier fingerId, @NonNull byte[] isoTemplateBytes)
             throws IllegalArgumentException {
         this.fingerId = fingerId;
-        //noinspection ConstantConditions
-        if (isoTemplateBytes == null)
-            throw new IllegalArgumentException("Invalid template");
         this.template = ByteBuffer.allocateDirect(isoTemplateBytes.length);
         this.template.put(isoTemplateBytes);
         template.order(ByteOrder.BIG_ENDIAN);
