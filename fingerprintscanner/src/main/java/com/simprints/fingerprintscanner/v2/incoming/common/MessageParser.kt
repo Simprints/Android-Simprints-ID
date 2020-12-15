@@ -4,6 +4,13 @@ import com.simprints.fingerprintscanner.v2.domain.Message
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
 import java.nio.BufferUnderflowException
 
+/**
+ * High level interface for parsing bytes into a [Message] of sub-type [R].
+ * The bytes received are assumed to be a complete, single message in byte form.
+ *
+ * Any exceptions that occur during parsing are wrapped and transformed into
+ * [InvalidMessageException]
+ */
 interface MessageParser<out R : Message> {
 
     /** @throws InvalidMessageException if message could not be successfully parsed */
