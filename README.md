@@ -71,14 +71,14 @@ If you want to build the app via command line you'll need to provide a combinati
 The examples below will show how to create app bundles using `./gradlew`.
 To create apks, use the `assemble` command instead of `bundle`.
 
-| Command                   | Debuggable      | Logs to file|  Environment  |
-|---------------------------|-----------------|-------------|---------------|
-| `bundleStandardDebug`     |       ✓         |     x       |  development  |
-| `bundleWithLogFileDebug`  |       ✓         |     ✓       |  development  |
-| `bundleStandardStaging`   |       x         |     x       |    staging    |
-| `bundleWithLogFileStaging`|       x         |     ✓       |    staging    |
-| `bundleStandardRelease`   |       x         |     x       |  production   |
-| `bundleWithLogFileRelease`|       x         |     ✓       |  production   |
+| Command                   | Debuggable      | Logs to file|  Environment                           |
+|---------------------------|-----------------|-------------|----------------------------------------|
+| `bundleStandardDebug`     |       ✓         |     x       |  development  						 |
+| `bundleWithLogFileDebug`  |       ✓         |     ✓       |  development  						 |
+| `bundleStandardStaging`   |       x         |     x       |    staging    						 |
+| `bundleWithLogFileStaging`|       x         |     ✓       |    staging    						 |
+| `bundleStandardRelease`   |       x         |     x       |  production (should be done in the CI) |
+| `bundleWithLogFileRelease`|       x         |     ✓       |  production (should be done in the CI) |
 
 ## Creation of universal apk
 To create an universal apk that can be shared you need to:
@@ -90,3 +90,17 @@ To create an universal apk that can be shared you need to:
 `bundletool build-apks --bundle=id/build/outputs/bundle/standard/debug/id-debug.aab --output=id-standard-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
 
 To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).
+
+## Deploying to the Google Play Store
+For a full guide go [here](https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+a+new+version) to get the complete breakdown. 
+
+Deploying to the Google Play Store has several steps:
+
+1. Update the VersionCode and VersionName 
+
+2. Building and signing a release bundle
+
+3. Uploading to the Google Play Store. 
+
+These steps are done automatically with [Bitbuket Piplines Deployments](https://bitbucket.org/simprints/android-simprints-id/addon/pipelines/deployments). 
+Pipelines in a release branch will have an extra step which can automatically upload the release to the internal test track. 
