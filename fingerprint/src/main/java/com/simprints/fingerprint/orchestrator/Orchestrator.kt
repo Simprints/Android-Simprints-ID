@@ -8,6 +8,10 @@ import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
 import com.simprints.fingerprint.orchestrator.taskflow.toFingerprintTaskFlow
 
+/**
+ * Principle class for co-ordinating tasks within the fingerprint module. See neighbouring README
+ * for details.
+ */
 class Orchestrator(private val finalResultBuilder: FinalResultBuilder) {
 
     private lateinit var taskFlow: FingerprintTaskFlow
