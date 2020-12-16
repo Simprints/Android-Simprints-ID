@@ -41,17 +41,17 @@ class SimulatedScannerManager(
 
 - `simulationMode` - The [SimulationMode](./SimulationMode.kt)
   determines which generation of Vero to simulate.
-  - `SimulationMode.V1` will simulate a Vero 1
-  - `SimulationMode.V2` will simulate a Vero 2
+    - `SimulationMode.V1` will simulate a Vero 1
+    - `SimulationMode.V2` will simulate a Vero 2
 - `initialScannerState` - The beginning `SimulatedScannerState`. Default
   (`null`) will create a disconnected scanner waiting for connection.
 - `simulationSpeedBehaviour` - How much delay should the simulation add
   before responding to messages.
-  - `SimulationSpeedBehaviour.INSTANT` will add no delay at all between
+    - `SimulationSpeedBehaviour.INSTANT` will add no delay at all between
     receiving a command and returning the response, allowing for very
     fast communication. This is ideal for unit and integration tests.
     This setting is the default.
-  - `SimulationSpeedBehaviour.REALISTIC` will add a delay between
+    - `SimulationSpeedBehaviour.REALISTIC` will add a delay between
     receiving a command and returning a response depending on the
     command, allowing for a realistic feel for the simulated scanner.
     Additionally, time will be added between Bluetooth packets. This is
@@ -65,13 +65,13 @@ class SimulatedScannerManager(
   fingerprint corresponding the second in the array, and so on. Upon
   reaching the end of the array, subsequent scans will loop to the
   beginning of the array.
-  - The default is `SimulatedFinger.person1TwoFingersGoodScan`.
-  - Multiple versions of the same finger can be used in tests for
+    - The default is `SimulatedFinger.person1TwoFingersGoodScan`.
+    - Multiple versions of the same finger can be used in tests for
     successful matching with good match scores during testing, or
     different people/fingers can be used for low match scores.
-  - There are options for good scans and poor scans that yield different
+    - There are options for good scans and poor scans that yield different
     quality scores.
-  - There is an option for if no finger is detected by the scanner at
+    - There is an option for if no finger is detected by the scanner at
     all, `SimulatedFinger.NO_FINGER`.
 - `pairedScannerAddresses` - This is a set of MAC addresses that the
   will act as if they are paired to the Bluetooth adapter. By default,

@@ -68,7 +68,7 @@ import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Consider this flow:
+ * Note on the consumers mechanism - consider this flow:
  * - consumers starts at 0
  * - Setup callout: OrchestratorActivity.onCreate() , Koin modules created, consumers + 1 → 1 (The Koin modules are now loaded)
  * - Then, Normal callout (e.g. match) begins before previous on destroy: OrchestratorActivity.onCreate(), consumers + 1 → 2
@@ -117,6 +117,9 @@ object KoinInjector {
         }
 
 
+    /**
+     * These are classes that are wrappers of ones that appear in the main app module
+     */
     private fun Module.defineBuildersForFingerprintManagers() {
         single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
