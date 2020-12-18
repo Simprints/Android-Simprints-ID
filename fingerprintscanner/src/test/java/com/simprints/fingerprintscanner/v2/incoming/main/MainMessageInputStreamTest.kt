@@ -30,16 +30,16 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 class MainMessageInputStreamTest {
-    
+
+    private val testScheduler = TestScheduler()
+    private val packetRouter = mock<PacketRouter>()
+    private val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
+    private val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
+    private val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
+    private val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
+
     @Test
     fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() {
-        val testScheduler = TestScheduler()
-        val packetRouter = mock<PacketRouter>()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
-
         val messageBytes = "20 10 01 00 FF".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
@@ -68,13 +68,6 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveUn20Response_correctlyForwardsResponse() {
-        val testScheduler = TestScheduler()
-        val packetRouter = mock<PacketRouter>()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
-
         val messageBytes = "30 00 01 00 00 00 10".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
         val expectedResponse = GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
@@ -103,13 +96,6 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_subscribeToVeroEvents_correctlyForwardsEvents() {
-        val testScheduler = TestScheduler()
-        val packetRouter = mock<PacketRouter>()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
-
         val numberOfEvents = 5
         val messageBytes = "3A 00 00 00".repeat(numberOfEvents).hexToByteArray()
         val packets = messageBytes.chunked(3).map { packetWithSourceAndPayload(Route.Remote.VeroEvent, it) }
@@ -140,13 +126,6 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveMultipleOfSameResponses_forwardsOnlyFirstAsResponse() {
-        val testScheduler = TestScheduler()
-        val packetRouter = mock<PacketRouter>()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
-
         val messageBytes = "20 10 01 00 FF 20 10 01 00 00".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val firstExpectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
@@ -175,13 +154,6 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() {
-        val testScheduler = TestScheduler()
-        val packetRouter = mock<PacketRouter>()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
-
         val messageBytes = "20 20 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
         val packets = messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
@@ -210,13 +182,6 @@ class MainMessageInputStreamTest {
 
     @Test
     fun messageInputStream_receiveResponsesAndEventsFromMultipleRoutesSimultaneously_correctlyForwardsResponsesAndEvents() {
-        val testScheduler = TestScheduler()
-        val packetRouter = mock<PacketRouter>()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(packetRouter, veroResponseAccumulator, veroEventAccumulator, un20ResponseAccumulator)
-
         val veroResponseBytes = "20 10 01 00 FF".hexToByteArray()
         val expectedVeroResponse = GetUn20OnResponse(DigitalValue.TRUE)
         val numberOfEvents = 5
