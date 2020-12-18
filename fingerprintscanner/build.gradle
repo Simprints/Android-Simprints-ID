@@ -114,8 +114,7 @@ repositories {
 task {
     test {
         retry {
-            maxRetries = 3
-            failOnPassedAfterRetry = true
+            maxRetries = 5
         }
     }
 }
