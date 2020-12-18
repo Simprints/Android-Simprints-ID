@@ -30,7 +30,7 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 class MainMessageInputStreamTest {
-    
+
     @Test
     fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() {
         val testScheduler = TestScheduler()

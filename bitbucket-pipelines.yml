@@ -181,29 +181,6 @@ flows:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
 
-    -   flow: &fingerprintscanner
-            -   parallel:
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
@@ -212,6 +189,5 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         ci/*: *main-flow
-        bio/*: *fingerprintscanner
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
