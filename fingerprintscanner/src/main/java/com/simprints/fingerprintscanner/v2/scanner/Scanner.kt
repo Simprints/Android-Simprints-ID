@@ -331,6 +331,7 @@ class Scanner(
             ))
             .map { it.captureFingerprintResult }
 
+    /** Requires UN20 API 1.1 */
     fun setScannerLedStateOn() : Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
@@ -339,6 +340,7 @@ class Scanner(
             .completeOnceReceived()
             .doOnComplete { state.scanLedState = true }
 
+    /** Requires UN20 API 1.1 */
     fun setScannerLedStateDefault() : Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
@@ -347,6 +349,8 @@ class Scanner(
             .completeOnceReceived()
             .doOnComplete { state.scanLedState = false }
 
+    /** Requires UN20 API 1.1
+     * No value emitted if an image could not be captured */
     fun getImageQualityPreview() : Maybe<Int> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
@@ -361,6 +365,7 @@ class Scanner(
             ))
             .map { it.supportedTemplateTypes }
 
+    /** No value emitted if an image has not been captured */
     fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Maybe<TemplateData> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetTemplateResponse>(
@@ -375,6 +380,7 @@ class Scanner(
             ))
             .map { it.supportedImageFormats }
 
+    /** No value emitted if an image has not been captured */
     fun acquireImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): Maybe<ImageData> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageResponse>(
@@ -382,6 +388,7 @@ class Scanner(
             ))
             .mapToMaybeEmptyIfNull { it.imageData }
 
+    /** No value emitted if an image has not been captured */
     fun getImageQualityScore(): Maybe<Int> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageQualityResponse>(
