@@ -184,15 +184,27 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - export ANDROID_SDK_ROOT=$PWD/android && export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin && export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/sdks/ndk-bundle
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
-                    - echo "$SIGNING_JKS_FILE" | base64 -di > android-signing-keystore.jks
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - ./gradlew bundleStandardRelease
                     - ./gradlew id:publishStandardReleaseBundle
                 artifacts:
                     - id/build/outputs/**
+
+        -   step: &promote-to-alpha
+                name: "Promote Internal to Alpha"
+                deployment: Alpha
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - echo $GOOGLE_API_KEY_JSON > google_api_key.json
+                    - ./gradlew id:promoteArtifact --track Alpha-Test
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -222,7 +234,9 @@ flows:
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
     -   flow: &ci-test
+            -   step: *run-clientapi-unit-tests
             -   step: *sign-and-deploy-to-internal
+            -   step: *promote-to-alpha
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -232,6 +246,6 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         release/*: *deploy-flow
-        ci/*: *deploy-flow
+        ci/*: *ci-test
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere

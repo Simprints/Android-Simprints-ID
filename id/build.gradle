@@ -130,7 +130,6 @@ android {
 play {
     serviceAccountCredentials = file("${rootDir}/google_api_key.json")
     defaultToAppBundles true
-    releaseStatus = "draft"
     artifactDir = file("build/outputs/bundle/standardRelease")
 }
 
