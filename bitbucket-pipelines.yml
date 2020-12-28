@@ -24,7 +24,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - . ./ci/pipeline/setup
+                    - bash ./ci/pipeline/setup
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
@@ -189,7 +189,7 @@ definitions:
                     - bash ./ci/pipeline/release_setup
                     - echo "$SIGNING_JKS_FILE" | base64 -di > android-signing-keystore.jks
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - ./gradlew clean bundleStandardRelease
+                    - ./gradlew bundleStandardRelease
                     - ./gradlew id:publishStandardReleaseBundle
                 artifacts:
                     - id/build/outputs/**
