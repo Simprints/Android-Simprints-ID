@@ -192,11 +192,15 @@ definitions:
                 artifacts:
                     - id/build/outputs/**
 
+        ######################################################################
+        # Promote an Internal build to the Closed Alpha Track. This step does
+        # not build the signed APK, it just promotes the existing Internal
+        # deployment via the Play Store API.
+        ######################################################################
         -   step: &promote-to-alpha
                 name: "Promote Internal to Alpha"
                 deployment: Alpha
                 max-time: 30
-                size: 2x
                 trigger: manual
                 caches:
                     - gradle
@@ -204,7 +208,7 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - ./gradlew id:promoteArtifact --track Alpha-Test
+                    - ./gradlew id:promoteArtifact --from-track internal --promote-track alpha-test
 
 ######################################################################
 # Define the different pipelines flows as anchors.
