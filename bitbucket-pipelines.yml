@@ -208,7 +208,7 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - ./gradlew id:promoteArtifact --from-track internal --promote-track alpha-test
+                    - ./gradlew id:promoteArtifact --track alpha
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -237,6 +237,7 @@ flows:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
+            -   step: *promote-to-alpha
     -   flow: &ci-test
             -   step: *run-clientapi-unit-tests
             -   step: *sign-and-deploy-to-internal
@@ -250,6 +251,6 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         release/*: *deploy-flow
-        ci/*: *ci-test
+        ci/*: *deploy-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
