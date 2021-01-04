@@ -2,6 +2,9 @@ package com.simprints.fingerprint.scanner.tools
 
 import android.annotation.SuppressLint
 
+/**
+ * Helper class for converting to and from Vero serial numbers and MAC addresses.
+ */
 class SerialNumberConverter {
 
     /**
