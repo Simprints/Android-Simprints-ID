@@ -2,6 +2,8 @@ package com.simprints.fingerprintscanner.v2.scanner.errorhandler
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.INTERVAL
+import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
@@ -34,10 +36,11 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }
-                .handleErrorsWith(responseErrorHandler).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
-        testScheduler.advanceTimeBy(10000, TimeUnit.MILLISECONDS)
+        do {
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.awaitAndAssertSuccess()
         testSubscriber.assertValue(successValue)
@@ -66,10 +69,11 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }
-                .handleErrorsWith(responseErrorHandler).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
-        testScheduler.advanceTimeBy(10000, TimeUnit.MILLISECONDS)
+        do {
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
         testSubscriber.assertError(IOException::class.java)
@@ -84,6 +88,7 @@ class ResponseErrorHandlerTest {
         val testSubscriber = Single
             .error<String>(thrownException)
             .handleErrorsWith(responseErrorHandler)
+            .timeout(TIMEOUT, TimeUnit.SECONDS)
             .test()
 
         testSubscriber.await()
@@ -110,10 +115,11 @@ class ResponseErrorHandlerTest {
                             this
                         }
                     }
-            }
-                .handleErrorsWith(responseErrorHandler).test()
+            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
 
-        testScheduler.advanceTimeBy(10000, TimeUnit.MILLISECONDS)
+        do {
+            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
+        } while (!testSubscriber.isTerminated)
 
         testSubscriber.await()
         testSubscriber.assertValue(successValue)
