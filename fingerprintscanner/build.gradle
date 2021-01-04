@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
+apply plugin: "org.gradle.test-retry"
 
 project.version = "2020.1.2"
 
@@ -108,4 +109,12 @@ artifactory {
 
 repositories {
     mavenCentral()
+}
+
+task {
+    test {
+        retry {
+            maxRetries = 5
+        }
+    }
 }
