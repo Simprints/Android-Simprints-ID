@@ -2,6 +2,9 @@ package com.simprints.fingerprint.scanner.tools
 
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 
+/**
+ * Helper class for determining which Vero generation a particular MAC address corresponds to.
+ */
 class ScannerGenerationDeterminer {
 
     /**

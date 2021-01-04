@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <pthread.h>
+#include <string.h>
 
 #include "SimMatcher/src/afm-src/afm.h"
 
@@ -81,15 +82,15 @@ JavaVM *jvm;
 
 
 // Resolve and cache once all the jclass and jmethodId used later
-JNIEXPORT jboolean JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_nativeInit(
+JNIEXPORT jboolean JNICALL Java_com_simprints_fingerprintmatcher_algorithms_simafis_JNILibAfis_nativeInit(
         JNIEnv* env,
         jobject obj)
 {
     LOG("nativeInit() Initializing classes");
     DEFINE_GLOBAL_CLASS(c_List, "java/util/List");
-    DEFINE_GLOBAL_CLASS(c_Person, "com/simprints/fingerprintmatcher/Person");
-    DEFINE_GLOBAL_CLASS(c_Fingerprint, "com/simprints/fingerprintmatcher/Fingerprint");
-    DEFINE_GLOBAL_CLASS(c_FingerIdentifier, "com/simprints/libsimprints/FingerIdentifier");
+    DEFINE_GLOBAL_CLASS(c_Person, "com/simprints/fingerprintmatcher/algorithms/simafis/models/SimAfisPerson");
+    DEFINE_GLOBAL_CLASS(c_Fingerprint, "com/simprints/fingerprintmatcher/algorithms/simafis/models/SimAfisFingerprint");
+    DEFINE_GLOBAL_CLASS(c_FingerIdentifier, "com/simprints/fingerprintmatcher/algorithms/simafis/models/SimAfisFingerIdentifier");
 
     LOG("nativeInit() Initializing methods");
     DEFINE_GLOBAL_METHOD(m_size, c_List, "size", "()I");
@@ -97,10 +98,10 @@ JNIEXPORT jboolean JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_nati
 
     DEFINE_GLOBAL_METHOD(m_getFingerprints, c_Person, "getFingerprints", "()Ljava/util/List;");
 
-    DEFINE_GLOBAL_METHOD(m_getFingerIdentifier, c_Fingerprint, "getFingerId", "()Lcom/simprints/libsimprints/FingerIdentifier;");
+    DEFINE_GLOBAL_METHOD(m_getFingerIdentifier, c_Fingerprint, "getFingerId", "()Lcom/simprints/fingerprintmatcher/algorithms/simafis/models/SimAfisFingerIdentifier;");
     DEFINE_GLOBAL_METHOD(m_getDirectBufferTemplate, c_Fingerprint, "getTemplateDirectBuffer", "()Ljava/nio/ByteBuffer;");
 
-    DEFINE_GLOBAL_STATIC_METHOD(m_values, c_FingerIdentifier, "values", "()[Lcom/simprints/libsimprints/FingerIdentifier;");
+    DEFINE_GLOBAL_STATIC_METHOD(m_values, c_FingerIdentifier, "values", "()[Lcom/simprints/fingerprintmatcher/algorithms/simafis/models/SimAfisFingerIdentifier;");
     DEFINE_GLOBAL_METHOD(m_ordinal, c_FingerIdentifier, "ordinal", "()I");
 
     LOG("nativeInit() Initializing objects");
@@ -109,7 +110,7 @@ JNIEXPORT jboolean JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_nati
     return JNI_TRUE;
 }
 
-JNIEXPORT jint JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_getNbCores(
+JNIEXPORT jint JNICALL Java_com_simprints_fingerprintmatcher_algorithms_simafis_JNILibAfis_getNbCores(
         JNIEnv *env,
         jobject obj)
 {
@@ -117,7 +118,7 @@ JNIEXPORT jint JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_getNbCor
 }
 
 
-JNIEXPORT jfloat JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_verify(
+JNIEXPORT jfloat JNICALL Java_com_simprints_fingerprintmatcher_algorithms_simafis_JNILibAfis_verify(
         JNIEnv* env,
         jobject obj,
         jobject probe,
@@ -285,7 +286,7 @@ void* performMatchingTask(void *arg)
     return NULL;
 }
 
-JNIEXPORT jfloatArray JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_identify(
+JNIEXPORT jfloatArray JNICALL Java_com_simprints_fingerprintmatcher_algorithms_simafis_JNILibAfis_identify(
         JNIEnv* env,
         jobject obj,
         jobject probe,
