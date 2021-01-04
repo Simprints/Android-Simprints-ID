@@ -57,6 +57,7 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.tools.BatteryLevelChecker
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
+import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import org.koin.android.ext.koin.androidContext
@@ -175,6 +176,8 @@ object KoinInjector {
 
         factory { FingerPriorityDeterminer() }
         factory { StartingStateDeterminer() }
+
+        factory { FingerprintMatcher.create() }
     }
 
     private fun Module.defineBuildersForPresentersAndViewModels() {
@@ -188,7 +191,7 @@ object KoinInjector {
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
         viewModel { OtaViewModel(get(), get(), get(), get(), get()) }

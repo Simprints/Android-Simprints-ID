@@ -1,6 +1,9 @@
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
+apply plugin: 'kotlin-android-extensions'
 
 apply from: 'profiling.gradle'
 
@@ -37,9 +40,12 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':libsimprints')
 
     implementation deps.androidx.appcompat
+
+    // Kotlin
+    implementation deps.kotlin.stdlib
+    implementation deps.kotlin.coroutines_core
 
     testImplementation 'junit:junit:4.12'
 }
