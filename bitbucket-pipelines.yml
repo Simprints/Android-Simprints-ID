@@ -24,7 +24,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - . ./ci/pipeline/setup
+                    - bash ./ci/pipeline/setup
                     - ./gradlew clientapi:jacocoTestReportStandardDebug
                 artifacts:
                     - clientapi/build/reports/**
@@ -58,7 +58,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportStandardDebug --no-daemon
+                    - ./gradlew face:jacocoTestReportStandardDebug
                 artifacts:
                     - face/build/reports/**
 
@@ -165,6 +165,49 @@ definitions:
                 artifacts:
                     - ci/pipeline/test-reports/**
 
+        ######################################################################
+        # Build a signed bundle with the Playstore upload key, and deploy it
+        # to the internal test track. Also upload the bundle and the relevant
+        # output files to artifacts.
+        #
+        # Signing vars are only available on a deployment step.
+        ######################################################################
+        -   step: &sign-and-deploy-to-internal
+                name: "Sign & Deploy to Internal Track"
+                deployment: Internal
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - bash ./ci/pipeline/release_setup
+                    - echo $GOOGLE_API_KEY_JSON > google_api_key.json
+                    - ./gradlew bundleStandardRelease
+                    - ./gradlew id:publishStandardReleaseBundle
+                artifacts:
+                    - id/build/outputs/**
+
+        ######################################################################
+        # Promote an Internal build to the Closed Alpha Track. This step does
+        # not build the signed APK, it just promotes the existing Internal
+        # deployment via the Play Store API.
+        ######################################################################
+        -   step: &promote-to-alpha
+                name: "Promote Internal to Alpha"
+                deployment: Alpha
+                max-time: 30
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - echo $GOOGLE_API_KEY_JSON > google_api_key.json
+                    - ./gradlew id:promoteArtifact --track alpha
+
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
@@ -180,6 +223,23 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
+    -   flow: &deploy-flow
+            -   parallel:
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *build-and-sign-universal-apk
+            -   parallel:
+                    -   step: *upload-sonar-scan-and-check-quality-gate
+                    -   step: *run-all-android-tests
+            -   step: *sign-and-deploy-to-internal
+            -   step: *promote-to-alpha
+    -   flow: &ci-test
+            -   step: *run-clientapi-unit-tests
+            -   step: *sign-and-deploy-to-internal
+            -   step: *promote-to-alpha
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -188,6 +248,7 @@ pipelines:
     branches:
         master: *main-flow
         develop: *main-flow
-        ci/*: *main-flow
+        release/*: *deploy-flow
+        ci/*: *deploy-flow
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
