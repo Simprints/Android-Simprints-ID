@@ -16,6 +16,10 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * Helper class for connecting to a Vero 2 with retries.
+ * Holds a reference to the [ComponentBluetoothSocket] so that it can be disconnected later.
+ */
 class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
                        private val timeScheduler: Scheduler = Schedulers.io()) {
 
