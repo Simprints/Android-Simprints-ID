@@ -1,10 +1,9 @@
 package com.simprints.fingerprint.scanner
 
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.scanner.exceptions.safe.*
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -61,16 +60,4 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
     }
 
     private fun bluetoothIsEnabled() = bluetoothAdapter.isEnabled()
-
-    override fun getAlertType(e: Throwable): FingerprintAlert =
-        when (e) {
-            is BluetoothNotEnabledException -> FingerprintAlert.BLUETOOTH_NOT_ENABLED
-            is BluetoothNotSupportedException -> FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
-            is MultiplePossibleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS
-            is ScannerLowBatteryException -> FingerprintAlert.LOW_BATTERY
-            is ScannerNotPairedException -> FingerprintAlert.NOT_PAIRED
-            is ScannerDisconnectedException -> FingerprintAlert.DISCONNECTED
-            is UnknownScannerIssueException -> FingerprintAlert.DISCONNECTED
-            else -> FingerprintAlert.UNEXPECTED_ERROR
-        }
 }

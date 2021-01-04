@@ -11,6 +11,9 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
 
+/**
+ * Downloads the latest firmware binaries, ensuring that the latest versions are always on the phone.
+ */
 class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
     : CoroutineWorker(context, params), KoinComponent {
 

@@ -13,6 +13,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 import java.io.IOException
 
@@ -82,9 +83,9 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
     private fun logExceptionIfRequired(t: Throwable?) {
         t?.let {
-            it.printStackTrace()
+            Timber.d(t)
             // IOExceptions are about network issues, so they are not worth to report
-            if (it !is IOException) {
+            if (it !is IOException || it !is CancellationException) {
                 crashReportManager.logExceptionOrSafeException(it)
             }
         }
