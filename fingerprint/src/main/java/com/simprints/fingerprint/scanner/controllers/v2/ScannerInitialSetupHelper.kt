@@ -16,6 +16,10 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
+/**
+ * For handling the initial setup to the scanner upon connection, such as retrieving and checking
+ * the firmware version and battery level, and determining whether OTA is necessary.
+ */
 class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLocalDataSource,
                                 private val connectionHelper: ConnectionHelper,
                                 private val batteryLevelChecker: BatteryLevelChecker,
@@ -23,6 +27,9 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
 
     private lateinit var scannerVersion: ScannerVersion
 
+    /**
+     * @throws OtaAvailableException If an OTA update is available and the battery is sufficiently charged.
+     */
     fun setupScannerWithOtaCheck(
         scanner: Scanner,
         macAddress: String,
