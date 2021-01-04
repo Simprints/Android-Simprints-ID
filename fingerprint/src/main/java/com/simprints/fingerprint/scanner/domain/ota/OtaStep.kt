@@ -15,6 +15,10 @@ sealed class CypressOtaStep(totalProgress: Float,
     object UpdatingUnifiedVersionInformation : CypressOtaStep(0.95f)
 }
 
+/**
+ * A quirk of the STM bootloader causes a disconnect upon first entering STM OTA mode, hence we
+ * need to reconnect and enter STM OTA mode a second time.
+ */
 sealed class StmOtaStep(totalProgress: Float,
                         recoveryStrategy: OtaRecoveryStrategy = OtaRecoveryStrategy.HARD_RESET)
     : OtaStep(totalProgress, recoveryStrategy) {
@@ -30,6 +34,10 @@ sealed class StmOtaStep(totalProgress: Float,
     object UpdatingUnifiedVersionInformation : StmOtaStep(0.95f, OtaRecoveryStrategy.SOFT_RESET)
 }
 
+/**
+ * A bug in UN20 app version 1.0 requires a delay after the transfer step otherwise the UN20 can be
+ * bricked, hence the [AwaitingCacheCommit] step.
+ */
 sealed class Un20OtaStep(totalProgress: Float,
                          recoveryStrategy: OtaRecoveryStrategy = OtaRecoveryStrategy.SOFT_RESET)
     : OtaStep(totalProgress, recoveryStrategy) {
