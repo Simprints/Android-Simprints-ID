@@ -10,6 +10,15 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 
+/**
+ * SimAFIS is Simprints' improvement over SourceAFIS, an open source fingerprint matching algorithm
+ * originally written in Java. It has been ported to C and optimized for use on Android.
+ *
+ * It is multithreaded by default. It currently does not support receiving a pipeline of candidates
+ * as they are loaded from the DB and instead requires all candidates to be presented up front as a
+ * list. It does not currently support progress indication and matching results are only available
+ * when all matching is completed.
+ */
 internal class SimAfisMatcher {
 
     suspend fun match(
