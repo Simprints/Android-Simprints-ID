@@ -9,14 +9,12 @@ import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
-import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -90,6 +88,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private lateinit var testProject: TestProject
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
+    private lateinit var eventLabels: EventLabels
 
     @MockK
     var remoteDbManager = mockk<RemoteDbManager>()
@@ -114,6 +113,7 @@ class EventRemoteDataSourceImplAndroidTest {
     fun setUp() {
         MockKAnnotations.init(this)
         testProject = testProjectRule.testProject
+        eventLabels =  EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 
         val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
@@ -404,7 +404,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(EnrolmentRecordCreationEvent(
             CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+            EventLabels(subjectId = GUID1, projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
         )
     }
 
