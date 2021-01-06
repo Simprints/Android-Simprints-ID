@@ -44,10 +44,6 @@ import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
@@ -412,22 +408,6 @@ class EventRemoteDataSourceImplAndroidTest {
         )
     }
 
-    private fun MutableList<Event>.addEnrolmentRecordMoveEvent() {
-        add(EnrolmentRecordMoveEvent(
-            CREATED_AT,
-            EnrolmentRecordCreationInMove(GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
-            EnrolmentRecordDeletionInMove(GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
-        )
-    }
-
-    private fun MutableList<Event>.addEnrolmentRecordDeletionEvent() {
-        add(EnrolmentRecordDeletionEvent(
-            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
-        )
-    }
-
     private fun MutableList<Event>.addCallbackErrorEvent() {
         ErrorCallbackPayload.Reason.values().forEach {
             add(ErrorCallbackEvent(DEFAULT_TIME, it, eventLabels))
@@ -484,8 +464,6 @@ class EventRemoteDataSourceImplAndroidTest {
         when (type) {
             SESSION_CAPTURE -> addSessionCaptureEvent()
             ENROLMENT_RECORD_CREATION -> addEnrolmentRecordCreation()
-            ENROLMENT_RECORD_DELETION -> addEnrolmentRecordDeletionEvent()
-            ENROLMENT_RECORD_MOVE -> addEnrolmentRecordMoveEvent()
             ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
             AUTHENTICATION -> addAuthenticationEvent()
             CONSENT -> addConsentEvent()
@@ -523,6 +501,8 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             FACE_CAPTURE_RETRY -> addFaceCaptureRetryEvent()
+            ENROLMENT_RECORD_DELETION,
+            ENROLMENT_RECORD_MOVE -> {}
         }.safeSealedWhens
     }
 
