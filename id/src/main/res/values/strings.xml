@@ -162,6 +162,7 @@
     <string name="login_title">Request Project credentials</string>
     <string name="requestLogin_message">You need to login. Please use your client app to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
+    <string name="device_id">DeviceID:\u0020%s</string>
     <string name="login">Login</string>
     <!-- QR code scanning messages -->
     <string name="login_qr_code_scanning_problem">A problem occurred while scanning the QR code</string>
