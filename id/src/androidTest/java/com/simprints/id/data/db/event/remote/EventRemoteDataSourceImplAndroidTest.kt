@@ -9,14 +9,12 @@ import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
-import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -44,10 +42,6 @@ import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
@@ -94,6 +88,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private lateinit var testProject: TestProject
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
+    private lateinit var eventLabels: EventLabels
 
     @MockK
     var remoteDbManager = mockk<RemoteDbManager>()
@@ -118,6 +113,7 @@ class EventRemoteDataSourceImplAndroidTest {
     fun setUp() {
         MockKAnnotations.init(this)
         testProject = testProjectRule.testProject
+        eventLabels =  EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 
         val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
@@ -408,23 +404,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(EnrolmentRecordCreationEvent(
             CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
-        )
-    }
-
-    private fun MutableList<Event>.addEnrolmentRecordMoveEvent() {
-        add(EnrolmentRecordMoveEvent(
-            CREATED_AT,
-            EnrolmentRecordCreationInMove(GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, buildFakeBiometricReferences()),
-            EnrolmentRecordDeletionInMove(GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
-        )
-    }
-
-    private fun MutableList<Event>.addEnrolmentRecordDeletionEvent() {
-        add(EnrolmentRecordDeletionEvent(
-            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-            EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+            EventLabels(subjectId = GUID1, projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
         )
     }
 
@@ -484,8 +464,6 @@ class EventRemoteDataSourceImplAndroidTest {
         when (type) {
             SESSION_CAPTURE -> addSessionCaptureEvent()
             ENROLMENT_RECORD_CREATION -> addEnrolmentRecordCreation()
-            ENROLMENT_RECORD_DELETION -> addEnrolmentRecordDeletionEvent()
-            ENROLMENT_RECORD_MOVE -> addEnrolmentRecordMoveEvent()
             ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
             AUTHENTICATION -> addAuthenticationEvent()
             CONSENT -> addConsentEvent()
@@ -523,6 +501,8 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             FACE_CAPTURE_RETRY -> addFaceCaptureRetryEvent()
+            ENROLMENT_RECORD_DELETION,
+            ENROLMENT_RECORD_MOVE -> {}
         }.safeSealedWhens
     }
 
