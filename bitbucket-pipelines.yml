@@ -240,8 +240,9 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-to-alpha
     -   flow: &ci-test
-            -   step: *run-clientapi-unit-tests
-            -   step: *run-fingerprintscanner-unit-tests
+            -   parallel:
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
             -   step: *upload-sonar-scan-and-check-quality-gate
 
 ######################################################################
