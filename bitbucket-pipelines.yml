@@ -110,6 +110,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - echo "org.gradle.daemon=false" >>gradle.properties
+                    - ./gradlew assembleStandardDebug
                     - bash ./ci/pipeline/install_java_11
                     - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
