@@ -241,8 +241,8 @@ flows:
             -   step: *promote-to-alpha
     -   flow: &ci-test
             -   step: *run-clientapi-unit-tests
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-to-alpha
+            -   step: *run-fingerprintscanner-unit-tests
+            -   step: *upload-sonar-scan-and-check-quality-gate
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -252,6 +252,6 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         release/*: *deploy-flow
-        ci/*: *deploy-flow
+        ci/*: *ci-test
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
