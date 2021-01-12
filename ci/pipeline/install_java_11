@@ -2,4 +2,4 @@
 
 add-apt-repository ppa:openjdk-r/ppa
 apt-get update
-apt-get install openjdk-11-jdk
+echo y | apt-get install openjdk-11-jdk
