@@ -7,6 +7,8 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreat
 import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
