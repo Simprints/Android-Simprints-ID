@@ -9,6 +9,7 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
 import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
+import com.simprints.id.data.db.event.remote.models.subject.fromApiToDomain
 
 @Keep
 data class ApiEvent(val id: String,

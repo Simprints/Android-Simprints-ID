@@ -7,11 +7,13 @@ import com.simprints.id.data.db.event.domain.models.subject.BiometricReference
 import com.simprints.id.data.db.event.domain.models.subject.FaceTemplate
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintTemplate
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplate
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier.*
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplate
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplateFormat.RANK_ONE_1_23
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier.*
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplateFormat.ISO_19794_2
 import com.simprints.id.data.db.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
 
@@ -43,10 +45,10 @@ enum class ApiBiometricReferenceType {
 
 fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
-        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, metadata)
+        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, RANK_ONE_1_23, metadata)
     }
     is DomainFingerprintReference -> {
-        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, metadata)
+        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, ISO_19794_2, metadata)
     }
 }
 
