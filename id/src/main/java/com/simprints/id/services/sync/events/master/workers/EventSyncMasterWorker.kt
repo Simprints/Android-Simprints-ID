@@ -72,11 +72,12 @@ open class EventSyncMasterWorker(
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
-            if (!canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
-
             try {
                 getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
+
+                if (!canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
+
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
                 timeHelper.now()
