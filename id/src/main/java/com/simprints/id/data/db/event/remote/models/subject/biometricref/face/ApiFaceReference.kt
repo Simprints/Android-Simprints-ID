@@ -10,6 +10,7 @@ import java.util.*
 data class ApiFaceReference(
     override val id: String = UUID.randomUUID().toString(),
     val templates: List<ApiFaceTemplate>,
+    val format: ApiFaceTemplateFormat,
     val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
     override val type: ApiBiometricReferenceType = FaceReference
 }
