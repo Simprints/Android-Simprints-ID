@@ -9,6 +9,9 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
+import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -50,6 +53,10 @@ class EventSyncMasterWorkerTest {
         get() = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
 
     private lateinit var masterWorker: EventSyncMasterWorker
+    private val preferencesManager = mockk<PreferencesManager>(relaxed = true) {
+        every { eventDownSyncSetting } returns ON
+        every { syncDestinationSetting } returns SIMPRINTS
+    }
 
     @Before
     fun setUp() {
@@ -73,8 +80,8 @@ class EventSyncMasterWorkerTest {
             eventSyncCache = mockk(relaxed = true)
             eventSyncSubMasterWorkersBuilder = mockk(relaxed = true)
             timeHelper = TestTimeHelperImpl()
+            preferenceManager = preferencesManager
         }
-        mockSubjectsDownSyncSetting(ON)
     }
 
     @Test
@@ -156,13 +163,27 @@ class EventSyncMasterWorkerTest {
         verify { masterWorker.resultSetter.failure(any()) }
     }
 
+    @Test
+    fun doWork_cantSyncSimprints() = runBlocking {
+        val uniqueSyncId = masterWorker.uniqueSyncId
+        prepareSyncWorkers(uniqueSyncId)
+        mockSyncDestinationSetting(COMMCARE)
+
+        masterWorker.doWork()
+
+        verify { masterWorker.resultSetter.success() }
+        assertSyncChainWasNotBuild()
+    }
+
     private fun enqueueASyncWorker(): String {
-        wm.enqueue(OneTimeWorkRequestBuilder<EventDownSyncDownloaderWorker>()
-            .setConstraints(constraintsForWorkers())
-            .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
-            .addTag(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
-            .addTag("${TAG_MASTER_SYNC_ID}$UNIQUE_SYNC_ID")
-            .build())
+        wm.enqueue(
+            OneTimeWorkRequestBuilder<EventDownSyncDownloaderWorker>()
+                .setConstraints(constraintsForWorkers())
+                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+                .addTag(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
+                .addTag("${TAG_MASTER_SYNC_ID}$UNIQUE_SYNC_ID")
+                .build()
+        )
         return UNIQUE_SYNC_ID
     }
 
@@ -181,9 +202,11 @@ class EventSyncMasterWorkerTest {
         assertThat(allWorkers.size).isEqualTo(total)
     }
 
-    private fun assertSyncWorkersState(uniqueSyncId: String,
-                                       state: WorkInfo.State,
-                                       specificType: EventSyncWorkerType? = null) {
+    private fun assertSyncWorkersState(
+        uniqueSyncId: String,
+        state: WorkInfo.State,
+        specificType: EventSyncWorkerType? = null
+    ) {
 
         val allWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
         val specificWorkers = specificType?.let { allWorkers.filterByTags(tagForType(specificType)) } ?: allWorkers
@@ -204,10 +227,18 @@ class EventSyncMasterWorkerTest {
     }
 
     private fun prepareSyncWorkers(uniqueSyncId: String) {
-        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
-        coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(uniqueSyncId)
-        coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(uniqueSyncId)
-        coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(uniqueSyncId)
+        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(
+            uniqueSyncId
+        )
+        coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(
+            uniqueSyncId
+        )
+        coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(
+            uniqueSyncId
+        )
+        coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(
+            uniqueSyncId
+        )
 
     }
 
@@ -272,9 +303,11 @@ class EventSyncMasterWorkerTest {
     }
 
     private fun mockSubjectsDownSyncSetting(eventDownSyncSetting: EventDownSyncSetting) {
-        masterWorker.preferenceManager = mockk<PreferencesManager>(relaxed = true).apply {
-            every { this@apply.eventDownSyncSetting } returns eventDownSyncSetting
-        }
+        every { preferencesManager.eventDownSyncSetting } returns eventDownSyncSetting
+    }
+
+    private fun mockSyncDestinationSetting(syncDestinationSetting: SyncDestinationSetting) {
+        every { preferencesManager.syncDestinationSetting } returns syncDestinationSetting
     }
 
     private fun buildOneTimeMasterWorker() {
