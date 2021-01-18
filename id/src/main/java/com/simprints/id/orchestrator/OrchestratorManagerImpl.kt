@@ -4,12 +4,16 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.FlowProvider.FlowType.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
@@ -47,6 +51,17 @@ open class OrchestratorManagerImpl(
 
     override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
         modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)
+        val fingerprintCaptureCompleted =
+            !modalities.contains(FINGER) || modalitiesFlow.steps.any { it.request is FingerprintCaptureRequest && it.getResult() is FingerprintCaptureResponse }
+
+        val faceCaptureCompleted =
+            !modalities.contains(FACE) || modalitiesFlow.steps.any { it.request is FingerprintCaptureRequest && it.getResult() is FaceCaptureResponse }
+
+
+        if (fingerprintCaptureCompleted && faceCaptureCompleted) {
+            personCreationEventHelper.addPersonCreationEventIfNeeded(modalitiesFlow.steps.mapNotNull { it.getResult() })
+        }
+
         proceedToNextStepOrAppResponse()
     }
 
@@ -102,13 +117,6 @@ open class OrchestratorManagerImpl(
         val appResponseToReturn = appResponseFactory.buildAppResponse(
             modalities, hotCache.appRequest, steps, sessionId
         )
-
-        when(appResponseToReturn.type) {
-            AppResponseType.ENROL, AppResponseType.IDENTIFY, AppResponseType.VERIFY -> {
-                personCreationEventHelper.addPersonCreationEventIfNeeded(steps.mapNotNull { it.getResult() })
-            }
-            else -> {}
-        }
 
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
