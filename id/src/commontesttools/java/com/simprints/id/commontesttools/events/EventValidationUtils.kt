@@ -278,7 +278,7 @@ fun validateEnrolmentEventApiModel(json: JSONObject) {
     validateCommonParams(json, "Enrolment")
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
         assertThat(getString("personId").isGuid()).isTrue()
         assertThat(length()).isEqualTo(4)
