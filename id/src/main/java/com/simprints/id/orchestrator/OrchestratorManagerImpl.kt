@@ -11,6 +11,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -55,7 +56,7 @@ open class OrchestratorManagerImpl(
             !modalities.contains(FINGER) || modalitiesFlow.steps.any { it.request is FingerprintCaptureRequest && it.getResult() is FingerprintCaptureResponse }
 
         val faceCaptureCompleted =
-            !modalities.contains(FACE) || modalitiesFlow.steps.any { it.request is FingerprintCaptureRequest && it.getResult() is FaceCaptureResponse }
+            !modalities.contains(FACE) || modalitiesFlow.steps.any { it.request is FaceCaptureRequest && it.getResult() is FaceCaptureResponse }
 
 
         if (fingerprintCaptureCompleted && faceCaptureCompleted) {
