@@ -52,11 +52,12 @@ open class OrchestratorManagerImpl(
 
     override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
         modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)
+
         val fingerprintCaptureCompleted =
-            !modalities.contains(FINGER) || modalitiesFlow.steps.any { it.request is FingerprintCaptureRequest && it.getResult() is FingerprintCaptureResponse }
+            !modalities.contains(FINGER) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }.all { it.getResult() is FingerprintCaptureResponse }
 
         val faceCaptureCompleted =
-            !modalities.contains(FACE) || modalitiesFlow.steps.any { it.request is FaceCaptureRequest && it.getResult() is FaceCaptureResponse }
+            !modalities.contains(FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }.all { it.getResult() is FaceCaptureResponse }
 
 
         if (fingerprintCaptureCompleted && faceCaptureCompleted) {
