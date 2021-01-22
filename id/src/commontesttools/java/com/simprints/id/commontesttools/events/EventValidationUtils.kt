@@ -280,8 +280,12 @@ fun validateEnrolmentEventApiModel(json: JSONObject) {
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
-        assertThat(getString("personId").isGuid()).isTrue()
-        assertThat(length()).isEqualTo(4)
+        assertThat(getString("subjectId"))
+        assertThat(getString("projectId"))
+        assertThat(getString("moduleId"))
+        assertThat(getString("attendantId"))
+        assertThat(getString("personCreationEventId"))
+        assertThat(length()).isEqualTo(8)
     }
 }
 
@@ -421,7 +425,7 @@ fun validateIntentParsingEventApiModel(json: JSONObject) {
 fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FingerprintCapture")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
         assertThat(getLong("endTime"))
         assertThat(getString("id"))
@@ -674,7 +678,7 @@ fun validateFaceFallbackCaptureEventApiModel(json: JSONObject) {
 fun validateFaceCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FaceCapture")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getString("id")).isNotNull()
         assertThat(getLong("startTime")).isNotNull()
         assertThat(getLong("endTime")).isNotNull()
