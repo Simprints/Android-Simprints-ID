@@ -151,7 +151,7 @@ class CommCarePresenterTest {
             mockk()
         ).handleEnrolResponse(EnrolResponse(registerId))
 
-        verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK, "{}") }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 

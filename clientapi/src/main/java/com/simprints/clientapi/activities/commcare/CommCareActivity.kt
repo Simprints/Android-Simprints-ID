@@ -33,6 +33,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val EXIT_REASON = "exitReason"
         private const val EXIT_EXTRA = "exitExtra"
         private const val SIMPRINTS_SESSION_ID = "sessionId"
+        private const val SIMPRINTS_EVENTS = "events"
     }
 
     private val action: CommCareAction
@@ -49,11 +50,12 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         loadClientApiKoinModules()
     }
 
-    override fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean, events: String) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(REGISTRATION_GUID_KEY, guid)
+            putString(SIMPRINTS_EVENTS, events)
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
