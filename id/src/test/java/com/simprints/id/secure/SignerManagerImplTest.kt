@@ -188,14 +188,6 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_sessionRepositorySignsOut() = runBlockingTest {
-        signerManager.signOut()
-
-        coVerify(exactly = 1) { mockEventRepository.signOut() }
-    }
-
-    @Test
-    @ExperimentalCoroutinesApi
     fun signOut_apiBaseUrlIsReset() = runBlockingTest {
         signerManager.signOut()
 

@@ -275,12 +275,6 @@ open class EventRepositoryImpl(
         (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()
     }
 
-    override suspend fun signOut() {
-        loadCloseSessions(LocalEventQuery(projectId = currentProject)).collect {
-            eventLocalDataSource.delete(DbLocalEventQuery(sessionId = it.id))
-        }
-    }
-
     private suspend fun loadOpenSessions(query: LocalEventQuery = LocalEventQuery()) =
         eventLocalDataSource.load(query.appendQueryForOpenSession().fromDomainToDb()).map { it as SessionCaptureEvent }
 
