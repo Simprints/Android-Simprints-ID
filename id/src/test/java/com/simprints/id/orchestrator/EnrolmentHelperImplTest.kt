@@ -6,7 +6,7 @@ import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
@@ -55,7 +55,7 @@ class EnrolmentHelperImplTest {
 
             enrolmentHelper.enrol(defaultSubject)
 
-            val expectedEnrolmentEvent = EnrolmentEvent(CREATED_AT, defaultSubject.subjectId, defaultSubject.projectId, defaultSubject.moduleId, defaultSubject.attendantId, personCreationEvent.id)
+            val expectedEnrolmentEvent = EnrolmentEventV2(CREATED_AT, defaultSubject.subjectId, defaultSubject.projectId, defaultSubject.moduleId, defaultSubject.attendantId, personCreationEvent.id)
 
             coVerify {
                 eventRepository.addEventToCurrentSession(expectedEnrolmentEvent)

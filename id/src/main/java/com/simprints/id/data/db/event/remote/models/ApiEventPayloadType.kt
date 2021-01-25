@@ -118,7 +118,8 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ARTIFICIAL_TERMINATION -> ApiEventPayloadType.ArtificialTermination
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
-    ENROLMENT -> ApiEventPayloadType.Enrolment
+    ENROLMENT_V1 -> ApiEventPayloadType.Enrolment
+    ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
@@ -163,7 +164,7 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.ArtificialTermination -> ARTIFICIAL_TERMINATION
     ApiEventPayloadType.Authentication -> AUTHENTICATION
     ApiEventPayloadType.Consent -> CONSENT
-    ApiEventPayloadType.Enrolment -> ENROLMENT
+    ApiEventPayloadType.Enrolment -> ENROLMENT_V2
     ApiEventPayloadType.Authorization -> AUTHORIZATION
     ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE
     ApiEventPayloadType.OneToOneMatch -> ONE_TO_MANY_MATCH

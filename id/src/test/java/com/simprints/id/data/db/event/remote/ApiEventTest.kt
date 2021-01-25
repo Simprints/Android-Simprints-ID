@@ -194,6 +194,15 @@ class ApiEventTest {
     }
 
     @Test
+    fun validateEnrolmentV1_enrolmentEventApiModel() {
+        val event = createEnrolmentEventV0()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateEnrolmentEventV1ApiModel(json)
+    }
+
+    @Test
     fun validate_enrolmentEventApiModel() {
         val event = createEnrolmentEvent()
         val apiEvent = event.fromDomainToApi()

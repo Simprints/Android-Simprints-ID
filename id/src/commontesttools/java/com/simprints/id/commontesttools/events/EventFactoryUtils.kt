@@ -182,7 +182,8 @@ fun createConnectivitySnapshotEvent() = ConnectivitySnapshotEvent(CREATED_AT, "w
 
 fun createConsentEvent() = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, eventLabels)
 
-fun createEnrolmentEvent() = EnrolmentEvent(CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, GUID2, eventLabels)
+fun createEnrolmentEvent() = EnrolmentEventV2(CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, GUID2, eventLabels)
+fun createEnrolmentEventV0() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = Fingerprint(LEFT_THUMB, 8, "template")
