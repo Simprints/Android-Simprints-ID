@@ -437,7 +437,8 @@ fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
             assertThat(getString("finger")).isIn(fingerIdentifiers)
             assertThat(getInt("quality"))
             assertThat(getString("template")).isNotEmpty()
-            assertThat(length()).isEqualTo(3)
+            assertThat(getString("format")).isIn(listOf("ISO_19794_2", "NEC"))
+            assertThat(length()).isEqualTo(4)
         }
         assertThat(length()).isEqualTo(9)
     }
@@ -692,7 +693,8 @@ fun validateFaceCaptureEventApiModel(json: JSONObject) {
             assertThat(getDouble("roll")).isNotNull()
             assertThat(getDouble("quality")).isNotNull()
             assertThat(getString("template")).isNotNull()
-            assertThat(length()).isEqualTo(4)
+            assertThat(getString("format")).isIn(listOf("RANK_ONE_1_23"))
+            assertThat(length()).isEqualTo(5)
         }
 
         assertThat(length()).isEqualTo(10)
