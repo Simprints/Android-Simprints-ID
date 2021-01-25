@@ -228,8 +228,9 @@ open class AppModule {
 
     @Provides
     open fun provideDbEventDatabaseFactory(ctx: Context,
-                                           secureDataManager: SecureLocalDbKeyProvider): EventDatabaseFactory =
-        DbEventDatabaseFactoryImpl(ctx, secureDataManager)
+                                           secureDataManager: SecureLocalDbKeyProvider,
+                                           crashReportManager: CrashReportManager): EventDatabaseFactory =
+        DbEventDatabaseFactoryImpl(ctx, secureDataManager, crashReportManager)
 
     @Provides
     @Singleton

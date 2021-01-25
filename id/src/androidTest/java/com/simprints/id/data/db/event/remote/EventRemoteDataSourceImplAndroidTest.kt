@@ -195,7 +195,7 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addEnrolmentEvent() {
-        add(EnrolmentEvent(DEFAULT_TIME, randomUUID(), testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, randomUUID(), eventLabels))
+        add(EnrolmentEventV2(DEFAULT_TIME, randomUUID(), testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, randomUUID(), eventLabels))
     }
 
     private fun MutableList<Event>.addFingerprintCaptureEvent() {
@@ -467,7 +467,7 @@ class EventRemoteDataSourceImplAndroidTest {
             ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
             AUTHENTICATION -> addAuthenticationEvent()
             CONSENT -> addConsentEvent()
-            ENROLMENT -> addEnrolmentEvent()
+            ENROLMENT_V1, ENROLMENT_V2 -> addEnrolmentEvent()
             AUTHORIZATION -> addAuthorizationEvent()
             FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()

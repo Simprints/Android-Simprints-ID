@@ -21,11 +21,17 @@ android {
         targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
         versionName VERSION_NAME
-        versionCode VERSION_CODE as Integer
+        versionCode 99999
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
         }
     }
 
@@ -75,7 +81,7 @@ android {
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
 
-            //resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
+            resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
         }
 
         staging {
@@ -106,6 +112,9 @@ android {
         }
         androidTest.java.srcDir sharedTestDir
         androidTest.java.srcDir 'src/androidTest/java'
+
+        // Adds exported room schema location as test app assets.
+        debug.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
     testOptions {
@@ -171,7 +180,7 @@ dependencies {
     implementation deps.kotlin.anko
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
-    implementation deps.androidx.room.coroutines
+    implementation deps.androidx.room.ktx
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
@@ -201,8 +210,8 @@ dependencies {
     implementation deps.kronos.kronos
     implementation deps.jackson.core
 
-    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
-    //debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 
     // RootBeer (root detection)
     implementation deps.rootbeer.core
@@ -306,6 +315,7 @@ dependencies {
     androidTestImplementation deps.testing.mockk.android
     androidTestImplementation deps.testing.mockwebserver
     androidTestImplementation deps.testing.coroutines_test
+    androidTestImplementation deps.testing.androidx.room
 
     androidTestImplementation(deps.testing.awaitility) {
         exclude group: "org.hamcrest"
