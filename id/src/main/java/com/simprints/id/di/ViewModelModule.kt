@@ -8,6 +8,7 @@ import com.simprints.id.activities.dashboard.cards.daily_activity.repository.Das
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
+import com.simprints.id.activities.faceexitform.FaceExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
@@ -61,6 +62,10 @@ open class ViewModelModule {
     @Provides
     open fun provideFingerprintExitFormViewModelFactory(eventRepository: EventRepository) =
         FingerprintExitFormViewModelFactory(eventRepository)
+
+    @Provides
+    open fun provideFaceExitFormViewModelFactory(eventRepository: EventRepository) =
+        FaceExitFormViewModelFactory(eventRepository)
 
     @Provides
     open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
