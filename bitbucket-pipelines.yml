@@ -99,6 +99,7 @@ definitions:
         ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
         # them to sonarcloud.io, and check that they pass the quality gateway.
+        # Sonarcloud requires Java 11 for the analysis. 
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
                 max-time: 30
@@ -109,6 +110,9 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - ./gradlew assembleStandardDebug
+                    - bash ./ci/pipeline/install_java_11
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
@@ -237,9 +241,10 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-to-alpha
     -   flow: &ci-test
-            -   step: *run-clientapi-unit-tests
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-to-alpha
+            -   parallel:
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
+            -   step: *upload-sonar-scan-and-check-quality-gate
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -249,6 +254,6 @@ pipelines:
         master: *main-flow
         develop: *main-flow
         release/*: *deploy-flow
-        ci/*: *deploy-flow
+        ci/*: *ci-test
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere

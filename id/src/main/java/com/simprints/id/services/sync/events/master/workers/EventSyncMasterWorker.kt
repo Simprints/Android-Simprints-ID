@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -17,8 +18,10 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-open class EventSyncMasterWorker(private val appContext: Context,
-                                 params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+open class EventSyncMasterWorker(
+    private val appContext: Context,
+    params: WorkerParameters
+) : SimCoroutineWorker(appContext, params) {
 
     companion object {
         const val MIN_BACKOFF_SECS = 15L
@@ -32,13 +35,26 @@ open class EventSyncMasterWorker(private val appContext: Context,
 
     override val tag: String = EventSyncMasterWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
-    @Inject lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
-    @Inject lateinit var preferenceManager: PreferencesManager
-    @Inject lateinit var eventSyncCache: EventSyncCache
-    @Inject lateinit var eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject
+    override lateinit var crashReportManager: CrashReportManager
+
+    @Inject
+    lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
+
+    @Inject
+    lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
+
+    @Inject
+    lateinit var preferenceManager: PreferencesManager
+
+    @Inject
+    lateinit var eventSyncCache: EventSyncCache
+
+    @Inject
+    lateinit var eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder
+
+    @Inject
+    lateinit var timeHelper: TimeHelper
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -59,12 +75,16 @@ open class EventSyncMasterWorker(private val appContext: Context,
             try {
                 getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
+
+                if (!canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
+
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
-                    val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    val startSyncReporterWorker =
+                        eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val upSyncWorkers = upSyncWorkersChain(uniqueSyncId).also {
                         Timber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
                     }
@@ -74,18 +94,23 @@ open class EventSyncMasterWorker(private val appContext: Context,
                     }
 
                     val chain = upSyncWorkers + downSyncWorkers
-                    val endSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
+                    val endSyncReporterWorker =
+                        eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
                     wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
 
                     eventSyncCache.clearProgresses()
 
-                    success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
-                        "Master work done: new id $uniqueSyncId")
+                    success(
+                        workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
+                        "Master work done: new id $uniqueSyncId"
+                    )
                 } else {
                     val lastSyncId = getLastSyncId()
 
-                    success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
-                        "Master work done: id already exists $lastSyncId")
+                    success(
+                        workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
+                        "Master work done: id already exists $lastSyncId"
+                    )
                 }
             } catch (t: Throwable) {
                 fail(t)
@@ -104,6 +129,10 @@ open class EventSyncMasterWorker(private val appContext: Context,
 
     private fun isEventDownSyncAllowed() = with(preferenceManager) {
         eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
+    }
+
+    private fun canSyncToSimprints(): Boolean = with(preferenceManager) {
+        syncDestinationSetting == SyncDestinationSetting.SIMPRINTS
     }
 
     private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
