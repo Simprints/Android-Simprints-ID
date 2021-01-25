@@ -24,6 +24,7 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.clientapi.tools.DeviceManagerImpl
+import com.simprints.core.tools.json.JsonHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -55,13 +56,14 @@ object KoinInjector {
             defineBuildersForPresenters()
             defineBuildersForGuidSelectionNotifiers()
             defineBuilderForDeviceManager()
+            factory { JsonHelper() }
         }
 
     private fun Module.defineBuildersForDomainManagers() {
         factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
         factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
         factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
-        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
+        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext(), get()) }
     }
 
     private fun Module.defineBuildersForPresenters() {
@@ -75,7 +77,16 @@ object KoinInjector {
             OdkPresenter(view, action, get(), get(), get())
         }
         factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: CommCareAction) ->
-            CommCarePresenter(view, action, get(), get(), get(), get())
+            CommCarePresenter(
+                view,
+                action,
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get<SharedPreferencesManager>().syncDestinationSetting
+            )
         }
     }
 

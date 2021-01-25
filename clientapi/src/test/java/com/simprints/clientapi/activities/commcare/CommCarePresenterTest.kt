@@ -18,10 +18,20 @@ import com.simprints.clientapi.requestFactories.EnrolRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
+import com.simprints.id.data.db.event.domain.models.session.Device
+import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.modality.Modes
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
 import io.mockk.*
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +45,7 @@ class CommCarePresenterTest {
     }
 
     private val view = mockk<CommCareActivity>()
+    private val jsonHelper = JsonHelper()
 
     @Before
     fun setup() {
@@ -52,7 +63,9 @@ class CommCarePresenterTest {
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).apply {
             runBlocking { start() }
         }
@@ -72,12 +85,20 @@ class CommCarePresenterTest {
                 mockSessionManagerToCreateSession(),
                 mockSharedPrefs(),
                 mockk(relaxed = true),
-                mockk(relaxed = true)
+                mockk(relaxed = true),
+                jsonHelper,
+                SyncDestinationSetting.SIMPRINTS
             ).apply {
                 start()
             }
 
-            verify(exactly = 1) { view.sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+            verify(exactly = 1) {
+                view.sendSimprintsRequest(
+                    IdentifyRequestFactory.getValidSimprintsRequest(
+                        INTEGRATION_INFO
+                    )
+                )
+            }
         }
     }
 
@@ -92,7 +113,9 @@ class CommCarePresenterTest {
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
@@ -110,7 +133,9 @@ class CommCarePresenterTest {
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
@@ -124,7 +149,9 @@ class CommCarePresenterTest {
             mockSessionManagerToCreateSession(),
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).apply {
             runBlocking {
                 shouldThrow<InvalidIntentActionException> {
@@ -148,10 +175,43 @@ class CommCarePresenterTest {
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).handleEnrolResponse(EnrolResponse(registerId))
 
-        verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK, "{}") }
+        verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK, null) }
+        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+    }
+
+    @Test
+    fun handleRegistration_ShouldReturnValidRegistration_withCommcareJson() {
+        val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(sessionCaptureEvent)
+
+        CommCarePresenter(
+            view,
+            Enrol,
+            sessionEventsManagerMock,
+            mockSharedPrefs(),
+            mockk(),
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.COMMCARE
+        ).handleEnrolResponse(EnrolResponse(registerId))
+
+        verify(exactly = 1) {
+            view.returnRegistration(
+                registerId,
+                sessionId,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}"
+            )
+        }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
@@ -168,21 +228,30 @@ class CommCarePresenterTest {
             mockk(),
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).handleIdentifyResponse(
-            IdentifyResponse(arrayListOf(id1, id2), sessionId))
+            IdentifyResponse(arrayListOf(id1, id2), sessionId)
+        )
 
         verify(exactly = 1) {
             view.returnIdentification(
                 ArrayList(idList.map {
-                    com.simprints.libsimprints.Identification(it.guidFound, it.confidenceScore, com.simprints.libsimprints.Tier.valueOf(it.tier.name))
-                }), sessionId)
+                    com.simprints.libsimprints.Identification(
+                        it.guidFound,
+                        it.confidenceScore,
+                        com.simprints.libsimprints.Tier.valueOf(it.tier.name)
+                    )
+                }), sessionId
+            )
         }
     }
 
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
-        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
+        val verification =
+            VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -194,7 +263,9 @@ class CommCarePresenterTest {
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).handleVerifyResponse(verification)
 
         verify(exactly = 1) {
@@ -203,7 +274,8 @@ class CommCarePresenterTest {
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
                 sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK)
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
         }
     }
 
@@ -220,7 +292,9 @@ class CommCarePresenterTest {
             sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
-            mockk()
+            mockk(),
+            jsonHelper,
+            SyncDestinationSetting.SIMPRINTS
         ).handleResponseError(error)
 
         verify(exactly = 1) {
@@ -237,5 +311,36 @@ class CommCarePresenterTest {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
     }
+
+    private val sessionCaptureEvent = SessionCaptureEvent(
+        id = "98ba1e99-5eed-458a-bdc4-8ac69429b91a",
+        type = EventType.SESSION_CAPTURE,
+        labels = EventLabels(
+            projectId = "23BGBiWsFmHutLGgLotu",
+            sessionId = "98ba1e99-5eed-458a-bdc4-8ac69429b91a",
+            deviceId = "b88d3b6bc2765a52"
+        ),
+        payload = SessionCaptureEvent.SessionCapturePayload(
+            eventVersion = 1,
+            id = "98ba1e99-5eed-458a-bdc4-8ac69429b91a",
+            projectId = "23BGBiWsFmHutLGgLotu",
+            createdAt = 1611315466612,
+            modalities = listOf(Modes.FACE),
+            appVersionName = "development - build - dev",
+            libVersionName = "2020.3.0",
+            language = "en",
+            device = Device(
+                androidSdkVersion = "29",
+                deviceModel = "HUAWEI_VOG - L09",
+                deviceId = "b88d3b6bc2765a52"
+            ),
+            databaseInfo = DatabaseInfo(sessionCount = 7, recordCount = 17),
+            location = Location(latitude = 52.2145821, longitude = 0.1381978),
+            analyticsId = null,
+            endedAt = 0,
+            uploadedAt = 0,
+            type = EventType.SESSION_CAPTURE
+        )
+    )
 
 }
