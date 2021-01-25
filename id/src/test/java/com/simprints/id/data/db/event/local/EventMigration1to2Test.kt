@@ -60,20 +60,18 @@ class EventMigration1to2Test {
         db = helper.runMigrationsAndValidate(TEST_DB, 2, true, EventMigration1to2(mockk()))
 
         val cursor = retrieveCursorWithEventById(db, id)
-
         validateEventType(cursor)
-
         val eventJson = cursor.getStringWithColumnName("eventJson")!!
-        val enrolmentEventV2 = JsonHelper().fromJson(eventJson, object : TypeReference<Event>() {})
-        assertThat(enrolmentEventV2).isInstanceOf(EnrolmentEventV1::class.java)
+        validatePayloadType(eventJson, cursor)
     }
 
     private fun validateEventType(cursor: Cursor) {
         assertThat(cursor.getStringWithColumnName("type")).isEqualTo(ENROLMENT_V1.toString())
     }
 
-    fun validatePayloadType(eventJson: String, cursor: Cursor) {
-        assertThat(cursor.getStringWithColumnName("type")).isEqualTo(ENROLMENT_V1.toString())
+    private fun validatePayloadType(eventJson: String, cursor: Cursor) {
+        val enrolmentEventV2 = JsonHelper().fromJson(eventJson, object : TypeReference<Event>() {})
+        assertThat(enrolmentEventV2).isInstanceOf(EnrolmentEventV1::class.java)
     }
 
     private fun retrieveCursorWithEventById(db: SupportSQLiteDatabase, id: String): Cursor =

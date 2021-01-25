@@ -231,7 +231,7 @@ class DbEventTest {
 
     @Test
     fun convert_EnrolmentEvent() {
-        val original = createEnrolmentEvent()
+        val original = createEnrolmentEventV2()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
