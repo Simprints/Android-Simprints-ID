@@ -3,7 +3,7 @@ package com.simprints.clientapi.activities.commcare
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
-import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
@@ -13,11 +13,15 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class CommCarePresenter(
@@ -26,7 +30,9 @@ class CommCarePresenter(
     private val sessionEventsManager: ClientApiSessionEventsManager,
     private val sharedPreferencesManager: SharedPreferencesManager,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
+    crashReportManager: ClientApiCrashReportManager,
+    private val jsonHelper: JsonHelper,
+    private val syncDestinationSetting: SyncDestinationSetting
 ) : RequestPresenter(
     view,
     sessionEventsManager,
@@ -55,7 +61,13 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck, "{}")
+            val eventsJson: String? = if (syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
+                val events = sessionEventsManager.getAllEventsForSession(getCurrentSessionIdOrEmpty()).toList()
+                jsonHelper.toJson(CommCareEvents(events))
+            } else {
+                null
+            }
+            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck, eventsJson)
         }
     }
 
@@ -95,8 +107,12 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnExitForms(refusalForm.reason, refusalForm.extra,
-                getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            view.returnExitForms(
+                refusalForm.reason,
+                refusalForm.extra,
+                getCurrentSessionIdOrEmpty(),
+                flowCompletedCheck
+            )
         }
     }
 
@@ -123,4 +139,5 @@ class CommCarePresenter(
         processConfirmIdentityRequest()
     }
 
+    private data class CommCareEvents(val events: List<Event>)
 }
