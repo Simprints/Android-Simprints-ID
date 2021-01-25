@@ -195,7 +195,7 @@ class ApiEventTest {
 
     @Test
     fun validateEnrolmentV1_enrolmentEventApiModel() {
-        val event = createEnrolmentEventV0()
+        val event = createEnrolmentEventV1()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
@@ -203,12 +203,12 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_enrolmentEventApiModel() {
-        val event = createEnrolmentEvent()
+    fun validateEnrolmentV2_enrolmentEventApiModel() {
+        val event = createEnrolmentEventV2()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateEnrolmentEventApiModel(json)
+        validateEnrolmentEventV2ApiModel(json)
     }
 
     @Test
@@ -416,7 +416,7 @@ class ApiEventTest {
             ArtificialTermination -> validate_artificialTerminationEventApiModel()
             Authentication -> validate_authenticationEventApiModel()
             Consent -> validate_consentEventApiModel()
-            Enrolment -> validate_enrolmentEventApiModel()
+            Enrolment -> validateEnrolmentV2_enrolmentEventApiModel()
             Authorization -> validate_authorizationEventApiModel()
             FingerprintCapture -> validate_fingerprintCaptureEventApiModel()
             OneToOneMatch -> validate_oneToOneMatchEventApiModel()

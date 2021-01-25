@@ -285,7 +285,7 @@ fun validateEnrolmentEventV1ApiModel(json: JSONObject) {
     }
 }
 
-fun validateEnrolmentEventApiModel(json: JSONObject) {
+fun validateEnrolmentEventV2ApiModel(json: JSONObject) {
     validateCommonParams(json, "Enrolment")
 
     with(json.getJSONObject("payload")) {
