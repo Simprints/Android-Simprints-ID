@@ -8,9 +8,15 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV1
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
+import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.extensions.getStringWithColumnName
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -24,7 +30,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class EventRoomDatabaseTest {
+class EventMigration1to2Test {
 
     @get:Rule
     public val helper: MigrationTestHelper = MigrationTestHelper(
@@ -57,10 +63,9 @@ class EventRoomDatabaseTest {
 
         validateEventType(cursor)
 
-        val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
-
-        val typeInPayload = eventJson.getJSONObject("payload").getString("type")
-        assertThat(typeInPayload).isEqualTo("ENROLMENT_V1")
+        val eventJson = cursor.getStringWithColumnName("eventJson")!!
+        val enrolmentEventV2 = JsonHelper().fromJson(eventJson, object : TypeReference<Event>() {})
+        assertThat(enrolmentEventV2).isInstanceOf(EnrolmentEventV1::class.java)
     }
 
     private fun validateEventType(cursor: Cursor) {
