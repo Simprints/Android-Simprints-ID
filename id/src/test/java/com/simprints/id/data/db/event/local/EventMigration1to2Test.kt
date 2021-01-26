@@ -78,6 +78,6 @@ class EventMigration1to2Test {
         db.query("SELECT * from DbEvent where id= ?", arrayOf(id)).apply { moveToNext() }
 
     companion object {
-        private val TEST_DB = "test"
+        private const val TEST_DB = "test"
     }
 }
