@@ -81,7 +81,7 @@ android {
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
 
-            resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
+            //resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
         }
 
         staging {
