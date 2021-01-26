@@ -10,7 +10,7 @@ class PersonCreationEventValidator : EventValidator {
     override fun validate(currentEvents: List<Event>, eventToAdd: Event) {
         if (eventToAdd is PersonCreationEvent) {
             if (currentEvents.any { it.payload.type == PERSON_CREATION }) {
-                throw SessionEventCaptureAlreadyExists("The session already got a PersonCreationEvent")
+                throw SessionEventCaptureAlreadyExists("The session already has a PersonCreationEvent")
             }
         }
     }
