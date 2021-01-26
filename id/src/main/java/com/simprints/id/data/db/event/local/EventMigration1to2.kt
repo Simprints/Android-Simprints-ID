@@ -12,7 +12,7 @@ import timber.log.Timber
 /**
  * The 2021.1.0 (room v2) introduced:
  * 1) Fingenrprint/Face templates format in Fingerprint/FaceApi capture and EnrolmentCreationApi:
- * not a breaking changes for domain/db. Templates format is added in the transformation in the API classes.
+ * not a breaking changes for domain/db. Template format is added in the transformations to the API classes.
  * 2) EnrolmentEvent merged with EnrolmentCreationEvent:
  * Added a new class EnrolmentEventV2. The original EnrolmentEvent is now called EnrolmentEventV1.
  * To serialise/deserialize the events stored from previous versions of SID, they need to
@@ -21,8 +21,8 @@ import timber.log.Timber
 class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Timber.d("Migrating from 1 to 2.")
-            val enrolmentEvents = database.query("SELECT * from DbEvent where type = 'ENROLMENT'")
+            Timber.d("Migrating room db from schema 1 to schema 2.")
+            val enrolmentEvents = database.query("SELECT * from DbEvent where type = ?", arrayOf(OLD_ENROLMENT_EVENT_TYPE))
             enrolmentEvents.use {
                 while (it.moveToNext()) {
                     val id = it.getStringWithColumnName("id")
@@ -30,7 +30,7 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
                     migrateEnrolmentEventPayloadType(it, database, id)
                 }
             }
-            Timber.d("Migration 1 to 2 done")
+            Timber.d("Migration from schema 1 to schema 2 done.")
         } catch (t: Throwable) {
             crashReportManager.logException(t)
             Timber.d(t)
@@ -38,11 +38,11 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
     }
 
     private fun migrateEnrolmentEventPayloadType(it: Cursor, database: SupportSQLiteDatabase, id: String?) {
-        val jsonData = it.getStringWithColumnName("eventJson")
+        val jsonData = it.getStringWithColumnName(DB_EVENT_JSON_FIELD)
         jsonData?.let {
-            val originalJson = JSONObject(jsonData).put("type", ENROLMENT_V1)
-            val newPayload = originalJson.getJSONObject("payload").put("type", ENROLMENT_V1)
-            val newJson = originalJson.put("payload", newPayload)
+            val originalJson = JSONObject(jsonData).put(DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1)
+            val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1)
+            val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
             database.execSQL("UPDATE DbEvent set eventJson = ? where id = ?", arrayOf(newJson, id))
         }
     }
@@ -51,5 +51,14 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
         id?.let {
             database.execSQL("UPDATE DbEvent set type = ? where id = ?", arrayOf(ENROLMENT_V1, it))
         }
+    }
+
+    companion object {
+        private const val OLD_ENROLMENT_EVENT_TYPE = "ENROLMENT"
+        private const val DB_EVENT_JSON_FIELD = "eventJson"
+        private const val DB_EVENT_JSON_EVENT_TYPE = "type"
+        private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
+
+
     }
 }
