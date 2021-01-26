@@ -320,8 +320,8 @@ class EventRemoteDataSourceImplAndroidTest {
         )
     }
 
-    private fun MutableList<Event>.addPersonCreationEvent() {
-        add(PersonCreationEvent(DEFAULT_TIME, listOf(randomUUID(), randomUUID()), randomUUID(), listOf(randomUUID()), randomUUID(), eventLabels))
+    private fun MutableList<Event>.addPersonCreationEvent(fingerprintCaptureEvent: FingerprintCaptureEvent?, faceCaptureEvent: FaceCaptureEvent?) {
+        add(PersonCreationEvent(DEFAULT_TIME, listOf(fingerprintCaptureEvent?.id ?: ""), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels))
     }
 
     private fun MutableList<Event>.addRefusalEvent() {
@@ -472,7 +472,7 @@ class EventRemoteDataSourceImplAndroidTest {
             FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
-            PERSON_CREATION -> addPersonCreationEvent()
+            PERSON_CREATION -> addPersonCreationEvent(this.filterIsInstance<FingerprintCaptureEvent>().firstOrNull(), this.filterIsInstance<FaceCaptureEvent>().firstOrNull())
             ALERT_SCREEN -> addAlertScreenEvents()
             GUID_SELECTION -> addGuidSelectionEvent()
             CONNECTIVITY_SNAPSHOT -> addConnectivitySnapshotEvent()
