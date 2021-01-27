@@ -27,6 +27,7 @@ import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
+import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.ignoreException
@@ -143,7 +144,7 @@ open class EventRepositoryImpl(
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading")
 
         if (query.projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
-            throw Throwable("Only events for the signed in project can be uploaded").also {
+            throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
                 crashReportManager.logException(it)
             }
         }
@@ -211,7 +212,7 @@ open class EventRepositoryImpl(
 
         // We don't upload unsigned sessions because the back-end would reject them.
         val sessionsToUpload =
-            merge(loadCloseSessions(query), markAndLoadOldOpenSessions(query)).filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
+            merge(loadCloseSessions(query), closeAndLoadOldOpenSessions(query)).filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
 
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
 
@@ -234,7 +235,7 @@ open class EventRepositoryImpl(
         }
     }
 
-    private suspend fun markAndLoadOldOpenSessions(query: LocalEventQuery): Flow<Event> {
+    private suspend fun closeAndLoadOldOpenSessions(query: LocalEventQuery): Flow<Event> {
         val queryForOldOpenSessions = query.copy(
             type = SESSION_CAPTURE,
             endTime = LongRange(0, 0),
