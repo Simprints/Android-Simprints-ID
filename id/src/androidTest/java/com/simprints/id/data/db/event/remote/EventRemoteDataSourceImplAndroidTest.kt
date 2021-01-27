@@ -15,6 +15,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
+import com.simprints.id.commontesttools.events.createEnrolmentEventV1
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -113,7 +115,7 @@ class EventRemoteDataSourceImplAndroidTest {
     fun setUp() {
         MockKAnnotations.init(this)
         testProject = testProjectRule.testProject
-        eventLabels =  EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
+        eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 
         val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
@@ -136,10 +138,11 @@ class EventRemoteDataSourceImplAndroidTest {
             }
 
             executeUpload(events)
+            executeUpload(listOf(createEnrolmentEventV1()))
         }
     }
 
-    private suspend fun executeUpload(events: MutableList<Event>) {
+    private suspend fun executeUpload(events: List<Event>) {
         eventRemoteDataSource.post(testProject.id, events.toImmutableList())
     }
 
@@ -321,7 +324,8 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addPersonCreationEvent(fingerprintCaptureEvent: FingerprintCaptureEvent?, faceCaptureEvent: FaceCaptureEvent?) {
-        add(PersonCreationEvent(DEFAULT_TIME, listOf(fingerprintCaptureEvent?.id ?: ""), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels))
+        add(PersonCreationEvent(DEFAULT_TIME, listOf(fingerprintCaptureEvent?.id
+            ?: ""), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels))
     }
 
     private fun MutableList<Event>.addRefusalEvent() {
@@ -467,7 +471,7 @@ class EventRemoteDataSourceImplAndroidTest {
             ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
             AUTHENTICATION -> addAuthenticationEvent()
             CONSENT -> addConsentEvent()
-            ENROLMENT_V1, ENROLMENT_V2 -> addEnrolmentEvent()
+            ENROLMENT_V2 -> addEnrolmentEvent()
             AUTHORIZATION -> addAuthorizationEvent()
             FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
@@ -502,7 +506,8 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             FACE_CAPTURE_RETRY -> addFaceCaptureRetryEvent()
             ENROLMENT_RECORD_DELETION,
-            ENROLMENT_RECORD_MOVE -> {}
+            ENROLMENT_RECORD_MOVE,
+            ENROLMENT_V1 -> { }
         }.safeSealedWhens
     }
 
