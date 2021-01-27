@@ -9,7 +9,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMEN
 import org.junit.Test
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V1
 
-class EnrolmentEventV0Test {
+class EnrolmentEventV1Test {
 
     @Test
     fun create_EnrolmentEvent() {
@@ -21,7 +21,7 @@ class EnrolmentEventV0Test {
         with(event.payload as EnrolmentEventV1.EnrolmentPayload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
-            assertThat(eventVersion).isEqualTo(EnrolmentEventV2.EVENT_VERSION)
+            assertThat(eventVersion).isEqualTo(EnrolmentEventV1.EVENT_VERSION)
             assertThat(type).isEqualTo(ENROLMENT_V1)
             assertThat(personId).isEqualTo(GUID2)
         }
