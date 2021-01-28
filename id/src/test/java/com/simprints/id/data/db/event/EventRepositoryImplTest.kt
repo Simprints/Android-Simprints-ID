@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.event
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
 import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
@@ -23,7 +24,9 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
+import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
 import com.simprints.id.tools.time.TimeHelper
+import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -33,6 +36,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.DisplayName
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -217,6 +221,16 @@ class EventRepositoryImplTest {
             eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
             verifySessionHasNotGotUploaded(GUID3)
+        }
+    }
+
+    @Test
+    @DisplayName("The repo should throw if sessions for a not signed project are requested to be uploaded")
+    fun upload_shouldNotUploadSessionsForNotSignedProject() {
+        runBlocking {
+            shouldThrow<TryToUploadEventsForNotSignedProject> {
+                eventRepo.uploadEvents(LocalEventQuery(randomUUID())).toList()
+            }
         }
     }
 
