@@ -423,10 +423,9 @@ open class AppModule {
     fun provideEnrolmentHelper(
         subjectRepository: SubjectRepository,
         eventRepository: EventRepository,
-        preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, preferencesManager, loginInfoManager, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, loginInfoManager, timeHelper)
 
     @Provides
     fun providePersonCreationEventHelper(

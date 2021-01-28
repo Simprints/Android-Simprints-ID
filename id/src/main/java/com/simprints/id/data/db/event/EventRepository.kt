@@ -32,9 +32,7 @@ interface EventRepository {
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 
     suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event>
-
-    suspend fun signOut()
-
+    
     companion object {
         fun build(app: Application): EventRepository =
             app.component.getSessionEventsManager()

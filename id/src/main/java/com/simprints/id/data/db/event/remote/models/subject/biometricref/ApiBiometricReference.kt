@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.remote.models.subject
+package com.simprints.id.data.db.event.remote.models.subject.biometricref
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
@@ -7,9 +7,13 @@ import com.simprints.id.data.db.event.domain.models.subject.BiometricReference
 import com.simprints.id.data.db.event.domain.models.subject.FaceTemplate
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintTemplate
-import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType.FaceReference
-import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType.FingerprintReference
-import java.util.*
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplate
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplateFormat.RANK_ONE_1_23
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier.*
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplateFormat.ISO_19794_2
 import com.simprints.id.data.db.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
 
@@ -27,22 +31,6 @@ interface ApiBiometricReference {
 }
 
 @Keep
-data class ApiFaceReference(
-    override val id: String = UUID.randomUUID().toString(),
-    val templates: List<ApiFaceTemplate>,
-    val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
-    override val type: ApiBiometricReferenceType = FaceReference
-}
-
-@Keep
-data class ApiFingerprintReference(
-    override val id: String = UUID.randomUUID().toString(),
-    val templates: List<ApiFingerprintTemplate>,
-    val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
-    override val type: ApiBiometricReferenceType = FingerprintReference
-}
-
-@Keep
 enum class ApiBiometricReferenceType {
     // a constant key is required to serialise/deserialize
     // ApiBiometricReference correctly with Jackson (see annotation in ApiBiometricReference).
@@ -57,10 +45,10 @@ enum class ApiBiometricReferenceType {
 
 fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
-        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, metadata)
+        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, RANK_ONE_1_23, metadata)
     }
     is DomainFingerprintReference -> {
-        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, metadata)
+        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, ISO_19794_2, metadata)
     }
 }
 
@@ -70,16 +58,16 @@ fun FingerprintTemplate.fromDomainToApi() =
     ApiFingerprintTemplate(quality, template, finger.fromDomainToApi())
 
 fun FingerIdentifier.fromDomainToApi() = when (this) {
-    FingerIdentifier.RIGHT_5TH_FINGER -> ApiFingerIdentifier.RIGHT_5TH_FINGER
-    FingerIdentifier.RIGHT_4TH_FINGER -> ApiFingerIdentifier.RIGHT_4TH_FINGER
-    FingerIdentifier.RIGHT_3RD_FINGER -> ApiFingerIdentifier.RIGHT_3RD_FINGER
-    FingerIdentifier.RIGHT_INDEX_FINGER -> ApiFingerIdentifier.RIGHT_INDEX_FINGER
-    FingerIdentifier.RIGHT_THUMB -> ApiFingerIdentifier.RIGHT_THUMB
-    FingerIdentifier.LEFT_THUMB -> ApiFingerIdentifier.LEFT_THUMB
-    FingerIdentifier.LEFT_INDEX_FINGER -> ApiFingerIdentifier.LEFT_INDEX_FINGER
-    FingerIdentifier.LEFT_3RD_FINGER -> ApiFingerIdentifier.LEFT_3RD_FINGER
-    FingerIdentifier.LEFT_4TH_FINGER -> ApiFingerIdentifier.LEFT_4TH_FINGER
-    FingerIdentifier.LEFT_5TH_FINGER -> ApiFingerIdentifier.LEFT_5TH_FINGER
+    FingerIdentifier.RIGHT_5TH_FINGER -> RIGHT_5TH_FINGER
+    FingerIdentifier.RIGHT_4TH_FINGER -> RIGHT_4TH_FINGER
+    FingerIdentifier.RIGHT_3RD_FINGER -> RIGHT_3RD_FINGER
+    FingerIdentifier.RIGHT_INDEX_FINGER -> RIGHT_INDEX_FINGER
+    FingerIdentifier.RIGHT_THUMB -> RIGHT_THUMB
+    FingerIdentifier.LEFT_THUMB -> LEFT_THUMB
+    FingerIdentifier.LEFT_INDEX_FINGER -> LEFT_INDEX_FINGER
+    FingerIdentifier.LEFT_3RD_FINGER -> LEFT_3RD_FINGER
+    FingerIdentifier.LEFT_4TH_FINGER -> LEFT_4TH_FINGER
+    FingerIdentifier.LEFT_5TH_FINGER -> LEFT_5TH_FINGER
 }
 
 

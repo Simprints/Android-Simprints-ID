@@ -191,6 +191,15 @@ open class EventRepositoryImpl(
         return createBatchesForEventsNotInSessions(query) + createBatchesForEventsInSessions(query)
     }
 
+    @Deprecated(
+        "Before 2021.1.0, SID could have events not associated with a session in the db like " +
+            "EnrolmentRecordCreationEvent that need to be uploaded. After 2021.1.0, SID doesn't generate " +
+            "EnrolmentRecordCreationEvent anymore during an enrolment and the event is used only for the down-sync " +
+            "(transformed to a subject). So this logic to batch the 'not-related with a session' events is unnecessary " +
+            "from 2021.1.0, but it's still required during the migration from previous app versions since the DB may " +
+            "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0, this logic" +
+            "can be deleted."
+    )
     private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
         val events = eventLocalDataSource.load(query.fromDomainToDb()).filter { it.labels.sessionId == null }.toList()
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
@@ -273,12 +282,6 @@ open class EventRepositoryImpl(
 
     private fun closeSession(session: Event) {
         (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()
-    }
-
-    override suspend fun signOut() {
-        loadCloseSessions(LocalEventQuery(projectId = currentProject)).collect {
-            eventLocalDataSource.delete(DbLocalEventQuery(sessionId = it.id))
-        }
     }
 
     private suspend fun loadOpenSessions(query: LocalEventQuery = LocalEventQuery()) =

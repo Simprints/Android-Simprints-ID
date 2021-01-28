@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.remote.models.subject
+package com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
@@ -17,11 +17,11 @@ data class ApiFingerprintSample(var finger: FingerIdentifier,
 }
 
 fun FingerprintSample.fromDomainToApi(): ApiFingerprintSample =
-    ApiFingerprintSample(
-        finger = fingerIdentifier,
-        template = EncodingUtils.byteArrayToBase64(template), // TODO: build rid of double bang
-        quality = templateQualityScore
-    )
+        ApiFingerprintSample(
+                finger = fingerIdentifier,
+                template = EncodingUtils.byteArrayToBase64(template), // TODO: build rid of double bang
+                quality = templateQualityScore
+        )
 
 fun ApiFingerprintSample.fromApiToDomain(): FingerprintSample =
     FingerprintSample(

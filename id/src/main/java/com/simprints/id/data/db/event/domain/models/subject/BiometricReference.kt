@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
-import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReference
-import com.simprints.id.data.db.event.remote.models.subject.ApiBiometricReferenceType
-import com.simprints.id.data.db.event.remote.models.subject.ApiFaceReference
-import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReferenceType
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceReference
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(

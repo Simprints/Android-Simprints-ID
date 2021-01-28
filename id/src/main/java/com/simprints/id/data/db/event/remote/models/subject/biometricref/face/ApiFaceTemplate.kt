@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.remote.models.subject
+package com.simprints.id.data.db.event.remote.models.subject.biometricref.face
 
 import androidx.annotation.Keep
 

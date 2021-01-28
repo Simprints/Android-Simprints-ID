@@ -14,12 +14,16 @@ data class EnrolmentEvent(
 
     constructor(
         createdAt: Long,
-        personId: String,
+        subjectId: String,
+        projectId: String,
+        moduleId: String,
+        attendantId: String,
+        personCreationEventId: String,
         labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        EnrolmentPayload(createdAt, EVENT_VERSION, personId),
+        EnrolmentPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId, personCreationEventId),
         ENROLMENT)
 
 
@@ -27,11 +31,15 @@ data class EnrolmentEvent(
     data class EnrolmentPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val personId: String,
+        val subjectId: String,
+        val projectId: String,
+        val moduleId: String,
+        val attendantId: String,
+        val personCreationEventId: String,
         override val type: EventType = ENROLMENT,
         override val endedAt: Long = 0) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

@@ -3,8 +3,8 @@ package com.simprints.id.data.db.subject.remote.models
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
-import com.simprints.id.data.db.event.remote.models.subject.ApiFingerprintSample
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintSample
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject
@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 class ApiFingerprintTest {
     @Test
     fun serialiseFbFingerprint_skipUnwantedFields() {
-        val fingerprint = ApiFingerprintSample(FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB))
+        val fingerprint = ApiFingerprintSample(FingerprintGeneratorUtils.generateRandomFingerprint(LEFT_THUMB))
         val jsonString = JsonHelper().toJson(fingerprint)
         val json = JSONObject(jsonString)
 

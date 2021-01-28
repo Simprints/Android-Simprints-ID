@@ -33,8 +33,6 @@ enum class EventType {
     ONE_TO_ONE_MATCH,
     /* key added: ONE_TO_MANY_MATCH_KEY */
     ONE_TO_MANY_MATCH,
-    /* key added: PERSON_CREATION_KEY */
-    PERSON_CREATION,
     /* key added: ALERT_SCREEN_KEY */
     ALERT_SCREEN,
     /* key added: GUID_SELECTION_KEY */
@@ -90,7 +88,9 @@ enum class EventType {
     /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
     FACE_CAPTURE_CONFIRMATION,
     /* key added: FACE_CAPTURE_RETRY_KEY */
-    FACE_CAPTURE_RETRY;
+    FACE_CAPTURE_RETRY,
+    /* key added: PERSON_CREATION_KEY */
+    PERSON_CREATION;
 
     companion object {
         const val CALLBACK_ENROLMENT_KEY = "CALLBACK_ENROLMENT"
