@@ -278,10 +278,14 @@ fun validateEnrolmentEventApiModel(json: JSONObject) {
     validateCommonParams(json, "Enrolment")
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
-        assertThat(getString("personId").isGuid()).isTrue()
-        assertThat(length()).isEqualTo(4)
+        assertThat(getString("subjectId"))
+        assertThat(getString("projectId"))
+        assertThat(getString("moduleId"))
+        assertThat(getString("attendantId"))
+        assertThat(getString("personCreationEventId"))
+        assertThat(length()).isEqualTo(8)
     }
 }
 
@@ -421,7 +425,7 @@ fun validateIntentParsingEventApiModel(json: JSONObject) {
 fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FingerprintCapture")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
         assertThat(getLong("endTime"))
         assertThat(getString("id"))
@@ -433,7 +437,8 @@ fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
             assertThat(getString("finger")).isIn(fingerIdentifiers)
             assertThat(getInt("quality"))
             assertThat(getString("template")).isNotEmpty()
-            assertThat(length()).isEqualTo(3)
+            assertThat(getString("format")).isIn(listOf("ISO_19794_2", "NEC"))
+            assertThat(length()).isEqualTo(4)
         }
         assertThat(length()).isEqualTo(9)
     }
@@ -674,7 +679,7 @@ fun validateFaceFallbackCaptureEventApiModel(json: JSONObject) {
 fun validateFaceCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FaceCapture")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getString("id")).isNotNull()
         assertThat(getLong("startTime")).isNotNull()
         assertThat(getLong("endTime")).isNotNull()
@@ -688,7 +693,8 @@ fun validateFaceCaptureEventApiModel(json: JSONObject) {
             assertThat(getDouble("roll")).isNotNull()
             assertThat(getDouble("quality")).isNotNull()
             assertThat(getString("template")).isNotNull()
-            assertThat(length()).isEqualTo(4)
+            assertThat(getString("format")).isIn(listOf("RANK_ONE_1_23"))
+            assertThat(length()).isEqualTo(5)
         }
 
         assertThat(length()).isEqualTo(10)

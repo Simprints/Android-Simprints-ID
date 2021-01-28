@@ -57,6 +57,6 @@ data class FingerprintCaptureEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }
