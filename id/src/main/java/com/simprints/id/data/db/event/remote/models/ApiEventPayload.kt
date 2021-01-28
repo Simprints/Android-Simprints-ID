@@ -11,7 +11,8 @@ import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Candidate
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 import com.simprints.id.data.db.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.models.EnrolmentEvent.EnrolmentPayload
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV1
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
@@ -74,7 +75,7 @@ import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMo
     JsonSubTypes.Type(value = ApiCompletionCheckPayload::class, name = Companion.COMPLETION_CHECK_KEY),
     JsonSubTypes.Type(value = ApiConnectivitySnapshotPayload::class, name = Companion.CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ApiConsentPayload::class, name = Companion.CONSENT_KEY),
-    JsonSubTypes.Type(value = ApiEnrolmentPayload::class, name = Companion.ENROLMENT_KEY),
+    JsonSubTypes.Type(value = ApiEnrolmentPayloadV2::class, name = Companion.ENROLMENT_KEY),
     JsonSubTypes.Type(value = ApiFingerprintCapturePayload::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiGuidSelectionPayload::class, name = Companion.GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = ApiIntentParsingPayload::class, name = Companion.INTENT_PARSING_KEY),
@@ -105,7 +106,8 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         ARTIFICIAL_TERMINATION -> ApiArtificialTerminationPayload(this as ArtificialTerminationPayload)
         AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
         CONSENT -> ApiConsentPayload(this as ConsentPayload)
-        ENROLMENT -> ApiEnrolmentPayload(this as EnrolmentPayload)
+        ENROLMENT_V1 -> ApiEnrolmentPayloadV1(this as EnrolmentEventV1.EnrolmentPayload)
+        ENROLMENT_V2 -> ApiEnrolmentPayloadV2(this as EnrolmentEventV2.EnrolmentPayload)
         AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
         FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCapturePayload)
         ONE_TO_ONE_MATCH -> ApiOneToOneMatchPayload(this as OneToOneMatchPayload)

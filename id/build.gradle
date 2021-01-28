@@ -27,6 +27,13 @@ android {
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
         }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                //Required by Room to be able to export the db schemas
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     lintOptions {
@@ -106,6 +113,9 @@ android {
         }
         androidTest.java.srcDir sharedTestDir
         androidTest.java.srcDir 'src/androidTest/java'
+
+        // Adds exported room schema location as test app assets.
+        debug.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
     testOptions {
@@ -171,7 +181,7 @@ dependencies {
     implementation deps.kotlin.anko
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
-    implementation deps.androidx.room.coroutines
+    implementation deps.androidx.room.ktx
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
@@ -306,6 +316,7 @@ dependencies {
     androidTestImplementation deps.testing.mockk.android
     androidTestImplementation deps.testing.mockwebserver
     androidTestImplementation deps.testing.coroutines_test
+    androidTestImplementation deps.testing.androidx.room
 
     androidTestImplementation(deps.testing.awaitility) {
         exclude group: "org.hamcrest"
