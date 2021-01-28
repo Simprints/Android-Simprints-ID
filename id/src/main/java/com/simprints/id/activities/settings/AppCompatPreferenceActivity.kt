@@ -2,12 +2,11 @@ package com.simprints.id.activities.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.preference.PreferenceActivity
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.simprints.core.tools.utils.LanguageHelper
 
@@ -15,7 +14,7 @@ import com.simprints.core.tools.utils.LanguageHelper
  * A [android.preference.PreferenceActivity] which implements and proxies the necessary calls
  * to be used with AppCompat.
  */
-abstract class AppCompatPreferenceActivity : PreferenceActivity() {
+abstract class AppCompatPreferenceActivity : AppCompatActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
@@ -33,7 +32,7 @@ abstract class AppCompatPreferenceActivity : PreferenceActivity() {
         delegate.onPostCreate(savedInstanceState)
     }
 
-    fun setSupportActionBar(toolbar: Toolbar?) {
+    override fun setSupportActionBar(toolbar: Toolbar?) {
         delegate.setSupportActionBar(toolbar)
         delegate.supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
@@ -78,7 +77,7 @@ abstract class AppCompatPreferenceActivity : PreferenceActivity() {
         delegate.onDestroy()
     }
 
-    private val delegate: AppCompatDelegate by lazy {
-        AppCompatDelegate.create(this, null)
-    }
+//    private val delegate: AppCompatDelegate by lazy {
+//        AppCompatDelegate.create(this, null)
+//    }
 }
