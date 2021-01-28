@@ -2,14 +2,11 @@ package com.simprints.id.activities.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.preference.PreferenceActivity
 import android.view.MenuItem
-import androidx.preference.PreferenceFragment
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.tools.extensions.isXLargeTablet
-import kotlinx.android.synthetic.main.settings_toolbar.*
+import kotlinx.android.synthetic.main.settings_toolbar.settingsToolbar
 
 
 class SettingsAboutActivity : AppCompatPreferenceActivity() {
@@ -30,12 +27,12 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         setContentView(R.layout.settings_toolbar)
         setSupportActionBar(settingsToolbar)
 
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsAboutFragment())
             .commit()
     }
 
-    override fun onIsMultiPane() = isXLargeTablet()
+    // override fun onIsMultiPane() = isXLargeTablet()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -47,13 +44,10 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
-    }
-
-    override fun isValidFragment(fragmentName: String): Boolean {
-        return PreferenceFragment::class.java.name == fragmentName
-            || SettingsAboutFragment::class.java.name == fragmentName
-    }
+//    override fun isValidFragment(fragmentName: String): Boolean {
+//        return PreferenceFragmentCompat::class.java.name == fragmentName
+//            || SettingsAboutFragment::class.java.name == fragmentName
+//    }
 
     fun finishActivityBecauseLogout() {
         setResult(LOGOUT_RESULT_CODE)

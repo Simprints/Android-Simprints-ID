@@ -1,6 +1,6 @@
 package com.simprints.id.activities.settings.fragments.settingsPreference
 
-import android.preference.Preference
+import androidx.preference.Preference
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 
@@ -10,13 +10,13 @@ interface SettingsPreferenceContract {
 
         fun getLanguageCodeAndNamePairs(): Map<String, String>
 
-        fun getPreferenceForLanguage(): Preference
+        fun getPreferenceForLanguage(): Preference?
 
-        fun getPreferenceForDefaultFingers(): Preference
+        fun getPreferenceForDefaultFingers(): Preference?
 
-        fun getPreferenceForAbout(): Preference
+        fun getPreferenceForAbout(): Preference?
 
-        fun getPreferenceForSyncInformation(): Preference
+        fun getPreferenceForSyncInformation(): Preference?
 
         fun getKeyForSyncInfoPreference(): String
 
@@ -38,7 +38,7 @@ interface SettingsPreferenceContract {
 
         fun clearActivityStackAndRelaunchApp()
 
-        fun enablePreference(preference: Preference)
+        fun enablePreference(preference: Preference?)
     }
 
     interface Presenter : BasePresenter

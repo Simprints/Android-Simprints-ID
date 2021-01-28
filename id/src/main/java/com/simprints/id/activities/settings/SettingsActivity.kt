@@ -4,16 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.preference.PreferenceFragment
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
-import com.simprints.id.tools.extensions.isXLargeTablet
-import kotlinx.android.synthetic.main.settings_toolbar.*
+import kotlinx.android.synthetic.main.settings_toolbar.settingsToolbar
 
 class SettingsActivity : AppCompatPreferenceActivity() {
 
@@ -34,7 +32,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         setupActionBar()
 
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsPreferenceFragment())
             .commit()
     }
@@ -44,7 +42,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         setSupportActionBar(settingsToolbar)
     }
 
-    override fun onIsMultiPane() = isXLargeTablet()
+    // override fun onIsMultiPane() = isXLargeTablet()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -56,13 +54,10 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBuildHeaders(target: List<Header>) {
-    }
-
-    override fun isValidFragment(fragmentName: String): Boolean {
-        return PreferenceFragment::class.java.name == fragmentName
-            || SettingsPreferenceFragment::class.java.name == fragmentName
-    }
+//    override fun isValidFragment(fragmentName: String): Boolean {
+//        return PreferenceFragmentCompat::class.java.name == fragmentName
+//            || SettingsPreferenceFragment::class.java.name == fragmentName
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
@@ -87,5 +82,5 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
         removeAnimationsToNextActivity()
     }
-    
+
 }
