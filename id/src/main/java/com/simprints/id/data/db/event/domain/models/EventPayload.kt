@@ -10,7 +10,7 @@ import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Candidate
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 import com.simprints.id.data.db.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.models.EnrolmentEvent.EnrolmentPayload
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2.EnrolmentPayload
 import com.simprints.id.data.db.event.domain.models.EventType.Companion
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
@@ -75,7 +75,8 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
     JsonSubTypes.Type(value = CompletionCheckPayload::class, name = EventType.COMPLETION_CHECK_KEY),
     JsonSubTypes.Type(value = ConnectivitySnapshotPayload::class, name = EventType.CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ConsentPayload::class, name = EventType.CONSENT_KEY),
-    JsonSubTypes.Type(value = EnrolmentPayload::class, name = EventType.ENROLMENT_KEY),
+    JsonSubTypes.Type(value = EnrolmentEventV1.EnrolmentPayload::class, name = EventType.ENROLMENT_V1_KEY),
+    JsonSubTypes.Type(value = EnrolmentEventV2.EnrolmentPayload::class, name = EventType.ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCapturePayload::class, name = EventType.FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = GuidSelectionPayload::class, name = EventType.GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingPayload::class, name = EventType.INTENT_PARSING_KEY),

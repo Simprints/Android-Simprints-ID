@@ -22,10 +22,11 @@ import com.simprints.id.data.db.event.domain.models.EventType.Companion.CANDIDAT
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.CONSENT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_RECORD_CREATION_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_RECORD_DELETION_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_RECORD_MOVE_KEY
+import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
+import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
 import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_CAPTURE_RETRY_KEY
@@ -82,7 +83,8 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
     JsonSubTypes.Type(value = CompletionCheckEvent::class, name = COMPLETION_CHECK_KEY),
     JsonSubTypes.Type(value = ConnectivitySnapshotEvent::class, name = CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ConsentEvent::class, name = CONSENT_KEY),
-    JsonSubTypes.Type(value = EnrolmentEvent::class, name = ENROLMENT_KEY),
+    JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
+    JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),

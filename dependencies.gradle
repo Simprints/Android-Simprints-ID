@@ -15,7 +15,7 @@ def dagger = [
 ]
 
 def androidx_lifecycle_version = "2.2.0"
-def androidx_room_version = "2.1.0-alpha04"
+def androidx_room_version = "2.2.6"
 def androidx_camerax_version = '1.0.0-beta01'
 def androidx_navigation_version = "2.3.0-alpha04"
 def androidx = [
@@ -24,9 +24,9 @@ def androidx = [
     appcompat : "androidx.appcompat:appcompat:1.2.0",
     legacy    : "androidx.legacy:legacy-support-v4: 1.0.0",
     room      : [
-        core      : "androidx.room:room-runtime:$androidx_room_version",
-        compiler  : "androidx.room:room-compiler:$androidx_room_version",
-        coroutines: "androidx.room:room-coroutines:$androidx_room_version"
+        core    : "androidx.room:room-runtime:$androidx_room_version",
+        compiler: "androidx.room:room-compiler:$androidx_room_version",
+        ktx     : "androidx.room:room-ktx:$androidx_room_version"
 
     ],
     lifecycle : [

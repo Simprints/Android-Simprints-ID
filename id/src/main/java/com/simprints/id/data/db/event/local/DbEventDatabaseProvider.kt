@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.event.local
 
 import android.content.Context
-import androidx.room.Room
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
@@ -14,19 +14,20 @@ interface EventDatabaseFactory {
 @OptIn(ExperimentalStdlibApi::class)
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
-    private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider
+    private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+    private val crashReportManager: CrashReportManager
 ) : EventDatabaseFactory {
 
     override fun build(): EventRoomDatabase {
         try {
-            val key = getOrCreateKey(DB_NAME)
-            //val key = "test".toCharArray() //Use com.amitshekhar.android:debug-db
 
+            // See README for debugging
+            //val key = "test".toCharArray()
+
+            val key = getOrCreateKey(DB_NAME)
             val passphrase: ByteArray = getBytes(key)
             val factory = SupportFactory(passphrase)
-            return Room.databaseBuilder(ctx, EventRoomDatabase::class.java, DB_NAME)
-                .openHelperFactory(factory)
-                .build()
+            return EventRoomDatabase.getDatabase(ctx, factory, DB_NAME, crashReportManager)
         } catch (t: Throwable) {
             Timber.e(t)
             throw t

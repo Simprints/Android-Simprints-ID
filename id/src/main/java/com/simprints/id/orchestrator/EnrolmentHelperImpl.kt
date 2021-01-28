@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator
 
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -49,7 +49,7 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         val personCreationEvent = eventRepository.loadEvents(currentSession).filterIsInstance<PersonCreationEvent>().first()
 
         eventRepository.addEventToCurrentSession(
-            EnrolmentEvent(timeHelper.now(),
+            EnrolmentEventV2(timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
                 subject.moduleId,
