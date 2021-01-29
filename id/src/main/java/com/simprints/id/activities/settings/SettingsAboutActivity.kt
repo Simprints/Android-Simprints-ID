@@ -6,10 +6,12 @@ import android.view.MenuItem
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import kotlinx.android.synthetic.main.settings_toolbar.settingsToolbar
+import com.simprints.id.databinding.SettingsToolbarBinding
 
 
 class SettingsAboutActivity : AppCompatPreferenceActivity() {
+
+    private lateinit var binding: SettingsToolbarBinding
 
     companion object {
         private const val LOGOUT_RESULT_CODE = 1
@@ -24,8 +26,9 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         super.onCreate(savedInstanceState)
         title = getString(R.string.title_activity_settings_about)
 
-        setContentView(R.layout.settings_toolbar)
-        setSupportActionBar(settingsToolbar)
+        binding = SettingsToolbarBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.settingsToolbar)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsAboutFragment())
