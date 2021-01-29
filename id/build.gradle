@@ -134,6 +134,10 @@ android {
         }
     }
 
+    buildFeatures {
+        viewBinding true
+    }
+
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
 }
 
