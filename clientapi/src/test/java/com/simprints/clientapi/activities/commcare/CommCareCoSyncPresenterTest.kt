@@ -16,6 +16,7 @@ import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.db.event.domain.models.RefusalEvent
 import com.simprints.id.data.db.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent
@@ -233,6 +234,35 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
+    fun `handleConfirmationResponse should return valid confirmation with events`() {
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(guidSelectionEvent)
+
+        CommCarePresenter(
+            view,
+            Enrol,
+            sessionEventsManagerMock,
+            mockSharedPrefs(),
+            mockk(),
+            mockk(),
+            jsonHelper,
+            syncDestinationSetting
+        ).handleConfirmationResponse(ConfirmationResponse(true))
+
+        verify(exactly = 1) {
+            view.returnConfirmation(
+                true,
+                sessionId,
+                "{\"events\":[${jsonHelper.toJson(guidSelectionEvent)}]}"
+            )
+        }
+        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+    }
+
+    @Test
     fun handleVerification_ShouldReturnValidVerification() {
         val verification =
             VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
@@ -359,4 +389,8 @@ class CommCareCoSyncPresenterTest {
         )
     )
 
+    private val guidSelectionEvent = GuidSelectionEvent(
+        2,
+        UUID.randomUUID().toString()
+    )
 }
