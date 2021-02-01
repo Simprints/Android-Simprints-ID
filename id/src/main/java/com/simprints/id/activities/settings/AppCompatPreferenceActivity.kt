@@ -11,7 +11,6 @@ import com.simprints.core.tools.utils.LanguageHelper
  */
 abstract class AppCompatPreferenceActivity : AppCompatActivity() {
 
-    // This method is overridden in the SettingsActivity. Why?
     override fun attachBaseContext(newBase: Context) {
         val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
         super.attachBaseContext(languageCtx)
