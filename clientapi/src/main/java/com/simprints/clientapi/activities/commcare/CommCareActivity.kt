@@ -87,7 +87,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         tier: Tier,
         guid: String,
         sessionId: String,
-        flowCompletedCheck: Boolean
+        flowCompletedCheck: Boolean,
+        eventsJson: String?
     ) = Intent().let {
         val data = Bundle().apply {
             putString(SIMPRINTS_SESSION_ID, sessionId)
@@ -95,6 +96,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
             putString(VERIFICATION_CONFIDENCE_KEY, confidence.toString())
             putString(VERIFICATION_TIER_KEY, tier.name)
             putString(VERIFICATION_GUID_KEY, guid)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)

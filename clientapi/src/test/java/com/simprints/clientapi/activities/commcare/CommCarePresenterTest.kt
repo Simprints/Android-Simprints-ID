@@ -235,7 +235,8 @@ class CommCarePresenterTest {
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
                 sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                null
             )
         }
     }
