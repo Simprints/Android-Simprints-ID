@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.commcare
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.baserequest.RequestContract
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
 
@@ -11,7 +12,7 @@ interface CommCareContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
-        fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean, events: String?)
+        fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean, eventsJson: String?)
 
         fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String)
 
@@ -23,6 +24,7 @@ interface CommCareContract {
 
         fun injectSessionIdIntoIntent(sessionId: String)
 
+        fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?)
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter {

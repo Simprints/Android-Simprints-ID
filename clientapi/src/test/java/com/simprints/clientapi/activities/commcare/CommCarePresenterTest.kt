@@ -185,37 +185,6 @@ class CommCarePresenterTest {
     }
 
     @Test
-    fun handleRegistration_ShouldReturnValidRegistration_withCommcareJson() {
-        val registerId = UUID.randomUUID().toString()
-        val sessionId = UUID.randomUUID().toString()
-
-        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
-        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(sessionCaptureEvent)
-
-        CommCarePresenter(
-            view,
-            Enrol,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper,
-            SyncDestinationSetting.COMMCARE
-        ).handleEnrolResponse(EnrolResponse(registerId))
-
-        verify(exactly = 1) {
-            view.returnRegistration(
-                registerId,
-                sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK,
-                "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}"
-            )
-        }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
-    }
-
-    @Test
     fun handleIdentification_ShouldReturnValidIdentification() {
         val id1 = MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH)
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5, MatchConfidence.LOW)
@@ -285,6 +254,7 @@ class CommCarePresenterTest {
         val sessionId = UUID.randomUUID().toString()
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
 
         CommCarePresenter(
             view,
@@ -298,7 +268,7 @@ class CommCarePresenterTest {
         ).handleResponseError(error)
 
         verify(exactly = 1) {
-            view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId)
+            view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, null)
         }
     }
 

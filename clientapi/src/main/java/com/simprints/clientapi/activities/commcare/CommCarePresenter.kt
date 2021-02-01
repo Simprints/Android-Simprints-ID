@@ -61,8 +61,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            val eventsJson = getEventsJson()
-            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck, eventsJson)
+            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck, getEventsJson())
         }
     }
 
@@ -80,7 +79,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty(), getEventsJson())
         }
     }
 
