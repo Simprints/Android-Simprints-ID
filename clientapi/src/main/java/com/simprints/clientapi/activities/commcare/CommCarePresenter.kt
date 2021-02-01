@@ -61,12 +61,7 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            val eventsJson: String? = if (syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
-                val events = sessionEventsManager.getAllEventsForSession(getCurrentSessionIdOrEmpty()).toList()
-                jsonHelper.toJson(CommCareEvents(events))
-            } else {
-                null
-            }
+            val eventsJson = getEventsJson()
             view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck, eventsJson)
         }
     }
@@ -114,6 +109,13 @@ class CommCarePresenter(
                 flowCompletedCheck
             )
         }
+    }
+
+    private suspend fun getEventsJson(): String? = if (syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
+        val events = sessionEventsManager.getAllEventsForSession(getCurrentSessionIdOrEmpty()).toList()
+        jsonHelper.toJson(CommCareEvents(events))
+    } else {
+        null
     }
 
     private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
