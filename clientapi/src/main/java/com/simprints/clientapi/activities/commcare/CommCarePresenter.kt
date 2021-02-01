@@ -61,7 +61,12 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck, getEventsJson())
+            view.returnRegistration(
+                enrol.guid,
+                getCurrentSessionIdOrEmpty(),
+                flowCompletedCheck,
+                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+            )
         }
     }
 
@@ -78,7 +83,7 @@ class CommCarePresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(ArrayList(identify.identifications.map {
                 Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
-            }), identify.sessionId, getEventsJson())
+            }), identify.sessionId, getEventsJsonForSession(identify.sessionId))
         }
     }
 
@@ -86,7 +91,11 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty(), getEventsJson())
+            view.returnConfirmation(
+                flowCompletedCheck,
+                getCurrentSessionIdOrEmpty(),
+                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+            )
         }
     }
 
@@ -94,7 +103,12 @@ class CommCarePresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty(), getEventsJson())
+            view.returnErrorToClient(
+                errorResponse,
+                flowCompletedCheck,
+                getCurrentSessionIdOrEmpty(),
+                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+            )
         }
     }
 
@@ -108,7 +122,7 @@ class CommCarePresenter(
                 verify.matchResult.guidFound,
                 getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck,
-                getEventsJson()
+                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
         }
     }
@@ -122,17 +136,18 @@ class CommCarePresenter(
                 refusalForm.extra,
                 getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck,
-                getEventsJson()
+                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
         }
     }
 
-    private suspend fun getEventsJson(): String? = if (syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
-        val events = sessionEventsManager.getAllEventsForSession(getCurrentSessionIdOrEmpty()).toList()
-        jsonHelper.toJson(CommCareEvents(events))
-    } else {
-        null
-    }
+    private suspend fun getEventsJsonForSession(sessionId: String): String? =
+        if (syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
+            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
+            jsonHelper.toJson(CommCareEvents(events))
+        } else {
+            null
+        }
 
     private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
 
