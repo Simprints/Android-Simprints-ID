@@ -66,17 +66,20 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
+    /**
+     * CommCare expect Identification result in LibSimprints 1.0.12 format.
+     * That's why it is being returned in a different way from others (not inside [COMMCARE_BUNDLE_KEY]).
+     */
     override fun returnIdentification(
         identifications: ArrayList<Identification>,
-        sessionId: String
-    ) = Intent().let {
+        sessionId: String,
+        eventsJson: String?
+    ) = Intent().let { intent ->
+        intent.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
+        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
 
-        // CommCare can't process Identifications as standard CommCare Bundle (COMMCARE_BUNDLE_KEY).
-        // It's excepting Identifications results in the LibSimprints format.
-        it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
-        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
-
-        sendOkResult(it)
+        sendOkResult(intent)
     }
 
     override fun returnVerification(
