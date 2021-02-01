@@ -152,7 +152,7 @@ class CommCarePresenterTest {
     }
 
     @Test
-    fun handleRegistration_ShouldReturnValidRegistration() {
+    fun `handleRegistration should return valid registration`() {
         val registerId = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
 
@@ -175,7 +175,7 @@ class CommCarePresenterTest {
     }
 
     @Test
-    fun handleIdentification_ShouldReturnValidIdentification() {
+    fun `handleIdentification should return valid identification`() {
         val id1 = MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH)
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5, MatchConfidence.LOW)
         val idList = arrayListOf(id1, id2)
@@ -210,7 +210,7 @@ class CommCarePresenterTest {
     }
 
     @Test
-    fun handleVerification_ShouldReturnValidVerification() {
+    fun `handleVerification should return valid verification`() {
         val verification =
             VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
         val sessionId = UUID.randomUUID().toString()
@@ -242,7 +242,7 @@ class CommCarePresenterTest {
     }
 
     @Test
-    fun handleResponseError_ShouldCallActionError() {
+    fun `handleResponseError should return error to client`() {
         val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
         val sessionId = UUID.randomUUID().toString()
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -266,7 +266,7 @@ class CommCarePresenterTest {
     }
 
     @Test
-    fun `handleRefusalResponse should return valid refusal with events`() {
+    fun `handleRefusalResponse should return valid refusal`() {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
