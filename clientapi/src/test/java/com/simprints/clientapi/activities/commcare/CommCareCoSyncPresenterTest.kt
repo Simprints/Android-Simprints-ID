@@ -5,10 +5,7 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareAction
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
@@ -19,11 +16,9 @@ import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.RefusalEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
-import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modes
@@ -281,6 +276,37 @@ class CommCareCoSyncPresenterTest {
         }
     }
 
+    @Test
+    fun `handleRefusalResponse should return correct events`() {
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
+
+        CommCarePresenter(
+            view,
+            Enrol,
+            sessionEventsManagerMock,
+            mockSharedPrefs(),
+            mockk(),
+            mockk(),
+            jsonHelper,
+            syncDestinationSetting
+        ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+
+        verify(exactly = 1) {
+            view.returnExitForms(
+                "APP_NOT_WORKING",
+                "",
+                sessionId,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
+            )
+        }
+        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+    }
+
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
         coEvery { this@apply.getCurrentSessionId() } returns "session_id"
         coEvery { this@apply.createSession(any()) } returns "session_id"
@@ -292,34 +318,26 @@ class CommCareCoSyncPresenterTest {
     }
 
     private val sessionCaptureEvent = SessionCaptureEvent(
-        id = "98ba1e99-5eed-458a-bdc4-8ac69429b91a",
-        type = EventType.SESSION_CAPTURE,
-        labels = EventLabels(
-            projectId = "23BGBiWsFmHutLGgLotu",
-            sessionId = "98ba1e99-5eed-458a-bdc4-8ac69429b91a",
+        id = UUID.randomUUID().toString(),
+        projectId = "23BGBiWsFmHutLGgLotu",
+        createdAt = System.currentTimeMillis(),
+        modalities = listOf(Modes.FACE),
+        appVersionName = "test",
+        libVersionName = "2020.3.0",
+        language = "en",
+        device = Device(
+            androidSdkVersion = "29",
+            deviceModel = "HUAWEI_VOG - L09",
             deviceId = "b88d3b6bc2765a52"
         ),
-        payload = SessionCaptureEvent.SessionCapturePayload(
-            eventVersion = 1,
-            id = "98ba1e99-5eed-458a-bdc4-8ac69429b91a",
-            projectId = "23BGBiWsFmHutLGgLotu",
-            createdAt = 1611315466612,
-            modalities = listOf(Modes.FACE),
-            appVersionName = "development - build - dev",
-            libVersionName = "2020.3.0",
-            language = "en",
-            device = Device(
-                androidSdkVersion = "29",
-                deviceModel = "HUAWEI_VOG - L09",
-                deviceId = "b88d3b6bc2765a52"
-            ),
-            databaseInfo = DatabaseInfo(sessionCount = 7, recordCount = 17),
-            location = Location(latitude = 52.2145821, longitude = 0.1381978),
-            analyticsId = null,
-            endedAt = 0,
-            uploadedAt = 0,
-            type = EventType.SESSION_CAPTURE
-        )
+        databaseInfo = DatabaseInfo(sessionCount = 0, recordCount = 0)
+    )
+
+    private val refusalEvent = RefusalEvent(
+        createdAt = 2,
+        endTime = 4,
+        reason = RefusalEvent.RefusalPayload.Answer.APP_NOT_WORKING,
+        otherText = ""
     )
 
 }

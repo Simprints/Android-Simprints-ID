@@ -66,6 +66,19 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
+    override fun returnIdentification(
+        identifications: ArrayList<Identification>,
+        sessionId: String
+    ) = Intent().let {
+
+        // CommCare can't process Identifications as standard CommCare Bundle (COMMCARE_BUNDLE_KEY).
+        // It's excepting Identifications results in the LibSimprints format.
+        it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
+        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
+
+        sendOkResult(it)
+    }
+
     override fun returnVerification(
         confidence: Int,
         tier: Tier,
@@ -89,13 +102,15 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         reason: String,
         extra: String,
         sessionId: String,
-        flowCompletedCheck: Boolean
+        flowCompletedCheck: Boolean,
+        eventsJson: String?
     ) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(EXIT_REASON, reason)
             putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(EXIT_EXTRA, extra)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
@@ -132,19 +147,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
-        sendOkResult(it)
-    }
-
-    override fun returnIdentification(
-        identifications: ArrayList<Identification>,
-        sessionId: String
-    ) = Intent().let {
-
-        // CommCare can't process Identifications as standard CommCare Bundle (COMMCARE_BUNDLE_KEY).
-        // It's excepting Identifications results in the LibSimprints format.
-        it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
-        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
-
         sendOkResult(it)
     }
 

@@ -105,7 +105,8 @@ class CommCarePresenter(
                 refusalForm.reason,
                 refusalForm.extra,
                 getCurrentSessionIdOrEmpty(),
-                flowCompletedCheck
+                flowCompletedCheck,
+                getEventsJson()
             )
         }
     }
