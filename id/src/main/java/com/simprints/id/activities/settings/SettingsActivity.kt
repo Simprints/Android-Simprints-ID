@@ -20,6 +20,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         private const val LOGOUT_RESULT_CODE = 1
     }
 
+    // Is this necessary here considering the superclass already has this implementation?
+    // This is observed in other activities as well
     override fun attachBaseContext(newBase: Context) {
         val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
         super.attachBaseContext(languageCtx)
