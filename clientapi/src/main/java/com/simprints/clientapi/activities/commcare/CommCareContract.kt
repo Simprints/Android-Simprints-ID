@@ -26,7 +26,7 @@ interface CommCareContract {
             eventsJson: String?
         )
 
-        fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String)
+        fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?)
 
         fun injectSessionIdIntoIntent(sessionId: String)
 

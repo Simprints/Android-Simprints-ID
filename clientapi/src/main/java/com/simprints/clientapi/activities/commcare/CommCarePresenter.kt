@@ -82,6 +82,14 @@ class CommCarePresenter(
         }
     }
 
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty(), getEventsJson())
+        }
+    }
+
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
@@ -129,14 +137,6 @@ class CommCarePresenter(
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-
-    override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
-        }
-    }
 
     private suspend fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {

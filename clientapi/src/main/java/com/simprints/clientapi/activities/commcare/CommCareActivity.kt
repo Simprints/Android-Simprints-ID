@@ -120,10 +120,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String) = Intent().let {
+    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(SIMPRINTS_SESSION_ID, sessionId)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
