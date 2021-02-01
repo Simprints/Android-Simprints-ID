@@ -16,7 +16,14 @@ interface CommCareContract {
 
         fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String, eventsJson: String?)
 
-        fun returnVerification(confidence: Int, tier: Tier, guid: String, sessionId: String, flowCompletedCheck: Boolean)
+        fun returnVerification(
+            confidence: Int,
+            tier: Tier,
+            guid: String,
+            sessionId: String,
+            flowCompletedCheck: Boolean,
+            eventsJson: String?
+        )
 
         fun returnExitForms(
             reason: String,

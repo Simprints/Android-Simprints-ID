@@ -20,6 +20,7 @@ import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.db.event.domain.models.RefusalEvent
 import com.simprints.id.data.db.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.id.data.db.event.domain.models.callback.VerificationCallbackEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -263,13 +264,14 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun handleVerification_ShouldReturnValidVerification() {
+    fun `handleVerification should return valid verification with events`() {
         val verification =
             VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(verificationCallbackEvent)
 
         CommCarePresenter(
             view,
@@ -288,13 +290,14 @@ class CommCareCoSyncPresenterTest {
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
                 sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(verificationCallbackEvent)}]}"
             )
         }
     }
 
     @Test
-    fun handleResponseError_ShouldCallActionError() {
+    fun `handleResponseError should return error to client with events`() {
         val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
         val sessionId = UUID.randomUUID().toString()
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -392,5 +395,10 @@ class CommCareCoSyncPresenterTest {
     private val guidSelectionEvent = GuidSelectionEvent(
         2,
         UUID.randomUUID().toString()
+    )
+
+    private val verificationCallbackEvent = VerificationCallbackEvent(
+        2,
+        CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1)
     )
 }

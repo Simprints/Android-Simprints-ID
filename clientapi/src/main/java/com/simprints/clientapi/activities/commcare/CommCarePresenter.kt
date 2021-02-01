@@ -107,7 +107,8 @@ class CommCarePresenter(
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
                 getCurrentSessionIdOrEmpty(),
-                flowCompletedCheck
+                flowCompletedCheck,
+                getEventsJson()
             )
         }
     }
