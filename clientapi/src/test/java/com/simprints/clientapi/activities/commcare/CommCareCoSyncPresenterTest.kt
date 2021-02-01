@@ -17,11 +17,14 @@ import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SE
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.RefusalEvent
+import com.simprints.id.data.db.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
@@ -158,7 +161,7 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun handleRegistration_ShouldReturnValidRegistration() {
+    fun `handleRegistration should return valid registration with events`() {
         val registerId = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
 
@@ -189,16 +192,22 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun handleIdentification_ShouldReturnValidIdentification() {
+    fun `handleIdentification should return valid identification with events`() {
         val id1 = MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH)
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5, MatchConfidence.LOW)
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            identificationCallbackEvent
+        )
+
         CommCarePresenter(
             view,
             Identify,
-            mockk(),
+            sessionEventsManagerMock,
             mockSharedPrefs(),
             mockk(),
             mockk(),
@@ -216,7 +225,9 @@ class CommCareCoSyncPresenterTest {
                         it.confidenceScore,
                         com.simprints.libsimprints.Tier.valueOf(it.tier.name)
                     )
-                }), sessionId
+                }),
+                sessionId,
+                "{\"events\":[${jsonHelper.toJson(identificationCallbackEvent)}]}"
             )
         }
     }
@@ -277,7 +288,7 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRefusalResponse should return correct events`() {
+    fun `handleRefusalResponse should return valid refusal with events`() {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -338,6 +349,14 @@ class CommCareCoSyncPresenterTest {
         endTime = 4,
         reason = RefusalEvent.RefusalPayload.Answer.APP_NOT_WORKING,
         otherText = ""
+    )
+
+    private val identificationCallbackEvent = IdentificationCallbackEvent(
+        createdAt = 2,
+        sessionId = UUID.randomUUID().toString(),
+        scores = listOf(
+            CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1)
+        )
     )
 
 }

@@ -65,14 +65,21 @@ class CommCarePresenter(
         }
     }
 
-    //CommCare can process Identifications results as LibSimprints format only.
-    //So CC will be able to handle flowCompletedCheck flag for Identifications only when libsimprints supports
-    // flowCompletedCheck flag and CC updates the libsimprints version (=never)
+    /**
+     * CommCare processes Identifications results as LibSimprints format.
+     *
+     * CommCare doesn't seem to handle flowCompletedCheck, so it shouldn't matter if we send it back or not.
+     */
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
-        view.returnIdentification(ArrayList(identify.identifications.map {
-            Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
-        }), identify.sessionId)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnIdentification(ArrayList(identify.identifications.map {
+                Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
+            }), identify.sessionId, getEventsJson())
+        }
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
