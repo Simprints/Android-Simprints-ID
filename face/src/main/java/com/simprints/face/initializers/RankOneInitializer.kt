@@ -20,7 +20,7 @@ class RankOneInitializer : SdkInitializer {
         try {
             loadNdkLibraries(activity)
         } catch (t: Throwable) {
-            Timber.e("Error initializing license $t")
+            Timber.e(t)
             return false
         }
         roc.roc_preinitialize_android(activity)

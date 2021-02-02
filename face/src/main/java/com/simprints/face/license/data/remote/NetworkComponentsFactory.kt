@@ -17,7 +17,7 @@ object NetworkComponentsFactory {
 
     private fun getOkHttpClientConfig(): OkHttpClient.Builder {
         val loggingInterceptor = HttpLoggingInterceptor(TimberLogger()).apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
 
         return OkHttpClient.Builder()
