@@ -25,7 +25,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), SettingsPreferenc
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        val component = (activity?.application as Application).component
+        val component = (requireActivity().application as Application).component
         component.inject(this)
 
         setTextInLayout()
