@@ -35,8 +35,6 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
             .commit()
     }
 
-    // override fun onIsMultiPane() = isXLargeTablet()
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -46,11 +44,6 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-//    override fun isValidFragment(fragmentName: String): Boolean {
-//        return PreferenceFragmentCompat::class.java.name == fragmentName
-//            || SettingsAboutFragment::class.java.name == fragmentName
-//    }
 
     fun finishActivityBecauseLogout() {
         setResult(LOGOUT_RESULT_CODE)
