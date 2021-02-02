@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
@@ -13,7 +14,7 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import kotlinx.android.synthetic.main.settings_toolbar.settingsToolbar
 
-class SettingsActivity : AppCompatPreferenceActivity() {
+class SettingsActivity : BaseSplitActivity() {
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -40,6 +41,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     private fun setupActionBar() {
         settingsToolbar.title = getString(R.string.settings_title)
         setSupportActionBar(settingsToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
