@@ -37,7 +37,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        val component = (activity?.application as Application).component
+        val component = (requireActivity().application as Application).component
         component.inject(this)
 
         setTextInLayout()
@@ -72,7 +72,6 @@ class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.
         getSyncAndSearchConfigurationPreference()?.title = getString(R.string.preference_sync_and_search_title)
         getLogoutPreference()?.title = getString(R.string.preference_logout_title)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
