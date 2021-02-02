@@ -20,8 +20,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         private const val LOGOUT_RESULT_CODE = 1
     }
 
-    // Is this necessary here considering the superclass already has this implementation?
-    // This is observed in other activities as well
     override fun attachBaseContext(newBase: Context) {
         val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
         super.attachBaseContext(languageCtx)
@@ -44,8 +42,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         setSupportActionBar(settingsToolbar)
     }
 
-    // override fun onIsMultiPane() = isXLargeTablet()
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -55,11 +51,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-//    override fun isValidFragment(fragmentName: String): Boolean {
-//        return PreferenceFragmentCompat::class.java.name == fragmentName
-//            || SettingsPreferenceFragment::class.java.name == fragmentName
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
@@ -84,5 +75,4 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
         removeAnimationsToNextActivity()
     }
-
 }
