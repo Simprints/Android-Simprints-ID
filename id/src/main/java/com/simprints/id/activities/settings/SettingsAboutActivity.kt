@@ -3,13 +3,14 @@ package com.simprints.id.activities.settings
 import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.databinding.SettingsToolbarBinding
 
 
-class SettingsAboutActivity : AppCompatPreferenceActivity() {
+class SettingsAboutActivity : BaseSplitActivity() {
 
     private lateinit var binding: SettingsToolbarBinding
 
@@ -29,6 +30,7 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         binding = SettingsToolbarBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.settingsToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsAboutFragment())
