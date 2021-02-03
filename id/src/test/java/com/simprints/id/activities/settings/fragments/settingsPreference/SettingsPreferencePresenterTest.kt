@@ -1,12 +1,16 @@
 package com.simprints.id.activities.settings.fragments.settingsPreference
 
-import android.preference.ListPreference
-import android.preference.MultiSelectListPreference
-import android.preference.Preference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
