@@ -1,10 +1,14 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
-import android.preference.Preference
+import androidx.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.fail

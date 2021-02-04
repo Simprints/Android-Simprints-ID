@@ -2,17 +2,17 @@ package com.simprints.id.activities.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.preference.PreferenceActivity
 import android.view.MenuItem
-import androidx.preference.PreferenceFragment
+import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.tools.extensions.isXLargeTablet
-import kotlinx.android.synthetic.main.settings_toolbar.*
+import com.simprints.id.databinding.SettingsToolbarBinding
 
 
-class SettingsAboutActivity : AppCompatPreferenceActivity() {
+class SettingsAboutActivity : BaseSplitActivity() {
+
+    private lateinit var binding: SettingsToolbarBinding
 
     companion object {
         private const val LOGOUT_RESULT_CODE = 1
@@ -27,15 +27,15 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
         super.onCreate(savedInstanceState)
         title = getString(R.string.title_activity_settings_about)
 
-        setContentView(R.layout.settings_toolbar)
-        setSupportActionBar(settingsToolbar)
+        binding = SettingsToolbarBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.settingsToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsAboutFragment())
             .commit()
     }
-
-    override fun onIsMultiPane() = isXLargeTablet()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -45,14 +45,6 @@ class SettingsAboutActivity : AppCompatPreferenceActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
-    }
-
-    override fun isValidFragment(fragmentName: String): Boolean {
-        return PreferenceFragment::class.java.name == fragmentName
-            || SettingsAboutFragment::class.java.name == fragmentName
     }
 
     fun finishActivityBecauseLogout() {

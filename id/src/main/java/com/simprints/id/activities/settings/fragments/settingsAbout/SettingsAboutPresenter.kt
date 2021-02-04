@@ -1,6 +1,6 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
-import android.preference.Preference
+import androidx.preference.Preference
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
@@ -51,8 +51,8 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         // No face-specific settings yet
     }
 
-    internal fun loadValueAndBindChangeListener(preference: Preference) {
-        when (preference.key) {
+    internal fun loadValueAndBindChangeListener(preference: Preference?) {
+        when (preference?.key) {
             view.getKeyForSyncAndSearchConfigurationPreference() -> {
                 loadSyncAndSearchConfigurationPreference(preference)
             }
@@ -74,8 +74,8 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         }
     }
 
-    internal fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
-        preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
+    internal fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
+        preference?.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
             " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 

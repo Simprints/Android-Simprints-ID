@@ -1,12 +1,10 @@
 package com.simprints.id.activities.settings.fragments.settingsPreference
 
-import android.preference.ListPreference
-import android.preference.MultiSelectListPreference
-import android.preference.Preference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.modality.Modality
@@ -17,9 +15,14 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                                   component: AppComponent) :
     SettingsPreferenceContract.Presenter {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var syncSchedulerHelper: SyncManager
-    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+
+    @Inject
+    lateinit var syncSchedulerHelper: SyncManager
+
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
 
     init {
         component.inject(this)
@@ -84,8 +87,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getPreferenceForSyncInformation())
     }
 
-    internal fun loadValueAndBindChangeListener(preference: Preference) {
-        when (preference.key) {
+    internal fun loadValueAndBindChangeListener(preference: Preference?) {
+        when (preference?.key) {
             view.getKeyForLanguagePreference() -> {
                 loadLanguagePreference(preference as ListPreference)
                 preference.setChangeListener { value: String ->
