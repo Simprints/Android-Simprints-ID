@@ -5,10 +5,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.Preference
-import android.preference.PreferenceFragment
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
@@ -23,25 +23,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
+class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.View {
 
     override lateinit var packageVersionName: String
     override lateinit var deviceId: String
     override lateinit var viewPresenter: SettingsAboutContract.Presenter
 
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.pref_app_details)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addPreferencesFromResource(R.xml.pref_app_details)
         setHasOptionsMenu(true)
 
-        val component = (activity.application as Application).component
+        val component = (requireActivity().application as Application).component
         component.inject(this)
 
         setTextInLayout()
         setPreferenceListeners()
 
-        packageVersionName = activity.packageVersionName
-        deviceId = activity.deviceId
+        packageVersionName = requireActivity().packageVersionName
+        deviceId = requireActivity().deviceId
 
         viewPresenter = SettingsAboutPresenter(this, component)
         viewPresenter.start()
@@ -49,13 +52,13 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
 
     private fun setPreferenceListeners() {
         if (BuildConfig.DEBUG) {
-            getDeviceIdPreference().setOnPreferenceClickListener {
-                with(activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
+            getDeviceIdPreference()?.setOnPreferenceClickListener {
+                with(activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
                     val clip = ClipData.newPlainText("deviceID", deviceId)
                     setPrimaryClip(clip)
                 }
 
-                context.showToast("Your Device Id $deviceId was copied to the clipboard")
+                context?.showToast("Your Device Id $deviceId was copied to the clipboard")
 
                 return@setOnPreferenceClickListener true
             }
@@ -63,13 +66,12 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
     }
 
     private fun setTextInLayout() {
-        getAppVersionPreference().title = getString(R.string.preference_app_version_title)
-        getDeviceIdPreference().title = getString(R.string.preference_device_id_title)
-        getScannerVersionPreference().title = getString(R.string.preference_scanner_version_title)
-        getSyncAndSearchConfigurationPreference().title = getString(R.string.preference_sync_and_search_title)
-        getLogoutPreference().title = getString(R.string.preference_logout_title)
+        getAppVersionPreference()?.title = getString(R.string.preference_app_version_title)
+        getDeviceIdPreference()?.title = getString(R.string.preference_device_id_title)
+        getScannerVersionPreference()?.title = getString(R.string.preference_scanner_version_title)
+        getSyncAndSearchConfigurationPreference()?.title = getString(R.string.preference_sync_and_search_title)
+        getLogoutPreference()?.title = getString(R.string.preference_logout_title)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
@@ -80,19 +82,19 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun getSyncAndSearchConfigurationPreference(): Preference =
+    override fun getSyncAndSearchConfigurationPreference(): Preference? =
         findPreference(getKeyForSyncAndSearchConfigurationPreference())
 
-    override fun getAppVersionPreference(): Preference =
+    override fun getAppVersionPreference(): Preference? =
         findPreference(getKeyForAppVersionPreference())
 
-    override fun getScannerVersionPreference(): Preference =
+    override fun getScannerVersionPreference(): Preference? =
         findPreference(getKeyForScannerVersionPreference())
 
-    override fun getDeviceIdPreference(): Preference =
+    override fun getDeviceIdPreference(): Preference? =
         findPreference(getKeyForDeviceIdPreference())
 
-    override fun getLogoutPreference(): Preference =
+    override fun getLogoutPreference(): Preference? =
         findPreference(getKeyForLogoutPreference())
 
     override fun getKeyForLogoutPreference(): String =
@@ -111,17 +113,17 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         getString(R.string.preference_device_id_key)
 
     override fun showConfirmationDialogForLogout() {
-        activity.runOnUiThreadIfStillRunning {
+        activity?.runOnUiThreadIfStillRunning {
             buildConfirmationDialogForLogout().show()
         }
     }
 
-    override fun enablePreference(preference: Preference) {
-        preference.isEnabled = true
+    override fun enablePreference(preference: Preference?) {
+        preference?.isEnabled = true
     }
 
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
-        AlertDialog.Builder(activity)
+        AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.confirmation_logout_title))
             .setMessage(getString(R.string.confirmation_logout_message))
             .setPositiveButton(
@@ -136,7 +138,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
             ).create()
 
     override fun finishSettings() {
-        activity.runOnUiThreadIfStillRunning {
+        activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsAboutActivity).finishActivityBecauseLogout()
         }
     }

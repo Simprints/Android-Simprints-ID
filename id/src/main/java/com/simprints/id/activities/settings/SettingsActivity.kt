@@ -4,18 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.preference.PreferenceFragment
+import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
+import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
-import com.simprints.id.tools.extensions.isXLargeTablet
-import kotlinx.android.synthetic.main.settings_toolbar.*
+import kotlinx.android.synthetic.main.settings_toolbar.settingsToolbar
 
-class SettingsActivity : AppCompatPreferenceActivity() {
+class SettingsActivity : BaseSplitActivity() {
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -34,7 +33,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         setupActionBar()
 
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsPreferenceFragment())
             .commit()
     }
@@ -42,9 +41,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     private fun setupActionBar() {
         settingsToolbar.title = getString(R.string.settings_title)
         setSupportActionBar(settingsToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
-    override fun onIsMultiPane() = isXLargeTablet()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -54,14 +52,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBuildHeaders(target: List<Header>) {
-    }
-
-    override fun isValidFragment(fragmentName: String): Boolean {
-        return PreferenceFragment::class.java.name == fragmentName
-            || SettingsPreferenceFragment::class.java.name == fragmentName
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -87,5 +77,4 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         startActivity(Intent(this, CheckLoginFromMainLauncherActivity::class.java))
         removeAnimationsToNextActivity()
     }
-    
 }

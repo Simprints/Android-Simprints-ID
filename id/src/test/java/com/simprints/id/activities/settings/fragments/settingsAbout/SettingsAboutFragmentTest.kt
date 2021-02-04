@@ -44,7 +44,7 @@ class SettingsAboutFragmentTest {
 
     @Test
     fun logoutDialogShown_userClicksOk_presenterShouldPerformLogout() = runBlocking {
-        val fragmentManager = settingsAboutActivity.fragmentManager
+        val fragmentManager = settingsAboutActivity.supportFragmentManager
         val fragment = fragmentManager.findFragmentById(com.simprints.id.R.id.prefContent) as SettingsAboutFragment
         fragment.viewPresenter = spyk(fragment.viewPresenter)
         coEvery { fragment.viewPresenter.logout() } coAnswers { }

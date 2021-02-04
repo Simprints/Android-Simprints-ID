@@ -1,6 +1,6 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
-import android.preference.Preference
+import androidx.preference.Preference
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 
@@ -12,15 +12,15 @@ interface SettingsAboutContract {
 
         var packageVersionName: String
 
-        fun getAppVersionPreference(): Preference
+        fun getAppVersionPreference(): Preference?
 
-        fun getScannerVersionPreference(): Preference
+        fun getScannerVersionPreference(): Preference?
 
-        fun getSyncAndSearchConfigurationPreference(): Preference
+        fun getSyncAndSearchConfigurationPreference(): Preference?
 
-        fun getDeviceIdPreference(): Preference
+        fun getDeviceIdPreference(): Preference?
 
-        fun getLogoutPreference(): Preference
+        fun getLogoutPreference(): Preference?
 
         fun getKeyForAppVersionPreference(): String
 
@@ -34,7 +34,7 @@ interface SettingsAboutContract {
 
         fun showConfirmationDialogForLogout()
 
-        fun enablePreference(preference: Preference)
+        fun enablePreference(preference: Preference?)
 
         fun finishSettings()
     }

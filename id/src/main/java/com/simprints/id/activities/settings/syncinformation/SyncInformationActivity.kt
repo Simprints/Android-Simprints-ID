@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.syncinformation
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -17,18 +18,24 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
-import kotlinx.android.synthetic.main.activity_sync_information.*
 import javax.inject.Inject
 
 class SyncInformationActivity : BaseSplitActivity() {
 
-    @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var eventSyncManager: EventSyncManager
+    @Inject
+    lateinit var viewModelFactory: SyncInformationViewModelFactory
+
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+
+    @Inject
+    lateinit var eventSyncManager: EventSyncManager
+    private lateinit var binding: ActivitySyncInformationBinding
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
@@ -40,7 +47,8 @@ class SyncInformationActivity : BaseSplitActivity() {
         (application as Application).component.inject(this)
 
         title = getString(R.string.title_activity_sync_information)
-        setContentView(R.layout.activity_sync_information)
+        binding = ActivitySyncInformationBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(SyncInformationViewModel::class.java)
@@ -62,17 +70,17 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        moduleSelectionButton.text =
+        binding.moduleSelectionButton.text =
             getString(R.string.select_modules_button_title)
-        recordsToUploadText.text =
+        binding.recordsToUploadText.text =
             getString(R.string.sync_info_records_to_upload)
-        recordsToDownloadText.text =
+        binding.recordsToDownloadText.text =
             getString(R.string.sync_info_records_to_download)
-        recordsToDeleteText.text =
+        binding.recordsToDeleteText.text =
             getString(R.string.sync_info_records_to_delete)
-        totalRecordsOnDeviceText.text =
+        binding.totalRecordsOnDeviceText.text =
             getString(R.string.sync_info_total_records_on_device)
-        imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
+        binding.imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -86,29 +94,29 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun clearValues() {
-        recordsToUploadCount.text = getString(R.string.empty)
-        recordsToDownloadCount.text = getString(R.string.empty)
-        totalRecordsCount.text = getString(R.string.empty)
-        recordsToDeleteCount.text = getString(R.string.empty)
-        imagesToUploadCount.text = getString(R.string.empty)
+        binding.recordsToUploadCount.text = getString(R.string.empty)
+        binding.recordsToDownloadCount.text = getString(R.string.empty)
+        binding.totalRecordsCount.text = getString(R.string.empty)
+        binding.recordsToDeleteCount.text = getString(R.string.empty)
+        binding.imagesToUploadCount.text = getString(R.string.empty)
     }
 
     private fun setFocusOnDefaultModulesTab() {
-        modulesTabHost.setCurrentTabByTag(SELECTED_MODULES_TAB_TAG)
+        binding.modulesTabHost.setCurrentTabByTag(SELECTED_MODULES_TAB_TAG)
     }
 
     private fun enableModuleSelectionButtonAndTabsIfNecessary() {
         if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
-            moduleSelectionButton.visibility = View.VISIBLE
-            modulesTabHost.visibility = View.VISIBLE
+            binding.moduleSelectionButton.visibility = View.VISIBLE
+            binding.modulesTabHost.visibility = View.VISIBLE
         } else {
-            moduleSelectionButton.visibility = View.GONE
-            modulesTabHost.visibility = View.GONE
+            binding.moduleSelectionButton.visibility = View.GONE
+            binding.modulesTabHost.visibility = View.GONE
         }
     }
 
     private fun setupAdapters() {
-        with(selectedModulesView) {
+        with(binding.selectedModulesView) {
             adapter = moduleCountAdapterForSelected
             layoutManager = LinearLayoutManager(applicationContext)
         }
@@ -118,67 +126,68 @@ class SyncInformationActivity : BaseSplitActivity() {
         preferencesManager.moduleIdOptions.isNotEmpty() && preferencesManager.syncGroup == GROUP.MODULE
 
     private fun setupToolbar() {
-        setSupportActionBar(syncInfoToolbar)
+        setSupportActionBar(binding.syncInfoToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun setupModulesTabs() {
-        modulesTabHost.setup()
+        binding.modulesTabHost.setup()
 
-        selectedModulesTabSpec = modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
+        selectedModulesTabSpec = binding.modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
             .setIndicator(getString(R.string.sync_info_selected_modules))
             .setContent(R.id.selectedModulesView)
 
-        modulesTabHost.addTab(selectedModulesTabSpec)
+        binding.modulesTabHost.addTab(selectedModulesTabSpec)
     }
 
     private fun setupClickListeners() {
-        moduleSelectionButton.setOnClickListener {
+        binding.moduleSelectionButton.setOnClickListener {
             startActivity(Intent(this, ModuleSelectionActivity::class.java))
         }
     }
 
     private fun observeUi() {
         viewModel.getViewStateLiveData().observe(this, Observer {
-            when(it) {
+            when (it) {
                 Syncing, Calculating -> showProgressOverlayAndClearValuesIfNecessary(it as ViewState.LoadingState)
                 is ViewState.SyncDataFetched -> hideProgressAndShowSyncData(it)
             }
         })
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupProgressOverlay() {
-        progressOverlayBackground.setOnTouchListener { _, _ -> true }
-        progress_sync_overlay.setOnTouchListener { _, _ -> true }
-        progressBar.setOnTouchListener { _, _ -> true }
+        binding.progressOverlayBackground.setOnTouchListener { _, _ -> true }
+        binding.progressSyncOverlay.setOnTouchListener { _, _ -> true }
+        binding.progressBar.setOnTouchListener { _, _ -> true }
     }
 
     private fun showProgressOverlayAndClearValuesIfNecessary(loadingState: ViewState.LoadingState) {
-        progress_sync_overlay.text = when (loadingState) {
+        binding.progressSyncOverlay.text = when (loadingState) {
             Syncing -> getString(R.string.progress_sync_overlay)
             Calculating -> getString(R.string.calculating_overlay)
         }
 
         if (!isProgressOverlayVisible()) {
             clearValues()
-            group_progress_overlay.visibility = View.VISIBLE
+            binding.groupProgressOverlay.visibility = View.VISIBLE
         }
     }
 
-    private fun isProgressOverlayVisible() = group_progress_overlay.visibility == View.VISIBLE
+    private fun isProgressOverlayVisible() = binding.groupProgressOverlay.visibility == View.VISIBLE
 
     private fun hideProgressAndShowSyncData(it: ViewState.SyncDataFetched) {
         hideProgressOverlay()
-        totalRecordsCount.text = it.recordsInLocal.toString()
-        recordsToUploadCount.text = it.recordsToUpSync.toString()
-        recordsToDownloadCount.text = it.recordsToDownSync?.toString() ?: ""
-        recordsToDeleteCount.text = it.recordsToDelete?.toString() ?: ""
-        imagesToUploadCount.text = it.imagesToUpload.toString()
+        binding.totalRecordsCount.text = it.recordsInLocal.toString()
+        binding.recordsToUploadCount.text = it.recordsToUpSync.toString()
+        binding.recordsToDownloadCount.text = it.recordsToDownSync?.toString() ?: ""
+        binding.recordsToDeleteCount.text = it.recordsToDelete?.toString() ?: ""
+        binding.imagesToUploadCount.text = it.imagesToUpload.toString()
         addTotalRowAndSubmitList(it.moduleCounts, moduleCountAdapterForSelected)
     }
 
     private fun hideProgressOverlay() {
-        group_progress_overlay.visibility = View.GONE
+        binding.groupProgressOverlay.visibility = View.GONE
     }
 
     private fun addTotalRowAndSubmitList(
@@ -199,8 +208,8 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun setupRecordsCountCards() {
         if (!isDownSyncAllowed()) {
-            recordsToDownloadCardView.visibility = View.GONE
-            recordsToDeleteCardView.visibility = View.GONE
+            binding.recordsToDownloadCardView.visibility = View.GONE
+            binding.recordsToDeleteCardView.visibility = View.GONE
         }
     }
 
@@ -209,16 +218,17 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     sealed class ViewState {
-        sealed class LoadingState: ViewState() {
+        sealed class LoadingState : ViewState() {
             object Syncing : LoadingState()
             object Calculating : LoadingState()
         }
+
         data class SyncDataFetched(val recordsInLocal: Int,
                                    val recordsToDownSync: Int?,
                                    val recordsToUpSync: Int,
                                    val recordsToDelete: Int?,
                                    val imagesToUpload: Int,
-                                   val moduleCounts: List<ModuleCount>): ViewState()
+                                   val moduleCounts: List<ModuleCount>) : ViewState()
     }
 
     companion object {
