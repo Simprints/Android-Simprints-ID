@@ -67,6 +67,7 @@ class CommCarePresenter(
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
+            deleteSessionEvents(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -162,6 +163,10 @@ class CommCarePresenter(
         }
 
         processConfirmIdentityRequest()
+    }
+
+    private suspend fun deleteSessionEvents(sessionId: String) {
+        sessionEventsManager.deleteSessionEvents(sessionId)
     }
 
     private data class CommCareEvents(val events: List<Event>)
