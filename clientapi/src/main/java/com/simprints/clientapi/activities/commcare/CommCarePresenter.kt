@@ -31,8 +31,7 @@ class CommCarePresenter(
     private val sharedPreferencesManager: SharedPreferencesManager,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager,
-    private val jsonHelper: JsonHelper,
-    private val syncDestinationSetting: SyncDestinationSetting
+    private val jsonHelper: JsonHelper
 ) : RequestPresenter(
     view,
     sessionEventsManager,
@@ -143,7 +142,7 @@ class CommCarePresenter(
     }
 
     private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
+        if (sharedPreferencesManager.syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CommCareEvents(events))
         } else {
