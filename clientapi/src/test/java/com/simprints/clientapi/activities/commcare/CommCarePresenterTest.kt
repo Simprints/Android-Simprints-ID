@@ -54,8 +54,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).apply {
             runBlocking { start() }
         }
@@ -76,8 +75,7 @@ class CommCarePresenterTest {
                 mockSharedPrefs(),
                 mockk(relaxed = true),
                 mockk(relaxed = true),
-                jsonHelper,
-                SyncDestinationSetting.SIMPRINTS
+                jsonHelper
             ).apply {
                 start()
             }
@@ -104,8 +102,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
@@ -124,8 +121,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
@@ -140,8 +136,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).apply {
             runBlocking {
                 shouldThrow<InvalidIntentActionException> {
@@ -166,8 +161,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK, null) }
@@ -188,8 +182,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId)
         )
@@ -225,8 +218,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).handleVerifyResponse(verification)
 
         verify(exactly = 1) {
@@ -256,8 +248,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).handleResponseError(error)
 
         verify(exactly = 1) {
@@ -279,8 +270,7 @@ class CommCarePresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            SyncDestinationSetting.SIMPRINTS
+            jsonHelper
         ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
 
         verify(exactly = 1) {

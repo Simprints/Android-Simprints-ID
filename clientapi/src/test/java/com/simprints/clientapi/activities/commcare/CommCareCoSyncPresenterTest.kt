@@ -46,7 +46,6 @@ class CommCareCoSyncPresenterTest {
 
     private val view = mockk<CommCareActivity>()
     private val jsonHelper = JsonHelper()
-    private val syncDestinationSetting = SyncDestinationSetting.COMMCARE
 
     @Before
     fun setup() {
@@ -65,8 +64,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).apply {
             runBlocking { start() }
         }
@@ -87,8 +85,7 @@ class CommCareCoSyncPresenterTest {
                 mockSharedPrefs(),
                 mockk(relaxed = true),
                 mockk(relaxed = true),
-                jsonHelper,
-                syncDestinationSetting
+                jsonHelper
             ).apply {
                 start()
             }
@@ -115,8 +112,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
@@ -135,8 +131,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
@@ -151,8 +146,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).apply {
             runBlocking {
                 shouldThrow<InvalidIntentActionException> {
@@ -178,8 +172,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) {
@@ -213,8 +206,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId)
         )
@@ -249,8 +241,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).handleConfirmationResponse(ConfirmationResponse(true))
 
         verify(exactly = 1) {
@@ -280,8 +271,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).handleVerifyResponse(verification)
 
         verify(exactly = 1) {
@@ -311,8 +301,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).handleResponseError(error)
 
         verify(exactly = 1) {
@@ -335,8 +324,7 @@ class CommCareCoSyncPresenterTest {
             mockSharedPrefs(),
             mockk(),
             mockk(),
-            jsonHelper,
-            syncDestinationSetting
+            jsonHelper
         ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
 
         verify(exactly = 1) {
@@ -359,6 +347,7 @@ class CommCareCoSyncPresenterTest {
     private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
+        every { this@apply.syncDestinationSetting } returns SyncDestinationSetting.COMMCARE
     }
 
     private val sessionCaptureEvent = SessionCaptureEvent(

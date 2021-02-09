@@ -84,8 +84,7 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(),
-                get<SharedPreferencesManager>().syncDestinationSetting
+                get()
             )
         }
     }
