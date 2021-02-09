@@ -66,7 +66,7 @@ class CommCarePresenter(
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
-            deleteSessionEvents(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -98,7 +98,7 @@ class CommCarePresenter(
                 getCurrentSessionIdOrEmpty(),
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
-            deleteSessionEvents(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -112,7 +112,7 @@ class CommCarePresenter(
                 getCurrentSessionIdOrEmpty(),
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
-            deleteSessionEvents(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -128,7 +128,7 @@ class CommCarePresenter(
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
-            deleteSessionEvents(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -143,7 +143,7 @@ class CommCarePresenter(
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
-            deleteSessionEvents(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -170,8 +170,10 @@ class CommCarePresenter(
         processConfirmIdentityRequest()
     }
 
-    private suspend fun deleteSessionEvents(sessionId: String) {
-        sessionEventsManager.deleteSessionEvents(sessionId)
+    private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
+        if (sharedPreferencesManager.syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
+            sessionEventsManager.deleteSessionEvents(sessionId)
+        }
     }
 
     private data class CommCareEvents(val events: List<Event>)
