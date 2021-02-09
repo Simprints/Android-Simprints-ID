@@ -74,6 +74,8 @@ class CommCarePresenter(
      * CommCare processes Identifications results as LibSimprints format.
      *
      * CommCare doesn't seem to handle flowCompletedCheck, so it shouldn't matter if we send it back or not.
+     *
+     * Identification doesn't delete session events because we need them for the confirmation return.
      */
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
@@ -96,6 +98,7 @@ class CommCarePresenter(
                 getCurrentSessionIdOrEmpty(),
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
+            deleteSessionEvents(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -109,6 +112,7 @@ class CommCarePresenter(
                 getCurrentSessionIdOrEmpty(),
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
+            deleteSessionEvents(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -124,6 +128,7 @@ class CommCarePresenter(
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
+            deleteSessionEvents(getCurrentSessionIdOrEmpty())
         }
     }
 
@@ -138,6 +143,7 @@ class CommCarePresenter(
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty())
             )
+            deleteSessionEvents(getCurrentSessionIdOrEmpty())
         }
     }
 
