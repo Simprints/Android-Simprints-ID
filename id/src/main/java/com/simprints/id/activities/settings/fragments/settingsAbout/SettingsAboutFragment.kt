@@ -15,19 +15,24 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+class SettingsAboutFragment : PreferenceFragmentCompat() {
 
-class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.View {
+    lateinit var packageVersionName: String
+    lateinit var deviceId: String
+    private lateinit var viewModel: SettingsAboutViewModel
 
-    override lateinit var packageVersionName: String
-    override lateinit var deviceId: String
-    override lateinit var viewPresenter: SettingsAboutContract.Presenter
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_app_details)
@@ -42,12 +47,19 @@ class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.
 
         setTextInLayout()
         setPreferenceListeners()
+        loadPreferenceValuesAndBindThemToChangeListeners()
+        enableSettingsBasedOnModalities()
 
         packageVersionName = requireActivity().packageVersionName
         deviceId = requireActivity().deviceId
+    }
 
-        viewPresenter = SettingsAboutPresenter(this, component)
-        viewPresenter.start()
+    private fun loadPreferenceValuesAndBindThemToChangeListeners() {
+        loadValueAndBindChangeListener(getSyncAndSearchConfigurationPreference())
+        loadValueAndBindChangeListener(getAppVersionPreference())
+        loadValueAndBindChangeListener(getScannerVersionPreference())
+        loadValueAndBindChangeListener(getDeviceIdPreference())
+        loadValueAndBindChangeListener(getLogoutPreference())
     }
 
     private fun setPreferenceListeners() {
@@ -61,6 +73,15 @@ class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.
                 context?.showToast("Your Device Id $deviceId was copied to the clipboard")
 
                 return@setOnPreferenceClickListener true
+            }
+        }
+    }
+
+    private fun enableSettingsBasedOnModalities() {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> viewModel.enableFingerprintSettings(getScannerVersionPreference())
+                Modality.FACE -> viewModel.enableFaceSettings()
             }
         }
     }
@@ -82,44 +103,63 @@ class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.
         return super.onOptionsItemSelected(item)
     }
 
-    override fun getSyncAndSearchConfigurationPreference(): Preference? =
+    private fun getSyncAndSearchConfigurationPreference(): Preference? =
         findPreference(getKeyForSyncAndSearchConfigurationPreference())
 
-    override fun getAppVersionPreference(): Preference? =
+    private fun getAppVersionPreference(): Preference? =
         findPreference(getKeyForAppVersionPreference())
 
-    override fun getScannerVersionPreference(): Preference? =
+    private fun getScannerVersionPreference(): Preference? =
         findPreference(getKeyForScannerVersionPreference())
 
-    override fun getDeviceIdPreference(): Preference? =
+    private fun getDeviceIdPreference(): Preference? =
         findPreference(getKeyForDeviceIdPreference())
 
-    override fun getLogoutPreference(): Preference? =
+    private fun getLogoutPreference(): Preference? =
         findPreference(getKeyForLogoutPreference())
 
-    override fun getKeyForLogoutPreference(): String =
+    private fun getKeyForLogoutPreference(): String =
         getString(R.string.preference_logout_key)
 
-    override fun getKeyForSyncAndSearchConfigurationPreference(): String =
+    private fun getKeyForSyncAndSearchConfigurationPreference(): String =
         getString(R.string.preference_sync_and_search_key)
 
-    override fun getKeyForAppVersionPreference(): String =
+    private fun getKeyForAppVersionPreference(): String =
         getString(R.string.preference_app_version_key)
 
-    override fun getKeyForScannerVersionPreference(): String =
+    private fun getKeyForScannerVersionPreference(): String =
         getString(R.string.preference_scanner_version_key)
 
-    override fun getKeyForDeviceIdPreference(): String =
+    private fun getKeyForDeviceIdPreference(): String =
         getString(R.string.preference_device_id_key)
 
-    override fun showConfirmationDialogForLogout() {
+    private fun showConfirmationDialogForLogout() {
         activity?.runOnUiThreadIfStillRunning {
             buildConfirmationDialogForLogout().show()
         }
     }
 
-    override fun enablePreference(preference: Preference?) {
-        preference?.isEnabled = true
+    internal fun loadValueAndBindChangeListener(preference: Preference?) {
+        when (preference?.key) {
+            getKeyForSyncAndSearchConfigurationPreference() -> {
+                viewModel.loadSyncAndSearchConfigurationPreference(preference)
+            }
+            getKeyForAppVersionPreference() -> {
+                viewModel.loadAppVersionInPreference(preference, packageVersionName)
+            }
+            getKeyForScannerVersionPreference() -> {
+                viewModel.loadScannerVersionInPreference(preference)
+            }
+            getKeyForDeviceIdPreference() -> {
+                viewModel.loadDeviceIdInPreference(preference, deviceId)
+            }
+            getKeyForLogoutPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    showConfirmationDialogForLogout()
+                    true
+                }
+            }
+        }
     }
 
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
@@ -130,14 +170,15 @@ class SettingsAboutFragment : PreferenceFragmentCompat(), SettingsAboutContract.
                 getString(R.string.logout)
             ) { _, _ ->
                 CoroutineScope(Dispatchers.Main).launch {
-                    viewPresenter.logout()
+                    viewModel.logout()
+                    finishSettings()
                 }
             }
             .setNegativeButton(
                 getString(R.string.confirmation_logout_cancel), null
             ).create()
 
-    override fun finishSettings() {
+    private fun finishSettings() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsAboutActivity).finishActivityBecauseLogout()
         }
