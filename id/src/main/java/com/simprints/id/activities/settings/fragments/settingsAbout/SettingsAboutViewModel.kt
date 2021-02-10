@@ -5,17 +5,27 @@ import androidx.preference.Preference
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.secure.SignerManager
 
 class SettingsAboutViewModel(val preferencesManager: PreferencesManager,
                              val signerManager: SignerManager,
                              private val recentEventsManager: RecentEventsPreferencesManager) : ViewModel() {
 
-    fun enableFingerprintSettings(scannerVersionPref: Preference?) {
+    fun enableSettingsBasedOnModalities(scannerVersionPref: Preference?) {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> enableFingerprintSettings(scannerVersionPref)
+                Modality.FACE -> enableFaceSettings()
+            }
+        }
+    }
+
+    private fun enableFingerprintSettings(scannerVersionPref: Preference?) {
         enablePreference(scannerVersionPref)
     }
 
-    fun enableFaceSettings() {
+    private fun enableFaceSettings() {
         // No face-specific settings yet
     }
 

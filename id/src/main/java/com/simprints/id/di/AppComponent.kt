@@ -69,13 +69,15 @@ import javax.inject.Singleton
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
-        DashboardActivityModule::class
+        DashboardActivityModule::class,
+        SettingsModule::class
     ]
 )
 @Singleton
 interface AppComponent {
 
-    @Component.Builder interface Builder {
+    @Component.Builder
+    interface Builder {
 
         @BindsInstance
         fun application(app: Application): Builder
