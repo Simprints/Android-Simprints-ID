@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.tools.extentions.showToast
@@ -16,7 +17,6 @@ import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
@@ -27,12 +27,15 @@ import javax.inject.Inject
 
 class SettingsAboutFragment : PreferenceFragmentCompat() {
 
-    lateinit var packageVersionName: String
-    lateinit var deviceId: String
-    private lateinit var viewModel: SettingsAboutViewModel
+    private lateinit var packageVersionName: String
+    private lateinit var deviceId: String
 
     @Inject
     lateinit var preferencesManager: PreferencesManager
+
+    @Inject
+    lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
+    private val settingsAboutViewModel: SettingsAboutViewModel by viewModels { settingsAboutViewModelFactory }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_app_details)
@@ -47,11 +50,12 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
         setTextInLayout()
         setPreferenceListeners()
-        loadPreferenceValuesAndBindThemToChangeListeners()
-        enableSettingsBasedOnModalities()
+        settingsAboutViewModel.enableSettingsBasedOnModalities(getScannerVersionPreference())
 
         packageVersionName = requireActivity().packageVersionName
         deviceId = requireActivity().deviceId
+
+        loadPreferenceValuesAndBindThemToChangeListeners()
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
@@ -73,15 +77,6 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
                 context?.showToast("Your Device Id $deviceId was copied to the clipboard")
 
                 return@setOnPreferenceClickListener true
-            }
-        }
-    }
-
-    private fun enableSettingsBasedOnModalities() {
-        preferencesManager.modalities.forEach {
-            when (it) {
-                Modality.FINGER -> viewModel.enableFingerprintSettings(getScannerVersionPreference())
-                Modality.FACE -> viewModel.enableFaceSettings()
             }
         }
     }
@@ -142,16 +137,16 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     internal fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForSyncAndSearchConfigurationPreference() -> {
-                viewModel.loadSyncAndSearchConfigurationPreference(preference)
+                settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(preference)
             }
             getKeyForAppVersionPreference() -> {
-                viewModel.loadAppVersionInPreference(preference, packageVersionName)
+                settingsAboutViewModel.loadAppVersionInPreference(preference, packageVersionName)
             }
             getKeyForScannerVersionPreference() -> {
-                viewModel.loadScannerVersionInPreference(preference)
+                settingsAboutViewModel.loadScannerVersionInPreference(preference)
             }
             getKeyForDeviceIdPreference() -> {
-                viewModel.loadDeviceIdInPreference(preference, deviceId)
+                settingsAboutViewModel.loadDeviceIdInPreference(preference, deviceId)
             }
             getKeyForLogoutPreference() -> {
                 preference.setOnPreferenceClickListener {
@@ -170,7 +165,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
                 getString(R.string.logout)
             ) { _, _ ->
                 CoroutineScope(Dispatchers.Main).launch {
-                    viewModel.logout()
+                    settingsAboutViewModel.logout()
                     finishSettings()
                 }
             }
