@@ -69,8 +69,7 @@ import javax.inject.Singleton
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
-        DashboardActivityModule::class,
-        SettingsModule::class
+        DashboardActivityModule::class
     ]
 )
 @Singleton

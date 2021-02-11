@@ -36,23 +36,23 @@ class SettingsAboutFragmentTest {
         UnitTestConfig(this, module).fullSetup()
 
         settingsAboutActivity = Robolectric.buildActivity(SettingsAboutActivity::class.java)
-           .create()
-           .start()
-           .resume()
-           .get()
+            .create()
+            .start()
+            .resume()
+            .get()
     }
 
     @Test
     fun logoutDialogShown_userClicksOk_presenterShouldPerformLogout() = runBlocking {
         val fragmentManager = settingsAboutActivity.supportFragmentManager
         val fragment = fragmentManager.findFragmentById(com.simprints.id.R.id.prefContent) as SettingsAboutFragment
-        fragment.viewPresenter = spyk(fragment.viewPresenter)
-        coEvery { fragment.viewPresenter.logout() } coAnswers { }
+        fragment.settingsAboutViewModel = spyk(fragment.settingsAboutViewModel)
+        coEvery { fragment.settingsAboutViewModel.logout() } coAnswers { }
         val dialog = fragment.buildConfirmationDialogForLogout()
 
         dialog.show()
         dialog.getButton(BUTTON_POSITIVE).performClick()
 
-        coVerify { fragment.viewPresenter.logout() }
+        coVerify { fragment.settingsAboutViewModel.logout() }
     }
 }
