@@ -16,9 +16,20 @@ import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
-import com.simprints.id.activities.qrcapture.tools.*
+import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
+import com.simprints.id.activities.qrcapture.tools.CameraFocusManagerImpl
+import com.simprints.id.activities.qrcapture.tools.CameraHelper
+import com.simprints.id.activities.qrcapture.tools.CameraHelperImpl
+import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
+import com.simprints.id.activities.qrcapture.tools.QrCodeDetectorImpl
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducerImpl
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilderImpl
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutViewModelFactory
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -49,8 +60,13 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.*
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
+import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
+import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -69,6 +85,7 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -451,5 +468,22 @@ open class AppModule {
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
+
+    @Provides
+    open fun provideSettingsPreferenceViewModelFactory(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ): SettingsPreferenceViewModelFactory {
+        return SettingsPreferenceViewModelFactory(preferencesManager, crashReportManager)
+    }
+
+    @Provides
+    open fun provideSettingsAboutViewModelFactory(
+        preferencesManager: PreferencesManager,
+        signerManager: SignerManager,
+        recentEventsManager: RecentEventsPreferencesManager
+    ): SettingsAboutViewModelFactory {
+        return SettingsAboutViewModelFactory(preferencesManager, signerManager, recentEventsManager)
+    }
 }
 

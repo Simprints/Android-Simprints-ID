@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.tools.extentions.showToast
@@ -32,7 +32,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     @Inject
     lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
-    private val settingsAboutViewModel: SettingsAboutViewModel by viewModels { settingsAboutViewModelFactory }
+    lateinit var settingsAboutViewModel: SettingsAboutViewModel
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_app_details)
@@ -45,6 +45,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         val component = (requireActivity().application as Application).component
         component.inject(this)
 
+        settingsAboutViewModel = ViewModelProvider(this, settingsAboutViewModelFactory).get(SettingsAboutViewModel::class.java)
         setTextInLayout()
         setPreferenceListeners()
 
