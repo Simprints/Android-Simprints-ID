@@ -3,7 +3,6 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -149,13 +148,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun getKeyForSyncInfoPreference(): String =
         getString(R.string.preference_sync_info_key)
-
-    fun setSelectModulePreferenceEnabled(enabled: Boolean) {
-    }
-
-    fun showToastForInvalidSelectionOfFingers() {
-        Toast.makeText(activity, getString(R.string.settings_invalid_selection), Toast.LENGTH_LONG).show()
-    }
 
     private fun openFingerSelectionActivity() {
         activity?.runOnUiThreadIfStillRunning {
