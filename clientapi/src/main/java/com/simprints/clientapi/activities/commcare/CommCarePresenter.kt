@@ -147,6 +147,10 @@ class CommCarePresenter(
         }
     }
 
+    /**
+     * Be aware that Android Intents have a cap at around 500KB of data that can be returned.
+     * When changing events, make sure they still fit in.
+     */
     private suspend fun getEventsJsonForSession(sessionId: String): String? =
         if (sharedPreferencesManager.syncDestinationSetting == SyncDestinationSetting.COMMCARE) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
