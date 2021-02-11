@@ -13,8 +13,8 @@ class SettingsAboutViewModelFactory(private val preferencesManager: PreferencesM
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SettingsAboutViewModel::class.java))
-            return SettingsAboutViewModel(preferencesManager, signerManager, recentEventsManager) as T
+        return if (modelClass.isAssignableFrom(SettingsAboutViewModel::class.java))
+            SettingsAboutViewModel(preferencesManager, signerManager, recentEventsManager) as T
         else
             throw IllegalArgumentException("View model not found")
     }

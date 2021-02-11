@@ -20,9 +20,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SettingsAboutFragment : PreferenceFragmentCompat() {
@@ -164,10 +161,8 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
             .setPositiveButton(
                 getString(R.string.logout)
             ) { _, _ ->
-                CoroutineScope(Dispatchers.Main).launch {
-                    settingsAboutViewModel.logout()
-                    finishSettings()
-                }
+                settingsAboutViewModel.logout()
+                finishSettings()
             }
             .setNegativeButton(
                 getString(R.string.confirmation_logout_cancel), null
