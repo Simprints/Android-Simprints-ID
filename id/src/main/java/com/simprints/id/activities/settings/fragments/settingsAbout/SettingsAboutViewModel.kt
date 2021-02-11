@@ -1,12 +1,14 @@
 package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.preference.Preference
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.secure.SignerManager
+import kotlinx.coroutines.launch
 
 class SettingsAboutViewModel(val preferencesManager: PreferencesManager,
                              val signerManager: SignerManager,
@@ -52,7 +54,7 @@ class SettingsAboutViewModel(val preferencesManager: PreferencesManager,
         preference?.isEnabled = true
     }
 
-    suspend fun logout() {
-        signerManager.signOut()
+    fun logout() {
+        viewModelScope.launch { signerManager.signOut() }
     }
 }
