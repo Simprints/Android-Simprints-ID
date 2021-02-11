@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.tools.extentions.getStringArray
@@ -12,10 +14,14 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import javax.inject.Inject
 
-class SettingsPreferenceFragment : PreferenceFragmentCompat(), SettingsPreferenceContract.View {
+class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
-    override lateinit var viewPresenter: SettingsPreferenceContract.Presenter
+    @Inject
+    lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
+
+    private val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_general)
@@ -30,10 +36,17 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), SettingsPreferenc
 
         setTextInLayout()
 
-        viewPresenter = SettingsPreferencePresenter(this, component)
-        viewPresenter.start()
-
         initTextInLayout()
+        settingsPreferenceViewModel.configureAvailableLanguageEntriesFromProjectLanguages(getPreferenceForLanguage(), getLanguageCodeAndNamePairs())
+        loadPreferenceValuesAndBindThemToChangeListeners()
+        settingsPreferenceViewModel.enableSettingsBasedOnModalities(getPreferenceForDefaultFingers())
+    }
+
+    private fun loadPreferenceValuesAndBindThemToChangeListeners() {
+        loadValueAndBindChangeListener(getPreferenceForLanguage())
+        loadValueAndBindChangeListener(getPreferenceForDefaultFingers())
+        loadValueAndBindChangeListener(getPreferenceForAbout())
+        loadValueAndBindChangeListener(getPreferenceForSyncInformation())
     }
 
     private fun setTextInLayout() {
@@ -65,7 +78,37 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), SettingsPreferenc
         return super.onOptionsItemSelected(item)
     }
 
-    override fun getLanguageCodeAndNamePairs(): Map<String, String> {
+    private fun loadValueAndBindChangeListener(preference: Preference?) {
+        when (preference?.key) {
+            getKeyForLanguagePreference() -> {
+                settingsPreferenceViewModel.loadLanguagePreference(preference as ListPreference)
+                preference.setChangeListener { value: String ->
+                    settingsPreferenceViewModel.handleLanguagePreferenceChanged(preference, value)
+                    clearActivityStackAndRelaunchApp()
+                }
+            }
+            getKeyForDefaultFingersPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    openFingerSelectionActivity()
+                    true
+                }
+            }
+            getKeyForSyncInfoPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    openSyncInfoActivity()
+                    true
+                }
+            }
+            getKeyForAboutPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    openSettingAboutActivity()
+                    true
+                }
+            }
+        }
+    }
+
+    private fun getLanguageCodeAndNamePairs(): Map<String, String> {
         val languageCodes = requireActivity().getStringArray(R.array.language_values)
         val languageNames = requireActivity().getStringArray(R.array.language_array)
         return languageCodes.zip(languageNames).toMap()
@@ -83,56 +126,56 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), SettingsPreferenc
     private fun getKeyForAppDetailsPreferenceCategory() =
         getString(R.string.preferences_app_details_key)
 
-    override fun getPreferenceForLanguage(): Preference? =
+    private fun getPreferenceForLanguage(): Preference? =
         findPreference(getKeyForLanguagePreference())
 
-    override fun getPreferenceForDefaultFingers(): Preference? =
+    private fun getPreferenceForDefaultFingers(): Preference? =
         findPreference(getKeyForDefaultFingersPreference())
 
-    override fun getKeyForLanguagePreference(): String =
+    private fun getKeyForLanguagePreference(): String =
         getString(R.string.preference_select_language_key)
 
-    override fun getKeyForDefaultFingersPreference(): String =
+    private fun getKeyForDefaultFingersPreference(): String =
         getString(R.string.preference_select_fingers_key)
 
-    override fun getPreferenceForAbout(): Preference? =
+    private fun getPreferenceForAbout(): Preference? =
         findPreference(getKeyForAboutPreference())
 
-    override fun getPreferenceForSyncInformation(): Preference? =
+    private fun getPreferenceForSyncInformation(): Preference? =
         findPreference(getKeyForSyncInfoPreference())
 
-    override fun getKeyForAboutPreference(): String =
+    private fun getKeyForAboutPreference(): String =
         getString(R.string.preference_app_details_key)
 
-    override fun getKeyForSyncInfoPreference(): String =
+    private fun getKeyForSyncInfoPreference(): String =
         getString(R.string.preference_sync_info_key)
 
-    override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
+    fun setSelectModulePreferenceEnabled(enabled: Boolean) {
     }
 
-    override fun showToastForInvalidSelectionOfFingers() {
+    fun showToastForInvalidSelectionOfFingers() {
         Toast.makeText(activity, getString(R.string.settings_invalid_selection), Toast.LENGTH_LONG).show()
     }
 
-    override fun openFingerSelectionActivity() {
+    private fun openFingerSelectionActivity() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openFingerSelectionActivity()
         }
     }
 
-    override fun openSettingAboutActivity() {
+    private fun openSettingAboutActivity() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSettingAboutActivity()
         }
     }
 
-    override fun openSyncInfoActivity() {
+    private fun openSyncInfoActivity() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSyncInformationActivity()
         }
     }
 
-    override fun clearActivityStackAndRelaunchApp() {
+    private fun clearActivityStackAndRelaunchApp() {
         activity?.runOnUiThreadIfStillRunning {
             activity?.finishAffinity()
             (activity as SettingsActivity).openCheckLoginFromMainLauncherActivity()
@@ -140,7 +183,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), SettingsPreferenc
         }
     }
 
-    override fun enablePreference(preference: Preference?) {
-        preference?.isEnabled = true
+    private inline fun <reified V : Any> Preference.setChangeListener(crossinline listener: (V) -> Unit) {
+        onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            listener(value as V)
+            true
+        }
     }
 }

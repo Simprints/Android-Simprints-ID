@@ -50,12 +50,12 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
         setTextInLayout()
         setPreferenceListeners()
-        settingsAboutViewModel.enableSettingsBasedOnModalities(getScannerVersionPreference())
 
         packageVersionName = requireActivity().packageVersionName
         deviceId = requireActivity().deviceId
 
         loadPreferenceValuesAndBindThemToChangeListeners()
+        settingsAboutViewModel.enableSettingsBasedOnModalities(getScannerVersionPreference())
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
@@ -134,7 +134,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         }
     }
 
-    internal fun loadValueAndBindChangeListener(preference: Preference?) {
+    private fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForSyncAndSearchConfigurationPreference() -> {
                 settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(preference)
