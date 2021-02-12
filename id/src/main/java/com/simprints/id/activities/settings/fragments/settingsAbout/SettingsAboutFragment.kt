@@ -102,10 +102,10 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private fun getAppVersionPreference(): Preference? =
         findPreference(getKeyForAppVersionPreference())
 
-    private fun getScannerVersionPreference(): Preference? =
+    fun getScannerVersionPreference(): Preference? =
         findPreference(getKeyForScannerVersionPreference())
 
-    private fun getDeviceIdPreference(): Preference? =
+    fun getDeviceIdPreference(): Preference? =
         findPreference(getKeyForDeviceIdPreference())
 
     fun getLogoutPreference(): Preference? =
@@ -114,16 +114,16 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     fun getKeyForLogoutPreference(): String =
         getString(R.string.preference_logout_key)
 
-    private fun getKeyForSyncAndSearchConfigurationPreference(): String =
+    fun getKeyForSyncAndSearchConfigurationPreference(): String =
         getString(R.string.preference_sync_and_search_key)
 
-    private fun getKeyForAppVersionPreference(): String =
+    fun getKeyForAppVersionPreference(): String =
         getString(R.string.preference_app_version_key)
 
-    private fun getKeyForScannerVersionPreference(): String =
+    fun getKeyForScannerVersionPreference(): String =
         getString(R.string.preference_scanner_version_key)
 
-    private fun getKeyForDeviceIdPreference(): String =
+    fun getKeyForDeviceIdPreference(): String =
         getString(R.string.preference_device_id_key)
 
     fun showConfirmationDialogForLogout() {

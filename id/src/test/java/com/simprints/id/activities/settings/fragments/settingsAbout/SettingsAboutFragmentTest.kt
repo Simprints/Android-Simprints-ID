@@ -89,4 +89,66 @@ class SettingsAboutFragmentTest {
             verify(exactly = 1) { fragment.showConfirmationDialogForLogout() }
         } ?: Assert.fail("Action for logout preference not set.")
     }
+
+    @Test
+    fun syncAndSearchPreference_loadValue_preferenceShouldHaveValues() {
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { fragment.getKeyForSyncAndSearchConfigurationPreference() } returns PREFERENCE_KEY_FOR_SYNC_AND_SEARCH
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_SYNC_AND_SEARCH
+        every { fragment.settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(any()) } returns Unit
+
+        fragment.loadValueAndBindChangeListener(mockPreference)
+
+        verify(exactly = 1) { fragment.settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(any()) }
+    }
+
+    @Test
+    fun appVersionPreference_loadValue_preferenceShouldHaveValues() {
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { fragment.getKeyForAppVersionPreference() } returns PREFERENCE_KEY_FOR_APP_VERSION
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_APP_VERSION
+        every { fragment.settingsAboutViewModel.loadAppVersionInPreference(any(), any()) } returns Unit
+
+        fragment.loadValueAndBindChangeListener(mockPreference)
+
+        verify(exactly = 1) { fragment.settingsAboutViewModel.loadAppVersionInPreference(any(), any()) }
+    }
+
+    @Test
+    fun scannerVersionPreference_loadValue_preferenceShouldHaveValues() {
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { fragment.getScannerVersionPreference() } returns mockPreference
+        every { fragment.getKeyForScannerVersionPreference() } returns PREFERENCE_KEY_FOR_SCANNER_VERSION
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_SCANNER_VERSION
+        every { fragment.settingsAboutViewModel.loadScannerVersionInPreference(any()) } returns Unit
+
+        fragment.loadValueAndBindChangeListener(mockPreference)
+
+        verify(exactly = 1) { fragment.settingsAboutViewModel.loadScannerVersionInPreference(any()) }
+    }
+
+    @Test
+    fun deviceIdPreference_loadValue_preferenceShouldHaveValues() {
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { fragment.getDeviceIdPreference() } returns mockPreference
+        every { fragment.getKeyForDeviceIdPreference() } returns PREFERENCE_KEY_FOR_DEVICE_ID
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_DEVICE_ID
+        every { fragment.settingsAboutViewModel.loadDeviceIdInPreference(any(), any()) } returns Unit
+
+        fragment.loadValueAndBindChangeListener(mockPreference)
+
+        verify(exactly = 1) { fragment.settingsAboutViewModel.loadDeviceIdInPreference(any(), any()) }
+    }
+
+    @Test
+    fun logoutPreference_bindClickListener_shouldHaveListenerBounded() {
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { fragment.getLogoutPreference() } returns mockPreference
+        every { fragment.getKeyForLogoutPreference() } returns PREFERENCE_KEY_FOR_LOGOUT
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_LOGOUT
+
+        fragment.loadValueAndBindChangeListener(mockPreference)
+
+        verify(exactly = 1) { mockPreference.setOnPreferenceClickListener(any()) }
+    }
 }
