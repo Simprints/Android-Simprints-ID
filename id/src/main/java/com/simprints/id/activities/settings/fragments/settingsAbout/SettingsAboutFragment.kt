@@ -108,10 +108,10 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private fun getDeviceIdPreference(): Preference? =
         findPreference(getKeyForDeviceIdPreference())
 
-    private fun getLogoutPreference(): Preference? =
+    fun getLogoutPreference(): Preference? =
         findPreference(getKeyForLogoutPreference())
 
-    private fun getKeyForLogoutPreference(): String =
+    fun getKeyForLogoutPreference(): String =
         getString(R.string.preference_logout_key)
 
     private fun getKeyForSyncAndSearchConfigurationPreference(): String =
@@ -126,13 +126,13 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private fun getKeyForDeviceIdPreference(): String =
         getString(R.string.preference_device_id_key)
 
-    private fun showConfirmationDialogForLogout() {
+    fun showConfirmationDialogForLogout() {
         activity?.runOnUiThreadIfStillRunning {
             buildConfirmationDialogForLogout().show()
         }
     }
 
-    private fun loadValueAndBindChangeListener(preference: Preference?) {
+    fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForSyncAndSearchConfigurationPreference() -> {
                 settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(preference)
