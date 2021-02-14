@@ -28,7 +28,6 @@ import com.simprints.id.activities.settings.fingerselection.FingerSelectionActiv
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -107,7 +106,6 @@ interface AppComponent {
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticatorImpl)
     fun inject(alertPresenter: AlertPresenter)
-    fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
     fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
