@@ -20,7 +20,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     @Inject
     lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
 
-    private val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
+     val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_general)
@@ -77,7 +77,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun loadValueAndBindChangeListener(preference: Preference?) {
+    fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForLanguagePreference() -> {
                 settingsPreferenceViewModel.loadLanguagePreference(preference as ListPreference)
@@ -125,25 +125,25 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun getKeyForAppDetailsPreferenceCategory() =
         getString(R.string.preferences_app_details_key)
 
-    private fun getPreferenceForLanguage(): Preference? =
+    fun getPreferenceForLanguage(): Preference? =
         findPreference(getKeyForLanguagePreference())
 
     private fun getPreferenceForDefaultFingers(): Preference? =
         findPreference(getKeyForDefaultFingersPreference())
 
-    private fun getKeyForLanguagePreference(): String =
+    fun getKeyForLanguagePreference(): String =
         getString(R.string.preference_select_language_key)
 
     private fun getKeyForDefaultFingersPreference(): String =
         getString(R.string.preference_select_fingers_key)
 
-    private fun getPreferenceForAbout(): Preference? =
+    fun getPreferenceForAbout(): Preference? =
         findPreference(getKeyForAboutPreference())
 
     private fun getPreferenceForSyncInformation(): Preference? =
         findPreference(getKeyForSyncInfoPreference())
 
-    private fun getKeyForAboutPreference(): String =
+    fun getKeyForAboutPreference(): String =
         getString(R.string.preference_app_details_key)
 
     private fun getKeyForSyncInfoPreference(): String =
@@ -155,7 +155,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun openSettingAboutActivity() {
+    fun openSettingAboutActivity() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSettingAboutActivity()
         }
