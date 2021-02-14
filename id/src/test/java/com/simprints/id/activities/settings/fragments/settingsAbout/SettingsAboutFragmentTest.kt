@@ -15,6 +15,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
@@ -26,6 +27,7 @@ import org.robolectric.annotation.Config
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@ExperimentalCoroutinesApi
 class SettingsAboutFragmentTest {
 
     companion object {
