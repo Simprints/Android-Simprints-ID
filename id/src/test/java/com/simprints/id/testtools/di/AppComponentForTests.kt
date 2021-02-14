@@ -7,9 +7,16 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenterTest
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragmentTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
-import com.simprints.id.di.*
+import com.simprints.id.di.AppComponent
+import com.simprints.id.di.AppModule
+import com.simprints.id.di.DashboardActivityModule
+import com.simprints.id.di.DataModule
+import com.simprints.id.di.PreferencesModule
+import com.simprints.id.di.SecurityModule
+import com.simprints.id.di.SerializerModule
+import com.simprints.id.di.SyncModule
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
 import com.simprints.id.services.sync.subjects.down.workers.EventDownSyncCountWorkerTest
@@ -52,11 +59,11 @@ interface AppComponentForTests : AppComponent {
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
+    fun inject(settingsPreferenceFragmentTest: SettingsPreferenceFragmentTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(subjectsDownSyncCountWorkerTest: EventDownSyncCountWorkerTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
-    fun inject(settingsPreferencePresenterTest: SettingsPreferencePresenterTest)
 
     @ExperimentalCoroutinesApi
     fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
