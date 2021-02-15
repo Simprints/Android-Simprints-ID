@@ -54,8 +54,9 @@ class ClientApiSessionEventsManagerImpl(
 
     /**
      * Since this is the last event before returning to the calling app, we want to make sure that all previous events
-     * were saved already. That's why this is blocking instead of running in background. This should give enough time
-     * to previous events to be saved since SQLite queues write attempts. [https://www.sqlite.org/lockingv3.html]
+     * were saved already. That's why this is blocking instead of running in background (`inBackground(dispatcher)`).
+     * This should give enough time to previous events to be saved since SQLite queues write attempts.
+     * [https://www.sqlite.org/lockingv3.html]
      */
     override suspend fun addCompletionCheckEvent(complete: Boolean) {
         coreEventRepository.addEventToCurrentSession(

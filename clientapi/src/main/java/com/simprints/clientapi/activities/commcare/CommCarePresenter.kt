@@ -9,6 +9,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.exceptions.CouldntSaveEventException
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
@@ -23,6 +24,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
+
+private const val RETURN_TIMEOUT = 1_000L
 
 class CommCarePresenter(
     private val view: CommCareContract.View,
@@ -161,8 +166,22 @@ class CommCarePresenter(
 
     private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
 
-    private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
-        sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
+    /**
+     * This method will wait [RETURN_TIMEOUT] for the completion event to finish.
+     * If it doesn't finish, it will log an error and continue the flow.
+     *
+     * We should not cause problems to the calling app if an event can't be saved at the end of the flow.
+     */
+    private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) {
+        val job = withTimeoutOrNull(RETURN_TIMEOUT) {
+            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
+        }
+
+        if (job == null) {
+            Timber.e(CouldntSaveEventException("Event: FlowCompletedEvent"))
+            crashReportManager.logExceptionOrSafeException(CouldntSaveEventException("Event: FlowCompletedEvent"))
+        }
+    }
 
     private suspend fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {
