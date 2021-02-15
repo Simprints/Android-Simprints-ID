@@ -16,7 +16,6 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
@@ -26,9 +25,6 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private lateinit var packageVersionName: String
     private lateinit var deviceId: String
-
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
 
     @Inject
     lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
