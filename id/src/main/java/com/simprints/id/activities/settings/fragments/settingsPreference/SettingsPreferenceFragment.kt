@@ -13,6 +13,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.id.tools.extensions.setChangeListener
 import javax.inject.Inject
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
@@ -172,13 +173,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             activity?.finishAffinity()
             (activity as SettingsActivity).openCheckLoginFromMainLauncherActivity()
             activity?.removeAnimationsToNextActivity()
-        }
-    }
-
-    private inline fun <reified V : Any> Preference.setChangeListener(crossinline listener: (V) -> Unit) {
-        onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-            listener(value as V)
-            true
         }
     }
 }
