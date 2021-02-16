@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.secure.SignerManager
+import com.simprints.id.tools.extensions.enablePreference
 import kotlinx.coroutines.launch
 
 class SettingsAboutViewModel(private val preferencesManager: PreferencesManager,
@@ -24,7 +25,7 @@ class SettingsAboutViewModel(private val preferencesManager: PreferencesManager,
     }
 
     private fun enableFingerprintSettings(scannerVersionPref: Preference?) {
-        enablePreference(scannerVersionPref)
+        scannerVersionPref?.enablePreference()
     }
 
     private fun enableFaceSettings() {
@@ -48,10 +49,6 @@ class SettingsAboutViewModel(private val preferencesManager: PreferencesManager,
 
     internal fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
         preference.summary = deviceId
-    }
-
-    private fun enablePreference(preference: Preference?) {
-        preference?.isEnabled = true
     }
 
     fun logout() {

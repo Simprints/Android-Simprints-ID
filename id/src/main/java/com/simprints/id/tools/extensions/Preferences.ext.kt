@@ -8,3 +8,7 @@ inline fun <reified V : Any> Preference.setChangeListener(crossinline listener: 
         true
     }
 }
+
+fun Preference.enablePreference() {
+    this.isEnabled = true
+}
