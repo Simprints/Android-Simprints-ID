@@ -347,7 +347,7 @@ class CommCareCoSyncPresenterTest {
     private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
-        every { this@apply.syncDestinationSetting } returns SyncDestinationSetting.COMMCARE
+        every { this@apply.syncDestinationSetting } returns listOf(SyncDestinationSetting.COMMCARE)
     }
 
     private val sessionCaptureEvent = SessionCaptureEvent(
