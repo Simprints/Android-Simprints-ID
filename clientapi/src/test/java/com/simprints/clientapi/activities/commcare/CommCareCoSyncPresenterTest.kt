@@ -339,6 +339,74 @@ class CommCareCoSyncPresenterTest {
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
+    @Test
+    fun `handleRefusalResponse should delete events - if only sync to commcare`() {
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
+
+        CommCarePresenter(
+            view,
+            Enrol,
+            sessionEventsManagerMock,
+            mockSharedPrefs(),
+            mockk(),
+            mockk(),
+            jsonHelper
+        ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+
+        verify(exactly = 1) {
+            view.returnExitForms(
+                "APP_NOT_WORKING",
+                "",
+                sessionId,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
+            )
+        }
+        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
+    }
+
+    @Test
+    fun `handleRefusalResponse shouldnt delete events - if sync has simprints`() {
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
+        val sharedPreferences = mockSharedPrefs().apply {
+            every { this@apply.syncDestinationSetting } returns listOf(
+                SyncDestinationSetting.COMMCARE,
+                SyncDestinationSetting.SIMPRINTS
+            )
+        }
+
+        CommCarePresenter(
+            view,
+            Enrol,
+            sessionEventsManagerMock,
+            sharedPreferences,
+            mockk(),
+            mockk(),
+            jsonHelper
+        ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+
+        verify(exactly = 1) {
+            view.returnExitForms(
+                "APP_NOT_WORKING",
+                "",
+                sessionId,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
+            )
+        }
+        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 0) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
+    }
+
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
         coEvery { this@apply.getCurrentSessionId() } returns "session_id"
         coEvery { this@apply.createSession(any()) } returns "session_id"
