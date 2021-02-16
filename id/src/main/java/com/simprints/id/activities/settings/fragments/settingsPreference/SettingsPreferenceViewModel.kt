@@ -8,6 +8,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.tools.extensions.enablePreference
 
 class SettingsPreferenceViewModel(
     val preferencesManager: PreferencesManager,
@@ -23,7 +24,7 @@ class SettingsPreferenceViewModel(
     }
 
     private fun enableFingerprintSettings(defaultFingersPref: Preference?) {
-        enablePreference(defaultFingersPref)
+        defaultFingersPref?.enablePreference()
     }
 
     private fun enableFaceSettings() {
@@ -83,9 +84,5 @@ class SettingsPreferenceViewModel(
 
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message)
-    }
-
-    private fun enablePreference(preference: Preference?) {
-        preference?.isEnabled = true
     }
 }
