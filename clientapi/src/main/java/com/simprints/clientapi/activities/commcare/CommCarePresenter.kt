@@ -174,8 +174,12 @@ class CommCarePresenter(
         processConfirmIdentityRequest()
     }
 
+    /**
+     * Delete the events if returning to CommCare but not Simprints
+     */
     private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSetting.contains(SyncDestinationSetting.COMMCARE)) {
+        if (sharedPreferencesManager.syncDestinationSetting.contains(SyncDestinationSetting.COMMCARE) &&
+            !sharedPreferencesManager.syncDestinationSetting.contains(SyncDestinationSetting.SIMPRINTS)) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
     }
