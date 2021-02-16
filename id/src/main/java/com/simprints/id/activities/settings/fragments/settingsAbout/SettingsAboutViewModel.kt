@@ -10,7 +10,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.secure.SignerManager
 import kotlinx.coroutines.launch
 
-class SettingsAboutViewModel(val preferencesManager: PreferencesManager,
+class SettingsAboutViewModel(private val preferencesManager: PreferencesManager,
                              val signerManager: SignerManager,
                              private val recentEventsManager: RecentEventsPreferencesManager) : ViewModel() {
 
