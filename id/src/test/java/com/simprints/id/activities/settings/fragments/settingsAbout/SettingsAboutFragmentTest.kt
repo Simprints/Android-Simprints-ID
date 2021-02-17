@@ -40,8 +40,8 @@ class SettingsAboutFragmentTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    private lateinit var settingsAboutActivity: SettingsAboutActivity
-    private lateinit var fragment: SettingsAboutFragment
+    lateinit var settingsAboutActivity: SettingsAboutActivity
+    lateinit var fragment: SettingsAboutFragment
 
     private val module by lazy {
         TestAppModule(app)
