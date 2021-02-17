@@ -16,6 +16,7 @@ interface OrchestratorComponent {
     @Subcomponent.Builder
     interface Builder {
         fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
         fun build(): OrchestratorComponent
     }
 
