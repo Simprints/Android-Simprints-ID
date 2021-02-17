@@ -179,22 +179,22 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         // No face-specific settings yet
     }
 
-    private fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
+    fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
         preference?.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
             " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 
     private fun GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
-    private fun loadAppVersionInPreference(preference: Preference, packageVersionName: String) {
+    fun loadAppVersionInPreference(preference: Preference, packageVersionName: String) {
         preference.summary = packageVersionName
     }
 
-    private fun loadScannerVersionInPreference(preference: Preference) {
+    fun loadScannerVersionInPreference(preference: Preference) {
         preference.summary = recentEventsManager.lastScannerVersion
     }
 
-    private fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
+    fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
         preference.summary = deviceId
     }
 

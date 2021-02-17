@@ -61,12 +61,12 @@ class SettingsPreferenceFragmentTest {
         every { fragment.getPreferenceForLanguage() } returns mockPreference
         every { fragment.getKeyForLanguagePreference() } returns PREFERENCE_KEY_FOR_LANGUAGES
         every { mockPreference.key } returns PREFERENCE_KEY_FOR_LANGUAGES
-        every { fragment.settingsPreferenceViewModel.loadLanguagePreference(any()) } just Runs
+        every { fragment.loadLanguagePreference(any()) } just Runs
 
         fragment.loadValueAndBindChangeListener(mockPreference)
 
         verify(atLeast = 1) { mockPreference.setOnPreferenceChangeListener(any()) }
-        verify(atLeast = 1) { fragment.settingsPreferenceViewModel.loadLanguagePreference(any()) }
+        verify(atLeast = 1) { fragment.loadLanguagePreference(any()) }
     }
 
     @Test

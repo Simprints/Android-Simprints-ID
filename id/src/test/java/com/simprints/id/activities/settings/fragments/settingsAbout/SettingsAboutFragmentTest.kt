@@ -97,11 +97,11 @@ class SettingsAboutFragmentTest {
         val mockPreference: Preference = mockk(relaxed = true)
         every { fragment.getKeyForSyncAndSearchConfigurationPreference() } returns PREFERENCE_KEY_FOR_SYNC_AND_SEARCH
         every { mockPreference.key } returns PREFERENCE_KEY_FOR_SYNC_AND_SEARCH
-        every { fragment.settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(any()) } returns Unit
+        every { fragment.loadSyncAndSearchConfigurationPreference(any()) } returns Unit
 
         fragment.loadValueAndBindChangeListener(mockPreference)
 
-        verify(exactly = 1) { fragment.settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(any()) }
+        verify(exactly = 1) { fragment.loadSyncAndSearchConfigurationPreference(any()) }
     }
 
     @Test
@@ -109,11 +109,11 @@ class SettingsAboutFragmentTest {
         val mockPreference: Preference = mockk(relaxed = true)
         every { fragment.getKeyForAppVersionPreference() } returns PREFERENCE_KEY_FOR_APP_VERSION
         every { mockPreference.key } returns PREFERENCE_KEY_FOR_APP_VERSION
-        every { fragment.settingsAboutViewModel.loadAppVersionInPreference(any(), any()) } returns Unit
+        every { fragment.loadAppVersionInPreference(any(), any()) } returns Unit
 
         fragment.loadValueAndBindChangeListener(mockPreference)
 
-        verify(exactly = 1) { fragment.settingsAboutViewModel.loadAppVersionInPreference(any(), any()) }
+        verify(exactly = 1) { fragment.loadAppVersionInPreference(any(), any()) }
     }
 
     @Test
@@ -122,11 +122,11 @@ class SettingsAboutFragmentTest {
         every { fragment.getScannerVersionPreference() } returns mockPreference
         every { fragment.getKeyForScannerVersionPreference() } returns PREFERENCE_KEY_FOR_SCANNER_VERSION
         every { mockPreference.key } returns PREFERENCE_KEY_FOR_SCANNER_VERSION
-        every { fragment.settingsAboutViewModel.loadScannerVersionInPreference(any()) } returns Unit
+        every { fragment.loadScannerVersionInPreference(any()) } returns Unit
 
         fragment.loadValueAndBindChangeListener(mockPreference)
 
-        verify(exactly = 1) { fragment.settingsAboutViewModel.loadScannerVersionInPreference(any()) }
+        verify(exactly = 1) { fragment.loadScannerVersionInPreference(any()) }
     }
 
     @Test
@@ -135,11 +135,11 @@ class SettingsAboutFragmentTest {
         every { fragment.getDeviceIdPreference() } returns mockPreference
         every { fragment.getKeyForDeviceIdPreference() } returns PREFERENCE_KEY_FOR_DEVICE_ID
         every { mockPreference.key } returns PREFERENCE_KEY_FOR_DEVICE_ID
-        every { fragment.settingsAboutViewModel.loadDeviceIdInPreference(any(), any()) } returns Unit
+        every { fragment.loadDeviceIdInPreference(any(), any()) } returns Unit
 
         fragment.loadValueAndBindChangeListener(mockPreference)
 
-        verify(exactly = 1) { fragment.settingsAboutViewModel.loadDeviceIdInPreference(any(), any()) }
+        verify(exactly = 1) { fragment.loadDeviceIdInPreference(any(), any()) }
     }
 
     @Test
