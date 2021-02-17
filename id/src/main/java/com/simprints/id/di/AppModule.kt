@@ -8,14 +8,8 @@ import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
-import com.simprints.id.activities.consent.ConsentViewModelFactory
-import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
-import com.simprints.id.activities.enrollast.EnrolLastBiometricsViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
-import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
-import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
 import com.simprints.id.activities.qrcapture.tools.CameraFocusManagerImpl
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
@@ -26,18 +20,11 @@ import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducerImpl
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilderImpl
-import com.simprints.id.activities.settings.fingerselection.FingerSelectionViewModelFactory
-import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutViewModelFactory
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
-import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
-import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.EventRepository
@@ -49,10 +36,8 @@ import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -85,11 +70,9 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -281,10 +264,6 @@ open class AppModule {
         )
 
     @Provides
-    fun provideModuleViewModelFactory(repository: ModuleRepository) =
-        ModuleViewModelFactory(repository)
-
-    @Provides
     fun provideModuleRepository(
         preferencesManager: PreferencesManager,
         crashReportManager: CrashReportManager,
@@ -320,18 +299,6 @@ open class AppModule {
     ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
-    open fun provideConsentViewModelFactory(eventRepository: EventRepository) =
-        ConsentViewModelFactory(eventRepository)
-
-    @Provides
-    open fun provideCoreExitFormViewModelFactory(eventRepository: EventRepository) =
-        CoreExitFormViewModelFactory(eventRepository)
-
-    @Provides
-    open fun provideFingerprintExitFormViewModelFactory(eventRepository: EventRepository) =
-        FingerprintExitFormViewModelFactory(eventRepository)
-
-    @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
@@ -340,41 +307,6 @@ open class AppModule {
                                         preferencesManager: PreferencesManager,
                                         crashReportManager: CrashReportManager): FetchGuidHelper =
         FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
-
-    @Provides
-    open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
-                                              deviceManager: DeviceManager,
-                                              eventRepository: EventRepository,
-                                              timeHelper: TimeHelper) =
-        FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
-
-    @Provides
-    open fun provideSyncInformationViewModelFactory(
-        downySyncHelper: EventDownSyncHelper,
-        eventRepository: EventRepository,
-        subjectRepository: SubjectRepository,
-        preferencesManager: PreferencesManager,
-        loginInfoManager: LoginInfoManager,
-        eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-        imageRepository: ImageRepository,
-        eventSyncManager: EventSyncManager
-    ) =
-        SyncInformationViewModelFactory(
-            downySyncHelper,
-            eventRepository,
-            subjectRepository,
-            preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            eventDownSyncScopeRepository,
-            imageRepository,
-            eventSyncManager
-        )
-
-    @Provides
-    open fun provideFingerSelectionViewModelFactory(
-        preferencesManager: PreferencesManager,
-        crashReportManager: CrashReportManager
-    ) = FingerSelectionViewModelFactory(preferencesManager, crashReportManager)
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
@@ -422,13 +354,6 @@ open class AppModule {
     ): QrCodeDetector = QrCodeDetectorImpl(crashReportManager)
 
     @Provides
-    open fun providePrivacyNoticeViewModelFactory(
-        longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager,
-        dispatcherProvider: DispatcherProvider
-    ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager, dispatcherProvider)
-
-    @Provides
     fun provideHotCache(
         @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
@@ -453,37 +378,6 @@ open class AppModule {
     ): PersonCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
 
     @Provides
-    open fun provideEnrolLastBiometricsViewModel(
-        enrolmentHelper: EnrolmentHelper,
-        timeHelper: TimeHelper,
-        preferencesManager: PreferencesManager
-    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, preferencesManager)
-
-    @ExperimentalCoroutinesApi
-    @Provides
-    open fun provideSetupViewModelFactory(
-        deviceManager: DeviceManager,
-        crashReportManager: CrashReportManager
-    ) = SetupViewModelFactory(deviceManager, crashReportManager)
-
-    @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
-
-    @Provides
-    open fun provideSettingsPreferenceViewModelFactory(
-        preferencesManager: PreferencesManager,
-        crashReportManager: CrashReportManager
-    ): SettingsPreferenceViewModelFactory {
-        return SettingsPreferenceViewModelFactory(preferencesManager, crashReportManager)
-    }
-
-    @Provides
-    open fun provideSettingsAboutViewModelFactory(
-        preferencesManager: PreferencesManager,
-        signerManager: SignerManager,
-        recentEventsManager: RecentEventsPreferencesManager
-    ): SettingsAboutViewModelFactory {
-        return SettingsAboutViewModelFactory(preferencesManager, signerManager, recentEventsManager)
-    }
 }
 
