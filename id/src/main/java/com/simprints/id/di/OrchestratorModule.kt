@@ -4,19 +4,27 @@ import android.content.Context
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
-import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
-import com.simprints.id.orchestrator.*
+import com.simprints.id.orchestrator.EnrolmentHelper
+import com.simprints.id.orchestrator.FlowProvider
+import com.simprints.id.orchestrator.ModalityFlowFactory
+import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
+import com.simprints.id.orchestrator.OrchestratorManager
+import com.simprints.id.orchestrator.OrchestratorManagerImpl
+import com.simprints.id.orchestrator.PersonCreationEventHelper
 import com.simprints.id.orchestrator.cache.HotCache
-import com.simprints.id.orchestrator.modality.*
+import com.simprints.id.orchestrator.modality.ModalityFlow
+import com.simprints.id.orchestrator.modality.ModalityFlowConfirmIdentity
+import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
+import com.simprints.id.orchestrator.modality.ModalityFlowEnrolLastBiometrics
+import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
+import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelper
@@ -197,24 +205,6 @@ class OrchestratorModule {
         timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
         OrchestratorEventsHelperImpl(eventRepository, timeHelper)
-
-    @Provides
-    fun provideOrchestratorViewModelFactory(
-        orchestratorManager: OrchestratorManager,
-        orchestratorEventsHelper: OrchestratorEventsHelper,
-        preferenceManager: PreferencesManager,
-        eventRepository: EventRepository,
-        crashReportManager: CrashReportManager
-    ): OrchestratorViewModelFactory {
-        return OrchestratorViewModelFactory(
-            orchestratorManager,
-            orchestratorEventsHelper,
-            preferenceManager.modalities,
-            eventRepository,
-            DomainToModuleApiAppResponse,
-            crashReportManager
-        )
-    }
 
     @Provides
     fun provideAppResponseBuilderFactory(

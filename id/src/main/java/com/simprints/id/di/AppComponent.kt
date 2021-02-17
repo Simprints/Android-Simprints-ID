@@ -67,7 +67,8 @@ import javax.inject.Singleton
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
-        DashboardActivityModule::class
+        DashboardActivityModule::class,
+        ViewModelModule::class
     ]
 )
 @Singleton
@@ -86,6 +87,7 @@ interface AppComponent {
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponent
     }

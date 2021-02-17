@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.id.activities.dashboard.DashboardViewModelFactory
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSourceImpl
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
@@ -22,8 +21,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 
@@ -82,22 +81,9 @@ open class DashboardActivityModule {
     ): DashboardDailyActivityCardDisplayer = DashboardDailyActivityCardDisplayerImpl(timeHelper)
 
     @Provides
-    open fun provideDashboardViewModelFactory(
-        projectDetailsRepository: DashboardProjectDetailsRepository,
-        syncCardStateRepository: DashboardSyncCardStateRepository,
-        dailyActivityRepository: DashboardDailyActivityRepository
-    ): DashboardViewModelFactory {
-        return DashboardViewModelFactory(
-            projectDetailsRepository,
-            syncCardStateRepository,
-            dailyActivityRepository
-        )
-    }
-
-    @Provides
     open fun provideDashboardSyncCardDisplayer(
-            timeHelper: TimeHelper,
-            ctx: Context
+        timeHelper: TimeHelper,
+        ctx: Context
     ): DashboardSyncCardDisplayer =
         DashboardSyncCardDisplayerImpl(timeHelper)
 
