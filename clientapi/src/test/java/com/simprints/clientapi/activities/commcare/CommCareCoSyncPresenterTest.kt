@@ -180,7 +180,8 @@ class CommCareCoSyncPresenterTest {
                 registerId,
                 sessionId,
                 RETURN_FOR_FLOW_COMPLETED_CHECK,
-                "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}"
+                "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
+                null
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
