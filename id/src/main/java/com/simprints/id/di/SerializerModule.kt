@@ -51,7 +51,7 @@ class SerializerModule {
 
     @Provides
     @Singleton
-    @Named("SyncDestinationSettingSerializer")
+    @Named("SyncDestinationSerializer")
     fun provideSyncDestinationSettingSerializer(): Serializer<List<SyncDestinationSetting>> = SyncDestinationListSerializer()
 
     @Provides
