@@ -28,7 +28,8 @@ import javax.inject.Singleton
         SecurityModule::class,
         DataModule::class,
         SyncModule::class,
-        DashboardActivityModule::class
+        DashboardActivityModule::class,
+        ViewModelModule::class
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {
