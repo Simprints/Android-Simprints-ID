@@ -242,12 +242,12 @@ open class SettingsPreferencesManagerImpl(
             eventDownSyncSettingSerializer
         )
 
-    override var syncDestinationSetting: List<SyncDestinationSetting>
+    override var syncDestinationSettings: List<SyncDestinationSetting>
         by RemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
-            SYNC_DESTINATION_SETTING_KEY,
-            SYNC_DESTINATION_SETTING_DEFAULT,
+            SYNC_DESTINATION_SETTINGS_KEY,
+            SYNC_DESTINATION_SETTINGS_DEFAULT,
             syncDestinationSerializer
         )
 
@@ -431,8 +431,8 @@ open class SettingsPreferencesManagerImpl(
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
-        const val SYNC_DESTINATION_SETTING_KEY = "SyncDestination"
-        val SYNC_DESTINATION_SETTING_DEFAULT = listOf(SyncDestinationSetting.SIMPRINTS)
+        const val SYNC_DESTINATION_SETTINGS_KEY = "SyncDestination"
+        val SYNC_DESTINATION_SETTINGS_DEFAULT = listOf(SyncDestinationSetting.SIMPRINTS)
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"

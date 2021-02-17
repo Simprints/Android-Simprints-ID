@@ -378,7 +378,7 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
         val sharedPreferences = mockSharedPrefs().apply {
-            every { this@apply.syncDestinationSetting } returns listOf(
+            every { this@apply.syncDestinationSettings } returns listOf(
                 SyncDestinationSetting.COMMCARE,
                 SyncDestinationSetting.SIMPRINTS
             )
@@ -415,7 +415,7 @@ class CommCareCoSyncPresenterTest {
     private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
-        every { this@apply.syncDestinationSetting } returns listOf(SyncDestinationSetting.COMMCARE)
+        every { this@apply.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
     }
 
     private val sessionCaptureEvent = SessionCaptureEvent(

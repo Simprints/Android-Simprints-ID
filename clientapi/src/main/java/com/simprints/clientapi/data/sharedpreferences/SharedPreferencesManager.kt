@@ -4,7 +4,7 @@ import com.simprints.id.domain.SyncDestinationSetting
 
 
 interface SharedPreferencesManager {
-    val syncDestinationSetting: List<SyncDestinationSetting>
+    val syncDestinationSettings: List<SyncDestinationSetting>
 
     fun stashSessionId(sessionId: String)
 
