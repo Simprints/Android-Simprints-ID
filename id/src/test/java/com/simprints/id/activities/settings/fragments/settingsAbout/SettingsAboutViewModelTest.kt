@@ -2,8 +2,6 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -30,13 +28,7 @@ class SettingsAboutViewModelTest {
     lateinit var settingsAboutViewModel: SettingsAboutViewModel
 
     @MockK
-    lateinit var preferencesManager: PreferencesManager
-
-    @MockK
     lateinit var signerManager: SignerManager
-
-    @MockK
-    lateinit var recentEventsManager: RecentEventsPreferencesManager
 
     @Before
     fun setUp() {
@@ -52,6 +44,6 @@ class SettingsAboutViewModelTest {
     }
 
     private fun buildSettingsViewModel() {
-        settingsAboutViewModel = SettingsAboutViewModel(preferencesManager, signerManager, recentEventsManager)
+        settingsAboutViewModel = SettingsAboutViewModel(signerManager)
     }
 }
