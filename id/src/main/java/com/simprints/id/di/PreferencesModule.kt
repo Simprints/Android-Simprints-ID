@@ -79,7 +79,7 @@ open class PreferencesModule {
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-        @Named("SyncDestinationSettingSerializer") syncDestinationSettingSerializer: Serializer<List<SyncDestinationSetting>>,
+        @Named("SyncDestinationSerializer") syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -101,7 +101,7 @@ open class PreferencesModule {
         fingerprintsToCollectSerializer,
         fingerprintConfidenceThresholdsSerializer,
         faceConfidenceThresholdsSerializer,
-        syncDestinationSettingSerializer
+        syncDestinationSerializer
     )
 
     @Provides
