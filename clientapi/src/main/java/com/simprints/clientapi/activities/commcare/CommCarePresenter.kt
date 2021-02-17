@@ -69,7 +69,8 @@ class CommCarePresenter(
                 enrol.guid,
                 getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck,
-                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+                getEventsJsonForSession(getCurrentSessionIdOrEmpty()),
+                null
             )
             deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }

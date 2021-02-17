@@ -35,6 +35,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val EXIT_EXTRA = "exitExtra"
         private const val SIMPRINTS_SESSION_ID = "sessionId"
         private const val SIMPRINTS_EVENTS = "events"
+        private const val SIMPRINTS_SUBJECT_ACTIONS = "subjectActions"
     }
 
     private val action: CommCareAction
@@ -51,18 +52,24 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         loadClientApiKoinModules()
     }
 
-    override fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean, eventsJson: String?) =
-        Intent().let {
-            val data = Bundle().apply {
-                putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
-                putString(SIMPRINTS_SESSION_ID, sessionId)
-                putString(REGISTRATION_GUID_KEY, guid)
-                eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
-            }
-
-            injectDataAsCommCareBundleIntoIntent(it, data)
-            sendOkResult(it)
+    override fun returnRegistration(
+        guid: String,
+        sessionId: String,
+        flowCompletedCheck: Boolean,
+        eventsJson: String?,
+        subjectActions: String?
+    ) = Intent().let {
+        val data = Bundle().apply {
+            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
+            putString(SIMPRINTS_SESSION_ID, sessionId)
+            putString(REGISTRATION_GUID_KEY, guid)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
+            subjectActions?.let { putString(SIMPRINTS_SUBJECT_ACTIONS, subjectActions) }
         }
+
+        injectDataAsCommCareBundleIntoIntent(it, data)
+        sendOkResult(it)
+    }
 
     /**
      * CommCare expect Identification result in LibSimprints 1.0.12 format.

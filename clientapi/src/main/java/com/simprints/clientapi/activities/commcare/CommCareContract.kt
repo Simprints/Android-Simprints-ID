@@ -12,7 +12,13 @@ interface CommCareContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
-        fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean, eventsJson: String?)
+        fun returnRegistration(
+            guid: String,
+            sessionId: String,
+            flowCompletedCheck: Boolean,
+            eventsJson: String?,
+            subjectActions: String?
+        )
 
         fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String, eventsJson: String?)
 
@@ -37,7 +43,12 @@ interface CommCareContract {
 
         fun injectSessionIdIntoIntent(sessionId: String)
 
-        fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?)
+        fun returnErrorToClient(
+            errorResponse: ErrorResponse,
+            flowCompletedCheck: Boolean,
+            sessionId: String,
+            eventsJson: String?
+        )
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter {
