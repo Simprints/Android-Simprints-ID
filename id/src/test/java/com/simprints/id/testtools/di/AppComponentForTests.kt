@@ -52,7 +52,7 @@ interface AppComponentForTests : AppComponent {
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder
-        fun viewModelModule(viewModelModule: ViewModelModule): AppComponent.Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponentForTests
     }
