@@ -14,7 +14,6 @@ import com.simprints.id.di.PreferencesModule
 import com.simprints.id.di.SecurityModule
 import com.simprints.id.di.SerializerModule
 import com.simprints.id.di.SyncModule
-import com.simprints.id.di.ViewModelModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -28,9 +27,7 @@ import javax.inject.Singleton
         SecurityModule::class,
         DataModule::class,
         SyncModule::class,
-        DashboardActivityModule::class,
-        ViewModelModule::class
-    ]
+        DashboardActivityModule::class]
 )
 interface AppComponentForAndroidTests : AppComponent {
 
@@ -47,7 +44,6 @@ interface AppComponentForAndroidTests : AppComponent {
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder
-        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponentForAndroidTests
     }
