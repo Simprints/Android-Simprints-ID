@@ -16,7 +16,12 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import javax.inject.Inject
@@ -25,6 +30,12 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private lateinit var packageVersionName: String
     private lateinit var deviceId: String
+
+    @Inject
+    lateinit var recentEventsManager: RecentEventsPreferencesManager
+
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
 
     @Inject
     lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
@@ -49,7 +60,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         deviceId = requireActivity().deviceId
 
         loadPreferenceValuesAndBindThemToChangeListeners()
-        settingsAboutViewModel.enableSettingsBasedOnModalities(getScannerVersionPreference())
+        enableSettingsBasedOnModalities(getScannerVersionPreference())
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
@@ -131,16 +142,16 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForSyncAndSearchConfigurationPreference() -> {
-                settingsAboutViewModel.loadSyncAndSearchConfigurationPreference(preference)
+                loadSyncAndSearchConfigurationPreference(preference)
             }
             getKeyForAppVersionPreference() -> {
-                settingsAboutViewModel.loadAppVersionInPreference(preference, packageVersionName)
+                loadAppVersionInPreference(preference, packageVersionName)
             }
             getKeyForScannerVersionPreference() -> {
-                settingsAboutViewModel.loadScannerVersionInPreference(preference)
+                loadScannerVersionInPreference(preference)
             }
             getKeyForDeviceIdPreference() -> {
-                settingsAboutViewModel.loadDeviceIdInPreference(preference, deviceId)
+                loadDeviceIdInPreference(preference, deviceId)
             }
             getKeyForLogoutPreference() -> {
                 preference.setOnPreferenceClickListener {
@@ -149,6 +160,42 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
                 }
             }
         }
+    }
+
+    private fun enableSettingsBasedOnModalities(scannerVersionPref: Preference?) {
+        preferencesManager.modalities.forEach {
+            when (it) {
+                Modality.FINGER -> enableFingerprintSettings(scannerVersionPref)
+                Modality.FACE -> enableFaceSettings()
+            }
+        }
+    }
+
+    private fun enableFingerprintSettings(scannerVersionPref: Preference?) {
+        scannerVersionPref?.enablePreference()
+    }
+
+    private fun enableFaceSettings() {
+        // No face-specific settings yet
+    }
+
+    private fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
+        preference?.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
+            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
+    }
+
+    private fun GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
+
+    private fun loadAppVersionInPreference(preference: Preference, packageVersionName: String) {
+        preference.summary = packageVersionName
+    }
+
+    private fun loadScannerVersionInPreference(preference: Preference) {
+        preference.summary = recentEventsManager.lastScannerVersion
+    }
+
+    private fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
+        preference.summary = deviceId
     }
 
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
