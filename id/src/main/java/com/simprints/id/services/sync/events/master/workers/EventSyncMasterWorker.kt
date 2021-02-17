@@ -132,7 +132,7 @@ open class EventSyncMasterWorker(
     }
 
     private fun canSyncToSimprints(): Boolean = with(preferenceManager) {
-        syncDestinationSetting.contains(SyncDestinationSetting.SIMPRINTS)
+        syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
     }
 
     private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =

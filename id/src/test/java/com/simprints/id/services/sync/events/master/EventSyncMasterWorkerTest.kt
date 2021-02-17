@@ -55,7 +55,7 @@ class EventSyncMasterWorkerTest {
     private lateinit var masterWorker: EventSyncMasterWorker
     private val preferencesManager = mockk<PreferencesManager>(relaxed = true) {
         every { eventDownSyncSetting } returns ON
-        every { syncDestinationSetting } returns listOf(SIMPRINTS)
+        every { syncDestinationSettings } returns listOf(SIMPRINTS)
     }
 
     @Before
@@ -307,7 +307,7 @@ class EventSyncMasterWorkerTest {
     }
 
     private fun mockSyncDestinationSetting(syncDestinationSetting: SyncDestinationSetting) {
-        every { preferencesManager.syncDestinationSetting } returns listOf(syncDestinationSetting)
+        every { preferencesManager.syncDestinationSettings } returns listOf(syncDestinationSetting)
     }
 
     private fun buildOneTimeMasterWorker() {

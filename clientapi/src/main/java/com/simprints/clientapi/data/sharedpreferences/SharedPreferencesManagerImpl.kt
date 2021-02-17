@@ -28,6 +28,6 @@ class SharedPreferencesManagerImpl(
         stashSessionId("")
     }
 
-    override val syncDestinationSetting: List<SyncDestinationSetting>
-        get() = corePreferencesManager.syncDestinationSetting
+    override val syncDestinationSettings: List<SyncDestinationSetting>
+        get() = corePreferencesManager.syncDestinationSettings
 }

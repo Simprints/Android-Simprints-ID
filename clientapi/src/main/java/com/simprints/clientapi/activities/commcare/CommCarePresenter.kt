@@ -152,7 +152,7 @@ class CommCarePresenter(
      * When changing events, make sure they still fit in.
      */
     private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSetting.contains(SyncDestinationSetting.COMMCARE)) {
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CommCareEvents(events))
         } else {
@@ -178,8 +178,8 @@ class CommCarePresenter(
      * Delete the events if returning to CommCare but not Simprints
      */
     private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSetting.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSetting.contains(SyncDestinationSetting.SIMPRINTS)) {
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
+            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
     }

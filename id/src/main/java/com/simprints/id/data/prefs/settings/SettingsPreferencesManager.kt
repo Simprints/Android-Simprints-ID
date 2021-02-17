@@ -38,7 +38,7 @@ interface SettingsPreferencesManager {
 
     var modalities: List<Modality>
     var eventDownSyncSetting: EventDownSyncSetting
-    var syncDestinationSetting: List<SyncDestinationSetting>
+    var syncDestinationSettings: List<SyncDestinationSetting>
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
