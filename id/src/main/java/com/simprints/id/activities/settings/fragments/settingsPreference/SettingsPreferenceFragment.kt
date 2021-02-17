@@ -156,7 +156,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun getKeyForSyncInfoPreference(): String =
         getString(R.string.preference_sync_info_key)
 
-    private fun loadLanguagePreference(preference: ListPreference) {
+    fun loadLanguagePreference(preference: ListPreference) {
         preference.value = preferencesManager.language
         val index = preference.findIndexOfValue(preference.value)
         preference.summary = if (index >= 0) {
