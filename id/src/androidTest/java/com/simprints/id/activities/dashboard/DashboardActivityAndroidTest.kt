@@ -45,7 +45,7 @@ class DashboardActivityAndroidTest {
 
         app.component = AndroidTestConfig(this, preferencesModule = preferencesModule)
             .componentBuilder()
-            .dashboardActivityModule(buildViewModelModule())
+            .viewModelModule(buildViewModelModule())
             .build()
 
         ActivityScenario.launch(DashboardActivity::class.java)
