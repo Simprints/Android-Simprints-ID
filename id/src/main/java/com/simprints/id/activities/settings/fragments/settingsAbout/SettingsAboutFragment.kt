@@ -109,37 +109,37 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private fun getAppVersionPreference(): Preference? =
         findPreference(getKeyForAppVersionPreference())
 
-    fun getScannerVersionPreference(): Preference? =
+    private fun getScannerVersionPreference(): Preference? =
         findPreference(getKeyForScannerVersionPreference())
 
-    fun getDeviceIdPreference(): Preference? =
+    private fun getDeviceIdPreference(): Preference? =
         findPreference(getKeyForDeviceIdPreference())
 
-    fun getLogoutPreference(): Preference? =
+    private fun getLogoutPreference(): Preference? =
         findPreference(getKeyForLogoutPreference())
 
-    fun getKeyForLogoutPreference(): String =
+    private fun getKeyForLogoutPreference(): String =
         getString(R.string.preference_logout_key)
 
-    fun getKeyForSyncAndSearchConfigurationPreference(): String =
+    private fun getKeyForSyncAndSearchConfigurationPreference(): String =
         getString(R.string.preference_sync_and_search_key)
 
-    fun getKeyForAppVersionPreference(): String =
+    private fun getKeyForAppVersionPreference(): String =
         getString(R.string.preference_app_version_key)
 
-    fun getKeyForScannerVersionPreference(): String =
+    private fun getKeyForScannerVersionPreference(): String =
         getString(R.string.preference_scanner_version_key)
 
-    fun getKeyForDeviceIdPreference(): String =
+    private fun getKeyForDeviceIdPreference(): String =
         getString(R.string.preference_device_id_key)
 
-    fun showConfirmationDialogForLogout() {
+    private fun showConfirmationDialogForLogout() {
         activity?.runOnUiThreadIfStillRunning {
             buildConfirmationDialogForLogout().show()
         }
     }
 
-    fun loadValueAndBindChangeListener(preference: Preference?) {
+    private fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForSyncAndSearchConfigurationPreference() -> {
                 loadSyncAndSearchConfigurationPreference(preference)
@@ -179,22 +179,22 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         // No face-specific settings yet
     }
 
-    fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
+    private fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
         preference?.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
             " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 
     private fun GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
-    fun loadAppVersionInPreference(preference: Preference, packageVersionName: String) {
+    private fun loadAppVersionInPreference(preference: Preference, packageVersionName: String) {
         preference.summary = packageVersionName
     }
 
-    fun loadScannerVersionInPreference(preference: Preference) {
+    private fun loadScannerVersionInPreference(preference: Preference) {
         preference.summary = recentEventsManager.lastScannerVersion
     }
 
-    fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
+    private fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
         preference.summary = deviceId
     }
 
