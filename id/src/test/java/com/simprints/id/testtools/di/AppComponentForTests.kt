@@ -6,8 +6,6 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragmentTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModule
@@ -61,8 +59,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(projectSecretManagerTest: ProjectSecretManagerTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
-    fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
-    fun inject(settingsPreferenceFragmentTest: SettingsPreferenceFragmentTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(subjectsDownSyncCountWorkerTest: EventDownSyncCountWorkerTest)
