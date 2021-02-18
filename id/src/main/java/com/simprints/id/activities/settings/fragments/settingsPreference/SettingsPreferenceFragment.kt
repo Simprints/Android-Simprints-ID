@@ -19,7 +19,7 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
 import javax.inject.Inject
 
-class SettingsPreferenceFragment : PreferenceFragmentCompat() {
+open class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     @Inject
     lateinit var preferencesManager: PreferencesManager
@@ -84,7 +84,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun loadValueAndBindChangeListener(preference: Preference?) {
+    open fun loadValueAndBindChangeListener(preference: Preference?) {
         when (preference?.key) {
             getKeyForLanguagePreference() -> {
                 loadLanguagePreference(preference as ListPreference)
@@ -132,31 +132,31 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun getKeyForAppDetailsPreferenceCategory() =
         getString(R.string.preferences_app_details_key)
 
-    fun getPreferenceForLanguage(): Preference? =
+    open fun getPreferenceForLanguage(): Preference? =
         findPreference(getKeyForLanguagePreference())
 
     private fun getPreferenceForDefaultFingers(): Preference? =
         findPreference(getKeyForDefaultFingersPreference())
 
-    fun getKeyForLanguagePreference(): String =
+    open fun getKeyForLanguagePreference(): String =
         getString(R.string.preference_select_language_key)
 
     private fun getKeyForDefaultFingersPreference(): String =
         getString(R.string.preference_select_fingers_key)
 
-    fun getPreferenceForAbout(): Preference? =
+    open fun getPreferenceForAbout(): Preference? =
         findPreference(getKeyForAboutPreference())
 
     private fun getPreferenceForSyncInformation(): Preference? =
         findPreference(getKeyForSyncInfoPreference())
 
-    fun getKeyForAboutPreference(): String =
+    open fun getKeyForAboutPreference(): String =
         getString(R.string.preference_app_details_key)
 
     private fun getKeyForSyncInfoPreference(): String =
         getString(R.string.preference_sync_info_key)
 
-    fun loadLanguagePreference(preference: ListPreference) {
+    open fun loadLanguagePreference(preference: ListPreference) {
         preference.value = preferencesManager.language
         val index = preference.findIndexOfValue(preference.value)
         preference.summary = if (index >= 0) {

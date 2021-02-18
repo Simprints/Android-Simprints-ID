@@ -3,6 +3,7 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 import android.content.DialogInterface.BUTTON_POSITIVE
 import androidx.preference.Preference
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.TestApplication
@@ -19,10 +20,12 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
 @Suppress("UsePropertyAccessSyntax")
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 @ExperimentalCoroutinesApi
 class SettingsAboutFragmentTest {
