@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.id.secure.SignerManager
 import kotlinx.coroutines.launch
 
-class SettingsAboutViewModel(val signerManager: SignerManager) : ViewModel() {
+open class SettingsAboutViewModel(open val signerManager: SignerManager) : ViewModel() {
 
-    fun logout() {
+    open fun logout() {
         viewModelScope.launch { signerManager.signOut() }
     }
 }
