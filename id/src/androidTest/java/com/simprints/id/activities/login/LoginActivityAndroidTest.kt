@@ -7,9 +7,16 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestSecurityModule
+import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
@@ -23,10 +30,14 @@ import javax.inject.Inject
 
 class LoginActivityAndroidTest {
 
-    @Inject lateinit var mockCrashReportManager: CrashReportManager
-    @Inject lateinit var mockAuthenticationHelper: AuthenticationHelper
+    @Inject
+    lateinit var mockCrashReportManager: CrashReportManager
 
-    @MockK lateinit var mockLoginActivityHelper: LoginActivityHelper
+    @Inject
+    lateinit var mockAuthenticationHelper: AuthenticationHelper
+
+    @MockK
+    lateinit var mockLoginActivityHelper: LoginActivityHelper
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -36,9 +47,6 @@ class LoginActivityAndroidTest {
 
     private val securityModule by lazy {
         TestSecurityModule(
-            loginViewModelFactoryRule = DependencyRule.ReplaceRule {
-                LoginViewModelFactory(mockAuthenticationHelper)
-            },
             loginActivityHelperRule = DependencyRule.ReplaceRule {
                 mockLoginActivityHelper
             },
@@ -46,10 +54,18 @@ class LoginActivityAndroidTest {
         )
     }
 
+    private val viewModelModule by lazy {
+        TestViewModelModule(
+            loginViewModelFactoryRule = DependencyRule.ReplaceRule {
+                LoginViewModelFactory(mockAuthenticationHelper)
+            }
+        )
+    }
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(this, appModule = appModule, securityModule = securityModule)
+        AndroidTestConfig(this, appModule = appModule, securityModule = securityModule, viewModelModule = viewModelModule)
             .initAndInjectComponent()
         Intents.init()
     }
