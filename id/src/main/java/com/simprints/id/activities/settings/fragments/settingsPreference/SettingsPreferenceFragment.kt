@@ -19,17 +19,17 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
 import javax.inject.Inject
 
-open class SettingsPreferenceFragment : PreferenceFragmentCompat() {
+ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
+     @Inject
+     lateinit var preferencesManager: PreferencesManager
 
-    @Inject
-    lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
+     @Inject
+     lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
 
-    val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
+     val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_general)
     }
 
@@ -84,21 +84,21 @@ open class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         return super.onOptionsItemSelected(item)
     }
 
-    open fun loadValueAndBindChangeListener(preference: Preference?) {
-        when (preference?.key) {
-            getKeyForLanguagePreference() -> {
-                loadLanguagePreference(preference as ListPreference)
-                preference.setChangeListener { value: String ->
-                    handleLanguagePreferenceChanged(preference, value)
-                    clearActivityStackAndRelaunchApp()
-                }
-            }
-            getKeyForDefaultFingersPreference() -> {
-                preference.setOnPreferenceClickListener {
-                    openFingerSelectionActivity()
-                    true
-                }
-            }
+     fun loadValueAndBindChangeListener(preference: Preference?) {
+         when (preference?.key) {
+             getKeyForLanguagePreference() -> {
+                 loadLanguagePreference(preference as ListPreference)
+                 preference.setChangeListener { value: String ->
+                     handleLanguagePreferenceChanged(preference, value)
+                     clearActivityStackAndRelaunchApp()
+                 }
+             }
+             getKeyForDefaultFingersPreference() -> {
+                 preference.setOnPreferenceClickListener {
+                     openFingerSelectionActivity()
+                     true
+                 }
+             }
             getKeyForSyncInfoPreference() -> {
                 preference.setOnPreferenceClickListener {
                     openSyncInfoActivity()
@@ -132,39 +132,39 @@ open class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun getKeyForAppDetailsPreferenceCategory() =
         getString(R.string.preferences_app_details_key)
 
-    open fun getPreferenceForLanguage(): Preference? =
-        findPreference(getKeyForLanguagePreference())
+     fun getPreferenceForLanguage(): Preference? =
+         findPreference(getKeyForLanguagePreference())
 
     private fun getPreferenceForDefaultFingers(): Preference? =
         findPreference(getKeyForDefaultFingersPreference())
 
-    open fun getKeyForLanguagePreference(): String =
-        getString(R.string.preference_select_language_key)
+     fun getKeyForLanguagePreference(): String =
+         getString(R.string.preference_select_language_key)
 
     private fun getKeyForDefaultFingersPreference(): String =
         getString(R.string.preference_select_fingers_key)
 
-    open fun getPreferenceForAbout(): Preference? =
-        findPreference(getKeyForAboutPreference())
+     fun getPreferenceForAbout(): Preference? =
+         findPreference(getKeyForAboutPreference())
 
     private fun getPreferenceForSyncInformation(): Preference? =
         findPreference(getKeyForSyncInfoPreference())
 
-    open fun getKeyForAboutPreference(): String =
-        getString(R.string.preference_app_details_key)
+     fun getKeyForAboutPreference(): String =
+         getString(R.string.preference_app_details_key)
 
     private fun getKeyForSyncInfoPreference(): String =
         getString(R.string.preference_sync_info_key)
 
-    open fun loadLanguagePreference(preference: ListPreference) {
-        preference.value = preferencesManager.language
-        val index = preference.findIndexOfValue(preference.value)
-        preference.summary = if (index >= 0) {
-            preference.entries[index]
-        } else {
-            null
-        }
-    }
+     fun loadLanguagePreference(preference: ListPreference) {
+         preference.value = preferencesManager.language
+         val index = preference.findIndexOfValue(preference.value)
+         preference.summary = if (index >= 0) {
+             preference.entries[index]
+         } else {
+             null
+         }
+     }
 
     private fun enableSettingsBasedOnModalities(defaultFingersPref: Preference?) {
         preferencesManager.modalities.forEach {

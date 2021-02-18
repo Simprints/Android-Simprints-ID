@@ -23,8 +23,8 @@ import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
 @Suppress("UsePropertyAccessSyntax")
-@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 class SettingsPreferenceFragmentTest {
 
