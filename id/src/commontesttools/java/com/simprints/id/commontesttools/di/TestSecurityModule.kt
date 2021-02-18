@@ -37,7 +37,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class TestSecurityModule(
     private val loginActivityHelperRule: DependencyRule = RealRule,
-    private val loginViewModelFactoryRule: DependencyRule = RealRule,
     private val projectAuthenticatorRule: DependencyRule = RealRule,
     private val authenticationHelperRule: DependencyRule = RealRule,
     private val safetyNetClientRule: DependencyRule = RealRule,

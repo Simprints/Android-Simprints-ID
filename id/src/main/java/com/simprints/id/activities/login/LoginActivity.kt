@@ -20,7 +20,6 @@ import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -29,7 +28,12 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_login.loginButtonScanQr
+import kotlinx.android.synthetic.main.activity_login.loginButtonSignIn
+import kotlinx.android.synthetic.main.activity_login.loginEditTextProjectId
+import kotlinx.android.synthetic.main.activity_login.loginEditTextProjectSecret
+import kotlinx.android.synthetic.main.activity_login.loginEditTextUserId
+import kotlinx.android.synthetic.main.activity_login.loginImageViewLogo
 import timber.log.Timber
 import javax.inject.Inject
 
