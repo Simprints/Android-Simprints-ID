@@ -21,8 +21,9 @@ class UnitTestConfig<T : Any>(
     private val preferencesModule: TestPreferencesModule? = null,
     private val dataModule: TestDataModule? = null,
     private val syncModule: TestSyncModule? = null,
-    private val loginModule: TestSecurityModule? = null
-    ): BaseUnitTestConfig() {
+    private val loginModule: TestSecurityModule? = null,
+    private val viewModelModule: TestViewModelModule? = null
+) : BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
         TestAppModule(app,
@@ -80,6 +81,7 @@ class UnitTestConfig<T : Any>(
             .dataModule(dataModule ?: TestDataModule())
             .syncModule(syncModule ?: TestSyncModule())
             .securityModule(loginModule ?: TestSecurityModule())
+            .viewModelModule(viewModelModule ?: TestViewModelModule())
             .build()
 
         app.component = testAppComponent

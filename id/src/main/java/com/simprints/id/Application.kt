@@ -43,6 +43,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
             .syncModule(SyncModule())
+            .viewModelModule(ViewModelModule())
             .build()
 
         // Create events for the subjects that are stored in the subjects (old architecture)

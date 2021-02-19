@@ -27,9 +27,7 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -69,13 +67,15 @@ import javax.inject.Singleton
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
-        DashboardActivityModule::class
+        DashboardActivityModule::class,
+        ViewModelModule::class
     ]
 )
 @Singleton
 interface AppComponent {
 
-    @Component.Builder interface Builder {
+    @Component.Builder
+    interface Builder {
 
         @BindsInstance
         fun application(app: Application): Builder
@@ -87,6 +87,7 @@ interface AppComponent {
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponent
     }
@@ -107,9 +108,7 @@ interface AppComponent {
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticatorImpl)
     fun inject(alertPresenter: AlertPresenter)
-    fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
-    fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
     fun inject(settingsActivity: SettingsActivity)

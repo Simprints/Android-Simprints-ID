@@ -9,13 +9,14 @@ import javax.inject.Scope
 @Retention(AnnotationRetention.RUNTIME)
 annotation class OrchestratorScope
 
-@Subcomponent(modules = [OrchestratorModule::class])
+@Subcomponent(modules = [OrchestratorModule::class, ViewModelModule::class])
 @OrchestratorScope
 interface OrchestratorComponent {
 
     @Subcomponent.Builder
     interface Builder {
         fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
         fun build(): OrchestratorComponent
     }
 

@@ -1,7 +1,6 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.id.activities.dashboard.DashboardViewModelFactory
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
@@ -17,8 +16,8 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.DashboardActivityModule
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestDashboardActivityModule(
@@ -93,20 +92,6 @@ class TestDashboardActivityModule(
     ): DashboardDailyActivityCardDisplayer {
         return dailyActivityCardDisplayerRule.resolveDependency {
             super.provideDashboardDailyActivityCardDisplayer(timeHelper)
-        }
-    }
-
-    override fun provideDashboardViewModelFactory(
-        projectDetailsRepository: DashboardProjectDetailsRepository,
-        syncCardStateRepository: DashboardSyncCardStateRepository,
-        dailyActivityRepository: DashboardDailyActivityRepository
-    ): DashboardViewModelFactory {
-        return viewModelFactoryRule.resolveDependency {
-            super.provideDashboardViewModelFactory(
-                projectDetailsRepository,
-                syncCardStateRepository,
-                dailyActivityRepository
-            )
         }
     }
 
