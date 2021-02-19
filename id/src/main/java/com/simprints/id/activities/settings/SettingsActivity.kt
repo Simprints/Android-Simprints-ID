@@ -12,9 +12,11 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import kotlinx.android.synthetic.main.settings_toolbar.settingsToolbar
+import com.simprints.id.databinding.SettingsToolbarBinding
 
 class SettingsActivity : BaseSplitActivity() {
+
+    private lateinit var binding: SettingsToolbarBinding
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -28,7 +30,8 @@ class SettingsActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.settings_toolbar)
+        binding = SettingsToolbarBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         title = getString(R.string.title_activity_settings)
 
         setupActionBar()
@@ -39,8 +42,8 @@ class SettingsActivity : BaseSplitActivity() {
     }
 
     private fun setupActionBar() {
-        settingsToolbar.title = getString(R.string.settings_title)
-        setSupportActionBar(settingsToolbar)
+        binding.settingsToolbar.title = getString(R.string.settings_title)
+        setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 

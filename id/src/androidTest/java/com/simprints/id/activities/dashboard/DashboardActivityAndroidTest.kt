@@ -8,8 +8,8 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.di.TestDashboardActivityModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
@@ -22,8 +22,11 @@ import org.junit.Test
 
 class DashboardActivityAndroidTest {
 
-    @MockK lateinit var mockPreferencesManager: SettingsPreferencesManager
-    @MockK lateinit var mockViewModelFactory: DashboardViewModelFactory
+    @MockK
+    lateinit var mockPreferencesManager: SettingsPreferencesManager
+
+    @MockK
+    lateinit var mockViewModelFactory: DashboardViewModelFactory
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -42,7 +45,7 @@ class DashboardActivityAndroidTest {
 
         app.component = AndroidTestConfig(this, preferencesModule = preferencesModule)
             .componentBuilder()
-            .dashboardActivityModule(buildDashboardActivityModule())
+            .viewModelModule(buildViewModelModule())
             .build()
 
         ActivityScenario.launch(DashboardActivity::class.java)
@@ -68,10 +71,9 @@ class DashboardActivityAndroidTest {
         }
     }
 
-    private fun buildDashboardActivityModule() = TestDashboardActivityModule(
-        viewModelFactoryRule = DependencyRule.ReplaceRule {
+    private fun buildViewModelModule() = TestViewModelModule(
+        dashboardViewModelFactoryRule = DependencyRule.ReplaceRule {
             mockViewModelFactory
         }
     )
-
 }
