@@ -84,6 +84,8 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
+                get(),
+                get(),
                 get()
             )
         }
