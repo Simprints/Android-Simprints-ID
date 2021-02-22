@@ -12,16 +12,23 @@ import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.CouldntSaveEventException
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.modality.toMode
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -34,9 +41,11 @@ class CommCarePresenter(
     private val action: CommCareAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     private val sharedPreferencesManager: SharedPreferencesManager,
+    private val jsonHelper: JsonHelper,
+    private val subjectRepository: SubjectRepository,
+    private val timeHelper: ClientApiTimeHelper,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager,
-    private val jsonHelper: JsonHelper
+    crashReportManager: ClientApiCrashReportManager
 ) : RequestPresenter(
     view,
     sessionEventsManager,
@@ -70,7 +79,7 @@ class CommCarePresenter(
                 getCurrentSessionIdOrEmpty(),
                 flowCompletedCheck,
                 getEventsJsonForSession(getCurrentSessionIdOrEmpty()),
-                null
+                getEnrolmentCreationEventForSubject(enrol.guid)
             )
             deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
         }
@@ -165,6 +174,18 @@ class CommCarePresenter(
             null
         }
 
+    private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
+        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
+
+        val recordCreationEvent =
+            subjectRepository.load(SubjectQuery(projectId = getProjectIdFromRequest(), subjectId = subjectId))
+                .firstOrNull()
+                ?.fromSubjectToEnrolmentCreationEvent()
+                ?: return null
+
+        return jsonHelper.toJson(CommCareEvents(listOf(recordCreationEvent)))
+    }
+
     private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
 
     /**
@@ -199,9 +220,24 @@ class CommCarePresenter(
      */
     private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
         if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)) {
+            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
+        ) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
+    }
+
+    private fun getProjectIdFromRequest() = view.extras?.get(Constants.SIMPRINTS_PROJECT_ID) as String
+
+    private fun Subject.fromSubjectToEnrolmentCreationEvent(): EnrolmentRecordCreationEvent {
+        return EnrolmentRecordCreationEvent(
+            timeHelper.now(),
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId,
+            sharedPreferencesManager.modalities.map { it.toMode() },
+            EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples)
+        )
     }
 
     private data class CommCareEvents(val events: List<Event>)
