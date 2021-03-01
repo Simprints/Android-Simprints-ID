@@ -15,6 +15,7 @@ import com.simprints.clientapi.requestFactories.EnrolRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.db.event.domain.models.RefusalEvent
@@ -24,6 +25,7 @@ import com.simprints.id.data.db.event.domain.models.callback.VerificationCallbac
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
@@ -44,7 +46,9 @@ class CommCareCoSyncPresenterTest {
         const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
-    private val view = mockk<CommCareActivity>()
+    private val view = mockk<CommCareActivity> {
+        every { extras?.get("projectId") } returns UUID.randomUUID().toString()
+    }
     private val jsonHelper = JsonHelper()
 
     @Before
@@ -57,15 +61,7 @@ class CommCareCoSyncPresenterTest {
         val enrolmentExtractor = EnrolRequestFactory.getMockExtractor()
         every { view.enrolExtractor } returns enrolmentExtractor
 
-        CommCarePresenter(
-            view,
-            Enrol,
-            mockSessionManagerToCreateSession(),
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).apply {
+        getNewPresenter(Enrol, mockSessionManagerToCreateSession()).apply {
             runBlocking { start() }
         }
 
@@ -74,29 +70,19 @@ class CommCareCoSyncPresenterTest {
 
     @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
-        runBlocking {
-            val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
-            every { view.identifyExtractor } returns identifyExtractor
+        val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
+        every { view.identifyExtractor } returns identifyExtractor
 
-            CommCarePresenter(
-                view,
-                Identify,
-                mockSessionManagerToCreateSession(),
-                mockSharedPrefs(),
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                jsonHelper
-            ).apply {
-                start()
-            }
+        getNewPresenter(Identify, mockSessionManagerToCreateSession()).apply {
+            runBlocking { start() }
+        }
 
-            verify(exactly = 1) {
-                view.sendSimprintsRequest(
-                    IdentifyRequestFactory.getValidSimprintsRequest(
-                        INTEGRATION_INFO
-                    )
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                IdentifyRequestFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
                 )
-            }
+            )
         }
     }
 
@@ -105,15 +91,7 @@ class CommCareCoSyncPresenterTest {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         every { view.verifyExtractor } returns verificationExtractor
 
-        CommCarePresenter(
-            view,
-            Verify,
-            mockSessionManagerToCreateSession(),
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).apply { runBlocking { start() } }
+        getNewPresenter(Verify, mockSessionManagerToCreateSession()).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
@@ -124,30 +102,14 @@ class CommCareCoSyncPresenterTest {
         every { view.confirmIdentityExtractor } returns confirmIdentify
         every { view.extras } returns mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
 
-        CommCarePresenter(
-            view,
-            ConfirmIdentity,
-            mockSessionManagerToCreateSession(),
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).apply { runBlocking { start() } }
+        getNewPresenter(ConfirmIdentity, mockSessionManagerToCreateSession()).apply { runBlocking { start() } }
 
         verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        CommCarePresenter(
-            view,
-            Invalid,
-            mockSessionManagerToCreateSession(),
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).apply {
+        getNewPresenter(Invalid, mockSessionManagerToCreateSession()).apply {
             runBlocking {
                 shouldThrow<InvalidIntentActionException> {
                     start()
@@ -165,15 +127,11 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(sessionCaptureEvent)
 
-        CommCarePresenter(
-            view,
-            Enrol,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleEnrolResponse(EnrolResponse(registerId))
+        val subjectRepository = mockk<SubjectRepository>()
+        coEvery { subjectRepository.load(any()) } returns flowOf()
+
+        getNewPresenter(Enrol, sessionEventsManagerMock, subjectRepository = subjectRepository)
+            .handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) {
             view.returnRegistration(
@@ -200,17 +158,8 @@ class CommCareCoSyncPresenterTest {
             identificationCallbackEvent
         )
 
-        CommCarePresenter(
-            view,
-            Identify,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleIdentifyResponse(
-            IdentifyResponse(arrayListOf(id1, id2), sessionId)
-        )
+        getNewPresenter(Identify, sessionEventsManagerMock)
+            .handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verify(exactly = 1) {
             view.returnIdentification(
@@ -235,15 +184,8 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(guidSelectionEvent)
 
-        CommCarePresenter(
-            view,
-            Enrol,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleConfirmationResponse(ConfirmationResponse(true))
+        getNewPresenter(Enrol, sessionEventsManagerMock)
+            .handleConfirmationResponse(ConfirmationResponse(true))
 
         verify(exactly = 1) {
             view.returnConfirmation(
@@ -265,15 +207,7 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(verificationCallbackEvent)
 
-        CommCarePresenter(
-            view,
-            Verify,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleVerifyResponse(verification)
+        getNewPresenter(Verify, sessionEventsManagerMock).handleVerifyResponse(verification)
 
         verify(exactly = 1) {
             view.returnVerification(
@@ -295,15 +229,7 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
 
-        CommCarePresenter(
-            view,
-            Invalid,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleResponseError(error)
+        getNewPresenter(Invalid, sessionEventsManagerMock).handleResponseError(error)
 
         verify(exactly = 1) {
             view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, "{\"events\":[]}")
@@ -318,15 +244,8 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
 
-        CommCarePresenter(
-            view,
-            Enrol,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        getNewPresenter(Enrol, sessionEventsManagerMock)
+            .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
 
         verify(exactly = 1) {
             view.returnExitForms(
@@ -348,15 +267,8 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
 
-        CommCarePresenter(
-            view,
-            Enrol,
-            sessionEventsManagerMock,
-            mockSharedPrefs(),
-            mockk(),
-            mockk(),
-            jsonHelper
-        ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        getNewPresenter(Enrol, sessionEventsManagerMock)
+            .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
 
         verify(exactly = 1) {
             view.returnExitForms(
@@ -385,14 +297,10 @@ class CommCareCoSyncPresenterTest {
             )
         }
 
-        CommCarePresenter(
-            view,
+        getNewPresenter(
             Enrol,
             sessionEventsManagerMock,
-            sharedPreferences,
-            mockk(),
-            mockk(),
-            jsonHelper
+            sharedPreferences
         ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
 
         verify(exactly = 1) {
@@ -418,6 +326,27 @@ class CommCareCoSyncPresenterTest {
         coEvery { this@apply.popSessionId() } returns "sessionId"
         every { this@apply.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
     }
+
+    private fun mockTimeHelper() = mockk<ClientApiTimeHelper> {
+        every { now() } returns 1
+    }
+
+    private fun getNewPresenter(
+        action: CommCareAction,
+        clientApiSessionEventsManager: ClientApiSessionEventsManager,
+        sharedPreferencesManager: SharedPreferencesManager = mockSharedPrefs(),
+        subjectRepository: SubjectRepository = mockk()
+    ): CommCarePresenter = CommCarePresenter(
+        view,
+        action,
+        clientApiSessionEventsManager,
+        sharedPreferencesManager,
+        jsonHelper,
+        subjectRepository,
+        mockTimeHelper(),
+        mockk(),
+        mockk()
+    )
 
     private val sessionCaptureEvent = SessionCaptureEvent(
         id = UUID.randomUUID().toString(),
