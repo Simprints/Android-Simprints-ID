@@ -26,11 +26,15 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.libsimprints.Constants
+import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.unit.BaseUnitTestConfig
+import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
@@ -140,6 +144,40 @@ class CommCareCoSyncPresenterTest {
                 RETURN_FOR_FLOW_COMPLETED_CHECK,
                 "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
                 null
+            )
+        }
+        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+    }
+
+    @Test
+    fun `handleRegistration should return valid registration with events and actions`() {
+        val projectId = UUID.randomUUID().toString()
+        val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(sessionCaptureEvent)
+
+        val subject = Subject(registerId, projectId, "thales", "mod1", Date(), null, emptyList(), emptyList())
+        val subjectRepository = mockk<SubjectRepository>()
+        coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+        getNewPresenter(Enrol, sessionEventsManagerMock, subjectRepository = subjectRepository)
+            .handleEnrolResponse(EnrolResponse(registerId))
+
+        verify(exactly = 1) {
+            view.returnRegistration(
+                registerId,
+                sessionId,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
+                match {
+                    it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
+                    it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
+                    it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
+                    it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                }
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
@@ -325,6 +363,7 @@ class CommCareCoSyncPresenterTest {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
         every { this@apply.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
+        every { this@apply.modalities } returns listOf(Modality.FACE)
     }
 
     private fun mockTimeHelper() = mockk<ClientApiTimeHelper> {
