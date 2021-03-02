@@ -241,10 +241,7 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-to-alpha
     -   flow: &ci-test
-            -   parallel:
-                    -   step: *run-clientapi-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-            -   step: *upload-sonar-scan-and-check-quality-gate
+            -   step: *run-fingerprintscanner-unit-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
