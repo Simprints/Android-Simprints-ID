@@ -4,6 +4,7 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
 import com.simprints.uicomponents.models.PreviewFrame
 import java.util.*
 
@@ -25,6 +26,17 @@ data class FaceDetection(
         OFFROLL,
         TOOCLOSE,
         TOOFAR
+    }
+
+    enum class TemplateFormat {
+        RANK_ONE_1_23,
+        MOCK;
+
+        fun fromDomainToCore(): FaceTemplateFormat =
+            when (this) {
+                RANK_ONE_1_23 -> FaceTemplateFormat.RANK_ONE_1_23
+                MOCK -> FaceTemplateFormat.MOCK
+            }
     }
 
     fun toFaceSample(): FaceSample =
