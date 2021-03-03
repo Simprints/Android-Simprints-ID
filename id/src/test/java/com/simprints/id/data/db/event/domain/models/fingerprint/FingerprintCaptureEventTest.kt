@@ -18,7 +18,7 @@ class FingerprintCaptureEventTest {
     @Test
     fun create_FingerprintCaptureEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val fingerprint = Fingerprint(LEFT_THUMB, 8, "template")
+        val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
         val event = FingerprintCaptureEvent(
             CREATED_AT,
             ENDED_AT,

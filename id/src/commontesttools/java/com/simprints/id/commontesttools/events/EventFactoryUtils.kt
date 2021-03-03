@@ -41,6 +41,7 @@ import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmation
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
@@ -187,7 +188,7 @@ fun createEnrolmentEventV2() = EnrolmentEventV2(CREATED_AT, GUID1, DEFAULT_PROJE
 fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
-    val fingerprint = Fingerprint(LEFT_THUMB, 8, "template")
+    val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
     return FingerprintCaptureEvent(CREATED_AT, ENDED_AT, LEFT_THUMB, 10, BAD_QUALITY, fingerprint, GUID1, eventLabels)
 }
 

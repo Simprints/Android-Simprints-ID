@@ -31,7 +31,8 @@ data class FingerprintCaptureEvent(
         id,
         labels,
         FingerprintCapturePayload(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id),
-        FINGERPRINT_CAPTURE)
+        FINGERPRINT_CAPTURE
+    )
 
     @Keep
     data class FingerprintCapturePayload(
@@ -47,7 +48,12 @@ data class FingerprintCaptureEvent(
     ) : EventPayload() {
 
         @Keep
-        data class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)
+        data class Fingerprint(
+            val finger: FingerIdentifier,
+            val quality: Int,
+            val template: String,
+            val format: FingerprintTemplateFormat
+        )
 
         @Keep
         enum class Result {
