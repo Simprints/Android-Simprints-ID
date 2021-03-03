@@ -236,7 +236,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 SubjectsGeneratorUtils.getRandomFaceSample().template
             )
 
-            val face = FaceCapturePayload.Face(30f, 40f, 100f, template)
+            val face = FaceCapturePayload.Face(30f, 40f, 100f, template, FaceTemplateFormat.RANK_ONE_1_23)
 
             val event = FaceCaptureEvent(
                 DEFAULT_TIME,
