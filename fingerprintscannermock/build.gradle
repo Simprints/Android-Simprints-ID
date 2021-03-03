@@ -6,7 +6,7 @@ apply plugin: 'maven-publish'
 project.version = "2020.1.2"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
 
     defaultConfig {
