@@ -4,5 +4,6 @@ import androidx.annotation.Keep
 
 @Keep
 enum class FaceTemplateFormat {
-    RANK_ONE_1_23
+    RANK_ONE_1_23,
+    MOCK
 }

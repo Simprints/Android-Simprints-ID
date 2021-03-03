@@ -2,6 +2,7 @@ package com.simprints.face.detection
 
 import android.graphics.Rect
 import android.graphics.RectF
+import com.simprints.face.models.FaceDetection
 
 // All values are after rotation of the source image
 open class Face(
@@ -11,7 +12,8 @@ open class Face(
     val yaw: Float,
     var roll: Float,
     val quality: Float,
-    val template: ByteArray
+    val template: ByteArray,
+    val format: FaceDetection.TemplateFormat
 ) {
 
     // Relative = coordinates are fractions of the source image dimensions
@@ -32,7 +34,8 @@ open class Face(
         yaw = -yaw,
         roll = -roll,
         quality = quality,
-        template = template
+        template = template,
+        format = format
     )
 
     fun scale(scale: Float): Face =
@@ -53,7 +56,8 @@ open class Face(
                 yaw = yaw,
                 roll = roll,
                 quality = quality,
-                template = template
+                template = template,
+                format = format
             )
         }
 
