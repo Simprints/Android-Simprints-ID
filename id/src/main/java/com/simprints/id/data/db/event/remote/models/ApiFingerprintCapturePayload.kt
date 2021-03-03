@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.*
 import com.simprints.id.data.db.event.remote.models.ApiFingerprintCapturePayload.ApiResult
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplateFormat
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplateFormat.ISO_19794_2
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat.ISO_19794_2
 
 @Keep
 @JsonInclude(Include.NON_NULL)
@@ -24,7 +24,7 @@ data class ApiFingerprintCapturePayload(val id: String,
     data class ApiFingerprint(val finger: ApiFingerIdentifier,
                               val quality: Int,
                               val template: String,
-                              val format: ApiFingerprintTemplateFormat = ISO_19794_2) {
+                              val format: FingerprintTemplateFormat = ISO_19794_2) {
 
         constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
             finger.finger.fromDomainToApi(),

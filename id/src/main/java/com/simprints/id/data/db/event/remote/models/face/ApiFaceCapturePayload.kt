@@ -8,8 +8,8 @@ import com.simprints.id.data.db.event.remote.models.ApiEventPayload
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiFace
 import com.simprints.id.data.db.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplateFormat
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplateFormat.RANK_ONE_1_23
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat.RANK_ONE_1_23
 
 @Keep
 @JsonInclude(Include.NON_NULL)
@@ -40,7 +40,7 @@ data class ApiFaceCapturePayload(val id: String,
         var roll: Float,
         val quality: Float,
         val template: String,
-        val format: ApiFaceTemplateFormat = RANK_ONE_1_23
+        val format: FaceTemplateFormat = RANK_ONE_1_23
     )
 
     @Keep
