@@ -95,7 +95,7 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(CREATED_AT, DEFA
 fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 
 fun createFaceCaptureEvent(): FaceCaptureEvent {
-    val faceArg = Face(0F, 1F, 2F, "")
+    val faceArg = Face(0F, 1F, 2F, "", FaceTemplateFormat.RANK_ONE_1_23)
     return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, eventLabels)
 }
 
