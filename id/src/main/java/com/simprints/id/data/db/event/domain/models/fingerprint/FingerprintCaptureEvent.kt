@@ -1,9 +1,12 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.id.data.db.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventPayload
+import com.simprints.id.data.db.event.domain.models.EventType
 
 import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import java.util.*
 

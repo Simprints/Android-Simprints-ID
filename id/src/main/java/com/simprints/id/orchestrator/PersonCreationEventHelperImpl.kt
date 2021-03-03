@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
 import com.simprints.id.data.db.subject.domain.FaceSample
