@@ -39,6 +39,7 @@ import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
@@ -211,7 +212,8 @@ class EventRemoteDataSourceImplAndroidTest {
                 val fingerprint = FingerprintCapturePayload.Fingerprint(
                     fingerIdentifier,
                     0,
-                    fakeTemplate
+                    fakeTemplate,
+                    FingerprintTemplateFormat.ISO_19794_2
                 )
 
                 val event = FingerprintCaptureEvent(
