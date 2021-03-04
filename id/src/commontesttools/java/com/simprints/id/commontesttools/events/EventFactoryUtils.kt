@@ -22,8 +22,8 @@ import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Candidate
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
 import com.simprints.id.data.db.event.domain.models.Matcher.RANK_ONE
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
@@ -40,6 +40,8 @@ import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
@@ -94,7 +96,7 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(CREATED_AT, DEFA
 fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 
 fun createFaceCaptureEvent(): FaceCaptureEvent {
-    val faceArg = Face(0F, 1F, 2F, "")
+    val faceArg = Face(0F, 1F, 2F, "", FaceTemplateFormat.RANK_ONE_1_23)
     return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, eventLabels)
 }
 
@@ -186,7 +188,7 @@ fun createEnrolmentEventV2() = EnrolmentEventV2(CREATED_AT, GUID1, DEFAULT_PROJE
 fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
-    val fingerprint = Fingerprint(LEFT_THUMB, 8, "template")
+    val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
     return FingerprintCaptureEvent(CREATED_AT, ENDED_AT, LEFT_THUMB, 10, BAD_QUALITY, fingerprint, GUID1, eventLabels)
 }
 

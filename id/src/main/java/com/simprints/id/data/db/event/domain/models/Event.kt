@@ -48,6 +48,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.Companion.VERO_2_I
 import com.simprints.id.data.db.event.domain.models.callback.*
 import com.simprints.id.data.db.event.domain.models.callout.*
 import com.simprints.id.data.db.event.domain.models.face.*
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent

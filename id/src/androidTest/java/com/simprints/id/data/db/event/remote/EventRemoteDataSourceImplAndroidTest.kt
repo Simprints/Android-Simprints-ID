@@ -16,7 +16,6 @@ import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.createEnrolmentEventV1
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -26,7 +25,7 @@ import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Authoriza
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
@@ -39,6 +38,8 @@ import com.simprints.id.data.db.event.domain.models.callout.*
 import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.Location
@@ -211,7 +212,8 @@ class EventRemoteDataSourceImplAndroidTest {
                 val fingerprint = FingerprintCapturePayload.Fingerprint(
                     fingerIdentifier,
                     0,
-                    fakeTemplate
+                    fakeTemplate,
+                    FingerprintTemplateFormat.ISO_19794_2
                 )
 
                 val event = FingerprintCaptureEvent(
@@ -236,7 +238,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 SubjectsGeneratorUtils.getRandomFaceSample().template
             )
 
-            val face = FaceCapturePayload.Face(30f, 40f, 100f, template)
+            val face = FaceCapturePayload.Face(30f, 40f, 100f, template, FaceTemplateFormat.RANK_ONE_1_23)
 
             val event = FaceCaptureEvent(
                 DEFAULT_TIME,

@@ -10,9 +10,8 @@ import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Candidate
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 import com.simprints.id.data.db.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2.EnrolmentPayload
 import com.simprints.id.data.db.event.domain.models.EventType.Companion
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIntentPayload

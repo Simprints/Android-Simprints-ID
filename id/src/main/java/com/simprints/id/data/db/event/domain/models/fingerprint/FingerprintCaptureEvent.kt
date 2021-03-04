@@ -1,9 +1,12 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.id.data.db.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventPayload
+import com.simprints.id.data.db.event.domain.models.EventType
 
 import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import java.util.*
 
@@ -28,7 +31,8 @@ data class FingerprintCaptureEvent(
         id,
         labels,
         FingerprintCapturePayload(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id),
-        FINGERPRINT_CAPTURE)
+        FINGERPRINT_CAPTURE
+    )
 
     @Keep
     data class FingerprintCapturePayload(
@@ -44,7 +48,12 @@ data class FingerprintCaptureEvent(
     ) : EventPayload() {
 
         @Keep
-        data class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)
+        data class Fingerprint(
+            val finger: FingerIdentifier,
+            val quality: Int,
+            val template: String,
+            val format: FingerprintTemplateFormat
+        )
 
         @Keep
         enum class Result {
