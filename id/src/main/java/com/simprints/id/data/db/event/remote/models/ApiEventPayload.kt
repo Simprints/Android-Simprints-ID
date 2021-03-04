@@ -15,7 +15,7 @@ import com.simprints.id.data.db.event.domain.models.EnrolmentEventV1
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIntentPayload

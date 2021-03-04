@@ -4,11 +4,12 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
 import com.simprints.id.data.db.subject.domain.FingerIdentifier as FingerIdentifierCore
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent as FingerprintCaptureEventCore
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
 
 @Keep
 class FingerprintCaptureEvent(
@@ -23,8 +24,9 @@ class FingerprintCaptureEvent(
     @Keep
     class Fingerprint(
         val finger: FingerIdentifier,
-        val quality: Int, val
-        template: String
+        val quality: Int,
+        val template: String,
+        val format: FingerprintTemplateFormat
     )
 
     @Keep
@@ -63,7 +65,8 @@ fun FingerprintCaptureEvent.fromDomainToCore() = FingerprintCaptureEventCore(
 fun FingerprintCaptureEvent.Fingerprint.fromDomainToCore() = FingerprintCore(
     finger.fromDomainToCore(),
     quality,
-    template
+    template,
+    format
 )
 
 fun FingerprintCaptureEvent.Result.fromDomainToCore() = when (this) {

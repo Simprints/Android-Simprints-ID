@@ -55,7 +55,8 @@ data class FaceCaptureEvent(
             val yaw: Float,
             var roll: Float,
             val quality: Float,
-            val template: String
+            val template: String,
+            val format: FaceTemplateFormat
         )
 
         enum class Result {

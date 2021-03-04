@@ -6,6 +6,7 @@ import androidx.core.graphics.toRect
 import com.simprints.face.capture.livefeedback.tools.CameraTargetOverlay
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
+import com.simprints.face.models.FaceDetection
 import com.simprints.uicomponents.models.PreviewFrame
 import kotlin.random.Random
 
@@ -23,7 +24,8 @@ class MockFaceDetector : FaceDetector {
             0f,
             0f,
             0f,
-            Random.Default.nextBytes(100)
+            Random.Default.nextBytes(100),
+            FaceDetection.TemplateFormat.MOCK
         )
     }
 
@@ -37,7 +39,8 @@ class MockFaceDetector : FaceDetector {
             0f,
             0f,
             0f,
-            Random.Default.nextBytes(100)
+            Random.Default.nextBytes(100),
+            FaceDetection.TemplateFormat.MOCK
         )
     }
 

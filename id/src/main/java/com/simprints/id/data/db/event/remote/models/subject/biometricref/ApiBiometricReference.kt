@@ -9,11 +9,11 @@ import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintTemplate
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceReference
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplate
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplateFormat.RANK_ONE_1_23
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat.RANK_ONE_1_23
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier.*
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplateFormat.ISO_19794_2
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat.ISO_19794_2
 import com.simprints.id.data.db.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.id.data.db.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
 
