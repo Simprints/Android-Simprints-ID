@@ -55,4 +55,76 @@ class ParentalConsentTextHelperTest {
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_MULTI_TEXT)
     }
+
+    @Test
+    fun `should return consent text containing associated 'consent_parent_collect_yes' string resource value, when consent_parent_collect_yes config flag is true`() {
+        val associatedConsentText = "Simprints will also use the data for research purposes."
+
+        // remote config - with consent_parent_collect_yes set to true
+        val jsonConfigWithParentConsentTrue = """
+            {
+              "consent_parent_enrol_only": false,
+              "consent_parent_enrol": true,
+              "consent_parent_id_verify": true,
+              "consent_parent_share_data_no": true,
+              "consent_parent_share_data_yes": false,
+              "consent_parent_collect_yes": true,
+              "consent_parent_privacy_rights": true,
+              "consent_parent_confirmation": true
+            }
+        """.trimIndent()
+
+        // create text helper to assemble text
+        val parentalConsentTextHelper = ParentalConsentTextHelper(
+            jsonConfigWithParentConsentTrue,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FACE),
+            mockk(),
+            JsonHelper()
+        )
+
+        // format entire object to get consent text message
+        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+
+
+        // assertion
+        assertThat(parentalConsentText).contains(associatedConsentText)
+    }
+
+    @Test
+    fun `should return consent text without associated 'consent_parent_collect_yes' string resource value, when consent_parent_collect_yes config flag is false`() {
+        val associatedConsentText = "Simprints will also use the data for research purposes."
+
+        // remote config - with consent_parent_collect_yes set to false
+        val jsonConfigWithParentConsentTrue = """
+            {
+              "consent_parent_enrol_only": false,
+              "consent_parent_enrol": true,
+              "consent_parent_id_verify": true,
+              "consent_parent_share_data_no": true,
+              "consent_parent_share_data_yes": false,
+              "consent_parent_collect_yes": false,
+              "consent_parent_privacy_rights": true,
+              "consent_parent_confirmation": true
+            }
+        """.trimIndent()
+
+        // create text helper to assemble text
+        val parentalConsentTextHelper = ParentalConsentTextHelper(
+            jsonConfigWithParentConsentTrue,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FACE),
+            mockk(),
+            JsonHelper()
+        )
+
+        // format entire object to get consent text message
+        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+
+
+        // assertion
+        assertThat(parentalConsentText).doesNotContain(associatedConsentText)
+    }
 }
