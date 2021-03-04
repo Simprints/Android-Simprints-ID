@@ -10,7 +10,7 @@ data class ParentalConsentOptions(
     @JsonProperty("consent_parent_id_verify") var consentParentIdVerify: Boolean = true,
     @JsonProperty("consent_parent_share_data_no") var consentParentShareDataNo: Boolean = true,
     @JsonProperty("consent_parent_share_data_yes") var consentParentShareDataYes: Boolean = false,
-    @JsonProperty("consent_collect_yes") var consentCollectYes: Boolean = false,
+    @JsonProperty("consent_parent_collect_yes") var consentParentalCollectYes: Boolean = false,
     @JsonProperty("consent_parent_privacy_rights") var consentParentPrivacyRights: Boolean = true,
     @JsonProperty("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 )
