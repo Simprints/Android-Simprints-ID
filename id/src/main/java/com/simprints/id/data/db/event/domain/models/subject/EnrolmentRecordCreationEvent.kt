@@ -32,9 +32,24 @@ data class EnrolmentRecordCreationEvent(
         extraLabels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        extraLabels.copy(subjectId = subjectId, projectId = projectId, moduleIds = listOf(moduleId), attendantId = attendantId, mode = modes),
-        EnrolmentRecordCreationPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId, biometricReferences),
-        ENROLMENT_RECORD_CREATION)
+        extraLabels.copy(
+            subjectId = subjectId,
+            projectId = projectId,
+            moduleIds = listOf(moduleId),
+            attendantId = attendantId,
+            mode = modes
+        ),
+        EnrolmentRecordCreationPayload(
+            createdAt,
+            EVENT_VERSION,
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId,
+            biometricReferences
+        ),
+        ENROLMENT_RECORD_CREATION
+    )
 
     data class EnrolmentRecordCreationPayload(
         override val createdAt: Long,
@@ -50,8 +65,10 @@ data class EnrolmentRecordCreationEvent(
 
     companion object {
 
-        fun buildBiometricReferences(fingerprintSamples: List<FingerprintSample>,
-                                     faceSamples: List<FaceSample>): List<BiometricReference> {
+        fun buildBiometricReferences(
+            fingerprintSamples: List<FingerprintSample>,
+            faceSamples: List<FaceSample>
+        ): List<BiometricReference> {
             val biometricReferences = mutableListOf<BiometricReference>()
 
             buildFingerprintReference(fingerprintSamples)?.let {
@@ -65,6 +82,7 @@ data class EnrolmentRecordCreationEvent(
             return biometricReferences
         }
 
+        // TODO: get the format from sample to add to reference
         private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
             if (fingerprintSamples.isNotEmpty()) {
                 FingerprintReference(
@@ -73,8 +91,10 @@ data class EnrolmentRecordCreationEvent(
                         FingerprintTemplate(
                             it.templateQualityScore,
                             EncodingUtils.byteArrayToBase64(it.template),
-                            it.fingerIdentifier.fromSubjectToEvent())
-                    }
+                            it.fingerIdentifier.fromSubjectToEvent()
+                        )
+                    },
+                    fingerprintSamples.first().format
                 )
             } else {
                 null
@@ -88,12 +108,13 @@ data class EnrolmentRecordCreationEvent(
                         FaceTemplate(
                             EncodingUtils.byteArrayToBase64(it.template)
                         )
-                    }
+                    },
+                    faceSamples.first().format
                 )
             } else {
                 null
             }
 
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }
