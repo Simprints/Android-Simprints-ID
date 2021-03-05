@@ -5,6 +5,7 @@ import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -94,10 +95,21 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             block()
         } catch (t: Throwable) {
             Timber.d(t)
-            throw if (t is SessionDataSourceException) {
-                t
-            } else {
-                SessionDataSourceException(t)
-            }
+
+            /**
+             * Jira: CORE-416. When the app closes calls to cancel the coroutines are thrown by
+             * SessionDataSourceException which is an RTE. Cancellation in coroutines is cooperative
+             * but in this case we don't need to propagate a JabCancellationException further.
+             * TODO: This check for a CancellationException can be removed after saving events is moved to the WorkManager.
+             */
+            if (t is CancellationException)
+                block()
+            else
+                throw if (t is SessionDataSourceException) {
+                    t
+                } else {
+                    SessionDataSourceException(t)
+                }
         }
+
 }
