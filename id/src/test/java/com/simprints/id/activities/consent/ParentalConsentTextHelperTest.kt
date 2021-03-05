@@ -20,40 +20,91 @@ import org.robolectric.annotation.Config
 class ParentalConsentTextHelperTest {
 
     private val context = ApplicationProvider.getApplicationContext() as TestApplication
-    private val parentalConsentOptionsJson = JsonHelper().toJson(ParentalConsentOptions())
     private val request = AskConsentRequest(ConsentType.ENROL)
 
-    companion object {
-        private const val PARENTAL_CONSENT_ENROL_FINGER_TEXT = "I'd like to use your child's fingerprints to enrol them in program_name and identify them in the future. Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location. If you accept, you may withdraw your permission at any time and ask for your child's data to be erased. May I use your child's fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\""
-        private const val PARENTAL_CONSENT_ENROL_FACE_TEXT = "I'd like to take photographs of your child's face to enrol them in program_name and identify them in the future. Simprints, a UK-based nonprofit, will have access to their photographs and current location. If you accept, you may withdraw your permission at any time and ask for your child's data to be erased. May I take photographs of your child's face? Please say \"I accept\", \"I decline\", or \"I have questions.\""
-        private const val PARENTAL_CONSENT_ENROL_MULTI_TEXT = "I'd like to use your child's fingerprints and take photographs of your child's face to enrol them in program_name and identify them in the future. Simprints, a UK-based nonprofit, will have access to their fingerprint information, photographs and current location. If you accept, you may withdraw your permission at any time and ask for your child's data to be erased. May I use your child's fingerprints and take photographs of your child's face? Please say \"I accept\", \"I decline\", or \"I have questions.\""
+    private val fingerprintConsentText = "use your child's fingerprints"
+    private val faceConsentText = "take photographs of your child's face"
+    private val defaultParentalConfigOptions = """
+            {
+              "consent_parent_enrol_only": false,
+              "consent_parent_enrol": true,
+              "consent_parent_id_verify": true,
+              "consent_parent_share_data_no": true,
+              "consent_parent_share_data_yes": false,
+              "consent_parent_collect_yes": true,
+              "consent_parent_privacy_rights": true,
+              "consent_parent_confirmation": true
+            }
+        """.trimIndent()
 
+
+    companion object {
         private const val PROGRAM_NAME = "program_name"
         private const val ORGANIZATION_NAME = "organization_name"
     }
 
     @Test
-    fun getParentalConsentTextForFinger_shouldReturnCorrectParentalConsentText() {
-        val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), JsonHelper()).assembleText(request, context)
+    fun `should return consent text only containing consent for fingerprint modality when only fingerprint is used`() {
+        // create text helper to assemble text
+        val parentalConsentTextHelper = ParentalConsentTextHelper(
+            defaultParentalConfigOptions,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FINGER),
+            mockk(),
+            JsonHelper()
+        )
 
-        assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_FINGER_TEXT)
+        // format entire object to get consent text message
+        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+
+
+        // assert that it contains fingerprint and not face consent
+        assertThat(parentalConsentText).contains(fingerprintConsentText)
+        assertThat(parentalConsentText).doesNotContain(faceConsentText)
     }
 
     @Test
-    fun getParentalConsentTextForFace_shouldReturnCorrectParentalConsentText() {
-        val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), JsonHelper()).assembleText(request, context)
+    fun `should return consent text only containing consent for face modality when only face is used`() {
+        // create text helper to assemble text
+        val parentalConsentTextHelper = ParentalConsentTextHelper(
+            defaultParentalConfigOptions,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FACE),
+            mockk(),
+            JsonHelper()
+        )
 
-        assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_FACE_TEXT)
+        // format entire object to get consent text message
+        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+
+
+        // assert that it contains face and not fingerprint consent
+        assertThat(parentalConsentText).contains(faceConsentText)
+        assertThat(parentalConsentText).doesNotContain(fingerprintConsentText)
     }
 
     @Test
-    fun getParentalConsentTextForMultiModal_shouldReturnCorrectParentalConsentText() {
-        val parentalConsentText = ParentalConsentTextHelper(parentalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), JsonHelper()).assembleText(request, context)
+    fun `should return consent text containing consent for both fingerprint and face modalities, when both are used`() {
+        val consentTextForBoth = "$fingerprintConsentText and $faceConsentText"
 
-        assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_MULTI_TEXT)
+        // create text helper to assemble text
+        val parentalConsentTextHelper = ParentalConsentTextHelper(
+            defaultParentalConfigOptions,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FINGER, Modality.FACE),
+            mockk(),
+            JsonHelper()
+        )
+
+        // format entire object to get consent text message
+        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+
+
+        // assert that it contains consent text for both modalities
+        assertThat(parentalConsentText).contains(consentTextForBoth)
     }
 
     @Test
