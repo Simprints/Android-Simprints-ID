@@ -23,8 +23,8 @@ class GeneralConsentTextHelperTest {
     private val request = AskConsentRequest(ConsentType.ENROL)
 
 
-    private val fingerprintConsentText = "use your child's fingerprints"
-    private val faceConsentText = "take photographs of your child's face"
+    private val fingerprintConsentText = "use your fingerprints"
+    private val faceConsentText = "take photographs of your face"
     private val defaultGeneralConfigOptions = """
         {
           "consent_enrol_only": false,
@@ -47,7 +47,7 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return consent text only containing consent for fingerprint modality when only fingerprint is used`() {
         // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
+        val generalConsentTextHelper = GeneralConsentTextHelper(
             defaultGeneralConfigOptions,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
@@ -57,18 +57,18 @@ class GeneralConsentTextHelperTest {
         )
 
         // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val generalConsentText = generalConsentTextHelper.assembleText(request, context)
 
 
         // assert that it contains fingerprint and not face consent
-        assertThat(parentalConsentText).contains(fingerprintConsentText)
-        assertThat(parentalConsentText).doesNotContain(faceConsentText)
+        assertThat(generalConsentText).contains(fingerprintConsentText)
+        assertThat(generalConsentText).doesNotContain(faceConsentText)
     }
 
     @Test
     fun `should return consent text only containing consent for face modality when only face is used`() {
         // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
+        val generalConsentTextHelper = GeneralConsentTextHelper(
             defaultGeneralConfigOptions,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
@@ -78,12 +78,12 @@ class GeneralConsentTextHelperTest {
         )
 
         // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val generalConsentText = generalConsentTextHelper.assembleText(request, context)
 
 
         // assert that it contains face and not fingerprint consent
-        assertThat(parentalConsentText).contains(faceConsentText)
-        assertThat(parentalConsentText).doesNotContain(fingerprintConsentText)
+        assertThat(generalConsentText).contains(faceConsentText)
+        assertThat(generalConsentText).doesNotContain(fingerprintConsentText)
     }
 
     @Test
@@ -91,7 +91,7 @@ class GeneralConsentTextHelperTest {
         val consentTextForBoth = "$fingerprintConsentText and $faceConsentText"
 
         // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
+        val generalConsentTextHelper = GeneralConsentTextHelper(
             defaultGeneralConfigOptions,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
@@ -101,10 +101,10 @@ class GeneralConsentTextHelperTest {
         )
 
         // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val generalConsentText = generalConsentTextHelper.assembleText(request, context)
 
 
         // assert that it contains consent text for both modalities
-        assertThat(parentalConsentText).contains(consentTextForBoth)
+        assertThat(generalConsentText).contains(consentTextForBoth)
     }
 }
