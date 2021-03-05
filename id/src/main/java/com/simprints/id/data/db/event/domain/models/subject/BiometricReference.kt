@@ -2,6 +2,8 @@ package com.simprints.id.data.db.event.domain.models.subject
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
@@ -19,10 +21,12 @@ sealed class BiometricReference(open val id: String,
 
 data class FaceReference(override val id: String,
                          val templates: List<FaceTemplate>,
+                         val format: FaceTemplateFormat,
                          val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(override val id: String,
                                 val templates: List<FingerprintTemplate>,
+                                val format: FingerprintTemplateFormat,
                                 val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {
@@ -48,6 +52,6 @@ fun ApiBiometricReference.fromApiToDomain() = when (this.type) {
     ApiBiometricReferenceType.FingerprintReference -> (this as ApiFingerprintReference).fromApiToDomain()
 }
 
-fun ApiFaceReference.fromApiToDomain() = FaceReference(id, templates.map { it.fromApiToDomain() }, metadata)
+fun ApiFaceReference.fromApiToDomain() = FaceReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
 
-fun ApiFingerprintReference.fromApiToDomain() = FingerprintReference(id, templates.map { it.fromApiToDomain() }, metadata)
+fun ApiFingerprintReference.fromApiToDomain() = FingerprintReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
