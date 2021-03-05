@@ -64,7 +64,7 @@ data class ParentalConsentTextHelper(val parentalConsentOptionsJson: String,
                 append(context.getString(R.string.consent_parental_share_data_yes)
                     .format(organizationName, getModalitySpecificAccessText(context)))
             }
-            if (consentParentalCollectYes) {
+            if (consentParentCollectYes) {
                 append(context.getString(R.string.consent_collect_yes))
             }
             if (consentParentPrivacyRights) {
