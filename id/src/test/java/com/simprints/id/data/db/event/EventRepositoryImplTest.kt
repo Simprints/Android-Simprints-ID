@@ -44,14 +44,29 @@ class EventRepositoryImplTest {
 
     private lateinit var eventRepo: EventRepository
 
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var eventLocalDataSource: EventLocalDataSource
-    @MockK lateinit var eventRemoteDataSource: EventRemoteDataSource
-    @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var crashReportManager: CrashReportManager
-    @MockK lateinit var timeHelper: TimeHelper
-    @MockK lateinit var sessionEventValidatorsFactory: SessionEventValidatorsFactory
-    @MockK lateinit var eventValidator: EventValidator
+    @MockK
+    lateinit var loginInfoManager: LoginInfoManager
+
+    @MockK
+    lateinit var eventLocalDataSource: EventLocalDataSource
+
+    @MockK
+    lateinit var eventRemoteDataSource: EventRemoteDataSource
+
+    @MockK
+    lateinit var preferencesManager: PreferencesManager
+
+    @MockK
+    lateinit var crashReportManager: CrashReportManager
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
+    lateinit var sessionEventValidatorsFactory: SessionEventValidatorsFactory
+
+    @MockK
+    lateinit var eventValidator: EventValidator
 
     lateinit var queryToLoadOpenSessions: DbLocalEventQuery
     lateinit var queryToLoadOldOpenSessions: DbLocalEventQuery
@@ -81,7 +96,9 @@ class EventRepositoryImplTest {
             preferencesManager,
             crashReportManager,
             timeHelper,
-            sessionEventValidatorsFactory)
+            sessionEventValidatorsFactory,
+            LIB_VERSION_NAME
+        )
 
         runBlocking {
             coEvery { eventLocalDataSource.load(queryToLoadOldOpenSessions) } returns emptyFlow()
@@ -272,7 +289,7 @@ class EventRepositoryImplTest {
 
             val progress = eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
-            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE/2)
+            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE / 2)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
         }
     }
