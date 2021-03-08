@@ -5,18 +5,22 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
 import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
 
@@ -69,6 +73,13 @@ class DashboardActivityAndroidTest {
         displayed {
             text("Privacy Notice")
         }
+    }
+
+    @Test
+    fun withOnlyCommCareAsSyncLocation_shouldNotShowSyncCard() {
+        every { mockPreferencesManager.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
+
+        onView(withId(R.id.dashboard_sync_card)).check(matches(not(isDisplayed())))
     }
 
     private fun buildViewModelModule() = TestViewModelModule(
