@@ -5,6 +5,7 @@ import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.data.moduleapi.face.responses.*
 import com.simprints.face.data.moduleapi.face.responses.entities.*
 import com.simprints.moduleapi.face.responses.*
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import org.junit.Test
 import java.util.*
 
@@ -29,6 +30,8 @@ class DomainToFaceResponseTest {
 
             val sample = first.sample
             assertThat(sample?.imageRef?.path).isEqualTo(path)
+
+            assertThat(sample?.format).isEqualTo(IFaceTemplateFormat.RANK_ONE_1_23)
         }
     }
 
@@ -132,7 +135,8 @@ class DomainToFaceResponseTest {
 
     private fun generateCaptureResult(): FaceCaptureResult {
         val securedImageRef = SecuredImageRef(path)
-        val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
+        val sample =
+            FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef, IFaceTemplateFormat.RANK_ONE_1_23)
         return FaceCaptureResult(0, sample)
     }
 
