@@ -1,4 +1,5 @@
 package com.simprints.id.commontesttools
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import java.nio.ByteBuffer
@@ -98,6 +99,6 @@ object FingerprintGeneratorUtils {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return FingerprintSample(fingerId, templateBytes, qualityScore)
+        return FingerprintSample(fingerId, templateBytes, qualityScore, FingerprintTemplateFormat.ISO_19794_2)
     }
 }
