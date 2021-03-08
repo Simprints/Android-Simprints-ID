@@ -8,7 +8,6 @@ import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
@@ -262,7 +261,7 @@ open class AppModule {
             crashReportManager,
             timeHelper,
             validatorFactory,
-            BuildConfig.VERSION_NAME
+            com.simprints.libsimprints.BuildConfig.VERSION_NAME
         )
 
     @Provides
