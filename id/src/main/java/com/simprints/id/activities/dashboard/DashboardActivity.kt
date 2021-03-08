@@ -24,6 +24,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
@@ -128,13 +129,29 @@ class DashboardActivity : BaseSplitActivity() {
 
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
-        syncCardDisplayer.initRoot(dashboard_sync_card)
         dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root)
+
+        // show sync-card only when syncing to BFSID is allowed
+        if (canSyncToSimprintsServer()) {
+            dashboard_sync_card.visibility = View.VISIBLE
+            syncCardDisplayer.initRoot(dashboard_sync_card)
+        } else {
+            dashboard_sync_card.visibility = View.GONE
+        }
+    }
+
+    // function to determine if app can sync with BFSID
+    private fun canSyncToSimprintsServer(): Boolean = with(settingsPreferencesManager) {
+        syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
     }
 
     private fun observeCardData() {
         observeForProjectDetails()
-        observeForSyncCardState()
+
+        // observe sync-state only when syncing to BFSID
+        if (canSyncToSimprintsServer()) {
+            observeForSyncCardState()
+        }
     }
 
     private fun observeForProjectDetails() {
@@ -186,20 +203,23 @@ class DashboardActivity : BaseSplitActivity() {
         super.onResume()
         loadDailyActivity()
 
-        lifecycleScope.launch {
-            stopTickerToCheckIfSyncIsRequired()
-            syncAgainTicker = ticker(
-                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
-                initialDelayMillis = 0
-            ).also {
-                for (event in it) {
-                    Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
-                    viewModel.syncIfRequired()
-                }
-            }
-
+        // trigger sync ticker only when syncing to BFSID
+        if (canSyncToSimprintsServer()) {
             lifecycleScope.launch {
-                syncCardDisplayer.startTickerToUpdateLastSyncText()
+                stopTickerToCheckIfSyncIsRequired()
+                syncAgainTicker = ticker(
+                    delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                    initialDelayMillis = 0
+                ).also {
+                    for (event in it) {
+                        Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
+                        viewModel.syncIfRequired()
+                    }
+                }
+
+                lifecycleScope.launch {
+                    syncCardDisplayer.startTickerToUpdateLastSyncText()
+                }
             }
         }
     }
