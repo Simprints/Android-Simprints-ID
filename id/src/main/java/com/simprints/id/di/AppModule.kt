@@ -260,7 +260,8 @@ open class AppModule {
             preferencesManager,
             crashReportManager,
             timeHelper,
-            validatorFactory
+            validatorFactory,
+            com.simprints.libsimprints.BuildConfig.VERSION_NAME
         )
 
     @Provides
