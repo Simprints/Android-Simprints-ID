@@ -34,7 +34,10 @@
             android:paddingBottom="@dimen/vertical_spacing_dashboard_cards"
             android:orientation="vertical">
 
-            <include layout="@layout/activity_dashboard_card_project_details" />
+            <include
+                android:id="@+id/dashboard_project_details"
+                layout="@layout/activity_dashboard_card_project_details" />
+
             <LinearLayout
                 android:id="@+id/dashboard_sync_card"
                 android:layout_width="match_parent"
@@ -42,7 +45,10 @@
                 android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards"
                 android:layout_marginBottom="@dimen/vertical_spacing_dashboard_cards"
                 android:orientation="vertical"/>
-            <include layout="@layout/activity_dashboard_card_daily_activity"/>
+
+            <include
+                android:id="@+id/dashboard_daily_activity"
+                layout="@layout/activity_dashboard_card_daily_activity"/>
 
         </LinearLayout>
     </ScrollView>
