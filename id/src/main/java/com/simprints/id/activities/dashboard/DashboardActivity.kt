@@ -141,14 +141,9 @@ class DashboardActivity : BaseSplitActivity() {
         projectDetailsCardDisplayer.initRoot(projectDetailsBinding.dashboardProjectDetailsCard)
         dailyActivityCardDisplayer.initRoot(dailyActivityBinding.dashboardDailyActivityCardRoot)
 
-        with(binding) {
-            // show sync-card only when syncing to BFSID is allowed
-            if (canSyncToSimprintsServer()) {
-                dashboardSyncCard.visibility = View.VISIBLE
-                syncCardDisplayer.initRoot(dashboardSyncCard)
-            } else {
-                dashboardSyncCard.visibility = View.GONE
-            }
+        // init sync-card only when syncing to BFSID is allowed
+        if (canSyncToSimprintsServer()) {
+            syncCardDisplayer.initRoot(binding.dashboardSyncCard)
         }
     }
 
@@ -159,11 +154,7 @@ class DashboardActivity : BaseSplitActivity() {
 
     private fun observeCardData() {
         observeForProjectDetails()
-
-        // observe sync-state only when syncing to BFSID
-        if (canSyncToSimprintsServer()) {
-            observeForSyncCardState()
-        }
+        observeForSyncCardState()
     }
 
     private fun observeForProjectDetails() {
@@ -217,21 +208,26 @@ class DashboardActivity : BaseSplitActivity() {
 
         // trigger sync ticker only when syncing to BFSID
         if (canSyncToSimprintsServer()) {
-            lifecycleScope.launch {
-                stopTickerToCheckIfSyncIsRequired()
-                syncAgainTicker = ticker(
-                    delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
-                    initialDelayMillis = 0
-                ).also {
-                    for (event in it) {
-                        Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
-                        viewModel.syncIfRequired()
-                    }
-                }
+            startTickerToCheckIfSyncIsRequired()
+        }
+    }
 
-                lifecycleScope.launch {
-                    syncCardDisplayer.startTickerToUpdateLastSyncText()
+    @ObsoleteCoroutinesApi
+    private fun startTickerToCheckIfSyncIsRequired() {
+        lifecycleScope.launch {
+            stopTickerToCheckIfSyncIsRequired()
+            syncAgainTicker = ticker(
+                delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
+                initialDelayMillis = 0
+            ).also {
+                for (event in it) {
+                    Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
+                    viewModel.syncIfRequired()
                 }
+            }
+
+            lifecycleScope.launch {
+                syncCardDisplayer.startTickerToUpdateLastSyncText()
             }
         }
     }
