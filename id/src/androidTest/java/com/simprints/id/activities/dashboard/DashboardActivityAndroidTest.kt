@@ -1,9 +1,11 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.core.view.isVisible
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -15,6 +17,7 @@ import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -75,12 +78,6 @@ class DashboardActivityAndroidTest {
         }
     }
 
-    @Test
-    fun withOnlyCommCareAsSyncLocation_shouldNotShowSyncCard() {
-        every { mockPreferencesManager.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
-
-        onView(withId(R.id.dashboard_sync_card)).check(matches(not(isDisplayed())))
-    }
 
     private fun buildViewModelModule() = TestViewModelModule(
         dashboardViewModelFactoryRule = DependencyRule.ReplaceRule {
