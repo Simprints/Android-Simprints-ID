@@ -12,7 +12,7 @@ open class DefaultOkHttpClientBuilder {
     companion object {
         const val DEVICE_ID_HEADER = "X-Device-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
-        const val VERSION_HEADER = "User-Agent"
+        const val USER_AGENT_HEADER = "User-Agent"
     }
 
     open fun get(authToken: String? = null,
@@ -62,7 +62,7 @@ open class DefaultOkHttpClientBuilder {
     private fun buildVersionInterceptor(versionName: String): Interceptor =
         Interceptor { chain ->
             val newRequest = chain.request().newBuilder()
-                .addHeader(VERSION_HEADER, "SimprintsID/$versionName")
+                .addHeader(USER_AGENT_HEADER, "SimprintsID/$versionName")
                 .build()
             return@Interceptor chain.proceed(newRequest)
         }
