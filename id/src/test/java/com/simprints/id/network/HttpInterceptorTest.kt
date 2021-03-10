@@ -44,7 +44,7 @@ class HttpInterceptorTest {
         val recordedRequest = mockWebServer.takeRequest()
 
 
-        assertThat(recordedRequest.getHeader(DefaultOkHttpClientBuilder.VERSION_HEADER))
+        assertThat(recordedRequest.getHeader(DefaultOkHttpClientBuilder.USER_AGENT_HEADER))
             .isEqualTo("SimprintsID/$versionName")
     }
 
