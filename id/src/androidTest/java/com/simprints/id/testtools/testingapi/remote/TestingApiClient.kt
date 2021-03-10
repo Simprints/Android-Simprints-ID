@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 
 class TestingApiClient<T : SimRemoteInterface>(service: KClass<T>, endpoint: String,
                                                private val jsonHelper: JsonHelper)
-    : SimApiClientImpl<T>(service, endpoint, "", "", mockk(), jsonHelper) {
+    : SimApiClientImpl<T>(service, endpoint, "", "", "", mockk(), jsonHelper) {
 
     override val retrofit: Retrofit by lazy {
         Retrofit.Builder()
