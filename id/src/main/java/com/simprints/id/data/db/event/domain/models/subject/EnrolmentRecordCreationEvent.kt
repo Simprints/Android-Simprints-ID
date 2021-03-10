@@ -82,7 +82,6 @@ data class EnrolmentRecordCreationEvent(
             return biometricReferences
         }
 
-        // TODO: get the format from sample to add to reference
         private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
             if (fingerprintSamples.isNotEmpty()) {
                 FingerprintReference(
