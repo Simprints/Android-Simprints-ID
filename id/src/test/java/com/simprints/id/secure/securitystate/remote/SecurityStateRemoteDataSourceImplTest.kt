@@ -47,6 +47,7 @@ class SecurityStateRemoteDataSourceImplTest {
             SecureApiInterface::class,
             mockWebServer.url("/").toString(),
             DEVICE_ID,
+            VERSION_NAME,
             randomUUID(),
             mockk(),
             JsonHelper()
@@ -104,6 +105,7 @@ class SecurityStateRemoteDataSourceImplTest {
     private companion object {
         const val PROJECT_ID = "mock-project-id"
         const val DEVICE_ID = "mock-device-id"
+        const val VERSION_NAME = "mock-version-name"
     }
 
     @After

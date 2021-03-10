@@ -8,6 +8,7 @@ import kotlin.reflect.KClass
 class SimApiClientFactoryImpl(
     val baseUrlProvider: BaseUrlProvider,
     val deviceId: String,
+    private val versionName: String,
     private val remoteDbManager: RemoteDbManager,
     private val performanceTracer: FirebasePerformanceTraceFactory,
     private val jsonHelper: JsonHelper,
@@ -22,6 +23,7 @@ class SimApiClientFactoryImpl(
             remoteInterface,
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
+            versionName,
             remoteDbManager.getCurrentToken(),
             performanceTracer,
             jsonHelper,
@@ -34,6 +36,7 @@ class SimApiClientFactoryImpl(
             remoteInterface,
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
+            versionName,
             null,
             performanceTracer,
             jsonHelper,
