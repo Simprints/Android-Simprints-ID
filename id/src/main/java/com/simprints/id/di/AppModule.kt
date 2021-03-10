@@ -204,6 +204,7 @@ open class AppModule {
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
+        ctx.packageVersionName,
         remoteDbManager,
         performanceTracer,
         jsonHelper
