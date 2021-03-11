@@ -207,7 +207,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
-        updateProjectInInCurrentSession()
+        updateProjectInCurrentSession()
 
         inBackground {
             ignoreException {
@@ -231,7 +231,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         Timber.d("[CHECK_LOGIN] Added authorised event")
     }
 
-    private suspend fun updateProjectInInCurrentSession() {
+    private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
         val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
