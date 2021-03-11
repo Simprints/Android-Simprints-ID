@@ -12,6 +12,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
@@ -21,14 +22,16 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
-                               private val eventRepository: EventRepository,
-                               private val subjectRepository: SubjectRepository,
-                               private val preferencesManager: PreferencesManager,
-                               private val projectId: String,
-                               private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-                               private val imageRepository: ImageRepository,
-                               private val eventSyncManager: EventSyncManager) : ViewModel() {
+class SyncInformationViewModel(
+    private val downySyncHelper: EventDownSyncHelper,
+    private val eventRepository: EventRepository,
+    private val subjectRepository: SubjectRepository,
+    private val preferencesManager: PreferencesManager,
+    private val projectId: String,
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    private val imageRepository: ImageRepository,
+    private val eventSyncManager: EventSyncManager
+) : ViewModel() {
 
     fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> =
         eventSyncManager.getLastSyncState().map { it.isRunning() }.switchMap { isRunning ->
@@ -48,9 +51,9 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
         val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
         return SyncDataFetched(
             recordsInLocal = fetchLocalRecordCount(),
-            recordsToDownSync = subjectCounts?.toCreate,
+            recordsToDownSync = subjectCounts?.toCreate ?: 0,
             recordsToUpSync = fetchAndUpdateRecordsToUpSyncCount(),
-            recordsToDelete = subjectCounts?.toDelete,
+            recordsToDelete = subjectCounts?.toDelete ?: 0,
             imagesToUpload = fetchAndUpdateImagesToUploadCount(),
             moduleCounts = fetchAndUpdateSelectedModulesCount()
         )
@@ -65,7 +68,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
         eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
-        if (isDownSyncAllowed()) {
+        if (isDownSyncAllowed() && canSyncToSimprints()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             null
@@ -73,9 +76,12 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
     private fun isDownSyncAllowed() =
         with(preferencesManager) {
-            this.eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
+            eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
         }
 
+    private fun canSyncToSimprints(): Boolean = with(preferencesManager) {
+        syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
+    }
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
@@ -100,8 +106,10 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
     private suspend fun fetchAndUpdateSelectedModulesCount() =
         preferencesManager.selectedModules.map {
-            ModuleCount(it,
-                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it)))
+            ModuleCount(
+                it,
+                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it))
+            )
         }
 
 
