@@ -204,6 +204,7 @@ open class AppModule {
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
+        ctx.packageVersionName,
         remoteDbManager,
         performanceTracer,
         jsonHelper
@@ -260,7 +261,8 @@ open class AppModule {
             preferencesManager,
             crashReportManager,
             timeHelper,
-            validatorFactory
+            validatorFactory,
+            com.simprints.libsimprints.BuildConfig.VERSION_NAME
         )
 
     @Provides

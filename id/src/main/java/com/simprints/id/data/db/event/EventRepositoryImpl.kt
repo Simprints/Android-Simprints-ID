@@ -49,7 +49,8 @@ open class EventRepositoryImpl(
     private val preferencesManager: PreferencesManager,
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
-    validatorsFactory: SessionEventValidatorsFactory
+    validatorsFactory: SessionEventValidatorsFactory,
+    override val libSimprintsVersionName: String
 ) : EventRepository {
 
     companion object {
@@ -75,8 +76,8 @@ open class EventRepositoryImpl(
         }
 
 
-    override suspend fun createSession(libSimprintsVersionName: String) {
-        reportExceptionIfNeeded {
+    override suspend fun createSession(libSimprintsVersion: String): SessionCaptureEvent {
+        return reportExceptionIfNeeded {
             val sessionCount = eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE))
             val sessionCaptureEvent = SessionCaptureEvent(
                 UUID.randomUUID().toString(),
@@ -94,6 +95,7 @@ open class EventRepositoryImpl(
 
             closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(), NEW_SESSION)
             addEvent(sessionCaptureEvent)
+            sessionCaptureEvent
         }
     }
 
@@ -260,7 +262,7 @@ open class EventRepositoryImpl(
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
         reportExceptionIfNeeded {
-            loadOpenSessions().first()
+            loadOpenSessions().firstOrNull() ?: createSession()
         }
 
 

@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventRepository {
 
-    suspend fun createSession(libSimprintsVersionName: String)
+    val libSimprintsVersionName: String
+
+    suspend fun createSession(libSimprintsVersion: String = libSimprintsVersionName): SessionCaptureEvent
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
@@ -32,7 +34,7 @@ interface EventRepository {
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 
     suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event>
-    
+
     companion object {
         fun build(app: Application): EventRepository =
             app.component.getSessionEventsManager()
