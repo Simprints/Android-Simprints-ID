@@ -28,7 +28,7 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
 
         inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
 
-        return coreEventRepository.getCurrentCaptureSessionEvent().id
+        return getCurrentSessionId()
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
