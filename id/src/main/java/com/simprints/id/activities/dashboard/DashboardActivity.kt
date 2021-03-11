@@ -147,7 +147,6 @@ class DashboardActivity : BaseSplitActivity() {
         }
     }
 
-    // function to determine if app can sync with BFSID
     private fun canSyncToSimprintsServer(): Boolean = with(settingsPreferencesManager) {
         syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
     }
