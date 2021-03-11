@@ -59,6 +59,10 @@ open class EventRepositoryImpl(
 
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
         const val SESSION_BATCH_SIZE = 20
+
+        // Open session flag. When a session has an end time of 0, it means that the session is
+        // open. We should not upload sessions with a 0 end time.
+        val OPEN_SESSION_FLAG = LongRange(0, 0)
     }
 
     private val validators = validatorsFactory.build()
@@ -238,7 +242,7 @@ open class EventRepositoryImpl(
     private suspend fun closeAndLoadOldOpenSessions(query: LocalEventQuery): Flow<Event> {
         val queryForOldOpenSessions = query.copy(
             type = SESSION_CAPTURE,
-            endTime = LongRange(0, 0),
+            endTime = OPEN_SESSION_FLAG,
             startTime = LongRange(0, timeHelper.now() - GRACE_PERIOD),
             projectId = query.projectId).fromDomainToDb()
 
@@ -292,7 +296,7 @@ open class EventRepositoryImpl(
         eventLocalDataSource.load(query.appendQueryForCloseSession().fromDomainToDb()).map { it as SessionCaptureEvent }
 
     private fun LocalEventQuery.appendQueryForOpenSession() =
-        this.copy(type = SESSION_CAPTURE, endTime = LongRange(0, 0))
+        this.copy(type = SESSION_CAPTURE, endTime = OPEN_SESSION_FLAG)
 
     private fun LocalEventQuery.appendQueryForCloseSession() =
         this.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))

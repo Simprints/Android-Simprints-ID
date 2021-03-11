@@ -18,7 +18,6 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
         eventDatabaseFactory.build().eventDao
     }
 
-
     override suspend fun load(dbQuery: DbLocalEventQuery): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(Dispatchers.IO) {
@@ -96,6 +95,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
         } catch (t: Throwable) {
             Timber.d(t)
 
+            //TODO this is an endless loop ATM
             /**
              * Jira: CORE-416. When the app closes calls to cancel the coroutines are thrown by
              * SessionDataSourceException which is an RTE. Cancellation in coroutines is cooperative
