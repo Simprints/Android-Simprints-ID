@@ -1,6 +1,9 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
@@ -33,19 +36,20 @@ class SyncInformationViewModel(
     private val eventSyncManager: EventSyncManager
 ) : ViewModel() {
 
-    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> =
-        eventSyncManager.getLastSyncState().map { it.isRunning() }.switchMap { isRunning ->
-            MutableLiveData<SyncInformationActivity.ViewState>().apply {
-                viewModelScope.launch {
-                    if (isRunning) {
-                        value = LoadingState.Syncing
-                    } else {
-                        value = LoadingState.Calculating
-                        value = fetchRecords()
-                    }
-                }
-            }
+    private val _viewState: MutableLiveData<SyncInformationActivity.ViewState> = MutableLiveData()
+    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> = _viewState
+
+    fun fetchSyncInformation() = viewModelScope.launch {
+        // If a sync was never triggered than it will return null - in Co-Sync only for example
+        val isRunning = eventSyncManager.getLastSyncState().value?.isRunning() ?: false
+
+        if (isRunning) {
+            _viewState.value = LoadingState.Syncing
+        } else {
+            _viewState.value = LoadingState.Calculating
+            _viewState.value = fetchRecords()
         }
+    }
 
     private suspend fun fetchRecords(): SyncDataFetched {
         val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
