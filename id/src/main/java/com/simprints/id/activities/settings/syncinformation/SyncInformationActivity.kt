@@ -62,6 +62,8 @@ class SyncInformationActivity : BaseSplitActivity() {
         observeUi()
         setupProgressOverlay()
         setupRecordsCountCards()
+
+        viewModel.fetchSyncInformation()
     }
 
     override fun onResume() {
@@ -223,12 +225,14 @@ class SyncInformationActivity : BaseSplitActivity() {
             object Calculating : LoadingState()
         }
 
-        data class SyncDataFetched(val recordsInLocal: Int,
-                                   val recordsToDownSync: Int?,
-                                   val recordsToUpSync: Int,
-                                   val recordsToDelete: Int?,
-                                   val imagesToUpload: Int,
-                                   val moduleCounts: List<ModuleCount>) : ViewState()
+        data class SyncDataFetched(
+            val recordsInLocal: Int,
+            val recordsToDownSync: Int?,
+            val recordsToUpSync: Int,
+            val recordsToDelete: Int?,
+            val imagesToUpload: Int,
+            val moduleCounts: List<ModuleCount>
+        ) : ViewState()
     }
 
     companion object {
