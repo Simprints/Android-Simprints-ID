@@ -18,8 +18,6 @@ android {
     defaultConfig {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -70,13 +68,6 @@ repositories {
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
-    maven {
-        url "http://178.62.61.39:8081/artifactory/libs-release-local"
-        credentials {
-            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
-            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
-        }
-    }
 }
 
 dependencies {
