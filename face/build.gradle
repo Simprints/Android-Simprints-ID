@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_properties.gradle"
+
 sonarqube {
     properties {
         property "sonar.sources", "src/main/java"
@@ -16,7 +18,6 @@ androidExtensions {
 android {
     compileSdkVersion 29
     defaultConfig {
-        minSdkVersion config.min_sdk
         targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'

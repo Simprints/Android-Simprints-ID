@@ -6,11 +6,11 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 
 apply from: 'profiling.gradle'
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_properties.gradle"
 
 android {
     compileSdkVersion 29
     defaultConfig {
-        minSdkVersion config.min_sdk
         targetSdkVersion 29
     }
 
