@@ -4,16 +4,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 apply plugin: "org.gradle.test-retry"
 
-project.version = "2020.1.2"
-
 android {
     compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
-        versionCode 1
-        versionName project.version
     }
     buildTypes {
         release {
