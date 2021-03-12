@@ -8,4 +8,16 @@ android {
         versionName buildProperties.getProperty("VERSION_NAME")
         versionCode buildProperties.getProperty("VERSION_CODE") as Integer
     }
+
+    buildTypes {
+        release {
+            versionNameSuffix ""
+        }
+        staging {
+            versionNameSuffix "-internal"
+        }
+        debug {
+            versionNameSuffix "-dev"
+        }
+    }
 }
