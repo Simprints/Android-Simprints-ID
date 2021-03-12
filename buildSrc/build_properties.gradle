@@ -1,0 +1,9 @@
+def buildProperties = new Properties()
+file("${rootDir}${File.separator}buildSrc${File.separator}build.properties").withInputStream { buildProperties.load(it) }
+
+android {
+    defaultConfig {
+        versionName buildProperties.getProperty("VERSION_NAME")
+        versionCode buildProperties.getProperty("VERSION_CODE") as Integer
+    }
+}
