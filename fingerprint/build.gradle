@@ -5,6 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_properties.gradle"
 
 androidExtensions {
     experimental = true
@@ -13,7 +14,6 @@ androidExtensions {
 android {
     compileSdkVersion 29
     defaultConfig {
-        minSdkVersion config.min_sdk
         targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
