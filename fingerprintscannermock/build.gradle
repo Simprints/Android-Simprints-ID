@@ -3,20 +3,13 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-project.version = "2020.1.2"
-
 android {
     compileSdkVersion 29
-
 
     defaultConfig {
         minSdkVersion config.min_sdk
         targetSdkVersion 29
-        versionCode 1
-        versionName project.version
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
