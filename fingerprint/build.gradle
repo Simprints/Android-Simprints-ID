@@ -4,7 +4,6 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-apply from: "${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle"
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 androidExtensions {
@@ -26,7 +25,6 @@ android {
         }
 
         staging {
-            initWith release
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 
