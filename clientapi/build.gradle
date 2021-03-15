@@ -34,13 +34,6 @@ android {
         debug {
             testCoverageEnabled true
         }
-
-        staging {
-            initWith release
-        }
-        debug {
-            testCoverageEnabled true
-        }
     }
 
     flavorDimensions "mode"

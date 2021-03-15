@@ -37,7 +37,6 @@ android {
         }
 
         staging {
-            initWith release
             buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
         }
     }

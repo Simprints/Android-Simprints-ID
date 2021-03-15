@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "releaseStorePassword=${SIGNING_KEYSTORE_PASSWORD}" >>keystore.properties
-echo "releaseKeyAlias=${SIGNING_KEY_ALIAS}" >>keystore.properties
-echo "releaseKeyPassword=${SIGNING_KEY_PASSWORD}" >>keystore.properties
+echo "releaseStorePassword=${SIGNING_KEYSTORE_PASSWORD}" >>buildSrc/keystore.properties
+echo "releaseKeyAlias=${SIGNING_KEY_ALIAS}" >>buildSrc/keystore.properties
+echo "releaseKeyPassword=${SIGNING_KEY_PASSWORD}" >>buildSrc/keystore.properties
 
 echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
 
