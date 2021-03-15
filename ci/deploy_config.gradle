@@ -3,7 +3,6 @@ def deployProperties = new Properties()
 deployProperties.load(new FileInputStream(deployPropertiesFile))
 
 play {
-    releaseName = versionName + "-" + deployProperties["VERSION_SUFFIX"]
     serviceAccountCredentials = file("${rootDir}/google_api_key.json")
     defaultToAppBundles true
     artifactDir = file("build/outputs/bundle/${deployProperties['BUNDLE_FOLDER']}")
