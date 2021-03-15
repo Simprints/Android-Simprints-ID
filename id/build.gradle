@@ -7,8 +7,9 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: 'com.github.triplet.play'
 
-apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
-apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_properties.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle"
+apply from: "${rootDir}${File.separator}ci${File.separator}deploy_config.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 androidExtensions {
     experimental = true
@@ -132,12 +133,6 @@ android {
     }
 
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
-}
-
-play {
-    serviceAccountCredentials = file("${rootDir}/google_api_key.json")
-    defaultToAppBundles true
-    artifactDir = file("build/outputs/bundle/standardRelease")
 }
 
 buildscript {
