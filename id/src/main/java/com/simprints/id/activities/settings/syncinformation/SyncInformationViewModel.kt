@@ -8,8 +8,7 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
@@ -69,7 +68,7 @@ class SyncInformationViewModel(
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
+        eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
         if (isDownSyncAllowed() && canSyncToSimprints()) {
