@@ -1,0 +1,24 @@
+def buildPropertiesFile = rootProject.file("buildSrc${File.separator}build.properties")
+def buildProperties = new Properties()
+buildProperties.load(new FileInputStream(buildPropertiesFile))
+
+android {
+    defaultConfig {
+        minSdkVersion buildProperties["MIN_SDK_VERSION"] as Integer
+
+        versionCode buildProperties["VERSION_CODE"] as Integer
+        versionName buildProperties["VERSION_NAME"] + "+" + versionCode
+    }
+
+    buildTypes {
+        release {
+            versionNameSuffix "-${buildProperties["VERSION_SUFFIX"]}"
+        }
+        staging {
+            versionNameSuffix "-${buildProperties["VERSION_SUFFIX"]}"
+        }
+        debug {
+            versionNameSuffix "-dev"
+        }
+    }
+}
