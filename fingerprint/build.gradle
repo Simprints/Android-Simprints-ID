@@ -4,8 +4,8 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
-apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_properties.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 androidExtensions {
     experimental = true
