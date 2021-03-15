@@ -8,3 +8,4 @@ echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
 
 echo "VERSION_CODE=${BITBUCKET_BUILD_NUMBER}" >>buildSrc/build.properties
 echo "VERSION_SUFFIX=${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>buildSrc/build.properties
+echo "VERSION_SUFFIX=${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>ci/deploy.properties
