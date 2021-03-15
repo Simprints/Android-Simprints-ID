@@ -19,9 +19,6 @@ android {
             minifyEnabled true
             proguardFiles.add(file('proguard-rules.pro'))
         }
-        staging {
-            initWith release
-        }
         profiling {
             initWith debug
         }
