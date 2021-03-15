@@ -189,8 +189,8 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - ./gradlew bundleStandardRelease
-                    - ./gradlew id:publishStandardReleaseBundle
+                    - ./gradlew bundleStandardStaging
+                    - ./gradlew id:publishStandardStagingBundle
                 artifacts:
                     - id/build/outputs/**
 
@@ -199,7 +199,7 @@ definitions:
         # not build the signed APK, it just promotes the existing Internal
         # deployment via the Play Store API.
         ######################################################################
-        -   step: &promote-to-alpha
+        -   step: &release-to-alpha
                 name: "Promote Internal to Alpha"
                 deployment: Alpha
                 max-time: 30
@@ -209,8 +209,10 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - ./gradlew id:promoteArtifact --track alpha
+                    - ./gradlew bundleStandardRelease
+                    - ./gradlew id:publishStandardReleaseBundle
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -239,7 +241,18 @@ flows:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
-            -   step: *promote-to-alpha
+    -   flow: &release-flow
+            -   parallel:
+                    -   step: *run-clientapi-unit-tests
+                    -   step: *run-id-unit-tests
+                    -   step: *run-face-unit-tests
+                    -   step: *run-fingerprint-unit-tests
+                    -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *build-and-sign-universal-apk
+            -   parallel:
+                    -   step: *upload-sonar-scan-and-check-quality-gate
+                    -   step: *run-all-android-tests
+            -   step: *release-to-alpha
     -   flow: &ci-test
             -   step: *run-fingerprintscanner-unit-tests
 
@@ -248,7 +261,7 @@ flows:
 ######################################################################
 pipelines:
     branches:
-        master: *main-flow
+        master: *release-flow
         develop: *main-flow
         release/*: *deploy-flow
         ci/*: *ci-test
