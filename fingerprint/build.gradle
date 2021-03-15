@@ -26,7 +26,6 @@ android {
         }
 
         staging {
-            initWith release
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 
