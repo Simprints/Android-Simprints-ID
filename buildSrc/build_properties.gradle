@@ -5,16 +5,16 @@ android {
     defaultConfig {
         minSdkVersion buildProperties.getProperty("MIN_SDK_VERSION") as Integer
 
-        versionName buildProperties.getProperty("VERSION_NAME")
         versionCode buildProperties.getProperty("VERSION_CODE") as Integer
+        versionName buildProperties.getProperty("VERSION_NAME") + "+" + versionCode
     }
 
     buildTypes {
         release {
-            versionNameSuffix ""
+            versionNameSuffix buildProperties.getProperty("VERSION_SUFFIX")
         }
         staging {
-            versionNameSuffix "-internal"
+            versionNameSuffix buildProperties.getProperty("VERSION_SUFFIX")
         }
         debug {
             versionNameSuffix "-dev"
