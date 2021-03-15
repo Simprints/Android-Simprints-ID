@@ -11,19 +11,9 @@ android {
     }
 
     buildTypes {
-        release {
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
-            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-152315-firebase-storage\"")
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
-        }
         staging {
             initWith release
             versionNameSuffix "-${buildProperties["VERSION_SUFFIX"]}"
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
-            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-firebase-staging.appspot.com\"")
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
         debug {
             versionNameSuffix "-dev"
