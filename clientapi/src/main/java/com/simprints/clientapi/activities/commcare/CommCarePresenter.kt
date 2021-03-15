@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
-private const val RETURN_TIMEOUT = 1_000L
+private const val RETURN_TIMEOUT = 3_000L
 
 class CommCarePresenter(
     private val view: CommCareContract.View,
