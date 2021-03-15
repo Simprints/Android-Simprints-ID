@@ -20,6 +20,7 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -213,10 +214,21 @@ class SyncInformationActivity : BaseSplitActivity() {
             binding.recordsToDownloadCardView.visibility = View.GONE
             binding.recordsToDeleteCardView.visibility = View.GONE
         }
+
+        if (!canSyncToSimprints()) {
+            binding.recordsToDownloadCardView.visibility = View.GONE
+            binding.recordsToDeleteCardView.visibility = View.GONE
+            binding.recordsToUploadCardView.visibility = View.GONE
+            binding.imagesToUploadCardView.visibility = View.GONE
+        }
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
         eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
+    }
+
+    private fun canSyncToSimprints(): Boolean = with(preferencesManager) {
+        syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
     }
 
     sealed class ViewState {
