@@ -11,11 +11,8 @@ android {
     }
 
     buildTypes {
-        release {
-            versionNameSuffix "-${buildProperties["VERSION_SUFFIX"]}"
-        }
         staging {
-            versionNameSuffix "-${buildProperties["VERSION_SUFFIX"]}"
+            versionNameSuffix "-" + buildProperties["VERSION_SUFFIX"]
         }
         debug {
             versionNameSuffix "-dev"
