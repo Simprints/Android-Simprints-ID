@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
+
 sonarqube {
     properties {
         property "sonar.sources", "src/main/java"
@@ -14,31 +16,13 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
-        release {
-            // If we enable a specific pro-guard, then we need to add rules for the Activities.
-            // in Dynamic Features, aapt doesn't pull them out from the Manifest as it does with the base model
-            //proguardFiles 'proguard-rules-dynamic-features.pro'
-        }
-
-        debug {
-            testCoverageEnabled true
-        }
-
-        staging {
-            initWith release
-        }
         debug {
             testCoverageEnabled true
         }
