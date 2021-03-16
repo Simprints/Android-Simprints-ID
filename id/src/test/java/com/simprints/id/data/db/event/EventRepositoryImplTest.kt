@@ -179,7 +179,7 @@ class EventRepositoryImplTest {
             val newEvent = createAlertScreenEvent()
             newEvent.labels = EventLabels()
 
-            eventRepo.addEvent(newEvent)
+            eventRepo.saveEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(

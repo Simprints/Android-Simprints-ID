@@ -5,14 +5,10 @@ import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.isNotASubjectEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -33,13 +29,11 @@ import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.util.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 open class EventRepositoryImpl(
     private val deviceId: String,
     private val appVersionName: String,
@@ -54,16 +48,8 @@ open class EventRepositoryImpl(
 ) : EventRepository {
 
     companion object {
-        // When the sync starts, any open activeSession started GRACE_PERIOD ms
-        // before it will be considered closed
-        const val GRACE_PERIOD: Long = 1000 * 60 * 60 // 60 minutes
-
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
         const val SESSION_BATCH_SIZE = 20
-
-        // Open session flag. When a session has an end time of 0, it means that the session is
-        // open. We should not upload sessions with a 0 end time.
-        val OPEN_SESSION_FLAG = LongRange(0, 0)
     }
 
     private val validators = validatorsFactory.build()
@@ -75,8 +61,7 @@ open class EventRepositoryImpl(
             loginInfoManager.getSignedInProjectIdOrEmpty()
         }
 
-
-    override suspend fun createSession(libSimprintsVersion: String): SessionCaptureEvent {
+    override suspend fun createSession(): SessionCaptureEvent {
         return reportExceptionIfNeeded {
             val sessionCount = eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE))
             val sessionCaptureEvent = SessionCaptureEvent(
@@ -93,8 +78,8 @@ open class EventRepositoryImpl(
                     deviceId),
                 DatabaseInfo(sessionCount))
 
-            closeSessionsAndAddArtificialTerminationEvent(loadOpenSessions(), NEW_SESSION)
-            addEvent(sessionCaptureEvent)
+            closeSessionsAndAddArtificialTerminationEvent(loadSessions(false), NEW_SESSION)
+            saveEvent(sessionCaptureEvent)
             sessionCaptureEvent
         }
     }
@@ -118,13 +103,13 @@ open class EventRepositoryImpl(
                     }
 
                     event.labels = event.labels.copy(sessionId = session.id, projectId = session.payload.projectId)
-                    addEvent(event)
+                    saveEvent(event)
                 }
             }
         }
     }
 
-    override suspend fun addEvent(event: Event) {
+    override suspend fun saveEvent(event: Event) {
         ignoreException {
             reportExceptionIfNeeded {
                 if (event.type.isNotASubjectEvent()) {
@@ -155,7 +140,7 @@ open class EventRepositoryImpl(
             }
         }
 
-        val batches = createBatches(query)
+        val batches = createBatches(query.fromDomainToDb())
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches ${batches.size}")
 
         batches.forEach { batch ->
@@ -193,7 +178,7 @@ open class EventRepositoryImpl(
     }
 
     @VisibleForTesting
-    suspend fun createBatches(query: LocalEventQuery): List<Batch> {
+    suspend fun createBatches(query: DbLocalEventQuery): List<Batch> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
         return createBatchesForEventsNotInSessions(query) + createBatchesForEventsInSessions(query)
     }
@@ -207,18 +192,18 @@ open class EventRepositoryImpl(
             "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0, this logic" +
             "can be deleted."
     )
-    private suspend fun createBatchesForEventsNotInSessions(query: LocalEventQuery): List<Batch> {
-        val events = eventLocalDataSource.load(query.fromDomainToDb()).filter { it.labels.sessionId == null }.toList()
+    private suspend fun createBatchesForEventsNotInSessions(query: DbLocalEventQuery): List<Batch> {
+        val events = eventLocalDataSource.load(query).filter { it.labels.sessionId == null }.toList()
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
 
         return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.toMutableList()) }
     }
 
-    private suspend fun createBatchesForEventsInSessions(query: LocalEventQuery): List<Batch> {
+    private suspend fun createBatchesForEventsInSessions(query: DbLocalEventQuery): List<Batch> {
 
         // We don't upload unsigned sessions because the back-end would reject them.
-        val sessionsToUpload =
-            merge(loadCloseSessions(query), closeAndLoadOldOpenSessions(query)).filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
+        val sessionsToUpload = loadSessions(true, query)
+            .filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
 
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
 
@@ -241,67 +226,42 @@ open class EventRepositoryImpl(
         }
     }
 
-    private suspend fun closeAndLoadOldOpenSessions(query: LocalEventQuery): Flow<Event> {
-        val queryForOldOpenSessions = query.copy(
-            type = SESSION_CAPTURE,
-            endTime = OPEN_SESSION_FLAG,
-            startTime = LongRange(0, timeHelper.now() - GRACE_PERIOD),
-            projectId = query.projectId).fromDomainToDb()
-
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Loading old open sessions for query $queryForOldOpenSessions")
-
-        val events = eventLocalDataSource.load(queryForOldOpenSessions)
-        return if (events.count() > 0) {
-            closeSessionsAndAddArtificialTerminationEvent(events, TIMED_OUT)
-            eventLocalDataSource.load(queryForOldOpenSessions)
-        } else {
-            events
-        }
-
-    }
-
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
         reportExceptionIfNeeded {
-            loadOpenSessions().firstOrNull() ?: createSession()
+            loadSessions(false).firstOrNull() ?: createSession()
         }
-
 
     override suspend fun loadEvents(sessionId: String): Flow<Event> =
         reportExceptionIfNeeded {
             eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId))
         }
 
-    private suspend fun closeSessionsAndAddArtificialTerminationEvent(openSessions: Flow<Event>,
+    private suspend fun closeSessionsAndAddArtificialTerminationEvent(openSessions: Flow<SessionCaptureEvent>,
                                                                       reason: ArtificialTerminationPayload.Reason) {
         openSessions.collect { sessionEvent ->
             val artificialTerminationEvent = ArtificialTerminationEvent(
                 timeHelper.now(),
                 reason
-            )
-            artificialTerminationEvent.labels = artificialTerminationEvent.labels.appendSessionId(sessionEvent.id)
+            ).apply { labels = labels.appendSessionId(sessionEvent.id) }
 
-            addEvent(artificialTerminationEvent)
+            saveEvent(artificialTerminationEvent)
 
-            closeSession(sessionEvent)
-            addEvent(sessionEvent)
+            sessionEvent.payload.endedAt = timeHelper.now()
+            sessionEvent.payload.sessionIsClosed = true
+
+            saveEvent(sessionEvent)
         }
     }
 
-    private fun closeSession(session: Event) {
-        (session as SessionCaptureEvent).payload.endedAt = timeHelper.now()
+    private suspend fun loadSessions(
+        isClosed: Boolean,
+        query: DbLocalEventQuery = DbLocalEventQuery()
+    ): Flow<SessionCaptureEvent> {
+        val sessionQuery = query.copy(type = SESSION_CAPTURE)
+        return eventLocalDataSource.load(sessionQuery)
+            .map { it as SessionCaptureEvent }
+            .filter { it.payload.sessionIsClosed == isClosed }
     }
-
-    private suspend fun loadOpenSessions(query: LocalEventQuery = LocalEventQuery()) =
-        eventLocalDataSource.load(query.appendQueryForOpenSession().fromDomainToDb()).map { it as SessionCaptureEvent }
-
-    private suspend fun loadCloseSessions(query: LocalEventQuery = LocalEventQuery()) =
-        eventLocalDataSource.load(query.appendQueryForCloseSession().fromDomainToDb()).map { it as SessionCaptureEvent }
-
-    private fun LocalEventQuery.appendQueryForOpenSession() =
-        this.copy(type = SESSION_CAPTURE, endTime = OPEN_SESSION_FLAG)
-
-    private fun LocalEventQuery.appendQueryForCloseSession() =
-        this.copy(type = SESSION_CAPTURE, endTime = LongRange(1, Long.MAX_VALUE))
 
     private fun EventLabels.appendLabelsForAllSessionEvents() =
         this.appendProjectIdLabel().appendDeviceIdLabel()
@@ -322,14 +282,6 @@ open class EventRepositoryImpl(
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }
-
-    private fun checkQueryProjectIsIsSignedIn(projectId: String?) {
-        if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
-            throw Throwable("Only events for the signed in project can be uploaded").also {
-                crashReportManager.logException(it)
-            }
-        }
-    }
 
     @VisibleForTesting
     data class Batch(val events: MutableList<Event>)

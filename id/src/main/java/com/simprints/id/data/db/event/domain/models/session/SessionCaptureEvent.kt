@@ -65,7 +65,8 @@ data class SessionCaptureEvent(
         var analyticsId: String? = null,
         override var endedAt: Long = 0,
         var uploadedAt: Long = 0,
-        override val type: EventType = SESSION_CAPTURE
+        override val type: EventType = SESSION_CAPTURE,
+        var sessionIsClosed: Boolean = false
     ) : EventPayload()
 
     companion object {

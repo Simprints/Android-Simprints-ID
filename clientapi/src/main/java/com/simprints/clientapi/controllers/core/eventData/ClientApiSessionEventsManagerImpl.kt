@@ -23,7 +23,7 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         runBlocking {
-            coreEventRepository.createSession(BuildConfig.VERSION_NAME)
+            coreEventRepository.createSession()
         }
 
         inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
