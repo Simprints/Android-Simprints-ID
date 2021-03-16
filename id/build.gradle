@@ -7,21 +7,18 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: 'com.github.triplet.play'
 
-apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle"
+apply from: "${rootDir}${File.separator}ci${File.separator}deploy_config.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 androidExtensions {
     experimental = true
 }
 
 android {
-    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
         vectorDrawables.useSupportLibrary = true
-        versionName VERSION_NAME
-        versionCode VERSION_CODE as Integer
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -48,50 +45,40 @@ android {
 
     buildTypes {
         release {
-            lintOptions {
-                // TODO : Remove whenever possible
-                // Check in the Translations Editor for crucial translations that may be missing
-                abortOnError true
-                fatal 'StopShip'
-                checkReleaseBuilds true
-            }
             minifyEnabled true
             ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
-            signingConfig signingConfigs.release
             buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-152315-firebase-storage\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
-
-        debug {
-            minifyEnabled false
-            ext.enableCrashlytics = false
-            testCoverageEnabled true
+        staging{
+            minifyEnabled true
+            ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
-            FirebasePerformance {
-                instrumentationEnabled false
-            }
-            signingConfig signingConfigs.debug
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
-            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-
-            //resValue("string", "DB_PASSWORD_DBEVENTS", "test") // used by debug-db
-        }
-
-        staging {
-            initWith release
             buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-firebase-staging.appspot.com\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
+        debug {
+            minifyEnabled false
+            ext.enableCrashlytics = false
+            testCoverageEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
+            FirebasePerformance {
+                instrumentationEnabled false
+            }
+            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+            buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+        }
+
     }
 
     flavorDimensions "mode"
@@ -141,12 +128,6 @@ android {
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
 }
 
-play {
-    serviceAccountCredentials = file("${rootDir}/google_api_key.json")
-    defaultToAppBundles true
-    artifactDir = file("build/outputs/bundle/standardRelease")
-}
-
 buildscript {
     repositories {
         jcenter()
@@ -161,13 +142,6 @@ repositories {
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
-    maven {
-        url "http://178.62.61.39:8081/artifactory/libs-release-local"
-        credentials {
-            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
-            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
-        }
-    }
 }
 
 dependencies {
