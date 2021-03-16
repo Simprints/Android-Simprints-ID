@@ -228,9 +228,11 @@ open class AppModule {
         SessionEventValidatorsFactoryImpl()
 
     @Provides
-    open fun provideDbEventDatabaseFactory(ctx: Context,
-                                           secureDataManager: SecureLocalDbKeyProvider,
-                                           crashReportManager: CrashReportManager): EventDatabaseFactory =
+    open fun provideDbEventDatabaseFactory(
+        ctx: Context,
+        secureDataManager: SecureLocalDbKeyProvider,
+        crashReportManager: CrashReportManager
+    ): EventDatabaseFactory =
         DbEventDatabaseFactoryImpl(ctx, secureDataManager, crashReportManager)
 
     @Provides
@@ -304,10 +306,12 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
-    open fun provideGuidFetchGuidHelper(downSyncHelper: EventDownSyncHelper,
-                                        subjectRepository: SubjectRepository,
-                                        preferencesManager: PreferencesManager,
-                                        crashReportManager: CrashReportManager): FetchGuidHelper =
+    open fun provideGuidFetchGuidHelper(
+        downSyncHelper: EventDownSyncHelper,
+        subjectRepository: SubjectRepository,
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ): FetchGuidHelper =
         FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
 
     @Provides

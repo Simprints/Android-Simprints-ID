@@ -1,7 +1,10 @@
 package com.simprints.id.orchestrator.cache
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -124,6 +127,7 @@ class StepEncoderImplTest {
                     FingerIdentifier.RIGHT_THUMB,
                     fakeSample.template,
                     fakeSample.templateQualityScore,
+                    FingerprintTemplateFormat.ISO_19794_2,
                     null
                 )
             )
@@ -138,7 +142,8 @@ class StepEncoderImplTest {
                 result = FaceCaptureSample(
                     "face_id",
                     mockTemplate(),
-                    null
+                    null,
+                    FaceTemplateFormat.RANK_ONE_1_23
                 )
             )
         ))
@@ -158,6 +163,7 @@ class StepEncoderImplTest {
                         MatcherAssert.assertThat(actualSample.imageRef, CoreMatchers.`is`(expectedSample.imageRef))
                         MatcherAssert.assertThat(actualSample.templateQualityScore, CoreMatchers.`is`(expectedSample.templateQualityScore))
                         MatcherAssert.assertThat(actualSample.template.contentEquals(expectedSample.template), CoreMatchers.`is`(true))
+                        MatcherAssert.assertThat(actualSample.format, CoreMatchers.`is`(FingerprintTemplateFormat.ISO_19794_2))
                     }
                 }
             }
@@ -178,6 +184,7 @@ class StepEncoderImplTest {
                     expectedSample?.template?.let { expectedTemplate ->
                         MatcherAssert.assertThat(sample.template.contentEquals(expectedTemplate), CoreMatchers.`is`(true))
                     }
+                    MatcherAssert.assertThat(sample.format, CoreMatchers.`is`(FaceTemplateFormat.RANK_ONE_1_23))
                 }
             }
         }

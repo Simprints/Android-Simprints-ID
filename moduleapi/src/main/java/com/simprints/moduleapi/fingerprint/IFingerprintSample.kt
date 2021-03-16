@@ -8,4 +8,5 @@ interface IFingerprintSample: Parcelable {
     val template: ByteArray
     val templateQualityScore: Int
     val imageRef: ISecuredImageRef?
+    val format: IFingerprintTemplateFormat
 }

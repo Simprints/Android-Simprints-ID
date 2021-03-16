@@ -5,7 +5,6 @@ import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator.generateFaceMatchResults
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
-import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
@@ -15,6 +14,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
 import com.simprints.moduleapi.face.responses.*
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
 import io.mockk.mockk
@@ -48,6 +48,7 @@ class FaceOrchestratorViewModelTest {
                 assertThat(it.sample?.template?.size).isEqualTo(0)
                 assertThat(it.sample?.faceId).isNotEmpty()
                 assertThat(it.sample?.imageRef?.path?.parts).isEqualTo(arrayOf("file://someFile"))
+                assertThat(it.sample?.format).isEqualTo(IFaceTemplateFormat.RANK_ONE_1_23)
             }
         }
     }
@@ -114,7 +115,8 @@ class FaceOrchestratorViewModelTest {
         val securedImageRef = SecuredImageRef(
             path = Path(arrayOf("file://someFile"))
         )
-        val sample = FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef)
+        val sample =
+            FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef, IFaceTemplateFormat.RANK_ONE_1_23)
         val result = FaceCaptureResult(0, sample)
         val captureResults = listOf(result)
         return FaceCaptureResponse(captureResults)

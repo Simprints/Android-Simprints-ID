@@ -80,7 +80,8 @@ fun FingerprintCaptureEvent.Result.fromDomainToCore() = when (this) {
 fun Fingerprint.fromDomainToCore() = FingerprintCaptureSample(
     fingerId.fromDomainToCore(),
     templateBytes,
-    qualityScore
+    qualityScore,
+    format
 )
 
 fun FingerIdentifier.fromDomainToCore(): FingerIdentifierCore = when (this) {

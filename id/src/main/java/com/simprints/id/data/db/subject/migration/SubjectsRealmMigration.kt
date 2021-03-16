@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.subject.migration
 
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.subject.local.models.DbFaceSample
 import com.simprints.id.data.db.subject.local.models.DbFingerprintSample
@@ -13,16 +15,18 @@ import java.util.*
 
 internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
-    @RealmModule(classes = [
-        DbFingerprintSample::class,
-        DbFaceSample::class,
-        DbSubject::class,
-        DbProject::class
-    ])
+    @RealmModule(
+        classes = [
+            DbFingerprintSample::class,
+            DbFaceSample::class,
+            DbSubject::class,
+            DbProject::class
+        ]
+    )
     class SubjectsModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 10
+        const val REALM_SCHEMA_VERSION: Long = 11
 
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
         const val SYNC_INFO_TABLE: String = "DbSyncInfo"
@@ -52,6 +56,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
                 7 -> migrateTo8(realm.schema)
                 8 -> migrateTo9(realm.schema)
                 9 -> migrateTo10(realm.schema)
+                10 -> migrateTo11(realm.schema)
             }
         }
     }
@@ -168,7 +173,10 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
             schema.rename(PeopleSchemaV6.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
                 .addNewField<String>(FINGERPRINT_FIELD_ID, REQUIRED)
                 .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_FINGER_IDENTIFIER, FINGERPRINT_FIELD_FINGER_IDENTIFIER)
-                .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE, FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE)
+                .renameField(
+                    PeopleSchemaV6.FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE,
+                    FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE
+                )
                 .markAsRequired(FINGERPRINT_FIELD_TEMPLATE)
 
             schema.get(PERSON_TABLE)
@@ -195,7 +203,24 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
             .renameField(PeopleSchemaV9.PERSON_USER_ID_FIELD, SubjectsSchemaV10.ATTENDANT_ID)
     }
 
-    private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
+    private fun migrateTo11(schema: RealmSchema) {
+        schema.get(PeopleSchemaV7.FINGERPRINT_TABLE)
+            ?.addStringAndMakeRequired(SubjectsSchemaV11.FIELD_FORMAT)
+            ?.transform {
+                it.set(SubjectsSchemaV11.FIELD_FORMAT, FingerprintTemplateFormat.ISO_19794_2.name)
+            }
+
+        schema.get(PeopleSchemaV7.FACE_TABLE)
+            ?.addStringAndMakeRequired(SubjectsSchemaV11.FIELD_FORMAT)
+            ?.transform {
+                it.set(SubjectsSchemaV11.FIELD_FORMAT, FaceTemplateFormat.RANK_ONE_1_23.name)
+            }
+    }
+
+    private inline fun <reified T> RealmObjectSchema.addNewField(
+        name: String,
+        vararg attributes: FieldAttribute
+    ): RealmObjectSchema =
         this.addField(name, T::class.java, *attributes)
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =

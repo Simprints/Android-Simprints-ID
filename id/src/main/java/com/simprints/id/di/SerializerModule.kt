@@ -51,8 +51,8 @@ class SerializerModule {
 
     @Provides
     @Singleton
-    @Named("SyncDestinationSettingSerializer")
-    fun provideSyncDestinationSettingSerializer(): Serializer<SyncDestinationSetting> = EnumSerializer(SyncDestinationSetting::class.java)
+    @Named("SyncDestinationSerializer")
+    fun provideSyncDestinationSettingSerializer(): Serializer<List<SyncDestinationSetting>> = SyncDestinationListSerializer()
 
     @Provides
     @Singleton

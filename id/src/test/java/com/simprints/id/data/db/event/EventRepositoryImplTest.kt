@@ -85,7 +85,8 @@ class EventRepositoryImplTest {
             type = SESSION_CAPTURE,
             endTime = LongRange(0, 0),
             startTime = LongRange(0, timeHelper.now() - EventRepositoryImpl.GRACE_PERIOD),
-            projectId = DEFAULT_PROJECT_ID)
+            projectId = DEFAULT_PROJECT_ID
+        )
 
         eventRepo = EventRepositoryImpl(
             DEVICE_ID,
@@ -168,7 +169,14 @@ class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+                    newEvent.copy(
+                        labels = EventLabels(
+                            sessionId = GUID1,
+                            deviceId = DEVICE_ID,
+                            projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
             }
         }
     }
@@ -183,7 +191,8 @@ class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID))
+                )
             }
         }
     }
@@ -197,7 +206,15 @@ class EventRepositoryImplTest {
             eventRepo.addEventToCurrentSession(newEvent)
 
             coVerify {
-                eventLocalDataSource.insertOrUpdate(newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+                eventLocalDataSource.insertOrUpdate(
+                    newEvent.copy(
+                        labels = EventLabels(
+                            sessionId = GUID1,
+                            deviceId = DEVICE_ID,
+                            projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
             }
         }
     }
@@ -265,19 +282,15 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_succeeds_shouldDeleteEvents() {
+    fun shouldDeleteSessionEvents() {
         runBlocking {
             val events =
                 mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
+            eventRepo.deleteSessionEvents(GUID1)
 
-            events.forEach {
-                coVerify {
-                    eventLocalDataSource.delete(DbLocalEventQuery(id = it.id))
-                }
-            }
+            coVerify { eventLocalDataSource.delete(DbLocalEventQuery(sessionId = GUID1)) }
         }
     }
 
@@ -324,7 +337,12 @@ class EventRepositoryImplTest {
     @Test
     fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
-            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
+                Response.error<String>(
+                    404,
+                    "".toResponseBody(null)
+                )
+            )
             val events = mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
@@ -374,7 +392,14 @@ class EventRepositoryImplTest {
             coVerify { eventLocalDataSource.load(queryToLoadOpenSessions) }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    eventInSession.copy(labels = EventLabels(deviceId = DEVICE_ID, sessionId = session.id, projectId = DEFAULT_PROJECT_ID)))
+                    eventInSession.copy(
+                        labels = EventLabels(
+                            deviceId = DEVICE_ID,
+                            sessionId = session.id,
+                            projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
             }
         }
     }
@@ -385,7 +410,10 @@ class EventRepositoryImplTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
-            coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session, eventInSession)
+            coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(
+                session,
+                eventInSession
+            )
             val newEvent = createAlertScreenEvent().removeLabels()
 
             eventRepo.addEventToCurrentSession(newEvent)
