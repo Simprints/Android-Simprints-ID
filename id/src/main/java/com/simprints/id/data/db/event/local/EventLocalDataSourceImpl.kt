@@ -6,13 +6,15 @@ import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatabaseFactory) : EventLocalDataSource {
+open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatabaseFactory,
+                                    private val dispatcher: CoroutineDispatcher = Dispatchers.IO) : EventLocalDataSource {
 
     private val roomDao by lazy {
         eventDatabaseFactory.build().eventDao
@@ -20,63 +22,63 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
 
     override suspend fun loadAll(): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.load().map { it.fromDbToDomain() }.asFlow()
             }
         }
 
     override suspend fun loadAllFromSession(sessionId: String): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.load(sessionId = sessionId).map { it.fromDbToDomain() }.asFlow()
             }
         }
 
     override suspend fun loadAllFromProject(projectId: String): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.load(projectId = projectId).map { it.fromDbToDomain() }.asFlow()
             }
         }
 
     override suspend fun loadSessionType(type: EventType): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.load(type = type).map { it.fromDbToDomain() }.asFlow()
             }
         }
 
     override suspend fun count(projectId: String): Int =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.count(projectId = projectId)
             }
         }
 
     override suspend fun count(projectId: String, type: EventType): Int =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.count(type = type, projectId = projectId)
             }
         }
 
     override suspend fun count(type: EventType): Int =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.count(type = type)
             }
         }
 
     override suspend fun insertOrUpdate(event: Event) =
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.insertOrUpdate(event.fromDomainToDb())
             }
         }
 
     override suspend fun delete(id: String) {
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.delete(id = id)
             }
         }
@@ -84,7 +86,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
 
     override suspend fun deleteAll() {
         wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 roomDao.delete()
             }
         }
