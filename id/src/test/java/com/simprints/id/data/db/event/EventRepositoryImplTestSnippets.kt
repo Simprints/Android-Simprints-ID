@@ -8,7 +8,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.GRACE_PERIOD
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -30,8 +29,10 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 
 fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): SessionCaptureEvent {
-    val oldOpenSession = createSessionCaptureEvent(id).openSession()
+    val oldOpenSession: SessionCaptureEvent = createSessionCaptureEvent(id).openSession()
+
     coEvery { eventLocalDataSource.count(any()) } returns 1
+
     // Mock query for session by id
     coEvery { eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, id = id)) } returns flowOf(oldOpenSession)
 
@@ -39,7 +40,7 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
     coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) } returns flowOf(oldOpenSession)
 
     // Mock query for open sessions
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE, endTime = LongRange(0, 0))) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE)) } returns flowOf(oldOpenSession)
 
     return oldOpenSession
 }
@@ -87,7 +88,6 @@ fun EventRepositoryImplTest.mockDbToLoadTwoCloseSessionsWithEvents(nEventsInTota
     val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, nEventsInTotal / 2 - 1)
     val queryForCloseSessions = DbLocalEventQuery(
         type = SESSION_CAPTURE,
-        endTime = LongRange(1, Long.MAX_VALUE),
         projectId = DEFAULT_PROJECT_ID)
 
     coEvery {
@@ -98,7 +98,7 @@ fun EventRepositoryImplTest.mockDbToLoadTwoCloseSessionsWithEvents(nEventsInTota
 }
 
 fun EventRepositoryImplTest.mockDbToLoadOldOpenSession(id: String) {
-    val session = createSessionCaptureEvent(id, timeHelper.now() - GRACE_PERIOD - 1000).openSession()
+    val session = createSessionCaptureEvent(id, timeHelper.now()).openSession()
     coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) } returns flowOf(session)
     coEvery { eventLocalDataSource.load(queryToLoadOldOpenSessions) } returns flowOf(session)
 }
@@ -131,6 +131,7 @@ fun EventRepositoryImplTest.verifyArtificialEventWasAdded(id: String, reason: Ar
         })
     }
 }
+
 fun EventRepositoryImplTest.verifySessionHasGotUploaded(id: String) {
     coVerify(exactly = 1) { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) }
     coVerify {

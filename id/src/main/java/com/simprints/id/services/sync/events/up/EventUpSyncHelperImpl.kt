@@ -14,7 +14,7 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
 class EventUpSyncHelperImpl(
     private val eventRepository: EventRepository,
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,

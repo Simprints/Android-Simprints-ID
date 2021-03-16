@@ -78,7 +78,7 @@ open class EventRepositoryImpl(
                     deviceId),
                 DatabaseInfo(sessionCount))
 
-            closeSessionsAndAddArtificialTerminationEvent(loadSessions(false), NEW_SESSION)
+            closeSessionsAndAddArtificialTerminationEvent(NEW_SESSION)
             saveEvent(sessionCaptureEvent)
             sessionCaptureEvent
         }
@@ -236,9 +236,8 @@ open class EventRepositoryImpl(
             eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId))
         }
 
-    private suspend fun closeSessionsAndAddArtificialTerminationEvent(openSessions: Flow<SessionCaptureEvent>,
-                                                                      reason: ArtificialTerminationPayload.Reason) {
-        openSessions.collect { sessionEvent ->
+    private suspend fun closeSessionsAndAddArtificialTerminationEvent(reason: ArtificialTerminationPayload.Reason) {
+        loadSessions(false).collect { sessionEvent ->
             val artificialTerminationEvent = ArtificialTerminationEvent(
                 timeHelper.now(),
                 reason
