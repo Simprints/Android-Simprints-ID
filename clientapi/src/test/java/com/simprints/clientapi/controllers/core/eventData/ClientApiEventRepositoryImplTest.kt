@@ -42,7 +42,7 @@ class ClientApiEventRepositoryImplTest {
             coEvery { coreEventEventsMgrMock.getCurrentCaptureSessionEvent() } returns session
             clientSessionEventsMgr.createSession(IntegrationInfo.ODK)
 
-            coVerify { coreEventEventsMgrMock.createSession(any()) }
+            coVerify { coreEventEventsMgrMock.createSession() }
             coVerify(exactly = 1) {
                 coreEventEventsMgrMock.addEventToCurrentSession(match {
                     it is IntentParsingEvent && it.payload.integration == CoreIntegrationInfo.ODK

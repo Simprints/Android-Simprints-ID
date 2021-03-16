@@ -18,6 +18,7 @@ import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
+import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -84,7 +85,7 @@ class EventRepositoryImplTest {
         queryToLoadOldOpenSessions = DbLocalEventQuery(
             type = SESSION_CAPTURE,
             endTime = LongRange(0, 0),
-            startTime = LongRange(0, timeHelper.now() - EventRepositoryImpl.GRACE_PERIOD),
+            startTime = LongRange(0, timeHelper.now()),
             projectId = DEFAULT_PROJECT_ID)
 
         eventRepo = EventRepositoryImpl(
@@ -112,7 +113,7 @@ class EventRepositoryImplTest {
             mockDbToHaveOneOpenSession()
             coEvery { eventLocalDataSource.count(DbLocalEventQuery(type = SESSION_CAPTURE)) } returns N_SESSIONS_DB
 
-            eventRepo.createSession(LIB_VERSION_NAME)
+            eventRepo.createSession()
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(match<SessionCaptureEvent> {
@@ -127,7 +128,7 @@ class EventRepositoryImplTest {
         runBlocking {
             val openSession = mockDbToHaveOneOpenSession()
 
-            eventRepo.createSession(LIB_VERSION_NAME)
+            eventRepo.createSession()
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(match {
@@ -148,7 +149,7 @@ class EventRepositoryImplTest {
         runBlocking {
             mockDbToBeEmpty()
 
-            eventRepo.createSession(LIB_VERSION_NAME)
+            eventRepo.createSession()
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(match {
@@ -208,7 +209,7 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE + 3)
 
-            val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery(DEFAULT_PROJECT_ID))
+            val bathes = (eventRepo as EventRepositoryImpl).createBatches(LocalEventQuery(DEFAULT_PROJECT_ID).fromDomainToDb())
 
             assertThat(bathes[0].events.size).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(bathes[1].events.size).isEqualTo(3)
@@ -325,6 +326,7 @@ class EventRepositoryImplTest {
     fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
+
             val events = mockDbToLoadTwoCloseSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
@@ -345,7 +347,7 @@ class EventRepositoryImplTest {
         runBlocking {
             mockDbToHaveOneOpenSession(GUID1)
 
-            eventRepo.createSession(LIB_VERSION_NAME)
+            eventRepo.createSession()
 
             coVerify { eventLocalDataSource.load(queryToLoadOpenSessions) }
             verifyArtificialEventWasAdded(GUID1, NEW_SESSION)
