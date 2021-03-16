@@ -34,20 +34,20 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
     coEvery { eventLocalDataSource.count(any()) } returns 1
 
     // Mock query for session by id
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, id = id)) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID, type = SESSION_CAPTURE, id = id)) } returns flowOf(oldOpenSession)
 
     // Mock query for events by session id
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = id)) } returns flowOf(oldOpenSession)
 
     // Mock query for open sessions
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(type = SESSION_CAPTURE)) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(type = SESSION_CAPTURE)) } returns flowOf(oldOpenSession)
 
     return oldOpenSession
 }
 
 fun EventRepositoryImplTest.mockDbToBeEmpty() {
     coEvery { eventLocalDataSource.count(any()) } returns 0
-    coEvery { eventLocalDataSource.load(any()) } returns flowOf()
+    coEvery { eventLocalDataSource.loadAll(any()) } returns flowOf()
 }
 
 fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(sessionId: String, nEvents: Int): List<Event> {
@@ -57,7 +57,7 @@ fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(sessionId: String, nEv
         events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = GUID1)))
     }
 
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = sessionId)) } returns events.asFlow()
+    coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = sessionId)) } returns events.asFlow()
     coEvery { eventLocalDataSource.count(DbLocalEventQuery(sessionId = sessionId)) } returns nEvents + 1
     return events
 }
@@ -91,7 +91,7 @@ fun EventRepositoryImplTest.mockDbToLoadTwoCloseSessionsWithEvents(nEventsInTota
         projectId = DEFAULT_PROJECT_ID)
 
     coEvery {
-        eventLocalDataSource.load(queryForCloseSessions)
+        eventLocalDataSource.loadAll(queryForCloseSessions)
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
 
     return (group1 + group2)
@@ -99,14 +99,14 @@ fun EventRepositoryImplTest.mockDbToLoadTwoCloseSessionsWithEvents(nEventsInTota
 
 fun EventRepositoryImplTest.mockDbToLoadOldOpenSession(id: String) {
     val session = createSessionCaptureEvent(id, timeHelper.now()).openSession()
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) } returns flowOf(session)
-    coEvery { eventLocalDataSource.load(queryToLoadOldOpenSessions) } returns flowOf(session)
+    coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = id)) } returns flowOf(session)
+    coEvery { eventLocalDataSource.loadAll(queryToLoadOldOpenSessions) } returns flowOf(session)
 }
 
 fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
     val session = createSessionCaptureEvent(id).openSession()
-    coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) } returns flowOf(session)
-    coEvery { eventLocalDataSource.load(queryToLoadOpenSessions) } returns flowOf(session)
+    coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = id)) } returns flowOf(session)
+    coEvery { eventLocalDataSource.loadAll(queryToLoadOpenSessions) } returns flowOf(session)
 }
 
 suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecordEvents: Int): List<Event> {
@@ -116,7 +116,7 @@ suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecord
     }
 
     coEvery {
-        eventLocalDataSource.load(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID))
+        eventLocalDataSource.loadAll(DbLocalEventQuery(projectId = DEFAULT_PROJECT_ID))
     } returns events.asFlow()
 
     return events.toList()
@@ -133,7 +133,7 @@ fun EventRepositoryImplTest.verifyArtificialEventWasAdded(id: String, reason: Ar
 }
 
 fun EventRepositoryImplTest.verifySessionHasGotUploaded(id: String) {
-    coVerify(exactly = 1) { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) }
+    coVerify(exactly = 1) { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = id)) }
     coVerify {
         eventRemoteDataSource.post(any(), match {
             it.any { it.id == id }
@@ -142,7 +142,7 @@ fun EventRepositoryImplTest.verifySessionHasGotUploaded(id: String) {
 }
 
 fun EventRepositoryImplTest.verifySessionHasNotGotUploaded(id: String) {
-    coVerify(exactly = 0) { eventLocalDataSource.load(DbLocalEventQuery(sessionId = id)) }
+    coVerify(exactly = 0) { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = id)) }
     coVerify {
         eventRemoteDataSource.post(any(), match {
             it.none { it.id == id }

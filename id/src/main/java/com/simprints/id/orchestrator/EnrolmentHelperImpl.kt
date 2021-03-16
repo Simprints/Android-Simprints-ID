@@ -4,7 +4,6 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
-import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
@@ -36,7 +35,7 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
 
         Timber.tag(TAG).d("Up-syncing")
         inBackground {
-            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.getSignedInProjectIdOrEmpty())).collect()
+            eventRepository.uploadEvents(projectId = loginInfoManager.getSignedInProjectIdOrEmpty()).collect()
         }
 
         Timber.tag(TAG).d("Done!")

@@ -18,7 +18,6 @@ import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
-import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -102,7 +101,7 @@ class EventRepositoryImplTest {
         )
 
         runBlocking {
-            coEvery { eventLocalDataSource.load(queryToLoadOldOpenSessions) } returns emptyFlow()
+            coEvery { eventLocalDataSource.loadAll(queryToLoadOldOpenSessions) } returns emptyFlow()
             mockDbToLoadPersonRecordEvents(0)
         }
     }
@@ -225,8 +224,8 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(LocalEventQuery(DEFAULT_PROJECT_ID)).toList()
 
-            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID1)) }
-            coVerify { eventLocalDataSource.load(DbLocalEventQuery(sessionId = GUID2)) }
+            coVerify { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = GUID1)) }
+            coVerify { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = GUID2)) }
         }
     }
 
@@ -349,7 +348,7 @@ class EventRepositoryImplTest {
 
             eventRepo.createSession()
 
-            coVerify { eventLocalDataSource.load(queryToLoadOpenSessions) }
+            coVerify { eventLocalDataSource.loadAll(queryToLoadOpenSessions) }
             verifyArtificialEventWasAdded(GUID1, NEW_SESSION)
         }
     }
@@ -373,7 +372,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addEventToCurrentSession(eventInSession)
 
-            coVerify { eventLocalDataSource.load(queryToLoadOpenSessions) }
+            coVerify { eventLocalDataSource.loadAll(queryToLoadOpenSessions) }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
                     eventInSession.copy(labels = EventLabels(deviceId = DEVICE_ID, sessionId = session.id, projectId = DEFAULT_PROJECT_ID)))
@@ -387,7 +386,7 @@ class EventRepositoryImplTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
-            coEvery { eventLocalDataSource.load(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session, eventInSession)
+            coEvery { eventLocalDataSource.loadAll(DbLocalEventQuery(sessionId = session.id)) } returns flowOf(session, eventInSession)
             val newEvent = createAlertScreenEvent().removeLabels()
 
             eventRepo.addEventToCurrentSession(newEvent)

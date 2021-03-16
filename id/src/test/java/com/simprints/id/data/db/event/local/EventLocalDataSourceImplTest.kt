@@ -53,7 +53,7 @@ class EventLocalDataSourceImplTest {
         runBlocking {
             val eventQuery = createCompleteEventQuery()
 
-            eventLocalDataSource.load(eventQuery)
+            eventLocalDataSource.loadAll(eventQuery)
 
             coVerify {
                 eventDao.load(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
