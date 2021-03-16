@@ -9,13 +9,13 @@ apply from: 'profiling.gradle'
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 android {
-    compileSdkVersion 29
-    defaultConfig {
-        targetSdkVersion 29
-    }
 
     buildTypes {
         release {
+            minifyEnabled true
+            proguardFiles.add(file('proguard-rules.pro'))
+        }
+        staging {
             minifyEnabled true
             proguardFiles.add(file('proguard-rules.pro'))
         }

@@ -16,21 +16,13 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 29
 
     defaultConfig {
-        targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
-        release {
-            // If we enable a specific pro-guard, then we need to add rules for the Activities.
-            // in Dynamic Features, aapt doesn't pull them out from the Manifest as it does with the base model
-            //proguardFiles 'proguard-rules-dynamic-features.pro'
-        }
-
         debug {
             testCoverageEnabled true
         }

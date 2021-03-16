@@ -5,16 +5,17 @@ apply plugin: 'kotlin-android-extensions'
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 android {
-    compileSdkVersion 29
 
     defaultConfig {
-        targetSdkVersion 29
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
         release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        staging {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
