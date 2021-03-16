@@ -14,7 +14,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
@@ -39,7 +39,7 @@ class SyncInformationViewModel(
     fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> = _viewState
 
     fun fetchSyncInformation() = viewModelScope.launch {
-        // If a sync was never triggered than it will return null - in Co-Sync only for example
+        // If a sync was never triggered (in Co-Sync only for example) then it will return null
         val isRunning = eventSyncManager.getLastSyncState().value?.isRunning() ?: false
 
         if (isRunning) {
@@ -71,7 +71,7 @@ class SyncInformationViewModel(
         eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
-        if (isDownSyncAllowed() && canSyncToSimprints()) {
+        if (isDownSyncAllowed() && preferencesManager.canSyncToSimprints()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             null
@@ -81,10 +81,6 @@ class SyncInformationViewModel(
         with(preferencesManager) {
             eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
         }
-
-    private fun canSyncToSimprints(): Boolean = with(preferencesManager) {
-        syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
-    }
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
