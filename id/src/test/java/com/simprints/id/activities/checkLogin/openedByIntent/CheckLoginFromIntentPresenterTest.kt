@@ -299,7 +299,7 @@ class CheckLoginFromIntentPresenterTest {
             }
 
             coVerify {
-                eventRepositoryMock.addEvent(expected)
+                eventRepositoryMock.saveEvent(expected)
             }
         }
     }
@@ -318,7 +318,7 @@ class CheckLoginFromIntentPresenterTest {
             presenter.handleSignedInUser()
 
             coVerify {
-                eventRepositoryMock.addEvent(createEnrolmentCalloutEvent(GUID1).apply {
+                eventRepositoryMock.saveEvent(createEnrolmentCalloutEvent(GUID1).apply {
                     labels = labels.copy(projectId = DEFAULT_PROJECT_ID)
                 })
             }

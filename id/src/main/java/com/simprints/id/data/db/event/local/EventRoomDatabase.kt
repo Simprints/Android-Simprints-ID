@@ -27,7 +27,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
             Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
                 .addMigrations()
                 // See README for debugging. Comment out `.openHelperFactory()`
-                .openHelperFactory(factory)
+                //.openHelperFactory(factory)
                 .addMigrations(EventMigration1to2(crashReportManager))
                 .build()
     }

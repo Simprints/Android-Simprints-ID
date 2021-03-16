@@ -15,7 +15,7 @@ interface EventRepository {
 
     val libSimprintsVersionName: String
 
-    suspend fun createSession(libSimprintsVersion: String = libSimprintsVersionName): SessionCaptureEvent
+    suspend fun createSession(): SessionCaptureEvent
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
@@ -25,7 +25,7 @@ interface EventRepository {
 
     suspend fun addEventToSession(event: Event, session: SessionCaptureEvent)
 
-    suspend fun addEvent(event: Event)
+    suspend fun saveEvent(event: Event)
 
     suspend fun uploadEvents(query: LocalEventQuery): Flow<Int>
 
