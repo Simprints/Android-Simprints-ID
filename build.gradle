@@ -1,5 +1,4 @@
-apply from: 'dependencies.gradle'
-apply from: 'config.gradle'
+apply from: "buildSrc${File.separator}dependencies.gradle"
 apply from: "ci${File.separator}scanning${File.separator}sonarqube.gradle"
 apply from: "ci${File.separator}scanning${File.separator}jacoco.gradle"
 

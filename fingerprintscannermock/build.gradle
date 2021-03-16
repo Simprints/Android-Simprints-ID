@@ -3,20 +3,12 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-project.version = "2020.1.2"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 android {
-    compileSdkVersion 29
-
 
     defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
-        versionCode 1
-        versionName project.version
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -25,7 +17,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         staging {
-            initWith release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -68,25 +61,6 @@ publishing.publications {
         artifactId libraryArtifactId
 
         artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-    }
-}
-
-artifactory {
-    contextUrl = 'http://178.62.61.39:8081/artifactory'
-    publish {
-        repository {
-            repoKey = 'libs-release-local'
-
-            username = SIMPRINTS_ARTIFACTORY_USERNAME
-            password = SIMPRINTS_ARTIFACTORY_PASSWORD
-        }
-        defaults {
-            publications('aar')
-            publishArtifacts = true
-
-            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
-            publishPom = true
-        }
     }
 }
 

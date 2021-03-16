@@ -3,28 +3,23 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
 apply plugin: "kotlin-android-extensions"
 
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
+
 android {
-    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
-        debug {
-            minifyEnabled false
-        }
         release {
             minifyEnabled false
         }
-        staging {
-            initWith release
+        staging{
+            minifyEnabled false
+        }
+        debug {
+            minifyEnabled false
         }
     }
 }
