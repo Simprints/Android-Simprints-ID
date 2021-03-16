@@ -9,10 +9,7 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 29
-
     defaultConfig {
-        targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -29,15 +26,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
         }
-
+        staging {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
+        }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
-        }
-
-        staging {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
         }
     }
 }

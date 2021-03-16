@@ -7,13 +7,13 @@ apply plugin: "org.gradle.test-retry"
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 android {
-    compileSdkVersion 29
 
-    defaultConfig {
-        targetSdkVersion 29
-    }
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        staging {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -65,20 +65,6 @@ dependencies {
 
     // Truth
     testImplementation deps.testing.truth
-}
-
-def libraryGroupId = 'com.simprints'
-def libraryArtifactId = 'fingerprintscanner'
-
-publishing.publications {
-    aar(MavenPublication) {
-        groupId libraryGroupId
-        //noinspection GroovyAssignabilityCheck
-        version project.version
-        artifactId libraryArtifactId
-
-        artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-    }
 }
 
 repositories {

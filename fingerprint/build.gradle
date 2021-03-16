@@ -11,9 +11,7 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 29
     defaultConfig {
-        targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -25,6 +23,7 @@ android {
         }
 
         staging {
+            proguardFiles 'proguard-rules-dynamic-features.pro'
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 

@@ -16,9 +16,7 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 29
     defaultConfig {
-        targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
