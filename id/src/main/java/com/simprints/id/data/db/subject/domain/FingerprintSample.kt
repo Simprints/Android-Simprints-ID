@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
@@ -9,7 +10,9 @@ import java.util.*
 data class FingerprintSample(
     val fingerIdentifier: FingerIdentifier,
     val template: ByteArray,
-    val templateQualityScore: Int) : Parcelable {
+    val templateQualityScore: Int,
+    val format: FingerprintTemplateFormat
+) : Parcelable {
 
     @IgnoredOnParcel
     val id: String by lazy {

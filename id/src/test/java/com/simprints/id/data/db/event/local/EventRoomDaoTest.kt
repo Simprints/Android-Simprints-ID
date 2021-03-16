@@ -155,6 +155,7 @@ class EventRoomDaoTest {
     @Test
     fun deletion() {
         runBlocking {
+            addIntoDb(event)
             db.eventDao.delete(event.id)
             assertThat(eventDao.count()).isEqualTo(0)
         }

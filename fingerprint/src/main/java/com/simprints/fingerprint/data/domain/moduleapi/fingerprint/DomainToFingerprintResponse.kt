@@ -10,6 +10,7 @@ import com.simprints.moduleapi.common.IPath
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
+import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchResult
@@ -31,8 +32,10 @@ object DomainToFingerprintResponse {
                     fingerprint.qualityScore,
                     fingerprint.imageRef?.path?.let {
                         ISecuredImageRefImpl(IPathImpl(it.parts))
-                    }
-                ))
+                    },
+                    fingerprint.format.fromDomainToModuleApi()
+                )
+            )
         })
 
     fun fromDomainToFingerprintMatchResponse(matchResponse: FingerprintMatchResponse): IFingerprintMatchResponse =
@@ -45,7 +48,7 @@ object DomainToFingerprintResponse {
 
     fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintExitFormResponse {
 
-        val reason = when(refusalResponse.reason) {
+        val reason = when (refusalResponse.reason) {
             RefusalFormReason.REFUSED_RELIGION -> IFingerprintExitReason.REFUSED_RELIGION
             RefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintExitReason.REFUSED_DATA_CONCERNS
             RefusalFormReason.REFUSED_PERMISSION -> IFingerprintExitReason.REFUSED_PERMISSION
@@ -71,44 +74,54 @@ object DomainToFingerprintResponse {
 
 @Parcelize
 private class IFingerprintErrorResponseImpl(override val error: IFingerprintErrorReason) : IFingerprintErrorResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ERROR
+    @IgnoredOnParcel
+    override val type: IFingerprintResponseType = IFingerprintResponseType.ERROR
 }
 
 @Parcelize
-private class IFingerprintCaptureResponseImpl(override val captureResult: List<IFingerprintCaptureResult>) : IFingerprintCaptureResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CAPTURE
+private class IFingerprintCaptureResponseImpl(override val captureResult: List<IFingerprintCaptureResult>) :
+    IFingerprintCaptureResponse {
+    @IgnoredOnParcel
+    override val type: IFingerprintResponseType = IFingerprintResponseType.CAPTURE
 }
 
 @Parcelize
 private class IFingerprintExitFormResponseImpl(
     override val reason: IFingerprintExitReason,
-    override val extra: String) : IFingerprintExitFormResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.REFUSAL
+    override val extra: String
+) : IFingerprintExitFormResponse {
+    @IgnoredOnParcel
+    override val type: IFingerprintResponseType = IFingerprintResponseType.REFUSAL
 }
 
 @Parcelize
 private data class IFingerprintMatchResponseImpl(
     override val result: List<IFingerprintMatchResult>
 ) : Parcelable, IFingerprintMatchResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.MATCH
+    @IgnoredOnParcel
+    override val type: IFingerprintResponseType = IFingerprintResponseType.MATCH
 }
 
 @Parcelize
 private data class IFingerprintMatchResultImpl(
     override val personId: String,
-    override val confidenceScore: Float) : Parcelable, IFingerprintMatchResult
+    override val confidenceScore: Float
+) : Parcelable, IFingerprintMatchResult
 
 @Parcelize
 private class IFingerprintCaptureResultImpl(
     override val identifier: IFingerIdentifier,
-    override val sample: IFingerprintSample?) : IFingerprintCaptureResult
+    override val sample: IFingerprintSample?
+) : IFingerprintCaptureResult
 
 @Parcelize
 private class IFingerprintSampleImpl(
     override val fingerIdentifier: IFingerIdentifier,
     override val template: ByteArray,
     override val templateQualityScore: Int,
-    override val imageRef: ISecuredImageRef?) : IFingerprintSample
+    override val imageRef: ISecuredImageRef?,
+    override val format: IFingerprintTemplateFormat
+) : IFingerprintSample
 
 @Parcelize
 private class ISecuredImageRefImpl(
@@ -122,5 +135,6 @@ private class IPathImpl(
 
 @Parcelize
 private class IFingerprintConfigurationResponseImpl : Parcelable, IFingerprintConfigurationResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CONFIGURATION
+    @IgnoredOnParcel
+    override val type: IFingerprintResponseType = IFingerprintResponseType.CONFIGURATION
 }

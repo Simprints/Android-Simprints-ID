@@ -12,7 +12,7 @@ import java.util.*
 data class ApiFingerprintReference(
     override val id: String = UUID.randomUUID().toString(),
     val templates: List<ApiFingerprintTemplate>,
-    val format: FingerprintTemplateFormat = ISO_19794_2,
+    val format: FingerprintTemplateFormat,
     val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
     override val type: ApiBiometricReferenceType = FingerprintReference
 }
