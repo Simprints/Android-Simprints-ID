@@ -170,14 +170,14 @@ definitions:
                     - ci/pipeline/test-reports/**
 
         ######################################################################
-        # Build a signed bundle with the Playstore upload key, and deploy it
-        # to the internal test track. Also upload the bundle and the relevant
-        # output files to artifacts.
+        # Build a signed Staging bundle with the Playstore upload key, and
+        # deploy it to the internal test track. Also upload the bundle and the
+        # relevant output files to artifacts.
         #
         # Signing vars are only available on a deployment step.
         ######################################################################
         -   step: &sign-and-deploy-to-internal
-                name: "Sign & Deploy to Internal Track"
+                name: "Sign & Deploy Staging build to Internal Track"
                 deployment: Internal
                 max-time: 30
                 size: 2x
@@ -189,6 +189,7 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
+                    - echo "VERSION_SUFFIX=internal" >> buildSrc/build.properties
                     - echo "BUNDLE_FOLDER=standardStaging" >>ci/deploy.properties
                     - ./gradlew bundleStandardStaging
                     - ./gradlew id:publishStandardStagingBundle
@@ -196,15 +197,16 @@ definitions:
                     - id/build/outputs/**
 
         ######################################################################
-        # Promote an Internal build to the Closed Alpha Track. This step does
-        # not build the signed APK, it just promotes the existing Internal
-        # deployment via the Play Store API.
+        # Build a signed Release bundle with the Playstore upload key, and
+        # deploy it to the alpha test track.
+        #
+        # Signing vars are only available on a deployment step.
         ######################################################################
         -   step: &release-to-alpha
-                name: "Promote Internal to Alpha"
+                name: "Sign and deploy Release build to Alpha Track"
                 deployment: Alpha
                 max-time: 30
-                trigger: manual
+                # trigger: manual
                 caches:
                     - gradle
                     - gradlewrapper
@@ -212,6 +214,7 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
+                    - echo "VERSION_SUFFIX=" >> buildSrc/build.properties
                     - echo "BUNDLE_FOLDER=standardRelease" >>ci/deploy.properties
                     - ./gradlew bundleStandardRelease
                     - ./gradlew id:publishStandardReleaseBundle
@@ -256,7 +259,7 @@ flows:
                     -   step: *run-all-android-tests
             -   step: *release-to-alpha
     -   flow: &ci-test
-            -   step: *run-fingerprintscanner-unit-tests
+            -   step: *release-to-alpha
 
 ######################################################################
 # Define the triggers that launch the pipeline.

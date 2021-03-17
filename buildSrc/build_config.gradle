@@ -10,7 +10,7 @@ android {
         minSdkVersion buildProperties["MIN_SDK_VERSION"] as Integer
 
         versionCode buildProperties["VERSION_CODE"] as Integer
-        versionName buildProperties["VERSION_NAME"] + "+" + versionCode
+        versionName buildProperties["VERSION_NAME"] + "-" + buildProperties["VERSION_SUFFIX"] + "+" + versionCode
     }
 
     buildTypes {
@@ -19,10 +19,8 @@ android {
         }
         staging {
             lintOptions.fatal 'StopShip'
-            versionNameSuffix "-${buildProperties["VERSION_SUFFIX"]}"
         }
         debug {
-            versionNameSuffix "-dev"
         }
     }
 }
