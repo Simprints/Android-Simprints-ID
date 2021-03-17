@@ -164,7 +164,7 @@ open class EventRepositoryImpl(
 
     override suspend fun deleteSessionEvents(sessionId: String) {
         try {
-            eventLocalDataSource.delete(DbLocalEventQuery(sessionId = sessionId))
+            eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
         } catch (t: Throwable) {
             Timber.e("Error deleting session from DB")
             Timber.e(t)
