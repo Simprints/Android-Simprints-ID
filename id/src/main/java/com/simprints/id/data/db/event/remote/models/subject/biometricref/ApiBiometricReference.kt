@@ -45,10 +45,10 @@ enum class ApiBiometricReferenceType {
 
 fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
-        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, RANK_ONE_1_23, metadata)
+        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, format, metadata)
     }
     is DomainFingerprintReference -> {
-        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, ISO_19794_2, metadata)
+        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, format, metadata)
     }
 }
 

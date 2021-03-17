@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -18,6 +19,7 @@ import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
+import com.simprints.id.tools.time.TimeHelper
 import kotlinx.android.synthetic.main.activity_face_exit_form.*
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
@@ -25,9 +27,17 @@ import javax.inject.Inject
 
 class FaceExitFormActivity : BaseSplitActivity() {
 
-    private var faceExitFormReason = OTHER
+    private lateinit var viewModel: FaceExitFormViewModel
 
-    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var timeHelper: TimeHelper
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var faceExitFormViewModelFactory: FaceExitFormViewModelFactory
+
+    private var exitFormStartTime: Long = 0
+    private var faceExitFormReason = OTHER
 
     private val textWatcher = textWatcherOnChange {
         handleTextChangedInExitForm(it)
@@ -40,6 +50,9 @@ class FaceExitFormActivity : BaseSplitActivity() {
         injectDependencies()
 
         setTextInLayout()
+
+        viewModel = ViewModelProvider(this, faceExitFormViewModelFactory).get(FaceExitFormViewModel::class.java)
+        exitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()
         setLayoutChangeListener()
@@ -75,7 +88,7 @@ class FaceExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        with (faceExitFormScrollView) {
+        with(faceExitFormScrollView) {
             onLayoutChange { _, _, _, _,
                              _, _, _, _, _ ->
                 fullScroll(View.FOCUS_DOWN)
@@ -151,11 +164,12 @@ class FaceExitFormActivity : BaseSplitActivity() {
         faceExitFormText.addTextChangedListener(textWatcher)
     }
 
-    fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handleGoBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         setResultAndFinish(Action.GO_BACK)
     }
 
-    fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handleSubmitClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), faceExitFormReason)
         setResultAndFinish(Action.SUBMIT)
     }
 

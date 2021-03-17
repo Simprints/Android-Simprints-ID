@@ -83,15 +83,47 @@ fun createVerificationCallbackEvent(): VerificationCallbackEvent {
     return VerificationCallbackEvent(CREATED_AT, comparisonScore, eventLabels)
 }
 
-fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2, eventLabels)
+fun createConfirmationCalloutEvent() =
+    ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2, eventLabels)
 
-fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(CREATED_AT, projectId, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels, projectId)
+fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(
+    CREATED_AT,
+    projectId,
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_METADATA,
+    eventLabels,
+    projectId
+)
 
-fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, eventLabels)
+fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
+    CREATED_AT,
+    DEFAULT_PROJECT_ID,
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_METADATA,
+    eventLabels
+)
 
-fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID2, eventLabels)
+fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(
+    CREATED_AT,
+    DEFAULT_PROJECT_ID,
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_METADATA,
+    GUID2,
+    eventLabels
+)
 
-fun createVerificationCalloutEvent() = VerificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID2, eventLabels)
+fun createVerificationCalloutEvent() = VerificationCalloutEvent(
+    CREATED_AT,
+    DEFAULT_PROJECT_ID,
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_METADATA,
+    GUID2,
+    eventLabels
+)
 
 fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 
@@ -117,7 +149,8 @@ fun createSessionCaptureEvent(id: String = GUID1,
     val deviceArg = Device(
         Build.VERSION.SDK_INT.toString(),
         Build.MANUFACTURER + "_" + Build.MODEL,
-        GUID1)
+        GUID1
+    )
 
     val databaseInfoArg = DatabaseInfo(2, 2)
     val locationArg = Location(0.0, 0.0)
@@ -141,24 +174,63 @@ fun createSessionCaptureEvent(id: String = GUID1,
 
 fun createEnrolmentRecordCreationEvent() =
     EnrolmentRecordCreationEvent(
-        CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
-        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        CREATED_AT,
+        GUID1,
+        DEFAULT_PROJECT_ID,
+        DEFAULT_MODULE_ID,
+        DEFAULT_USER_ID,
+        listOf(FINGERPRINT, FACE),
+        buildFakeBiometricReferences(),
+        EventLabels(
+            subjectId = GUID1,
+            projectId = DEFAULT_PROJECT_ID,
+            moduleIds = listOf(GUID2),
+            attendantId = DEFAULT_USER_ID,
+            mode = listOf(FINGERPRINT, FACE)
+        )
+    )
 
 fun createEnrolmentRecordDeletionEvent() =
     EnrolmentRecordDeletionEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        EventLabels(
+            subjectId = GUID1,
+            projectId = DEFAULT_PROJECT_ID,
+            moduleIds = listOf(GUID2),
+            attendantId = DEFAULT_USER_ID,
+            mode = listOf(FINGERPRINT, FACE)
+        )
+    )
 
 fun createEnrolmentRecordMoveEvent() =
     EnrolmentRecordMoveEvent(
         CREATED_AT,
-        EnrolmentRecordCreationInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, DEFAULT_USER_ID, buildFakeBiometricReferences()),
+        EnrolmentRecordCreationInMove(
+            GUID1,
+            DEFAULT_PROJECT_ID,
+            DEFAULT_MODULE_ID_2,
+            DEFAULT_USER_ID,
+            buildFakeBiometricReferences()
+        ),
         EnrolmentRecordDeletionInMove(GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID),
-        EventLabels(subjectId = GUID1, projectId = DEFAULT_PROJECT_ID, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        EventLabels(
+            subjectId = GUID1,
+            projectId = DEFAULT_PROJECT_ID,
+            moduleIds = listOf(GUID2),
+            attendantId = DEFAULT_USER_ID,
+            mode = listOf(FINGERPRINT, FACE)
+        )
+    )
 
 fun buildFakeBiometricReferences(): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(GUID1, listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)), hashMapOf("some_key" to "some_value"))
-    val faceReference = FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())))
+    val fingerprintReference = FingerprintReference(
+        GUID1,
+        listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(), LEFT_3RD_FINGER)),
+        FingerprintTemplateFormat.ISO_19794_2,
+        hashMapOf("some_key" to "some_value")
+    )
+    val faceReference =
+        FaceReference(GUID2, listOf(FaceTemplate(buildFakeFaceTemplate())), FaceTemplateFormat.RANK_ONE_1_23)
     return listOf(fingerprintReference, faceReference)
 }
 
@@ -174,19 +246,28 @@ fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLE
 
 fun createArtificialTerminationEvent() = ArtificialTerminationEvent(CREATED_AT, NEW_SESSION, eventLabels)
 
-fun createAuthenticationEvent() = AuthenticationEvent(CREATED_AT, ENDED_AT, UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), AUTHENTICATED, eventLabels)
+fun createAuthenticationEvent() =
+    AuthenticationEvent(CREATED_AT, ENDED_AT, UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), AUTHENTICATED, eventLabels)
 
-fun createAuthorizationEvent() = AuthorizationEvent(CREATED_AT, AUTHORIZED, AuthorizationPayload.UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID), eventLabels)
+fun createAuthorizationEvent() = AuthorizationEvent(
+    CREATED_AT,
+    AUTHORIZED,
+    AuthorizationPayload.UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
+    eventLabels
+)
 
 fun createCandidateReadEvent() = CandidateReadEvent(CREATED_AT, ENDED_AT, GUID1, FOUND, NOT_FOUND, eventLabels)
 
 fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventLabels)
 
-fun createConnectivitySnapshotEvent() = ConnectivitySnapshotEvent(CREATED_AT, "wifi", listOf(Connection("GPRS", CONNECTED)), eventLabels)
+fun createConnectivitySnapshotEvent() =
+    ConnectivitySnapshotEvent(CREATED_AT, "wifi", listOf(Connection("GPRS", CONNECTED)), eventLabels)
 
 fun createConsentEvent() = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, eventLabels)
 
-fun createEnrolmentEventV2() = EnrolmentEventV2(CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, GUID2, eventLabels)
+fun createEnrolmentEventV2() =
+    EnrolmentEventV2(CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID, GUID2, eventLabels)
+
 fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
@@ -198,7 +279,8 @@ fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, GUID1, eventLabe
 
 fun createIntentParsingEvent() = IntentParsingEvent(CREATED_AT, COMMCARE, eventLabels)
 
-fun createInvalidIntentEvent() = InvalidIntentEvent(CREATED_AT, "action", mapOf("extra_key" to "extra_value"), eventLabels)
+fun createInvalidIntentEvent() =
+    InvalidIntentEvent(CREATED_AT, "action", mapOf("extra_key" to "extra_value"), eventLabels)
 
 fun createOneToManyMatchEvent(): OneToManyMatchEvent {
     val poolArg = MatchPool(PROJECT, 100)
@@ -211,11 +293,13 @@ fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     return OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, RANK_ONE, matchEntry, eventLabels)
 }
 
-fun createPersonCreationEvent() = PersonCreationEvent(CREATED_AT, listOf(GUID1, GUID2), GUID1, listOf(GUID1, GUID2), GUID2, eventLabels)
+fun createPersonCreationEvent() =
+    PersonCreationEvent(CREATED_AT, listOf(GUID1, GUID2), GUID1, listOf(GUID1, GUID2), GUID2, eventLabels)
 
 fun createRefusalEvent() = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, "other_text", eventLabels)
 
-fun createScannerConnectionEvent() = ScannerConnectionEvent(CREATED_AT, ScannerInfo("scanner_id", "macaddress", VERO_1, "version"), eventLabels)
+fun createScannerConnectionEvent() =
+    ScannerConnectionEvent(CREATED_AT, ScannerInfo("scanner_id", "macaddress", VERO_1, "version"), eventLabels)
 
 fun createScannerFirmwareUpdateEvent() =
     ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "targetAppVersion", "error", eventLabels)

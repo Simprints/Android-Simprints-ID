@@ -35,7 +35,7 @@ class TestPreferencesModule(
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-        syncDestinationSettingSerializer: Serializer<SyncDestinationSetting>,
+        syncDestinationSettingSerializer: Serializer<List<SyncDestinationSetting>>,
         modalitiesSerializer: Serializer<List<Modality>>,
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,

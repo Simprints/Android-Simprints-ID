@@ -5,6 +5,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
 import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.uicomponents.models.PreviewFrame
 import java.util.*
 
@@ -37,10 +38,21 @@ data class FaceDetection(
                 RANK_ONE_1_23 -> FaceTemplateFormat.RANK_ONE_1_23
                 MOCK -> FaceTemplateFormat.MOCK
             }
+
+        fun fromDomainToModuleApi(): IFaceTemplateFormat =
+            when (this) {
+                RANK_ONE_1_23 -> IFaceTemplateFormat.RANK_ONE_1_23
+                MOCK -> IFaceTemplateFormat.MOCK
+            }
     }
 
     fun toFaceSample(): FaceSample =
-        FaceSample(id, face?.template ?: ByteArray(0), securedImageRef)
+        FaceSample(
+            id,
+            face?.template ?: ByteArray(0),
+            securedImageRef,
+            face?.format?.fromDomainToModuleApi() ?: IFaceTemplateFormat.RANK_ONE_1_23
+        )
 
     fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float): FaceCaptureEvent =
         FaceCaptureEvent(

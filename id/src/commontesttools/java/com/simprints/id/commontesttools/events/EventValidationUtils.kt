@@ -316,7 +316,7 @@ fun validateEnrolmentRecordCreationEventApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(3)
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(2)
+        assertThat(getInt("version")).isEqualTo(3)
         assertThat(getString("subjectId")).isNotEmpty()
         assertThat(getString("projectId")).isNotEmpty()
         assertThat(getString("moduleId")).isNotEmpty()

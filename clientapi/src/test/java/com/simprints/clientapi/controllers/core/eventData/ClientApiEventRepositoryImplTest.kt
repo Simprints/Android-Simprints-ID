@@ -26,7 +26,7 @@ class ClientApiEventRepositoryImplTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK(relaxed = true) lateinit var coreEventEventsMgrMock: EventRepository
-    private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManagerImpl
+    private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManager
 
     @Before
     fun setup() {
