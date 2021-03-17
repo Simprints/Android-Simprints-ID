@@ -19,7 +19,7 @@ interface EventRepository {
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
-    suspend fun loadEvents(sessionId: String): Flow<Event>
+    suspend fun loadEventsFromSession(sessionId: String): Flow<Event>
 
     suspend fun addEventToCurrentSession(event: Event)
 

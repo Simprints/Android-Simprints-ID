@@ -100,7 +100,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { timeHelper.now() } returns CREATED_AT
 
             coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-            coEvery { eventRepository.loadEvents(any()) } returns emptyFlow()
+            coEvery { eventRepository.loadEventsFromSession(any()) } returns emptyFlow()
 
             coEvery { analyticsManager.getAnalyticsId() } returns GUID1
             crashReportManager = crashReportManagerMock
@@ -265,7 +265,7 @@ class CheckLoginFromIntentPresenterTest {
 
             val session = createSessionCaptureEvent(projectId = GUID1)
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
-            coEvery { eventRepositoryMock.loadEvents(any()) } returns emptyFlow()
+            coEvery { eventRepositoryMock.loadEventsFromSession(any()) } returns emptyFlow()
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
             coEvery { analyticsManagerMock.getAnalyticsId() } returns GUID1
             coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
@@ -310,7 +310,7 @@ class CheckLoginFromIntentPresenterTest {
             val session = createSessionCaptureEvent(projectId = GUID1)
             val callout = createEnrolmentCalloutEvent(projectId = GUID1)
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
-            coEvery { eventRepositoryMock.loadEvents(any()) } returns flowOf(session, callout)
+            coEvery { eventRepositoryMock.loadEventsFromSession(any()) } returns flowOf(session, callout)
             coEvery { subjectLocalDataSourceMock.count(any()) } returns 2
 
             presenter.appRequest = AppVerifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID1)

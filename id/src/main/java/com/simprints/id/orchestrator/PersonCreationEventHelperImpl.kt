@@ -1,10 +1,10 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.uniqueId
@@ -22,7 +22,7 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
         val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-        val personCreationEventInSession = eventRepository.loadEvents(currentSession.id).filterIsInstance<PersonCreationEvent>().toList()
+        val personCreationEventInSession = eventRepository.loadEventsFromSession(currentSession.id).filterIsInstance<PersonCreationEvent>().toList()
         // If a personCreationEvent is already in the current session,
         // we don' want to add it again (the capture steps would still be the same)
         if (personCreationEventInSession.isEmpty()) {
@@ -57,8 +57,8 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
     private suspend fun addPersonCreationEvent(fingerprintSamples: List<FingerprintSample>,
                                                faceSamples: List<FaceSample>) {
         val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        val fingerprintCaptureEvents = eventRepository.loadEvents(currentCaptureSessionEvent.id).filterIsInstance<FingerprintCaptureEvent>().toList()
-        val faceCaptureEvents = eventRepository.loadEvents(currentCaptureSessionEvent.id).filterIsInstance<FaceCaptureEvent>().toList()
+        val fingerprintCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FingerprintCaptureEvent>().toList()
+        val faceCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FaceCaptureEvent>().toList()
 
         eventRepository.addEventToCurrentSession(build(timeHelper, faceCaptureEvents, fingerprintCaptureEvents, faceSamples, fingerprintSamples))
     }

@@ -232,7 +232,7 @@ open class EventRepositoryImpl(
             loadSessions(false).firstOrNull() ?: createSession()
         }
 
-    override suspend fun loadEvents(sessionId: String): Flow<Event> =
+    override suspend fun loadEventsFromSession(sessionId: String): Flow<Event> =
         reportExceptionIfNeeded {
             eventLocalDataSource.loadAllFromSession(sessionId = sessionId)
         }
