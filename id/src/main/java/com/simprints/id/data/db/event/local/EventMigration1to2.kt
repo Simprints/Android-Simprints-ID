@@ -28,7 +28,6 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
                     val id = it.getStringWithColumnName("id")
                     migrateEnrolmentEventType(id, database)
                     migrateEnrolmentEventPayloadType(it, database, id)
-                    migrateAddUploadFlagToEventDb(database)
                 }
             }
             Timber.d("Migration from schema 1 to schema 2 done.")
@@ -52,10 +51,6 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
         id?.let {
             database.execSQL("UPDATE DbEvent set type = ? where id = ?", arrayOf(ENROLMENT_V1, it))
         }
-    }
-
-    private fun migrateAddUploadFlagToEventDb(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE DbEvent ADD COLUMN sessionIsClosed BOOLEAN NOT NULL DEFAULT(0)")
     }
 
     companion object {
