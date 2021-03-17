@@ -21,10 +21,12 @@ import java.util.*
 
 private const val TAG = "ENROLMENT"
 
-class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
-                          private val eventRepository: EventRepository,
-                          private val loginInfoManager: LoginInfoManager,
-                          private val timeHelper: TimeHelper) : EnrolmentHelper {
+class EnrolmentHelperImpl(
+    private val subjectRepository: SubjectRepository,
+    private val eventRepository: EventRepository,
+    private val loginInfoManager: LoginInfoManager,
+    private val timeHelper: TimeHelper
+) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
         Timber.tag(TAG).d("Enrolment in progress")
@@ -48,24 +50,35 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         val personCreationEvent = eventRepository.loadEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
 
         eventRepository.addEventToCurrentSession(
-            EnrolmentEventV2(timeHelper.now(),
+            EnrolmentEventV2(
+                timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
                 subject.moduleId,
                 subject.attendantId,
-                personCreationEvent.id)
+                personCreationEvent.id
+            )
         )
     }
 
-    override fun buildSubject(projectId: String,
-                              userId: String,
-                              moduleId: String,
-                              fingerprintResponse: FingerprintCaptureResponse?,
-                              faceResponse: FaceCaptureResponse?,
-                              timeHelper: TimeHelper): Subject =
+    override fun buildSubject(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse?,
+        faceResponse: FaceCaptureResponse?,
+        timeHelper: TimeHelper
+    ): Subject =
         when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildSubjectFromFingerprintAndFace(projectId, userId, moduleId, fingerprintResponse, faceResponse, timeHelper)
+                buildSubjectFromFingerprintAndFace(
+                    projectId,
+                    userId,
+                    moduleId,
+                    fingerprintResponse,
+                    faceResponse,
+                    timeHelper
+                )
             }
 
             fingerprintResponse != null -> {
@@ -80,12 +93,14 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         }
 
 
-    private fun buildSubjectFromFingerprintAndFace(projectId: String,
-                                                   userId: String,
-                                                   moduleId: String,
-                                                   fingerprintResponse: FingerprintCaptureResponse,
-                                                   faceResponse: FaceCaptureResponse,
-                                                   timeHelper: TimeHelper): Subject {
+    private fun buildSubjectFromFingerprintAndFace(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse,
+        faceResponse: FaceCaptureResponse,
+        timeHelper: TimeHelper
+    ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
             patientId,
@@ -98,11 +113,13 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         )
     }
 
-    private fun buildSubjectFromFingerprint(projectId: String,
-                                            userId: String,
-                                            moduleId: String,
-                                            fingerprintResponse: FingerprintCaptureResponse,
-                                            timeHelper: TimeHelper): Subject {
+    private fun buildSubjectFromFingerprint(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse,
+        timeHelper: TimeHelper
+    ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
             patientId,
@@ -114,11 +131,13 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         )
     }
 
-    private fun buildSubjectFromFace(projectId: String,
-                                     userId: String,
-                                     moduleId: String,
-                                     faceResponse: FaceCaptureResponse,
-                                     timeHelper: TimeHelper): Subject {
+    private fun buildSubjectFromFace(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        faceResponse: FaceCaptureResponse,
+        timeHelper: TimeHelper
+    ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
             patientId,
@@ -136,15 +155,15 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         return fingerprintResponse.captureResult.mapNotNull { captureResult ->
             val fingerId = captureResult.identifier
             captureResult.sample?.let { sample ->
-                FingerprintSample(fingerId, sample.template, sample.templateQualityScore)
+                FingerprintSample(fingerId, sample.template, sample.templateQualityScore, sample.format)
             }
         }
     }
 
     private fun extractFaceSamples(faceResponse: FaceCaptureResponse) =
-        faceResponse.capturingResult.mapNotNull { it ->
-            it.result?.let {
-                FaceSample(it.template)
+        faceResponse.capturingResult.mapNotNull { captureResult ->
+            captureResult.result?.let { sample ->
+                FaceSample(sample.template, sample.format)
             }
         }
 }

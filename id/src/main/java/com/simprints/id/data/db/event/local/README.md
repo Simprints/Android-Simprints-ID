@@ -10,3 +10,11 @@ Note: you can't access a db that was already encrypted with a password that was 
 
 
 
+# Second approach
+
+The above method didn't work for me, the app was crashing and debug-db never decrypted my DB. I went another route: not
+encrypting the DB at all.
+* Comment `.openHelperFactory(factory)` inside `EventRoomDatabase`, so the DB is not encrypted
+* Uncomment `debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'` in `build.gradle`
+* Install SID
+* Access https://phone_ip:8080/ on your computer

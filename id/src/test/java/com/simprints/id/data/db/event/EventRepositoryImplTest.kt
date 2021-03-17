@@ -156,7 +156,14 @@ class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+                    newEvent.copy(
+                        labels = EventLabels(
+                            sessionId = GUID1,
+                            deviceId = DEVICE_ID,
+                            projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
             }
         }
     }
@@ -171,7 +178,8 @@ class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID))
+                )
             }
         }
     }
@@ -185,7 +193,15 @@ class EventRepositoryImplTest {
             eventRepo.addEventToCurrentSession(newEvent)
 
             coVerify {
-                eventLocalDataSource.insertOrUpdate(newEvent.copy(labels = EventLabels(sessionId = GUID1, deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID)))
+                eventLocalDataSource.insertOrUpdate(
+                    newEvent.copy(
+                        labels = EventLabels(
+                            sessionId = GUID1,
+                            deviceId = DEVICE_ID,
+                            projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
             }
         }
     }
@@ -350,7 +366,14 @@ class EventRepositoryImplTest {
             coVerify { eventLocalDataSource.loadAllFromType(SESSION_CAPTURE) }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    eventInSession.copy(labels = EventLabels(deviceId = DEVICE_ID, sessionId = session.id, projectId = DEFAULT_PROJECT_ID)))
+                    eventInSession.copy(
+                        labels = EventLabels(
+                            deviceId = DEVICE_ID,
+                            sessionId = session.id,
+                            projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
             }
         }
     }

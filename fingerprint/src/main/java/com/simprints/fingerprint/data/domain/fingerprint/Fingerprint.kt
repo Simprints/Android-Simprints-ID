@@ -3,15 +3,19 @@ package com.simprints.fingerprint.data.domain.fingerprint
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 @Parcelize
-class Fingerprint(val fingerId: FingerIdentifier,
-                  val template: ByteBuffer,
-                  var imageRef: FingerprintImageRef? = null) : Parcelable {
+class Fingerprint(
+    val fingerId: FingerIdentifier,
+    val template: ByteBuffer,
+    var imageRef: FingerprintImageRef? = null,
+    val format: FingerprintTemplateFormat
+) : Parcelable {
 
     /**
      * @return A newly allocated byte array containing the ISO 2005 template of
@@ -40,8 +44,11 @@ class Fingerprint(val fingerId: FingerIdentifier,
      * (2011 not supported yet) template containing only 1 fingerprint.
      */
     @Throws(IllegalArgumentException::class)
-    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray) :
-        this(fingerId, ByteBuffer.allocateDirect(isoTemplateBytes.size)) {
+    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray) : this(
+        fingerId,
+        ByteBuffer.allocateDirect(isoTemplateBytes.size),
+        format = FingerprintTemplateFormat.ISO_19794_2
+    ) {
 
         template.put(isoTemplateBytes)
         template.order(ByteOrder.BIG_ENDIAN)
@@ -49,7 +56,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
         require(this.template.getInt(FORMAT_ID) == ISO_FORMAT_ID) { "Invalid template: not an ISO template" }
         require(this.template.getInt(VERSION) == ISO_2005_VERSION) { "Invalid template: only ISO 2005 is supported" }
         require(this.template.getInt(RECORD_LENGTH) == isoTemplateBytes.size) { "Invalid template: invalid length" }
-        require(this.template.get(NB_FINGERPRINTS)== 1.toByte()) { "Invalid template: only single fingerprint template ares supported" }
+        require(this.template.get(NB_FINGERPRINTS) == 1.toByte()) { "Invalid template: only single fingerprint template ares supported" }
     }
 
     companion object : Parceler<Fingerprint> {
@@ -75,7 +82,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
             parcel.readByteArray(temp)
             val template = ByteBuffer.allocateDirect(temp.size)
             template.put(temp)
-            return Fingerprint(fingerId, template)
+            return Fingerprint(fingerId, template, format = FingerprintTemplateFormat.ISO_19794_2)
         }
     }
 }

@@ -16,9 +16,11 @@ import com.simprints.id.tools.utils.EncodingUtils
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.toList
 
-class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
-                                    val timeHelper: TimeHelper,
-                                    private val encodingUtils: EncodingUtils) : PersonCreationEventHelper {
+class PersonCreationEventHelperImpl(
+    val eventRepository: EventRepository,
+    val timeHelper: TimeHelper,
+    private val encodingUtils: EncodingUtils
+) : PersonCreationEventHelper {
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
         val currentSession = eventRepository.getCurrentCaptureSessionEvent()
@@ -39,7 +41,7 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
             it.captureResult.mapNotNull { captureResult ->
                 val fingerId = captureResult.identifier
                 captureResult.sample?.let { sample ->
-                    FingerprintSample(fingerId, sample.template, sample.templateQualityScore)
+                    FingerprintSample(fingerId, sample.template, sample.templateQualityScore, sample.format)
                 }
             }
         }.flatten()
@@ -48,19 +50,29 @@ class PersonCreationEventHelperImpl(val eventRepository: EventRepository,
     private fun extractFaceSamples(responses: List<FaceCaptureResponse>) =
         responses.map {
             it.capturingResult.mapNotNull { captureResult ->
-                captureResult.result?.let {
-                    FaceSample(it.template)
+                captureResult.result?.let { sample ->
+                    FaceSample(sample.template, sample.format)
                 }
             }
         }.flatten()
 
-    private suspend fun addPersonCreationEvent(fingerprintSamples: List<FingerprintSample>,
-                                               faceSamples: List<FaceSample>) {
+    private suspend fun addPersonCreationEvent(
+        fingerprintSamples: List<FingerprintSample>,
+        faceSamples: List<FaceSample>
+    ) {
         val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
         val fingerprintCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FingerprintCaptureEvent>().toList()
         val faceCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FaceCaptureEvent>().toList()
 
-        eventRepository.addEventToCurrentSession(build(timeHelper, faceCaptureEvents, fingerprintCaptureEvents, faceSamples, fingerprintSamples))
+        eventRepository.addEventToCurrentSession(
+            build(
+                timeHelper,
+                faceCaptureEvents,
+                fingerprintCaptureEvents,
+                faceSamples,
+                fingerprintSamples
+            )
+        )
     }
 
     fun build(
