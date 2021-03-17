@@ -84,6 +84,14 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
         }
     }
 
+    override suspend fun deleteAllFromSession(sessionId: String) {
+        wrapSuspendExceptionIfNeeded {
+            withContext(dispatcher) {
+                roomDao.delete(sessionId = sessionId)
+            }
+        }
+    }
+
     override suspend fun deleteAll() {
         wrapSuspendExceptionIfNeeded {
             withContext(dispatcher) {
