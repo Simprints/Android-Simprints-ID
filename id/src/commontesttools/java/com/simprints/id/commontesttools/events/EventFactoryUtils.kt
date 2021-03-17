@@ -22,8 +22,6 @@ import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Candidate
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
 import com.simprints.id.data.db.event.domain.models.Matcher.RANK_ONE
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
@@ -41,6 +39,8 @@ import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmation
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
@@ -108,7 +108,8 @@ fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT
 
 fun createSessionCaptureEvent(id: String = GUID1,
                               createdAt: Long = CREATED_AT,
-                              projectId: String = DEFAULT_PROJECT_ID): SessionCaptureEvent {
+                              projectId: String = DEFAULT_PROJECT_ID,
+                              isClosed: Boolean = false): SessionCaptureEvent {
 
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
@@ -131,10 +132,11 @@ fun createSessionCaptureEvent(id: String = GUID1,
         languageArg,
         deviceArg,
         databaseInfoArg).apply {
-            payload.location = locationArg
-            payload.analyticsId = GUID1
-            payload.endedAt = ENDED_AT
-        }
+        payload.location = locationArg
+        payload.analyticsId = GUID1
+        payload.endedAt = ENDED_AT
+        payload.sessionIsClosed = isClosed
+    }
 }
 
 fun createEnrolmentRecordCreationEvent() =

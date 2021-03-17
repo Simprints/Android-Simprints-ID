@@ -149,7 +149,6 @@ open class EventRepositoryImpl(
 
             try {
                 uploadEvents(events, projectId)
-
                 deleteEventsFromDb(events.map { it.id })
             } catch (t: Throwable) {
                 Timber.d(t)
@@ -254,7 +253,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun loadSessions(isClosed: Boolean): Flow<SessionCaptureEvent> {
-        return eventLocalDataSource.loadSessionType(type = SESSION_CAPTURE)
+        return eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
             .map { it as SessionCaptureEvent }
             .filter { it.payload.sessionIsClosed == isClosed }
     }

@@ -7,7 +7,6 @@ import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
-import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -80,7 +79,7 @@ class EnrolmentHelperImplTest {
             enrolmentHelper.enrol(defaultSubject)
 
             coVerify(exactly = 1) {
-                eventRepository.uploadEvents(LocalEventQuery(projectId = DEFAULT_PROJECT_ID))
+                eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID)
             }
         }
     }

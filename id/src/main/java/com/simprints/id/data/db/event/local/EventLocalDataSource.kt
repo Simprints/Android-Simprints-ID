@@ -12,7 +12,7 @@ interface EventLocalDataSource {
     suspend fun loadAll(): Flow<Event>
     suspend fun loadAllFromSession(sessionId: String): Flow<Event>
     suspend fun loadAllFromProject(projectId: String): Flow<Event>
-    suspend fun loadSessionType(type: EventType): Flow<Event>
+    suspend fun loadAllFromType(type: EventType): Flow<Event>
     suspend fun delete(id: String)
     suspend fun deleteAll()
     suspend fun insertOrUpdate(event: Event)

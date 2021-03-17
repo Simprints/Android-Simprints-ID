@@ -41,7 +41,7 @@ open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatab
             }
         }
 
-    override suspend fun loadSessionType(type: EventType): Flow<Event> =
+    override suspend fun loadAllFromType(type: EventType): Flow<Event> =
         wrapSuspendExceptionIfNeeded {
             withContext(dispatcher) {
                 roomDao.load(type = type).map { it.fromDbToDomain() }.asFlow()
