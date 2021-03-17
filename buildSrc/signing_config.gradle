@@ -6,12 +6,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     signingConfigs {
-        debug {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
 
         release {
             keyAlias keystoreProperties['releaseKeyAlias']
@@ -19,11 +13,29 @@ android {
             storeFile file("${rootDir}/android-signing-keystore.jks")
             storePassword keystoreProperties['releaseStorePassword']
         }
+
+        staging {
+            keyAlias keystoreProperties['releaseKeyAlias']
+            keyPassword keystoreProperties['releaseKeyPassword']
+            storeFile file("${rootDir}/android-signing-keystore.jks")
+            storePassword keystoreProperties['releaseStorePassword']
+        }
+
+        debug {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+
     }
 
     buildTypes {
         release {
             signingConfig signingConfigs.release
+        }
+        staging {
+            signingConfig signingConfigs.staging
         }
         debug {
             signingConfig signingConfigs.debug
