@@ -44,7 +44,7 @@ class EnrolmentHelperImplTest {
         every { timeHelper.now() } returns CREATED_AT
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-        coEvery { eventRepository.loadEvents(any()) } returns flowOf(personCreationEvent)
+        coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(personCreationEvent)
 
         mockUUID()
     }

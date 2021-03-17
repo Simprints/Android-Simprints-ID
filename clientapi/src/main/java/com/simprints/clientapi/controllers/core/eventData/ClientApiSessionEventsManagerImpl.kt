@@ -9,7 +9,6 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
@@ -51,7 +50,7 @@ class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRe
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.loadEvents(session.id).toList().any {
+        return coreEventRepository.loadEventsFromSession(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
     }
