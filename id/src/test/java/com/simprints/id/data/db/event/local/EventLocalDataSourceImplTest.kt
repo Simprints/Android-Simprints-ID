@@ -5,15 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.events.CREATED_AT_RANGE
-import com.simprints.id.commontesttools.events.ENDED_AT_RANGE
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
@@ -34,7 +26,8 @@ class EventLocalDataSourceImplTest {
     private lateinit var eventDao: EventRoomDao
     private lateinit var eventLocalDataSource: EventLocalDataSource
 
-    @RelaxedMockK lateinit var eventDatabaseFactory: EventDatabaseFactory
+    @RelaxedMockK
+    lateinit var eventDatabaseFactory: EventDatabaseFactory
 
     @Before
     fun setup() {
@@ -51,13 +44,11 @@ class EventLocalDataSourceImplTest {
     @Test
     fun loadWithAQuery() {
         runBlocking {
-            val eventQuery = createCompleteEventQuery()
 
-            eventLocalDataSource.loadAll(eventQuery)
+            eventLocalDataSource.loadAll()
 
             coVerify {
-                eventDao.load(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
-                    CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
+                eventDao.load()
             }
         }
     }
@@ -65,13 +56,10 @@ class EventLocalDataSourceImplTest {
     @Test
     fun countWithAQuery() {
         runBlocking {
-            val eventQuery = createCompleteEventQuery()
-
-            eventLocalDataSource.count(eventQuery)
+            eventLocalDataSource.count(SESSION_CAPTURE)
 
             coVerify {
-                eventDao.count(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
-                    CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
+                eventDao.count(type = SESSION_CAPTURE)
             }
         }
     }
@@ -79,29 +67,13 @@ class EventLocalDataSourceImplTest {
     @Test
     fun deleteWithAQuery() {
         runBlocking {
-            val eventQuery = createCompleteEventQuery()
-
-            eventLocalDataSource.delete(eventQuery)
+            eventLocalDataSource.deleteAll()
 
             coVerify {
-                eventDao.delete(ID, SESSION_CAPTURE, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_USER_ID_2, GUID1, GUID2,
-                    CREATED_AT_RANGE.first, CREATED_AT_RANGE.last, ENDED_AT_RANGE.first, ENDED_AT_RANGE.last)
+                eventDao.delete()
             }
         }
     }
-
-    private fun createCompleteEventQuery() =
-        DbLocalEventQuery(
-            ID,
-            SESSION_CAPTURE,
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            DEFAULT_USER_ID_2,
-            GUID1,
-            GUID2,
-            CREATED_AT_RANGE,
-            ENDED_AT_RANGE
-        )
 
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)
