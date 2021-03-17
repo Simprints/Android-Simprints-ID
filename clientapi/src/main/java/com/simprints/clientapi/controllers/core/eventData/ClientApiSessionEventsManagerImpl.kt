@@ -99,7 +99,7 @@ class ClientApiSessionEventsManagerImpl(
     }
 
     override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
-        coreEventRepository.loadEvents(sessionId)
+        coreEventRepository.loadEventsFromSession(sessionId)
 
     override suspend fun deleteSessionEvents(sessionId: String) {
         inBackground(dispatcher) {
