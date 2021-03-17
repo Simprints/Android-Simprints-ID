@@ -206,6 +206,7 @@ definitions:
                 name: "Sign and deploy Release build to Alpha Track"
                 deployment: Alpha
                 max-time: 30
+                size: 2x
                 # trigger: manual
                 caches:
                     - gradle
