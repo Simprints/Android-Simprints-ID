@@ -258,7 +258,7 @@ flows:
                     -   step: *run-all-android-tests
             -   step: *release-to-alpha
     -   flow: &ci-test
-            -   step: *run-clientapi-unit-tests
+            -   step: *sign-and-deploy-to-internal
 
 ######################################################################
 # Define the triggers that launch the pipeline.
