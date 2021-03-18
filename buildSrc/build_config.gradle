@@ -15,15 +15,21 @@ android {
 
     buildTypes {
         release {
+            debuggable false
             lintOptions.fatal 'StopShip'
             versionNameSuffix "+" + buildProperties["VERSION_CODE"]
+            buildConfigField("Boolean", "DEBUG_MODE", "false")
         }
         staging {
+            debuggable true
             lintOptions.fatal 'StopShip'
             versionNameSuffix "-" + buildProperties["VERSION_SUFFIX"] + "+" + buildProperties["VERSION_CODE"]
+            buildConfigField("Boolean", "DEBUG_MODE", "true")
         }
         debug {
+            debuggable true
             versionNameSuffix "-" + buildProperties["VERSION_SUFFIX"] + "+" + buildProperties["VERSION_CODE"]
+            buildConfigField("Boolean", "DEBUG_MODE", "true")
         }
     }
 }

@@ -4,7 +4,7 @@ import com.simprints.id.tools.logging.LoggingConfigHelper
 import com.simprints.id.tools.logging.TimberFileLoggingConfigHelper
 
 @Suppress("unused")
-class WithLogFileApplication : Application() {
+class Logging : Application() {
 
     override var loggingConfigHelper: LoggingConfigHelper = TimberFileLoggingConfigHelper()
 

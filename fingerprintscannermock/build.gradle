@@ -50,20 +50,6 @@ dependencies {
     testImplementation deps.testing.robolectric.core
 }
 
-def libraryGroupId = 'com.simprints'
-def libraryArtifactId = 'fingerprintscannermock'
-
-publishing.publications {
-    aar(MavenPublication) {
-        groupId libraryGroupId
-        //noinspection GroovyAssignabilityCheck
-        version project.version
-        artifactId libraryArtifactId
-
-        artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-    }
-}
-
 repositories {
     mavenCentral()
 }

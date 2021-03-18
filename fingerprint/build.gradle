@@ -32,18 +32,6 @@ android {
         }
     }
 
-    flavorDimensions "mode"
-
-    productFlavors {
-        standard {
-            dimension "mode"
-        }
-
-        withLogFile {
-            dimension "mode"
-        }
-    }
-
     sourceSets {
         String sharedTestDir = 'src/commontesttools/java'
         test {
