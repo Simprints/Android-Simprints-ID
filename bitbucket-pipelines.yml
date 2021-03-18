@@ -190,7 +190,7 @@ definitions:
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
-                    - ./gradlew bundleStaging
+                    - ./gradlew id:bundleStaging
                     - ./gradlew id:publishBundle
                 artifacts:
                     - id/build/outputs/**
@@ -215,7 +215,7 @@ definitions:
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
-                    - ./gradlew bundleRelease
+                    - ./gradlew id:bundleRelease
                     - ./gradlew id:publishReleaseBundle
 
 ######################################################################
