@@ -15,7 +15,6 @@ android {
 
     buildTypes {
         release {
-            debuggable buildProperties["DEBUGGABLE"] as Boolean
             lintOptions.fatal 'StopShip'
             versionNameSuffix "+" + buildProperties["VERSION_CODE"]
             buildConfigField("Boolean", "DEBUG_MODE", "false")
