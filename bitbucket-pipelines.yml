@@ -25,7 +25,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:jacocoTestReportStandardDebug
+                    - ./gradlew clientapi:jacocoTestReportDebug
                 artifacts:
                     - clientapi/build/reports/**
 
@@ -42,7 +42,7 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew core:jacocoTestReportDebug
-                    - ./gradlew id:jacocoTestReportStandardDebug
+                    - ./gradlew id:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
                     - core/build/reports/**
@@ -58,7 +58,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportStandardDebug
+                    - ./gradlew face:jacocoTestReportDebug
                 artifacts:
                     - face/build/reports/**
 
@@ -75,7 +75,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprint:jacocoTestReportStandardDebug
+                    - ./gradlew fingerprint:jacocoTestReportDebug
                 artifacts:
                     - fingerprint/build/reports/**
 
@@ -110,7 +110,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew assembleStandardDebug
+                    - ./gradlew assembleDebug
                     - bash ./ci/pipeline/install_java_11
                     - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
@@ -130,29 +130,29 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     # Build ID Android Test APK
-                    - ./gradlew id:assembleStandardDebugAndroidTest
-                    - mv id/build/outputs/apk/androidTest/standard/debug/id-standard-debug-androidTest.apk id-standard-debug-androidTest.apk
+                    - ./gradlew id:assembleDebugAndroidTest
+                    - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
                     # Build Client API Android Test APK
-                    - ./gradlew clientapi:assembleStandardDebugAndroidTest
-                    - mv clientapi/build/outputs/apk/androidTest/standard/debug/clientapi-standard-debug-androidTest.apk clientapi-standard-debug-androidTest.apk
+                    - ./gradlew clientapi:assembleDebugAndroidTest
+                    - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk
                     # Build Fingerprint Android Test APK
-                    - ./gradlew fingerprint:assembleStandardDebugAndroidTest
-                    - mv fingerprint/build/outputs/apk/androidTest/standard/debug/fingerprint-standard-debug-androidTest.apk fingerprint-standard-debug-androidTest.apk
+                    - ./gradlew fingerprint:assembleDebugAndroidTest
+                    - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk
                     # Build Face Android Test APK
-                    - ./gradlew face:assembleStandardDebugAndroidTest
-                    - mv face/build/outputs/apk/androidTest/standard/debug/face-standard-debug-androidTest.apk face-standard-debug-androidTest.apk
+                    - ./gradlew face:assembleDebugAndroidTest
+                    - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     # Build Universal APK
-                    - ./gradlew bundleStandardDebug --stacktrace
+                    - ./gradlew bundleDebug --stacktrace
                     - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/standardDebug/id-standard-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug.keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
+                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug.keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
                     - mv universal.apks universal.zip
                     - unzip universal.zip
                 artifacts:
                     - universal.apk
-                    - id-standard-debug-androidTest.apk
-                    - clientapi-standard-debug-androidTest.apk
-                    - fingerprint-standard-debug-androidTest.apk
-                    - face-standard-debug-androidTest.apk
+                    - id-debug-androidTest.apk
+                    - clientapi-debug-androidTest.apk
+                    - fingerprint-debug-androidTest.apk
+                    - face-debug-androidTest.apk
 
         ######################################################################
         # Run All Android tests on Firebase test lab.
@@ -165,7 +165,7 @@ definitions:
                     - bash ./ci/pipeline/setup_gcloud
                     - mv ./*.apk ./ci/pipeline/
                     - cd ./ci/pipeline/
-                    - ./run_all_android_tests.sh universal.apk id:id-standard-debug-androidTest.apk fingerprint:fingerprint-standard-debug-androidTest.apk face:face-standard-debug-androidTest.apk clientapi:clientapi-standard-debug-androidTest.apk
+                    - ./run_all_android_tests.sh universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
@@ -189,9 +189,9 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - echo "BUNDLE_FOLDER=standardStaging" >>ci/deploy.properties
-                    - ./gradlew bundleStandardStaging
-                    - ./gradlew id:publishStandardStagingBundle
+                    - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
+                    - ./gradlew bundleStaging
+                    - ./gradlew id:publishStagingBundle
                 artifacts:
                     - id/build/outputs/**
 
@@ -214,9 +214,9 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
-                    - echo "BUNDLE_FOLDER=standardRelease" >>ci/deploy.properties
-                    - ./gradlew bundleStandardRelease
-                    - ./gradlew id:publishStandardReleaseBundle
+                    - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
+                    - ./gradlew bundleRelease
+                    - ./gradlew id:publishReleaseBundle
 
 ######################################################################
 # Define the different pipelines flows as anchors.
