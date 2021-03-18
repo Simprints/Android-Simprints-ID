@@ -191,7 +191,7 @@ definitions:
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
                     - ./gradlew bundleStaging
-                    - ./gradlew id:publishStagingBundle
+                    - ./gradlew id:publishBundle
                 artifacts:
                     - id/build/outputs/**
 
