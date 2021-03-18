@@ -26,18 +26,6 @@ android {
         }
     }
 
-    flavorDimensions "mode"
-
-    productFlavors {
-        standard {
-            dimension "mode"
-        }
-
-        withLogFile {
-            dimension "mode"
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

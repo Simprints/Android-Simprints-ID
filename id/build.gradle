@@ -81,18 +81,6 @@ android {
 
     }
 
-    flavorDimensions "mode"
-
-    productFlavors {
-        standard {
-            dimension "mode"
-        }
-
-        withLogFile {
-            dimension "mode"
-        }
-    }
-
     sourceSets {
         String sharedTestDir = 'src/commontesttools/java'
         test {
@@ -103,6 +91,14 @@ android {
 
         // Adds exported room schema location as test app assets.
         debug.assets.srcDirs += files("$projectDir/schemas".toString())
+
+        release {
+            java.srcDirs = ['release/java']
+        }
+
+        staging {
+            java.srcDirs = ['staging/java']
+        }
     }
 
     testOptions {
