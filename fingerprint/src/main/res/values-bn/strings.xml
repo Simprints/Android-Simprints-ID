@@ -1,59 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
-    <string name="register_title">তালিকাভুক্ত করণ</string>
+    <string name="register_title">তালিকাভুক্তকরণ</string>
     <string name="identify_title">সনাক্তকরণ</string>
     <string name="verify_title">যাচাইকরণ</string>
     <string name="refusal_label">প্রত্যাখ্যান ফর্ম</string>
-
-
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
-
-
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-    <string name="connect_scanner_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
-    <string name="connect_scanner_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
-    <string name="connect_scanner_setup">सेट अप Vero</string>
-
-
+    <string name="connect_scanner_bt_connect">স্ক্যানার সংযুক্ত হচ্ছে…</string>
+    <string name="connect_scanner_wake_un20">ইউএন২০ চালু হচ্ছে…</string>
+    <string name="connect_scanner_setup">ভেরো সেট-আপ হচ্ছে…</string>
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
-    <string name="good_scan_direction">পরবর্তী আঙুল স্ক্যান করতে বামে সোয়াইপ করুন</string>
+    <string name="good_scan_direction">পরবর্তী আঙ্গুল স্ক্যান করতে বামে সোয়াইপ করুন</string>
     <string name="please_scan">স্ক্যান করুন</string>
     <string name="poor_scan_direction">আবার স্ক্যান করুন</string>
     <string name="scanning">স্ক্যান করা হচ্ছে</string>
     <string name="good_scan_message">"ছাপ নেয়া সঠিক হয়েছে "</string>
     <string name="poor_scan_message">ছাপ নেয়া ভুল হয়েছে</string>
     <string name="reconnecting_message">পুনঃসংযোগ করা হচ্ছে</string>
-    <string name="capture_number_text">%2$s এর %1$s স্ক্যান  করুন</string>
+    <string name="capture_number_text">"%2$s এর %1$s স্ক্যান  করুন"</string>
     <string name="please_scan_again">আবার স্ক্যান করুন</string>
     <!-- Button Labels -->
-    <string name="rescan_label">পুনরায় স্ক্যান করুন</string>
-    <string name="rescan_label_question">পুনরায় স্ক্যান করতে চান?</string>
+    <string name="rescan_label">আবার স্ক্যান করুন</string>
+    <string name="rescan_label_question">আবার স্ক্যান করতে চান\?</string>
     <string name="scan_label">স্ক্যান</string>
     <string name="cancel_button">বাতিল করুন</string>
     <string name="scan">স্ক্যান</string>
-
     <!-- ConnectScannerActivity : the activity for connecting to the scanner -->
     <!-- Scanner issue text -->
     <!-- BluetoothOffFragment -->
     <string name="bluetooth_off_title">ব্লুুটুথ বন্ধ আছে</string>
     <string name="turn_on_bluetooth">ব্লুটুথ চালু করুন</string>
-    <string name="bluetooth_on">✓ ব্লুটুথ চালু আছে</string>
+    <string name="bluetooth_on">ব্লুটুথ চালু আছে</string>
     <string name="bluetooth_off_toast_error">ব্লুটুথ চালু করা যায়নি। ফোন এর সেটিংস থেকে ব্লুটুথ চালু করুন।</string>
     <!-- NfcOffFragment -->
     <string name="nfc_off_title">এন.এফ.সি বন্ধ আছে</string>
     <string name="turn_on_nfc">এন.এফ.সি চালু করুন</string>
-    <string name="nfc_on">✓ এন.এফ.সি চালু আছে</string>
+    <string name="nfc_on">এন.এফ.সি চালু আছে</string>
     <!-- ScannerOffFragment -->
     <string name="scanner_off_title">স্ক্যানার বন্ধ আছে</string>
     <string name="scanner_off_instructions">স্ক্যানার-এর পাওয়ার বাটন চাপুন</string>
-    <string name="scanner_on">✓ স্ক্যানার চাালু আছে</string>
+    <string name="scanner_on">স্ক্যানার চাালু আছে</string>
     <string name="try_again_label">আবার চেষ্টা করুন</string>
     <string name="not_my_scanner">%1$s আমার স্ক্যানার না</string>
     <!-- NfcPairFragment -->
@@ -70,7 +61,7 @@
     <string name="enter_scanner_number">নিচের বক্স-এ স্ক্যানার এর নাম্বার লিখুন</string>
     <string name="enter_scanner_number_detail">এই নাম্বারটি স্ক্যানার-এর একদম নিচে পাবেন</string>
     <string name="serial_entry_pair_failed">স্ক্যানার চালুু আছে কিনা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
-    <string name="serial_entry_pair_toast_invalid">সিরিয়াল নাম্বার টির ৬টি সংখ্যা লিখুন</string>
+    <string name="serial_entry_pair_toast_invalid">৬ সংখ্যার সিরিয়াল নাম্বারটি লিখুন</string>
     <!-- OtaFragment -->
     <string name="ota_title">স্ক্যানার আপডেট করা প্রয়োজন</string>
     <string name="ota_instructions">স্ক্যানার চালু রাখুন, তা আপডেট হচ্ছে</string>
@@ -86,8 +77,6 @@
     <string name="ota_failed_title">স্ক্যানার আপডেট হয়নি</string>
     <string name="ota_failed_instructions">সাহায্যের জন্য সুপারভাইসর এর সাথে যোগাযোগ করুন</string>
     <string name="continue_button">সামনে আগান</string>
-
-
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
     <!-- Toast Messages -->
@@ -102,13 +91,9 @@
     <string name="r_3_finger_name">ডান হাতের মধ্যমা</string>
     <string name="r_4_finger_name">ডান হাতের অনামিকা</string>
     <string name="r_5_finger_name">ডান হাতের কনিষ্ঠা</string>
-
-
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
     <string name="please_wait">আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন  </string>
-
-
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
     <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
@@ -122,16 +107,10 @@
     <!-- Button Labels For Error Messages -->
     <string name="close">বন্ধ করুন</string>
     <string name="settings_label">ফোন সেটিংস</string>
-
-
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-
-
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-
-
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
     <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
@@ -142,16 +121,13 @@
     <string name="refusal_other">অন্যান্য</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">অতিরিক্ত তথ্য</string>
-
-
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-
     <string name="bluetooth_error_pair_scanner_and_device_message">১। স্ক্যানার চালু আছে কিনা দেখুন।
-২। সেটিংস চাপুন।
-৩। অন্য কোন স্ক্যানার অসংযুক্ত করুন।
-৪। এবার আপনার স্ক্যানার-এর সাথে ট্যাব সংযুক্ত করুন।
-৫। সিমপ্রিন্টস অ্যাপ- এ ফেরত যেতে ফেরত বাটন চাপুন।</string>
+\n২। \"সেটিংস\" চাপুন।
+\n৩। অন্য কোন স্ক্যানার অসংযুক্ত করুন।
+\n৪। এবার আপনার স্ক্যানার-এর সাথে ট্যাব সংযুক্ত করুন।
+\n৫। সিমপ্রিন্টস অ্যাপ- এ ফেরত যেতে \"ফেরত\" বাটন চাপুন।</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">স্ক্যানার এবং ট্যাব সংযুক্ত করুন</string>
     <string name="confirm">নিশ্চিত করুন</string>
     <string name="confirm_fingers_dialog_title">আঙ্গুলের ছাপ নেয়া হয়েছে</string>
@@ -159,7 +135,7 @@
     <string name="get_ready">প্রস্তুত হোন</string>
     <string name="loading_candidates">অংশগ্রহণকারীদের তথ্য লোড হচ্ছে</string>
     <string name="matching_fingerprints">আঙ্গুলের ছাপ মেলানো হচ্ছে</string>
-    <string name="missing_finger"><u>আঙ্গুল নেই / কাটা</u></string>
+    <string name="missing_finger">আঙ্গুল নেই / কাটা</string>
     <string name="no_finger_detected_message">আঙ্গুল সনাক্ত করা যাচ্ছেনা</string>
     <string name="no_fingers_scanned">অন্তত ১টি আঙ্গুলের ছাপ নিন</string>
     <string name="pair_scanner_label">স্ক্যানার যোগ করুন</string>
@@ -171,16 +147,14 @@
     <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং সাবমিট করুন</string>
     <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
     <string name="refusal_too_young">বয়স কম</string>
-    <string name="restart">পুনরাায় শুরু করুন</string>
+    <string name="restart">আবার শুরু করুন</string>
     <string name="scanner_confirmation_no">না</string>
     <string name="scanner_confirmation_yes">হ্যা</string>
     <string name="scanner_error_turn_scanner_on_message">১। স্ক্যানার চালু করুন। \n২। \"আবার চেষ্টা করুন\" চাপুন।</string>
     <string name="scanner_error_turn_scanner_on_title">স্ক্যানার চালু করুন</string>
-    <string name="try_another_finger">আরেকটি আঙুল চেষ্টা করুন</string>
+    <string name="try_another_finger">আরেকটি আঙ্গুল চেষ্টা করুন</string>
     <string name="connect_scanner_finished">সংযুক্ত হয়েছে</string>
     <string name="please_wait_button">অপেক্ষা করুন</string>
     <string name="transfering_data">তথ্য প্রদান করা হচ্ছে</string>
     <string name="scanner_id_confirmation_message">%1$s কি আপনার স্ক্যানার?</string>
-
-
 </resources>
