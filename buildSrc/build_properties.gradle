@@ -31,8 +31,11 @@ ext {
     DEBUGGABLE = true
 
     /**
-     * API key for Google attestation endpoint to check root detection. This is the dev key.
+     * API key for Google attestation endpoint to check root detection. We keep the DEV and STAGING
+     * ones here so we can test none production builds locally. The release one is added by the CD.
      */
-    SAFETYNET_KEY = "AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I"
+    RELEASE_SAFETYNET_KEY = ""
+    STAGING_SAFETYNET_KEY = "AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE"
+    DEV_SAFETYNET_KEY = "AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I"
 
 }
