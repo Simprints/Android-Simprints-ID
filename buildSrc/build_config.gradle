@@ -17,20 +17,17 @@ android {
             lintOptions.fatal 'StopShip'
             versionNameSuffix "+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "false")
-            buildConfigField("String", "SAFETYNET_API_KEY", "$SAFETYNET_KEY")
         }
         staging {
             debuggable = DEBUGGABLE
             lintOptions.fatal 'StopShip'
             versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "true")
-            buildConfigField("String", "SAFETYNET_API_KEY", "$SAFETYNET_KEY")
         }
         debug {
             debuggable = DEBUGGABLE
             versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "true")
-            buildConfigField("String", "SAFETYNET_API_KEY", "$SAFETYNET_KEY")
         }
     }
 }
