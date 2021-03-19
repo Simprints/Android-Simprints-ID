@@ -60,34 +60,24 @@ Simprints ID has 3 different build types: `debug`, `staging` and `release`.
 - `staging`: to be used only for pre-release internal tests. Uses the staging environment of the backend
 - `release`: to be used only in production. Uses the production environment of the backend
 
-## Flavours
-The app has 2 flavours: `standard` and `withLogFile`.
-- `standard`: a normal version of the app, without exporting log files to the device.
-- `withLogFile`: all logs are exported to a file in the downloads folder. Requires permission to write to the device's external storage
-
 ## Building the app (command line)
-If you want to build the app via command line you'll need to provide a combination of a flavour and a build type.
-
 The examples below will show how to create app bundles using `./gradlew`.
 To create apks, use the `assemble` command instead of `bundle`.
 
-| Command                   | Debuggable      | Logs to file|  Environment                           |
+| Command                   | Debuggable      |   Logging   |  Backend                              |
 |---------------------------|-----------------|-------------|----------------------------------------|
-| `bundleStandardDebug`     |       ✓         |     x       |  development  						 |
-| `bundleWithLogFileDebug`  |       ✓         |     ✓       |  development  						 |
-| `bundleStandardStaging`   |       x         |     x       |    staging    						 |
-| `bundleWithLogFileStaging`|       x         |     ✓       |    staging    						 |
-| `bundleStandardRelease`   |       x         |     x       |  production (should be done in the CI) |
-| `bundleWithLogFileRelease`|       x         |     ✓       |  production (should be done in the CI) |
+| `bundleDebug`             |       ✓         |     ✓      |  development  						    |
+| `bundleStaging`           |       x         |     ✓       |  staging    						     |
+| `bundleRelease`           |       x         |     x       |  production (should be done in the CI) |
 
 ## Creation of universal apk
 To create an universal apk that can be shared you need to:
 
 1. Create a bundle of the app
-`./gradlew clean bundleStandardDebug`
+`./gradlew clean bundleDebug`
 
 2. Create a universal apk that can be installed in any device (warning: this is a big app)
-`bundletool build-apks --bundle=id/build/outputs/bundle/standard/debug/id-debug.aab --output=id-standard-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
+`bundletool build-apks --bundle=id/build/outputs/bundle/debug/id-debug.aab --output=id-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
 
 To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).
 
