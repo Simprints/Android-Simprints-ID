@@ -34,7 +34,6 @@ class FaceMatchViewModel(
     private val masterFlowManager: MasterFlowManager,
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
-    private val faceMatchThreshold: Float,
     private val crashReportManager: FaceCrashReportManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val faceTimeHelper: FaceTimeHelper,
@@ -135,7 +134,6 @@ class FaceMatchViewModel(
     private fun getMaxFilteredResults(sortedResults: List<FaceMatchResult>): List<FaceMatchResult> {
         return sortedResults
             .take(returnCount)
-            .filter { it.confidence >= faceMatchThreshold }
     }
 
     private fun sendMatchEvent(
