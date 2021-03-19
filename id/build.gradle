@@ -93,11 +93,11 @@ android {
         debug.assets.srcDirs += files("$projectDir/schemas".toString())
 
         release {
-            java.srcDirs = ['release/java']
+            java.srcDirs = ['src/release/java']
         }
 
         staging {
-            java.srcDirs = ['staging/java']
+            java.srcDirs = ['src/staging/java']
         }
     }
 

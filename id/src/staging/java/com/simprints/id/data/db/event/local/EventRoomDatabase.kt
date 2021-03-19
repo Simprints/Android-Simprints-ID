@@ -21,6 +21,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
 
     companion object {
 
+        @Suppress("UNUSED_PARAMETER")
         fun getDatabase(context: Context,
                         factory: SupportFactory,
                         dbName: String,
