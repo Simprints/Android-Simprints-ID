@@ -28,6 +28,6 @@ ext {
      * Set debuggable, default it true so local staging and release builds can be debugged. NOTE: THE
      * CD WILL OVERWRITE TO FALSE AS THE PLAYSTORE DOES NOT ACCEPT DEBUGGABLE TRUE APPS
      */
-    DEBUGGABLE = false
+    DEBUGGABLE = true
 
 }
