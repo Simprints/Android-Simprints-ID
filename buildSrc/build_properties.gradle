@@ -30,4 +30,9 @@ ext {
      */
     DEBUGGABLE = true
 
+    /**
+     * API key for Google attestation endpoint to check root detection. This is the dev key.
+     */
+    SAFETYNET_KEY = "AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I"
+
 }
