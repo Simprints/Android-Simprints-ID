@@ -191,7 +191,7 @@ definitions:
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
                     - ./gradlew id:bundleStaging
-                    - ./gradlew publishBundle
+                    - ./gradlew id:publishStagingBundle
                 artifacts:
                     - id/build/outputs/**
 
@@ -216,7 +216,7 @@ definitions:
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
                     - ./gradlew id:bundleRelease
-                    - ./gradlew publishBundle
+                    - ./gradlew id:publishReleaseBundle
 
 ######################################################################
 # Define the different pipelines flows as anchors.
