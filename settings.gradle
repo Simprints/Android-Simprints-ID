@@ -1,5 +1,4 @@
 include ':id',
-//    ':libsimprints',
     ':fingerprintmatcher',
     'fingerprintscanner',
     'fingerprintscannermock',
