@@ -49,17 +49,15 @@ android {
             ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-152315-firebase-storage\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
-        staging{
+        staging {
             minifyEnabled true
             ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-firebase-staging.appspot.com\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
@@ -73,7 +71,6 @@ android {
             FirebasePerformance {
                 instrumentationEnabled false
             }
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
             buildConfigField("String", "LONG_CONSENT_BUCKET", "\"gs://simprints-dev-firebase-storage\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
