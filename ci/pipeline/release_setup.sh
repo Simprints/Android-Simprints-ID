@@ -7,7 +7,4 @@ echo "keyPassword=${SIGNING_KEY_PASSWORD}" >>buildSrc/keystore.properties
 
 echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
 
-echo "VERSION_CODE=${BITBUCKET_BUILD_NUMBER}" >>buildSrc/build.properties
-echo "VERSION_SUFFIX=${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>buildSrc/build.properties
-
-echo "DEBUGGABLE=false" >>buildSrc/build.properties
+printf "ext { \n VERSION_CODE=%d \n VERSION_SUFFIX=%s \n DEBUGGABLE=false }" "${BITBUCKET_BUILD_NUMBER}" "${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" >>buildSrc/build_properties.gradle
