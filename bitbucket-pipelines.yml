@@ -187,7 +187,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup
+                    - bash ./ci/pipeline/release_setup.sh
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
                     - ./gradlew id:bundleStaging
@@ -212,7 +212,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup
+                    - bash ./ci/pipeline/release_setup.sh
                     - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
                     - ./gradlew id:bundleRelease
