@@ -1,34 +1,39 @@
-//package com.simprints.id.data.db.event.local
-//
-//import android.content.Context
-//import androidx.annotation.Keep
-//import androidx.room.Database
-//import androidx.room.Room
-//import androidx.room.RoomDatabase
-//import androidx.room.TypeConverters
-//import com.simprints.id.data.analytics.crashreport.CrashReportManager
-//import com.simprints.id.data.db.common.room.Converters
-//import com.simprints.id.data.db.event.local.models.DbEvent
-//import net.sqlcipher.database.SupportFactory
-//
-//@Database(entities = [DbEvent::class], version = 2, exportSchema = true)
-//@TypeConverters(Converters::class)
-//@Keep
-//abstract class EventRoomDatabase : RoomDatabase() {
-//
-//    abstract val eventDao: EventRoomDao
-//
-//    companion object {
-//
-//        fun getDatabase(context: Context,
-//                        factory: SupportFactory,
-//                        dbName: String,
-//                        crashReportManager: CrashReportManager): EventRoomDatabase {
-//            return Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
-//                .addMigrations()
-//                .addMigrations(EventMigration1to2(crashReportManager))
-//                .openHelperFactory(factory)
-//                .build()
-//        }
-//    }
-//}
+package com.simprints.id.data.db.event.local
+
+import android.content.Context
+import androidx.annotation.Keep
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.simprints.id.BuildConfig
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.common.room.Converters
+import com.simprints.id.data.db.event.local.models.DbEvent
+import net.sqlcipher.database.SupportFactory
+
+@Database(entities = [DbEvent::class], version = 2, exportSchema = true)
+@TypeConverters(Converters::class)
+@Keep
+abstract class EventRoomDatabase : RoomDatabase() {
+
+    abstract val eventDao: EventRoomDao
+
+    companion object {
+
+        fun getDatabase(context: Context,
+                        factory: SupportFactory,
+                        dbName: String,
+                        crashReportManager: CrashReportManager): EventRoomDatabase {
+            val builder = Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
+                .addMigrations()
+                .addMigrations(EventMigration1to2(crashReportManager))
+
+            if (BuildConfig.DEBUG_MODE)
+                builder.openHelperFactory(factory)
+
+            return builder.build()
+        }
+
+    }
+}
