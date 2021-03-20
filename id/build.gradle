@@ -149,7 +149,7 @@ dependencies {
     api project(':core')
     implementation project(':fingerprintscanner')
     api project(':moduleapi')
-    implementation project(':libsimprints')
+    implementation deps.libsimprints
 
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
