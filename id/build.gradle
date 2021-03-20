@@ -91,14 +91,6 @@ android {
 
         // Adds exported room schema location as test app assets.
         debug.assets.srcDirs += files("$projectDir/schemas".toString())
-
-        release {
-            java.srcDirs = ['src/release/java']
-        }
-
-        staging {
-            java.srcDirs = ['src/staging/java']
-        }
     }
 
     testOptions {

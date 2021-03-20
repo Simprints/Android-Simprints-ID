@@ -10,6 +10,7 @@ import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.LoggingConfigHelper
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
+import com.simprints.id.tools.logging.TimberDebugLoggingConfigHelper
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -25,8 +26,6 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
-
-    open var loggingConfigHelper: LoggingConfigHelper = NoLoggingConfigHelper()
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -73,6 +72,11 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     }
 
     fun setUpLogging() {
+        val loggingConfigHelper = if (BuildConfig.DEBUG_MODE)
+            TimberDebugLoggingConfigHelper()
+        else
+            NoLoggingConfigHelper()
+
         if (loggingConfigHelper.loggingNeedsSetUp())
             loggingConfigHelper.setUpLogging()
     }
