@@ -56,19 +56,20 @@ More about each feature or how each module work can be seen inside every module 
 
 ## Build types
 Simprints ID has 3 different build types: `debug`, `staging` and `release`.
+
 - `debug`: to be used only in development. Uses the development environment of the backend
-- `staging`: to be used only for pre-release internal tests. Uses the staging environment of the backend
+- `staging`: to be used only for pre-release internal tests. Uses the staging environment of the backend, and can be used to test production builds both locally and on the Playstore internal channel
 - `release`: to be used only in production. Uses the production environment of the backend
 
 ## Building the app (command line)
 The examples below will show how to create app bundles using `./gradlew`.
 To create apks, use the `assemble` command instead of `bundle`.
 
-| Command                   | Debuggable      |   Logging   |  Backend                              |
-|---------------------------|-----------------|-------------|----------------------------------------|
-| `bundleDebug`             |       ✓         |     ✓      |  development  						    |
-| `bundleStaging`           |       x         |     ✓       |  staging    						     |
-| `bundleRelease`           |       x         |     x       |  production (should be done in the CI) |
+| Command                   |  DEBUG_MODE      | Encrypted DBs |   Logging   | Debug Features (i.e debug activity) |  Backend                              |
+|---------------------------|-----------------|----------------|-------------|-------------------------------------|----------------------------------------|
+| `bundleDebug`             |       ✓         |      x          |     ✓      |                ✓                    |  development  						    |
+| `bundleStaging`           |       ✓         |      x          |     ✓       |               ✓                    |  staging    						     |
+| `bundleRelease`           |       x         |      ✓          |     x       |                x                    |  production (CI only) |
 
 ## Creation of universal apk
 To create an universal apk that can be shared you need to:
