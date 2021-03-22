@@ -188,7 +188,6 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup.sh
-                    - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
                     - ./gradlew id:bundleStaging
                     - ./gradlew id:publishStagingBundle
@@ -213,8 +212,8 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup.sh
-                    - echo $GOOGLE_API_KEY_JSON > google_api_key.json
                     - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
+                    - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
                     - ./gradlew id:publishReleaseBundle
 
