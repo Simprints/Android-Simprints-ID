@@ -14,10 +14,4 @@ class FacePreferencesManagerImpl(private val prefs: PreferencesManager) : FacePr
             field = value
             prefs.faceQualityThreshold = field
         }
-
-    override var faceMatchThreshold: Float = prefs.faceMatchThreshold
-        set(value) {
-            field = value
-            prefs.faceMatchThreshold = field
-        }
 }
