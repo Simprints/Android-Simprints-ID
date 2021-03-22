@@ -23,7 +23,6 @@ data class EnrolmentEventV1(
         EnrolmentPayload(createdAt, EVENT_VERSION, personId),
         ENROLMENT_V1)
 
-
     @Keep
     data class EnrolmentPayload(
         override val createdAt: Long,

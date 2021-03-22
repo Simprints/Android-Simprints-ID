@@ -3,9 +3,9 @@ package com.simprints.id.data.db.event
 import com.simprints.id.Application
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
-import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
@@ -15,21 +15,23 @@ interface EventRepository {
 
     val libSimprintsVersionName: String
 
-    suspend fun createSession(libSimprintsVersion: String = libSimprintsVersionName): SessionCaptureEvent
+    suspend fun createSession(): SessionCaptureEvent
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
-    suspend fun loadEvents(sessionId: String): Flow<Event>
+    suspend fun loadEventsFromSession(sessionId: String): Flow<Event>
 
     suspend fun addEventToCurrentSession(event: Event)
 
     suspend fun addEventToSession(event: Event, session: SessionCaptureEvent)
 
-    suspend fun addEvent(event: Event)
+    suspend fun saveEvent(event: Event)
 
-    suspend fun uploadEvents(query: LocalEventQuery): Flow<Int>
+    suspend fun uploadEvents(projectId: String): Flow<Int>
 
-    suspend fun localCount(query: LocalEventQuery): Int
+    suspend fun localCount(projectId: String): Int
+
+    suspend fun localCount(projectId: String, type: EventType): Int
 
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 

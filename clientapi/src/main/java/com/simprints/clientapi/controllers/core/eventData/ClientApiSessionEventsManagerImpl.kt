@@ -9,7 +9,6 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +25,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         runBlocking {
-            coreEventRepository.createSession(BuildConfig.VERSION_NAME)
+            coreEventRepository.createSession()
         }
 
         inBackground(dispatcher) {
@@ -38,7 +37,7 @@ class ClientApiSessionEventsManagerImpl(
             )
         }
 
-        return coreEventRepository.getCurrentCaptureSessionEvent().id
+        return getCurrentSessionId()
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
@@ -94,13 +93,13 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.loadEvents(session.id).toList().any {
+        return coreEventRepository.loadEventsFromSession(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
     }
 
     override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
-        coreEventRepository.loadEvents(sessionId)
+        coreEventRepository.loadEventsFromSession(sessionId)
 
     override suspend fun deleteSessionEvents(sessionId: String) {
         inBackground(dispatcher) {
