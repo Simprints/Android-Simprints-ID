@@ -267,7 +267,7 @@ pipelines:
     branches:
         master: *release-flow
         develop: *main-flow
-        release/*: *ci-test
+        release/*: *deploy-flow
         ci/*: *ci-test
     custom:
         default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
