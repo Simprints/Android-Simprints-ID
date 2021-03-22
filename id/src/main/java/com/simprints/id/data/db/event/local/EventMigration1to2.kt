@@ -58,7 +58,5 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val DB_EVENT_JSON_EVENT_TYPE = "type"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
-
-
     }
 }

@@ -34,7 +34,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         runBlocking {
             ignoreException {
                 val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-                val scannerConnectivityEvents = eventRepository.loadEvents(currentSession.id).filterIsInstance<ScannerConnectionEvent>()
+                val scannerConnectivityEvents = eventRepository.loadEventsFromSession(currentSession.id).filterIsInstance<ScannerConnectionEvent>()
                 scannerConnectivityEvents.collect { it.scannerInfo.hardwareVersion = hardwareVersion }
             }
         }

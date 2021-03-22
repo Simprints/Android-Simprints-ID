@@ -14,6 +14,5 @@ abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
 
     @Keep
     data class ProjectScope(val projectId: String) :
-        EventUpSyncScope(EventUpSyncOperation(LocalEventQuery(projectId = projectId))) {
-    }
+        EventUpSyncScope(EventUpSyncOperation(projectId = projectId))
 }

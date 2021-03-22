@@ -178,9 +178,6 @@ dependencies {
     implementation deps.kronos.kronos
     implementation deps.jackson.core
 
-    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
-    //debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
-
     // RootBeer (root detection)
     implementation deps.rootbeer.core
 
@@ -217,9 +214,7 @@ dependencies {
     api deps.playcore.core_ktx
     api deps.androidx.sqlite
     api deps.sqlcipher.core
-
-    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
-
+    
     // ######################################################
     //                      Unit test
     // ######################################################
