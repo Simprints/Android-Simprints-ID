@@ -221,6 +221,8 @@ def kronos = [
     kronos: "com.lyft.kronos:kronos-android:$kronos_version"
 ]
 
+def libsimprints = "com.simprints:libsimprints:2021.1.0"
+
 ext.deps = [
     kotlin         : kotlin,
     dagger         : dagger,
@@ -242,5 +244,6 @@ ext.deps = [
     rootbeer       : rootbeer,
     cameraView     : cameraView,
     circleImageView: circleImageView,
-    kronos         : kronos
+    kronos         : kronos,
+    libsimprints   : libsimprints
 ]
