@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatabaseFactory,
-                                    private val dispatcher: CoroutineDispatcher = Dispatchers.IO) : EventLocalDataSource {
+open class EventLocalDataSourceImpl(
+    private val eventDatabaseFactory: EventDatabaseFactory,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : EventLocalDataSource {
 
     private val roomDao by lazy {
         eventDatabaseFactory.build().eventDao
