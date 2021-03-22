@@ -338,14 +338,6 @@ open class SettingsPreferencesManagerImpl(
             FACE_NB_OF_FRAMES_CAPTURED_DEFAULT
         )
 
-    override var faceMatchThreshold: Float
-        by RemoteConfigPrimitivePreference(
-            prefs,
-            remoteConfigWrapper,
-            FACE_MATCH_THRESHOLD,
-            FACE_MATCH_THRESHOLD_DEFAULT
-        )
-
     override var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
         by RemoteConfigComplexPreference(
             prefs,
@@ -467,8 +459,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val FACE_NB_OF_FRAMES_CAPTURED = "FaceNbOfFramesCaptured"
         const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
-        const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"
-        const val FACE_MATCH_THRESHOLD_DEFAULT = 0f
 
         const val FINGERPRINT_CONFIDENCE_THRESHOLDS = "FingerprintConfidenceThresholds"
         val FINGERPRINT_CONFIDENCE_THRESHOLDS_DEFAULT = mapOf(

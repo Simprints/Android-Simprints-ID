@@ -129,7 +129,6 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get<FacePreferencesManager>().faceMatchThreshold,
                 get(),
                 get(),
                 get(),
