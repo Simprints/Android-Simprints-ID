@@ -32,6 +32,7 @@ data class ArtificialTerminationEvent(
         override val endedAt: Long = 0
     ) : EventPayload() {
 
+        //TODO: We can remove TIMED_OUT after checking in with analytics that it's not used for anything.
         @Keep
         enum class Reason {
             TIMED_OUT, NEW_SESSION
