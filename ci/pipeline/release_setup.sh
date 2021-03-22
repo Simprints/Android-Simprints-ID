@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
+echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
 
 printf "ext { \n
 store_file = \"\$rootDir/android-signing-keystore.jks\" \n
