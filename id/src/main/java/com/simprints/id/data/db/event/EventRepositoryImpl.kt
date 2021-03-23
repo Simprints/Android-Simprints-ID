@@ -77,6 +77,7 @@ open class EventRepositoryImpl(
 
             closeSessionsAndAddArtificialTerminationEvent(NEW_SESSION)
             saveEvent(sessionCaptureEvent)
+            sessionDataCache.currentSession = sessionCaptureEvent
             sessionCaptureEvent
         }
     }
