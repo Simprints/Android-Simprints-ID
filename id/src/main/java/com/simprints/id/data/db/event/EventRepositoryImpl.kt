@@ -109,6 +109,7 @@ open class EventRepositoryImpl(
                         sessionId = session.id,
                         projectId = session.payload.projectId
                     )
+                    if (event is SessionCaptureEvent) sessionDataCache.currentSession = event
                     saveEvent(event)
                 }
             }
