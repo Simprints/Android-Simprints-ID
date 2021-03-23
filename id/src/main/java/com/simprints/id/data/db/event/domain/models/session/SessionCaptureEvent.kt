@@ -19,16 +19,18 @@ data class SessionCaptureEvent(
     override val payload: SessionCapturePayload
 ) : Event() {
 
-    constructor(id: String,
-                projectId: String,
-                createdAt: Long,
-                modalities: List<Modes>,
-                appVersionName: String,
-                libVersionName: String,
-                language: String,
-                device: Device,
-                databaseInfo: DatabaseInfo,
-                extraLabels: EventLabels = EventLabels()) :
+    constructor(
+        id: String,
+        projectId: String,
+        createdAt: Long,
+        modalities: List<Modes>,
+        appVersionName: String,
+        libVersionName: String,
+        language: String,
+        device: Device,
+        databaseInfo: DatabaseInfo,
+        extraLabels: EventLabels = EventLabels()
+    ) :
         this(
             id,
             SESSION_CAPTURE,
@@ -43,7 +45,9 @@ data class SessionCaptureEvent(
                 libVersionName,
                 language,
                 device,
-                databaseInfo)) {
+                databaseInfo
+            )
+        ) {
 
         // Ensure that sessionId is equal to the id
         this.labels = labels.copy(sessionId = id)
@@ -66,7 +70,8 @@ data class SessionCaptureEvent(
         override var endedAt: Long = 0,
         var uploadedAt: Long = 0,
         override val type: EventType = SESSION_CAPTURE,
-        var sessionIsClosed: Boolean = false
+        var sessionIsClosed: Boolean = false,
+        val validators: MutableList<EventType> = mutableListOf()
     ) : EventPayload()
 
     companion object {
