@@ -127,7 +127,7 @@ open class AppModule {
         RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
-    fun provideSessionIdCache(app: Application): SessionDataCache = SessionDataCacheImpl(app)
+    open fun provideSessionDataCache(app: Application): SessionDataCache = SessionDataCacheImpl(app)
 
     @Provides
     @Singleton
