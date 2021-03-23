@@ -16,6 +16,7 @@ import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.SessionDataCache
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -65,6 +66,9 @@ class EventRepositoryImplTest {
     @MockK
     lateinit var eventValidator: EventValidator
 
+    @MockK
+    lateinit var sessionDataCache: SessionDataCache
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -72,7 +76,7 @@ class EventRepositoryImplTest {
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { preferencesManager.modalities } returns listOf(FACE, FINGER)
         every { preferencesManager.language } returns LANGUAGE
-
+        every { sessionDataCache.currentSession } returns null
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
         eventRepo = EventRepositoryImpl(
@@ -85,7 +89,8 @@ class EventRepositoryImplTest {
             crashReportManager,
             timeHelper,
             sessionEventValidatorsFactory,
-            LIB_VERSION_NAME
+            LIB_VERSION_NAME,
+            sessionDataCache
         )
 
         runBlocking {
