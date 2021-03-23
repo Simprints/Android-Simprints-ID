@@ -99,17 +99,25 @@ open class EventRepositoryImpl(
         ignoreException {
             reportExceptionIfNeeded {
                 session.let {
-                    val eventsInSession =
-                        eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
+                    if (session.payload.validators.isEmpty())
+                        eventLocalDataSource.loadAllFromSession(session.id).toList().forEach {
+                            session.payload.validators.add(it.type)
+                        }
+
                     validators.forEach {
-                        it.validate(eventsInSession, event)
+                        it.validate(session, event)
                     }
 
                     event.labels = event.labels.copy(
                         sessionId = session.id,
                         projectId = session.payload.projectId
                     )
-                    if (event is SessionCaptureEvent) sessionDataCache.currentSession = event
+
+                    if (event is SessionCaptureEvent)
+                        sessionDataCache.currentSession = event
+
+                    session.payload.validators.add(event.type)
+
                     saveEvent(event)
                 }
             }
