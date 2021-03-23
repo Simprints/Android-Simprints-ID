@@ -11,17 +11,18 @@ import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.face.databinding.FragmentExitFormBinding
 import com.simprints.id.tools.textWatcherOnChange
-import kotlinx.android.synthetic.main.fragment_exit_form.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import com.simprints.id.R as IDR
 
-class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
+class ExitFormFragment : Fragment() {
 
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: ExitFormViewModel by viewModel { parametersOf(mainVm) }
+    private var binding: FragmentExitFormBinding? = null
 
     private val textWatcher = textWatcherOnChange {
         handleTextChangedInExitForm(it)
@@ -49,24 +50,26 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
     }
 
     private fun setTextInLayout() {
-        whySkipBiometricsText.text = getString(R.string.why_did_you_skip_face_capture)
-        rbReligiousConcerns.text = getString(IDR.string.refusal_religious_concerns)
-        rbDataConcerns.text = getString(IDR.string.refusal_data_concerns)
-        rbDoesNotHavePermission.text = getString(IDR.string.refusal_does_not_have_permission)
-        rbAppNotWorking.text = getString(IDR.string.refusal_app_not_working)
-        rbPersonNotPresent.text = getString(IDR.string.refusal_person_not_present)
-        rbTooYoung.text = getString(IDR.string.refusal_too_young)
-        rbOther.text = getString(IDR.string.refusal_other)
-        exitFormText.hint = getString(IDR.string.hint_other_reason)
-        btGoBack.text = getString(R.string.exit_form_return_to_face_capture)
-        btSubmitExitForm.text = getString(IDR.string.button_submit)
+        binding?.apply {
+            whySkipBiometricsText.text = getString(R.string.why_did_you_skip_face_capture)
+            rbReligiousConcerns.text = getString(IDR.string.refusal_religious_concerns)
+            rbDataConcerns.text = getString(IDR.string.refusal_data_concerns)
+            rbDoesNotHavePermission.text = getString(IDR.string.refusal_does_not_have_permission)
+            rbAppNotWorking.text = getString(IDR.string.refusal_app_not_working)
+            rbPersonNotPresent.text = getString(IDR.string.refusal_person_not_present)
+            rbTooYoung.text = getString(IDR.string.refusal_too_young)
+            rbOther.text = getString(IDR.string.refusal_other)
+            exitFormText.hint = getString(IDR.string.hint_other_reason)
+            btGoBack.text = getString(R.string.exit_form_return_to_face_capture)
+            btSubmitExitForm.text = getString(IDR.string.button_submit)
+        }
     }
 
     private fun setButtonListeners() {
-        btGoBack.setOnClickListener {
+        binding?.btGoBack?.setOnClickListener {
             findNavController().navigate(R.id.action_refusalFragment_to_liveFeedbackFragment)
         }
-        btSubmitExitForm.setOnClickListener {
+        binding?.btSubmitExitForm?.setOnClickListener {
             vm.submitExitForm(getExitFormText())
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -75,8 +78,8 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
     }
 
     private fun setRadioGroupListener() {
-        exitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            exitFormText.removeTextChangedListener(textWatcher)
+        binding?.exitFormRadioGroup?.setOnCheckedChangeListener { _, optionIdentifier ->
+            binding?.exitFormText?.removeTextChangedListener(textWatcher)
             enableSubmitButton()
             enableRefusalText()
             handleRadioOptionIdentifierClick(optionIdentifier)
@@ -97,8 +100,8 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        faceExitFormScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            faceExitFormScrollView.fullScroll(View.FOCUS_DOWN)
+        binding?.faceExitFormScrollView?.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            binding?.faceExitFormScrollView?.fullScroll(View.FOCUS_DOWN)
         }
     }
 
@@ -111,28 +114,36 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
     }
 
     private fun enableSubmitButton() {
-        btSubmitExitForm.isEnabled = true
+        binding?.btSubmitExitForm?.isEnabled = true
     }
 
     private fun disableSubmitButton() {
-        btSubmitExitForm.isEnabled = false
+        binding?.btSubmitExitForm?.isEnabled = false
     }
 
     private fun enableRefusalText() {
-        exitFormText.isEnabled = true
+        binding?.exitFormText?.isEnabled = true
     }
 
-    private fun getExitFormText() = exitFormText.text.toString()
+    private fun getExitFormText() = binding?.exitFormText?.text.toString()
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
-        btSubmitExitForm.isEnabled = false
-        exitFormText.requestFocus()
+        binding?.btSubmitExitForm?.isEnabled = false
+        binding?.exitFormText?.requestFocus()
         setTextChangeListenerOnExitText()
-        (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(exitFormText, InputMethodManager.SHOW_IMPLICIT)
+
+        val inputManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        inputManager.showSoftInput(binding?.exitFormText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setTextChangeListenerOnExitText() {
-        exitFormText.addTextChangedListener(textWatcher)
+        binding?.exitFormText?.addTextChangedListener(textWatcher)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 }
