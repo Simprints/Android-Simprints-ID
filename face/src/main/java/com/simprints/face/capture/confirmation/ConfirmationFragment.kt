@@ -1,7 +1,9 @@
 package com.simprints.face.capture.confirmation
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.simprints.face.R
@@ -11,29 +13,30 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationE
 import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent.Result.CONTINUE
 import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent.Result.RECAPTURE
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
-import kotlinx.android.synthetic.main.fragment_confirmation.*
+import com.simprints.face.databinding.FragmentConfirmationBinding
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
+class ConfirmationFragment: Fragment() {
 
     private val mainVM: FaceCaptureViewModel by sharedViewModel()
+    private var binding: FragmentConfirmationBinding? = null
+
     private val faceSessionEventsManager: FaceSessionEventsManager by inject()
     private val faceTimeHelper: FaceTimeHelper by inject()
     private val startTime = faceTimeHelper.now()
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentConfirmationBinding.inflate(inflater, container, false)
+        return binding?.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
-        confirmation_img.setImageBitmap(mainVM.faceDetections.first().frame.toBitmap())
-        confirmation_btn.setOnClickListener {
-            sendConfirmationEvent(CONTINUE)
-            mainVM.flowFinished()
-        }
-        recapture_btn.setOnClickListener {
-            sendConfirmationEvent(RECAPTURE)
-            mainVM.recapture()
-        }
+
+        binding?.let { setImageBitmapAndButtonClickListener(it) }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             sendConfirmationEvent(RECAPTURE)
             mainVM.recapture()
@@ -41,15 +44,34 @@ class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
     }
 
     private fun setTextInLayout() {
-        face_confirm_title.text = getString(R.string.title_confirmation)
-        confirmation_txt.text = getString(R.string.captured_successfully)
-        recapture_btn.text = getString(R.string.btn_recapture)
-        confirmation_btn.text = getString(R.string.btn_finish)
+        binding?.apply {
+            faceConfirmTitle.text = getString(R.string.title_confirmation)
+            confirmationTxt.text = getString(R.string.captured_successfully)
+            recaptureBtn.text = getString(R.string.btn_recapture)
+            confirmationBtn.text = getString(R.string.btn_finish)
+        }
+    }
+
+    private fun setImageBitmapAndButtonClickListener(binding: FragmentConfirmationBinding) {
+        binding.confirmationImg.setImageBitmap(mainVM.faceDetections.first().frame.toBitmap())
+        binding.confirmationImg.setOnClickListener {
+            sendConfirmationEvent(CONTINUE)
+            mainVM.flowFinished()
+        }
+        binding.recaptureBtn.setOnClickListener {
+            sendConfirmationEvent(RECAPTURE)
+            mainVM.recapture()
+        }
     }
 
     private fun sendConfirmationEvent(result: FaceCaptureConfirmationEvent.Result) {
         faceSessionEventsManager.addEventInBackground(
             FaceCaptureConfirmationEvent(startTime, faceTimeHelper.now(), result)
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 }
