@@ -256,7 +256,7 @@ open class EventRepositoryImpl(
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
         reportExceptionIfNeeded {
-            loadSessions(false).firstOrNull() ?: createSession()
+            sessionDataCache.currentSession ?: loadSessions(false).firstOrNull() ?: createSession()
         }
 
     override suspend fun loadEventsFromSession(sessionId: String): Flow<Event> =
