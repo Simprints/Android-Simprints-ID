@@ -3,7 +3,6 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: "kotlin-kapt"
-apply plugin: 'kotlin-android-extensions'
 
 apply from: 'profiling.gradle'
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
