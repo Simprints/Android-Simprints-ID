@@ -60,7 +60,7 @@ class FaceMatchViewModelTest {
 
     @Test
     fun `Handle enrolment+ (identification during enrolment) correctly`() {
-        viewModel = newFaceMatchViewModel(0f)
+        viewModel = newFaceMatchViewModel()
         every { masterFlowManager.getCurrentAction() } returns Action.ENROL
 
         // Doing this way so I can compare later
@@ -120,7 +120,7 @@ class FaceMatchViewModelTest {
 
     @Test
     fun `Send events with correct values for identification`() = testCoroutineRule.runBlockingTest {
-        viewModel = newFaceMatchViewModel(0f)
+        viewModel = newFaceMatchViewModel()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(5) { FixtureGenerator.getFaceIdentity(2) }.toList()
@@ -178,66 +178,8 @@ class FaceMatchViewModelTest {
     }
 
     @Test
-    fun `Send events with correct values after filter for identification`() = testCoroutineRule.runBlockingTest {
-        viewModel = newFaceMatchViewModel(60f)
-
-        every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
-        // Doing this way so I can compare later
-        val candidates = generateSequenceN(5) { FixtureGenerator.getFaceIdentity(2) }.toList()
-        coEvery { faceDbManager.loadPeople(any()) } returns candidates.asFlow()
-        coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(
-            90f, // person 1
-            80f,
-            60f, // person 2
-            60f,
-            70f, // person 3
-            70f,
-            10f, // person 4
-            20f,
-            50f, // person 5
-            55f
-        )
-        val matchStateObserver = viewModel.matchState.testObserver()
-        val eventCapture: CapturingSlot<Event> = slot()
-        every { faceTimeHelper.now() } returnsMany (0..100L).toList()
-        every { faceSessionEventsManager.addEventInBackground(capture(eventCapture)) } just Runs
-
-        viewModel.setupMatch(identifyRequest)
-
-        assertThat(matchStateObserver.observedValues.size).isEqualTo(4)
-        with(matchStateObserver.observedValues) {
-            assertThat(get(0)).isEqualTo(FaceMatchViewModel.MatchState.NotStarted)
-            assertThat(get(1)).isEqualTo(FaceMatchViewModel.MatchState.LoadingCandidates)
-            assertThat(get(2)).isEqualTo(FaceMatchViewModel.MatchState.Matching)
-            assertThat(get(3)).isEqualTo(FaceMatchViewModel.MatchState.Finished(5, 3, 3, 0, 0))
-        }
-
-        val responseResults = listOf(
-            FaceMatchResult(candidates[0].faceId, 90f),
-            FaceMatchResult(candidates[2].faceId, 70f),
-            FaceMatchResult(candidates[1].faceId, 60f)
-        )
-
-        assertThat(viewModel.faceMatchResponse.value?.getContentIfNotHandled()).isEqualTo(
-            FaceMatchResponse(responseResults)
-        )
-
-        val eventEntries = responseResults.map { MatchEntry(it.guid, it.confidence) }
-        with(eventCapture.captured as OneToManyMatchEvent) {
-            assertThat(startTime).isEqualTo(0)
-            assertThat(endTime).isEqualTo(1)
-            assertThat(count).isEqualTo(5)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
-            assertThat(query).isEqualTo(mockQuery)
-            assertThat(result).isEqualTo(eventEntries)
-        }
-
-        verify(atMost = 1) { faceSessionEventsManager.addEventInBackground(any()) }
-    }
-
-    @Test
     fun `Send events with correct values for verification`() = testCoroutineRule.runBlockingTest {
-        viewModel = newFaceMatchViewModel(0f)
+        viewModel = newFaceMatchViewModel()
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         // Doing this way so I can compare later
         val candidates = generateSequenceN(1) { FixtureGenerator.getFaceIdentity(2) }.toList()
@@ -276,12 +218,11 @@ class FaceMatchViewModelTest {
         verify(atMost = 1) { faceSessionEventsManager.addEventInBackground(any()) }
     }
 
-    private fun newFaceMatchViewModel(faceMatchThreshold: Float): FaceMatchViewModel {
+    private fun newFaceMatchViewModel(): FaceMatchViewModel {
         return FaceMatchViewModel(
             masterFlowManager,
             faceDbManager,
             faceMatcher,
-            faceMatchThreshold,
             faceCrashReportManager,
             faceSessionEventsManager,
             faceTimeHelper,

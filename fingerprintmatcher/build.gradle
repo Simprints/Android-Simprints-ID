@@ -42,19 +42,3 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 }
-
-def libraryGroupId = 'com.simprints'
-def libraryArtifactId = 'fingerprintmatcher'
-
-publishing {
-    publications {
-        aar(MavenPublication) {
-            groupId libraryGroupId
-            //noinspection GroovyAssignabilityCheck
-            version project.version
-            artifactId libraryArtifactId
-
-            artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-        }
-    }
-}

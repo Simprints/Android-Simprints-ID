@@ -100,6 +100,7 @@ class SyncInformationViewModelTest {
         coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), any()) } returns localCount
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
@@ -134,6 +135,7 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), any()) } returns localCount
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
@@ -163,6 +165,7 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns flowOf(buildSubjectsSyncState(Succeeded)).asLiveData()
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), any()) } returns localCount
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { subjectRepositoryMock.count(any()) } throws IOException()

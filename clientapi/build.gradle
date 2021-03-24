@@ -22,24 +22,6 @@ android {
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
-    buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
-    }
-
-    flavorDimensions "mode"
-
-    productFlavors {
-        standard {
-            dimension "mode"
-        }
-
-        withLogFile {
-            dimension "mode"
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -66,7 +48,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':id')
     implementation project(':moduleapi')
-    implementation project(':libsimprints')
+    implementation deps.libsimprints
 
     // Service Location
     implementation deps.koin.core
@@ -93,6 +75,7 @@ dependencies {
 
     // Unit Tests
     testImplementation project(':testtools')
+    testImplementation deps.libsimprints
     testImplementation deps.testing.junit
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.androidx.core_testing

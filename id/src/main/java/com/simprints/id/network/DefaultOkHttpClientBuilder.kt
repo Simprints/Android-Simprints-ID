@@ -1,6 +1,5 @@
 package com.simprints.id.network
 
-import com.simprints.id.BuildConfig.FLAVOR
 import com.test.core.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -29,7 +28,7 @@ open class DefaultOkHttpClientBuilder {
                 }
             }
             .apply {
-                if (BuildConfig.DEBUG || FLAVOR == "withLogFile") {
+                if (BuildConfig.DEBUG_MODE) {
                     addInterceptor(buildLoggingInterceptor())
                 }
             }
