@@ -2,6 +2,7 @@ package com.simprints.id.data.images.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.io.File
 
 /**
  * An abstraction of a file path
@@ -23,7 +24,7 @@ data class Path(val parts: Array<String>) : Parcelable {
     /**
      * Composes the path, separating the parts by a /
      */
-    fun compose(): String = parts.joinToString("/")
+    fun compose(): String = parts.joinToString(File.separator)
 
     /**
      * Removes a directory. e.g.: if the current path is dir1/dir2/dir3/file.txt and
@@ -87,7 +88,7 @@ data class Path(val parts: Array<String>) : Parcelable {
          * @return the path
          */
         fun parse(pathString: String): Path {
-            val parts = pathString.split('/').filter { it.isNotEmpty() }.toTypedArray()
+            val parts = pathString.split(File.separator).filter { it.isNotEmpty() }.toTypedArray()
             return Path(parts)
         }
     }

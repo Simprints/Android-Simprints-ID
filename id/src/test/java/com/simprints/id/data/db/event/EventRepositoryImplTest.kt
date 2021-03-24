@@ -394,7 +394,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addEventToCurrentSession(newEvent)
 
-            verify { eventValidator.validate(listOf(session, eventInSession), newEvent) }
+            verify { eventValidator.validate(session, newEvent) }
         }
     }
 

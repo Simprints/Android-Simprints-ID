@@ -11,6 +11,7 @@ import org.junit.Test
 class GuidSelectionEventValidatorTest {
 
     lateinit var validator: GuidSelectionEventValidator
+
     @Before
     fun setUp() {
         validator = GuidSelectionEventValidator()
@@ -18,23 +19,24 @@ class GuidSelectionEventValidatorTest {
 
     @Test
     fun validate_shouldValidateIfIdentificationEventIsPresent() {
-        val currentEvents = listOf(createSessionCaptureEvent(), createIdentificationCallbackEvent())
-        validator.validate(currentEvents, createGuidSelectionEvent())
+        val sessionEvent = createSessionCaptureEvent()
+        val currentEvents = createIdentificationCallbackEvent()
+        validator.validate(sessionEvent, currentEvents)
     }
 
     @Test
     fun validate_shouldThrowIfGuidEventIsAlreadyPresent() {
         shouldThrow<GuidSelectEventValidatorException> {
-            val currentEvents = listOf(createSessionCaptureEvent(), createGuidSelectionEvent())
-            validator.validate(currentEvents, createGuidSelectionEvent())
+            val sessionEvent = createSessionCaptureEvent()
+            validator.validate(sessionEvent, createGuidSelectionEvent())
         }
     }
 
     @Test
     fun validate_shouldThrowIfIdentificationCallbackIsNotPresent() {
         shouldThrow<GuidSelectEventValidatorException> {
-            val currentEvents = listOf(createSessionCaptureEvent())
-            validator.validate(currentEvents, createGuidSelectionEvent())
+            val sessionEvent = createSessionCaptureEvent()
+            validator.validate(sessionEvent, createGuidSelectionEvent())
         }
     }
 }
