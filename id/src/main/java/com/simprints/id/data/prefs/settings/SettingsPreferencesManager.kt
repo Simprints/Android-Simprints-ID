@@ -52,7 +52,6 @@ interface SettingsPreferencesManager {
     var faceMaxRetries: Int
     var faceQualityThreshold: Float
     var faceNbOfFramesCaptured: Int
-    var faceMatchThreshold: Float
 
     var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
     var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>

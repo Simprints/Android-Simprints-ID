@@ -16,7 +16,7 @@ object SubjectsRealmConfig {
 
         .modules(SubjectsRealmMigration.SubjectsModule())
 
-      if (BuildConfig.DEBUG_MODE)
+      if (BuildConfig.DB_ENCRYPTION)
         builder.encryptionKey(key)
 
       return builder.build()

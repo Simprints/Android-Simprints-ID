@@ -18,6 +18,10 @@ import com.simprints.face.models.SymmetricTarget
 import com.simprints.uicomponents.models.FloatRange
 import com.simprints.uicomponents.models.PreviewFrame
 import com.simprints.uicomponents.models.Size
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LiveFeedbackFragmentViewModel(
@@ -51,6 +55,8 @@ class LiveFeedbackFragmentViewModel(
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = faceTimeHelper.now()
 
+        currentDetection.postValue(faceDetection)
+
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
@@ -62,8 +68,6 @@ class LiveFeedbackFragmentViewModel(
             else -> {//no-op
             }
         }
-
-        currentDetection.postValue(faceDetection)
     }
 
     fun startCapture() {
@@ -161,9 +165,18 @@ class LiveFeedbackFragmentViewModel(
         faceDetection.id = faceCaptureEvent.id
     }
 
-    private fun sendAllCaptureEvents() {
-        userCaptures.forEach { sendCaptureEvent(it) }
-        sendCaptureEvent(fallbackCapture)
+    /**
+     * Since all events are saved in a blocking way
+     * [FaceSessionEventsManagerImpl.addEvent][com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl.addEvent],
+     * to speed things up this method creates multiple async jobs and run them all in parallel.
+     *
+     * This is already running in a background Thread because of CameraView, don't worry about the runBlocking.
+     */
+    private fun sendAllCaptureEvents() = runBlocking {
+        val allDeferredEvents = mutableListOf<Deferred<Unit>>()
+        allDeferredEvents += userCaptures.map { async { sendCaptureEvent(it) } }
+        allDeferredEvents += async { sendCaptureEvent(fallbackCapture) }
+        allDeferredEvents.awaitAll()
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }

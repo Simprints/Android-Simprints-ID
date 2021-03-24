@@ -14,5 +14,6 @@ printf "ext { \n
 VERSION_CODE=%d as Integer \n
 VERSION_SUFFIX=%s as String \n
 DEBUGGABLE=false \n
-RELEASE_SAFETYNET_KEY=%s
+RELEASE_SAFETYNET_KEY=%s \n
+DB_ENCRYPTION = true
 }" "${BITBUCKET_BUILD_NUMBER}" "\"${BITBUCKET_DEPLOYMENT_ENVIRONMENT}\"" "\"${RELEASE_SAFETYNET_KEY}\"" >>buildSrc/build_properties.gradle
