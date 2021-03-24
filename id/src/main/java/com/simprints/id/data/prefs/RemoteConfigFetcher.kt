@@ -8,7 +8,7 @@ import timber.log.Timber
 class RemoteConfigFetcher(private val remoteConfig: FirebaseRemoteConfig) {
 
     init {
-        remoteConfig.setConfigSettings(FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(BuildConfig.DEBUG).build())
+        remoteConfig.setConfigSettings(FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(BuildConfig.DEBUG_MODE).build())
     }
 
     fun forceDoFetchInBackgroundAndActivate() =
