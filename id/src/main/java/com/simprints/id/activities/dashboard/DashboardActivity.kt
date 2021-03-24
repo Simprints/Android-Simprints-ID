@@ -94,7 +94,7 @@ class DashboardActivity : BaseSplitActivity() {
                         SettingsActivity::class.java
                     ), SETTINGS_ACTIVITY_REQUEST_CODE
                 )
-                R.id.debug -> if (BuildConfig.DEBUG) {
+                R.id.debug -> if (BuildConfig.DEBUG_MODE) {
                     startActivity(Intent(this, DebugActivity::class.java))
                 }
             }
@@ -106,7 +106,7 @@ class DashboardActivity : BaseSplitActivity() {
         menuInflater.inflate(R.menu.app_menu, menu)
 
         menu?.run {
-            this.findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG
+            this.findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG_MODE
 
             findItem(R.id.menuSettings).title =
                 getString(R.string.menu_settings)

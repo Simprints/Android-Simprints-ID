@@ -73,9 +73,9 @@ task clean(type: Delete) {
 
 task runAllJacocoTests(type: GradleBuild) {
     group = "verification"
-    tasks = ['clientapi:jacocoTestReportStandardDebug', 'core:jacocoTestReportDebug',
-             'id:jacocoTestReportStandardDebug', 'face:jacocoTestReportStandardDebug',
-             'fingerprint:jacocoTestReportStandardDebug', 'fingerprintscanner:jacocoTestReportDebug']
+    tasks = ['clientapi:jacocoTestReportDebug', 'core:jacocoTestReportDebug',
+             'id:jacocoTestReportDebug', 'face:jacocoTestReportDebug',
+             'fingerprint:jacocoTestReportDebug', 'fingerprintscanner:jacocoTestReportDebug']
 }
 
 /*

@@ -72,7 +72,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     }
 
     private fun setPreferenceListeners() {
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG_MODE) {
             getDeviceIdPreference()?.setOnPreferenceClickListener {
                 with(activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager) {
                     val clip = ClipData.newPlainText("deviceID", deviceId)
