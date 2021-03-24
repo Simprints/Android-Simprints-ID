@@ -138,11 +138,10 @@ fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, 
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 
-fun createSessionCaptureEvent(
-    id: String = GUID1,
-    createdAt: Long = CREATED_AT,
-    projectId: String = DEFAULT_PROJECT_ID
-): SessionCaptureEvent {
+fun createSessionCaptureEvent(id: String = GUID1,
+                              createdAt: Long = CREATED_AT,
+                              projectId: String = DEFAULT_PROJECT_ID,
+                              isClosed: Boolean = false): SessionCaptureEvent {
 
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
@@ -165,11 +164,11 @@ fun createSessionCaptureEvent(
         libSimprintsVersionNameArg,
         languageArg,
         deviceArg,
-        databaseInfoArg
-    ).apply {
+        databaseInfoArg).apply {
         payload.location = locationArg
         payload.analyticsId = GUID1
         payload.endedAt = ENDED_AT
+        payload.sessionIsClosed = isClosed
     }
 }
 

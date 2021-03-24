@@ -20,10 +20,6 @@ class DbEventDatabaseFactoryImpl(
 
     override fun build(): EventRoomDatabase {
         try {
-
-            // See README for debugging
-            //val key = "test".toCharArray()
-
             val key = getOrCreateKey(DB_NAME)
             val passphrase: ByteArray = getBytes(key)
             val factory = SupportFactory(passphrase)

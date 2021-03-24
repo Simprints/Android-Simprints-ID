@@ -8,7 +8,6 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
@@ -63,7 +62,7 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        eventRepository.localCount(LocalEventQuery(projectId = projectId, type = ENROLMENT_RECORD_CREATION))
+        eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
         if (isDownSyncAllowed()) {
@@ -86,8 +85,10 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
             downSyncScope.operations.forEach {
                 val counts = downySyncHelper.countForDownSync(it)
-                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }?.count ?: 0
-                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }?.count ?: 0
+                creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }
+                    ?.count ?: 0
+                deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }
+                    ?.count ?: 0
             }
 
             DownSyncCounts(creationsToDownload, deletionsToDownload)

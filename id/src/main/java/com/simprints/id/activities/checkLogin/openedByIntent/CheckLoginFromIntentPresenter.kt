@@ -207,7 +207,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
-        updateProjectInInCurrentSession()
+        updateProjectInCurrentSession()
 
         inBackground {
             ignoreException {
@@ -231,19 +231,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         Timber.d("[CHECK_LOGIN] Added authorised event")
     }
 
-    private suspend fun updateProjectInInCurrentSession() {
+    private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
         val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             currentSessionEvent.updateProjectId(signedProjectId)
             currentSessionEvent.updateModalities(preferencesManager.modalities)
-            eventRepository.addEvent(currentSessionEvent)
+            eventRepository.saveEvent(currentSessionEvent)
         }
-        val associatedEvents = eventRepository.loadEvents(currentSessionEvent.id)
+        val associatedEvents = eventRepository.loadEventsFromSession(currentSessionEvent.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)
-            eventRepository.addEvent(it)
+            eventRepository.saveEvent(it)
         }
 
         Timber.d("[CHECK_LOGIN] Updated projectId in current session")
@@ -255,7 +255,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         val payload = currentSessionEvent.payload
         payload.databaseInfo.recordCount = subjectLocalDataSource.count()
 
-        eventRepository.addEvent(currentSessionEvent)
+        eventRepository.saveEvent(currentSessionEvent)
         Timber.d("[CHECK_LOGIN] Updated Database count in current session")
     }
 
@@ -273,7 +273,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private suspend fun updateAnalyticsIdInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
         currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
-        eventRepository.addEvent(currentSessionEvent)
+        eventRepository.saveEvent(currentSessionEvent)
         Timber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 

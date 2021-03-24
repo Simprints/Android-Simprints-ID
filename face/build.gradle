@@ -20,23 +20,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
-    buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
-    }
-
-    flavorDimensions "mode"
-
-    productFlavors {
-        standard {
-            dimension "mode"
-        }
-
-        withLogFile {
-            dimension "mode"
-        }
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

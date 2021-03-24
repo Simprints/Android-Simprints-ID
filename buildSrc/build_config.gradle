@@ -1,29 +1,36 @@
-def buildPropertiesFile = rootProject.file("buildSrc${File.separator}build.properties")
-def buildProperties = new Properties()
-buildProperties.load(new FileInputStream(buildPropertiesFile))
+apply from: "$rootDir${File.separator}buildSrc${File.separator}build_properties.gradle"
 
 android {
-    compileSdkVersion buildProperties["TARGET_SDK_VERSION"] as Integer
+    compileSdkVersion TARGET_SDK_VERSION
 
     defaultConfig {
-        targetSdkVersion buildProperties["TARGET_SDK_VERSION"] as Integer
-        minSdkVersion buildProperties["MIN_SDK_VERSION"] as Integer
+        targetSdkVersion TARGET_SDK_VERSION
+        minSdkVersion MIN_SDK_VERSION
 
-        versionCode buildProperties["VERSION_CODE"] as Integer
-        versionName buildProperties["VERSION_NAME"]
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
     }
 
     buildTypes {
         release {
+            debuggable = DEBUGGABLE
             lintOptions.fatal 'StopShip'
-            versionNameSuffix "+" + buildProperties["VERSION_CODE"]
+            versionNameSuffix "+$VERSION_CODE"
+            buildConfigField("Boolean", "DEBUG_MODE", "false")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
         }
         staging {
+            debuggable = DEBUGGABLE
             lintOptions.fatal 'StopShip'
-            versionNameSuffix "-" + buildProperties["VERSION_SUFFIX"] + "+" + buildProperties["VERSION_CODE"]
+            versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
+            buildConfigField("Boolean", "DEBUG_MODE", "true")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
         }
         debug {
-            versionNameSuffix "-" + buildProperties["VERSION_SUFFIX"] + "+" + buildProperties["VERSION_CODE"]
+            debuggable = DEBUGGABLE
+            versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
+            buildConfigField("Boolean", "DEBUG_MODE", "true")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
         }
     }
 }

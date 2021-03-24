@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- App Name -->
+    <string name="app_name" translatable="false">Simprints ID STAGING</string>
+    <!-- Activity Titles -->
+    <string name="title_activity_front" translatable="false">Simprints ID STAGING</string>
+
+
+    <!-- App Titles -->
+    <string name="simprints_label" translatable="false">Simprints STAGING</string>
+
+</resources>
