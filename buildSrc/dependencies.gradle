@@ -135,7 +135,7 @@ def fuzzywuzzy = [
 ]
 
 // Koin, Service Location
-def koin_version = "2.1.5"
+def koin_version = "2.2.2"
 def koin = [
     core     : "org.koin:koin-core:$koin_version",
     core_ext : "org.koin:koin-core-ext:$koin_version",
@@ -149,7 +149,7 @@ def rootbeer = [
     core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
-def cameraView = "com.otaliastudios:cameraview:2.6.3"
+def cameraView = "com.otaliastudios:cameraview:2.7.0"
 def circleImageView = "de.hdodenhof:circleimageview:3.0.1"
 
 // Testing
