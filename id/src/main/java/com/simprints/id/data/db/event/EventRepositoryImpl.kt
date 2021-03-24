@@ -100,7 +100,8 @@ open class EventRepositoryImpl(
             reportExceptionIfNeeded {
                 session.let {
                     if (session.payload.validators.isEmpty())
-                        eventLocalDataSource.loadAllFromSession(session.id).toList().forEach {
+                        eventLocalDataSource.loadAllFromSession(session.id).toList()
+                            .filter { it.type != SESSION_CAPTURE }.forEach {
                             session.payload.validators.add(it.type)
                         }
 
