@@ -17,17 +17,20 @@ android {
             lintOptions.fatal 'StopShip'
             versionNameSuffix "+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "false")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
         }
         staging {
             debuggable = DEBUGGABLE
             lintOptions.fatal 'StopShip'
             versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "true")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
         }
         debug {
             debuggable = DEBUGGABLE
             versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "true")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
         }
     }
 }

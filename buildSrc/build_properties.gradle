@@ -29,6 +29,7 @@ ext {
      * CD WILL OVERWRITE TO FALSE AS THE PLAYSTORE DOES NOT ACCEPT DEBUGGABLE TRUE APPS
      */
     DEBUGGABLE = true
+    DB_ENCRYPTION = false
 
     /**
      * API key for Google attestation endpoint to check root detection. We keep the DEV and STAGING

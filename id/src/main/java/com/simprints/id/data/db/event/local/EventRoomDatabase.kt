@@ -29,7 +29,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations()
                 .addMigrations(EventMigration1to2(crashReportManager))
 
-            if (BuildConfig.DEBUG_MODE)
+            if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)
 
             return builder.build()
