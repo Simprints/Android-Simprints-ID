@@ -102,8 +102,8 @@ open class EventRepositoryImpl(
                     if (session.payload.validators.isEmpty())
                         eventLocalDataSource.loadAllFromSession(session.id).toList()
                             .filter { it.type != SESSION_CAPTURE }.forEach {
-                            session.payload.validators.add(it.type)
-                        }
+                                session.payload.validators.add(it.type)
+                            }
 
                     validators.forEach {
                         it.validate(session, event)
@@ -114,8 +114,10 @@ open class EventRepositoryImpl(
                         projectId = session.payload.projectId
                     )
 
-                    if (event is SessionCaptureEvent)
+                    if (event is SessionCaptureEvent) {
+                        event.payload.validators.retainAll(session.payload.validators)
                         sessionDataCache.currentSession = event
+                    }
 
                     session.payload.validators.add(event.type)
 
