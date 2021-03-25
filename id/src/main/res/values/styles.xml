@@ -10,6 +10,8 @@
         <item name="windowNoTitle">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="android:textViewStyle">@style/SimprintsStyle.TextView</item>
+        <item name="buttonStyle">@style/SimprintsButtonFont</item>
+        <item name="android:buttonStyle">@style/SimprintsButtonFont</item>
     </style>
 
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -129,11 +131,15 @@
     <!-- Common -->
     <style name="SimprintsButton" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/button_rounded_corners_orange</item>
-        <item name="android:fontFamily">font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
         <item name="android:textColor">@color/simprints_white</item>
         <item name="android:textSize">16sp</item>
         <item name="android:padding">3dp</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
+    </style>
+
+    <style name="SimprintsButtonFont" parent="Base.Widget.AppCompat.Button">
+        <item name="android:fontFamily">@font/muli</item>
     </style>
 </resources>
