@@ -1,9 +1,7 @@
 package com.simprints.face.capture.livefeedback
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -12,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.otaliastudios.cameraview.frame.FrameProcessor
 import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
@@ -24,32 +23,27 @@ import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 import com.simprints.uicomponents.R as UCR
 
-class LiveFeedbackFragment: Fragment(), FrameProcessor {
+class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProcessor {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: LiveFeedbackFragmentViewModel by viewModel { parametersOf(mainVm) }
-    private var binding: FragmentLiveFeedbackBinding? = null
+    private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentLiveFeedbackBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.faceCaptureCamera?.setLifecycleOwner(viewLifecycleOwner)
+        binding.faceCaptureCamera.setLifecycleOwner(viewLifecycleOwner)
         bindViewModel()
-        binding?.captureFeedbackTxtTitle?.setOnClickListener { vm.startCapture() }
-        binding?.captureProgress?.max = mainVm.samplesToCapture
+        binding.captureFeedbackTxtTitle.setOnClickListener { vm.startCapture() }
+        binding.captureProgress.max = mainVm.samplesToCapture
     }
 
     override fun onResume() {
-        binding?.faceCaptureCamera?.addFrameProcessor(this)
+        binding.faceCaptureCamera.addFrameProcessor(this)
         super.onResume()
     }
 
     override fun onStop() {
-        binding?.faceCaptureCamera?.removeFrameProcessor(this)
+        binding.faceCaptureCamera.removeFrameProcessor(this)
         super.onStop()
     }
 
@@ -82,13 +76,12 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
      */
     override fun process(frame: Frame) {
         try {
-            binding?.let {
-                vm.process(
-                    frame,
-                    it.captureOverlay.rectInCanvas,
-                    Size(it.captureOverlay.width, it.captureOverlay.height)
-                )
-            }
+            vm.process(
+                frame,
+                binding.captureOverlay.rectInCanvas,
+                Size(binding.captureOverlay.width, binding.captureOverlay.height)
+            )
+
         } catch (t: Throwable) {
             Timber.e(t)
             mainVm.submitError(t)
@@ -97,9 +90,9 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
 
     private fun renderDebugInfo(face: Face?) {
         if (face == null) {
-            binding?.captureFeedbackTxtDebug?.text = null
+            binding.captureFeedbackTxtDebug.text = null
         } else {
-            binding?.captureFeedbackTxtDebug?.text = getString(
+            binding.captureFeedbackTxtDebug.text = getString(
                 R.string.capture_debug_features,
                 face.yaw.toString(),
                 face.roll.toString()
@@ -120,7 +113,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderCapturingStateColors() {
-        binding?.apply {
+        with(binding) {
             captureOverlay.drawWhiteTarget()
 
             captureTitle.setTextColor(
@@ -133,17 +126,17 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderCapturingNotStarted() {
-        binding?.apply {
+        binding.apply {
             captureOverlay.drawSemiTransparentTarget()
             captureTitle.text = getString(R.string.title_preparation)
             captureFeedbackTxtTitle.text = getString(R.string.capture_title_previewing)
-            toggleCaptureButtons(false)
         }
+        toggleCaptureButtons(false)
     }
 
     private fun renderCapturing() {
         renderCapturingStateColors()
-        binding?.apply {
+        binding.apply {
             captureProgress.isVisible = true
             captureTitle.text = getString(R.string.title_capturing)
             captureFeedbackTxtTitle.text = getString(R.string.capture_prep_begin_btn_capturing)
@@ -152,7 +145,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderValidFace() {
-        binding?.apply {
+        binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_prep_begin_btn)
             captureFeedbackTxtExplanation.text = null
 
@@ -165,7 +158,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderValidCapturingFace() {
-        binding?.apply {
+        binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_prep_begin_btn_capturing)
             captureFeedbackTxtExplanation.text = getString(R.string.capture_hold)
 
@@ -179,7 +172,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderFaceTooFar() {
-        binding?.apply {
+        binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_title_face_too_far)
             captureFeedbackTxtExplanation.text = getString(R.string.capture_error_face_too_far)
 
@@ -191,7 +184,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderFaceTooClose() {
-        binding?.apply {
+        binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_title_too_close)
             captureFeedbackTxtExplanation.text = getString(R.string.capture_error_face_too_close)
 
@@ -203,7 +196,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderNoFace() {
-        binding?.apply {
+        binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_title_no_face)
             captureFeedbackTxtTitle.text = getString(R.string.capture_error_no_face)
 
@@ -215,7 +208,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderFaceNotStraight() {
-        binding?.apply {
+        binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_title_look_straight)
             captureFeedbackTxtExplanation.text = getString(R.string.capture_error_look_straight)
 
@@ -227,7 +220,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun renderProgressBar(valid: Boolean) {
-        binding?.apply {
+        binding.apply {
             val progressColor =
                 if (valid) UCR.color.capture_green
                 else UCR.color.capture_grey
@@ -242,12 +235,7 @@ class LiveFeedbackFragment: Fragment(), FrameProcessor {
     }
 
     private fun toggleCaptureButtons(valid: Boolean) {
-        binding?.captureFeedbackTxtTitle?.isClickable = valid
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+        binding.captureFeedbackTxtTitle.isClickable = valid
     }
 }
 

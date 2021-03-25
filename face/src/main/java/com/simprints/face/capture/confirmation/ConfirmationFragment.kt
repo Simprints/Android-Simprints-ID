@@ -1,11 +1,10 @@
 package com.simprints.face.capture.confirmation
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -17,25 +16,20 @@ import com.simprints.face.databinding.FragmentConfirmationBinding
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class ConfirmationFragment: Fragment() {
+class ConfirmationFragment: Fragment(R.layout.fragment_confirmation) {
 
     private val mainVM: FaceCaptureViewModel by sharedViewModel()
-    private var binding: FragmentConfirmationBinding? = null
+    private val binding by viewBinding(FragmentConfirmationBinding::bind)
 
     private val faceSessionEventsManager: FaceSessionEventsManager by inject()
     private val faceTimeHelper: FaceTimeHelper by inject()
     private val startTime = faceTimeHelper.now()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentConfirmationBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
-        binding?.let { setImageBitmapAndButtonClickListener(it) }
+        binding.apply(::setImageBitmapAndButtonClickListener)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             sendConfirmationEvent(RECAPTURE)
@@ -44,7 +38,7 @@ class ConfirmationFragment: Fragment() {
     }
 
     private fun setTextInLayout() {
-        binding?.apply {
+        binding.apply {
             faceConfirmTitle.text = getString(R.string.title_confirmation)
             confirmationTxt.text = getString(R.string.captured_successfully)
             recaptureBtn.text = getString(R.string.btn_recapture)
@@ -68,10 +62,5 @@ class ConfirmationFragment: Fragment() {
         faceSessionEventsManager.addEventInBackground(
             FaceCaptureConfirmationEvent(startTime, faceTimeHelper.now(), result)
         )
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
     }
 }

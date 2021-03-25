@@ -35,7 +35,8 @@ def androidx = [
         viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version",
         scope    : "androidx.lifecycle:lifecycle-runtime-ktx:$androidx_lifecycle_version",
         ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:$androidx_lifecycle_version",
-        ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
+        ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version",
+        java8    : "androidx.lifecycle:lifecycle-common-java8:$androidx_lifecycle_version"
     ],
     ui        : [
         constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta4",
