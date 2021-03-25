@@ -92,7 +92,4 @@ class EventLocalDataSourceImplTest {
         db.close()
     }
 
-    companion object {
-        private val ID = randomUUID()
-    }
 }

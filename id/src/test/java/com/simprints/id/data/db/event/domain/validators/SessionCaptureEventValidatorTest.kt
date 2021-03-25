@@ -10,7 +10,7 @@ import org.junit.Test
 class SessionCaptureEventValidatorTest {
 
     @Test
-    fun addSessionCaptureEvent_succeeds() {
+    fun addFirstSessionCaptureEvent_succeeds() {
         SessionCaptureEventValidator().validate(
             createSessionCaptureEvent(GUID1),
             createSessionCaptureEvent()
