@@ -12,7 +12,8 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration.*
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration.VERO_1
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration.VERO_2
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.*
 import com.simprints.fingerprint.scanner.exceptions.safe.*
@@ -33,9 +34,10 @@ import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.declareModule
 
 class ConnectScannerViewModelTest : KoinTest {
 
@@ -58,7 +60,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Before
     fun setUp() {
-        declareModule {
+        val mockModule = module(override = true) {
             factory { mockk<FingerprintTimeHelper>(relaxed = true) }
             factory { sessionEventsManager }
             factory { fingerprintAnalyticsManager }
@@ -69,21 +71,26 @@ class ConnectScannerViewModelTest : KoinTest {
             factory { nfcManager }
             factory { scannerFactory }
         }
+        loadKoinModules(mockModule)
+
         viewModel = get()
     }
 
-    private fun mockScannerWrapper(scannerGeneration: ScannerGeneration, connectFailException: Throwable? = null) = mockk<ScannerWrapper> {
-        every { disconnect() } returns Completable.complete()
-        every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(connectFailException)
-        every { setup() } returns Completable.complete()
-        every { sensorWakeUp() } returns Completable.complete()
-        every { setUiIdle() } returns Completable.complete()
-        every { versionInformation() } returns when (scannerGeneration) {
-            VERO_1 -> VERO_1_VERSION
-            VERO_2 -> VERO_2_VERSION
+    private fun mockScannerWrapper(scannerGeneration: ScannerGeneration, connectFailException: Throwable? = null) =
+        mockk<ScannerWrapper> {
+            every { disconnect() } returns Completable.complete()
+            every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(
+                connectFailException
+            )
+            every { setup() } returns Completable.complete()
+            every { sensorWakeUp() } returns Completable.complete()
+            every { setUiIdle() } returns Completable.complete()
+            every { versionInformation() } returns when (scannerGeneration) {
+                VERO_1 -> VERO_1_VERSION
+                VERO_2 -> VERO_2_VERSION
+            }
+            every { batteryInformation() } returns mockk(relaxed = true)
         }
-        every { batteryInformation() } returns mockk(relaxed = true)
-    }
 
     @Test
     fun start_bluetoothOff_sendsBluetoothOffIssueEvent() {
@@ -100,7 +107,10 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun start_bluetoothNotSupported_sendsBluetoothNotSupportedAlert() {
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, connectFailException = BluetoothNotSupportedException())
+        every { scannerFactory.create(any()) } returns mockScannerWrapper(
+            VERO_2,
+            connectFailException = BluetoothNotSupportedException()
+        )
 
         val launchAlertObserver = viewModel.launchAlert.testObserver()
 
@@ -263,7 +273,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.connectScannerIssue.assertEventReceivedWithContentAssertions {
             assertThat(it).isInstanceOf(ConnectScannerIssue.Ota::class.java)
-            assertThat((it as ConnectScannerIssue.Ota).otaFragmentRequest.availableOtas).containsExactlyElementsIn(e.availableOtas).inOrder()
+            assertThat((it as ConnectScannerIssue.Ota).otaFragmentRequest.availableOtas).containsExactlyElementsIn(e.availableOtas)
+                .inOrder()
         }
     }
 
