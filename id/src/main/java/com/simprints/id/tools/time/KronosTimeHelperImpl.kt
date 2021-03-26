@@ -20,14 +20,15 @@ class KronosTimeHelperImpl(private val clock: KronosClock) : TimeHelper {
     override fun msBetweenNowAndTime(time: Long): Long = now() - time
 
     override fun readableBetweenNowAndTime(date: Date): String =
-        getRelativeTimeSpanString(date.time, Date().time, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
+        getRelativeTimeSpanString(date.time, now(), MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
 
     override fun getCurrentDateAsString(): String {
         val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-        return dateFormat.format(Date())
+        return dateFormat.format(Date(now()))
     }
 
     override fun todayInMillis(): Long = Calendar.getInstance().run {
+        timeInMillis = now()
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
@@ -37,6 +38,7 @@ class KronosTimeHelperImpl(private val clock: KronosClock) : TimeHelper {
     }
 
     override fun tomorrowInMillis(): Long = Calendar.getInstance().run {
+        timeInMillis = now()
         add(Calendar.DATE, 1)
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
