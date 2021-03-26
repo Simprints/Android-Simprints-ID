@@ -30,6 +30,10 @@ android {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         animationsDisabled = true
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 buildscript {

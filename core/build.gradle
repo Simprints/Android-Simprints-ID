@@ -1,12 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
-
-androidExtensions {
-    experimental = true
-}
 
 android {
     defaultConfig {
@@ -37,6 +32,11 @@ android {
             buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
         }
     }
+
+    buildFeatures {
+        viewBinding true
+    }
+
 }
 
 dependencies {
@@ -44,6 +44,7 @@ dependencies {
 
     implementation deps.androidx.appcompat
     implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.java8
 
     implementation deps.kotlin.stdlib
     implementation deps.kotlin.coroutines_core

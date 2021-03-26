@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
+import com.simprints.clientapi.databinding.ActivityErrorBinding
 import com.simprints.core.tools.activity.BaseSplitActivity
-import kotlinx.android.synthetic.main.activity_error.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
 import org.koin.android.ext.android.inject
@@ -23,17 +23,20 @@ class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
     override val presenter: ErrorContract.Presenter by inject { parametersOf(this) }
 
     private lateinit var clientApiAlertType: ClientApiAlert
+    private lateinit var binding: ActivityErrorBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_error)
+
+        binding = ActivityErrorBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setTextInLayout()
 
         clientApiAlertType = intent
             .extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
             ?: throw Throwable("No AlertActRequest found")
 
-        textView_close_button.setOnClickListener { presenter.handleCloseOrBackClick() }
+        binding.textViewCloseButton.setOnClickListener { presenter.handleCloseOrBackClick() }
 
         lifecycleScope.launch {
             presenter.start(clientApiAlertType)
@@ -41,8 +44,8 @@ class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
     }
 
     private fun setTextInLayout() {
-        alert_image.contentDescription = getString(R.string.main_error_graphic)
-        textView_close_button.text = getString(R.string.close)
+        binding.alertImage.contentDescription = getString(R.string.main_error_graphic)
+        binding.textViewCloseButton.text = getString(R.string.close)
     }
 
     override fun closeActivity() {
@@ -54,20 +57,20 @@ class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
     }
 
     override fun setErrorTitleText(title: String) {
-        textView_error_title.text = title
+        binding.textViewErrorTitle.text = title
     }
 
     override fun setErrorMessageText(message: String) {
-        textView_message.text = message
+        binding.textViewMessage.text = message
     }
 
     override fun setBackgroundColour(colour: Int) {
-        alertLayout.backgroundColor = colour
-        textView_close_button.backgroundColor = colour
+        binding.alertLayout.backgroundColor = colour
+        binding.textViewCloseButton.backgroundColor = colour
     }
 
     override fun setErrorHintVisible(isHintVisible: Boolean) {
-        imageView_error_hint.visibility = if (isHintVisible) VISIBLE else GONE
+        binding.imageViewErrorHint.visibility = if (isHintVisible) VISIBLE else GONE
     }
 
     override fun getStringFromResources(res: Int): String = getString(res)
