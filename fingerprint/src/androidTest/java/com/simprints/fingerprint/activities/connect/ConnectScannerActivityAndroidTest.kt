@@ -33,8 +33,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.mock.declareModule
 
 @RunWith(AndroidJUnit4::class)
 class ConnectScannerActivityAndroidTest : KoinTest {
@@ -43,7 +44,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     var androidTestConfigRule = FullAndroidTestConfigRule()
 
     @get:Rule
-    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    var permissionRule: GrantPermissionRule =
+        GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
@@ -51,9 +53,9 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @Before
     fun setUp() {
-        declareModule {
+        loadKoinModules(module(override = true) {
             viewModel { viewModelMock }
-        }
+        })
     }
 
     @Test
@@ -115,10 +117,14 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        private fun connectScannerTaskRequest() =
+            ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
         private fun ConnectScannerTaskRequest.toIntent() = Intent().also {
-            it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, ConnectScannerActivity::class.qualifiedName!!)
+            it.setClassName(
+                ApplicationProvider.getApplicationContext<Application>().packageName,
+                ConnectScannerActivity::class.qualifiedName!!
+            )
             it.putExtra(ConnectScannerTaskRequest.BUNDLE_KEY, this)
         }
     }
