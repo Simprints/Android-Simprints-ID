@@ -36,8 +36,9 @@ import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.runner.RunWith
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.mock.declareModule
 import org.mockito.stubbing.Answer
 import java.util.*
 
@@ -61,7 +62,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
 
     private fun setupMocksAndKoinModules(simulationMode: SimulationMode, action: Action) {
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
-        declareModule {
+        loadKoinModules(module(override = true) {
             single<ScannerFactory> {
                 spyk(ScannerFactoryImpl(
                     bluetoothAdapter = simulatedBluetoothAdapter,
@@ -88,7 +89,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
             single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get(), get(), get()) }
             factory { masterFlowManager }
             factory { dbManagerMock }
-        }
+        })
         setupMasterFlowManager(action)
         setupDbManagerMock()
     }

@@ -30,9 +30,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.declareModule
 import java.io.Serializable
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
@@ -64,15 +65,14 @@ class MatchingViewModelTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        declareModule {
+        loadKoinModules(module(override = true) {
             factory { dbManagerMock }
             factory { crashReportManagerMock }
             factory { masterFlowManager }
             factory<FingerprintPreferencesManager> { mockk(relaxed = true) }
             factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }
             factory { mockMatcher }
-        }
-
+        })
     }
 
     @Test
