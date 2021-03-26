@@ -235,24 +235,23 @@ class EventSyncMasterWorkerTest {
         )
         coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(
             uniqueSyncId
-        )
+        ).build()
         coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(
             uniqueSyncId
-        )
+        ).build()
 
     }
 
-    private fun buildEndSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(EventEndSyncReporterWorker::class.java)
+    private fun buildEndSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest.Builder =
+        OneTimeWorkRequestBuilder<EventEndSyncReporterWorker>()
             .addTagForMasterSyncId(uniqueSyncId)
             .addTagForScheduledAtNow()
             .addCommonTagForAllSyncWorkers()
             .addTagForEndSyncReporter()
             .setInputData(workDataOf(EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncId))
             .setConstraints(constraintsForWorkers())
-            .build() as OneTimeWorkRequest
 
-    private fun buildStartSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
+    private fun buildStartSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest.Builder =
         OneTimeWorkRequest.Builder(EventStartSyncReporterWorker::class.java)
             .addTagForMasterSyncId(uniqueSyncId)
             .addTagForScheduledAtNow()
@@ -260,7 +259,6 @@ class EventSyncMasterWorkerTest {
             .addTagForStartSyncReporter()
             .setInputData(workDataOf(EventStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncId))
             .setConstraints(constraintsForWorkers())
-            .build() as OneTimeWorkRequest
 
     private fun buildDownSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
         listOf(
