@@ -23,8 +23,6 @@ interface EventRepository {
 
     suspend fun addEventToCurrentSession(event: Event)
 
-    suspend fun addEventToSession(event: Event, session: SessionCaptureEvent)
-
     suspend fun saveEvent(event: Event)
 
     suspend fun uploadEvents(projectId: String): Flow<Int>
