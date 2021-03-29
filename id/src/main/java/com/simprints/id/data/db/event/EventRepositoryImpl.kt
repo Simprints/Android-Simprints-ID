@@ -61,50 +61,50 @@ open class EventRepositoryImpl(
         }
 
     override suspend fun createSession(): SessionCaptureEvent {
-        return reportExceptionIfNeeded {
+        closeSession(NEW_SESSION)
+
+        return reportException {
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
-                UUID.randomUUID().toString(),
-                currentProject,
-                timeHelper.now(),
-                preferencesManager.modalities.map { it.toMode() },
-                appVersionName,
-                libSimprintsVersionName,
-                preferencesManager.language,
-                Device(
+                id = UUID.randomUUID().toString(),
+                projectId = currentProject,
+                createdAt = timeHelper.now(),
+                modalities = preferencesManager.modalities.map { it.toMode() },
+                appVersionName = appVersionName,
+                libVersionName = libSimprintsVersionName,
+                language = preferencesManager.language,
+                device = Device(
                     VERSION.SDK_INT.toString(),
                     Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId
                 ),
-                DatabaseInfo(sessionCount)
+                databaseInfo = DatabaseInfo(sessionCount)
             )
 
-            closeSessionsAndAddArtificialTerminationEvent(NEW_SESSION)
             saveEvent(sessionCaptureEvent)
-            sessionDataCache.currentSession = sessionCaptureEvent
+            sessionDataCache.eventCache.add(sessionCaptureEvent)
             sessionCaptureEvent
         }
     }
 
     override suspend fun addEventToCurrentSession(event: Event) {
+        val startTime = System.currentTimeMillis()
+
         ignoreException {
-            reportExceptionIfNeeded {
+            reportException {
                 val session = getCurrentCaptureSessionEvent()
                 addEventToSession(event, session)
             }
         }
+
+        val endTime = System.currentTimeMillis()
+        Timber.d("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
-    override suspend fun addEventToSession(event: Event, session: SessionCaptureEvent) {
+    private suspend fun addEventToSession(event: Event, session: SessionCaptureEvent) {
         ignoreException {
-            reportExceptionIfNeeded {
+            reportException {
                 session.let {
-                    if (session.payload.validators.isEmpty())
-                        eventLocalDataSource.loadAllFromSession(session.id).toList()
-                            .filter { it.type != SESSION_CAPTURE }.forEach {
-                                session.payload.validators.add(it.type)
-                            }
-
                     validators.forEach {
                         it.validate(session, event)
                     }
@@ -114,12 +114,7 @@ open class EventRepositoryImpl(
                         projectId = session.payload.projectId
                     )
 
-                    if (event is SessionCaptureEvent) {
-                        event.payload.validators.retainAll(session.payload.validators)
-                        sessionDataCache.currentSession = event
-                    }
-
-                    session.payload.validators.add(event.type)
+                    sessionDataCache.eventCache.add(event)
 
                     saveEvent(event)
                 }
@@ -129,7 +124,7 @@ open class EventRepositoryImpl(
 
     override suspend fun saveEvent(event: Event) {
         ignoreException {
-            reportExceptionIfNeeded {
+            reportException {
                 if (event.type.isNotASubjectEvent()) {
                     event.labels = event.labels.appendLabelsForAllSessionEvents()
                 } else {
@@ -224,7 +219,7 @@ open class EventRepositoryImpl(
             "EnrolmentRecordCreationEvent anymore during an enrolment and the event is used only for the down-sync " +
             "(transformed to a subject). So this logic to batch the 'not-related with a session' events is unnecessary " +
             "from 2021.1.0, but it's still required during the migration from previous app versions since the DB may " +
-            "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0, this logic" +
+            "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0+, this logic" +
             "can be deleted."
     )
     private suspend fun createBatchesForEventsNotInSessions(projectId: String): List<Batch> {
@@ -266,24 +261,30 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
-        reportExceptionIfNeeded {
-            sessionDataCache.currentSession ?: loadSessions(false).firstOrNull() ?: createSession()
-        }
+    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
+        sessionDataCache.eventCache.filterIsInstance<SessionCaptureEvent>().firstOrNull()
+            ?: loadSessions(false).firstOrNull()?.also { session ->
+                loadEventsToCache(session)
+            }
+            ?: createSession()
+    }
 
     override suspend fun loadEventsFromSession(sessionId: String): Flow<Event> =
-        reportExceptionIfNeeded {
+        reportException {
             eventLocalDataSource.loadAllFromSession(sessionId = sessionId)
         }
 
-    private suspend fun closeSessionsAndAddArtificialTerminationEvent(reason: ArtificialTerminationPayload.Reason) {
-        loadSessions(false).collect { sessionEvent ->
-            val artificialTerminationEvent = ArtificialTerminationEvent(
-                timeHelper.now(),
-                reason
-            ).apply { labels = labels.appendSessionId(sessionEvent.id) }
+    private suspend fun closeSession(reason: ArtificialTerminationPayload.Reason? = null) {
 
-            saveEvent(artificialTerminationEvent)
+        sessionDataCache.eventCache.clear()
+
+        loadSessions(false).collect { sessionEvent ->
+
+            if (reason != null) {
+                saveEvent(ArtificialTerminationEvent(timeHelper.now(), reason).apply {
+                    labels = labels.appendSessionId(sessionEvent.id)
+                })
+            }
 
             sessionEvent.payload.endedAt = timeHelper.now()
             sessionEvent.payload.sessionIsClosed = true
@@ -296,6 +297,12 @@ open class EventRepositoryImpl(
         return eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
             .map { it as SessionCaptureEvent }
             .filter { it.payload.sessionIsClosed == isClosed }
+    }
+
+    private suspend fun loadEventsToCache(session: SessionCaptureEvent) {
+        eventLocalDataSource.loadAllFromSession(session.id).collect {
+            sessionDataCache.eventCache.add(it)
+        }
     }
 
     private fun EventLabels.appendLabelsForAllSessionEvents() =
@@ -311,7 +318,7 @@ open class EventRepositoryImpl(
     private fun EventLabels.appendSessionId(sessionId: String): EventLabels =
         this.copy(sessionId = sessionId)
 
-    private suspend fun <T> reportExceptionIfNeeded(block: suspend () -> T): T =
+    private suspend fun <T> reportException(block: suspend () -> T): T =
         try {
             block()
         } catch (t: Throwable) {
