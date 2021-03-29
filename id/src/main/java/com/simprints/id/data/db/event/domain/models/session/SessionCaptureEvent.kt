@@ -70,8 +70,7 @@ data class SessionCaptureEvent(
         override var endedAt: Long = 0,
         var uploadedAt: Long = 0,
         override val type: EventType = SESSION_CAPTURE,
-        var sessionIsClosed: Boolean = false,
-        val validators: MutableList<EventType> = mutableListOf()
+        var sessionIsClosed: Boolean = false
     ) : EventPayload()
 
     companion object {

@@ -10,20 +10,18 @@ import org.junit.Test
 class SessionCaptureEventValidatorTest {
 
     @Test
-    fun addFirstSessionCaptureEvent_succeeds() {
-        SessionCaptureEventValidator().validate(
-            createSessionCaptureEvent(GUID1),
-            createSessionCaptureEvent()
-        )
+    fun addSessionCaptureEvent_succeeds() {
+        SessionCaptureEventValidator().validate(emptyList(), createSessionCaptureEvent())
     }
 
     @Test
     fun alreadySessionCaptureEventPresent_addNewSessionCaptureEvent_fails() {
         shouldThrow<SessionEventCaptureAlreadyExists> {
             SessionCaptureEventValidator().validate(
-                createSessionCaptureEvent(GUID1),
+                listOf(createSessionCaptureEvent(GUID1)),
                 createSessionCaptureEvent(GUID2)
             )
         }
     }
+
 }

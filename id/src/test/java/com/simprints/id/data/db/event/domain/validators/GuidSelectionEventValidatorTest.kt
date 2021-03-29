@@ -19,24 +19,23 @@ class GuidSelectionEventValidatorTest {
 
     @Test
     fun validate_shouldValidateIfIdentificationEventIsPresent() {
-        val sessionEvent = createSessionCaptureEvent()
-        val currentEvents = createIdentificationCallbackEvent()
-        validator.validate(sessionEvent, currentEvents)
+        val currentEvents = listOf(createSessionCaptureEvent(), createIdentificationCallbackEvent())
+        validator.validate(currentEvents, createGuidSelectionEvent())
     }
 
     @Test
     fun validate_shouldThrowIfGuidEventIsAlreadyPresent() {
         shouldThrow<GuidSelectEventValidatorException> {
-            val sessionEvent = createSessionCaptureEvent()
-            validator.validate(sessionEvent, createGuidSelectionEvent())
+            val currentEvents = listOf(createSessionCaptureEvent(), createGuidSelectionEvent())
+            validator.validate(currentEvents, createGuidSelectionEvent())
         }
     }
 
     @Test
     fun validate_shouldThrowIfIdentificationCallbackIsNotPresent() {
         shouldThrow<GuidSelectEventValidatorException> {
-            val sessionEvent = createSessionCaptureEvent()
-            validator.validate(sessionEvent, createGuidSelectionEvent())
+            val currentEvents = listOf(createSessionCaptureEvent())
+            validator.validate(currentEvents, createGuidSelectionEvent())
         }
     }
 }
