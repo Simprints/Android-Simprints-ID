@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
@@ -18,13 +19,14 @@ import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBa
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
-import kotlinx.android.synthetic.main.fragment_finger.*
+import com.simprints.fingerprint.databinding.FragmentFingerBinding
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class FingerFragment : FingerprintFragment() {
 
     private val vm: CollectFingerprintsViewModel by sharedViewModel()
+    private val binding by viewBinding(FragmentFingerBinding::bind)
 
     private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
 
@@ -63,7 +65,7 @@ class FingerFragment : FingerprintFragment() {
                         .apply { if (it != 0) marginStart = PROGRESS_BAR_MARGIN }
                 }
             }.map { progressBar ->
-                progressBarContainer.addView(progressBar)
+                binding.progressBarContainer.addView(progressBar)
                 if (vm.isImageTransferRequired()) {
                     ScanningWithImageTransferTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
                 } else {
@@ -75,41 +77,41 @@ class FingerFragment : FingerprintFragment() {
 
     private fun updateOrHideFingerImageAccordingToSettings() {
         if (fingerprintPreferencesManager.fingerImagesExist) {
-            fingerImage.visibility = View.VISIBLE
-            fingerImage.setImageResource(fingerId.fingerDrawable())
+            binding.fingerImage.visibility = View.VISIBLE
+            binding.fingerImage.setImageResource(fingerId.fingerDrawable())
         } else {
-            fingerImage.visibility = View.INVISIBLE
+            binding.fingerImage.visibility = View.INVISIBLE
         }
     }
 
     private fun updateFingerNameText() {
-        fingerNumberText.text = getString(fingerId.nameTextId())
-        fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
+        binding.fingerNumberText.text = getString(fingerId.nameTextId())
+        binding.fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
     }
 
     private fun CollectFingerprintsState.updateFingerCaptureNumberText() {
         fingerStates.find { it.id == fingerId }?.run {
             if (isMultiCapture()) {
-                fingerCaptureNumberText.setTextColor(resources.getColor(nameTextColour(), null))
-                fingerCaptureNumberText.text = getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
-                fingerCaptureNumberText.visibility = View.VISIBLE
+                binding.fingerCaptureNumberText.setTextColor(resources.getColor(nameTextColour(), null))
+                binding.fingerCaptureNumberText.text = getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
+                binding.fingerCaptureNumberText.visibility = View.VISIBLE
             } else {
-                fingerCaptureNumberText.visibility = View.GONE
+                binding.fingerCaptureNumberText.visibility = View.GONE
             }
         }
     }
 
     private fun CollectFingerprintsState.updateFingerResultText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerResultText.text = getString(currentCapture().resultTextId())
-            fingerResultText.setTextColor(resources.getColor(currentCapture().resultTextColour(), null))
+            binding.fingerResultText.text = getString(currentCapture().resultTextId())
+            binding.fingerResultText.setTextColor(resources.getColor(currentCapture().resultTextColour(), null))
         }
     }
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
         fingerStates.find { it.id == fingerId }?.run {
-            fingerDirectionText.text = getString(directionTextId(isOnLastFinger()))
-            fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
+            binding.fingerDirectionText.text = getString(directionTextId(isOnLastFinger()))
+            binding.fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
         }
     }
 

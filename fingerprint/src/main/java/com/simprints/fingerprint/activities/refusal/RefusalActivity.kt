@@ -11,8 +11,8 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import org.koin.android.ext.android.inject
@@ -20,6 +20,7 @@ import org.koin.core.parameter.parametersOf
 
 class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
+    private lateinit var binding: ActivityRefusalBinding
     override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
 
     private val textWatcher = object : TextWatcher {
@@ -36,7 +37,9 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_refusal)
+        binding = ActivityRefusalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         title = getString(R.string.refusal_label)
 
@@ -48,35 +51,37 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     }
 
     private fun setTextInLayout() {
-        whySkipFingerprintingText.text = getString(R.string.why_did_you_skip_fingerprinting)
-        rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-        rbDataConcerns.text = getString(R.string.refusal_data_concerns)
-        rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-        rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-        rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-        rbTooYoung.text = getString(R.string.refusal_too_young)
-        rbOther.text = getString(R.string.refusal_other)
-        refusalText.hint = getString(R.string.hint_other_reason)
-        btScanFingerprints.text = getString(R.string.button_scan_prints)
-        btSubmitRefusalForm.text = getString(R.string.button_submit)
+        binding.apply {
+            whySkipFingerprintingText.text = getString(R.string.why_did_you_skip_fingerprinting)
+            rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            rbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            rbTooYoung.text = getString(R.string.refusal_too_young)
+            rbOther.text = getString(R.string.refusal_other)
+            refusalText.hint = getString(R.string.hint_other_reason)
+            btScanFingerprints.text = getString(R.string.button_scan_prints)
+            btSubmitRefusalForm.text = getString(R.string.button_submit)
+        }
     }
 
     private fun setButtonClickListeners() {
-        btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(getRefusalText()) }
-        btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
+        binding.btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(getRefusalText()) }
+        binding.btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
     }
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListeners() {
-        refusalScrollView.onLayoutChange { _, _, _, _,
+        binding.refusalScrollView.onLayoutChange { _, _, _, _,
                                            _, _, _, _, _ ->
             viewPresenter.handleLayoutChange()
         }
     }
 
     private fun setRadioGroupListener() {
-        refusalRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            refusalText.removeTextChangedListener(textWatcher)
+        binding.refusalRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
+            binding.refusalText.removeTextChangedListener(textWatcher)
             viewPresenter.handleRadioOptionCheckedChange()
             handleRadioOptionIdentifierClick(optionIdentifier)
         }
@@ -95,32 +100,32 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     }
 
     override fun scrollToBottom() {
-        refusalScrollView.post {
-            refusalScrollView.fullScroll(View.FOCUS_DOWN)
+        binding.refusalScrollView.post {
+            binding.refusalScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
     override fun enableSubmitButton() {
-        btSubmitRefusalForm.isEnabled = true
+        binding.btSubmitRefusalForm.isEnabled = true
     }
 
     override fun disableSubmitButton() {
-        btSubmitRefusalForm.isEnabled = false
+        binding.btSubmitRefusalForm.isEnabled = false
     }
 
     override fun enableRefusalText() {
-        refusalText.isEnabled = true
+        binding.refusalText.isEnabled = true
     }
 
     override fun setFocusOnRefusalReasonAndDisableSubmit() {
-        btSubmitRefusalForm.isEnabled = false
-        refusalText.requestFocus()
+        binding.btSubmitRefusalForm.isEnabled = false
+        binding.refusalText.requestFocus()
         setTextChangeListenerOnRefusalText()
-        inputMethodManager.showSoftInput(refusalText, SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(binding.refusalText, SHOW_IMPLICIT)
     }
 
     private fun setTextChangeListenerOnRefusalText() {
-        refusalText.addTextChangedListener(textWatcher)
+        binding.refusalText.addTextChangedListener(textWatcher)
     }
 
     override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalTaskResult) {
@@ -133,13 +138,13 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
             RefusalTaskResult.BUNDLE_KEY,
             refusalResult)
 
-    private fun getRefusalText() = refusalText.text.toString()
+    private fun getRefusalText() = binding.refusalText.text.toString()
 
     override fun onBackPressed() {
         viewPresenter.handleOnBackPressed()
     }
 
-    override fun isSubmitButtonEnabled() = btSubmitRefusalForm.isEnabled
+    override fun isSubmitButtonEnabled() = binding.btSubmitRefusalForm.isEnabled
 
     override fun showToastForFormSubmit() {
         showToast(getString(R.string.refusal_toast_submit))

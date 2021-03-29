@@ -4,20 +4,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
-import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.databinding.ActivityFingerprintAlertBinding as AlertBinding
+import com.simprints.fingerprint.databinding.ActivityFingerprintBluetoothAlertBinding as BluetoothAlertBinding
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -25,6 +28,15 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
 
     private lateinit var alertType: FingerprintAlert
     override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
+
+
+    private lateinit var alertLeftButton: TextView
+    private lateinit var alertLayout: LinearLayout
+    private lateinit var alertTitle: TextView
+    private lateinit var alertImage: ImageView
+    private lateinit var message: TextView
+    private var alertRightButton: TextView? = null
+    private var hintGraphic: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,12 +47,36 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
             ?: UNEXPECTED_ERROR
 
         if (isNewBluetoothAlert(alertType)) {
-           setContentView(R.layout.activity_fingerprint_bluetooth_alert)
+            BluetoothAlertBinding.inflate(layoutInflater).let {
+                setContentView(it.root)
+                setViewsWithBluetoothAlertBinding(it)
+            }
         } else {
-            setContentView(R.layout.activity_fingerprint_alert)
+            AlertBinding.inflate(layoutInflater).let {
+                setContentView(it.root)
+                setViewsWithAlertBinding(it)
+            }
         }
 
         viewPresenter.start()
+    }
+
+    private fun setViewsWithAlertBinding(binding: AlertBinding) {
+        alertLayout = binding.alertLayout
+        alertTitle = binding.alertTitle
+        alertImage = binding.alertImage
+        message = binding.message
+        alertLeftButton = binding.alertLeftButton
+        alertRightButton = binding.alertRightButton
+        hintGraphic = binding.hintGraphic
+    }
+
+    private fun setViewsWithBluetoothAlertBinding(binding: BluetoothAlertBinding) {
+        alertLayout = binding.alertLayout
+        alertTitle = binding.alertTitle
+        alertImage = binding.alertImage
+        message = binding.message
+        alertLeftButton = binding.alertLeftButton
     }
 
     override fun onResume() {
@@ -55,7 +91,7 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
     override fun setLeftButtonBackgroundColor(@ColorInt color: Int) {
-        alertLeftButton?.setBackgroundColor(color)
+        alertLeftButton.setBackgroundColor(color)
     }
 
     override fun setRightButtonBackgroundColor(@ColorInt color: Int) {
@@ -81,9 +117,9 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertLeftButton?.visibility = View.VISIBLE
-            alertLeftButton?.text = getString(leftButtonAction.buttonText)
-            alertLeftButton?.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
+            alertLeftButton.visibility = View.VISIBLE
+            alertLeftButton.text = getString(leftButtonAction.buttonText)
+            alertLeftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         }
     }
 
