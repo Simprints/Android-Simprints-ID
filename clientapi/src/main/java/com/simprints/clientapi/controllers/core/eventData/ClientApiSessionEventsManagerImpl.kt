@@ -93,13 +93,13 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.loadEventsFromSession(session.id).toList().any {
+        return coreEventRepository.getEventsFromSession(session.id).any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
     }
 
-    override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
-        coreEventRepository.loadEventsFromSession(sessionId)
+    override suspend fun getAllEventsForSession(sessionId: String): Set<Event> =
+        coreEventRepository.getEventsFromSession(sessionId)
 
     override suspend fun deleteSessionEvents(sessionId: String) {
         inBackground(dispatcher) {
