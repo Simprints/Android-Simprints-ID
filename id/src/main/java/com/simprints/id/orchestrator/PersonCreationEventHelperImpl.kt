@@ -64,7 +64,7 @@ class PersonCreationEventHelperImpl(
         val fingerprintCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FingerprintCaptureEvent>().toList()
         val faceCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FaceCaptureEvent>().toList()
 
-        eventRepository.addEventToCurrentSession(
+        eventRepository.addEvent(
             build(
                 timeHelper,
                 faceCaptureEvents,

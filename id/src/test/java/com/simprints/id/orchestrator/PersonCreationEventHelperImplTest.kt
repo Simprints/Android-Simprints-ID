@@ -111,7 +111,7 @@ class PersonCreationEventHelperImplTest {
             personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(fingerprintCaptureResponse))
 
             coVerify {
-                eventRepository.addEventToCurrentSession(match {
+                eventRepository.addEvent(match {
                     it == PersonCreationEvent(
                         startTime = CREATED_AT,
                         fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
@@ -139,7 +139,7 @@ class PersonCreationEventHelperImplTest {
             personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(faceCaptureResponse))
 
             coVerify {
-                eventRepository.addEventToCurrentSession(match {
+                eventRepository.addEvent(match {
                     it == PersonCreationEvent(
                         startTime = CREATED_AT,
                         fingerprintCaptureIds = null,
@@ -165,7 +165,7 @@ class PersonCreationEventHelperImplTest {
             )
 
             coVerify {
-                eventRepository.addEventToCurrentSession(match {
+                eventRepository.addEvent(match {
                     it == PersonCreationEvent(
                         startTime = CREATED_AT,
                         fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
@@ -198,7 +198,7 @@ class PersonCreationEventHelperImplTest {
             )
 
             coVerify(exactly = 0) {
-                eventRepository.addEventToCurrentSession(any())
+                eventRepository.addEvent(any())
             }
         }
     }
