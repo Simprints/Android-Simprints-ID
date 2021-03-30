@@ -44,7 +44,7 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         alertType.fromAlertToAlertTypeEvent()?.let {
-            inBackground { eventRepository.addEventToCurrentSession(AlertScreenEvent(timeHelper.now(), it)) }
+            inBackground { eventRepository.addEvent(AlertScreenEvent(timeHelper.now(), it)) }
         }
     }
 

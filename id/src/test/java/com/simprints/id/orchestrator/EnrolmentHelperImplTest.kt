@@ -57,7 +57,7 @@ class EnrolmentHelperImplTest {
             val expectedEnrolmentEvent = EnrolmentEventV2(CREATED_AT, defaultSubject.subjectId, defaultSubject.projectId, defaultSubject.moduleId, defaultSubject.attendantId, personCreationEvent.id)
 
             coVerify {
-                eventRepository.addEventToCurrentSession(expectedEnrolmentEvent)
+                eventRepository.addEvent(expectedEnrolmentEvent)
             }
         }
     }

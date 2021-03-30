@@ -29,7 +29,7 @@ class ClientApiSessionEventsManagerImpl(
         }
 
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addEvent(
                 IntentParsingEvent(
                     timeHelper.now(),
                     integration.fromDomainToCore()
@@ -42,7 +42,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addEvent(
                 AlertScreenEvent(
                     timeHelper.now(),
                     clientApiAlertType.fromAlertToAlertTypeEvent()
@@ -58,7 +58,7 @@ class ClientApiSessionEventsManagerImpl(
      * [https://www.sqlite.org/lockingv3.html]
      */
     override suspend fun addCompletionCheckEvent(complete: Boolean) {
-        coreEventRepository.addEventToCurrentSession(
+        coreEventRepository.addEvent(
             CompletionCheckEvent(
                 timeHelper.now(),
                 complete
@@ -68,7 +68,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addEvent(
                 SuspiciousIntentEvent(
                     timeHelper.now(),
                     unexpectedExtras
@@ -79,7 +79,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addEvent(
                 InvalidIntentEvent(
                     timeHelper.now(),
                     action,

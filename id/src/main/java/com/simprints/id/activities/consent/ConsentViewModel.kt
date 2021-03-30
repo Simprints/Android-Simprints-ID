@@ -8,6 +8,6 @@ import com.simprints.id.data.db.event.domain.models.ConsentEvent
 class ConsentViewModel(private val eventRepository: EventRepository) : ViewModel() {
 
     fun addConsentEvent(consentEvent: ConsentEvent) {
-        inBackground { eventRepository.addEventToCurrentSession(consentEvent) }
+        inBackground { eventRepository.addEvent(consentEvent) }
     }
 }
