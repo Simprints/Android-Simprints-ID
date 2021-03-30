@@ -6,7 +6,7 @@ import com.simprints.id.data.db.event.domain.models.Event
 
 class SessionDataCacheImpl(val application: Application) : SessionDataCache {
 
-    override val eventCache: MutableSet<Event>
+    override val eventCache: MutableList<Event>
         get() = application.eventCache
 
 }

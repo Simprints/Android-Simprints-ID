@@ -240,7 +240,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             currentSessionEvent.updateModalities(preferencesManager.modalities)
             eventRepository.addEvent(currentSessionEvent)
         }
-        val associatedEvents = eventRepository.loadEventsFromSession(currentSessionEvent.id)
+        val associatedEvents = eventRepository.getEventsFromSession(currentSessionEvent.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)
             eventRepository.addEvent(it)
