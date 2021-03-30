@@ -61,7 +61,7 @@ open class EventRepositoryImpl(
         }
 
     override suspend fun createSession(): SessionCaptureEvent {
-        closeSession(NEW_SESSION)
+        closeSessions(NEW_SESSION)
 
         return reportException {
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
@@ -87,13 +87,24 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun addEventToCurrentSession(event: Event) {
+    override suspend fun addEvent(event: Event) {
         val startTime = System.currentTimeMillis()
 
         ignoreException {
             reportException {
                 val session = getCurrentCaptureSessionEvent()
-                addEventToSession(event, session)
+
+                validators.forEach {
+                    it.validate(sessionDataCache.eventCache.toList(), event)
+                }
+
+                event.labels = event.labels.copy(
+                    sessionId = session.id,
+                    projectId = session.payload.projectId
+                )
+
+                saveEvent(event)
+                sessionDataCache.eventCache.add(event)
             }
         }
 
@@ -101,28 +112,7 @@ open class EventRepositoryImpl(
         Timber.d("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
-    private suspend fun addEventToSession(event: Event, session: SessionCaptureEvent) {
-        ignoreException {
-            reportException {
-                session.let {
-                    validators.forEach {
-                        it.validate(session, event)
-                    }
-
-                    event.labels = event.labels.copy(
-                        sessionId = session.id,
-                        projectId = session.payload.projectId
-                    )
-
-                    sessionDataCache.eventCache.add(event)
-
-                    saveEvent(event)
-                }
-            }
-        }
-    }
-
-    override suspend fun saveEvent(event: Event) {
+    private suspend fun saveEvent(event: Event) {
         ignoreException {
             reportException {
                 if (event.type.isNotASubjectEvent()) {
@@ -274,7 +264,7 @@ open class EventRepositoryImpl(
             eventLocalDataSource.loadAllFromSession(sessionId = sessionId)
         }
 
-    private suspend fun closeSession(reason: ArtificialTerminationPayload.Reason? = null) {
+    private suspend fun closeSessions(reason: ArtificialTerminationPayload.Reason? = null) {
 
         sessionDataCache.eventCache.clear()
 
