@@ -85,7 +85,7 @@ class PersonCreationEventHelperImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-        coEvery { eventRepository.loadEventsFromSession(any()) } returns emptyFlow()
+        coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
         coEvery { timeHelper.now() } returns CREATED_AT
 
 
@@ -95,18 +95,18 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun addPersonCreationEventIfNeeded_shouldLoadEventsForCurrentSessions() {
         runBlocking {
-            coEvery { eventRepository.loadEventsFromSession(any()) } returns emptyFlow()
+            coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(emptyList())
 
-            coVerify(atLeast = 2) { eventRepository.loadEventsFromSession(currentSession.id) }
+            coVerify(atLeast = 2) { eventRepository.getEventsFromSession(currentSession.id) }
         }
     }
 
     @Test
     fun fingerprintsCapturing_personCreationEventShouldHaveFingerprintsFieldsSet() {
         runBlocking {
-            coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent)
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent)
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(fingerprintCaptureResponse))
 
@@ -134,7 +134,7 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun facesCapturing_personCreationEventShouldHaveFacesFieldsSet() {
         runBlocking {
-            coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(currentSession, faceCaptureEvent)
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, faceCaptureEvent)
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(faceCaptureResponse))
 
@@ -155,7 +155,7 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun facesAndFingerprintsCapturing_personCreationEventShouldHaveFacesAndFingerprintsFieldsSet() {
         runBlocking {
-            coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent)
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent)
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(
                 listOf(
@@ -188,7 +188,7 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun personCreationEventAlreadyExistsInCurrentSession_nothingHappens() {
         runBlocking {
-            coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent, createPersonCreationEvent())
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent, createPersonCreationEvent())
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(
                 listOf(

@@ -47,7 +47,7 @@ class EnrolmentHelperImpl(
         Timber.tag(TAG).d("Register events for enrolments")
 
         val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
-        val personCreationEvent = eventRepository.loadEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
+        val personCreationEvent = eventRepository.getEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
 
         eventRepository.addEvent(
             EnrolmentEventV2(
