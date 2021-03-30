@@ -95,6 +95,8 @@ open class EventRepositoryImpl(
         reportException {
             val session = getCurrentCaptureSessionEvent()
 
+            sessionDataCache.eventCache.removeAll { it.id == event.id }
+
             validators.forEach {
                 it.validate(sessionDataCache.eventCache.toList(), event)
             }
@@ -104,7 +106,7 @@ open class EventRepositoryImpl(
         }
 
         val endTime = System.currentTimeMillis()
-        Timber.d("Save event: ${event.type} = ${endTime - startTime}ms")
+        Timber.d("Save event: $event = ${endTime - startTime}ms")
     }
 
     private suspend fun saveEvent(event: Event, session: SessionCaptureEvent) {
@@ -259,7 +261,7 @@ open class EventRepositoryImpl(
                 loadEventsIntoCache(sessionId)
             }
 
-            return@reportException flow<Event> {  sessionDataCache.eventCache.toSet()}
+            return@reportException flow { sessionDataCache.eventCache.toList().forEach { emit(it) } }
         }
 
     override suspend fun closeAllSessions(reason: Reason?) {

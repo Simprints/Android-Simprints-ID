@@ -29,7 +29,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
 
-    val eventCache: MutableSet<Event> = mutableSetOf()
+    val eventCache: MutableList<Event> = mutableListOf()
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
