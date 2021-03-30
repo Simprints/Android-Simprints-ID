@@ -120,9 +120,9 @@ open class OrchestratorManagerImpl(
             modalities, hotCache.appRequest, steps, sessionId
         )
 
+        dashboardDailyActivityRepository.updateDailyActivity(appResponseToReturn)
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
-        dashboardDailyActivityRepository.updateDailyActivity(appResponseToReturn)
     }
 
     private fun resetInternalState() {
