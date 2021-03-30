@@ -16,7 +16,6 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -27,10 +26,14 @@ class EnrolmentHelperImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK lateinit var subjectRepository: SubjectRepository
-    @MockK lateinit var eventRepository: EventRepository
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var timeHelper: TimeHelper
+    @MockK
+    lateinit var subjectRepository: SubjectRepository
+
+    @MockK
+    lateinit var eventRepository: EventRepository
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
 
     private lateinit var enrolmentHelper: EnrolmentHelper
     private val personCreationEvent = createPersonCreationEvent()
@@ -39,9 +42,8 @@ class EnrolmentHelperImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        enrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, loginInfoManager, timeHelper)
+        enrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
         coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(personCreationEvent)
 
@@ -49,39 +51,22 @@ class EnrolmentHelperImplTest {
     }
 
     @Test
-    fun enrol_shouldRegisterEnrolmentEvents() {
-        runBlocking {
+    fun `enrol should run correct actions`() = testCoroutineRule.runBlockingTest {
 
-            enrolmentHelper.enrol(defaultSubject)
+        enrolmentHelper.enrol(defaultSubject)
 
-            val expectedEnrolmentEvent = EnrolmentEventV2(CREATED_AT, defaultSubject.subjectId, defaultSubject.projectId, defaultSubject.moduleId, defaultSubject.attendantId, personCreationEvent.id)
+        val expectedEnrolmentEvent = EnrolmentEventV2(
+            CREATED_AT,
+            defaultSubject.subjectId,
+            defaultSubject.projectId,
+            defaultSubject.moduleId,
+            defaultSubject.attendantId,
+            personCreationEvent.id
+        )
 
-            coVerify {
-                eventRepository.addEventToCurrentSession(expectedEnrolmentEvent)
-            }
-        }
-    }
-
-    @Test
-    fun enrol_shouldEnrolANewSubject() {
-        runBlocking {
-            enrolmentHelper.enrol(defaultSubject)
-
-            coVerify(exactly = 1) {
-                subjectRepository.performActions(listOf(SubjectAction.Creation(defaultSubject)))
-            }
-        }
-    }
-
-    @Test
-    fun enrol_shouldPerformUpload() {
-        runBlocking {
-            enrolmentHelper.enrol(defaultSubject)
-
-            coVerify(exactly = 1) {
-                eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID)
-            }
-        }
+        coVerify { eventRepository.addEventToCurrentSession(expectedEnrolmentEvent) }
+        coVerify(exactly = 1) { subjectRepository.performActions(listOf(SubjectAction.Creation(defaultSubject))) }
+        coVerify(exactly = 0) { eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID) }
     }
 
     @After
