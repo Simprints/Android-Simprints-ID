@@ -4,6 +4,6 @@ import com.simprints.id.data.db.event.domain.models.Event
 
 interface SessionDataCache {
 
-    val eventCache: MutableList<Event>
+    val eventCache: MutableMap<String, Event>
 
 }
