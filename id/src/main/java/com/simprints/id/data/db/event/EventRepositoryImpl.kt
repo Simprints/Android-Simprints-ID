@@ -84,7 +84,7 @@ open class EventRepositoryImpl(
             )
 
             saveEvent(sessionCaptureEvent, sessionCaptureEvent)
-            sessionDataCache.eventCache.add(sessionCaptureEvent)
+            sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
             sessionCaptureEvent
         }
     }
@@ -95,18 +95,17 @@ open class EventRepositoryImpl(
         reportException {
             val session = getCurrentCaptureSessionEvent()
 
-            sessionDataCache.eventCache.removeAll { it.id == event.id }
-
             validators.forEach {
-                it.validate(sessionDataCache.eventCache.toList(), event)
+                it.validate(sessionDataCache.eventCache.values.toList(), event)
             }
 
-            sessionDataCache.eventCache.add(event)
+            sessionDataCache.eventCache[event.id] = event
+
             saveEvent(event, session)
         }
 
         val endTime = System.currentTimeMillis()
-        Timber.d("Save event: $event = ${endTime - startTime}ms")
+        Timber.d("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
     private suspend fun saveEvent(event: Event, session: SessionCaptureEvent) {
@@ -248,7 +247,8 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
-        sessionDataCache.eventCache.filterIsInstance<SessionCaptureEvent>().firstOrNull()
+        sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
+            .firstOrNull()
             ?: loadSessions(false).firstOrNull()?.also { session ->
                 loadEventsIntoCache(session.id)
             }
@@ -261,7 +261,9 @@ open class EventRepositoryImpl(
                 loadEventsIntoCache(sessionId)
             }
 
-            return@reportException flow { sessionDataCache.eventCache.toList().forEach { emit(it) } }
+            return@reportException flow {
+                sessionDataCache.eventCache.values.toList().forEach { emit(it) }
+            }
         }
 
     override suspend fun closeAllSessions(reason: Reason?) {
@@ -289,7 +291,7 @@ open class EventRepositoryImpl(
 
     private suspend fun loadEventsIntoCache(sessionId: String) {
         eventLocalDataSource.loadAllFromSession(sessionId).collect {
-            sessionDataCache.eventCache.add(it)
+            sessionDataCache.eventCache[it.id] = it
         }
     }
 

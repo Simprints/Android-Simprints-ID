@@ -6,6 +6,11 @@ import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.exceptions.safe.session.validator.SessionEventCaptureAlreadyExists
 
 class SessionCaptureEventValidator : EventValidator {
+
+    /**
+     * This validator checks to make sure that no new SESSION_CAPTURE events are added to the session.
+     * There can only be one session capture event in any given session.
+     */
     override fun validate(currentEvents: List<Event>, eventToAdd: Event) {
         if (eventToAdd is SessionCaptureEvent) {
             currentEvents.filter { it.payload.type == SESSION_CAPTURE }.forEach {
@@ -15,4 +20,5 @@ class SessionCaptureEventValidator : EventValidator {
             }
         }
     }
+
 }

@@ -8,8 +8,6 @@ import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.local.SessionDataCache
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
 import com.simprints.id.tools.logging.TimberDebugLoggingConfigHelper
@@ -29,7 +27,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
 
-    val eventCache: MutableList<Event> = mutableListOf()
+    val eventCache: MutableMap<String, Event> = mutableMapOf()
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
