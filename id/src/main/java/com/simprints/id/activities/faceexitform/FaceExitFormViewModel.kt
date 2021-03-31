@@ -11,7 +11,7 @@ class FaceExitFormViewModel(private val eventRepository: EventRepository) : View
 
     fun addExitFormEvent(startTime: Long, endTime: Long, otherText: String, faceExitFormReason: FaceExitFormReason) {
         inBackground {
-            eventRepository.addEvent(
+            eventRepository.addOrUpdateEvent(
                 RefusalEvent(startTime, endTime, faceExitFormReason.toRefusalEventAnswer(), otherText)
             )
         }

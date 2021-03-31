@@ -184,7 +184,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEvent(any<EnrolmentCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<EnrolmentCalloutEvent>()) }
         }
     }
 
@@ -196,7 +196,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify(exactly = 1) { eventRepositoryMock.addEvent(any<EnrolmentLastBiometricsCalloutEvent>()) }
+            coVerify(exactly = 1) { eventRepositoryMock.addOrUpdateEvent(any<EnrolmentLastBiometricsCalloutEvent>()) }
         }
     }
 
@@ -208,7 +208,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEvent(any<ConfirmationCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<ConfirmationCalloutEvent>()) }
         }
     }
 
@@ -220,7 +220,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEvent(any<IdentificationCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<IdentificationCalloutEvent>()) }
         }
     }
 
@@ -232,7 +232,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEvent(any<VerificationCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<VerificationCalloutEvent>()) }
         }
     }
 
@@ -242,7 +242,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.handleSignedInUser()
 
-            coVerify(exactly = 1) { eventRepositoryMock.addEvent(any()) }
+            coVerify(exactly = 1) { eventRepositoryMock.addOrUpdateEvent(any()) }
         }
     }
 

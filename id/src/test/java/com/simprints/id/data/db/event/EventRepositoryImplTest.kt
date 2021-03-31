@@ -195,7 +195,7 @@ class EventRepositoryImplTest {
             mockDbToHaveOneOpenSession(GUID1)
             val newEvent = createAlertScreenEvent()
 
-            eventRepo.addEvent(newEvent)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
@@ -366,7 +366,7 @@ class EventRepositoryImplTest {
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
 
-            eventRepo.addEvent(eventInSession)
+            eventRepo.addOrUpdateEvent(eventInSession)
 
             coVerify { eventLocalDataSource.loadAllFromType(SESSION_CAPTURE) }
             coVerify {
@@ -392,7 +392,7 @@ class EventRepositoryImplTest {
             coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns flowOf(session, eventInSession)
             val newEvent = createAlertScreenEvent().removeLabels()
 
-            eventRepo.addEvent(newEvent)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             verify { eventValidator.validate(session, newEvent) }
         }
