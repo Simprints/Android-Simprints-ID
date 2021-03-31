@@ -76,7 +76,7 @@ class EventRepositoryImplTest {
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { preferencesManager.modalities } returns listOf(FACE, FINGER)
         every { preferencesManager.language } returns LANGUAGE
-        every { sessionDataCache.currentSession } returns null
+        every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
         eventRepo = EventRepositoryImpl(
@@ -157,7 +157,7 @@ class EventRepositoryImplTest {
             val session = mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
 
-            eventRepo.addEventToSession(newEvent, session)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
@@ -176,14 +176,15 @@ class EventRepositoryImplTest {
     @Test
     fun addEvent_shouldStoreItIntoTheDbWithRightLabels() {
         runBlocking {
+            val session = mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
             newEvent.labels = EventLabels()
 
-            eventRepo.saveEvent(newEvent)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID))
+                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID, sessionId = GUID1))
                 )
             }
         }
@@ -394,7 +395,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addOrUpdateEvent(newEvent)
 
-            verify { eventValidator.validate(session, newEvent) }
+            verify { eventValidator.validate(listOf(eventInSession), newEvent) }
         }
     }
 
