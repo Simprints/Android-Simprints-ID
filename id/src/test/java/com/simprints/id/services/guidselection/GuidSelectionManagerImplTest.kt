@@ -57,7 +57,7 @@ class GuidSelectionManagerImplTest {
 
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
 
-            coVerify(exactly = 1) { eventRepository.addEvent(any<GuidSelectionEvent>()) }
+            coVerify(exactly = 1) { eventRepository.addOrUpdateEvent(any<GuidSelectionEvent>()) }
         }
     }
 

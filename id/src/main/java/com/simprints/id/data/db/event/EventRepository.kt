@@ -24,7 +24,7 @@ interface EventRepository {
 
     suspend fun getEventsFromSession(sessionId: String): Flow<Event>
 
-    suspend fun addEvent(event: Event)
+    suspend fun addOrUpdateEvent(event: Event)
 
     suspend fun uploadEvents(projectId: String): Flow<Int>
 

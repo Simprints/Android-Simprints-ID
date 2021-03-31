@@ -49,7 +49,7 @@ class EnrolmentHelperImpl(
         val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
         val personCreationEvent = eventRepository.getEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
 
-        eventRepository.addEvent(
+        eventRepository.addOrUpdateEvent(
             EnrolmentEventV2(
                 timeHelper.now(),
                 subject.subjectId,

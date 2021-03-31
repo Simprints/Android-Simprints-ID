@@ -14,7 +14,7 @@ class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository)
     override fun addEventInBackground(event: Event) {
         fromDomainToCore(event)?.let {
             inBackground {
-                eventRepository.addEvent(it)
+                eventRepository.addOrUpdateEvent(it)
             }
         }
     }
@@ -23,7 +23,7 @@ class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository)
         runBlocking {
             ignoreException {
                 fromDomainToCore(event)?.let {
-                    eventRepository.addEvent(it)
+                    eventRepository.addOrUpdateEvent(it)
                 }
             }
         }

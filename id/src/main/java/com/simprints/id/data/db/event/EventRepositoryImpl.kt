@@ -89,7 +89,7 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun addEvent(event: Event) {
+    override suspend fun addOrUpdateEvent(event: Event) {
         val startTime = System.currentTimeMillis()
 
         reportException {

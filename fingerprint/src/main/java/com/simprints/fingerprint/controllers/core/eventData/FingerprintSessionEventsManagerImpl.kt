@@ -15,7 +15,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
     override fun addEventInBackground(event: Event) {
         inBackground {
             fromDomainToCore(event)?.let {
-                eventRepository.addEvent(it)
+                eventRepository.addOrUpdateEvent(it)
             }
         }
     }
@@ -24,7 +24,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         ignoreException {
             fromDomainToCore(event)?.let {
                 runBlocking {
-                    eventRepository.addEvent(it)
+                    eventRepository.addOrUpdateEvent(it)
                 }
             }
         }
