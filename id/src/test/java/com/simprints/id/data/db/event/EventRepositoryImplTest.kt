@@ -11,6 +11,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
@@ -27,10 +28,12 @@ import com.simprints.id.tools.time.TimeHelper
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -38,6 +41,7 @@ import org.junit.jupiter.api.DisplayName
 import retrofit2.HttpException
 import retrofit2.Response
 
+@ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
 
     private lateinit var eventRepo: EventRepository
@@ -184,7 +188,13 @@ class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID, sessionId = GUID1))
+                    newEvent.copy(
+                        labels = EventLabels(
+                            deviceId = DEVICE_ID,
+                            projectId = DEFAULT_PROJECT_ID,
+                            sessionId = GUID1
+                        )
+                    )
                 )
             }
         }
@@ -321,7 +331,12 @@ class EventRepositoryImplTest {
     @Test
     fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
-            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(Response.error<String>(404, "".toResponseBody(null)))
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
+                Response.error<String>(
+                    404,
+                    "".toResponseBody(null)
+                )
+            )
 
             val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
@@ -390,12 +405,26 @@ class EventRepositoryImplTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
-            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns flowOf(session, eventInSession)
+            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns flowOf(
+                session,
+                eventInSession
+            )
             val newEvent = createAlertScreenEvent().removeLabels()
 
             eventRepo.addOrUpdateEvent(newEvent)
 
             verify { eventValidator.validate(listOf(eventInSession), newEvent) }
+        }
+    }
+
+    @Test
+    fun `should close current session correctly`() = runBlockingTest {
+        val session = mockDbToHaveOneOpenSession(GUID1)
+        eventRepo.closeCurrentSession(null)
+
+        assertThatSessionCaptureEventWasClosed(session)
+        coVerify(exactly = 0) {
+            eventLocalDataSource.insertOrUpdate(match { it.type == EventType.ARTIFICIAL_TERMINATION })
         }
     }
 

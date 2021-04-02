@@ -105,7 +105,7 @@ open class EventRepositoryImpl(
         }
 
         val endTime = System.currentTimeMillis()
-        Timber.d("Save event: ${event.type} = ${endTime - startTime}ms")
+        Timber.v("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
     private suspend fun saveEvent(event: Event, session: SessionCaptureEvent) {
@@ -266,21 +266,40 @@ open class EventRepositoryImpl(
             }
         }
 
+    /**
+     * The reason is only used when we want to create an [ArtificialTerminationEvent].
+     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
+     */
     override suspend fun closeAllSessions(reason: Reason?) {
 
         sessionDataCache.eventCache.clear()
 
-        loadSessions(false).collect { sessionEvent ->
+        loadSessions(false).collect { closeSession(it, reason) }
+    }
 
-            if (reason != null) {
-                saveEvent(ArtificialTerminationEvent(timeHelper.now(), reason), sessionEvent)
-            }
+    /**
+     * The reason is only used when we want to create an [ArtificialTerminationEvent].
+     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
+     */
+    override suspend fun closeCurrentSession(reason: Reason?) {
+        closeSession(getCurrentCaptureSessionEvent(), reason)
 
-            sessionEvent.payload.endedAt = timeHelper.now()
-            sessionEvent.payload.sessionIsClosed = true
+        sessionDataCache.eventCache.clear()
+    }
 
-            saveEvent(sessionEvent, sessionEvent)
+    /**
+     * The reason is only used when we want to create an [ArtificialTerminationEvent].
+     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
+     */
+    private suspend fun closeSession(sessionCaptureEvent: SessionCaptureEvent, reason: Reason?) {
+        if (reason != null) {
+            saveEvent(ArtificialTerminationEvent(timeHelper.now(), reason), sessionCaptureEvent)
         }
+
+        sessionCaptureEvent.payload.endedAt = timeHelper.now()
+        sessionCaptureEvent.payload.sessionIsClosed = true
+
+        saveEvent(sessionCaptureEvent, sessionCaptureEvent)
     }
 
     private suspend fun loadSessions(isClosed: Boolean): Flow<SessionCaptureEvent> {

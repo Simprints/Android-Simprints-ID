@@ -80,7 +80,7 @@ fun assertANewSessionCaptureWasAdded(event: Event): Boolean =
 
 
 fun assertThatSessionCaptureEventWasClosed(event: Event): Boolean =
-    event is SessionCaptureEvent && event.payload.endedAt > 0
+    event is SessionCaptureEvent && event.payload.endedAt > 0 && event.payload.sessionIsClosed
 
 fun assertThatArtificialTerminationEventWasAdded(event: Event, id: String): Boolean =
     event is ArtificialTerminationEvent &&
