@@ -7,11 +7,17 @@ import com.simprints.id.exceptions.safe.session.validator.SessionEventCaptureAlr
 
 class PersonCreationEventValidator : EventValidator {
 
+    /**
+     * This validator checks to make sure that no new PERSON_CREATION events are added to the session.
+     * There can only be one person creation event in any given session.
+     */
     override fun validate(currentEvents: List<Event>, eventToAdd: Event) {
         if (eventToAdd is PersonCreationEvent) {
-            if (currentEvents.any { it.payload.type == PERSON_CREATION }) {
-                throw SessionEventCaptureAlreadyExists("The session already has a PersonCreationEvent")
+            currentEvents.filter { it.payload.type == PERSON_CREATION }.forEach {
+                if (it.id != eventToAdd.id)
+                    throw SessionEventCaptureAlreadyExists("The session already has a PersonCreationEvent")
             }
         }
     }
+
 }

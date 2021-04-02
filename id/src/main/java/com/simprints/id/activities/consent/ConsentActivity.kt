@@ -199,7 +199,7 @@ class ConsentActivity : BaseSplitActivity() {
         inBackground {
             val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
             currentSessionEvent.payload.location = null
-            eventRepository.addEventToCurrentSession(currentSessionEvent)
+            eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
     }
 

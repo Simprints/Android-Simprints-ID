@@ -9,7 +9,6 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.tools.mockUUID
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -45,11 +44,43 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-        coEvery { eventRepository.loadEventsFromSession(any()) } returns flowOf(personCreationEvent)
+        coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(personCreationEvent)
 
         mockUUID()
     }
 
+    @Test
+    fun enrol_shouldRegisterEnrolmentEvents() {
+        testCoroutineRule.runBlockingTest {
+
+            enrolmentHelper.enrol(defaultSubject)
+
+            val expectedEnrolmentEvent = EnrolmentEventV2(
+                CREATED_AT,
+                defaultSubject.subjectId,
+                defaultSubject.projectId,
+                defaultSubject.moduleId,
+                defaultSubject.attendantId,
+                personCreationEvent.id
+            )
+
+            coVerify {
+                eventRepository.addOrUpdateEvent(expectedEnrolmentEvent)
+            }
+        }
+    }
+
+    @Test
+    fun enrol_shouldEnrolANewSubject() {
+        testCoroutineRule.runBlockingTest {
+            enrolmentHelper.enrol(defaultSubject)
+
+            coVerify(exactly = 1) {
+                subjectRepository.performActions(listOf(SubjectAction.Creation(defaultSubject)))
+            }
+        }
+    }
+    
     @Test
     fun `enrol should run correct actions`() = testCoroutineRule.runBlockingTest {
 
@@ -64,9 +95,18 @@ class EnrolmentHelperImplTest {
             personCreationEvent.id
         )
 
-        coVerify { eventRepository.addEventToCurrentSession(expectedEnrolmentEvent) }
-        coVerify(exactly = 1) { subjectRepository.performActions(listOf(SubjectAction.Creation(defaultSubject))) }
+        coVerify { eventRepository.addOrUpdateEvent(expectedEnrolmentEvent) }
+        coVerify(exactly = 1) {
+            subjectRepository.performActions(
+                listOf(
+                    SubjectAction.Creation(
+                        defaultSubject
+                    )
+                )
+            )
+        }
         coVerify(exactly = 0) { eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID) }
+
     }
 
     @After

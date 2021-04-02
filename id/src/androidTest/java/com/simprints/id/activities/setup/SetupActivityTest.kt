@@ -79,7 +79,7 @@ class SetupActivityTest {
         ActivityScenario.launch<SetupActivity>(intent)
 
         coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent()}
-        coVerify(exactly = 1) { mockEventRepository.addEventToCurrentSession(any())}
+        coVerify(exactly = 1) { mockEventRepository.addOrUpdateEvent(any())}
     }
 
     private fun buildFakeLocation() = Location(PROVIDER).apply {

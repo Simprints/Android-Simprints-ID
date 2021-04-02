@@ -51,7 +51,7 @@ class FetchGuidViewModelTest {
 
 
     private fun configureMocks() {
-        coEvery { eventRepository.addEventToCurrentSession(any()) } just Runs
+        coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
         every { timeHelper.now() } returns CREATED_AT
     }
 
@@ -104,7 +104,7 @@ class FetchGuidViewModelTest {
 
             viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
-            eventRepository.addEventToCurrentSession(
+            eventRepository.addOrUpdateEvent(
                 CandidateReadEvent(CREATED_AT,
                     CREATED_AT,
                     VERIFY_GUID,
@@ -120,7 +120,7 @@ class FetchGuidViewModelTest {
 
             viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
-            eventRepository.addEventToCurrentSession(
+            eventRepository.addOrUpdateEvent(
                 CandidateReadEvent(CREATED_AT,
                     CREATED_AT,
                     VERIFY_GUID,
@@ -137,7 +137,7 @@ class FetchGuidViewModelTest {
 
             viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
-            eventRepository.addEventToCurrentSession(
+            eventRepository.addOrUpdateEvent(
                 CandidateReadEvent(CREATED_AT,
                     CREATED_AT,
                     VERIFY_GUID,

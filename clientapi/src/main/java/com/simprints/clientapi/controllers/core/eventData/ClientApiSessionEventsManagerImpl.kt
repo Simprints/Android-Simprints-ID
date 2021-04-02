@@ -29,7 +29,7 @@ class ClientApiSessionEventsManagerImpl(
         }
 
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addOrUpdateEvent(
                 IntentParsingEvent(
                     timeHelper.now(),
                     integration.fromDomainToCore()
@@ -42,7 +42,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addOrUpdateEvent(
                 AlertScreenEvent(
                     timeHelper.now(),
                     clientApiAlertType.fromAlertToAlertTypeEvent()
@@ -58,7 +58,7 @@ class ClientApiSessionEventsManagerImpl(
      * [https://www.sqlite.org/lockingv3.html]
      */
     override suspend fun addCompletionCheckEvent(complete: Boolean) {
-        coreEventRepository.addEventToCurrentSession(
+        coreEventRepository.addOrUpdateEvent(
             CompletionCheckEvent(
                 timeHelper.now(),
                 complete
@@ -68,7 +68,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addOrUpdateEvent(
                 SuspiciousIntentEvent(
                     timeHelper.now(),
                     unexpectedExtras
@@ -79,7 +79,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
         inBackground(dispatcher) {
-            coreEventRepository.addEventToCurrentSession(
+            coreEventRepository.addOrUpdateEvent(
                 InvalidIntentEvent(
                     timeHelper.now(),
                     action,
@@ -93,13 +93,13 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.loadEventsFromSession(session.id).toList().any {
+        return coreEventRepository.getEventsFromSession(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
     }
 
     override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
-        coreEventRepository.loadEventsFromSession(sessionId)
+        coreEventRepository.getEventsFromSession(sessionId)
 
     override suspend fun deleteSessionEvents(sessionId: String) {
         inBackground(dispatcher) {

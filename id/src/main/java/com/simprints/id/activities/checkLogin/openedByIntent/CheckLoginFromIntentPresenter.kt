@@ -75,9 +75,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private suspend fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         ignoreException {
             if (appRequest !is AppRequest.AppRequestFollowUp) {
-                eventRepository.addEventToCurrentSession(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
+                eventRepository.addOrUpdateEvent(buildConnectivitySnapshotEvent(simNetworkUtils, timeHelper))
             }
-            eventRepository.addEventToCurrentSession(buildRequestEvent(timeHelper.now(), appRequest))
+            eventRepository.addOrUpdateEvent(buildRequestEvent(timeHelper.now(), appRequest))
         }
     }
 
@@ -163,7 +163,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            inBackground { eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
+            inBackground { eventRepository.addOrUpdateEvent(buildAuthorizationEvent(AuthorizationResult.NOT_AUTHORIZED)) }
 
             loginAlreadyTried.set(true)
             view.openLoginActivity(appRequest)
@@ -227,7 +227,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     private suspend fun addAuthorizedEventInCurrentSession() {
-        eventRepository.addEventToCurrentSession(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
+        eventRepository.addOrUpdateEvent(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
         Timber.d("[CHECK_LOGIN] Added authorised event")
     }
 
@@ -238,12 +238,12 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             currentSessionEvent.updateProjectId(signedProjectId)
             currentSessionEvent.updateModalities(preferencesManager.modalities)
-            eventRepository.saveEvent(currentSessionEvent)
+            eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
-        val associatedEvents = eventRepository.loadEventsFromSession(currentSessionEvent.id)
+        val associatedEvents = eventRepository.getEventsFromSession(currentSessionEvent.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)
-            eventRepository.saveEvent(it)
+            eventRepository.addOrUpdateEvent(it)
         }
 
         Timber.d("[CHECK_LOGIN] Updated projectId in current session")
@@ -255,7 +255,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         val payload = currentSessionEvent.payload
         payload.databaseInfo.recordCount = subjectLocalDataSource.count()
 
-        eventRepository.saveEvent(currentSessionEvent)
+        eventRepository.addOrUpdateEvent(currentSessionEvent)
         Timber.d("[CHECK_LOGIN] Updated Database count in current session")
     }
 
@@ -273,7 +273,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private suspend fun updateAnalyticsIdInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
         currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
-        eventRepository.saveEvent(currentSessionEvent)
+        eventRepository.addOrUpdateEvent(currentSessionEvent)
         Timber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 
