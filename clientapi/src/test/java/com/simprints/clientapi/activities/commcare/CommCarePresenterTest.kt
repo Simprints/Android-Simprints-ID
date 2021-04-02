@@ -127,6 +127,7 @@ class CommCarePresenterTest {
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -136,7 +137,8 @@ class CommCarePresenterTest {
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
-        getNewPresenter(Identify, mockSessionManagerToCreateSession()).handleIdentifyResponse(
+        val sessionEventsManagerMock = mockSessionManagerToCreateSession()
+        getNewPresenter(Identify, sessionEventsManagerMock).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId)
         )
 
@@ -153,6 +155,7 @@ class CommCarePresenterTest {
                 null
             )
         }
+        coVerify(exactly = 0) { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -176,6 +179,7 @@ class CommCarePresenterTest {
                 null
             )
         }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -191,6 +195,7 @@ class CommCarePresenterTest {
         verify(exactly = 1) {
             view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, null)
         }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -212,7 +217,10 @@ class CommCarePresenterTest {
                 null
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(CommCareCoSyncPresenterTest.RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(CommCareCoSyncPresenterTest.RETURN_FOR_FLOW_COMPLETED_CHECK)
+        }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
