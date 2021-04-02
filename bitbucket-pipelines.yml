@@ -264,7 +264,7 @@ flows:
 ######################################################################
 pipelines:
     branches:
-        master: *release-flow
+        main: *release-flow
         develop: *main-flow
         release/*: *deploy-flow
         ci/*: *ci-test
