@@ -54,27 +54,50 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreat
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true
+)
 @JsonSubTypes(
     JsonSubTypes.Type(value = ConfirmationCallbackEvent::class, name = CALLBACK_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = EnrolmentCallbackEvent::class, name = CALLBACK_ENROLMENT_KEY),
     JsonSubTypes.Type(value = ErrorCallbackEvent::class, name = CALLBACK_ERROR_KEY),
-    JsonSubTypes.Type(value = IdentificationCallbackEvent::class, name = CALLBACK_IDENTIFICATION_KEY),
+    JsonSubTypes.Type(
+        value = IdentificationCallbackEvent::class,
+        name = CALLBACK_IDENTIFICATION_KEY
+    ),
     JsonSubTypes.Type(value = RefusalCallbackEvent::class, name = CALLBACK_REFUSAL_KEY),
     JsonSubTypes.Type(value = VerificationCallbackEvent::class, name = CALLBACK_VERIFICATION_KEY),
     JsonSubTypes.Type(value = ConfirmationCalloutEvent::class, name = CALLOUT_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = EnrolmentCalloutEvent::class, name = CALLOUT_ENROLMENT_KEY),
-    JsonSubTypes.Type(value = EnrolmentLastBiometricsCalloutEvent::class, name = CALLOUT_LAST_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = EnrolmentLastBiometricsCalloutEvent::class,
+        name = CALLOUT_LAST_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = IdentificationCalloutEvent::class, name = CALLOUT_IDENTIFICATION_KEY),
     JsonSubTypes.Type(value = VerificationCalloutEvent::class, name = CALLOUT_VERIFICATION_KEY),
-    JsonSubTypes.Type(value = FaceCaptureConfirmationEvent::class, name = FACE_CAPTURE_CONFIRMATION_KEY),
+    JsonSubTypes.Type(
+        value = FaceCaptureConfirmationEvent::class,
+        name = FACE_CAPTURE_CONFIRMATION_KEY
+    ),
     JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceCaptureRetryEvent::class, name = FACE_CAPTURE_RETRY_KEY),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FaceOnboardingCompleteEvent::class, name = FACE_ONBOARDING_COMPLETE_KEY),
+    JsonSubTypes.Type(
+        value = FaceOnboardingCompleteEvent::class,
+        name = FACE_ONBOARDING_COMPLETE_KEY
+    ),
     JsonSubTypes.Type(value = SessionCaptureEvent::class, name = SESSION_CAPTURE_KEY),
-    JsonSubTypes.Type(value = EnrolmentRecordCreationEvent::class, name = ENROLMENT_RECORD_CREATION_KEY),
-    JsonSubTypes.Type(value = EnrolmentRecordDeletionEvent::class, name = ENROLMENT_RECORD_DELETION_KEY),
+    JsonSubTypes.Type(
+        value = EnrolmentRecordCreationEvent::class,
+        name = ENROLMENT_RECORD_CREATION_KEY
+    ),
+    JsonSubTypes.Type(
+        value = EnrolmentRecordDeletionEvent::class,
+        name = ENROLMENT_RECORD_DELETION_KEY
+    ),
     JsonSubTypes.Type(value = EnrolmentRecordMoveEvent::class, name = ENROLMENT_RECORD_MOVE_KEY),
     JsonSubTypes.Type(value = AlertScreenEvent::class, name = ALERT_SCREEN_KEY),
     JsonSubTypes.Type(value = ArtificialTerminationEvent::class, name = ARTIFICIAL_TERMINATION_KEY),
@@ -95,7 +118,10 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
     JsonSubTypes.Type(value = PersonCreationEvent::class, name = PERSON_CREATION_KEY),
     JsonSubTypes.Type(value = RefusalEvent::class, name = REFUSAL_KEY),
     JsonSubTypes.Type(value = ScannerConnectionEvent::class, name = SCANNER_CONNECTION_KEY),
-    JsonSubTypes.Type(value = ScannerFirmwareUpdateEvent::class, name = SCANNER_FIRMWARE_UPDATE_KEY),
+    JsonSubTypes.Type(
+        value = ScannerFirmwareUpdateEvent::class,
+        name = SCANNER_FIRMWARE_UPDATE_KEY
+    ),
     JsonSubTypes.Type(value = SuspiciousIntentEvent::class, name = SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY)
 )
@@ -104,6 +130,15 @@ abstract class Event {
     abstract val id: String
     abstract var labels: EventLabels
     abstract val payload: EventPayload
+
+    override fun equals(other: Any?): Boolean {
+        return other is Event && other.id == id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
 }
 
 fun EventType.isNotASubjectEvent() =

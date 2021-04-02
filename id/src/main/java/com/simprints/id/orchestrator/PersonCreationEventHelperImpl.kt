@@ -24,7 +24,7 @@ class PersonCreationEventHelperImpl(
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
         val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-        val personCreationEventInSession = eventRepository.loadEventsFromSession(currentSession.id).filterIsInstance<PersonCreationEvent>().toList()
+        val personCreationEventInSession = eventRepository.getEventsFromSession(currentSession.id).filterIsInstance<PersonCreationEvent>().toList()
         // If a personCreationEvent is already in the current session,
         // we don' want to add it again (the capture steps would still be the same)
         if (personCreationEventInSession.isEmpty()) {
@@ -61,10 +61,10 @@ class PersonCreationEventHelperImpl(
         faceSamples: List<FaceSample>
     ) {
         val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        val fingerprintCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FingerprintCaptureEvent>().toList()
-        val faceCaptureEvents = eventRepository.loadEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FaceCaptureEvent>().toList()
+        val fingerprintCaptureEvents = eventRepository.getEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FingerprintCaptureEvent>().toList()
+        val faceCaptureEvents = eventRepository.getEventsFromSession(currentCaptureSessionEvent.id).filterIsInstance<FaceCaptureEvent>().toList()
 
-        eventRepository.addEventToCurrentSession(
+        eventRepository.addOrUpdateEvent(
             build(
                 timeHelper,
                 faceCaptureEvents,

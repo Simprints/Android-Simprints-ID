@@ -5,15 +5,19 @@ import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.*
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.id.data.db.event.domain.models.isNotASubjectEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.SessionDataCache
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.events_sync.down.domain.fromDomainToApi
@@ -23,7 +27,6 @@ import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
-import com.simprints.id.tools.ignoreException
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -41,7 +44,8 @@ open class EventRepositoryImpl(
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
-    override val libSimprintsVersionName: String
+    override val libSimprintsVersionName: String,
+    private val sessionDataCache: SessionDataCache
 ) : EventRepository {
 
     companion object {
@@ -59,63 +63,64 @@ open class EventRepositoryImpl(
         }
 
     override suspend fun createSession(): SessionCaptureEvent {
-        return reportExceptionIfNeeded {
+        closeAllSessions(NEW_SESSION)
+
+        return reportException {
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
-                UUID.randomUUID().toString(),
-                currentProject,
-                timeHelper.now(),
-                preferencesManager.modalities.map { it.toMode() },
-                appVersionName,
-                libSimprintsVersionName,
-                preferencesManager.language,
-                Device(
+                id = UUID.randomUUID().toString(),
+                projectId = currentProject,
+                createdAt = timeHelper.now(),
+                modalities = preferencesManager.modalities.map { it.toMode() },
+                appVersionName = appVersionName,
+                libVersionName = libSimprintsVersionName,
+                language = preferencesManager.language,
+                device = Device(
                     VERSION.SDK_INT.toString(),
                     Build.MANUFACTURER + "_" + Build.MODEL,
-                    deviceId),
-                DatabaseInfo(sessionCount))
+                    deviceId
+                ),
+                databaseInfo = DatabaseInfo(sessionCount)
+            )
 
-            closeSessionsAndAddArtificialTerminationEvent(NEW_SESSION)
-            saveEvent(sessionCaptureEvent)
+            saveEvent(sessionCaptureEvent, sessionCaptureEvent)
+            sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
             sessionCaptureEvent
         }
     }
 
-    override suspend fun addEventToCurrentSession(event: Event) {
-        ignoreException {
-            reportExceptionIfNeeded {
-                val session = getCurrentCaptureSessionEvent()
-                addEventToSession(event, session)
+    override suspend fun addOrUpdateEvent(event: Event) {
+        val startTime = System.currentTimeMillis()
+
+        reportException {
+            val session = getCurrentCaptureSessionEvent()
+
+            validators.forEach {
+                it.validate(sessionDataCache.eventCache.values.toList(), event)
             }
+
+            sessionDataCache.eventCache[event.id] = event
+
+            saveEvent(event, session)
         }
+
+        val endTime = System.currentTimeMillis()
+        Timber.d("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
-    override suspend fun addEventToSession(event: Event, session: SessionCaptureEvent) {
-        ignoreException {
-            reportExceptionIfNeeded {
-                session.let {
-                    val eventsInSession = eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
-                    validators.forEach {
-                        it.validate(eventsInSession, event)
-                    }
-
-                    event.labels = event.labels.copy(sessionId = session.id, projectId = session.payload.projectId)
-                    saveEvent(event)
-                }
-            }
-        }
+    private suspend fun saveEvent(event: Event, session: SessionCaptureEvent) {
+        checkAndUpdateLabels(event, session)
+        eventLocalDataSource.insertOrUpdate(event)
     }
 
-    override suspend fun saveEvent(event: Event) {
-        ignoreException {
-            reportExceptionIfNeeded {
-                if (event.type.isNotASubjectEvent()) {
-                    event.labels = event.labels.appendLabelsForAllSessionEvents()
-                } else {
-                    event.labels = event.labels.appendProjectIdLabel()
-                }
-                eventLocalDataSource.insertOrUpdate(event)
-            }
+    private fun checkAndUpdateLabels(event: Event, session: SessionCaptureEvent) {
+        event.labels = event.labels.copy(
+            sessionId = session.id,
+            projectId = session.payload.projectId
+        )
+
+        if (event.type.isNotASubjectEvent()) {
+            event.labels = event.labels.copy(deviceId = deviceId)
         }
     }
 
@@ -128,7 +133,10 @@ open class EventRepositoryImpl(
     override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
         eventRemoteDataSource.count(query.fromDomainToApi())
 
-    override suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event> =
+    override suspend fun downloadEvents(
+        scope: CoroutineScope,
+        query: RemoteEventQuery
+    ): ReceiveChannel<Event> =
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
     override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
@@ -163,12 +171,8 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun deleteSessionEvents(sessionId: String) {
-        try {
+        reportException {
             eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
-        } catch (t: Throwable) {
-            Timber.e("Error deleting session from DB")
-            Timber.e(t)
-            crashReportManager.logException(t)
         }
     }
 
@@ -189,7 +193,9 @@ open class EventRepositoryImpl(
     @VisibleForTesting
     suspend fun createBatches(projectId: String): List<Batch> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
-        return createBatchesForEventsNotInSessions(projectId) + createBatchesForEventsInSessions(projectId)
+        return createBatchesForEventsNotInSessions(projectId) + createBatchesForEventsInSessions(
+            projectId
+        )
     }
 
     @Deprecated(
@@ -198,11 +204,12 @@ open class EventRepositoryImpl(
             "EnrolmentRecordCreationEvent anymore during an enrolment and the event is used only for the down-sync " +
             "(transformed to a subject). So this logic to batch the 'not-related with a session' events is unnecessary " +
             "from 2021.1.0, but it's still required during the migration from previous app versions since the DB may " +
-            "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0, this logic" +
+            "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0+, this logic" +
             "can be deleted."
     )
     private suspend fun createBatchesForEventsNotInSessions(projectId: String): List<Batch> {
-        val events = eventLocalDataSource.loadAllFromProject(projectId = projectId).filter { it.labels.sessionId == null }.toList()
+        val events = eventLocalDataSource.loadAllFromProject(projectId = projectId)
+            .filter { it.labels.sessionId == null }.toList()
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
 
         return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.toMutableList()) }
@@ -220,11 +227,14 @@ open class EventRepositoryImpl(
         return sessionsToUpload.fold(mutableListOf()) { batches, session ->
             val lastBatch = batches.lastOrNull()
             val eventsCountInTheLastBatch = lastBatch?.events?.size ?: 0
-            val eventsToUpload = eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
+            val eventsToUpload =
+                eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
 
-            val hasLastBatchStillRoom = eventsCountInTheLastBatch + eventsToUpload.size <= SESSION_BATCH_SIZE
+            val hasLastBatchStillRoom =
+                eventsCountInTheLastBatch + eventsToUpload.size <= SESSION_BATCH_SIZE
             if (hasLastBatchStillRoom && lastBatch != null) {
-                Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Adding $eventsCountInTheLastBatch into an existing batch")
+                Timber.tag(SYNC_LOG_TAG)
+                    .d("[EVENT_REPO] Adding $eventsCountInTheLastBatch into an existing batch")
 
                 lastBatch.events.addAll(eventsToUpload)
             } else {
@@ -236,29 +246,40 @@ open class EventRepositoryImpl(
         }
     }
 
-    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
-        reportExceptionIfNeeded {
-            loadSessions(false).firstOrNull() ?: createSession()
+    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
+        sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
+            .firstOrNull()
+            ?: loadSessions(false).firstOrNull()?.also { session ->
+                loadEventsIntoCache(session.id)
+            }
+            ?: createSession()
+    }
+
+    override suspend fun getEventsFromSession(sessionId: String): Flow<Event> =
+        reportException {
+            if (sessionDataCache.eventCache.isEmpty()) {
+                loadEventsIntoCache(sessionId)
+            }
+
+            return@reportException flow {
+                sessionDataCache.eventCache.values.toList().forEach { emit(it) }
+            }
         }
 
-    override suspend fun loadEventsFromSession(sessionId: String): Flow<Event> =
-        reportExceptionIfNeeded {
-            eventLocalDataSource.loadAllFromSession(sessionId = sessionId)
-        }
+    override suspend fun closeAllSessions(reason: Reason?) {
 
-    private suspend fun closeSessionsAndAddArtificialTerminationEvent(reason: ArtificialTerminationPayload.Reason) {
+        sessionDataCache.eventCache.clear()
+
         loadSessions(false).collect { sessionEvent ->
-            val artificialTerminationEvent = ArtificialTerminationEvent(
-                timeHelper.now(),
-                reason
-            ).apply { labels = labels.appendSessionId(sessionEvent.id) }
 
-            saveEvent(artificialTerminationEvent)
+            if (reason != null) {
+                saveEvent(ArtificialTerminationEvent(timeHelper.now(), reason), sessionEvent)
+            }
 
             sessionEvent.payload.endedAt = timeHelper.now()
             sessionEvent.payload.sessionIsClosed = true
 
-            saveEvent(sessionEvent)
+            saveEvent(sessionEvent, sessionEvent)
         }
     }
 
@@ -268,18 +289,13 @@ open class EventRepositoryImpl(
             .filter { it.payload.sessionIsClosed == isClosed }
     }
 
-    private fun EventLabels.appendLabelsForAllSessionEvents() =
-        this.appendProjectIdLabel().appendDeviceIdLabel()
-
-    private fun EventLabels.appendProjectIdLabel(): EventLabels {
-        return this.copy(projectId = currentProject)
+    private suspend fun loadEventsIntoCache(sessionId: String) {
+        eventLocalDataSource.loadAllFromSession(sessionId).collect {
+            sessionDataCache.eventCache[it.id] = it
+        }
     }
 
-    private fun EventLabels.appendDeviceIdLabel(): EventLabels = this.copy(deviceId = this@EventRepositoryImpl.deviceId)
-
-    private fun EventLabels.appendSessionId(sessionId: String): EventLabels = this.copy(sessionId = sessionId)
-
-    private suspend fun <T> reportExceptionIfNeeded(block: suspend () -> T): T =
+    private suspend fun <T> reportException(block: suspend () -> T): T =
         try {
             block()
         } catch (t: Throwable) {
@@ -290,4 +306,5 @@ open class EventRepositoryImpl(
 
     @VisibleForTesting
     data class Batch(val events: MutableList<Event>)
+
 }

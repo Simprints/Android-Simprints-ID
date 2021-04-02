@@ -31,10 +31,7 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactoryImpl
-import com.simprints.id.data.db.event.local.DbEventDatabaseFactoryImpl
-import com.simprints.id.data.db.event.local.EventDatabaseFactory
-import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.local.EventLocalDataSourceImpl
+import com.simprints.id.data.db.event.local.*
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -128,6 +125,9 @@ open class AppModule {
     @Singleton
     open fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager =
         RecentEventsPreferencesManagerImpl(prefs)
+
+    @Provides
+    open fun provideSessionDataCache(app: Application): SessionDataCache = SessionDataCacheImpl(app)
 
     @Provides
     @Singleton
@@ -252,7 +252,8 @@ open class AppModule {
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager,
-        validatorFactory: SessionEventValidatorsFactory
+        validatorFactory: SessionEventValidatorsFactory,
+        sessionDataCache: SessionDataCache
     ): EventRepository =
         EventRepositoryImpl(
             ctx.deviceId,
@@ -264,7 +265,8 @@ open class AppModule {
             crashReportManager,
             timeHelper,
             validatorFactory,
-            com.simprints.libsimprints.BuildConfig.VERSION_NAME
+            com.simprints.libsimprints.BuildConfig.VERSION_NAME,
+            sessionDataCache
         )
 
     @Provides

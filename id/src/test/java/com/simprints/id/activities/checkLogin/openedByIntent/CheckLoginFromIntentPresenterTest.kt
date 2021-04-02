@@ -100,7 +100,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { timeHelper.now() } returns CREATED_AT
 
             coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-            coEvery { eventRepository.loadEventsFromSession(any()) } returns emptyFlow()
+            coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
             coEvery { analyticsManager.getAnalyticsId() } returns GUID1
             crashReportManager = crashReportManagerMock
@@ -184,7 +184,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEventToCurrentSession(any<EnrolmentCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<EnrolmentCalloutEvent>()) }
         }
     }
 
@@ -196,7 +196,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify(exactly = 1) { eventRepositoryMock.addEventToCurrentSession(any<EnrolmentLastBiometricsCalloutEvent>()) }
+            coVerify(exactly = 1) { eventRepositoryMock.addOrUpdateEvent(any<EnrolmentLastBiometricsCalloutEvent>()) }
         }
     }
 
@@ -208,7 +208,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEventToCurrentSession(any<ConfirmationCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<ConfirmationCalloutEvent>()) }
         }
     }
 
@@ -220,7 +220,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEventToCurrentSession(any<IdentificationCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<IdentificationCalloutEvent>()) }
         }
     }
 
@@ -232,7 +232,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { eventRepositoryMock.addEventToCurrentSession(any<VerificationCalloutEvent>()) }
+            coVerify { eventRepositoryMock.addOrUpdateEvent(any<VerificationCalloutEvent>()) }
         }
     }
 
@@ -242,7 +242,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.handleSignedInUser()
 
-            coVerify(exactly = 1) { eventRepositoryMock.addEventToCurrentSession(any()) }
+            coVerify(exactly = 3) { eventRepositoryMock.addOrUpdateEvent(any()) }
         }
     }
 
@@ -265,7 +265,7 @@ class CheckLoginFromIntentPresenterTest {
 
             val session = createSessionCaptureEvent(projectId = GUID1)
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
-            coEvery { eventRepositoryMock.loadEventsFromSession(any()) } returns emptyFlow()
+            coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
             coEvery { analyticsManagerMock.getAnalyticsId() } returns GUID1
             coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
@@ -299,7 +299,7 @@ class CheckLoginFromIntentPresenterTest {
             }
 
             coVerify {
-                eventRepositoryMock.saveEvent(expected)
+                eventRepositoryMock.addOrUpdateEvent(expected)
             }
         }
     }
@@ -310,7 +310,7 @@ class CheckLoginFromIntentPresenterTest {
             val session = createSessionCaptureEvent(projectId = GUID1)
             val callout = createEnrolmentCalloutEvent(projectId = GUID1)
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
-            coEvery { eventRepositoryMock.loadEventsFromSession(any()) } returns flowOf(session, callout)
+            coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns flowOf(session, callout)
             coEvery { subjectLocalDataSourceMock.count(any()) } returns 2
 
             presenter.appRequest = AppVerifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID1)
@@ -318,7 +318,7 @@ class CheckLoginFromIntentPresenterTest {
             presenter.handleSignedInUser()
 
             coVerify {
-                eventRepositoryMock.saveEvent(createEnrolmentCalloutEvent(GUID1).apply {
+                eventRepositoryMock.addOrUpdateEvent(createEnrolmentCalloutEvent(GUID1).apply {
                     labels = labels.copy(projectId = DEFAULT_PROJECT_ID)
                 })
             }

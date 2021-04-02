@@ -15,7 +15,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
     override fun addEventInBackground(event: Event) {
         inBackground {
             fromDomainToCore(event)?.let {
-                eventRepository.addEventToCurrentSession(it)
+                eventRepository.addOrUpdateEvent(it)
             }
         }
     }
@@ -24,7 +24,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         ignoreException {
             fromDomainToCore(event)?.let {
                 runBlocking {
-                    eventRepository.addEventToCurrentSession(it)
+                    eventRepository.addOrUpdateEvent(it)
                 }
             }
         }
@@ -34,7 +34,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         runBlocking {
             ignoreException {
                 val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-                val scannerConnectivityEvents = eventRepository.loadEventsFromSession(currentSession.id).filterIsInstance<ScannerConnectionEvent>()
+                val scannerConnectivityEvents = eventRepository.getEventsFromSession(currentSession.id).filterIsInstance<ScannerConnectionEvent>()
                 scannerConnectivityEvents.collect { it.scannerInfo.hardwareVersion = hardwareVersion }
             }
         }
