@@ -171,6 +171,7 @@ class LibSimprintsPresenterTest {
                 RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
         verifyCompletionCheckEventWasAdded()
+        coVerify { clientApiSessionEventsManager.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -204,6 +205,7 @@ class LibSimprintsPresenterTest {
         }
 
         verifyCompletionCheckEventWasAdded()
+        coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -240,6 +242,7 @@ class LibSimprintsPresenterTest {
                 RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
         verifyCompletionCheckEventWasAdded()
+        coVerify { clientApiSessionEventsManager.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -259,6 +262,7 @@ class LibSimprintsPresenterTest {
             view.returnErrorToClient(any(), RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId)
         }
         verifyCompletionCheckEventWasAdded()
+        coVerify { clientApiSessionEventsManager.closeCurrentSessionNormally() }
     }
 
     private fun verifyCompletionCheckEventWasAdded() {
