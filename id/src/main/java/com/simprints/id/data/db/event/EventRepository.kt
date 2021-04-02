@@ -18,6 +18,8 @@ interface EventRepository {
 
     suspend fun createSession(): SessionCaptureEvent
 
+    suspend fun closeCurrentSession(reason: Reason? = null)
+
     suspend fun closeAllSessions(reason: Reason? = null)
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
