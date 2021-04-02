@@ -108,6 +108,9 @@ class ClientApiSessionEventsManagerImpl(
 
     /**
      * Closes the current session normally, without adding an [ArtificialTerminationEvent].
+     * After calling this method, the currentSessionId will be `null` and calling [getCurrentSessionId] will open
+     * a new session.
+     *
      * Since this is updating the session, it needs to run blocking instead of in background.
      */
     override suspend fun closeCurrentSessionNormally() {
