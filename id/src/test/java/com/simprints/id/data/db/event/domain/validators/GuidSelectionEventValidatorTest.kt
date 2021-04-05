@@ -11,6 +11,7 @@ import org.junit.Test
 class GuidSelectionEventValidatorTest {
 
     lateinit var validator: GuidSelectionEventValidator
+
     @Before
     fun setUp() {
         validator = GuidSelectionEventValidator()

@@ -22,7 +22,7 @@ class OrchestratorEventsHelperImpl(private val eventRepository: EventRepository,
 
         callbackEvent.let {
             inBackground {
-                eventRepository.addEventToCurrentSession(it)
+                eventRepository.addOrUpdateEvent(it)
             }
         }
     }

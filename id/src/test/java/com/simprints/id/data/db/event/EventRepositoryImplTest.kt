@@ -16,6 +16,7 @@ import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.validators.EventValidator
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.SessionDataCache
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -65,6 +66,9 @@ class EventRepositoryImplTest {
     @MockK
     lateinit var eventValidator: EventValidator
 
+    @MockK
+    lateinit var sessionDataCache: SessionDataCache
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -72,7 +76,7 @@ class EventRepositoryImplTest {
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { preferencesManager.modalities } returns listOf(FACE, FINGER)
         every { preferencesManager.language } returns LANGUAGE
-
+        every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
         eventRepo = EventRepositoryImpl(
@@ -85,7 +89,8 @@ class EventRepositoryImplTest {
             crashReportManager,
             timeHelper,
             sessionEventValidatorsFactory,
-            LIB_VERSION_NAME
+            LIB_VERSION_NAME,
+            sessionDataCache
         )
 
         runBlocking {
@@ -152,7 +157,7 @@ class EventRepositoryImplTest {
             val session = mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
 
-            eventRepo.addEventToSession(newEvent, session)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
@@ -171,14 +176,15 @@ class EventRepositoryImplTest {
     @Test
     fun addEvent_shouldStoreItIntoTheDbWithRightLabels() {
         runBlocking {
+            val session = mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
             newEvent.labels = EventLabels()
 
-            eventRepo.saveEvent(newEvent)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
-                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID))
+                    newEvent.copy(labels = EventLabels(deviceId = DEVICE_ID, projectId = DEFAULT_PROJECT_ID, sessionId = GUID1))
                 )
             }
         }
@@ -190,7 +196,7 @@ class EventRepositoryImplTest {
             mockDbToHaveOneOpenSession(GUID1)
             val newEvent = createAlertScreenEvent()
 
-            eventRepo.addEventToCurrentSession(newEvent)
+            eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
@@ -361,7 +367,7 @@ class EventRepositoryImplTest {
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
 
-            eventRepo.addEventToCurrentSession(eventInSession)
+            eventRepo.addOrUpdateEvent(eventInSession)
 
             coVerify { eventLocalDataSource.loadAllFromType(SESSION_CAPTURE) }
             coVerify {
@@ -387,9 +393,9 @@ class EventRepositoryImplTest {
             coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns flowOf(session, eventInSession)
             val newEvent = createAlertScreenEvent().removeLabels()
 
-            eventRepo.addEventToCurrentSession(newEvent)
+            eventRepo.addOrUpdateEvent(newEvent)
 
-            verify { eventValidator.validate(listOf(session, eventInSession), newEvent) }
+            verify { eventValidator.validate(listOf(eventInSession), newEvent) }
         }
     }
 

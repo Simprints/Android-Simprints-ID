@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event
 
 import com.simprints.id.Application
 import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -17,15 +18,13 @@ interface EventRepository {
 
     suspend fun createSession(): SessionCaptureEvent
 
+    suspend fun closeAllSessions(reason: Reason? = null)
+
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
-    suspend fun loadEventsFromSession(sessionId: String): Flow<Event>
+    suspend fun getEventsFromSession(sessionId: String): Flow<Event>
 
-    suspend fun addEventToCurrentSession(event: Event)
-
-    suspend fun addEventToSession(event: Event, session: SessionCaptureEvent)
-
-    suspend fun saveEvent(event: Event)
+    suspend fun addOrUpdateEvent(event: Event)
 
     suspend fun uploadEvents(projectId: String): Flow<Int>
 
@@ -35,7 +34,10 @@ interface EventRepository {
 
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 
-    suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event>
+    suspend fun downloadEvents(
+        scope: CoroutineScope,
+        query: RemoteEventQuery
+    ): ReceiveChannel<Event>
 
     suspend fun deleteSessionEvents(sessionId: String)
 

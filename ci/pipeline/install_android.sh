@@ -12,7 +12,7 @@ echo "sdk.dir=$PWD/android" >> local.properties
 echo "ndk.dir=$PWD/android/ndk-bundle" >> local.properties
 
 mkdir android
-cd android
+cd android || exit
 wget -nv https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 unzip -q -d cmdline-tools commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
 mv cmdline-tools/cmdline-tools cmdline-tools/tools
