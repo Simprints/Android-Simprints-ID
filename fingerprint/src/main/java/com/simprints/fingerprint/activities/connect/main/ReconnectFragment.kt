@@ -1,12 +1,14 @@
 package com.simprints.fingerprint.activities.connect.main
 
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
-import kotlinx.android.synthetic.main.fragment_reconnect.*
+import com.simprints.fingerprint.databinding.FragmentReconnectBinding
 
 class ReconnectFragment : ConnectFragment(R.layout.fragment_reconnect) {
+    private val binding by viewBinding(FragmentReconnectBinding::bind)
 
     override fun initUiComponents() {
-        reconnect_message_text_view.text = getString(R.string.reconnecting_message)
+        binding.reconnectMessageTextView.text = getString(R.string.reconnecting_message)
     }
 
     override fun observeScannerEvents() {

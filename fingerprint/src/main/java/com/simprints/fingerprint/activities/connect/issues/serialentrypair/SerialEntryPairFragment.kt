@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -18,11 +19,11 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.databinding.FragmentSerialEntryPairBinding
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
-import kotlinx.android.synthetic.main.fragment_serial_entry_pair.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -31,6 +32,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
     private val viewModel: SerialEntryPairViewModel by viewModel()
+    private val binding by viewBinding(FragmentSerialEntryPairBinding::bind)
 
     private val scannerPairingManager: ScannerPairingManager by inject()
     private val serialNumberConverter: SerialNumberConverter by inject()
@@ -58,25 +60,27 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
         sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.SerialEntryPair))
 
-        serialEntryOkButton.setOnClickListener { parseTextAndCommencePair() }
+        binding.serialEntryOkButton.setOnClickListener { parseTextAndCommencePair() }
         setupDoneButtonForEditText()
 
         viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith {
-            serialEntryOkButton.visibility = View.INVISIBLE
-            serialEntryPairProgressBar.visibility = View.VISIBLE
+            binding.serialEntryOkButton.visibility = View.INVISIBLE
+            binding.serialEntryPairProgressBar.visibility = View.VISIBLE
             handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
         }
     }
 
     private fun setTextInLayout() {
-        serialEntryOkButton.text = getString(R.string.serial_entry_ok)
-        serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
-        serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
-        serialEntryPairInstructionsDetailTextView.text = getString(R.string.enter_scanner_number_detail)
+        binding.apply {
+            serialEntryOkButton.text = getString(R.string.serial_entry_ok)
+            serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
+            serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
+            serialEntryPairInstructionsDetailTextView.text = getString(R.string.enter_scanner_number_detail)
+        }
     }
 
     private fun setupDoneButtonForEditText() {
-        serialEntryEditText.setOnEditorActionListener { _, actionId, _ ->
+        binding.serialEntryEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == IME_ACTION_DONE) {
                 parseTextAndCommencePair()
                 true
@@ -96,7 +100,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
         // Show the keyboard as we'll be focused on the serialEntryEditText
         val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.showSoftInput(serialEntryEditText, InputMethodManager.SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(binding.serialEntryEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onStop() {
@@ -111,7 +115,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     private fun parseTextAndCommencePair() {
         try {
-            val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(serialEntryEditText.text.toString())
+            val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(
+                binding.serialEntryEditText.text.toString())
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
             context?.showToast(getString(R.string.serial_entry_pair_toast_invalid))
@@ -131,10 +136,10 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private fun handlePairingAttemptFailed() {
         handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
-            serialEntryPairProgressBar.visibility = View.INVISIBLE
-            serialEntryOkButton.visibility = View.VISIBLE
-            serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            serialEntryPairInstructionsTextView.text = String.format(getString(R.string.serial_entry_pair_failed),
+            binding.serialEntryPairProgressBar.visibility = View.INVISIBLE
+            binding.serialEntryOkButton.visibility = View.VISIBLE
+            binding.serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
+            binding.serialEntryPairInstructionsTextView.text = String.format(getString(R.string.serial_entry_pair_failed),
                 serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()))
         }
     }
