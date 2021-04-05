@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -17,9 +18,9 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.databinding.FragmentBluetoothOffBinding
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import kotlinx.android.synthetic.main.fragment_bluetooth_off.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -29,6 +30,7 @@ class BluetoothOffFragment : FingerprintFragment() {
     private val bluetoothAdapter: ComponentBluetoothAdapter by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
+    private val binding by viewBinding(FragmentBluetoothOffBinding::bind)
 
     private val bluetoothOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -49,7 +51,7 @@ class BluetoothOffFragment : FingerprintFragment() {
 
         sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.BluetoothOff))
 
-        turnOnBluetoothButton.setOnClickListener {
+        binding.turnOnBluetoothButton.setOnClickListener {
             if (bluetoothAdapter.isEnabled()) {
                 handleBluetoothEnabled()
             } else {
@@ -59,8 +61,8 @@ class BluetoothOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        turnOnBluetoothButton.text = getString(R.string.turn_on_bluetooth)
-        bluetoothOffTitleTextView.text = getString(R.string.bluetooth_off_title)
+        binding.turnOnBluetoothButton.text = getString(R.string.turn_on_bluetooth)
+        binding.bluetoothOffTitleTextView.text = getString(R.string.bluetooth_off_title)
     }
 
     override fun onStart() {
@@ -75,9 +77,11 @@ class BluetoothOffFragment : FingerprintFragment() {
 
     private fun tryEnableBluetooth() {
         if (bluetoothAdapter.enable()) {
-            turnOnBluetoothProgressBar.visibility = View.VISIBLE
-            turnOnBluetoothButton.visibility = View.INVISIBLE
-            turnOnBluetoothButton.isEnabled = false
+            binding.apply {
+                turnOnBluetoothProgressBar.visibility = View.VISIBLE
+                turnOnBluetoothButton.visibility = View.INVISIBLE
+                turnOnBluetoothButton.isEnabled = false
+            }
         } else {
             handleCouldNotEnable()
         }
@@ -88,11 +92,13 @@ class BluetoothOffFragment : FingerprintFragment() {
     }
 
     private fun handleBluetoothEnabled() {
-        turnOnBluetoothProgressBar.visibility = View.INVISIBLE
-        turnOnBluetoothButton.visibility = View.VISIBLE
-        turnOnBluetoothButton.isEnabled = false
-        turnOnBluetoothButton.text = getString(R.string.bluetooth_on)
-        turnOnBluetoothButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
+        binding.apply {
+            turnOnBluetoothProgressBar.visibility = View.INVISIBLE
+            turnOnBluetoothButton.visibility = View.VISIBLE
+            turnOnBluetoothButton.isEnabled = false
+            turnOnBluetoothButton.text = getString(R.string.bluetooth_on)
+            turnOnBluetoothButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
+        }
         Handler().postDelayed({ retryConnectAndFinishFragment() }, FINISHED_TIME_DELAY_MS)
     }
 

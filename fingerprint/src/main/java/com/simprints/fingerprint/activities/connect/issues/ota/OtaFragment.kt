@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -13,12 +14,17 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import kotlinx.android.synthetic.main.fragment_ota.*
+import com.simprints.fingerprint.databinding.FragmentOtaBinding
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import kotlin.concurrent.schedule
 
+/**
+ * Ota (stands for: Over The Air) fragment is used to handle/send
+ * Over The Air updates to the fingerprint scanner, have a look at the
+ * readme for more details - /connect/README.md
+ */
 class OtaFragment : FingerprintFragment() {
 
     private val timeHelper: FingerprintTimeHelper by inject()
@@ -26,6 +32,7 @@ class OtaFragment : FingerprintFragment() {
 
     private val viewModel: OtaViewModel by viewModel()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    private val binding by viewBinding(FragmentOtaBinding::bind)
 
     private val args: OtaFragmentArgs by navArgs()
 
@@ -52,34 +59,39 @@ class OtaFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        otaTitleTextView.text = getString(R.string.ota_title)
-        otaInstructionsTextView.text = getString(R.string.ota_instructions)
-        startUpdateButton.text = getString(R.string.start_update)
+        binding.apply {
+            otaTitleTextView.text = getString(R.string.ota_title)
+            otaInstructionsTextView.text = getString(R.string.ota_instructions)
+            startUpdateButton.text = getString(R.string.start_update)
+        }
     }
 
     private fun initStartUpdateButton() {
-        startUpdateButton.setOnClickListener {
+        binding.startUpdateButton.setOnClickListener {
             adjustUiAndStartUpdate()
         }
     }
 
     private fun adjustUiAndStartUpdate() {
-        otaProgressBar.visibility = View.VISIBLE
-        otaStatusTextView.visibility = View.VISIBLE
-        otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
-            0 -> getString(R.string.updating)
-            else -> String.format(requireActivity().getString(R.string.updating_attempt),
-                "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}")
+        binding.apply {
+            otaProgressBar.visibility = View.VISIBLE
+            otaStatusTextView.visibility = View.VISIBLE
+            otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
+                0 -> getString(R.string.updating)
+                else -> String.format(requireActivity().getString(R.string.updating_attempt),
+                    "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}")
+            }
+            startUpdateButton.visibility = View.INVISIBLE
+            startUpdateButton.isEnabled = false
         }
-        startUpdateButton.visibility = View.INVISIBLE
-        startUpdateButton.isEnabled = false
+
         connectScannerViewModel.disableBackButton()
         viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
     }
 
     private fun listenForProgress() {
         viewModel.progress.fragmentObserveWith {
-            otaProgressBar.progress = (it * 100f).toInt()
+            binding.otaProgressBar.progress = (it * 100f).toInt()
         }
     }
 
@@ -97,7 +109,7 @@ class OtaFragment : FingerprintFragment() {
 
     private fun listenForCompleteEvent() {
         viewModel.otaComplete.fragmentObserveEventWith {
-            otaStatusTextView.text = getString(R.string.update_complete)
+            binding.otaStatusTextView.text = getString(R.string.update_complete)
             timeHelper.newTimer().schedule(FINISHED_TIME_DELAY_MS) {
                 requireActivity().runOnUiThread { retryConnectAndFinishFragment() }
             }
