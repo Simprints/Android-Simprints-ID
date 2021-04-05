@@ -217,7 +217,7 @@ def commons_io = [
 ]
 
 // For NTP time
-def kronos_version = "0.0.1-alpha11"
+def kronos_version = "0.0.1-alpha09"
 def kronos = [
     kronos: "com.lyft.kronos:kronos-android:$kronos_version"
 ]

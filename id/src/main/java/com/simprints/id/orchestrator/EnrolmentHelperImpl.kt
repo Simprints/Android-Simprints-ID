@@ -1,6 +1,5 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
@@ -9,11 +8,9 @@ import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.tools.time.TimeHelper
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
@@ -24,7 +21,6 @@ private const val TAG = "ENROLMENT"
 class EnrolmentHelperImpl(
     private val subjectRepository: SubjectRepository,
     private val eventRepository: EventRepository,
-    private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper
 ) : EnrolmentHelper {
 
@@ -35,11 +31,6 @@ class EnrolmentHelperImpl(
         Timber.tag(TAG).d("Create a subject record")
         subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
 
-        Timber.tag(TAG).d("Up-syncing")
-        inBackground {
-            eventRepository.uploadEvents(projectId = loginInfoManager.getSignedInProjectIdOrEmpty()).collect()
-        }
-
         Timber.tag(TAG).d("Done!")
     }
 
@@ -47,9 +38,9 @@ class EnrolmentHelperImpl(
         Timber.tag(TAG).d("Register events for enrolments")
 
         val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
-        val personCreationEvent = eventRepository.loadEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
+        val personCreationEvent = eventRepository.getEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
 
-        eventRepository.addEventToCurrentSession(
+        eventRepository.addOrUpdateEvent(
             EnrolmentEventV2(
                 timeHelper.now(),
                 subject.subjectId,
