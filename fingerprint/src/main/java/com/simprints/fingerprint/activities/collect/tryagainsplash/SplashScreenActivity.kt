@@ -3,17 +3,16 @@ package com.simprints.fingerprint.activities.collect.tryagainsplash
 import android.os.Bundle
 import android.os.Handler
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
 import com.simprints.fingerprint.databinding.ActivitySplashScreenBinding
 
 class SplashScreenActivity : BaseSplitActivity() {
-    private lateinit var binding: ActivitySplashScreenBinding
+    private val binding by viewBinding(ActivitySplashScreenBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivitySplashScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setTextInLayout()
