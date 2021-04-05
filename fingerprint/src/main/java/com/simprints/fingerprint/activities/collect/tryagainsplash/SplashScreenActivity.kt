@@ -3,15 +3,17 @@ package com.simprints.fingerprint.activities.collect.tryagainsplash
 import android.os.Bundle
 import android.os.Handler
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
-import kotlinx.android.synthetic.main.activity_splash_screen.*
+import com.simprints.fingerprint.databinding.ActivitySplashScreenBinding
 
 class SplashScreenActivity : BaseSplitActivity() {
+    private val binding by viewBinding(ActivitySplashScreenBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash_screen)
+        setContentView(binding.root)
 
         setTextInLayout()
 
@@ -22,9 +24,8 @@ class SplashScreenActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        splashGetReady.text = getString(R.string.get_ready)
-        splashTryAnotherFinger.text = getString(R.string.try_another_finger)
-
+        binding.splashGetReady.text = getString(R.string.get_ready)
+        binding.splashTryAnotherFinger.text = getString(R.string.try_another_finger)
     }
 
     override fun onBackPressed() { }

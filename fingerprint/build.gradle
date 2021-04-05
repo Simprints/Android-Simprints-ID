@@ -56,6 +56,10 @@ android {
     packagingOptions {
         pickFirst 'mockito-extensions/org.mockito.plugins.MockMaker'
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 buildscript {

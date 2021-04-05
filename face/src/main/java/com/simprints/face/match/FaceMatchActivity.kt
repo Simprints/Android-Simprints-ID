@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.getStringPlural
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
@@ -25,13 +26,12 @@ import org.koin.android.viewmodel.ext.android.viewModel
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 class FaceMatchActivity : FaceActivity() {
     private val vm: FaceMatchViewModel by viewModel()
-    private lateinit var binding: ActivityFaceMatchBinding
+    private val binding by viewBinding(ActivityFaceMatchBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityFaceMatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         setTextInLayout()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
