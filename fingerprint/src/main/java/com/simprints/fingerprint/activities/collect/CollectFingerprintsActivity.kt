@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -41,7 +42,7 @@ class CollectFingerprintsActivity: FingerprintActivity() {
     private val masterFlowManager: MasterFlowManager by inject()
 
     private val vm: CollectFingerprintsViewModel by viewModel()
-    private lateinit var binding: ActivityCollectFingerprintsBinding
+    private val binding by viewBinding(ActivityCollectFingerprintsBinding::inflate)
     private lateinit var mainContentBinding: ContentMainBinding
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
@@ -50,8 +51,6 @@ class CollectFingerprintsActivity: FingerprintActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityCollectFingerprintsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mainContentBinding = binding.mainContent
 

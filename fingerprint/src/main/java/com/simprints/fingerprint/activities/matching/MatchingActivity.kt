@@ -10,6 +10,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.simprints.core.tools.extentions.getStringPlural
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -23,7 +24,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class MatchingActivity : FingerprintActivity() {
 
     private val viewModel: MatchingViewModel by viewModel()
-    private lateinit var binding: ActivityMatchingBinding
+    private val binding by viewBinding(ActivityMatchingBinding::inflate)
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
@@ -34,7 +35,6 @@ class MatchingActivity : FingerprintActivity() {
         matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
-        binding = ActivityMatchingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setTextInLayout()

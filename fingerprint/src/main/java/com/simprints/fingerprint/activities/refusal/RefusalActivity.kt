@@ -11,6 +11,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
 import org.jetbrains.anko.inputMethodManager
@@ -20,7 +21,7 @@ import org.koin.core.parameter.parametersOf
 
 class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
-    private lateinit var binding: ActivityRefusalBinding
+    private val binding by viewBinding(ActivityRefusalBinding::inflate)
     override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
 
     private val textWatcher = object : TextWatcher {
@@ -36,8 +37,6 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityRefusalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
