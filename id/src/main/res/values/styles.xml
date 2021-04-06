@@ -131,7 +131,7 @@
     <!-- Common -->
     <style name="SimprintsOrangeButton" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/button_rounded_corners_orange</item>
-        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli_semibold</item>
         <item name="android:textColor">@color/simprints_white</item>
         <item name="android:textSize">16sp</item>
         <item name="android:padding">3dp</item>
@@ -140,6 +140,6 @@
     </style>
 
     <style name="SimprintsButton" parent="Base.Widget.AppCompat.Button">
-        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli_semibold</item>
     </style>
 </resources>
