@@ -25,4 +25,6 @@ interface ClientApiSessionEventsManager {
     suspend fun getAllEventsForSession(sessionId: String): Flow<Event>
 
     suspend fun deleteSessionEvents(sessionId: String)
+
+    suspend fun closeCurrentSessionNormally()
 }
