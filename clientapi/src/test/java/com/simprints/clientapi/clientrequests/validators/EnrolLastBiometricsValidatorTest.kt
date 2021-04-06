@@ -2,7 +2,7 @@ package com.simprints.clientapi.clientrequests.validators
 
 import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
-import io.kotlintest.shouldThrow
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -19,14 +19,14 @@ class EnrolLastBiometricsValidatorTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        every { enrolLastBiometricsExtractor.getProjectId() } returns "project_id"
+        every { enrolLastBiometricsExtractor.getProjectId() } returns "xppPLwmR2eUmyN6LS3SN"
         every { enrolLastBiometricsExtractor.getUserId() } returns "user_id"
     }
 
     @Test
     fun givenNotIdentificationAsLastFlow_enrolLastBiometricsReceived_shouldThrowAnException() {
         val enrolLastBiometricsValidator = EnrolLastBiometricsValidator(enrolLastBiometricsExtractor, sessionID, false)
-        shouldThrow<InvalidSessionIdException> {
+        assertThrows<InvalidSessionIdException> {
             enrolLastBiometricsValidator.validateClientRequest()
         }
     }
@@ -34,7 +34,7 @@ class EnrolLastBiometricsValidatorTest {
     @Test
     fun aRequestWithoutSessionIdReceived_shouldThrowAnException() {
         val enrolLastBiometricsValidator = EnrolLastBiometricsValidator(enrolLastBiometricsExtractor, sessionID, true)
-        shouldThrow<InvalidSessionIdException> {
+        assertThrows<InvalidSessionIdException> {
             enrolLastBiometricsValidator.validateClientRequest()
         }
     }
