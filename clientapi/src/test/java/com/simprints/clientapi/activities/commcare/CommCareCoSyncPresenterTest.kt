@@ -147,6 +147,7 @@ class CommCareCoSyncPresenterTest {
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -181,6 +182,7 @@ class CommCareCoSyncPresenterTest {
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -212,6 +214,7 @@ class CommCareCoSyncPresenterTest {
                 "{\"events\":[${jsonHelper.toJson(identificationCallbackEvent)}]}"
             )
         }
+        coVerify(exactly = 0) { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -233,6 +236,7 @@ class CommCareCoSyncPresenterTest {
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -257,6 +261,7 @@ class CommCareCoSyncPresenterTest {
                 "{\"events\":[${jsonHelper.toJson(verificationCallbackEvent)}]}"
             )
         }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -272,6 +277,7 @@ class CommCareCoSyncPresenterTest {
         verify(exactly = 1) {
             view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, "{\"events\":[]}")
         }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -295,6 +301,7 @@ class CommCareCoSyncPresenterTest {
             )
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -319,6 +326,7 @@ class CommCareCoSyncPresenterTest {
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
         coVerify(exactly = 1) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -352,6 +360,7 @@ class CommCareCoSyncPresenterTest {
         }
         coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
         coVerify(exactly = 0) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
