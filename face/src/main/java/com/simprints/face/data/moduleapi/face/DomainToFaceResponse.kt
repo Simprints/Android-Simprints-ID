@@ -4,7 +4,7 @@ import com.simprints.face.data.moduleapi.face.responses.*
 import com.simprints.moduleapi.face.responses.*
 import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
 import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 object DomainToFaceResponse {
 

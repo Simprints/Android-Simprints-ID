@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.responses.IFaceErrorReason
 import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceErrorResponse(val reason: FaceErrorReason) : FaceResponse {
