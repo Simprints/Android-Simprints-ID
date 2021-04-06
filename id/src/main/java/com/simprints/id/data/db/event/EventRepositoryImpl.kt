@@ -270,17 +270,13 @@ open class EventRepositoryImpl(
      * The reason is only used when we want to create an [ArtificialTerminationEvent].
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
-    override suspend fun closeAllSessions(reason: Reason?) {
+    private suspend fun closeAllSessions(reason: Reason) {
 
         sessionDataCache.eventCache.clear()
 
         loadSessions(false).collect { closeSession(it, reason) }
     }
 
-    /**
-     * The reason is only used when we want to create an [ArtificialTerminationEvent].
-     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
-     */
     override suspend fun closeCurrentSession(reason: Reason?) {
         closeSession(getCurrentCaptureSessionEvent(), reason)
 
