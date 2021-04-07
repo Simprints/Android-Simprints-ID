@@ -1,4 +1,4 @@
-package com.simprints.face.license.data.remote
+package com.simprints.id.data.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery

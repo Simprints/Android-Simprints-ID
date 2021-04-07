@@ -1,4 +1,4 @@
-package com.simprints.face.license.data.remote
+package com.simprints.id.data.license.remote
 
 import com.simprints.id.network.TimberLogger
 import okhttp3.OkHttpClient

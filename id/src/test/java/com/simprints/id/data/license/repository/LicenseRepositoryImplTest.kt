@@ -1,8 +1,8 @@
-package com.simprints.face.license.data.repository
+package com.simprints.id.data.license.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.license.data.local.LicenseLocalDataSource
-import com.simprints.face.license.data.remote.LicenseRemoteDataSource
+import com.simprints.id.data.license.local.LicenseLocalDataSource
+import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

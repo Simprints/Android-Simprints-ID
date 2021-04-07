@@ -1,4 +1,4 @@
-package com.simprints.face.license.data.remote
+package com.simprints.id.data.license.remote
 
 import okhttp3.Credentials
 import okhttp3.Interceptor

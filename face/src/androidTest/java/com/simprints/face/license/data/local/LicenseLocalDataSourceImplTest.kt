@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.license.local.LicenseLocalDataSourceImpl
 import io.mockk.every
 import io.mockk.spyk
 import org.junit.Before

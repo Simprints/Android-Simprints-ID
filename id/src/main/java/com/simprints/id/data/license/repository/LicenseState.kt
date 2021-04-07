@@ -1,4 +1,4 @@
-package com.simprints.face.license.data.repository
+package com.simprints.id.data.license.repository
 
 sealed class LicenseState {
     object Started : LicenseState()
