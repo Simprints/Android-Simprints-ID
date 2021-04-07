@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.databinding.ActivityFingerSelectionBinding
@@ -28,7 +29,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
     @Inject
     lateinit var viewModelFactory: FingerSelectionViewModelFactory
     private lateinit var viewModel: FingerSelectionViewModel
-    private lateinit var binding: ActivityFingerSelectionBinding
+    private val binding by viewBinding(ActivityFingerSelectionBinding::inflate)
 
     private lateinit var fingerSelectionAdapter: FingerSelectionItemAdapter
 
@@ -65,7 +66,6 @@ class FingerSelectionActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
-        binding = ActivityFingerSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         configureToolbar()
