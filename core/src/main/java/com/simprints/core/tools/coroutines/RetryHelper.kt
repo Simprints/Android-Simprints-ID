@@ -15,7 +15,8 @@ suspend fun <T> retryIO(
         try {
             return runBlock()
         } catch (t: Throwable) {
-            Timber.d("IO failed")
+            Timber.e("IO failed")
+            Timber.e(t)
 
             if (!retryIf(t)) {
                 throw t

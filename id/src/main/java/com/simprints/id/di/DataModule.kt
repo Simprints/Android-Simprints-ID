@@ -28,7 +28,6 @@ import com.simprints.id.data.license.local.LicenseLocalDataSource
 import com.simprints.id.data.license.local.LicenseLocalDataSourceImpl
 import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
-import com.simprints.id.data.license.remote.NetworkComponentsFactory
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -169,8 +168,8 @@ open class DataModule {
         LicenseLocalDataSourceImpl(context)
 
     @Provides
-    open fun provideLicenseRemoteDataSource(): LicenseRemoteDataSource =
-        LicenseRemoteDataSourceImpl(NetworkComponentsFactory.getLicenseServer())
+    open fun provideLicenseRemoteDataSource(simApiClientFactory: SimApiClientFactory): LicenseRemoteDataSource =
+        LicenseRemoteDataSourceImpl(simApiClientFactory)
 
     @Provides
     open fun provideLicenseRepository(
