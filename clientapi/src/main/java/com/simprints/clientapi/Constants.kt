@@ -4,5 +4,5 @@ object Constants {
 
     const val RETURN_FOR_FLOW_COMPLETED = true
     const val RETURN_FOR_FLOW_NOT_COMPLETED = !RETURN_FOR_FLOW_COMPLETED
-
+    const val PROJECT_ID_LENGTH = 20
 }
