@@ -1,17 +1,20 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
@@ -21,36 +24,39 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
-                               private val eventRepository: EventRepository,
-                               private val subjectRepository: SubjectRepository,
-                               private val preferencesManager: PreferencesManager,
-                               private val projectId: String,
-                               private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-                               private val imageRepository: ImageRepository,
-                               private val eventSyncManager: EventSyncManager) : ViewModel() {
+class SyncInformationViewModel(
+    private val downySyncHelper: EventDownSyncHelper,
+    private val eventRepository: EventRepository,
+    private val subjectRepository: SubjectRepository,
+    private val preferencesManager: PreferencesManager,
+    private val projectId: String,
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    private val imageRepository: ImageRepository,
+    private val eventSyncManager: EventSyncManager
+) : ViewModel() {
 
-    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> =
-        eventSyncManager.getLastSyncState().map { it.isRunning() }.switchMap { isRunning ->
-            MutableLiveData<SyncInformationActivity.ViewState>().apply {
-                viewModelScope.launch {
-                    if (isRunning) {
-                        value = LoadingState.Syncing
-                    } else {
-                        value = LoadingState.Calculating
-                        value = fetchRecords()
-                    }
-                }
-            }
+    private val _viewState: MutableLiveData<SyncInformationActivity.ViewState> = MutableLiveData()
+    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> = _viewState
+
+    fun fetchSyncInformation() = viewModelScope.launch {
+        // If a sync was never triggered (in Co-Sync only for example) then it will return null
+        val isRunning = eventSyncManager.getLastSyncState().value?.isRunning() ?: false
+
+        if (isRunning) {
+            _viewState.value = LoadingState.Syncing
+        } else {
+            _viewState.value = LoadingState.Calculating
+            _viewState.value = fetchRecords()
         }
+    }
 
     private suspend fun fetchRecords(): SyncDataFetched {
         val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
         return SyncDataFetched(
             recordsInLocal = fetchLocalRecordCount(),
-            recordsToDownSync = subjectCounts?.toCreate,
+            recordsToDownSync = subjectCounts?.toCreate ?: 0,
             recordsToUpSync = fetchAndUpdateRecordsToUpSyncCount(),
-            recordsToDelete = subjectCounts?.toDelete,
+            recordsToDelete = subjectCounts?.toDelete ?: 0,
             imagesToUpload = fetchAndUpdateImagesToUploadCount(),
             moduleCounts = fetchAndUpdateSelectedModulesCount()
         )
@@ -62,10 +68,10 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
+        eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
-        if (isDownSyncAllowed()) {
+        if (isDownSyncAllowed() && preferencesManager.canSyncToSimprints()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             null
@@ -73,9 +79,8 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
     private fun isDownSyncAllowed() =
         with(preferencesManager) {
-            this.eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
+            eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
         }
-
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
@@ -100,8 +105,10 @@ class SyncInformationViewModel(private val downySyncHelper: EventDownSyncHelper,
 
     private suspend fun fetchAndUpdateSelectedModulesCount() =
         preferencesManager.selectedModules.map {
-            ModuleCount(it,
-                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it)))
+            ModuleCount(
+                it,
+                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it))
+            )
         }
 
 
