@@ -123,7 +123,14 @@ object KoinInjector {
 
     private fun Module.defineBuildersForViewModels() {
         viewModel { FaceOrchestratorViewModel(get()) }
-        viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get(), get()) }
+        viewModel {
+            FaceCaptureViewModel(
+                get<FacePreferencesManager>().maxRetries,
+                get<FacePreferencesManager>().shouldSaveFaceImages,
+                get(),
+                get()
+            )
+        }
         viewModel {
             FaceMatchViewModel(
                 get(),

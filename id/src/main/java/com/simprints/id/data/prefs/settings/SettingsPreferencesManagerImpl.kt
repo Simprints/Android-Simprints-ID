@@ -150,7 +150,7 @@ open class SettingsPreferencesManagerImpl(
 
     /**
      * Whether the parental consent should be shown
-      */
+     */
     override var parentalConsentExists: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -172,7 +172,7 @@ open class SettingsPreferencesManagerImpl(
 
     /**
      * The options of the parental consent as a JSON string of booleans
-      */
+     */
     override var parentalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -338,6 +338,14 @@ open class SettingsPreferencesManagerImpl(
             FACE_NB_OF_FRAMES_CAPTURED_DEFAULT
         )
 
+    override var shouldSaveFaceImages: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            SHOULD_SAVE_FACE_IMAGES_KEY,
+            SHOULD_SAVE_FACE_IMAGES_DEFAULT
+        )
+
     override var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
         by RemoteConfigComplexPreference(
             prefs,
@@ -369,7 +377,10 @@ open class SettingsPreferencesManagerImpl(
     ): T = serializer.deserialize(getRemoteConfigStringPreference(key))
 
     override fun getRemoteConfigFingerprintsToCollect() =
-        getRemoteConfigComplexPreference(FINGERPRINTS_TO_COLLECT_KEY, fingerprintsToCollectSerializer)
+        getRemoteConfigComplexPreference(
+            FINGERPRINTS_TO_COLLECT_KEY,
+            fingerprintsToCollectSerializer
+        )
 
     companion object {
         const val NB_IDS_KEY = "NbOfIdsInt"
@@ -403,10 +414,12 @@ open class SettingsPreferencesManagerImpl(
         const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
 
         const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String =
+            JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String =
+            JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
 
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
@@ -430,7 +443,8 @@ open class SettingsPreferencesManagerImpl(
         const val MODALITY_KEY = "Modality"
 
         const val FINGERPRINTS_TO_COLLECT_KEY = "FingerprintsToCollect"
-        val FINGERPRINTS_TO_COLLECT_DEFAULT = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+        val FINGERPRINTS_TO_COLLECT_DEFAULT =
+            listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
 
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
@@ -446,6 +460,9 @@ open class SettingsPreferencesManagerImpl(
 
         const val FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT = false
         const val FINGERPRINT_LIVE_FEEDBACK_ON_KEY = "FingerprintLiveFeedbackOn"
+
+        const val SHOULD_SAVE_FACE_IMAGES_DEFAULT = true
+        const val SHOULD_SAVE_FACE_IMAGES_KEY = "SaveFaceImages"
 
         const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60
         const val FINGERPRINT_QUALITY_THRESHOLD_KEY = "FingerprintQualityThreshold"
