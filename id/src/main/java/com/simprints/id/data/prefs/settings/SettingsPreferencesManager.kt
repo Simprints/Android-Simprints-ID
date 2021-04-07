@@ -57,7 +57,10 @@ interface SettingsPreferencesManager {
     var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
 
     fun getRemoteConfigStringPreference(key: String): String
-    fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
+    fun <T : Any> getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
     fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>
 
 }
+
+fun SettingsPreferencesManager.canSyncToSimprints(): Boolean =
+    syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)

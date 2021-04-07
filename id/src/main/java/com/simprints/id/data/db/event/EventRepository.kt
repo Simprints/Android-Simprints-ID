@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event
 
 import com.simprints.id.Application
 import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType
@@ -18,7 +19,11 @@ interface EventRepository {
 
     suspend fun createSession(): SessionCaptureEvent
 
-    suspend fun closeAllSessions(reason: Reason? = null)
+    /**
+     * The reason is only used when we want to create an [ArtificialTerminationEvent].
+     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
+     */
+    suspend fun closeCurrentSession(reason: Reason? = null)
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 

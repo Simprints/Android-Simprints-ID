@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -76,7 +76,7 @@ open class EventSyncMasterWorker(
                 getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
 
-                if (!canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
+                if (!preferenceManager.canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
 
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
@@ -129,10 +129,6 @@ open class EventSyncMasterWorker(
 
     private fun isEventDownSyncAllowed() = with(preferenceManager) {
         eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-    }
-
-    private fun canSyncToSimprints(): Boolean = with(preferenceManager) {
-        syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
     }
 
     private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =

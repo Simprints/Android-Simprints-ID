@@ -24,11 +24,13 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
+import com.simprints.id.databinding.ActivityDashboardBinding
+import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
+import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.*
-import kotlinx.android.synthetic.main.activity_dashboard_card_project_details.*
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
@@ -48,6 +50,9 @@ class DashboardActivity : BaseSplitActivity() {
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private lateinit var viewModel: DashboardViewModel
+    private lateinit var binding: ActivityDashboardBinding
+    private lateinit var projectDetailsBinding: ActivityDashboardCardProjectDetailsBinding
+    private lateinit var dailyActivityBinding: ActivityDashboardCardDailyActivityBinding
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -60,8 +65,15 @@ class DashboardActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         val component = (application as Application).component
         component.inject(this)
-        setContentView(R.layout.activity_dashboard)
+
+        binding = ActivityDashboardBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         title = getString(R.string.dashboard_label)
+        // set bindings for included layouts
+        dailyActivityBinding = binding.dashboardDailyActivity
+        projectDetailsBinding = binding.dashboardProjectDetails
+
 
         setupActionBar()
         setupViewModel()
@@ -71,15 +83,15 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun setupActionBar() {
-        dashboardToolbar.title = getString(R.string.dashboard_label)
-        setSupportActionBar(dashboardToolbar)
+        binding.dashboardToolbar.title = getString(R.string.dashboard_label)
+        setSupportActionBar(binding.dashboardToolbar)
         supportActionBar?.elevation = 4F
 
         setMenuItemClickListener()
     }
 
     private fun setMenuItemClickListener() {
-        dashboardToolbar.setOnMenuItemClickListener { menuItem ->
+        binding.dashboardToolbar.setOnMenuItemClickListener { menuItem ->
 
             when (menuItem.itemId) {
                 R.id.menuPrivacyNotice -> startActivity(
@@ -127,9 +139,13 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun setupCards() {
-        projectDetailsCardDisplayer.initRoot(dashboard_project_details_card)
-        syncCardDisplayer.initRoot(dashboard_sync_card)
-        dailyActivityCardDisplayer.initRoot(dashboard_daily_activity_card_root)
+        projectDetailsCardDisplayer.initRoot(projectDetailsBinding.dashboardProjectDetailsCard)
+        dailyActivityCardDisplayer.initRoot(dailyActivityBinding.dashboardDailyActivityCardRoot)
+
+        // init sync-card only when syncing to BFSID is allowed
+        if (settingsPreferencesManager.canSyncToSimprints()) {
+            syncCardDisplayer.initRoot(binding.dashboardSyncCard)
+        }
     }
 
     private fun observeCardData() {
@@ -165,9 +181,9 @@ class DashboardActivity : BaseSplitActivity() {
     private fun loadDailyActivity() {
         viewModel.getDailyActivity().let {
             if (it.hasNoActivity()) {
-                dashboard_daily_activity_card.visibility = View.GONE
+                 dailyActivityBinding.dashboardDailyActivityCard.visibility = View.GONE
             } else {
-                dashboard_daily_activity_card.visibility = View.VISIBLE
+                dailyActivityBinding.dashboardDailyActivityCard.visibility = View.VISIBLE
                 dailyActivityCardDisplayer.displayDailyActivityState(it)
             }
         }
@@ -186,6 +202,14 @@ class DashboardActivity : BaseSplitActivity() {
         super.onResume()
         loadDailyActivity()
 
+        // trigger sync ticker only when syncing to BFSID
+        if (settingsPreferencesManager.canSyncToSimprints()) {
+            startTickerToCheckIfSyncIsRequired()
+        }
+    }
+
+    @ObsoleteCoroutinesApi
+    private fun startTickerToCheckIfSyncIsRequired() {
         lifecycleScope.launch {
             stopTickerToCheckIfSyncIsRequired()
             syncAgainTicker = ticker(

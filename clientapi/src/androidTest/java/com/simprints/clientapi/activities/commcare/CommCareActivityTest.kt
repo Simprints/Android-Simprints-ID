@@ -43,7 +43,7 @@ class CommCareActivityTest : BaseClientApiTest() {
 
     private fun buildIntent(): Intent {
         return Intent(ConfirmIdentity.action)
-            .putExtra(SIMPRINTS_PROJECT_ID, "projectId")
+            .putExtra(SIMPRINTS_PROJECT_ID, "xppPLwmR2eUmyN6LS3SN")
             .putExtra(SIMPRINTS_SESSION_ID, "sessionId")
             .putExtra(SIMPRINTS_SELECTED_GUID, "selectedGuid")
     }

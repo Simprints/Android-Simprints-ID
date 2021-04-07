@@ -20,8 +20,7 @@ class ClientApiSessionEventsManagerImpl(
     private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) :
-    ClientApiSessionEventsManager {
+) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         runBlocking {
@@ -105,6 +104,17 @@ class ClientApiSessionEventsManagerImpl(
         inBackground(dispatcher) {
             coreEventRepository.deleteSessionEvents(sessionId)
         }
+    }
+
+    /**
+     * Closes the current session normally, without adding an [ArtificialTerminationEvent].
+     * After calling this method, the currentSessionId will be `null` and calling [getCurrentSessionId] will open
+     * a new session.
+     *
+     * Since this is updating the session, it needs to run blocking instead of in background.
+     */
+    override suspend fun closeCurrentSessionNormally() {
+        coreEventRepository.closeCurrentSession()
     }
 }
 
