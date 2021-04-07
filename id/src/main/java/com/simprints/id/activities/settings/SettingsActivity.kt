@@ -7,6 +7,7 @@ import android.view.MenuItem
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
@@ -16,7 +17,7 @@ import com.simprints.id.databinding.SettingsToolbarBinding
 
 class SettingsActivity : BaseSplitActivity() {
 
-    private lateinit var binding: SettingsToolbarBinding
+    private val binding by viewBinding(SettingsToolbarBinding::inflate)
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -30,7 +31,6 @@ class SettingsActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = SettingsToolbarBinding.inflate(layoutInflater)
         setContentView(binding.root)
         title = getString(R.string.title_activity_settings)
 

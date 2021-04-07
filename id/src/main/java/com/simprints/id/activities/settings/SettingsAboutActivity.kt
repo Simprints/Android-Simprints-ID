@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.databinding.SettingsToolbarBinding
@@ -12,7 +13,7 @@ import com.simprints.id.databinding.SettingsToolbarBinding
 
 class SettingsAboutActivity : BaseSplitActivity() {
 
-    private lateinit var binding: SettingsToolbarBinding
+    private val binding by viewBinding(SettingsToolbarBinding::inflate)
 
     companion object {
         private const val LOGOUT_RESULT_CODE = 1
@@ -27,7 +28,6 @@ class SettingsAboutActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         title = getString(R.string.title_activity_settings_about)
 
-        binding = SettingsToolbarBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
