@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -21,6 +22,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -28,16 +30,12 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_login.loginButtonScanQr
-import kotlinx.android.synthetic.main.activity_login.loginButtonSignIn
-import kotlinx.android.synthetic.main.activity_login.loginEditTextProjectId
-import kotlinx.android.synthetic.main.activity_login.loginEditTextProjectSecret
-import kotlinx.android.synthetic.main.activity_login.loginEditTextUserId
-import kotlinx.android.synthetic.main.activity_login.loginImageViewLogo
 import timber.log.Timber
 import javax.inject.Inject
 
 class LoginActivity : BaseSplitActivity() {
+
+    private val binding by viewBinding(ActivityLoginBinding::inflate)
 
     @Inject lateinit var viewModelFactory: LoginViewModelFactory
     @Inject lateinit var crashReportManager: CrashReportManager
@@ -55,7 +53,8 @@ class LoginActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
-        setContentView(R.layout.activity_login)
+
+        setContentView(binding.root)
 
         baseUrlProvider.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
@@ -67,25 +66,27 @@ class LoginActivity : BaseSplitActivity() {
         setUpTexts()
         setUpButtons()
         progressDialog = SimProgressDialog(this)
-        loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
+        binding.loginEditTextUserId.setText(loginActRequest.userIdFromIntent)
     }
 
     private fun setUpTexts() {
-        loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
-        loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
-        loginButtonScanQr.text = getString(R.string.scan_qr)
-        loginButtonSignIn.text = getString(R.string.login)
-        loginEditTextProjectId.hint = getString(R.string.login_id_hint)
-        loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
+        binding.apply {
+            loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
+            loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
+            loginButtonScanQr.text = getString(R.string.scan_qr)
+            loginButtonSignIn.text = getString(R.string.login)
+            loginEditTextProjectId.hint = getString(R.string.login_id_hint)
+            loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
+        }
     }
 
     private fun setUpButtons() {
-        loginButtonScanQr.setOnClickListener {
+        binding.loginButtonScanQr.setOnClickListener {
             logMessageForCrashReport("Scan QR button clicked")
             scanQrCode()
         }
 
-        loginButtonSignIn.setOnClickListener {
+        binding.loginButtonSignIn.setOnClickListener {
             logMessageForCrashReport("Login button clicked")
             signIn()
         }
@@ -152,8 +153,8 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private fun updateProjectInfoOnTextFields(projectId: String, projectSecret: String) {
-        loginEditTextProjectId.setText(projectId)
-        loginEditTextProjectSecret.setText(projectSecret)
+        binding.loginEditTextProjectId.setText(projectId)
+        binding.loginEditTextProjectSecret.setText(projectSecret)
     }
 
     private fun showErrorForInvalidQRCode() {
@@ -174,9 +175,9 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun signIn() {
         progressDialog.show()
-        val projectId = loginEditTextProjectId.text.toString()
-        val userId = loginEditTextUserId.text.toString()
-        val projectSecret = loginEditTextProjectSecret.text.toString()
+        val projectId = binding.loginEditTextProjectId.text.toString()
+        val userId = binding.loginEditTextUserId.text.toString()
+        val projectSecret = binding.loginEditTextProjectSecret.text.toString()
         val projectIdFromIntent = loginActRequest.projectIdFromIntent
 
         val areMandatoryCredentialsPresent = loginActivityHelper.areMandatoryCredentialsPresent(

@@ -1,8 +1,10 @@
 package com.simprints.id.activities.consent
 
 import android.content.Intent
+import android.widget.Button
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
@@ -21,7 +23,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
-import kotlinx.android.synthetic.main.activity_consent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -93,4 +94,7 @@ class ConsentActivityTest {
     private fun getIntentForConsentAct() = Intent().apply {
         putExtra(CORE_STEP_BUNDLE, AskConsentRequest(ConsentType.ENROL))
     }
+
+    private val ConsentActivity.consentDeclineButton
+        get() = findViewById<Button>(R.id.consentDeclineButton)
 }
