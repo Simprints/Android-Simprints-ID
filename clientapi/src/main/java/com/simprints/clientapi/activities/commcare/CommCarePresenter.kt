@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
-private const val RETURN_TIMEOUT = 1_000L
+private const val RETURN_TIMEOUT = 3_000L
 
 class CommCarePresenter(
     private val view: CommCareContract.View,
@@ -72,16 +72,21 @@ class CommCarePresenter(
 
     override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
             view.returnRegistration(
                 enrol.guid,
-                getCurrentSessionIdOrEmpty(),
+                currentSessionId,
                 flowCompletedCheck,
-                getEventsJsonForSession(getCurrentSessionIdOrEmpty()),
+                getEventsJsonForSession(currentSessionId),
                 getEnrolmentCreationEventForSubject(enrol.guid)
             )
-            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -106,59 +111,79 @@ class CommCarePresenter(
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
             view.returnConfirmation(
                 flowCompletedCheck,
-                getCurrentSessionIdOrEmpty(),
-                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+                currentSessionId,
+                getEventsJsonForSession(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
-        }
-    }
-
-    override fun handleResponseError(errorResponse: ErrorResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(
-                errorResponse,
-                flowCompletedCheck,
-                getCurrentSessionIdOrEmpty(),
-                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
-            )
-            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
             view.returnVerification(
                 verify.matchResult.confidenceScore,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
-                getCurrentSessionIdOrEmpty(),
+                currentSessionId,
                 flowCompletedCheck,
-                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+                getEventsJsonForSession(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
             view.returnExitForms(
                 refusalForm.reason,
                 refusalForm.extra,
-                getCurrentSessionIdOrEmpty(),
+                currentSessionId,
                 flowCompletedCheck,
-                getEventsJsonForSession(getCurrentSessionIdOrEmpty())
+                getEventsJsonForSession(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(getCurrentSessionIdOrEmpty())
+            deleteSessionEventsIfNeeded(currentSessionId)
+        }
+    }
+
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
+            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnErrorToClient(
+                errorResponse,
+                flowCompletedCheck,
+                currentSessionId,
+                getEventsJsonForSession(currentSessionId)
+            )
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -185,8 +210,6 @@ class CommCarePresenter(
 
         return jsonHelper.toJson(CommCareEvents(listOf(recordCreationEvent)))
     }
-
-    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
 
     /**
      * This method will wait [RETURN_TIMEOUT] for the completion event to finish.
