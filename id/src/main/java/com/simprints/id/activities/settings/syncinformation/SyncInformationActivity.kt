@@ -18,6 +18,7 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -62,6 +63,8 @@ class SyncInformationActivity : BaseSplitActivity() {
         observeUi()
         setupProgressOverlay()
         setupRecordsCountCards()
+
+        viewModel.fetchSyncInformation()
     }
 
     override fun onResume() {
@@ -211,6 +214,13 @@ class SyncInformationActivity : BaseSplitActivity() {
             binding.recordsToDownloadCardView.visibility = View.GONE
             binding.recordsToDeleteCardView.visibility = View.GONE
         }
+
+        if (!preferencesManager.canSyncToSimprints()) {
+            binding.recordsToDownloadCardView.visibility = View.GONE
+            binding.recordsToDeleteCardView.visibility = View.GONE
+            binding.recordsToUploadCardView.visibility = View.GONE
+            binding.imagesToUploadCardView.visibility = View.GONE
+        }
     }
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
@@ -223,12 +233,14 @@ class SyncInformationActivity : BaseSplitActivity() {
             object Calculating : LoadingState()
         }
 
-        data class SyncDataFetched(val recordsInLocal: Int,
-                                   val recordsToDownSync: Int?,
-                                   val recordsToUpSync: Int,
-                                   val recordsToDelete: Int?,
-                                   val imagesToUpload: Int,
-                                   val moduleCounts: List<ModuleCount>) : ViewState()
+        data class SyncDataFetched(
+            val recordsInLocal: Int,
+            val recordsToDownSync: Int?,
+            val recordsToUpSync: Int,
+            val recordsToDelete: Int?,
+            val imagesToUpload: Int,
+            val moduleCounts: List<ModuleCount>
+        ) : ViewState()
     }
 
     companion object {
