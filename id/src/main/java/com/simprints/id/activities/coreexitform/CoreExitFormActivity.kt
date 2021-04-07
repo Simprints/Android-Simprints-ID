@@ -7,6 +7,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
@@ -16,11 +17,11 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.CoreExitFormReason.*
+import com.simprints.id.databinding.ActivityCoreExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
-import kotlinx.android.synthetic.main.activity_core_exit_form.*
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
@@ -28,6 +29,7 @@ import javax.inject.Inject
 class CoreExitFormActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: CoreExitFormViewModel
+    private val binding by viewBinding(ActivityCoreExitFormBinding::inflate)
 
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var crashReportManager: CrashReportManager
@@ -42,7 +44,7 @@ class CoreExitFormActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_core_exit_form)
+        setContentView(binding.root)
 
         injectDependencies()
 
@@ -61,22 +63,24 @@ class CoreExitFormActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
-        rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-        rbDataConcerns.text = getString(R.string.refusal_data_concerns)
-        rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-        rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-        rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-        rbTooYoung.text = getString(R.string.refusal_too_young)
-        rbOther.text = getString(R.string.refusal_other)
-        exitFormText.hint = getString(R.string.hint_other_reason)
-        btSubmitExitForm.text = getString(R.string.button_submit)
-        btGoBack.text = getString(R.string.exit_form_capture_face)
+        binding.apply {
+            whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
+            rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            rbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            rbTooYoung.text = getString(R.string.refusal_too_young)
+            rbOther.text = getString(R.string.refusal_other)
+            exitFormText.hint = getString(R.string.hint_other_reason)
+            btSubmitExitForm.text = getString(R.string.button_submit)
+            btGoBack.text = getString(R.string.exit_form_capture_face)
+        }
     }
 
     private fun setRadioGroupListener() {
-        exitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            exitFormText.removeTextChangedListener(textWatcher)
+        binding.exitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
+            binding.exitFormText.removeTextChangedListener(textWatcher)
             enableSubmitButton()
             enableRefusalText()
             handleRadioOptionIdentifierClick(optionIdentifier)
@@ -85,11 +89,8 @@ class CoreExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        with (coreExitFormScrollView) {
-            onLayoutChange { _, _, _, _,
-                             _, _, _, _, _ ->
-                fullScroll(View.FOCUS_DOWN)
-            }
+        binding.coreExitFormScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
+            binding.coreExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
@@ -102,15 +103,15 @@ class CoreExitFormActivity : BaseSplitActivity() {
     }
 
     private fun enableSubmitButton() {
-        btSubmitExitForm.isEnabled = true
+        binding.btSubmitExitForm.isEnabled = true
     }
 
     private fun disableSubmitButton() {
-        btSubmitExitForm.isEnabled = false
+        binding.btSubmitExitForm.isEnabled = false
     }
 
     private fun enableRefusalText() {
-        exitFormText.isEnabled = true
+        binding.exitFormText.isEnabled = true
     }
 
     private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
@@ -162,7 +163,7 @@ class CoreExitFormActivity : BaseSplitActivity() {
         finish()
     }
 
-    private fun getExitFormText() = exitFormText.text.toString()
+    private fun getExitFormText() = binding.exitFormText.text.toString()
 
     private fun getIntentForResult(exitFormActivityAction: CoreExitFormActivityResult.Action) =
         Intent().putExtra(EXIT_FORM_BUNDLE_KEY, buildExitFormResult(exitFormActivityAction))
@@ -172,18 +173,18 @@ class CoreExitFormActivity : BaseSplitActivity() {
             CoreExitFormActivityResult.Answer(exitFormReason, getExitFormText()))
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
-        btSubmitExitForm.isEnabled = false
-        exitFormText.requestFocus()
+        binding.btSubmitExitForm.isEnabled = false
+        binding.exitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(exitFormText, InputMethodManager.SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(binding.exitFormText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setTextChangeListenerOnExitText() {
-        exitFormText.addTextChangedListener(textWatcher)
+        binding.exitFormText.addTextChangedListener(textWatcher)
     }
 
     override fun onBackPressed() {
-        if (btSubmitExitForm.isEnabled) {
+        if (binding.btSubmitExitForm.isEnabled) {
             showToast(R.string.refusal_toast_submit)
         } else {
             showToast(R.string.refusal_toast_select_option_submit)
