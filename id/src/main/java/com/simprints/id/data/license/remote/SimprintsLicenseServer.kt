@@ -1,4 +1,4 @@
-package com.simprints.face.license.data.remote
+package com.simprints.id.data.license.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Path

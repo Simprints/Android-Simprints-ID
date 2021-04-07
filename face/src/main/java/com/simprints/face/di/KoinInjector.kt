@@ -25,21 +25,14 @@ import com.simprints.face.detection.rankone.RankOneFaceDetector
 import com.simprints.face.exitform.ExitFormViewModel
 import com.simprints.face.initializers.RankOneInitializer
 import com.simprints.face.initializers.SdkInitializer
-import com.simprints.face.license.data.local.LicenseLocalDataSource
-import com.simprints.face.license.data.local.LicenseLocalDataSourceImpl
-import com.simprints.face.license.data.remote.LicenseRemoteDataSource
-import com.simprints.face.license.data.remote.LicenseRemoteDataSourceImpl
-import com.simprints.face.license.data.remote.NetworkComponentsFactory
-import com.simprints.face.license.data.repository.LicenseRepository
-import com.simprints.face.license.data.repository.LicenseRepositoryImpl
 import com.simprints.face.match.FaceMatchViewModel
 import com.simprints.face.match.FaceMatcher
 import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
+import com.simprints.id.data.license.remote.NetworkComponentsFactory
 import com.simprints.uicomponents.imageTools.LibYuvJni
 import org.koin.android.ext.koin.androidApplication
-import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -115,9 +108,6 @@ object KoinInjector {
         factory { FrameProcessor(get()) }
         factory { LibYuvJni() }
         factory<FaceMatcher> { RankOneFaceMatcher() }
-        factory<LicenseLocalDataSource> { LicenseLocalDataSourceImpl(androidContext()) }
-        factory<LicenseRemoteDataSource> { LicenseRemoteDataSourceImpl(get()) }
-        factory<LicenseRepository> { LicenseRepositoryImpl(get(), get()) }
         factory<SdkInitializer> { RankOneInitializer() }
     }
 

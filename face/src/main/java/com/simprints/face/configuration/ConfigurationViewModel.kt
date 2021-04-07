@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.face.license.data.repository.LicenseRepository
-import com.simprints.face.license.data.repository.LicenseState
+import com.simprints.id.data.license.repository.LicenseRepository
+import com.simprints.id.data.license.repository.LicenseState
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
