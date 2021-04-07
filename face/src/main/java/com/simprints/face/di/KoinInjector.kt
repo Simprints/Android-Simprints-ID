@@ -30,7 +30,6 @@ import com.simprints.face.match.FaceMatcher
 import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.Application
-import com.simprints.id.data.license.remote.NetworkComponentsFactory
 import com.simprints.uicomponents.imageTools.LibYuvJni
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
@@ -89,7 +88,6 @@ object KoinInjector {
             defineBuildersForFaceManagers()
             defineBuildersForDomainClasses()
             defineBuildersForViewModels()
-            defineBuildersForRemote()
         }
 
     private fun Module.defineBuildersForFaceManagers() {
@@ -141,7 +139,4 @@ object KoinInjector {
         viewModel { ConfigurationViewModel(get(), get()) }
     }
 
-    private fun Module.defineBuildersForRemote() {
-        factory { NetworkComponentsFactory.getLicenseServer() }
-    }
 }
