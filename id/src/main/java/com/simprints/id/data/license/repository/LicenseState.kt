@@ -4,5 +4,5 @@ sealed class LicenseState {
     object Started : LicenseState()
     object Downloading : LicenseState()
     data class FinishedWithSuccess(val license: String) : LicenseState()
-    object FinishedWithError : LicenseState()
+    data class FinishedWithError(val errorCode: String) : LicenseState()
 }

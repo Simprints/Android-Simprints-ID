@@ -37,6 +37,6 @@ class ConfigurationViewModel(
             LicenseState.Started -> ConfigurationState.Started
             LicenseState.Downloading -> ConfigurationState.Downloading
             is LicenseState.FinishedWithSuccess -> ConfigurationState.FinishedWithSuccess(license)
-            LicenseState.FinishedWithError -> ConfigurationState.FinishedWithError
+            is LicenseState.FinishedWithError -> ConfigurationState.FinishedWithError(errorCode)
         }
 }

@@ -31,7 +31,7 @@ class ConfigurationFragment : Fragment(R.layout.configuration_fragment) {
                 ConfigurationState.Started -> renderStarted()
                 ConfigurationState.Downloading -> renderDownloading()
                 is ConfigurationState.FinishedWithSuccess -> renderFinishedWithSuccess(it.license)
-                ConfigurationState.FinishedWithError -> renderFinishedWithError()
+                is ConfigurationState.FinishedWithError -> renderFinishedWithError()
             }
         })
     }
