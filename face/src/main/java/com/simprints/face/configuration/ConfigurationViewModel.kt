@@ -8,6 +8,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseState
+import com.simprints.id.data.license.repository.LicenseVendor
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -21,7 +22,7 @@ class ConfigurationViewModel(
     val configurationState: MutableLiveData<LiveDataEventWithContent<ConfigurationState>> = MutableLiveData()
 
     fun retrieveLicense(projectId: String, deviceId: String) = viewModelScope.launch {
-        licenseRepository.getLicenseStates(projectId, deviceId)
+        licenseRepository.getLicenseStates(projectId, deviceId, LicenseVendor.RANK_ONE_FACE)
             .flowOn(dispatcherProvider.io())
             .map { it.toConfigurationState() }
             .collect { configurationState.send(it) }
