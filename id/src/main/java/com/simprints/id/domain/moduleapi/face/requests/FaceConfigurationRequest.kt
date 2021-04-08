@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.face.requests
 
 import com.simprints.moduleapi.face.requests.IFaceConfigurationRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceConfigurationRequest(
