@@ -11,22 +11,23 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
-import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 
@@ -39,6 +40,8 @@ class DebugActivity : BaseSplitActivity() {
     @Inject lateinit var eventLocalDataSource: EventLocalDataSource
     @Inject lateinit var subjectRepository: SubjectRepository
 
+    private val binding by viewBinding(ActivityDebugBinding::inflate)
+
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
 
@@ -47,7 +50,7 @@ class DebugActivity : BaseSplitActivity() {
         val component = (application as Application).component
         component.inject(this)
 
-        setContentView(R.layout.activity_debug)
+        setContentView(binding.root)
 
         eventSyncManager.getLastSyncState().observe(this, Observer {
             val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
@@ -56,25 +59,25 @@ class DebugActivity : BaseSplitActivity() {
                     "${states.toDebugActivitySyncState().name} - " +
                     "${it.progress}/${it.total}"
 
-            val ssb = SpannableStringBuilder(logs.text)
+            val ssb = SpannableStringBuilder(binding.logs.text)
             ssb.append(coloredText(message + "\n", Color.parseColor(getRandomColor(it.syncId))))
 
-            logs.setText(ssb, TextView.BufferType.SPANNABLE)
+            binding.logs.setText(ssb, TextView.BufferType.SPANNABLE)
         })
 
-        syncSchedule.setOnClickListener {
+        binding.syncSchedule.setOnClickListener {
             eventSyncManager.scheduleSync()
         }
 
-        syncStart.setOnClickListener {
+        binding.syncStart.setOnClickListener {
             eventSyncManager.sync()
         }
 
-        syncStop.setOnClickListener {
+        binding.syncStop.setOnClickListener {
             eventSyncManager.stop()
         }
 
-        cleanAll.setOnClickListener {
+        binding.cleanAll.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     eventSyncManager.cancelScheduledSync()
@@ -87,24 +90,27 @@ class DebugActivity : BaseSplitActivity() {
             }
         }
 
-        securityStateCompromised.setOnClickListener {
+        binding.securityStateCompromised.setOnClickListener {
             setSecurityStatus(SecurityState.Status.COMPROMISED)
         }
 
-        securityStateProjectEnded.setOnClickListener {
+        binding.securityStateProjectEnded.setOnClickListener {
             setSecurityStatus(SecurityState.Status.PROJECT_ENDED)
         }
 
-        printRoomDb.setOnClickListener {
-            logs.text = ""
+        binding.printRoomDb.setOnClickListener {
+            binding.logs.text = ""
             lifecycleScope.launch {
                 withContext(Dispatchers.Main) {
-                    logs.text = "${logs.text} ${subjectRepository.count()} \n"
+                    val logStringBuilder = StringBuilder()
+                    logStringBuilder.append("${binding.logs.text} ${subjectRepository.count()} \n")
 
                     val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
-                        logs.text = "${logs.text} ${it.key} ${it.value.size} \n"
+                        logStringBuilder.append(" ${it.key} ${it.value.size} \n")
                     }
+
+                    binding.logs.text = logStringBuilder.toString()
                 }
             }
         }
