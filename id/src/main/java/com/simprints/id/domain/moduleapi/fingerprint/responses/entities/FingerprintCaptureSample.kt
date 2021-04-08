@@ -13,8 +13,8 @@ import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize
