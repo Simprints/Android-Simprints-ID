@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.app.responses
 
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class AppEnrolResponse(val guid: String): AppResponse {
