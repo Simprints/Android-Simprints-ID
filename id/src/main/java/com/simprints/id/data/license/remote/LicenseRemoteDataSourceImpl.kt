@@ -1,5 +1,6 @@
 package com.simprints.id.data.license.remote
 
+import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
@@ -10,10 +11,13 @@ import timber.log.Timber
 
 class LicenseRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) : LicenseRemoteDataSource {
 
-    //TODO: put a vendor enum here
-    override suspend fun getLicense(projectId: String, deviceId: String): ApiLicenseResult = try {
+    override suspend fun getLicense(
+        projectId: String,
+        deviceId: String,
+        licenseVendor: LicenseVendor
+    ): ApiLicenseResult = try {
         executeCall("DownloadLicense") {
-            val apiLicense = it.getLicense(projectId, deviceId, "RANK_ONE_FACE")
+            val apiLicense = it.getLicense(projectId, deviceId, licenseVendor.name)
             ApiLicenseResult.Success(licenseJson = apiLicense.rankOneLicense?.data ?: "")
         }
     } catch (t: Throwable) {
@@ -40,9 +44,7 @@ class LicenseRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientF
     /**
      * BFSID returns an error in the following format:
      * ```
-     * {
-     *   "error": "001"
-     * }
+     * { "error": "001" }
      * ```
      */
     private fun getLicenseErrorCode(errorBody: ResponseBody): String {

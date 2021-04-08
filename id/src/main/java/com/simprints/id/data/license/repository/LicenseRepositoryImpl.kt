@@ -11,13 +11,17 @@ class LicenseRepositoryImpl(
     private val licenseLocalDataSource: LicenseLocalDataSource,
     private val licenseRemoteDataSource: LicenseRemoteDataSource
 ) : LicenseRepository {
-    override fun getLicenseStates(projectId: String, deviceId: String): Flow<LicenseState> = flow {
+    override fun getLicenseStates(
+        projectId: String,
+        deviceId: String,
+        licenseVendor: LicenseVendor
+    ): Flow<LicenseState> = flow {
         emit(LicenseState.Started)
 
         val license = licenseLocalDataSource.getLicense()
         if (license == null) {
             emit(LicenseState.Downloading)
-            licenseRemoteDataSource.getLicense(projectId, deviceId).let { apiLicenseResult ->
+            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor).let { apiLicenseResult ->
                 when (apiLicenseResult) {
                     is ApiLicenseResult.Success -> handleLicenseResultSuccess(apiLicenseResult)
                     is ApiLicenseResult.Error -> handleLicenseResultError(apiLicenseResult)
