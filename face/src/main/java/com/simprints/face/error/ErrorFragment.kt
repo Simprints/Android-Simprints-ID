@@ -30,7 +30,7 @@ class ErrorFragment : Fragment(R.layout.fragment_error) {
             errorLayout.setBackgroundColor(
                 ContextCompat.getColor(requireContext(), backgroundColor)
             )
-            errorTitle.text = getString(title)
+            errorTitle.text = errorCode?.let { getString(title) + " ($it)" } ?: getString(title)
             errorMessage.text = getString(message)
             errorButton.text = getString(buttonText)
             errorImage.setImageResource(mainDrawable)
