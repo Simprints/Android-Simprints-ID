@@ -12,7 +12,7 @@ import com.simprints.id.tools.ParcelableConverter.unmarshall
 import com.simprints.id.tools.extensions.getMap
 import com.simprints.id.tools.extensions.putMap
 import com.simprints.id.tools.extensions.save
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import com.simprints.core.tools.EncodingUtils.base64ToBytes
 import com.simprints.core.tools.EncodingUtils.byteArrayToBase64
 
