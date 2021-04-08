@@ -2,6 +2,7 @@ package com.simprints.id.data.license.repository
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.license.local.LicenseLocalDataSource
+import com.simprints.id.data.license.remote.ApiLicenseResult
 import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.every
@@ -20,8 +21,20 @@ class LicenseRepositoryImplTest {
 
     @Before
     fun setup() {
-        coEvery { licenseRemoteDataSource.getLicense("invalidProject", any()) } returns null
-        coEvery { licenseRemoteDataSource.getLicense("validProject", any()) } returns license
+        coEvery {
+            licenseRemoteDataSource.getLicense(
+                "invalidProject",
+                any(),
+                any()
+            )
+        } returns ApiLicenseResult.Error("001")
+        coEvery {
+            licenseRemoteDataSource.getLicense(
+                "validProject",
+                any(),
+                any()
+            )
+        } returns ApiLicenseResult.Success(license)
     }
 
     @Test
@@ -29,7 +42,7 @@ class LicenseRepositoryImplTest {
         every { licenseLocalDataSource.getLicense() } returns license
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId")
+        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", LicenseVendor.RANK_ONE_FACE)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -44,7 +57,7 @@ class LicenseRepositoryImplTest {
         every { licenseLocalDataSource.getLicense() } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("validProject", "deviceId")
+        licenseRepositoryImpl.getLicenseStates("validProject", "deviceId", LicenseVendor.RANK_ONE_FACE)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -56,18 +69,18 @@ class LicenseRepositoryImplTest {
     }
 
     @Test
-    fun `Get null license flow if things go wrong`() = runBlockingTest {
+    fun `Get error if things go wrong`() = runBlockingTest {
         every { licenseLocalDataSource.getLicense() } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId")
+        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", LicenseVendor.RANK_ONE_FACE)
             .toCollection(licenseStates)
 
         with(licenseStates) {
             assertThat(size).isEqualTo(3)
             assertThat(get(0)).isEqualTo(LicenseState.Started)
             assertThat(get(1)).isEqualTo(LicenseState.Downloading)
-            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithError)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithError("001"))
         }
     }
 }
