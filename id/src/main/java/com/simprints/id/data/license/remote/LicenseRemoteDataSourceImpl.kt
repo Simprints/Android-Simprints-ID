@@ -3,6 +3,7 @@ package com.simprints.id.data.license.remote
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.id.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import okhttp3.ResponseBody
@@ -13,6 +14,8 @@ class LicenseRemoteDataSourceImpl(
     private val simApiClientFactory: SimApiClientFactory,
     private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
+
+    private val unknownErrorCode = "000"
 
     override suspend fun getLicense(
         projectId: String,
@@ -29,7 +32,7 @@ class LicenseRemoteDataSourceImpl(
         if (t is SyncCloudIntegrationException)
             handleCloudException(t)
         else
-            ApiLicenseResult.Error("000")
+            ApiLicenseResult.Error(unknownErrorCode)
     }
 
     /**
@@ -38,14 +41,14 @@ class LicenseRemoteDataSourceImpl(
      * Anything else we can't really recover.
      */
     private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult {
-        return if (exception.cause is HttpException && exception.cause.code() == 403)
+        return if (exception.cause is HttpException && exception.cause.code() == AUTHORIZATION_ERROR)
             handleRetrofitException(exception.cause)
         else
-            ApiLicenseResult.Error("000")
+            ApiLicenseResult.Error(unknownErrorCode)
     }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
-        val errorCode = exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: "000"
+        val errorCode = exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
         return ApiLicenseResult.Error(errorCode)
     }
 
