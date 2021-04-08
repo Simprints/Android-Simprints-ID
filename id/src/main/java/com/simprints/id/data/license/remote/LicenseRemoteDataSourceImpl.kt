@@ -11,10 +11,10 @@ import timber.log.Timber
 class LicenseRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) : LicenseRemoteDataSource {
 
     //TODO: put a vendor enum here
-    //TODO: return a resource (license or error)
-    override suspend fun getLicense(projectId: String, deviceId: String): String = try {
+    override suspend fun getLicense(projectId: String, deviceId: String): ApiLicenseResult = try {
         executeCall("DownloadLicense") {
-            it.getLicense(projectId, deviceId, "RANK_ONE_FACE")
+            val apiLicense = it.getLicense(projectId, deviceId, "RANK_ONE_FACE")
+            ApiLicenseResult.Success(licenseJson = apiLicense.rankOneLicense?.data ?: "")
         }
     } catch (t: Throwable) {
         Timber.e(t)
@@ -22,18 +22,19 @@ class LicenseRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientF
         if (t is SyncCloudIntegrationException)
             handleCloudException(t)
         else
-            ""
+            ApiLicenseResult.Error("000")
     }
 
-    private fun handleCloudException(exception: SyncCloudIntegrationException): String {
+    private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult {
         return if (exception.cause is HttpException && exception.cause.code() == 403)
             handleRetrofitException(exception.cause)
         else
-            ""
+            ApiLicenseResult.Error("000")
     }
 
-    private fun handleRetrofitException(exception: HttpException): String {
-        return exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: "000"
+    private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
+        val errorCode = exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: "000"
+        return ApiLicenseResult.Error(errorCode)
     }
 
     /**

@@ -11,5 +11,5 @@ interface LicenseRemoteInterface : SimRemoteInterface {
         @Path("projectId") projectId: String,
         @Path("deviceId") deviceId: String,
         @Query("vendor") vendor: String?
-    ): String
+    ): ApiLicense
 }
