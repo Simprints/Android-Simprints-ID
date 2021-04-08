@@ -3,22 +3,25 @@ package com.simprints.id.activities.settings
 import android.os.Bundle
 import android.view.MenuItem
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
-import kotlinx.android.synthetic.main.settings_toolbar.*
+import com.simprints.id.databinding.SettingsToolbarBinding
+
 
 class ModuleSelectionActivity : BaseSplitActivity() {
 
     private lateinit var moduleSelectionFragment: ModuleSelectionFragment
+    private val binding by viewBinding(SettingsToolbarBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
 
-        setContentView(R.layout.settings_toolbar)
+        setContentView(binding.root)
         configureToolbar()
-        moduleSelectionFragment = ModuleSelectionFragment(application as Application)
+        moduleSelectionFragment = ModuleSelectionFragment()
         title = getString(R.string.preference_select_modules_title)
 
         supportFragmentManager.beginTransaction()
@@ -37,7 +40,7 @@ class ModuleSelectionActivity : BaseSplitActivity() {
     }
 
     private fun configureToolbar() {
-        setSupportActionBar(settingsToolbar)
+        setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
