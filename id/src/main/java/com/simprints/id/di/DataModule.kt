@@ -168,8 +168,10 @@ open class DataModule {
         LicenseLocalDataSourceImpl(context)
 
     @Provides
-    open fun provideLicenseRemoteDataSource(simApiClientFactory: SimApiClientFactory): LicenseRemoteDataSource =
-        LicenseRemoteDataSourceImpl(simApiClientFactory)
+    open fun provideLicenseRemoteDataSource(
+        simApiClientFactory: SimApiClientFactory,
+        jsonHelper: JsonHelper
+    ): LicenseRemoteDataSource = LicenseRemoteDataSourceImpl(simApiClientFactory, jsonHelper)
 
     @Provides
     open fun provideLicenseRepository(
