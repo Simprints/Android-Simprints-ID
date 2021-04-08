@@ -83,17 +83,19 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
-    fun configurationFinished(isSuccess: Boolean) {
+    fun configurationFinished(isSuccess: Boolean, errorCode: String? = null) {
         if (isSuccess) {
             flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(FaceConfigurationResponse()))
         } else {
-            Timber.d("Configuration error")
+            Timber.d("Configuration error. Error Code = $errorCode")
             crashReportManager.logMessageForCrashReport(
                 FACE_LICENSE,
                 UI,
-                message = "Error with configuration download"
+                message = "Error with configuration download. Error Code = $errorCode"
             )
-            errorEvent.send(ErrorType.CONFIGURATION_ERROR)
+            errorEvent.send(ErrorType.CONFIGURATION_ERROR.apply {
+                this.errorCode = errorCode
+            })
         }
     }
 
