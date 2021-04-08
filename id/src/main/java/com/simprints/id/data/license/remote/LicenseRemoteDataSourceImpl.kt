@@ -24,7 +24,8 @@ class LicenseRemoteDataSourceImpl(
     ): ApiLicenseResult = try {
         executeCall("DownloadLicense") {
             val apiLicense = it.getLicense(projectId, deviceId, licenseVendor.name)
-            ApiLicenseResult.Success(licenseJson = apiLicense.rankOneLicense?.data ?: "")
+
+            ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(licenseVendor))
         }
     } catch (t: Throwable) {
         Timber.e(t)
@@ -37,7 +38,7 @@ class LicenseRemoteDataSourceImpl(
 
     /**
      * If it's a Cloud exception we need to check if it's something we can recover from or not.
-     * If it's 403 it means Authorization error, and we can check which error code BFSID returned.
+     * If it's an Authorization error we can check which error code BFSID returned.
      * Anything else we can't really recover.
      */
     private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult {
@@ -52,12 +53,6 @@ class LicenseRemoteDataSourceImpl(
         return ApiLicenseResult.Error(errorCode)
     }
 
-    /**
-     * BFSID returns an error in the following format:
-     * ```
-     * { "error": "001" }
-     * ```
-     */
     private fun getLicenseErrorCode(errorBody: ResponseBody): String {
         return jsonHelper.fromJson<ApiLicenseError>(errorBody.string()).error
     }
