@@ -1,7 +1,7 @@
 package com.simprints.id.activities.login.response
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class LoginActivityResponse: Parcelable{

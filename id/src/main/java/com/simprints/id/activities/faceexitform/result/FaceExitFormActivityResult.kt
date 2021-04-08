@@ -3,7 +3,7 @@ package com.simprints.id.activities.faceexitform.result
 import android.os.Parcelable
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 
 @Parcelize
