@@ -8,19 +8,8 @@ apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gr
 android {
 
     defaultConfig {
+        consumerProguardFiles 'proguard-rules.pro'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-        staging{
-            minifyEnabled false
-        }
-        debug {
-            minifyEnabled false
-        }
     }
 }
 

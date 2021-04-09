@@ -15,3 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# We need to keep the vero and UN20 models because the scanner sdk uses reflection to create these
+# classes from the message stream.
+-keep class com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.* { *; }
+-keep class com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.* { *; }

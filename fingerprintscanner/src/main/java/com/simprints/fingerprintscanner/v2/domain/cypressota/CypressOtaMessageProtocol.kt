@@ -10,7 +10,7 @@ object CypressOtaMessageProtocol : Protocol {
     const val MAX_PAYLOAD_SIZE = 253
 
     const val HEADER_SIZE: Int = 3
-    const val MESSAGE_TYPE_INDEX_IN_HEADER: Int = 0
+    private const val MESSAGE_TYPE_INDEX_IN_HEADER: Int = 0
 
     fun getMessageType(messageBytes: ByteArray): CypressOtaResponseType =
         CypressOtaResponseType.fromByte(messageBytes[MESSAGE_TYPE_INDEX_IN_HEADER])

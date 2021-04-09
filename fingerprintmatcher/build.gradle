@@ -9,15 +9,11 @@ apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gr
 
 android {
 
+    defaultConfig {
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
     buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles.add(file('proguard-rules.pro'))
-        }
-        staging {
-            minifyEnabled true
-            proguardFiles.add(file('proguard-rules.pro'))
-        }
         profiling {
             initWith debug
         }
@@ -36,8 +32,7 @@ dependencies {
     implementation deps.androidx.appcompat
 
     // Kotlin
-    implementation deps.kotlin.stdlib
     implementation deps.kotlin.coroutines_core
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation deps.testing.junit
 }
