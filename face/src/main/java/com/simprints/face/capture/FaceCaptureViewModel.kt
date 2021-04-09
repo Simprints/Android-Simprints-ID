@@ -117,7 +117,7 @@ class FaceCaptureViewModel(
         )
     }
 
-    private fun saveFaceDetections() {
+    fun saveFaceDetections() {
         crashReportManager.logMessageForCrashReport(
             FACE_CAPTURE,
             UI,
