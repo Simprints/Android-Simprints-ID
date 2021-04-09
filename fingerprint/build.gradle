@@ -95,7 +95,6 @@ dependencies {
     implementation project(':fingerprintscannermock')
 
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
 

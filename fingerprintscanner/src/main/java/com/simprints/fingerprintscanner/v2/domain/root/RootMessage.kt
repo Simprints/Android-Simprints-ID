@@ -4,7 +4,7 @@ import com.simprints.fingerprintscanner.v2.domain.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.Message
 import com.simprints.fingerprintscanner.v2.domain.OutgoingMessage
 
-sealed class RootMessage(val rootMessageType: RootMessageType) : Message {
+sealed class RootMessage(private val rootMessageType: RootMessageType) : Message {
 
     override fun getBytes(): ByteArray =
         RootMessageProtocol.buildMessageBytes(rootMessageType, getDataBytes())

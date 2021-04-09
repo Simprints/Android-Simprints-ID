@@ -15,3 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# We need to keep the simAFIS classes for the JNI
+-keep class com.simprints.fingerprintmatcher.algorithms.simafis** { *; }
