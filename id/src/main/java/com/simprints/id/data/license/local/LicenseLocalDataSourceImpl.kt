@@ -1,12 +1,12 @@
-package com.simprints.face.license.data.local
+package com.simprints.id.data.license.local
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
-import com.simprints.face.license.data.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
-import com.simprints.face.license.data.local.LicenseLocalDataSource.Companion.LICENSE_NAME
+import com.simprints.id.data.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
+import com.simprints.id.data.license.local.LicenseLocalDataSource.Companion.LICENSE_NAME
 import timber.log.Timber
 import java.io.File
 

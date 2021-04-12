@@ -165,6 +165,7 @@ dependencies {
     implementation deps.retrofit.jackson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
+    implementation deps.retrofit.converterScalars
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
@@ -213,7 +214,7 @@ dependencies {
     api deps.playcore.core_ktx
     api deps.androidx.sqlite
     api deps.sqlcipher.core
-    
+
     // ######################################################
     //                      Unit test
     // ######################################################
