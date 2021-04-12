@@ -3,8 +3,12 @@ package com.simprints.face.capture
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.image.FaceImageManager
+import com.simprints.face.models.FaceDetection
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
 
@@ -13,9 +17,23 @@ class FaceCaptureViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    private val faceImageManager: FaceImageManager = mockk(relaxed = true)
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val faceImageManager: FaceImageManager = mockk(relaxed = true) {
+        coEvery { save(any(), any()) } returns null
+    }
 
     private val crashReportManager: FaceCrashReportManager = mockk(relaxed = true)
+
+    private val faceDetections = listOf<FaceDetection>(
+        mockk(relaxed = true) {
+            every { id } returns "FAKE_ID"
+            every { frame } returns mockk {
+                every { toByteArray(any()) } returns byteArrayOf()
+            }
+        }
+    )
 
     private fun buildViewModel(shouldSaveFaceImages: Boolean) = FaceCaptureViewModel(
         maxRetries = 0,
@@ -25,16 +43,18 @@ class FaceCaptureViewModelTest {
     )
 
     @Test
-    private fun `save face detections should not be called when save flag set to false`() {
+    fun `save face detections should not be called when save flag set to false`() {
         val vm = buildViewModel(false)
+        vm.captureFinished(faceDetections)
         vm.flowFinished()
-        verify(exactly = 0) { vm.saveFaceDetections() }
+        coVerify(exactly = 0) { faceImageManager.save(any(), any()) }
     }
 
     @Test
-    private fun `save face detections should be called when save flag set to true`() {
+    fun `save face detections should be called when save flag set to true`() {
         val vm = buildViewModel(true)
+        vm.captureFinished(faceDetections)
         vm.flowFinished()
-        verify(atLeast = 1) { vm.saveFaceDetections() }
+        coVerify(atLeast = 1) { faceImageManager.save(any(), any()) }
     }
 }
