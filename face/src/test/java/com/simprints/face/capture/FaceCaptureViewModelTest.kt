@@ -44,17 +44,21 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `save face detections should not be called when save flag set to false`() {
-        val vm = buildViewModel(false)
-        vm.captureFinished(faceDetections)
-        vm.flowFinished()
-        coVerify(exactly = 0) { faceImageManager.save(any(), any()) }
+        testCoroutineRule.runBlockingTest {
+            val vm = buildViewModel(false)
+            vm.captureFinished(faceDetections)
+            vm.flowFinished()
+            coVerify(exactly = 0) { faceImageManager.save(any(), any()) }
+        }
     }
 
     @Test
     fun `save face detections should be called when save flag set to true`() {
-        val vm = buildViewModel(true)
-        vm.captureFinished(faceDetections)
-        vm.flowFinished()
-        coVerify(atLeast = 1) { faceImageManager.save(any(), any()) }
+        testCoroutineRule.runBlockingTest {
+            val vm = buildViewModel(true)
+            vm.captureFinished(faceDetections)
+            vm.flowFinished()
+            coVerify(atLeast = 1) { faceImageManager.save(any(), any()) }
+        }
     }
 }
