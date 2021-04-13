@@ -88,6 +88,10 @@ class SyncInformationActivity : BaseSplitActivity() {
                 onBackPressed()
                 return true
             }
+            android.R.id.redo -> {
+                viewModel.fetchSyncInformation()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
