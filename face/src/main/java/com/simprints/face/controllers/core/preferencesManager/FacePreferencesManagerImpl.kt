@@ -14,4 +14,10 @@ class FacePreferencesManagerImpl(private val prefs: PreferencesManager) : FacePr
             field = value
             prefs.faceQualityThreshold = field
         }
+
+    override var shouldSaveFaceImages: Boolean = prefs.shouldSaveFaceImages
+        set(value) {
+            field = value
+            prefs.shouldSaveFaceImages = field
+        }
 }

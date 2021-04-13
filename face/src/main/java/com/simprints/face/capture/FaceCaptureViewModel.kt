@@ -24,6 +24,7 @@ import kotlinx.coroutines.runBlocking
 
 class FaceCaptureViewModel(
     private val maxRetries: Int,
+    private val shouldSaveFaceImages: Boolean,
     private val faceImageManager: FaceImageManager,
     private val crashReportManager: FaceCrashReportManager
 ) : ViewModel() {
@@ -55,7 +56,9 @@ class FaceCaptureViewModel(
     }
 
     fun flowFinished() {
-        saveFaceDetections()
+        if (shouldSaveFaceImages) {
+            saveFaceDetections()
+        }
 
         val results = faceDetections.mapIndexed { index, detection ->
             FaceCaptureResult(index, detection.toFaceSample())
