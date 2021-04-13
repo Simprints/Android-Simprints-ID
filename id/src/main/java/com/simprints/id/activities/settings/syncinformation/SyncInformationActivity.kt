@@ -95,6 +95,7 @@ class SyncInformationActivity : BaseSplitActivity() {
                 return true
             }
             R.id.sync_redo -> {
+                viewModel.resetFetchingSyncInformation()
                 viewModel.fetchSyncInformation()
                 return true
             }
