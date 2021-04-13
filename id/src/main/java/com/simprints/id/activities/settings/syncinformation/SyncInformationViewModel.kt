@@ -16,6 +16,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -37,7 +38,6 @@ class SyncInformationViewModel(
     val moduleCounts = MutableLiveData<List<ModuleCount>?>(null)
 
     fun fetchSyncInformation() {
-        emptyCounts()
         viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
         viewModelScope.launch { recordsToUpSync.value = fetchAndUpdateRecordsToUpSyncCount() }
         viewModelScope.launch {
@@ -53,13 +53,18 @@ class SyncInformationViewModel(
         viewModelScope.launch { moduleCounts.value = fetchAndUpdateSelectedModulesCount() }
     }
 
-    private fun emptyCounts() {
-        recordsInLocal.value = null
-        recordsToUpSync.value = null
-        imagesToUpload.value = null
-        recordsToDownSync.value = null
-        recordsToDelete.value = null
-        moduleCounts.value = null
+    /**
+     * This function cancels any previous coroutines fetching sync data, and resets the record
+     * values. This allows the user to hard reset any stuck http requests / disk reads etc.
+     */
+    fun resetFetchingSyncInformation() {
+        viewModelScope.coroutineContext.cancelChildren()
+        recordsInLocal.postValue(null)
+        recordsToUpSync.postValue(null)
+        imagesToUpload.postValue(null)
+        recordsToDownSync.postValue(null)
+        recordsToDelete.postValue(null)
+        moduleCounts.postValue(null)
     }
 
     private suspend fun fetchLocalRecordCount() =
