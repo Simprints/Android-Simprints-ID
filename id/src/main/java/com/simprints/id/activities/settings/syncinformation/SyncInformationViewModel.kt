@@ -1,11 +1,8 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState
-import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.*
@@ -16,11 +13,9 @@ import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
-import com.simprints.id.services.sync.events.master.models.EventSyncState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -31,35 +26,30 @@ class SyncInformationViewModel(
     private val preferencesManager: PreferencesManager,
     private val projectId: String,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    private val imageRepository: ImageRepository,
-    private val eventSyncManager: EventSyncManager
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
 
-    private val _viewState: MutableLiveData<SyncInformationActivity.ViewState> = MutableLiveData()
-    fun getViewStateLiveData(): LiveData<SyncInformationActivity.ViewState> = _viewState
+    val recordsInLocal = MutableLiveData<Int?>(null)
+    val recordsToUpSync = MutableLiveData<Int?>(null)
+    val imagesToUpload = MutableLiveData<Int?>(null)
+    val recordsToDownSync = MutableLiveData<Int?>(null)
+    val recordsToDelete = MutableLiveData<Int?>(null)
+    val moduleCounts = MutableLiveData<List<ModuleCount>?>(null)
 
-    fun fetchSyncInformation() = viewModelScope.launch {
-        // If a sync was never triggered (in Co-Sync only for example) then it will return null
-        val isRunning = eventSyncManager.getLastSyncState().value?.isRunning() ?: false
-
-        if (isRunning) {
-            _viewState.value = LoadingState.Syncing
-        } else {
-            _viewState.value = LoadingState.Calculating
-            _viewState.value = fetchRecords()
+    fun fetchSyncInformation() {
+        viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
+        viewModelScope.launch { recordsToUpSync.value = fetchAndUpdateRecordsToUpSyncCount() }
+        viewModelScope.launch {
+            fetchRecordsToCreateAndDeleteCountOrNull().let {
+                recordsToDownSync.value = it?.toCreate ?: 0
+                recordsToDelete.value = it?.toDelete ?: 0
+            }
         }
-    }
-
-    private suspend fun fetchRecords(): SyncDataFetched {
-        val subjectCounts = fetchRecordsToCreateAndDeleteCountOrNull()
-        return SyncDataFetched(
-            recordsInLocal = fetchLocalRecordCount(),
-            recordsToDownSync = subjectCounts?.toCreate ?: 0,
-            recordsToUpSync = fetchAndUpdateRecordsToUpSyncCount(),
-            recordsToDelete = subjectCounts?.toDelete ?: 0,
-            imagesToUpload = fetchAndUpdateImagesToUploadCount(),
-            moduleCounts = fetchAndUpdateSelectedModulesCount()
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
+        }
+        viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
+        viewModelScope.launch { moduleCounts.value = fetchAndUpdateSelectedModulesCount() }
     }
 
     private suspend fun fetchLocalRecordCount() =
@@ -88,8 +78,8 @@ class SyncInformationViewModel(
             var creationsToDownload = 0
             var deletionsToDownload = 0
 
-            downSyncScope.operations.forEach {
-                val counts = downySyncHelper.countForDownSync(it)
+            downSyncScope.operations.forEach { syncOperation ->
+                val counts = downySyncHelper.countForDownSync(syncOperation)
                 creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }
                     ?.count ?: 0
                 deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }
@@ -110,16 +100,6 @@ class SyncInformationViewModel(
                 subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it))
             )
         }
-
-
-    private fun EventSyncState.isRunning(): Boolean {
-        val downSyncStates = downSyncWorkersInfo
-        val upSyncStates = upSyncWorkersInfo
-        val allSyncStates = downSyncStates + upSyncStates
-        return allSyncStates.any {
-            it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued
-        }
-    }
 
     data class DownSyncCounts(val toCreate: Int, val toDelete: Int)
 }
