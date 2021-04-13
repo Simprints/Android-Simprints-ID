@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Keep
