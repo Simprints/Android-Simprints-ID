@@ -2,7 +2,6 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
@@ -34,7 +33,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -75,8 +73,7 @@ class SyncInformationViewModelTest {
             preferencesManager,
             projectId,
             eventDownSyncScopeRepository,
-            imageRepository,
-            eventSyncManager
+            imageRepository
         )
     }
 

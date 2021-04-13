@@ -8,7 +8,6 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.EventSyncManager
 
 class SyncInformationViewModelFactory(private val downySyncHelper: EventDownSyncHelper,
                                       private val eventRepository: EventRepository,
@@ -16,8 +15,7 @@ class SyncInformationViewModelFactory(private val downySyncHelper: EventDownSync
                                       private val preferencesManager: PreferencesManager,
                                       private val projectId: String,
                                       private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-                                      private val imageRepository: ImageRepository,
-                                      private val eventSyncManager: EventSyncManager) : ViewModelProvider.Factory {
+                                      private val imageRepository: ImageRepository) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -29,8 +27,7 @@ class SyncInformationViewModelFactory(private val downySyncHelper: EventDownSync
                 preferencesManager,
                 projectId,
                 eventDownSyncScopeRepository,
-                imageRepository,
-                eventSyncManager
+                imageRepository
             ) as T
         } else {
             throw IllegalArgumentException("ViewModel Not Found")

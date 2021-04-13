@@ -24,48 +24,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <View
-        android:id="@+id/progressOverlayBackground"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0.6"
-        android:background="@color/simprints_white"
-        android:elevation="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:indeterminateTint="@color/simprints_blue"
-        android:translationZ="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/progress_sync_overlay"
-        style="@style/SimprintsStyle.TextView.ProgressBarOverlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_default"
-        android:translationZ="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBar"
-        tools:text="Syncing..." />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_progress_overlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="progressOverlayBackground,progressBar,progress_sync_overlay" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsToDownloadCardView"
         android:layout_width="0dp"
