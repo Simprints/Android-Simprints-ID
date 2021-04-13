@@ -53,6 +53,8 @@ interface SettingsPreferencesManager {
     var faceQualityThreshold: Float
     var faceNbOfFramesCaptured: Int
 
+    var shouldSaveFaceImages: Boolean
+
     var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
     var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
 
