@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses
 
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class FingerprintCaptureResponse(val fingerprints: List<Fingerprint>): FingerprintResponse {

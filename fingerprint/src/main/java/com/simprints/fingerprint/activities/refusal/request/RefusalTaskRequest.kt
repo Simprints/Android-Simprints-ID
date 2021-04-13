@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.refusal.request
 
 import android.os.Parcelable
 import com.simprints.fingerprint.orchestrator.task.TaskRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class RefusalTaskRequest : TaskRequest, Parcelable {

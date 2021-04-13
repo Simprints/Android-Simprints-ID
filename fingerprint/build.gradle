@@ -1,14 +1,10 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: "kotlin-kapt"
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
-
-androidExtensions {
-    experimental = true
-}
 
 android {
     defaultConfig {
