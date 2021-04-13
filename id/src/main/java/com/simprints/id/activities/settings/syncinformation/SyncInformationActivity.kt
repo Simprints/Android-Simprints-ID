@@ -2,6 +2,7 @@ package com.simprints.id.activities.settings.syncinformation
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TabHost
@@ -82,13 +83,18 @@ class SyncInformationActivity : BaseSplitActivity() {
         binding.imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.sync_info_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
                 return true
             }
-            android.R.id.redo -> {
+            R.id.sync_redo -> {
                 viewModel.fetchSyncInformation()
                 return true
             }
@@ -163,7 +169,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         })
 
         viewModel.moduleCounts.observe(this, Observer {
-            it?.let{
+            it?.let {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
         })
