@@ -37,6 +37,7 @@ class SyncInformationViewModel(
     val moduleCounts = MutableLiveData<List<ModuleCount>?>(null)
 
     fun fetchSyncInformation() {
+        emptyCounts()
         viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
         viewModelScope.launch { recordsToUpSync.value = fetchAndUpdateRecordsToUpSyncCount() }
         viewModelScope.launch {
@@ -50,6 +51,15 @@ class SyncInformationViewModel(
         }
         viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
         viewModelScope.launch { moduleCounts.value = fetchAndUpdateSelectedModulesCount() }
+    }
+
+    private fun emptyCounts() {
+        recordsInLocal.value = null
+        recordsToUpSync.value = null
+        imagesToUpload.value = null
+        recordsToDownSync.value = null
+        recordsToDelete.value = null
+        moduleCounts.value = null
     }
 
     private suspend fun fetchLocalRecordCount() =
