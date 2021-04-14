@@ -99,7 +99,7 @@ class DebugActivity : BaseSplitActivity() {
             logs.text = ""
             lifecycleScope.launch {
                 withContext(Dispatchers.Main) {
-                    logs.text = "${logs.text} ${subjectRepository.count()} \n"
+                    logs.text = "${logs.text} Subjects ${subjectRepository.count()} \n"
 
                     val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
