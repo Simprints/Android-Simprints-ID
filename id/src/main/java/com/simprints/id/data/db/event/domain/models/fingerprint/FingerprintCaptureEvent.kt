@@ -52,7 +52,7 @@ data class FingerprintCaptureEvent(
             val finger: FingerIdentifier,
             val quality: Int,
             val template: String,
-            val format: FingerprintTemplateFormat
+            val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2
         )
 
         @Keep
