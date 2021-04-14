@@ -1,11 +1,13 @@
 package com.simprints.id.data.license.remote
 
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.simprints.id.data.license.repository.LicenseVendor
 
 /**
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.
  */
+@Keep
 data class ApiLicense(@JsonProperty("RANK_ONE_FACE") val rankOneLicense: RankOneLicense?) {
 
     /**
@@ -18,6 +20,7 @@ data class ApiLicense(@JsonProperty("RANK_ONE_FACE") val rankOneLicense: RankOne
         }
 }
 
+@Keep
 data class RankOneLicense(val vendor: String, val expiration: String, val data: String)
 
 /**
@@ -26,4 +29,5 @@ data class RankOneLicense(val vendor: String, val expiration: String, val data: 
  * { "error": "001" }
  * ```
  */
+@Keep
 data class ApiLicenseError(val error: String)
