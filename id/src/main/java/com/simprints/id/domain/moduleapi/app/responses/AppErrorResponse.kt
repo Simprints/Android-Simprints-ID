@@ -1,14 +1,17 @@
 package com.simprints.id.domain.moduleapi.app.responses
 
+import androidx.annotation.Keep
 import com.simprints.id.domain.alert.AlertType
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
+@Keep
 data class AppErrorResponse(val reason: Reason) : AppResponse {
 
     @IgnoredOnParcel override val type: AppResponseType = AppResponseType.ERROR
 
+    @Keep
     enum class Reason {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
