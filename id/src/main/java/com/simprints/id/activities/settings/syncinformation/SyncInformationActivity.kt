@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TabHost
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -150,23 +152,28 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun observeUi() {
         viewModel.recordsInLocal.observe(this, Observer {
-            binding.totalRecordsCount.text = it?.toString() ?: "..."
+            binding.totalRecordsCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
         })
 
         viewModel.recordsToUpSync.observe(this, Observer {
-            binding.recordsToUploadCount.text = it?.toString() ?: "..."
+            binding.recordsToUploadCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.recordsToUploadCount, binding.recordsToUploadProgress)
         })
 
         viewModel.imagesToUpload.observe(this, Observer {
-            binding.imagesToUploadCount.text = it?.toString() ?: "..."
+            binding.imagesToUploadCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.imagesToUploadCount, binding.imagesToUploadProgress)
         })
 
         viewModel.recordsToDownSync.observe(this, Observer {
-            binding.recordsToDownloadCount.text = it?.toString() ?: "..."
+            binding.recordsToDownloadCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         })
 
         viewModel.recordsToDelete.observe(this, Observer {
-            binding.recordsToDeleteCount.text = it?.toString() ?: "..."
+            binding.recordsToDeleteCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
         })
 
         viewModel.moduleCounts.observe(this, Observer {
@@ -174,6 +181,16 @@ class SyncInformationActivity : BaseSplitActivity() {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
         })
+    }
+
+    private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {
+        if (value == null) {
+            pb.visibility = View.VISIBLE
+            tv.visibility = View.GONE
+        } else {
+            pb.visibility = View.GONE
+            tv.visibility = View.VISIBLE
+        }
     }
 
     private fun addTotalRowAndSubmitList(
