@@ -242,7 +242,6 @@ flows:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
-            -   step: *sign-and-deploy-to-alpha-testing
     -   flow: &production_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
