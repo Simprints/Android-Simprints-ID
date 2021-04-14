@@ -1,7 +1,7 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
@@ -9,10 +9,6 @@ sonarqube {
     properties {
         property "sonar.sources", "src/main/java"
     }
-}
-
-androidExtensions {
-    experimental = true
 }
 
 android {
