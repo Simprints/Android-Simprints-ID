@@ -3,7 +3,7 @@ package com.simprints.face.data.moduleapi.face.responses
 import androidx.annotation.Keep
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.responses.IFaceErrorReason
-import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
