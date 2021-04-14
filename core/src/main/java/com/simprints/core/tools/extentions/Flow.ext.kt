@@ -1,10 +1,7 @@
 package com.simprints.core.tools.extentions
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 
 fun <T, R> Flow<T>.concurrentMap(
     dispatcher: CoroutineDispatcher,
@@ -14,3 +11,7 @@ fun <T, R> Flow<T>.concurrentMap(
         flow { emit(transform(value)) }
     }.flowOn(dispatcher)
 }
+
+
+suspend fun <T> Flow<T>.toMutableList(destination: MutableList<T> = ArrayList()): MutableList<T> =
+    toCollection(destination)
