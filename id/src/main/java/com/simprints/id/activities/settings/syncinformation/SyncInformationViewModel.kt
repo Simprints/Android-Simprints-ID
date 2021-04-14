@@ -74,7 +74,9 @@ class SyncInformationViewModel(
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2)
+        eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2) +
+            // this is needed because of events created before 2021.1. Once all users update to 2021.1+ we can remove it
+            eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
         if (isDownSyncAllowed() && preferencesManager.canSyncToSimprints()) {
