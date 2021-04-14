@@ -3,6 +3,7 @@ package com.simprints.id.data.db.event
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
+import com.simprints.core.tools.extentions.toMutableList
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
@@ -26,6 +27,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
@@ -148,10 +150,10 @@ open class EventRepositoryImpl(
             }
         }
 
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches")
         val batches = createBatches(projectId)
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches ${batches.size}")
 
-        batches.forEach { batch ->
+        batches.collect { batch ->
             val events = batch.events
             Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading ${events.size} events in a batch")
 
@@ -191,11 +193,12 @@ open class EventRepositoryImpl(
     }
 
     @VisibleForTesting
-    suspend fun createBatches(projectId: String): List<Batch> {
+    suspend fun createBatches(projectId: String): Flow<Batch> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
-        return createBatchesForEventsNotInSessions(projectId) + createBatchesForEventsInSessions(
-            projectId
-        )
+        return flowOf(
+            createBatchesForEventsNotInSessions(projectId),
+            createBatchesForEventsInSessions(projectId)
+        ).flattenConcat()
     }
 
     @Deprecated(
@@ -207,42 +210,32 @@ open class EventRepositoryImpl(
             "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0+, this logic" +
             "can be deleted."
     )
-    private suspend fun createBatchesForEventsNotInSessions(projectId: String): List<Batch> {
-        val events = eventLocalDataSource.loadAllFromProject(projectId = projectId)
-            .filter { it.labels.sessionId == null }.toList()
+    private suspend fun createBatchesForEventsNotInSessions(projectId: String): Flow<Batch> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
 
-        return events.chunked(SESSION_BATCH_SIZE).map { Batch(it.toMutableList()) }
+        val events = eventLocalDataSource
+            .loadAllFromProject(projectId = projectId)
+            .filter { it.labels.sessionId == null }
+            .bufferedChunks(SESSION_BATCH_SIZE)
+
+        return events.map { Batch(it.toMutableList()) }
     }
 
-    private suspend fun createBatchesForEventsInSessions(projectId: String): List<Batch> {
-
+    /**
+     * Each session will create its own Batch. Sessions have between 10 and 20 events, which renders [SESSION_BATCH_SIZE]
+     * pretty much useless, as no 2 sessions will ever be merged. Because of that, it means that each session will
+     * be uploaded individually to BFSID.
+     */
+    private suspend fun createBatchesForEventsInSessions(projectId: String): Flow<Batch> {
         // We don't upload unsigned sessions because the back-end would reject them.
-        val sessionsToUpload = loadSessions(true)
+        val sessionsToUpload: Flow<SessionCaptureEvent> = loadSessions(true)
             .filter { it.labels.projectId == projectId }
             .filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
 
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
 
-        return sessionsToUpload.fold(mutableListOf()) { batches, session ->
-            val lastBatch = batches.lastOrNull()
-            val eventsCountInTheLastBatch = lastBatch?.events?.size ?: 0
-            val eventsToUpload =
-                eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
-
-            val hasLastBatchStillRoom =
-                eventsCountInTheLastBatch + eventsToUpload.size <= SESSION_BATCH_SIZE
-            if (hasLastBatchStillRoom && lastBatch != null) {
-                Timber.tag(SYNC_LOG_TAG)
-                    .d("[EVENT_REPO] Adding $eventsCountInTheLastBatch into an existing batch")
-
-                lastBatch.events.addAll(eventsToUpload)
-            } else {
-                Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating new batch")
-
-                batches.add(Batch(eventsToUpload.toMutableList()))
-            }
-            batches
+        return sessionsToUpload.map { session ->
+            Batch(eventLocalDataSource.loadAllFromSession(sessionId = session.id).toMutableList())
         }
     }
 
