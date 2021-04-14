@@ -164,7 +164,7 @@ open class EventRepositoryImpl(
                 Timber.d(t)
                 if (t.isClientAndCloudIntegrationIssue()) {
                     crashReportManager.logException(t)
-                    //We do not delete subject events (pokodex) since they are important.
+                    // We do not delete subject events (pokedex) since they are important.
                     deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
                 }
             }
