@@ -30,6 +30,8 @@ import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -140,6 +142,8 @@ open class EventRepositoryImpl(
     ): ReceiveChannel<Event> =
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading")
 
@@ -190,6 +194,8 @@ open class EventRepositoryImpl(
         }
     }
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     @VisibleForTesting
     suspend fun createBatches(projectId: String): Flow<List<Event>> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
@@ -199,6 +205,7 @@ open class EventRepositoryImpl(
         ).flattenConcat()
     }
 
+    @ExperimentalCoroutinesApi
     @Deprecated(
         "Before 2021.1.0, SID could have events not associated with a session in the db like " +
             "EnrolmentRecordCreationEvent that need to be uploaded. After 2021.1.0, SID doesn't generate " +
