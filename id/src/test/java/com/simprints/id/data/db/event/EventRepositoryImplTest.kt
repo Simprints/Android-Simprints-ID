@@ -230,10 +230,10 @@ class EventRepositoryImplTest {
 
             val batches = (eventRepo as EventRepositoryImpl).createBatches(DEFAULT_PROJECT_ID).toList()
 
-            assertThat(batches[0].events.size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(batches[1].events.size).isEqualTo(3)
-            assertThat(batches[2].events.size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(batches[3].events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(batches[0].size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(batches[1].size).isEqualTo(3)
+            assertThat(batches[2].size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(batches[3].size).isEqualTo(SESSION_BATCH_SIZE)
         }
     }
 
