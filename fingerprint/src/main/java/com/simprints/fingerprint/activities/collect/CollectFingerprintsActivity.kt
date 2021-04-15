@@ -195,13 +195,11 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
-            when (ResultCode.fromValue(resultCode)) {
-                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
-                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
-                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
-                ResultCode.OK -> {
-                }
+        when (ResultCode.fromValue(resultCode)) {
+            ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+            ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+            ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+            ResultCode.OK -> {
             }
         }
     }
