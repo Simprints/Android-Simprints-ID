@@ -3,7 +3,6 @@ package com.simprints.id.data.db.event
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
-import com.simprints.core.tools.extentions.toMutableList
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
@@ -153,8 +152,7 @@ open class EventRepositoryImpl(
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches")
         val batches = createBatches(projectId)
 
-        batches.collect { batch ->
-            val events = batch.events
+        batches.collect { events ->
             Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading ${events.size} events in a batch")
 
             try {
@@ -178,7 +176,7 @@ open class EventRepositoryImpl(
         }
     }
 
-    private suspend fun uploadEvents(events: MutableList<Event>, projectId: String) {
+    private suspend fun uploadEvents(events: List<Event>, projectId: String) {
         events.filterIsInstance<SessionCaptureEvent>().forEach {
             it.payload.uploadedAt = timeHelper.now()
         }
@@ -193,7 +191,7 @@ open class EventRepositoryImpl(
     }
 
     @VisibleForTesting
-    suspend fun createBatches(projectId: String): Flow<Batch> {
+    suspend fun createBatches(projectId: String): Flow<List<Event>> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
         return flowOf(
             createBatchesForEventsNotInSessions(projectId),
@@ -210,7 +208,7 @@ open class EventRepositoryImpl(
             "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0+, this logic" +
             "can be deleted."
     )
-    private suspend fun createBatchesForEventsNotInSessions(projectId: String): Flow<Batch> {
+    private suspend fun createBatchesForEventsNotInSessions(projectId: String): Flow<List<Event>> {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
 
         val events = eventLocalDataSource
@@ -218,7 +216,7 @@ open class EventRepositoryImpl(
             .filter { it.labels.sessionId == null }
             .bufferedChunks(SESSION_BATCH_SIZE)
 
-        return events.map { Batch(it.toMutableList()) }
+        return events.map { it.toList() }
     }
 
     /**
@@ -226,7 +224,7 @@ open class EventRepositoryImpl(
      * pretty much useless, as no 2 sessions will ever be merged. Because of that, it means that each session will
      * be uploaded individually to BFSID.
      */
-    private suspend fun createBatchesForEventsInSessions(projectId: String): Flow<Batch> {
+    private suspend fun createBatchesForEventsInSessions(projectId: String): Flow<List<Event>> {
         // We don't upload unsigned sessions because the back-end would reject them.
         val sessionsToUpload: Flow<SessionCaptureEvent> = loadSessions(true)
             .filter { it.labels.projectId == projectId }
@@ -235,7 +233,7 @@ open class EventRepositoryImpl(
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
 
         return sessionsToUpload.map { session ->
-            Batch(eventLocalDataSource.loadAllFromSession(sessionId = session.id).toMutableList())
+            eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
         }
     }
 
@@ -311,8 +309,5 @@ open class EventRepositoryImpl(
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }
-
-    @VisibleForTesting
-    data class Batch(val events: MutableList<Event>)
 
 }
