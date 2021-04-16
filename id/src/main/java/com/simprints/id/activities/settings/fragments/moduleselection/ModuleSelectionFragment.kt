@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -25,16 +26,15 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.id.databinding.FragmentModuleSelectionBinding
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
-import kotlinx.android.synthetic.main.fragment_module_selection.*
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
 import org.jetbrains.anko.sdk27.coroutines.onFocusChange
 import javax.inject.Inject
 
-class ModuleSelectionFragment(
-    private val application: Application
-) : Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
+class ModuleSelectionFragment: Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
@@ -44,15 +44,19 @@ class ModuleSelectionFragment(
 
     private val chipHelper by lazy { ModuleChipHelper(requireContext(), listener = this) }
 
+    private val binding by viewBinding(FragmentModuleSelectionBinding::bind)
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
     }
 
     private var modules = emptyList<Module>()
+    private var rvModules: RecyclerView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        application.component.inject(this)
+
+        val component = (requireActivity().application as Application).component
+        component.inject(this)
 
         configureRecyclerView()
         configureTextViews()
@@ -60,19 +64,21 @@ class ModuleSelectionFragment(
     }
 
     private fun configureTextViews() {
-        txtSelectedModules.text = getString(R.string.selected_modules)
-        txtNoModulesSelected.text = getString(R.string.no_modules_selected)
-        txtNoResults.text = getString(R.string.no_results)
+        binding.apply {
+            txtSelectedModules.text = getString(R.string.selected_modules)
+            txtNoModulesSelected.text = getString(R.string.no_modules_selected)
+            txtNoResults.text = getString(R.string.no_results)
+        }
     }
 
     override fun onModuleSelected(module: Module) {
-        searchView.setQuery("", false)
+        binding.searchView.setQuery("", false)
         hideKeyboard()
         updateSelectionIfPossible(module)
-        scrollView.post {
-            scrollView.isSmoothScrollingEnabled = false
-            scrollView.fullScroll(View.FOCUS_DOWN)
-            scrollView.isSmoothScrollingEnabled = true
+        binding.scrollView.post {
+            binding.scrollView.isSmoothScrollingEnabled = false
+            binding.scrollView.fullScroll(View.FOCUS_DOWN)
+            binding.scrollView.isSmoothScrollingEnabled = true
         }
     }
 
@@ -88,14 +94,15 @@ class ModuleSelectionFragment(
     }
 
     private fun configureRecyclerView() {
-        rvModules.adapter = adapter
+        rvModules = binding.rvModules
+        rvModules?.adapter = adapter
         val context = requireContext()
         val dividerItemDecoration = DividerItemDecoration(context,
             DividerItemDecoration.VERTICAL).apply {
             val colour = ContextCompat.getColor(context, R.color.simprints_light_grey)
             setDrawable(ColorDrawable(colour))
         }
-        rvModules.addItemDecoration(dividerItemDecoration)
+        rvModules?.addItemDecoration(dividerItemDecoration)
     }
 
     private fun fetchData() {
@@ -105,15 +112,15 @@ class ModuleSelectionFragment(
             configureSearchView()
             configureTextViewVisibility()
             displaySelectedModules()
-            rvModules.requestFocus()
+            rvModules?.requestFocus()
         })
     }
 
     private fun configureSearchView() {
         configureSearchViewEditText()
-        searchView.queryHint = getString(R.string.hint_search_modules)
+        binding.searchView.queryHint = getString(R.string.hint_search_modules)
         val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
-        searchView.setOnQueryTextListener(queryListener)
+        binding.searchView.setOnQueryTextListener(queryListener)
         observeSearchResults(queryListener)
     }
 
@@ -130,7 +137,7 @@ class ModuleSelectionFragment(
     }
 
     private fun displaySelectedModules() {
-        val displayedModuleNames = chipHelper.findSelectedModuleNames(chipGroup)
+        val displayedModuleNames = chipHelper.findSelectedModuleNames(binding.chipGroup)
 
         modules.forEach { module ->
             val isModuleDisplayed = displayedModuleNames.contains(module.name)
@@ -151,18 +158,18 @@ class ModuleSelectionFragment(
     }
 
     private fun addChipForModule(selectedModule: Module) {
-        chipHelper.addModuleChip(chipGroup, selectedModule)
+        chipHelper.addModuleChip(binding.chipGroup, selectedModule)
     }
 
     private fun removeChipForModule(selectedModule: Module) {
-        chipHelper.removeModuleChip(chipGroup, selectedModule)
+        chipHelper.removeModuleChip(binding.chipGroup, selectedModule)
     }
 
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
         queryListener.searchResults.observe(viewLifecycleOwner, Observer { searchResults ->
             adapter.submitList(searchResults)
-            txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
-            rvModules.scrollToPosition(0)
+            binding.txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
+            rvModules?.scrollToPosition(0)
         })
     }
 
@@ -236,7 +243,7 @@ class ModuleSelectionFragment(
 
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
-            application,
+            requireContext(),
             String.format(getString(R.string.settings_too_many_modules_toast), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
@@ -244,11 +251,11 @@ class ModuleSelectionFragment(
 
     private fun configureTextViewVisibility() {
         if (isNoModulesSelected()) {
-            txtNoModulesSelected.visibility = VISIBLE
-            txtSelectedModules.visibility = GONE
+            binding.txtNoModulesSelected.visibility = VISIBLE
+            binding.txtSelectedModules.visibility = GONE
         } else {
-            txtNoModulesSelected.visibility = GONE
-            txtSelectedModules.visibility = VISIBLE
+            binding.txtNoModulesSelected.visibility = GONE
+            binding.txtSelectedModules.visibility = VISIBLE
         }
     }
 
@@ -263,7 +270,7 @@ class ModuleSelectionFragment(
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 hideKeyboard()
                 v?.clearFocus()
-                rvModules.requestFocus()
+                rvModules?.requestFocus()
             }
         }
     }
@@ -275,5 +282,10 @@ class ModuleSelectionFragment(
                 rvModules?.scrollToPosition(0)
             // The safe call above is necessary only when the 'up' action bar button is clicked
         }
+    }
+
+    override fun onDestroyView() {
+        rvModules = null
+        super.onDestroyView()
     }
 }

@@ -3,8 +3,8 @@ package com.simprints.id.domain.moduleapi.face.responses
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.moduleapi.face.responses.IFaceErrorReason
 import com.simprints.moduleapi.face.responses.IFaceErrorResponse
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceErrorResponse(val faceErrorReason: FaceErrorReason) : FaceResponse {

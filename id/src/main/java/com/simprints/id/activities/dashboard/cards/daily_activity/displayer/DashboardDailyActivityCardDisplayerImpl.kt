@@ -11,7 +11,6 @@ import com.simprints.core.tools.extentions.nand
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.tools.time.TimeHelper
-import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.view.*
 
 class DashboardDailyActivityCardDisplayerImpl(
     private val timeHelper: TimeHelper
@@ -108,8 +107,8 @@ class DashboardDailyActivityCardDisplayerImpl(
         val shouldHideDividers = dailyActivityState.shouldHideDividers()
 
         if (shouldHideDividers) {
-            divider_enrolments.visibility = GONE
-            divider_identifications.visibility = GONE
+            enrolmentsDivider.visibility = GONE
+            identificationsDivider.visibility = GONE
         } else {
             setEnrolmentsDividerVisibility(enrolmentsDivider, dailyActivityState)
             setIdentificationsDividerVisibility(identificationsDivider, dailyActivityState)

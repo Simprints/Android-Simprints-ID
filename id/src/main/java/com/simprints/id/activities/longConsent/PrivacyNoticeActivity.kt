@@ -6,11 +6,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.databinding.ActivityPrivacyNoticeBinding
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_privacy_notice.*
 import javax.inject.Inject
 
 class PrivacyNoticeActivity : BaseSplitActivity() {
@@ -22,6 +23,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     lateinit var deviceManager: DeviceManager
 
     private lateinit var viewModel: PrivacyNoticeViewModel
+    private val binding by viewBinding(ActivityPrivacyNoticeBinding::inflate)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +32,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         (application as Application).component.also { it.inject(this) }
         viewModel = ViewModelProvider(this, viewModelFactory).get(PrivacyNoticeViewModel::class.java)
 
-        setContentView(R.layout.activity_privacy_notice)
+        setContentView(binding.root)
 
         initActionBar()
 
@@ -41,7 +43,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun initActionBar() {
-        setSupportActionBar(longConsentToolbar)
+        setSupportActionBar(binding.longConsentToolbar)
 
         supportActionBar?.run {
             setDisplayHomeAsUpEnabled(true)
@@ -51,7 +53,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun initInUi() {
-        longConsent_downloadButton.setOnClickListener {
+        binding.longConsentDownloadButton.setOnClickListener {
             if (deviceManager.isConnected()) {
                 viewModel.retrievePrivacyNotice()
             } else {
@@ -94,32 +96,37 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun setLongConsentText(text: String) {
-        longConsent_downloadButton.isVisible = false
-        longConsent_header.isVisible = false
-        longConsent_downloadProgressBar.isVisible = false
+        binding.apply {
+            longConsentDownloadButton.isVisible = false
+            longConsentHeader.isVisible = false
+            longConsentDownloadProgressBar.isVisible = false
 
-        longConsent_TextView.isVisible = true
-        longConsent_TextView.text = text
-        longConsent_TextView.movementMethod = ScrollingMovementMethod()
+            longConsentTextView.isVisible = true
+            longConsentTextView.text = text
+            longConsentTextView.movementMethod = ScrollingMovementMethod()
+        }
     }
 
     private fun setNoPrivacyNoticeFound() {
-        longConsent_TextView.isVisible = false
-        longConsent_downloadProgressBar.isVisible = false
-        longConsent_header.isVisible = false
-
-        longConsent_downloadButton.isVisible = true
+        binding.apply {
+            longConsentTextView.isVisible = false
+            longConsentDownloadProgressBar.isVisible = false
+            longConsentHeader.isVisible = false
+            longConsentDownloadButton.isVisible = true
+        }
     }
 
     private fun setDownloadProgress(progress: Int) {
-        longConsent_downloadButton.isVisible = false
-        longConsent_TextView.isVisible = false
+        binding.apply {
+            longConsentDownloadButton.isVisible = false
+            longConsentTextView.isVisible = false
 
-        longConsent_header.isVisible = true
-        longConsent_header.text = getString(R.string.long_consent_downloading)
+            longConsentHeader.isVisible = true
+            longConsentHeader.text = getString(R.string.long_consent_downloading)
 
-        longConsent_downloadProgressBar.isVisible = true
-        longConsent_downloadProgressBar.progress = progress
+            longConsentDownloadProgressBar.isVisible = true
+            longConsentDownloadProgressBar.progress = progress
+        }
     }
 
     private fun showDownloadErrorToast() {

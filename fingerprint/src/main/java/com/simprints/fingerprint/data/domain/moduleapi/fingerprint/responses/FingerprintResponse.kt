@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses
 
 import android.os.Parcelable
-import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.parcelize.IgnoredOnParcel
 
 interface FingerprintResponse: Parcelable {
     @IgnoredOnParcel val type: FingerprintResponseType

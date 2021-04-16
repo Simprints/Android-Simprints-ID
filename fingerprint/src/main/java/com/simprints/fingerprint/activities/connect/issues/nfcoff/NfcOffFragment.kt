@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -15,7 +16,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
-import kotlinx.android.synthetic.main.fragment_nfc_off.*
+import com.simprints.fingerprint.databinding.FragmentNfcOffBinding
 import org.koin.android.ext.android.inject
 
 class NfcOffFragment : FingerprintFragment() {
@@ -23,6 +24,7 @@ class NfcOffFragment : FingerprintFragment() {
     private var handlingNfcEnabled = false
 
     private val nfcManager: NfcManager by inject()
+    private val binding by viewBinding(FragmentNfcOffBinding::bind)
     private val sessionManager: FingerprintSessionEventsManager by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
 
@@ -40,15 +42,15 @@ class NfcOffFragment : FingerprintFragment() {
             return
         }
 
-        turnOnNfcButton.setOnClickListener {
+        binding.turnOnNfcButton.setOnClickListener {
             val enableNfcIntent = Intent(Settings.ACTION_NFC_SETTINGS)
             startActivityForResult(enableNfcIntent, REQUEST_ENABLE_NFC)
         }
     }
 
     private fun setTextInLayout() {
-        turnOnNfcButton.text = getString(R.string.turn_on_nfc)
-        nfcOffTitleTextView.text = getString(R.string.nfc_off_title)
+        binding.turnOnNfcButton.text = getString(R.string.turn_on_nfc)
+        binding.nfcOffTitleTextView.text = getString(R.string.nfc_off_title)
     }
 
     override fun onResume() {
@@ -70,9 +72,9 @@ class NfcOffFragment : FingerprintFragment() {
     private fun handleNfcEnabled() {
         if (handlingNfcEnabled) return
         handlingNfcEnabled = true
-        turnOnNfcButton.isEnabled = false
-        turnOnNfcButton.text = getString(R.string.nfc_on)
-        turnOnNfcButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
+        binding.turnOnNfcButton.isEnabled = false
+        binding.turnOnNfcButton.text = getString(R.string.nfc_on)
+        binding.turnOnNfcButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
         Handler().postDelayed({ continueToNfcPair() }, FINISHED_TIME_DELAY_MS)
     }
 

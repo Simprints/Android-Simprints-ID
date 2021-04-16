@@ -1,6 +1,6 @@
 package com.simprints.id.orchestrator.steps.core.response
 
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class AskConsentResponse(val consentData: ConsentResponse): CoreResponse(type = CoreResponseType.CONSENT)

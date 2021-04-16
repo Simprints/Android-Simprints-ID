@@ -2,7 +2,7 @@ package com.simprints.id.domain.moduleapi.face.responses.entities
 
 import android.os.Parcelable
 import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceCaptureResult(val index: Int,

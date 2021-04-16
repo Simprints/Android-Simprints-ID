@@ -2,8 +2,8 @@ package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize

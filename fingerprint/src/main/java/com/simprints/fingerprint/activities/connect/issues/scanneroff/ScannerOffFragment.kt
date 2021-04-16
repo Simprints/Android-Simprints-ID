@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -14,13 +15,14 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import kotlinx.android.synthetic.main.fragment_scanner_off.*
+import com.simprints.fingerprint.databinding.FragmentScannerOffBinding
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class ScannerOffFragment : FingerprintFragment() {
 
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    private val binding by viewBinding(FragmentScannerOffBinding::bind)
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
 
@@ -39,9 +41,9 @@ class ScannerOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        tryAgainButton.text = getString(R.string.try_again_label)
-        scannerOffInstructionsTextView.text = getString(R.string.scanner_off_instructions)
-        scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
+        binding.tryAgainButton.text = getString(R.string.try_again_label)
+        binding.scannerOffInstructionsTextView.text = getString(R.string.scanner_off_instructions)
+        binding.scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
     }
 
     private fun initRetryConnectBehaviour() {
@@ -56,10 +58,10 @@ class ScannerOffFragment : FingerprintFragment() {
 
     private fun initCouldNotConnectTextView() {
         connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerIdEvent ->
-            couldNotConnectTextView.paintFlags = couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            couldNotConnectTextView.text = String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
-            couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
-            couldNotConnectTextView.visibility = View.VISIBLE
+            binding.couldNotConnectTextView.paintFlags = binding.couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            binding.couldNotConnectTextView.text = String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
+            binding.couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
+            binding.couldNotConnectTextView.visibility = View.VISIBLE
         }
         connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
             connectScannerViewModel.stopConnectingAndResetState()
@@ -70,20 +72,23 @@ class ScannerOffFragment : FingerprintFragment() {
     // The tryAgainButton doesn't actually do anything - we're already retrying in the background
     // Show a progress bar to make it known that something is happening
     private fun initTryAgainButton() {
-        tryAgainButton.setOnClickListener {
-            scannerOffProgressBar.visibility = View.VISIBLE
-            tryAgainButton.visibility = View.INVISIBLE
-            tryAgainButton.isEnabled = false
+        binding.tryAgainButton.setOnClickListener {
+            binding.scannerOffProgressBar.visibility = View.VISIBLE
+            binding.tryAgainButton.visibility = View.INVISIBLE
+            binding.tryAgainButton.isEnabled = false
         }
     }
 
     private fun handleScannerConnected() {
-        scannerOffProgressBar.visibility = View.INVISIBLE
-        couldNotConnectTextView.visibility = View.INVISIBLE
-        tryAgainButton.visibility = View.VISIBLE
-        tryAgainButton.isEnabled = false
-        tryAgainButton.text = getString(R.string.scanner_on)
-        tryAgainButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
+        binding.apply {
+            scannerOffProgressBar.visibility = View.INVISIBLE
+            couldNotConnectTextView.visibility = View.INVISIBLE
+            tryAgainButton.visibility = View.VISIBLE
+            tryAgainButton.isEnabled = false
+            tryAgainButton.text = getString(R.string.scanner_on)
+            tryAgainButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
+        }
+
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }
 

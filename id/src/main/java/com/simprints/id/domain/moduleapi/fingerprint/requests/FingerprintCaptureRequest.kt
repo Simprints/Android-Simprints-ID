@@ -4,7 +4,7 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 //Do not change the order of the parameters. Parcelize is not able to marshall correctly if type is the 2nd param
 @Parcelize

@@ -16,9 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
+import com.simprints.id.databinding.ItemFingerSelectionBinding
 import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
-import kotlinx.android.synthetic.main.item_finger_selection.view.*
 
 class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
                                  private val getItems: () -> List<FingerSelectionItem>,
@@ -27,10 +27,19 @@ class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
                                  private val removeItem: (itemIndex: Int) -> Unit) :
     RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder =
-        FingerSelectionItemViewHolder(parent.context, itemTouchHelper, getItems, onFingerSelectionChanged, onQuantitySelectionChanged, removeItem,
-            LayoutInflater.from(parent.context).inflate(R.layout.item_finger_selection, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemFingerSelectionBinding.inflate(inflater, parent, false)
+        return FingerSelectionItemViewHolder(
+            parent.context,
+            itemTouchHelper,
+            getItems,
+            onFingerSelectionChanged,
+            onQuantitySelectionChanged,
+            removeItem,
+            binding
         )
+    }
 
     override fun getItemCount(): Int = getItems().size
 
@@ -45,13 +54,13 @@ class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
         private val onFingerSelectionChanged: (itemIndex: Int, finger: FingerIdentifier) -> Unit,
         private val onQuantitySelectionChanged: (itemIndex: Int, quantity: Int) -> Unit,
         private val removeItem: (itemIndex: Int) -> Unit,
-        view: View
-    ) : RecyclerView.ViewHolder(view) {
+        binding: ItemFingerSelectionBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val grip: ImageView = view.gripFingerSelectionImageView
-        private val fingerSpinner: Spinner = view.fingerSelectionSpinner
-        private val quantitySpinner: Spinner = view.fingerQuantitySpinner
-        private val deleteButton: ImageView = view.deleteFingerSelectionImageView
+        private val grip: ImageView = binding.gripFingerSelectionImageView
+        private val fingerSpinner: Spinner = binding.fingerSelectionSpinner
+        private val quantitySpinner: Spinner = binding.fingerQuantitySpinner
+        private val deleteButton: ImageView = binding.deleteFingerSelectionImageView
 
         private val fingerIdAdapter = FingerIdAdapter(context, getItems)
         private val quantityAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)

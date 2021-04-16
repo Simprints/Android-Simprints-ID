@@ -11,7 +11,7 @@ import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResult
 import com.simprints.moduleapi.face.responses.IFaceResponseType
 import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 internal val verifyAppRequest = AppVerifyRequest(
     DEFAULT_PROJECT_ID,

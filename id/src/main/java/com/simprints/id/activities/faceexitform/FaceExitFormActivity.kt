@@ -7,6 +7,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
@@ -16,11 +17,11 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
+import com.simprints.id.databinding.ActivityFaceExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.id.tools.time.TimeHelper
-import kotlinx.android.synthetic.main.activity_face_exit_form.*
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
@@ -28,6 +29,7 @@ import javax.inject.Inject
 class FaceExitFormActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: FaceExitFormViewModel
+    private val binding by viewBinding(ActivityFaceExitFormBinding::inflate)
 
     @Inject
     lateinit var timeHelper: TimeHelper
@@ -45,7 +47,7 @@ class FaceExitFormActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_face_exit_form)
+        setContentView(binding.root)
 
         injectDependencies()
 
@@ -64,22 +66,25 @@ class FaceExitFormActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        whySkipFaceText.text = getString(R.string.why_did_you_skip_face_capture)
-        faceRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-        faceRbDataConcerns.text = getString(R.string.refusal_data_concerns)
-        faceRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-        faceRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-        faceRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-        faceRbTooYoung.text = getString(R.string.refusal_too_young)
-        faceRbOther.text = getString(R.string.refusal_other)
-        faceExitFormText.hint = getString(R.string.hint_other_reason)
-        faceBtSubmitExitForm.text = getString(R.string.button_submit)
-        faceBtGoBack.text = getString(R.string.exit_form_capture_face)
+        binding.apply {
+            whySkipFaceText.text = getString(R.string.why_did_you_skip_face_capture)
+            faceRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            faceRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            faceRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            faceRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            faceRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            faceRbTooYoung.text = getString(R.string.refusal_too_young)
+            faceRbOther.text = getString(R.string.refusal_other)
+            faceExitFormText.hint = getString(R.string.hint_other_reason)
+            faceBtSubmitExitForm.text = getString(R.string.button_submit)
+            faceBtGoBack.text = getString(R.string.exit_form_capture_face)
+
+        }
     }
 
     private fun setRadioGroupListener() {
-        faceExitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            faceExitFormText.removeTextChangedListener(textWatcher)
+        binding.faceExitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
+            binding.faceExitFormText.removeTextChangedListener(textWatcher)
             enableSubmitButton()
             enableFaceExitFormText()
             handleRadioOptionIdentifierClick(optionIdentifier)
@@ -88,11 +93,8 @@ class FaceExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        with(faceExitFormScrollView) {
-            onLayoutChange { _, _, _, _,
-                             _, _, _, _, _ ->
-                fullScroll(View.FOCUS_DOWN)
-            }
+        binding.faceExitFormScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
+            binding.faceExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
@@ -105,15 +107,15 @@ class FaceExitFormActivity : BaseSplitActivity() {
     }
 
     private fun enableSubmitButton() {
-        faceBtSubmitExitForm.isEnabled = true
+        binding.faceBtSubmitExitForm.isEnabled = true
     }
 
     private fun disableSubmitButton() {
-        faceBtSubmitExitForm.isEnabled = false
+        binding.faceBtSubmitExitForm.isEnabled = false
     }
 
     private fun enableFaceExitFormText() {
-        faceExitFormText.isEnabled = true
+        binding.faceExitFormText.isEnabled = true
     }
 
     private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
@@ -151,17 +153,17 @@ class FaceExitFormActivity : BaseSplitActivity() {
         }
     }
 
-    private fun getExitFormText() = faceExitFormText.text.toString()
+    private fun getExitFormText() = binding.faceExitFormText.text.toString()
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
-        faceBtSubmitExitForm.isEnabled = false
-        faceExitFormText.requestFocus()
+        binding.faceBtSubmitExitForm.isEnabled = false
+        binding.faceExitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(faceExitFormText, InputMethodManager.SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(binding.faceExitFormText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setTextChangeListenerOnExitText() {
-        faceExitFormText.addTextChangedListener(textWatcher)
+        binding.faceExitFormText.addTextChangedListener(textWatcher)
     }
 
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -187,7 +189,7 @@ class FaceExitFormActivity : BaseSplitActivity() {
 
 
     override fun onBackPressed() {
-        if (faceBtSubmitExitForm.isEnabled) {
+        if (binding.faceBtSubmitExitForm.isEnabled) {
             showToast(R.string.refusal_toast_submit)
         } else {
             showToast(R.string.refusal_toast_select_option_submit)
