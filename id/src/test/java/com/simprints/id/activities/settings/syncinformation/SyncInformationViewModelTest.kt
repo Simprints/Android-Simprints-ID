@@ -111,7 +111,8 @@ class SyncInformationViewModelTest {
         coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
-        coEvery { eventRepository.localCount(any(), any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
@@ -145,7 +146,8 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
-        coEvery { eventRepository.localCount(any(), any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
@@ -174,7 +176,8 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
-        coEvery { eventRepository.localCount(any(), any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         coEvery { eventDownSyncScopeRepository.getDownSyncScope() } throws IOException()
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
