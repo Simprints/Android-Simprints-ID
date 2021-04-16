@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.steps.core.response
 
 import android.os.Parcelable
 import com.simprints.id.orchestrator.steps.Step
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 open class CoreResponse(val type: CoreResponseType): Parcelable, Step.Result {

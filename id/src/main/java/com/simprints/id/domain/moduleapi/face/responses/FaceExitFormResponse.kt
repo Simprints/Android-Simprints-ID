@@ -3,8 +3,8 @@ package com.simprints.id.domain.moduleapi.face.responses
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormReason
 import com.simprints.moduleapi.face.responses.IFaceExitFormResponse
 import com.simprints.moduleapi.face.responses.IFaceExitReason
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceExitFormResponse(val reason: FaceExitReason, val extra: String) : FaceResponse {

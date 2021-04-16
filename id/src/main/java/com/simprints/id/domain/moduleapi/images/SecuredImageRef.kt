@@ -3,7 +3,7 @@ package com.simprints.id.domain.moduleapi.images
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.moduleapi.common.IPath
 import com.simprints.moduleapi.common.ISecuredImageRef
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 fun SecuredImageRef.fromDomainToModuleApi(): ISecuredImageRef = ISecuredImageRefImpl(
     relativePath.fromDomainToModuleApi()

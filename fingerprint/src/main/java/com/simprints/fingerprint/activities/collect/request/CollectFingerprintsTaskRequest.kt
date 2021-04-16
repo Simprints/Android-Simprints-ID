@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.collect.request
 import android.os.Parcelable
 import com.simprints.fingerprint.orchestrator.task.TaskRequest
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CollectFingerprintsTaskRequest(val fingerprintsToCapture: List<FingerIdentifier>) : TaskRequest, Parcelable {

@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.errors.request
 
 import android.os.Parcelable
 import com.simprints.clientapi.activities.errors.ClientApiAlert
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 
 @Parcelize

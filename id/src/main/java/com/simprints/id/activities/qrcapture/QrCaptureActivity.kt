@@ -11,12 +11,13 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
+import com.simprints.id.databinding.ActivityQrCaptureBinding
 import com.simprints.id.tools.extensions.hasPermission
-import kotlinx.android.synthetic.main.activity_qr_capture.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class QrCaptureActivity : BaseSplitActivity() {
 
     @Inject lateinit var cameraHelper: CameraHelper
     @Inject lateinit var qrCodeProducer: QrCodeProducer
+    private val binding by viewBinding(ActivityQrCaptureBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +61,7 @@ class QrCaptureActivity : BaseSplitActivity() {
         lifecycleScope.launch {
             cameraHelper.startCamera(
                 this@QrCaptureActivity,
-                cameraPreview,
+                binding.cameraPreview,
                 qrCodeProducer
             )
 
@@ -81,7 +83,7 @@ class QrCaptureActivity : BaseSplitActivity() {
             setImageResource(R.drawable.ic_camera_focus)
             translationZ = 1f
         }
-        previewRoot.addView(img)
+        binding.previewRoot.addView(img)
     }
 
     private fun sendQrCodeInResultIfNotEmpty(qrCodeValue: String) {

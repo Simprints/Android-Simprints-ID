@@ -5,26 +5,30 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
+import com.simprints.id.databinding.ActivityAlertBinding
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
-import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
 
 class AlertActivity : BaseSplitActivity(), AlertContract.View {
+
+    private val binding by viewBinding(ActivityAlertBinding::inflate)
 
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType
@@ -32,7 +36,8 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_alert)
+        setContentView(binding.root)
+
         (application as Application).component.inject(this)
         title = getString(R.string.alert_title)
 
@@ -54,40 +59,37 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
     }
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
-    override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
-    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = alertLeftButton.setBackgroundColor(color)
-    override fun setRightButtonBackgroundColor(@ColorInt color: Int) = alertRightButton.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) { alertTitle.text = getString(stringRes) }
-    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
+    override fun setLayoutBackgroundColor(@ColorInt color: Int) = binding.alertLayout.setBackgroundColor(color)
+    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = binding.alertLeftButton.setBackgroundColor(color)
+    override fun setRightButtonBackgroundColor(@ColorInt color: Int) = binding.alertRightButton.setBackgroundColor(color)
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) { binding.alertTitle.text = getString(stringRes) }
+    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = binding.alertImage.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
-            hintGraphic.setImageResource(alertHintDrawableId)
+            binding.hintGraphic.setImageResource(alertHintDrawableId)
         } else {
-            hintGraphic.visibility = View.GONE
+            binding.hintGraphic.visibility = View.GONE
         }
     }
 
     override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) {
-        message.text = String.format(getString(stringRes), *params)
+        binding.message.text = String.format(getString(stringRes), *params)
     }
 
     override fun getTranslatedString(@StringRes stringRes: Int) = getString(stringRes)
 
-    override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
-        if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertLeftButton.text = getString(leftButtonAction.buttonText)
-            alertLeftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
-        } else {
-            alertLeftButton.visibility = View.GONE
-        }
-    }
+    override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) =
+        initButtonWithButtonAction(binding.alertLeftButton, leftButtonAction)
 
-    override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
-        if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertRightButton.text = getString(rightButtonAction.buttonText)
-            alertRightButton.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
+    override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) =
+        initButtonWithButtonAction(binding.alertRightButton, rightButtonAction)
+
+    private fun initButtonWithButtonAction(button: TextView, buttonAction: AlertActivityViewModel.ButtonAction) {
+        if (buttonAction !is AlertActivityViewModel.ButtonAction.None) {
+            button.text = getString(buttonAction.buttonText)
+            button.setOnClickListener { viewPresenter.handleButtonClick(buttonAction) }
         } else {
-            alertRightButton.visibility = View.GONE
+            button.visibility = View.GONE
         }
     }
 

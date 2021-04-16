@@ -8,8 +8,8 @@ import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 object DomainToModuleApiAppResponse {
 

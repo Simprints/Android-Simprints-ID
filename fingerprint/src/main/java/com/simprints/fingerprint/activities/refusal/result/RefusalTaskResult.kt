@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.refusal.result
 import android.os.Parcelable
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 //If user taps back-back then nothing is submitted "reason" = null
 @Parcelize

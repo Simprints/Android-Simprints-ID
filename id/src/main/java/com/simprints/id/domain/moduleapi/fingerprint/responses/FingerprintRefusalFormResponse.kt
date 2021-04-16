@@ -3,8 +3,8 @@ package com.simprints.id.domain.moduleapi.fingerprint.responses
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintExitFormResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintExitReason
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FingerprintRefusalFormResponse(val reason: FingerprintRefusalFormReason,

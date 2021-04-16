@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
@@ -36,7 +37,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
-    private lateinit var binding: ActivitySyncInformationBinding
+    private val binding by viewBinding(ActivitySyncInformationBinding::inflate)
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
@@ -48,7 +49,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         (application as Application).component.inject(this)
 
         title = getString(R.string.title_activity_sync_information)
-        binding = ActivitySyncInformationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this, viewModelFactory)
