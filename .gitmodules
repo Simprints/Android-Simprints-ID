@@ -1,3 +1,3 @@
 [submodule "fingerprintmatcher/src/main/jni/SimMatcher"]
 	path = fingerprintmatcher/src/main/jni/SimMatcher
-	url = git@github.com:Simprints/Fingerprint-SimMatcher.git
+	url = git@bitbucket.org:simprints/fingerprint-simmatcher.git

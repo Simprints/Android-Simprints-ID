@@ -128,6 +128,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
         factory { component.getSimClientFactory() }
+        factory { component.getLicenseRepository() }
     }
 
     override fun onTerminate() {

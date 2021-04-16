@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
+import androidx.annotation.Keep
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
@@ -263,5 +264,6 @@ class CommCarePresenter(
         )
     }
 
+    @Keep
     private data class CommCareEvents(val events: List<Event>)
 }
