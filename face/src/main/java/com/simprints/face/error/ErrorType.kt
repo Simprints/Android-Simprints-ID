@@ -14,7 +14,8 @@ enum class ErrorType(
     @StringRes val message: Int,
     @StringRes val buttonText: Int,
     @ColorRes val backgroundColor: Int,
-    @DrawableRes val mainDrawable: Int
+    @DrawableRes val mainDrawable: Int,
+    var errorCode: String? = null
 ) {
     LICENSE_MISSING(
         R.string.error_licence_missing_title,

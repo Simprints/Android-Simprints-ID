@@ -33,7 +33,7 @@ class ErrorFragment : Fragment(R.layout.fragment_error) {
             binding.errorLayout.setBackgroundColor(
                 ContextCompat.getColor(requireContext(), backgroundColor)
             )
-            binding.errorTitle.text = getString(title)
+            binding.errorTitle.text = errorCode?.let { getString(title) + " ($it)" } ?: getString(title)
             binding.errorMessage.text = getString(message)
             binding.errorButton.text = getString(buttonText)
             binding.errorImage.setImageResource(mainDrawable)

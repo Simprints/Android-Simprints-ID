@@ -35,7 +35,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
                 ConfigurationState.Started -> renderStarted()
                 ConfigurationState.Downloading -> renderDownloading()
                 is ConfigurationState.FinishedWithSuccess -> renderFinishedWithSuccess(it.license)
-                ConfigurationState.FinishedWithError -> renderFinishedWithError()
+                is ConfigurationState.FinishedWithError -> renderFinishedWithError(it.errorCode)
             }
         })
     }
@@ -57,8 +57,8 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
         }
     }
 
-    private fun renderFinishedWithError() {
-        mainVm.configurationFinished(false)
+    private fun renderFinishedWithError(errorCode: String) {
+        mainVm.configurationFinished(false, errorCode)
     }
 
 }
