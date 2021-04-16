@@ -73,6 +73,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import timber.log.Timber
 
 
 @RunWith(AndroidJUnit4::class)
@@ -139,8 +140,10 @@ class EventRemoteDataSourceImplAndroidTest {
                 events.addEventFor(it)
             }
 
+            Timber.d("UPLOAD ALL EVENTS")
             executeUpload(events)
-            executeUpload(listOf(createEnrolmentEventV1()))
+            Timber.d("UPLOAD ENROLMENT V1")
+            executeUpload(listOf(createEnrolmentEventV1().apply { labels = eventLabels }))
         }
     }
 
