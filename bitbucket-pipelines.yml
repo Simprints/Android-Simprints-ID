@@ -142,11 +142,8 @@ definitions:
                     # - ./gradlew face:assembleDebugAndroidTest
                     # - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     # Build Universal APK
-                    - ./gradlew bundleDebug --stacktrace
-                    - wget "https://github.com/google/bundletool/releases/download/0.13.4/bundletool-all.jar"
-                    - java -jar bundletool-all.jar build-apks --bundle id/build/outputs/bundle/debug/id-debug.aab --output universal.apks --overwrite --mode=UNIVERSAL --ks=debug.keystore --ks-key-alias=androiddebugkey --key-pass=pass:android --ks-pass=pass:android
-                    - mv universal.apks universal.zip
-                    - unzip universal.zip
+                    - ./gradlew packageDebugUniversalApk --stacktrace
+                    - mv id/build/outputs/universal_apk/debug/id-debug-universal.apk universal.apk
                 artifacts:
                     - universal.apk
                     - id-debug-androidTest.apk
@@ -177,7 +174,7 @@ definitions:
         # Signing vars are only available on a deployment step.
         ######################################################################
         -   step: &sign-and-deploy-to-internal
-                name: "Sign & Deploy Staging build to Internal Track"
+                name: "Sign and deploy Staging build to Internal Track"
                 deployment: Internal
                 max-time: 30
                 size: 2x
@@ -200,8 +197,8 @@ definitions:
         #
         # Signing vars are only available on a deployment step.
         ######################################################################
-        -   step: &release-to-alpha
-                name: "Sign and deploy Release build to Alpha Track"
+        -   step: &sign-and-deploy-to-alpha-testing
+                name: "Sign and deploy Release build to Alpha-Test Track"
                 deployment: Alpha
                 max-time: 30
                 size: 2x
@@ -213,15 +210,16 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/pipeline/release_setup.sh
                     - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
+                    - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
-                    - ./gradlew id:publishReleaseBundle
+                    - ./gradlew id:publishReleaseBundle --track Alpha-Test
 
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
 flows:
-    -   flow: &main-flow
+    -   flow: &development_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
@@ -232,7 +230,7 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
-    -   flow: &deploy-flow
+    -   flow: &release_branch_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
@@ -244,7 +242,7 @@ flows:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
             -   step: *sign-and-deploy-to-internal
-    -   flow: &release-flow
+    -   flow: &production_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
@@ -255,18 +253,20 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
-            -   step: *release-to-alpha
+            -   step: *sign-and-deploy-to-alpha-testing
     -   flow: &ci-test
             -   step: *sign-and-deploy-to-internal
+            -   step: *sign-and-deploy-to-alpha-testing
 
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
 pipelines:
     branches:
-        master: *release-flow
-        develop: *main-flow
-        release/*: *deploy-flow
+        main: *production_flow
+        develop: *development_flow
+        release/*: *release_branch_flow
         ci/*: *ci-test
     custom:
-        default-pipeline: *main-flow # Pipeline that can be triggered manually anywhere
+        default-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
+        release-pipeline: *production_flow # Pipeline to create a separate build and release to alpha
