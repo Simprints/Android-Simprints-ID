@@ -46,6 +46,7 @@ class SyncInformationViewModel(
                 recordsToDelete.value = it?.toDelete ?: 0
             }
         }
+        // Move walking the file system to the IO thread
         viewModelScope.launch(Dispatchers.IO) {
             imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
         }
