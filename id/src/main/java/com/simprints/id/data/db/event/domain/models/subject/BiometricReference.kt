@@ -21,12 +21,12 @@ sealed class BiometricReference(open val id: String,
 
 data class FaceReference(override val id: String,
                          val templates: List<FaceTemplate>,
-                         val format: FaceTemplateFormat,
+                         val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23,
                          val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(override val id: String,
                                 val templates: List<FingerprintTemplate>,
-                                val format: FingerprintTemplateFormat,
+                                val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2,
                                 val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {
