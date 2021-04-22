@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.common
 
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
@@ -18,7 +17,7 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
 
     override suspend fun signIn(token: String) {
         cacheTokenClaims(token)
-        val result = Tasks.await(firebaseAuth.signInWithCustomToken(token))
+        val result = firebaseAuth.signInWithCustomToken(token).awaitTask()
         Timber.d(result.user?.uid)
     }
 
