@@ -30,7 +30,7 @@ class QrCaptureActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
-        setContentView(R.layout.activity_qr_capture)
+        setContentView(binding.root)
 
         if (hasPermission(CAMERA))
             startCamera()
