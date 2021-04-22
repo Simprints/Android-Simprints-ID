@@ -27,18 +27,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.StringBuilder
 import javax.inject.Inject
 
 
 class DebugActivity : BaseSplitActivity() {
 
-    @Inject lateinit var eventSyncManager: EventSyncManager
-    @Inject lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
-    @Inject lateinit var securityStateRepository: SecurityStateRepository
-    @Inject lateinit var securityStateProcessor: SecurityStateProcessor
-    @Inject lateinit var eventLocalDataSource: EventLocalDataSource
-    @Inject lateinit var subjectRepository: SubjectRepository
+    @Inject
+    lateinit var eventSyncManager: EventSyncManager
+    @Inject
+    lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
+    @Inject
+    lateinit var securityStateRepository: SecurityStateRepository
+    @Inject
+    lateinit var securityStateProcessor: SecurityStateProcessor
+    @Inject
+    lateinit var eventLocalDataSource: EventLocalDataSource
+    @Inject
+    lateinit var subjectRepository: SubjectRepository
 
     private val binding by viewBinding(ActivityDebugBinding::inflate)
 
@@ -103,7 +108,7 @@ class DebugActivity : BaseSplitActivity() {
             lifecycleScope.launch {
                 withContext(Dispatchers.Main) {
                     val logStringBuilder = StringBuilder()
-                    logStringBuilder.append("${binding.logs.text} ${subjectRepository.count()} \n")
+                    logStringBuilder.append("${binding.logs.text} Subjects ${subjectRepository.count()} \n")
 
                     val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
@@ -125,8 +130,10 @@ class DebugActivity : BaseSplitActivity() {
     private fun coloredText(text: String, color: Int): SpannableString? {
         val spannableString = SpannableString(text)
         try {
-            spannableString.setSpan(ForegroundColorSpan(color), 0,
-                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(
+                ForegroundColorSpan(color), 0,
+                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         } catch (e: Exception) {
         }
         return spannableString

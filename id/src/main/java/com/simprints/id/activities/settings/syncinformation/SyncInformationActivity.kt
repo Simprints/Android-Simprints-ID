@@ -1,11 +1,13 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TabHost
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,8 +16,6 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
-import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState.Calculating
-import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.LoadingState.Syncing
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
@@ -61,7 +61,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         setupModulesTabs()
         setupClickListeners()
         observeUi()
-        setupProgressOverlay()
         setupRecordsCountCards()
 
         viewModel.fetchSyncInformation()
@@ -86,22 +85,24 @@ class SyncInformationActivity : BaseSplitActivity() {
         binding.imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.sync_info_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
                 return true
             }
+            R.id.sync_redo -> {
+                viewModel.resetFetchingSyncInformation()
+                viewModel.fetchSyncInformation()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun clearValues() {
-        binding.recordsToUploadCount.text = getString(R.string.empty)
-        binding.recordsToDownloadCount.text = getString(R.string.empty)
-        binding.totalRecordsCount.text = getString(R.string.empty)
-        binding.recordsToDeleteCount.text = getString(R.string.empty)
-        binding.imagesToUploadCount.text = getString(R.string.empty)
     }
 
     private fun setFocusOnDefaultModulesTab() {
@@ -150,47 +151,46 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.getViewStateLiveData().observe(this, Observer {
-            when (it) {
-                Syncing, Calculating -> showProgressOverlayAndClearValuesIfNecessary(it as ViewState.LoadingState)
-                is ViewState.SyncDataFetched -> hideProgressAndShowSyncData(it)
+        viewModel.recordsInLocal.observe(this, Observer {
+            binding.totalRecordsCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
+        })
+
+        viewModel.recordsToUpSync.observe(this, Observer {
+            binding.recordsToUploadCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.recordsToUploadCount, binding.recordsToUploadProgress)
+        })
+
+        viewModel.imagesToUpload.observe(this, Observer {
+            binding.imagesToUploadCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.imagesToUploadCount, binding.imagesToUploadProgress)
+        })
+
+        viewModel.recordsToDownSync.observe(this, Observer {
+            binding.recordsToDownloadCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
+        })
+
+        viewModel.recordsToDelete.observe(this, Observer {
+            binding.recordsToDeleteCount.text = it?.toString() ?: ""
+            setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
+        })
+
+        viewModel.moduleCounts.observe(this, Observer {
+            it?.let {
+                addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
         })
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setupProgressOverlay() {
-        binding.progressOverlayBackground.setOnTouchListener { _, _ -> true }
-        binding.progressSyncOverlay.setOnTouchListener { _, _ -> true }
-        binding.progressBar.setOnTouchListener { _, _ -> true }
-    }
-
-    private fun showProgressOverlayAndClearValuesIfNecessary(loadingState: ViewState.LoadingState) {
-        binding.progressSyncOverlay.text = when (loadingState) {
-            Syncing -> getString(R.string.progress_sync_overlay)
-            Calculating -> getString(R.string.calculating_overlay)
+    private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {
+        if (value == null) {
+            pb.visibility = View.VISIBLE
+            tv.visibility = View.GONE
+        } else {
+            pb.visibility = View.GONE
+            tv.visibility = View.VISIBLE
         }
-
-        if (!isProgressOverlayVisible()) {
-            clearValues()
-            binding.groupProgressOverlay.visibility = View.VISIBLE
-        }
-    }
-
-    private fun isProgressOverlayVisible() = binding.groupProgressOverlay.visibility == View.VISIBLE
-
-    private fun hideProgressAndShowSyncData(it: ViewState.SyncDataFetched) {
-        hideProgressOverlay()
-        binding.totalRecordsCount.text = it.recordsInLocal.toString()
-        binding.recordsToUploadCount.text = it.recordsToUpSync.toString()
-        binding.recordsToDownloadCount.text = it.recordsToDownSync?.toString() ?: ""
-        binding.recordsToDeleteCount.text = it.recordsToDelete?.toString() ?: ""
-        binding.imagesToUploadCount.text = it.imagesToUpload.toString()
-        addTotalRowAndSubmitList(it.moduleCounts, moduleCountAdapterForSelected)
-    }
-
-    private fun hideProgressOverlay() {
-        binding.groupProgressOverlay.visibility = View.GONE
     }
 
     private fun addTotalRowAndSubmitList(
@@ -225,22 +225,6 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun isDownSyncAllowed() = with(preferencesManager) {
         eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-    }
-
-    sealed class ViewState {
-        sealed class LoadingState : ViewState() {
-            object Syncing : LoadingState()
-            object Calculating : LoadingState()
-        }
-
-        data class SyncDataFetched(
-            val recordsInLocal: Int,
-            val recordsToDownSync: Int?,
-            val recordsToUpSync: Int,
-            val recordsToDelete: Int?,
-            val imagesToUpload: Int,
-            val moduleCounts: List<ModuleCount>
-        ) : ViewState()
     }
 
     companion object {

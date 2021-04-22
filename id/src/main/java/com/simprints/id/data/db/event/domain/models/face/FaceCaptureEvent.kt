@@ -56,7 +56,7 @@ data class FaceCaptureEvent(
             var roll: Float,
             val quality: Float,
             val template: String,
-            val format: FaceTemplateFormat
+            val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
         )
 
         enum class Result {

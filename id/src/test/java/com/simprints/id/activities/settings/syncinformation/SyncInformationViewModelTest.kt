@@ -2,9 +2,7 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity.ViewState.SyncDataFetched
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
@@ -24,7 +22,6 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Running
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Succeeded
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.testtools.UnitTestConfig
@@ -34,7 +31,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -47,16 +43,22 @@ class SyncInformationViewModelTest {
 
     @MockK
     lateinit var downySyncHelper: EventDownSyncHelper
+
     @MockK
     lateinit var eventRepository: EventRepository
+
     @MockK
     lateinit var subjectRepository: SubjectRepository
+
     @MockK
     lateinit var preferencesManager: PreferencesManager
+
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+
     @MockK
     lateinit var imageRepository: ImageRepository
+
     @MockK
     lateinit var eventSyncManager: EventSyncManager
 
@@ -75,19 +77,21 @@ class SyncInformationViewModelTest {
             preferencesManager,
             projectId,
             eventDownSyncScopeRepository,
-            imageRepository,
-            eventSyncManager
+            imageRepository
         )
     }
 
     @Test
-    fun syncInProgress_shouldHaveSyncingViewState() {
-        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Running))
+    fun syncReset_shouldResetViewState() {
+        viewModel.resetFetchingSyncInformation()
+        val vo = ViewObservers(viewModel)
 
-        viewModel.fetchSyncInformation()
-        val testObserver = viewModel.getViewStateLiveData().getOrAwaitValue()
-
-        assertThat(testObserver).isEqualTo(SyncInformationActivity.ViewState.LoadingState.Syncing)
+        assertThat(vo.imagesToUploadObserver).isEqualTo(null)
+        assertThat(vo.recordsToUpSyncObserver).isEqualTo(null)
+        assertThat(vo.recordsInLocalObserver).isEqualTo(null)
+        assertThat(vo.recordsToDeleteObserver).isEqualTo(null)
+        assertThat(vo.recordsToDownSyncObserver).isEqualTo(null)
+        assertThat(vo.moduleCountsObserver).isEqualTo(null)
     }
 
     @Test
@@ -107,7 +111,8 @@ class SyncInformationViewModelTest {
         coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
-        coEvery { eventRepository.localCount(any(), any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
@@ -117,18 +122,15 @@ class SyncInformationViewModelTest {
         )
 
         viewModel.fetchSyncInformation()
-        val testObserver = viewModel.getViewStateLiveData().getOrAwaitValue()
 
-        assertThat(testObserver).isEqualTo(
-            SyncDataFetched(
-                recordsInLocal = localCount,
-                recordsToDownSync = countInRemoteForCreate,
-                recordsToUpSync = localCount,
-                recordsToDelete = countInRemoteForDelete,
-                imagesToUpload = imagesToUpload,
-                moduleCounts = moduleCount
-            )
-        )
+        val vo = ViewObservers(viewModel)
+
+        assertThat(vo.imagesToUploadObserver).isEqualTo(imagesToUpload)
+        assertThat(vo.recordsToUpSyncObserver).isEqualTo(localCount)
+        assertThat(vo.recordsInLocalObserver).isEqualTo(localCount)
+        assertThat(vo.recordsToDeleteObserver).isEqualTo(countInRemoteForDelete)
+        assertThat(vo.recordsToDownSyncObserver).isEqualTo(countInRemoteForCreate)
+        assertThat(vo.moduleCountsObserver).isEqualTo(moduleCount)
     }
 
     @Test
@@ -144,23 +146,21 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
-        coEvery { eventRepository.localCount(any(), any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         viewModel.fetchSyncInformation()
-        val testObserver = viewModel.getViewStateLiveData().getOrAwaitValue()
 
-        assertThat(testObserver).isEqualTo(
-            SyncDataFetched(
-                recordsInLocal = localCount,
-                recordsToDownSync = 0,
-                recordsToUpSync = localCount,
-                recordsToDelete = 0,
-                imagesToUpload = imagesToUpload,
-                moduleCounts = moduleCount
-            )
-        )
+        val vo = ViewObservers(viewModel)
+
+        assertThat(vo.imagesToUploadObserver).isEqualTo(imagesToUpload)
+        assertThat(vo.recordsToUpSyncObserver).isEqualTo(localCount)
+        assertThat(vo.recordsInLocalObserver).isEqualTo(localCount)
+        assertThat(vo.recordsToDeleteObserver).isEqualTo(0)
+        assertThat(vo.recordsToDownSyncObserver).isEqualTo(0)
+        assertThat(vo.moduleCountsObserver).isEqualTo(moduleCount)
     }
 
     @Test
@@ -176,24 +176,22 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
-        coEvery { eventRepository.localCount(any(), any()) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         coEvery { eventDownSyncScopeRepository.getDownSyncScope() } throws IOException()
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         viewModel.fetchSyncInformation()
-        val testObserver = viewModel.getViewStateLiveData().getOrAwaitValue()
 
-        assertThat(testObserver).isEqualTo(
-            SyncDataFetched(
-                recordsInLocal = localCount,
-                recordsToDownSync = 0,
-                recordsToUpSync = localCount,
-                recordsToDelete = 0,
-                imagesToUpload = imagesToUpload,
-                moduleCounts = moduleCount
-            )
-        )
+        val vo = ViewObservers(viewModel)
+
+        assertThat(vo.imagesToUploadObserver).isEqualTo(imagesToUpload)
+        assertThat(vo.recordsToUpSyncObserver).isEqualTo(localCount)
+        assertThat(vo.recordsInLocalObserver).isEqualTo(localCount)
+        assertThat(vo.recordsToDeleteObserver).isEqualTo(0)
+        assertThat(vo.recordsToDownSyncObserver).isEqualTo(0)
+        assertThat(vo.moduleCountsObserver).isEqualTo(moduleCount)
     }
 
     private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =
@@ -206,4 +204,15 @@ class SyncInformationViewModelTest {
                 )
             )
         )
+
+    data class ViewObservers(
+        val viewModel: SyncInformationViewModel,
+        val imagesToUploadObserver: Int? = viewModel.imagesToUpload.getOrAwaitValue(),
+        val recordsToUpSyncObserver: Int? = viewModel.recordsToUpSync.getOrAwaitValue(),
+        val recordsInLocalObserver: Int? = viewModel.recordsInLocal.getOrAwaitValue(),
+        val recordsToDeleteObserver: Int? = viewModel.recordsToDelete.getOrAwaitValue(),
+        val recordsToDownSyncObserver: Int? = viewModel.recordsToDownSync.getOrAwaitValue(),
+        val moduleCountsObserver: List<ModuleCount>? = viewModel.moduleCounts.getOrAwaitValue()
+    )
+
 }

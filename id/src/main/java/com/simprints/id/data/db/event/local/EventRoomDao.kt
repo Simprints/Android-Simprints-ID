@@ -10,83 +10,35 @@ import com.simprints.id.data.db.event.local.models.DbEvent
 @Dao
 interface EventRoomDao {
 
-    @Query("""
-        select * from DbEvent where
-        (:id IS NULL OR :id = id) AND
-        (:type IS NULL OR :type = type) AND
-        (:projectId IS NULL OR :projectId = projectId) AND
-        (:subjectId IS NULL OR :subjectId = subjectId) AND
-        (:attendantId IS NULL OR :attendantId = attendantId) AND
-        (:sessionId IS NULL OR :sessionId = sessionId) AND
-        (:deviceId IS NULL OR :deviceId = deviceId) AND
-        (:createdAtLower IS NULL OR createdAt >= :createdAtLower) AND
-        (:createdAtUpper IS NULL OR createdAt <= :createdAtUpper) AND
-        (:endedAtLower IS NULL OR endedAt >= :endedAtLower) AND
-        (:endedAtUpper IS NULL OR endedAt <= :endedAtUpper) order by createdAt desc
-    """)
-    suspend fun load(id: String? = null,
-                     type: EventType? = null,
-                     projectId: String? = null,
-                     subjectId: String? = null,
-                     attendantId: String? = null,
-                     sessionId: String? = null,
-                     deviceId: String? = null,
-                     createdAtLower: Long? = null,
-                     createdAtUpper: Long? = null,
-                     endedAtLower: Long? = null,
-                     endedAtUpper: Long? = null): List<DbEvent>
+    @Query("select * from DbEvent order by createdAt desc")
+    suspend fun loadAll(): List<DbEvent>
 
-    @Query("""
-        select count(*) from DbEvent where
-        (:id IS NULL OR :id = id) AND
-        (:type IS NULL OR :type = type) AND
-        (:projectId IS NULL OR :projectId = projectId) AND
-        (:subjectId IS NULL OR :subjectId = subjectId) AND
-        (:attendantId IS NULL OR :attendantId = attendantId) AND
-        (:sessionId IS NULL OR :sessionId = sessionId) AND
-        (:deviceId IS NULL OR :deviceId = deviceId) AND
-        (:createdAtLower IS NULL OR createdAt >= :createdAtLower) AND
-        (:createdAtUpper IS NULL OR createdAt <= :createdAtUpper) AND
-        (:endedAtLower IS NULL OR endedAt >= :endedAtLower) AND
-        (:endedAtUpper IS NULL OR endedAt <= :endedAtUpper)
-    """)
-    suspend fun count(id: String? = null,
-                      type: EventType? = null,
-                      projectId: String? = null,
-                      subjectId: String? = null,
-                      attendantId: String? = null,
-                      sessionId: String? = null,
-                      deviceId: String? = null,
-                      createdAtLower: Long? = null,
-                      createdAtUpper: Long? = null,
-                      endedAtLower: Long? = null,
-                      endedAtUpper: Long? = null): Int
+    @Query("select * from DbEvent where sessionId = :sessionId order by createdAt desc")
+    suspend fun loadFromSession(sessionId: String): List<DbEvent>
 
-    @Query("""
-    delete from DbEvent where
-    (:id IS NULL OR :id = id) AND
-    (:type IS NULL OR :type = type) AND
-    (:projectId IS NULL OR :projectId = projectId) AND
-    (:subjectId IS NULL OR :subjectId = subjectId) AND
-    (:attendantId IS NULL OR :attendantId = attendantId) AND
-    (:sessionId IS NULL OR :sessionId = sessionId) AND
-    (:deviceId IS NULL OR :deviceId = deviceId) AND
-    (:createdAtLower IS NULL OR createdAt >= :createdAtLower) AND
-    (:createdAtUpper IS NULL OR createdAt <= :createdAtUpper) AND
-    (:endedAtLower IS NULL OR endedAt >= :endedAtLower) AND
-    (:endedAtUpper IS NULL OR endedAt <= :endedAtUpper)
-    """)
-    suspend fun delete(id: String? = null,
-                       type: EventType? = null,
-                       projectId: String? = null,
-                       subjectId: String? = null,
-                       attendantId: String? = null,
-                       sessionId: String? = null,
-                       deviceId: String? = null,
-                       createdAtLower: Long? = null,
-                       createdAtUpper: Long? = null,
-                       endedAtLower: Long? = null,
-                       endedAtUpper: Long? = null)
+    @Query("select * from DbEvent where projectId = :projectId order by createdAt desc")
+    suspend fun loadFromProject(projectId: String): List<DbEvent>
+
+    @Query("select * from DbEvent where type = :type order by createdAt desc")
+    suspend fun loadFromType(type: EventType?): List<DbEvent>
+
+    @Query("select count(*) from DbEvent where projectId = :projectId")
+    suspend fun countFromProject(projectId: String): Int
+
+    @Query("select count(*) from DbEvent where type = :type AND projectId = :projectId")
+    suspend fun countFromProjectByType(type: EventType, projectId: String): Int
+
+    @Query("select count(*) from DbEvent where type = :type")
+    suspend fun countFromType(type: EventType): Int
+
+    @Query("delete from DbEvent where id = :id")
+    suspend fun delete(id: String)
+
+    @Query("delete from DbEvent where sessionId = :sessionId")
+    suspend fun deleteAllFromSession(sessionId: String)
+
+    @Query("delete from DbEvent")
+    suspend fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(dbEvent: DbEvent)

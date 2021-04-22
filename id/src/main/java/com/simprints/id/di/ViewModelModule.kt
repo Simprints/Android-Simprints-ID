@@ -92,8 +92,7 @@ open class ViewModelModule {
             preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             eventDownSyncScopeRepository,
-            imageRepository,
-            eventSyncManager
+            imageRepository
         )
 
     @Provides
