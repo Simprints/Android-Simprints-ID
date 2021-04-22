@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -48,7 +47,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.loadAll()
 
             coVerify {
-                eventDao.load()
+                eventDao.loadAll()
             }
         }
     }
@@ -59,7 +58,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.count(SESSION_CAPTURE)
 
             coVerify {
-                eventDao.count(type = SESSION_CAPTURE)
+                eventDao.countFromType(type = SESSION_CAPTURE)
             }
         }
     }
@@ -70,7 +69,7 @@ class EventLocalDataSourceImplTest {
             eventLocalDataSource.deleteAll()
 
             coVerify {
-                eventDao.delete()
+                eventDao.deleteAll()
             }
         }
     }
@@ -79,8 +78,13 @@ class EventLocalDataSourceImplTest {
         db = mockk(relaxed = true)
         eventDao = mockk(relaxed = true)
         eventDatabaseFactory = mockk(relaxed = true)
-        coEvery { eventDao.load(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns emptyList()
-        coEvery { eventDao.count(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns 0
+        coEvery { eventDao.loadAll() } returns emptyList()
+        coEvery { eventDao.loadFromType(any()) } returns emptyList()
+        coEvery { eventDao.loadFromProject(any()) } returns emptyList()
+        coEvery { eventDao.loadFromSession(any()) } returns emptyList()
+        coEvery { eventDao.countFromProject(any()) } returns 0
+        coEvery { eventDao.countFromType(any()) } returns 0
+        coEvery { eventDao.countFromProjectByType(any(), any()) } returns 0
         every { db.eventDao } returns eventDao
         every { eventDatabaseFactory.build() } returns db
         eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory)
