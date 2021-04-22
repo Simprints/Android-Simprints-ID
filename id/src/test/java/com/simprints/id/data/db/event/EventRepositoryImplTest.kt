@@ -228,12 +228,12 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE + 3)
 
-            val bathes = (eventRepo as EventRepositoryImpl).createBatches(DEFAULT_PROJECT_ID)
+            val batches = (eventRepo as EventRepositoryImpl).createBatches(DEFAULT_PROJECT_ID).toList()
 
-            assertThat(bathes[0].events.size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(bathes[1].events.size).isEqualTo(3)
-            assertThat(bathes[2].events.size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(bathes[3].events.size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(batches[0].size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(batches[1].size).isEqualTo(3)
+            assertThat(batches[2].size).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(batches[3].size).isEqualTo(SESSION_BATCH_SIZE)
         }
     }
 
