@@ -44,8 +44,7 @@ def androidx = [
         preference      : "androidx.preference:preference:1.1.1",
         viewpager2      : "androidx.viewpager2:viewpager2:1.0.0"
     ],
-    //Do not update - proguard issue https://github.com/google/tink/issues/361#issuecomment-634880080
-    security  : ['androidx.security:security-crypto:1.0.0-alpha02'],
+    security  : ['androidx.security:security-crypto:1.0.0-rc04'],
     camerax   : [
         core     : "androidx.camera:camera-core:$androidx_camerax_version",
         camera2  : "androidx.camera:camera-camera2:$androidx_camerax_version",
