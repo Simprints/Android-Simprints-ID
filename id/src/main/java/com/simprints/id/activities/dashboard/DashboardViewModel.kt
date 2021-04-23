@@ -26,7 +26,9 @@ class DashboardViewModel(
         loadProjectDetails()
     }
 
-    fun syncIfRequired() = viewModelScope.launch { syncCardStateRepository.syncIfRequired() }
+    fun syncIfRequired() {
+        viewModelScope.launch { syncCardStateRepository.syncIfRequired() }
+    }
 
     fun getProjectDetails(): LiveData<DashboardProjectState> = projectCardStateLiveData
 
