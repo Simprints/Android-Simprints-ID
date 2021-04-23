@@ -69,7 +69,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
             is SyncDefault -> prepareSyncDefaultStateView(syncCardState)
             is SyncFailed -> prepareSyncFailedStateView(syncCardState)
             is SyncTryAgain -> prepareTryAgainStateView(syncCardState)
-            is SyncNoModules -> prepareNoModulesStateView(syncCardState)
+            is SyncHasNoModules -> prepareNoModulesStateView(syncCardState)
             is SyncOffline -> prepareSyncOfflineView(syncCardState)
             is SyncProgress -> prepareProgressView(syncCardState)
             is SyncConnecting -> prepareSyncConnectingView(syncCardState)

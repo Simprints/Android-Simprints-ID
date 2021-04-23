@@ -100,7 +100,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncNoModules(lastSyncTime))
+        assertThat(tester.observedValues.last()).isEqualTo(SyncHasNoModules(lastSyncTime))
     }
 
     @Test
@@ -112,7 +112,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncNoModules(lastSyncTime))
+        assertThat(tester.observedValues.last()).isEqualTo(SyncHasNoModules(lastSyncTime))
     }
 
     @Test

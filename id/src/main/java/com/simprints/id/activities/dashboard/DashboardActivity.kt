@@ -28,7 +28,6 @@ import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.databinding.ActivityDashboardBinding
 import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
 import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
-import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -42,12 +41,23 @@ class DashboardActivity : BaseSplitActivity() {
 
     private var syncAgainTicker: ReceiveChannel<Unit>? = null
 
-    @Inject lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
-    @Inject lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
-    @Inject lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
-    @Inject lateinit var viewModelFactory: DashboardViewModelFactory
-    @Inject lateinit var eventSyncManager: EventSyncManager
-    @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
+    @Inject
+    lateinit var projectDetailsCardDisplayer: DashboardProjectDetailsCardDisplayer
+
+    @Inject
+    lateinit var syncCardDisplayer: DashboardSyncCardDisplayer
+
+    @Inject
+    lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
+
+    @Inject
+    lateinit var viewModelFactory: DashboardViewModelFactory
+
+    @Inject
+    lateinit var eventSyncManager: EventSyncManager
+
+    @Inject
+    lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private lateinit var viewModel: DashboardViewModel
     private lateinit var binding: ActivityDashboardBinding
@@ -76,7 +86,9 @@ class DashboardActivity : BaseSplitActivity() {
 
 
         setupActionBar()
-        setupViewModel()
+        viewModel = ViewModelProvider(this, viewModelFactory).get(
+            DashboardViewModel::class.java
+        )
         setupCards()
         observeCardData()
         loadDailyActivity()
@@ -132,12 +144,6 @@ class DashboardActivity : BaseSplitActivity() {
         return true
     }
 
-    private fun setupViewModel() {
-        viewModel = ViewModelProvider(this, viewModelFactory).get(
-            DashboardViewModel::class.java
-        )
-    }
-
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(projectDetailsBinding.dashboardProjectDetailsCard)
         dailyActivityCardDisplayer.initRoot(dailyActivityBinding.dashboardDailyActivityCardRoot)
@@ -181,7 +187,7 @@ class DashboardActivity : BaseSplitActivity() {
     private fun loadDailyActivity() {
         viewModel.getDailyActivity().let {
             if (it.hasNoActivity()) {
-                 dailyActivityBinding.dashboardDailyActivityCard.visibility = View.GONE
+                dailyActivityBinding.dashboardDailyActivityCard.visibility = View.GONE
             } else {
                 dailyActivityBinding.dashboardDailyActivityCard.visibility = View.VISIBLE
                 dailyActivityCardDisplayer.displayDailyActivityState(it)
@@ -216,10 +222,8 @@ class DashboardActivity : BaseSplitActivity() {
                 delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
                 initialDelayMillis = 0
             ).also {
-                for (event in it) {
                     Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
                     viewModel.syncIfRequired()
-                }
             }
 
             lifecycleScope.launch {
