@@ -4,6 +4,7 @@ class SessionEventValidatorsFactoryImpl : SessionEventValidatorsFactory {
     override fun build(): Array<EventValidator> = arrayOf(
         GuidSelectionEventValidator(),
         SessionCaptureEventValidator(),
-        PersonCreationEventValidator()
+        PersonCreationEventValidator(),
+        EnrolmentEventValidator()
     )
 }
