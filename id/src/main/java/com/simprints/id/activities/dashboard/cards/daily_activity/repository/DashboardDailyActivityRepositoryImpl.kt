@@ -11,21 +11,17 @@ class DashboardDailyActivityRepositoryImpl(
     private val timeHelper: TimeHelper
 ) : DashboardDailyActivityRepository {
 
-    private var dailyActivityState = DashboardDailyActivityState()
-
     override fun getDailyActivity(): DashboardDailyActivityState {
         return clearOldActivityThenReturn {
             val enrolments = localDataSource.getEnrolmentsMadeToday()
             val identifications = localDataSource.getIdentificationsMadeToday()
             val verifications = localDataSource.getVerificationsMadeToday()
 
-            dailyActivityState = DashboardDailyActivityState(
+            DashboardDailyActivityState(
                 enrolments,
                 identifications,
                 verifications
             )
-
-            dailyActivityState
         }
     }
 
@@ -39,37 +35,19 @@ class DashboardDailyActivityRepositoryImpl(
     }
 
     private fun computeNewEnrolment() = clearOldActivityThenReturn {
-        val enrolments = localDataSource.computeNewEnrolmentAndGet()
-
-        dailyActivityState = DashboardDailyActivityState(
-            enrolments,
-            dailyActivityState.identifications,
-            dailyActivityState.verifications
-        )
+        localDataSource.computeNewEnrolmentAndGet()
 
         localDataSource.setLastActivityTime(timeHelper.now())
     }
 
     private fun computeNewIdentification() = clearOldActivityThenReturn {
-        val identifications = localDataSource.computeNewIdentificationAndGet()
-
-        dailyActivityState = DashboardDailyActivityState(
-            dailyActivityState.enrolments,
-            identifications,
-            dailyActivityState.verifications
-        )
+        localDataSource.computeNewIdentificationAndGet()
 
         localDataSource.setLastActivityTime(timeHelper.now())
     }
 
     private fun computeNewVerification() = clearOldActivityThenReturn {
-        val verifications = localDataSource.computeNewVerificationAndGet()
-
-        dailyActivityState = DashboardDailyActivityState(
-            dailyActivityState.enrolments,
-            dailyActivityState.identifications,
-            verifications
-        )
+        localDataSource.computeNewVerificationAndGet()
 
         localDataSource.setLastActivityTime(timeHelper.now())
     }

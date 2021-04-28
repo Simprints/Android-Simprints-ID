@@ -1,12 +1,13 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-data class FaceSample(val template: ByteArray) : Parcelable {
+data class FaceSample(val template: ByteArray, val format: FaceTemplateFormat) : Parcelable {
 
     @IgnoredOnParcel
     val id: String by lazy {
@@ -38,7 +39,7 @@ fun List<FaceSample>.uniqueId(): String? {
             concatTemplates()
         ).toString()
     } else {
-       null
+        null
     }
 }
 

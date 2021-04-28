@@ -2,10 +2,12 @@ package com.simprints.id.data.db.event
 
 import com.simprints.id.Application
 import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
-import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
@@ -13,27 +15,36 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventRepository {
 
-    suspend fun createSession(libSimprintsVersionName: String)
+    val libSimprintsVersionName: String
+
+    suspend fun createSession(): SessionCaptureEvent
+
+    /**
+     * The reason is only used when we want to create an [ArtificialTerminationEvent].
+     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
+     */
+    suspend fun closeCurrentSession(reason: Reason? = null)
 
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
-    suspend fun loadEvents(sessionId: String): Flow<Event>
+    suspend fun getEventsFromSession(sessionId: String): Flow<Event>
 
-    suspend fun addEventToCurrentSession(event: Event)
+    suspend fun addOrUpdateEvent(event: Event)
 
-    suspend fun addEventToSession(event: Event, session: SessionCaptureEvent)
+    suspend fun uploadEvents(projectId: String): Flow<Int>
 
-    suspend fun addEvent(event: Event)
+    suspend fun localCount(projectId: String): Int
 
-    suspend fun uploadEvents(query: LocalEventQuery): Flow<Int>
-
-    suspend fun localCount(query: LocalEventQuery): Int
+    suspend fun localCount(projectId: String, type: EventType): Int
 
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 
-    suspend fun downloadEvents(scope: CoroutineScope, query: RemoteEventQuery): ReceiveChannel<Event>
+    suspend fun downloadEvents(
+        scope: CoroutineScope,
+        query: RemoteEventQuery
+    ): ReceiveChannel<Event>
 
-    suspend fun signOut()
+    suspend fun deleteSessionEvents(sessionId: String)
 
     companion object {
         fun build(app: Application): EventRepository =

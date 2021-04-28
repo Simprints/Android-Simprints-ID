@@ -14,7 +14,6 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
 import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.secure.models.SecurityState
@@ -80,7 +79,7 @@ class DebugActivity : BaseSplitActivity() {
                 withContext(Dispatchers.IO) {
                     eventSyncManager.cancelScheduledSync()
                     eventSyncManager.stop()
-                    eventLocalDataSource.delete()
+                    eventLocalDataSource.deleteAll()
                     dbEventDownSyncOperationStateDao.deleteAll()
                     subjectRepository.deleteAll()
                     wm.pruneWork()
@@ -100,9 +99,9 @@ class DebugActivity : BaseSplitActivity() {
             logs.text = ""
             lifecycleScope.launch {
                 withContext(Dispatchers.Main) {
-                    logs.text = "${logs.text} ${subjectRepository.count()} \n"
+                    logs.text = "${logs.text} Subjects ${subjectRepository.count()} \n"
 
-                    val events = eventLocalDataSource.load(DbLocalEventQuery()).toList().groupBy { it.type }
+                    val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
                         logs.text = "${logs.text} ${it.key} ${it.value.size} \n"
                     }

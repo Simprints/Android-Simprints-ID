@@ -12,7 +12,6 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.alert.AlertType
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 // App launched when user open SimprintsID using the Home button
 open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginFromMainLauncherContract.View {

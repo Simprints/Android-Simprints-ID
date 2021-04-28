@@ -17,7 +17,11 @@ class SessionCaptureEventValidatorTest {
     @Test
     fun alreadySessionCaptureEventPresent_addNewSessionCaptureEvent_fails() {
         shouldThrow<SessionEventCaptureAlreadyExists> {
-                SessionCaptureEventValidator().validate(listOf(createSessionCaptureEvent(GUID1)), createSessionCaptureEvent(GUID2))
+            SessionCaptureEventValidator().validate(
+                listOf(createSessionCaptureEvent(GUID1)),
+                createSessionCaptureEvent(GUID2)
+            )
         }
     }
+
 }

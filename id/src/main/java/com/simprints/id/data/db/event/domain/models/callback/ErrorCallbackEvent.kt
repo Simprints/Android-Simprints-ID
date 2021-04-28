@@ -3,11 +3,9 @@ package com.simprints.id.data.db.event.domain.models.callback
 import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
-
 import com.simprints.id.data.db.event.domain.models.EventPayload
 import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_ERROR
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import java.util.*
 
@@ -37,6 +35,7 @@ data class ErrorCallbackEvent(
         override val type: EventType = CALLBACK_ERROR,
         override val endedAt: Long = 0) : EventPayload() {
 
+        @Keep
         enum class Reason {
             DIFFERENT_PROJECT_ID_SIGNED_IN,
             DIFFERENT_USER_ID_SIGNED_IN,

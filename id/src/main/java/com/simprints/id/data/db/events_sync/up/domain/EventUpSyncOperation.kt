@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-data class EventUpSyncOperation(val queryEvent: LocalEventQuery,
+data class EventUpSyncOperation(val projectId: String,
                                 var lastState: UpSyncState? = null,
                                 var lastSyncTime: Long? = null) {
     @Keep
@@ -15,9 +15,5 @@ data class EventUpSyncOperation(val queryEvent: LocalEventQuery,
     }
 }
 
-fun EventUpSyncOperation.getUniqueKey() =
-    with(this.queryEvent) {
-        UUID.nameUUIDFromBytes(
-            "$projectId".toByteArray()
-        ).toString()
-    }
+fun EventUpSyncOperation.getUniqueKey() = UUID.nameUUIDFromBytes(projectId.toByteArray()).toString()
+

@@ -6,10 +6,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.simprints.id.BuildConfig
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.room.Converters
 import com.simprints.id.data.db.event.local.models.DbEvent
+import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [DbEvent::class], version = 1, exportSchema = false)
+@Database(entities = [DbEvent::class], version = 2, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
@@ -17,10 +20,20 @@ abstract class EventRoomDatabase : RoomDatabase() {
     abstract val eventDao: EventRoomDao
 
     companion object {
-        private const val ROOM_DB_NAME = "events_room_db"
 
-        fun getDatabase(context: Context): EventRoomDatabase = Room
-            .databaseBuilder(context.applicationContext, EventRoomDatabase::class.java, ROOM_DB_NAME)
-            .build()
+        fun getDatabase(context: Context,
+                        factory: SupportFactory,
+                        dbName: String,
+                        crashReportManager: CrashReportManager): EventRoomDatabase {
+            val builder = Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
+                .addMigrations()
+                .addMigrations(EventMigration1to2(crashReportManager))
+
+            if (BuildConfig.DB_ENCRYPTION)
+                builder.openHelperFactory(factory)
+
+            return builder.build()
+        }
+
     }
 }

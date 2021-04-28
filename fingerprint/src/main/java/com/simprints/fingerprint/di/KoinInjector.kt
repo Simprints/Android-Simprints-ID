@@ -57,6 +57,7 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.tools.BatteryLevelChecker
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
+import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import org.koin.android.ext.koin.androidContext
@@ -68,7 +69,7 @@ import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Consider this flow:
+ * Note on the consumers mechanism - consider this flow:
  * - consumers starts at 0
  * - Setup callout: OrchestratorActivity.onCreate() , Koin modules created, consumers + 1 → 1 (The Koin modules are now loaded)
  * - Then, Normal callout (e.g. match) begins before previous on destroy: OrchestratorActivity.onCreate(), consumers + 1 → 2
@@ -117,6 +118,9 @@ object KoinInjector {
         }
 
 
+    /**
+     * These are classes that are wrappers of ones that appear in the main app module
+     */
     private fun Module.defineBuildersForFingerprintManagers() {
         single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
@@ -175,6 +179,8 @@ object KoinInjector {
 
         factory { FingerPriorityDeterminer() }
         factory { StartingStateDeterminer() }
+
+        factory { FingerprintMatcher.create() }
     }
 
     private fun Module.defineBuildersForPresentersAndViewModels() {
@@ -188,7 +194,7 @@ object KoinInjector {
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
         viewModel { OtaViewModel(get(), get(), get(), get(), get()) }

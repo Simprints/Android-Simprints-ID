@@ -10,6 +10,10 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import java.io.InputStream
 
+/**
+ * Takes an InputStream and transforms it into a Flowable<RootResponse> for use while the Vero is in
+ * Root Mode.
+ */
 class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : MessageInputStream {
 
     var rootResponseStream: Flowable<RootResponse>? = null

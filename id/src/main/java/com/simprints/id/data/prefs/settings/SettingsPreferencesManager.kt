@@ -5,6 +5,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -37,6 +38,7 @@ interface SettingsPreferencesManager {
 
     var modalities: List<Modality>
     var eventDownSyncSetting: EventDownSyncSetting
+    var syncDestinationSettings: List<SyncDestinationSetting>
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
@@ -50,13 +52,15 @@ interface SettingsPreferencesManager {
     var faceMaxRetries: Int
     var faceQualityThreshold: Float
     var faceNbOfFramesCaptured: Int
-    var faceMatchThreshold: Float
 
     var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
     var faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
 
     fun getRemoteConfigStringPreference(key: String): String
-    fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
+    fun <T : Any> getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
     fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>
 
 }
+
+fun SettingsPreferencesManager.canSyncToSimprints(): Boolean =
+    syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)

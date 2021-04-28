@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.subject.domain
 
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.subject.*
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
@@ -37,20 +39,28 @@ class SubjectFactoryImpl(private val encodingUtils: EncodingUtils) : SubjectFact
 
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FingerprintReference>()
-            ?.firstOrNull()?.templates?.map { buildFingerprintSample(it) } ?: emptyList()
+            ?.firstOrNull()
+            ?.let { reference -> reference.templates.map { buildFingerprintSample(it, reference.format) } }
+            ?: emptyList()
 
-    private fun buildFingerprintSample(template: FingerprintTemplate): FingerprintSample {
+    private fun buildFingerprintSample(
+        template: FingerprintTemplate,
+        format: FingerprintTemplateFormat
+    ): FingerprintSample {
         return FingerprintSample(
             template.finger.fromEventToPerson(),
             encodingUtils.base64ToBytes(template.template),
-            template.quality
+            template.quality,
+            format
         )
     }
 
     private fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FaceReference>()
-            ?.firstOrNull()?.templates?.map { buildFaceSample(it) } ?: emptyList()
+            ?.firstOrNull()
+            ?.let { reference -> reference.templates.map { buildFaceSample(it, reference.format) } }
+            ?: emptyList()
 
-    private fun buildFaceSample(template: FaceTemplate) =
-        FaceSample(encodingUtils.base64ToBytes(template.template))
+    private fun buildFaceSample(template: FaceTemplate, format: FaceTemplateFormat) =
+        FaceSample(encodingUtils.base64ToBytes(template.template), format)
 }

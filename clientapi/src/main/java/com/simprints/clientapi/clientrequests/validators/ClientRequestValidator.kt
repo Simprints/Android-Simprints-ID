@@ -1,5 +1,6 @@
 package com.simprints.clientapi.clientrequests.validators
 
+import com.simprints.clientapi.Constants.PROJECT_ID_LENGTH
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.exceptions.InvalidMetadataException
 import com.simprints.clientapi.exceptions.InvalidModuleIdException
@@ -20,6 +21,8 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
     protected open fun validateProjectId() {
         if (extractor.getProjectId().isBlank())
             throw InvalidProjectIdException("Missing Project ID")
+        else if (extractor.getProjectId().length != PROJECT_ID_LENGTH)
+            throw InvalidProjectIdException("Project ID has invalid length")
     }
 
     protected open fun validateUserId() {

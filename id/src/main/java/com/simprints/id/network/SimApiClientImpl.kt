@@ -11,11 +11,13 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import kotlin.reflect.KClass
 
 open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<T>,
                                                     private val url: String,
                                                     private val deviceId: String,
+                                                    private val versionName: String,
                                                     private val authToken: String? = null,
                                                     private val performanceTracer: FirebasePerformanceTraceFactory,
                                                     private val jsonHelper: JsonHelper,
@@ -28,13 +30,14 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
     open val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(jsonHelper.jackson))
             .baseUrl(url)
             .client(okHttpClientConfig.build()).build()
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        okHttpClientBuilder.get(authToken, deviceId)
+        okHttpClientBuilder.get(authToken, deviceId, versionName)
     }
 
     override suspend fun <V> executeCall(traceName: String?,

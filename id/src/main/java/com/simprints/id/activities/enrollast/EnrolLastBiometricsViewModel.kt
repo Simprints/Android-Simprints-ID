@@ -11,6 +11,7 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
+import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -52,7 +53,7 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
             val faceResponse = getFaceMatchResponseFromSteps(results)
             processResponsesAndGetViewState(fingerprintResponse, faceResponse, enrolLastBiometricsRequest, steps)
         } else {
-            buildSubjectAndGetSuccessViewState(enrolLastBiometricsRequest, steps)
+            buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
         }
     }
 
@@ -67,31 +68,35 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
                 if (isAnyResponseWithHighConfidence(fingerprintResponse)) {
                     Failed
                 } else {
-                    buildSubjectAndGetSuccessViewState(enrolLastBiometricsRequest, steps)
+                    buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             fingerprintResponse != null -> {
                 if (isAnyResponseWithHighConfidence(fingerprintResponse)) {
                     Failed
                 } else {
-                    buildSubjectAndGetSuccessViewState(enrolLastBiometricsRequest, steps)
+                    buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             faceResponse != null -> {
                 if (isAnyResponseWithHighConfidence(faceResponse)) {
                     Failed
                 } else {
-                    buildSubjectAndGetSuccessViewState(enrolLastBiometricsRequest, steps)
+                    buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             else -> Failed
         }
     }
 
-    private suspend fun buildSubjectAndGetSuccessViewState(enrolLastBiometricsRequest: EnrolLastBiometricsRequest, steps: List<Step>): Success {
-        val subject = enrolLastBiometricsRequest.buildSubject(steps)
-        enrolmentHelper.enrol(subject)
-        return Success(subject.subjectId)
+    private suspend fun buildSubjectAndGetViewState(enrolLastBiometricsRequest: EnrolLastBiometricsRequest, steps: List<Step>): ViewState {
+        return try {
+            val subject = enrolLastBiometricsRequest.buildSubject(steps)
+            enrolmentHelper.enrol(subject)
+            Success(subject.subjectId)
+        } catch (e: EnrolmentEventValidatorException){
+            Failed
+        }
     }
 
     private fun isAnyResponseWithHighConfidence(fingerprintResponse: FingerprintMatchResponse) =

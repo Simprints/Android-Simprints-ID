@@ -21,6 +21,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -78,6 +79,7 @@ open class PreferencesModule {
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
+        @Named("SyncDestinationSerializer") syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
@@ -98,14 +100,17 @@ open class PreferencesModule {
         scannerGenerationsSerializer,
         fingerprintsToCollectSerializer,
         fingerprintConfidenceThresholdsSerializer,
-        faceConfidenceThresholdsSerializer
+        faceConfidenceThresholdsSerializer,
+        syncDestinationSerializer
     )
 
     @Provides
     @Singleton
-    fun providePreferencesManager(settingsPreferencesManager: SettingsPreferencesManager,
-                                  lastEventsPreferencesManager: RecentEventsPreferencesManager,
-                                  app: Application): PreferencesManager =
+    fun providePreferencesManager(
+        settingsPreferencesManager: SettingsPreferencesManager,
+        lastEventsPreferencesManager: RecentEventsPreferencesManager,
+        app: Application
+    ): PreferencesManager =
         PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
 
 }

@@ -1,0 +1,36 @@
+apply from: "$rootDir${File.separator}buildSrc${File.separator}build_properties.gradle"
+
+android {
+    compileSdkVersion TARGET_SDK_VERSION
+
+    defaultConfig {
+        targetSdkVersion TARGET_SDK_VERSION
+        minSdkVersion MIN_SDK_VERSION
+
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+    }
+
+    buildTypes {
+        release {
+            debuggable = DEBUGGABLE
+            lintOptions.fatal 'StopShip'
+            versionNameSuffix "+$VERSION_CODE"
+            buildConfigField("Boolean", "DEBUG_MODE", "false")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
+        }
+        staging {
+            debuggable = DEBUGGABLE
+            lintOptions.fatal 'StopShip'
+            versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
+            buildConfigField("Boolean", "DEBUG_MODE", "true")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
+        }
+        debug {
+            debuggable = DEBUGGABLE
+            versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
+            buildConfigField("Boolean", "DEBUG_MODE", "true")
+            buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
+        }
+    }
+}

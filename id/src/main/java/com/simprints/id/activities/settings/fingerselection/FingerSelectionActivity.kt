@@ -9,14 +9,18 @@ import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
+import androidx.recyclerview.widget.ItemTouchHelper.DOWN
+import androidx.recyclerview.widget.ItemTouchHelper.END
+import androidx.recyclerview.widget.ItemTouchHelper.START
+import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.databinding.ActivityFingerSelectionBinding
 import com.simprints.id.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_finger_selection.*
 import javax.inject.Inject
 
 class FingerSelectionActivity : BaseSplitActivity() {
@@ -24,6 +28,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
     @Inject
     lateinit var viewModelFactory: FingerSelectionViewModelFactory
     private lateinit var viewModel: FingerSelectionViewModel
+    private lateinit var binding: ActivityFingerSelectionBinding
 
     private lateinit var fingerSelectionAdapter: FingerSelectionItemAdapter
 
@@ -60,7 +65,8 @@ class FingerSelectionActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
-        setContentView(R.layout.activity_finger_selection)
+        binding = ActivityFingerSelectionBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         configureToolbar()
 
@@ -77,16 +83,16 @@ class FingerSelectionActivity : BaseSplitActivity() {
     }
 
     private fun configureToolbar() {
-        setSupportActionBar(settingsToolbar)
+        setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.finger_selection_activity_title)
     }
 
     private fun initTextInLayout() {
-        addFingerButton.text = getString(R.string.finger_selection_add_finger)
-        resetButton.text = getString(R.string.finger_selection_reset)
-        fingerLabelTextView.text = getString(R.string.finger_selection_finger_label)
-        quantityLabelTextView.text = getString(R.string.finger_selection_quantity_label)
+        binding.addFingerButton.text = getString(R.string.finger_selection_add_finger)
+        binding.resetButton.text = getString(R.string.finger_selection_reset)
+        binding.fingerLabelTextView.text = getString(R.string.finger_selection_finger_label)
+        binding.quantityLabelTextView.text = getString(R.string.finger_selection_quantity_label)
     }
 
     private fun initRecyclerView() {
@@ -97,28 +103,28 @@ class FingerSelectionActivity : BaseSplitActivity() {
             viewModel::changeQuantitySelection,
             viewModel::removeItem
         )
-        fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(this)
-        fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
-        itemTouchHelper.attachToRecyclerView(fingerSelectionRecyclerView)
+        binding.fingerSelectionRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.fingerSelectionRecyclerView.adapter = fingerSelectionAdapter
+        itemTouchHelper.attachToRecyclerView(binding.fingerSelectionRecyclerView)
     }
 
     private fun initAddFingerButton() {
-        addFingerButton.setOnClickListener { viewModel.addNewFinger() }
+        binding.addFingerButton.setOnClickListener { viewModel.addNewFinger() }
     }
 
     private fun initResetButton() {
-        resetButton.setOnClickListener { viewModel.resetFingerItems() }
+        binding.resetButton.setOnClickListener { viewModel.resetFingerItems() }
     }
 
     private fun listenForItemChanges() {
         viewModel.items.observe(this, Observer {
             fingerSelectionAdapter.notifyDataSetChanged()
             if (it.size >= MAXIMUM_NUMBER_OF_ITEMS) {
-                addFingerButton.isEnabled = false
-                addFingerButton.background.colorFilter = PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
+                binding.addFingerButton.isEnabled = false
+                binding.addFingerButton.background.colorFilter = PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
             } else {
-                addFingerButton.isEnabled = true
-                addFingerButton.background.colorFilter = null
+                binding.addFingerButton.isEnabled = true
+                binding.addFingerButton.background.colorFilter = null
             }
         })
     }

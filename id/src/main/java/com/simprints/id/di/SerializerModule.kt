@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -47,6 +48,11 @@ class SerializerModule {
     @Singleton
     @Named("PeopleDownSyncSettingSerializer")
     fun providePeopleDownSyncSettingSerializer(): Serializer<EventDownSyncSetting> = EnumSerializer(EventDownSyncSetting::class.java)
+
+    @Provides
+    @Singleton
+    @Named("SyncDestinationSerializer")
+    fun provideSyncDestinationSettingSerializer(): Serializer<List<SyncDestinationSetting>> = SyncDestinationListSerializer()
 
     @Provides
     @Singleton

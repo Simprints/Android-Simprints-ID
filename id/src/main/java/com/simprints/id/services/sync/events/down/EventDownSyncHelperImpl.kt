@@ -49,8 +49,6 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
             try {
                 eventRepository.downloadEvents(scope, operation.queryEvent).consumeEach {
-                    Timber.d("[DOWN_SYNC_HELPER] Event Received")
-
                     batchOfEventsToProcess.add(it)
                     count++
                     //We immediately process the first event to initialise a progress
@@ -87,8 +85,6 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                                              lastOperation: EventDownSyncOperation): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
-            Timber.d("[DOWN_SYNC_HELPER] Event Processed ${event.type}")
-
             return@map when (event.type) {
                 ENROLMENT_RECORD_CREATION -> {
                     handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)

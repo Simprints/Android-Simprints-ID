@@ -36,7 +36,6 @@ class OrchestratorViewModel(
             modalities,
             appRequest,
             getCurrentSessionId())
-
     }
 
     private suspend fun getCurrentSessionId(): String =

@@ -5,8 +5,6 @@
 git submodule init
 git submodule update
 
-echo "SIMPRINTS_ARTIFACTORY_USERNAME=${ARTIFACTORY_USERNAME}" >>gradle.properties
-echo "SIMPRINTS_ARTIFACTORY_PASSWORD=${ARTIFACTORY_PASSWORD}" >>gradle.properties
 echo "org.gradle.caching=true" >>gradle.properties
 
 #########################################################################################

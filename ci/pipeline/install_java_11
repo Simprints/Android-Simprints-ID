@@ -1,0 +1,5 @@
+#!/bin/bash
+
+add-apt-repository ppa:openjdk-r/ppa
+apt-get update
+echo y | apt-get install openjdk-11-jdk

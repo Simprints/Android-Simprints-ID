@@ -1,6 +1,6 @@
 package com.simprints.id.services.sync.events.master.models
 
-import io.realm.internal.Keep
+import androidx.annotation.Keep
 
 @Keep
 enum class EventDownSyncSetting {

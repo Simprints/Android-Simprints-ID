@@ -1,103 +1,69 @@
 package com.simprints.id.data.db.event.local
 
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.local.models.DbLocalEventQuery
+import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
-import com.simprints.id.exceptions.safe.session.SessionDataSourceException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
-open class EventLocalDataSourceImpl(private val eventDatabaseFactory: EventDatabaseFactory) : EventLocalDataSource {
+open class EventLocalDataSourceImpl(
+    private val eventDatabaseFactory: EventDatabaseFactory,
+    private val readingDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val writingContext: CoroutineContext = readingDispatcher + NonCancellable
+) : EventLocalDataSource {
 
-    private val roomDao by lazy {
+    private val eventDao by lazy {
         eventDatabaseFactory.build().eventDao
     }
 
-
-    override suspend fun load(dbQuery: DbLocalEventQuery): Flow<Event> =
-        wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
-                with(dbQuery) {
-                    roomDao.load(
-                        id = id,
-                        type = type,
-                        projectId = projectId,
-                        subjectId = subjectId,
-                        attendantId = attendantId,
-                        sessionId = sessionId,
-                        deviceId = deviceId,
-                        createdAtLower = startTime?.first,
-                        createdAtUpper = startTime?.last,
-                        endedAtLower = endTime?.first,
-                        endedAtUpper = endTime?.last)
-                        .map { it.fromDbToDomain() }
-                        .asFlow()
-                }
-            }
-        }
-
-
-    override suspend fun count(dbQuery: DbLocalEventQuery): Int =
-        wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
-                with(dbQuery) {
-                    roomDao.count(
-                        id = id,
-                        type = type,
-                        projectId = projectId,
-                        subjectId = subjectId,
-                        attendantId = attendantId,
-                        sessionId = sessionId,
-                        deviceId = deviceId,
-                        createdAtLower = startTime?.first,
-                        createdAtUpper = startTime?.endInclusive,
-                        endedAtLower = endTime?.first,
-                        endedAtUpper = endTime?.last)
-                }
-            }
-        }
-
-    override suspend fun delete(dbQuery: DbLocalEventQuery) {
-        wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
-                with(dbQuery) {
-                    roomDao.delete(
-                        id = id,
-                        type = type,
-                        projectId = projectId,
-                        subjectId = subjectId,
-                        attendantId = attendantId,
-                        sessionId = sessionId,
-                        deviceId = deviceId,
-                        createdAtLower = startTime?.first,
-                        createdAtUpper = startTime?.endInclusive,
-                        endedAtLower = endTime?.first,
-                        endedAtUpper = endTime?.last)
-                }
-            }
-        }
+    override suspend fun loadAll(): Flow<Event> = withContext(readingDispatcher) {
+        eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
-    override suspend fun insertOrUpdate(event: Event) =
-        wrapSuspendExceptionIfNeeded {
-            withContext(Dispatchers.IO) {
-                roomDao.insertOrUpdate(event.fromDomainToDb())
-            }
-        }
+    override suspend fun loadAllFromSession(sessionId: String): Flow<Event> = withContext(readingDispatcher) {
+        eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }.asFlow()
+    }
 
-    private suspend fun <T> wrapSuspendExceptionIfNeeded(block: suspend () -> T): T =
-        try {
-            block()
-        } catch (t: Throwable) {
-            Timber.d(t)
-            throw if (t is SessionDataSourceException) {
-                t
-            } else {
-                SessionDataSourceException(t)
-            }
-        }
+    override suspend fun loadAllFromProject(projectId: String): Flow<Event> = withContext(readingDispatcher) {
+        eventDao.loadFromProject(projectId = projectId).map { it.fromDbToDomain() }.asFlow()
+    }
+
+    override suspend fun loadAllFromType(type: EventType): Flow<Event> = withContext(readingDispatcher) {
+        eventDao.loadFromType(type = type).map { it.fromDbToDomain() }.asFlow()
+    }
+
+    override suspend fun count(projectId: String): Int = withContext(readingDispatcher) {
+        eventDao.countFromProject(projectId = projectId)
+    }
+
+    override suspend fun count(projectId: String, type: EventType): Int = withContext(readingDispatcher) {
+        eventDao.countFromProjectByType(type = type, projectId = projectId)
+    }
+
+    override suspend fun count(type: EventType): Int = withContext(readingDispatcher) {
+        eventDao.countFromType(type = type)
+    }
+
+    override suspend fun insertOrUpdate(event: Event) = withContext(writingContext) {
+        eventDao.insertOrUpdate(event.fromDomainToDb())
+    }
+
+    override suspend fun delete(id: String) = withContext(writingContext) {
+        eventDao.delete(id = id)
+    }
+
+    override suspend fun deleteAllFromSession(sessionId: String) = withContext(writingContext) {
+        eventDao.deleteAllFromSession(sessionId = sessionId)
+    }
+
+    override suspend fun deleteAll() = withContext(writingContext) {
+        eventDao.deleteAll()
+    }
+
 }

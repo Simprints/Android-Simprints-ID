@@ -1,49 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
     <string name="settings_title">সেটিংস</string>
     <string name="alert_title">সতর্ক বার্তা</string>
-
-
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
-
-
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-
-
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <!-- Button Labels -->
     <string name="ok">ঠিক আছে</string>
     <string name="cancel_button">বাতিল করুন</string>
-
-
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
     <!-- Toast Messages -->
     <!-- Finger Names -->
-    <string name="r_1_finger_name">ডান বুড়ো আঙুল</string>
-    <string name="r_2_finger_name">ডান তর্জনী</string>
-    <string name="r_3_finger_name">ডান ৩য় আঙুল</string>
-    <string name="r_4_finger_name">ডান ৪র্থ আঙুল</string>
-    <string name="r_5_finger_name">ডান ৫ম আঙুল</string>
-
-    <string name="l_5_finger_name">বাম হাতের কনিষ্ঠা</string>
+    <string name="r_1_finger_name">ডান হাতের বৃদ্ধাঙ্গুল / বুড়ো আঙ্গুল</string>
+    <string name="r_2_finger_name">ডান হাতের তর্জনী</string>
+    <string name="r_3_finger_name">ডান হাতের মধ্যমা</string>
+    <string name="r_4_finger_name">ডান হাতের অনামিকা</string>
+    <string name="r_5_finger_name">ডান হাতের কনিষ্ঠা / কড়ে আঙ্গুল</string>
+    <string name="l_5_finger_name">বাম হাতের কনিষ্ঠা / কড়ে আঙ্গুল</string>
     <string name="l_4_finger_name">বাম হাতের অনামিকা</string>
     <string name="l_3_finger_name">বাম হাতের মধ্যমা</string>
     <string name="l_2_finger_name">বাম হাতের তর্জনী</string>
-    <string name="l_1_finger_name">বাম হাতের বৃদ্ধাঙ্গুল</string>
-
-
+    <string name="l_1_finger_name">বাম হাতের বৃদ্ধাঙ্গুল / বুড়ো আঙ্গুল</string>
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-
-
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
     <string name="configuration_error_title">কনফিগারেশন সমস্যা</string>
@@ -52,22 +37,17 @@
     <!-- Error Message Text -->
     <string name="verify_guid_not_found_online_message">যাচাইয়ের জন্য নির্বাচিত ব্যক্তি ডাটাবেসে নেই</string>
     <string name="verify_guid_not_found_offline_message">ব্যক্তি খুঁজে পাওয়া যায়নি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটে সংযুক্ত আছেন এবং আবার চেষ্টা করুন</string>
-    <string name="unforeseen_error_message">আবাার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
+    <string name="unforeseen_error_message">আবার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">বন্ধ করুন</string>
     <string name="try_again_label">বন্ধ করুন</string>
     <string name="settings_label">ফোন সেটিংস</string>
-
-
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
     <string name="preference_app_version_title">অ্যাপ সংস্করণ</string>
     <string name="preference_scanner_version_title">স্ক্যানার সংস্করণ</string>
-
-
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-
     <!-- Finger Selection Activity -->
     <string name="finger_selection_activity_title">আঙ্গুল নির্বাচন করুন</string>
     <string name="finger_selection_confirm_dialog_text">সেটিংস সেভ করতে চাচ্ছেন?</string>
@@ -78,30 +58,27 @@
     <string name="finger_selection_reset">পুনরায় নির্বাচন</string>
     <string name="finger_selection_add_finger">আঙ্গুল যোগ করুন</string>
     <string name="finger_selection_invalid">অবৈধ নির্বাচন- এক আঙ্গুল ৫ বারের বেশি আছে</string>
-
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
+    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙ্গুলের ছাপ দেয়া এড়িয়ে গেছেন\?</string>
     <!-- Button Labels -->
     <string name="button_submit">জমা দিন</string>
-    <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
+    <string name="button_scan_prints">আঙ্গুলের ছাপ স্ক্যান করুন</string>
     <!-- Refusal Selection Points -->
     <!-- Text Prompt -->
-    <string name="hint_other_reason">আরো তথ্য…</string>
-
-
+    <string name="hint_other_reason">অতিরিক্ত তথ্য</string>
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
     <string name="alert_try_again">আবার চেষ্টা করুন</string>
     <string name="confirmation_logout_cancel">বাতিল করুন</string>
     <string name="confirmation_logout_message">আপনি কি লগআউট করতে চান?</string>
     <string name="confirmation_logout_title">লগআউট করুন</string>
-    <string name="consent_confirmation">আমি কি আপনার আঙ্গুলের ছাপ ব্যবহার করতে পারি? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি\", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে\"।</string>
-    <string name="consent_enrol">আমি আপনাার আঙ্গুলের ছাপ ব্যবহার করে আপনাকে এসেনশিয়াল হেল্‌থ কেয়ার প্রোগ্রাম এ নিবন্ধন করতে চাই এবং ভবিষ্যতে তা দিয়ে আপনাকে সনাক্ত করতে চাই।</string>
+    <string name="consent_confirmation">আমি কি %1$s\? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি \", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে।\"</string>
+    <string name="consent_enrol">আমি আপনাার %2$s আপনাকে %1$s এ নিবন্ধন করতে চাই এবং ভবিষ্যতে তা দিয়ে আপনাকে সনাক্ত করতে চাই। </string>
     <string name="consent_id_verify">আমি আপনার আঙ্গু্লের ছাপ ব্যবহার করে এসেনশিয়াল হেল্‌থ কেয়ার প্রোগ্রাম- এর জন্য আপনার তথ্যাদি খুঁজে বের করতে চাই।</string>
-    <string name="consent_parental_share_data_yes">ব্র্যাক এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার আঙ্গুলের ছাপ সম্পর্কিত তথ্য ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
+    <string name="consent_parental_share_data_yes">%1$s এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে। </string>
     <string name="consent_privacy_rights">সম্মতি দেবার পরেও যেকোনো সময় আপনি অনুমতি ফিরিয়ে নিতে এবং আপনার তথ্যাদি মুছে ফেলতে বলতে পারেন।</string>
-    <string name="consent_share_data_yes">ব্র্যাক এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার আঙ্গুলের ছাপ সম্পর্কিত তথ্য ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
+    <string name="consent_share_data_yes">%1$s এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে। </string>
     <string name="dashboard_card_calculating">হিসাাব করা হচ্ছে</string>
     <string name="dashboard_card_current_user">বর্তমান ব্যবহারকারী: %1$s</string>
     <string name="dashboard_card_scanner_used">স্ক্যানার ব্যবহার করা হয়েছে: %1$s</string>
@@ -152,28 +129,26 @@
     <string name="launch_consent_decline_button"> প্রত্যাখ্যান করুন</string>
     <string name="consent_parental_title">মাতা-পিতার সম্মতি</string>
     <string name="consent_general_title">সাধারন সম্মতি</string>
-
     <string name="refusal_app_not_working">অ্যাপ কাজ করছে না</string>
     <string name="refusal_data_concerns">তথ্য দিতে আগ্রহী নন</string>
     <string name="refusal_does_not_have_permission">অনুমতি নেই</string>
     <string name="refusal_person_not_present">ব্যক্তি উপস্থিত নয়</string>
-    <string name="refusal_religious_concerns">"ধর্মীয় সমস্যা   "</string>
+    <string name="refusal_religious_concerns">ধর্মীয় সমস্যা</string>
     <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং জমা দিন</string>
     <string name="refusal_toast_submit">"ফর্ম জমা দিন "</string>
     <string name="refusal_too_young">বয়স কম</string>
     <string name="refusal_other">অন্যান্য</string>
-
     <plurals name="dashboard_card_enrolments">
-        <item quantity="one">তালিকাভুক্ত করণ</item>
-        <item quantity="other">নিবন্ধন সমূহ</item>
+        <item quantity="one">নিবন্ধন সমূহ</item>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="dashboard_card_identifications">
-        <item quantity="one">সনাক্তকরণ</item>
-        <item quantity="other">সনাক্তকরণ সমূহ</item>
+        <item quantity="one">সনাক্তকরণ সমূহ</item>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="dashboard_card_verifications">
-        <item quantity="one">যাচাই করুন</item>
-        <item quantity="other">যাচাইকরণ সমূহ</item>
+        <item quantity="one">যাচাইকরণ সমূহ</item>
+        <item quantity="other"></item>
     </plurals>
     <string name="title_activity_sync_information">তথ্য সিঙ্ক করুন</string>
     <string name="preference_sync_information_title">তথ্য সিঙ্ক করুন</string>
@@ -194,7 +169,7 @@
     <string name="sync_info_unselected_modules">অনির্বাচিত মডিউল</string>
     <string name="dashboard_sync_card_connecting">সংযুক্ত হচ্ছে</string>
     <string name="dashboard_sync_card_no_modules_message">সিঙ্ক করতে মডিউল নির্বাচন করুন</string>
-    <string name="dashboard_sync_card_no_modules_button">মডিউল</string>
+    <string name="dashboard_sync_card_no_modules_button">মডিউল সমূহ</string>
     <string name="dashboard_sync_card_offline_message">সেটিংস্‌ থেকে ইন্টারনেট সংযোগ চালু করুন</string>
     <string name="dashboard_sync_card_incomplete">সিঙ্ক অসম্পূর্ণ</string>
     <string name="dashboard_sync_card_complete">সিঙ্ক হয়েছে</string>
@@ -204,7 +179,7 @@
     <string name="dashboard_sync_card_try_again_button">আবার চেষ্টা করুন</string>
     <string name="dashboard_sync_card_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
     <string name="dashboard_card_activity">কার্যক্রম তথ্য: %1$s</string>
-    <string name="progress_sync_overlay">সিঙ্ক করা হচ্ছে</string>
+    <string name="progress_sync_overlay">সিঙ্ক হচ্ছে…</string>
     <string name="different_projectId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="fetch_guid_checking_person_in_database">ব্যক্তির তথ্য ডাটাবেসে আছে কি না খুঁজে দেখা হচ্ছে</string>
     <string name="enrol_last_biometrics_alert_message">১। %1$s রেকর্ড সেভ করা যায়নি \n ২। বন্ধ করুন</string>
@@ -215,12 +190,31 @@
     <string name="enrol_last_biometrics_alert_title">সেভ করা যায়নি</string>
     <string name="modality_installation_offline_title">মোডালিটি ডাউনলোডে সমস্যা হচ্ছে</string>
     <string name="feature_not_downloaded_title">সিমপ্রিন্টস ডাউনলোড অসম্পূর্ণ</string>
-    <string name="modality_installation_offline">"আপনার ওয়াই-ফাই অথবা ফোন ইন্টারনেট চালু আছে কিনা দেখুন। ডাউনলোড সম্পূর্ণ করতে সেটিংস থেকে ইন্টারনেট চালু করুন। "</string>
+    <string name="modality_installation_offline">আপনার ওয়াই-ফাই অথবা ফোন ইন্টারনেট চালু আছে কিনা দেখুন। ডাউনলোড সম্পূর্ণ করতে সেটিংস থেকে ইন্টারনেট চালু করুন।</string>
     <string name="feature_not_downloaded">সিমপ্রিন্টস ব্যবহার করতে %1$s ডাউনলোড করুন।</string>
     <string name="modality_download_taking_longer">ডাউলোড</string>
     <string name="fingerprint_feature_alert">আঙ্গুলের ছাপ এর বৈশিষ্ট্য</string>
     <string name="modality_starting_download">ডাউনলোড শুরু করুন</string>
     <string name="modality_downloading">"ডাউনলোড হচ্ছে "</string>
     <string name="modality_installing">ইন্সটল হচ্ছে</string>
-
+    <string name="biometrics_access_fingerprint_face">আঙ্গুলের ছাপের তথ্য, ছবি</string>
+    <string name="consent_enrol_only">আমি আপনাকে %1$s এ নিবন্ধন করতে চাই %2$s </string>
+    <string name="consent_share_data_no">সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %1$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে। </string>
+    <string name="consent_parental_id_verify">"আমি  %2$s তাঁকে খুঁজে বের করতে চাই %1$s "</string>
+    <string name="consent_parental_share_data_no">সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক প্রতিষ্ঠানের কাছে তাঁর %1$s এবং বর্তমান ঠিকানা সংরক্ষিত আছে। </string>
+    <string name="consent_parental_privacy_rights">আপনি সম্মতি দিলেও যে কোন সময় অনুমতি সরিয়ে নিয়ে আপনার সন্তানের তথ্য মুছে ফেলতে বলতে পারেন। </string>
+    <string name="consent_parental_confirmation">আমি কি আপনার সন্তানের %1$s ব্যবহার করতে পারি\? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি \", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে।\"</string>
+    <string name="biometrics_general_fingerprint">আপনার আঙ্গুলের ছাপ ব্যবহার</string>
+    <string name="biometrics_parental_face">আপানার সন্তানের ছবি</string>
+    <string name="fingerprint_face_feature_alert">আঙ্গুলের ছাপ ও ছবি তোলার ফিচার</string>
+    <string name="consent_parental_enrol_only">আমি %2$s তাঁকে %1$s এ নিবন্ধন করতে চাই। </string>
+    <string name="consent_parental_enrol">আমি %2$s তাঁকে %1Ss নিবন্ধন করে, ভবিষ্যতে সনাক্ত করতে চাই। </string>
+    <string name="biometrics_access_fingerprint">আঙ্গুলের ছাপের তথ্য</string>
+    <string name="biometric_general_face">আপনার ছবি তোলা হবে</string>
+    <string name="biometrics_access_face">ছবি</string>
+    <string name="biometrics_parental_fingerprint">আপনার সন্তানের আঙ্গুলের ছাপ ব্যবহার</string>
+    <string name="biometric_concat_modalities">এবং</string>
+    <string name="face_feature_alert">ছবি তোলার ফিচার</string>
+    <string name="sync_info_images_to_upload">আপলোড এর জন্য প্রস্তুত ছবি</string>
+    <string name="why_did_you_skip_biometrics">বায়োমেট্রিক তথ্য এড়িয়ে গেলেন কেন\?</string>
 </resources>

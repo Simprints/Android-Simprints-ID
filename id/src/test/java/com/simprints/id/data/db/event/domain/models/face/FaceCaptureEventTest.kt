@@ -17,7 +17,7 @@ class FaceCaptureEventTest {
     @Test
     fun create_FaceCaptureEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val faceArg = Face(0F, 1F, 2F, "")
+        val faceArg = Face(0F, 1F, 2F, "", FaceTemplateFormat.RANK_ONE_1_23)
         val event = FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

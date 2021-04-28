@@ -3,8 +3,8 @@ package com.simprints.clientapi.clientrequests.validators
 import com.simprints.clientapi.exceptions.InvalidSelectedIdException
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 
 class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFactory) {
@@ -18,11 +18,8 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
         val extractor = ConfirmIdentityFactory.getMockExtractor()
         every { extractor.getSessionId() } returns ""
 
-        try {
+        assertThrows<InvalidSessionIdException> {
             ConfirmIdentityFactory.getValidator(extractor).validateClientRequest()
-            Assert.fail()
-        } catch (ex: Exception) {
-            Assert.assertTrue(ex is InvalidSessionIdException)
         }
     }
 
@@ -31,11 +28,8 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
         val extractor = ConfirmIdentityFactory.getMockExtractor()
         every { extractor.getSelectedGuid() } returns ""
 
-        try {
+        assertThrows<InvalidSelectedIdException> {
             ConfirmIdentityFactory.getValidator(extractor).validateClientRequest()
-            Assert.fail()
-        } catch (ex: Exception) {
-            Assert.assertTrue(ex is InvalidSelectedIdException)
         }
     }
 }

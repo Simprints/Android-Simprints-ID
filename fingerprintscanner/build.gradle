@@ -2,26 +2,20 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
+apply plugin: "org.gradle.test-retry"
 
-project.version = "2020.1.2"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
 
-    defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
-        versionCode 1
-        versionName project.version
-    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         staging {
-            initWith release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     testOptions {
@@ -45,6 +39,9 @@ dependencies {
 
     // Android
     implementation deps.androidx.appcompat
+
+    // Logging
+    implementation deps.timber.core
 
     // RxJava
     implementation deps.rxjava2.core
@@ -70,39 +67,14 @@ dependencies {
     testImplementation deps.testing.truth
 }
 
-def libraryGroupId = 'com.simprints'
-def libraryArtifactId = 'fingerprintscanner'
-
-publishing.publications {
-    aar(MavenPublication) {
-        groupId libraryGroupId
-        //noinspection GroovyAssignabilityCheck
-        version project.version
-        artifactId libraryArtifactId
-
-        artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-    }
-}
-
-artifactory {
-    contextUrl = 'http://178.62.61.39:8081/artifactory'
-    publish {
-        repository {
-            repoKey = 'libs-release-local'
-
-            username = SIMPRINTS_ARTIFACTORY_USERNAME
-            password = SIMPRINTS_ARTIFACTORY_PASSWORD
-        }
-        defaults {
-            publications('aar')
-            publishArtifacts = true
-
-            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
-            publishPom = true
-        }
-    }
-}
-
 repositories {
     mavenCentral()
+}
+
+task {
+    test {
+        retry {
+            maxRetries = 5
+        }
+    }
 }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
+import com.simprints.face.models.FaceDetection
 import com.simprints.uicomponents.models.PreviewFrame
 import io.rankone.rocsdk.embedded.*
 import kotlinx.coroutines.Dispatchers
@@ -93,7 +94,8 @@ class RankOneFaceDetector : FaceDetector {
             yawValue,
             rocFace.face.rotation,
             qualityValue,
-            roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt())
+            roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
+            FaceDetection.TemplateFormat.RANK_ONE_1_23
         )
 
         // Free all resources after getting the face

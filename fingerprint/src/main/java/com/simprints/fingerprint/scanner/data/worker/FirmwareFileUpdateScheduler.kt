@@ -7,6 +7,9 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import java.util.concurrent.TimeUnit
 
+/**
+ * Schedules the [FirmwareFileUpdateWorker] as necessary.
+ */
 class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: FingerprintPreferencesManager) {
 
     fun scheduleOrCancelWorkIfNecessary() {

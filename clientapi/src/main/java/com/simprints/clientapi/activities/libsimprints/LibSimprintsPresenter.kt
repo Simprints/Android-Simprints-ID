@@ -52,22 +52,18 @@ class LibSimprintsPresenter(
         }
     }
 
-    override fun handleResponseError(errorResponse: ErrorResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
-        }
-    }
-
     override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(Registration(enrol.guid), getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnRegistration(Registration(enrol.guid), currentSessionId, flowCompletedCheck)
         }
     }
-
 
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -77,45 +73,77 @@ class LibSimprintsPresenter(
                 Identification(
                     it.guidFound,
                     it.confidenceScore,
-                    it.tier.fromDomainToLibsimprintsTier())
+                    it.tier.fromDomainToLibsimprintsTier()
+                )
             }), identify.sessionId, flowCompletedCheck)
+        }
+    }
+
+
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnConfirmation(flowCompletedCheck, currentSessionId)
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
             with(verify) {
                 val verification = Verification(
                     matchResult.confidenceScore,
                     matchResult.tier.fromDomainToLibsimprintsTier(),
-                    matchResult.guidFound)
-                view.returnVerification(verification, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+                    matchResult.guidFound
+                )
+                view.returnVerification(verification, currentSessionId, flowCompletedCheck)
             }
         }
     }
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra),
-                getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnRefusalForms(
+                RefusalForm(refusalForm.reason, refusalForm.extra),
+                currentSessionId, flowCompletedCheck
+            )
         }
     }
 
-    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId()
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
+            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, currentSessionId)
+        }
+    }
+
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-
-    override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
-        }
-    }
 }
 

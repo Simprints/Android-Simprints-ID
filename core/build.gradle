@@ -2,18 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
+
 androidExtensions {
     experimental = true
 }
 
 android {
-    compileSdkVersion 29
-
     defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -30,23 +26,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
         }
-
+        staging {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
+        }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
-        }
-
-        staging {
-            initWith release
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
         }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':libsimprints')
 
     implementation deps.androidx.appcompat
     implementation deps.androidx.lifecycle.viewmodel

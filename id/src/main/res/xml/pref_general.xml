@@ -18,8 +18,6 @@
             android:key="@string/preference_sync_info_key" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:layout="@layout/line_separator" />
-
     <PreferenceCategory android:key="@string/preferences_app_details_key"
         android:title="@string/settings_app_details">
         <Preference

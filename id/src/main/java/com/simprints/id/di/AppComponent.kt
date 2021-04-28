@@ -27,9 +27,7 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -40,10 +38,10 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.securitystate.SecurityStateWorker
@@ -69,13 +67,15 @@ import javax.inject.Singleton
         PreferencesModule::class,
         SerializerModule::class,
         SyncModule::class,
-        DashboardActivityModule::class
+        DashboardActivityModule::class,
+        ViewModelModule::class
     ]
 )
 @Singleton
 interface AppComponent {
 
-    @Component.Builder interface Builder {
+    @Component.Builder
+    interface Builder {
 
         @BindsInstance
         fun application(app: Application): Builder
@@ -87,6 +87,7 @@ interface AppComponent {
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponent
     }
@@ -94,7 +95,6 @@ interface AppComponent {
     fun getOrchestratorComponent(): OrchestratorComponent.Builder
 
     fun inject(app: Application)
-    fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
     fun inject(privacyNoticeActivity: PrivacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
@@ -107,9 +107,7 @@ interface AppComponent {
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticatorImpl)
     fun inject(alertPresenter: AlertPresenter)
-    fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
-    fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
     fun inject(settingsActivity: SettingsActivity)
@@ -151,4 +149,5 @@ interface AppComponent {
     fun getImageRepository(): ImageRepository
     fun getSimClientFactory(): SimApiClientFactory
     fun getSubjectToEventMigrationManager(): SubjectToEventMigrationManager
+    fun getLicenseRepository(): LicenseRepository
 }
