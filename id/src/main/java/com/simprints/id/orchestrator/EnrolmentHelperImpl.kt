@@ -1,32 +1,28 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EnrolmentEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.Companion.buildBiometricReferences
-import com.simprints.id.data.db.events_sync.up.domain.LocalEventQuery
+import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
+import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.FaceSample
 import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.toMode
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.tools.time.TimeHelper
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import java.util.*
 
 private const val TAG = "ENROLMENT"
-class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
-                          private val eventRepository: EventRepository,
-                          private val preferencesManager: PreferencesManager,
-                          private val loginInfoManager: LoginInfoManager,
-                          private val timeHelper: TimeHelper) : EnrolmentHelper {
+
+class EnrolmentHelperImpl(
+    private val subjectRepository: SubjectRepository,
+    private val eventRepository: EventRepository,
+    private val timeHelper: TimeHelper
+) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
         Timber.tag(TAG).d("Enrolment in progress")
@@ -35,43 +31,45 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         Timber.tag(TAG).d("Create a subject record")
         subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
 
-        Timber.tag(TAG).d("Up-syncing")
-        inBackground {
-            eventRepository.uploadEvents(LocalEventQuery(projectId = loginInfoManager.getSignedInProjectIdOrEmpty())).collect()
-        }
-
         Timber.tag(TAG).d("Done!")
     }
 
     private suspend fun registerEvent(subject: Subject) {
         Timber.tag(TAG).d("Register events for enrolments")
 
-        eventRepository.addEventToCurrentSession(
-            EnrolmentEvent(timeHelper.now(), subject.subjectId)
-        )
+        val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
+        val personCreationEvent = eventRepository.getEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
 
-        eventRepository.addEvent(
-            EnrolmentRecordCreationEvent(
+        eventRepository.addOrUpdateEvent(
+            EnrolmentEventV2(
                 timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
                 subject.moduleId,
                 subject.attendantId,
-                preferencesManager.modalities.map { it.toMode() },
-                buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+                personCreationEvent.id
             )
         )
     }
 
-    override fun buildSubject(projectId: String,
-                              userId: String,
-                              moduleId: String,
-                              fingerprintResponse: FingerprintCaptureResponse?,
-                              faceResponse: FaceCaptureResponse?,
-                              timeHelper: TimeHelper): Subject =
+    override fun buildSubject(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse?,
+        faceResponse: FaceCaptureResponse?,
+        timeHelper: TimeHelper
+    ): Subject =
         when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildSubjectFromFingerprintAndFace(projectId, userId, moduleId, fingerprintResponse, faceResponse, timeHelper)
+                buildSubjectFromFingerprintAndFace(
+                    projectId,
+                    userId,
+                    moduleId,
+                    fingerprintResponse,
+                    faceResponse,
+                    timeHelper
+                )
             }
 
             fingerprintResponse != null -> {
@@ -86,12 +84,14 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         }
 
 
-    private fun buildSubjectFromFingerprintAndFace(projectId: String,
-                                                   userId: String,
-                                                   moduleId: String,
-                                                   fingerprintResponse: FingerprintCaptureResponse,
-                                                   faceResponse: FaceCaptureResponse,
-                                                   timeHelper: TimeHelper): Subject {
+    private fun buildSubjectFromFingerprintAndFace(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse,
+        faceResponse: FaceCaptureResponse,
+        timeHelper: TimeHelper
+    ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
             patientId,
@@ -104,11 +104,13 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         )
     }
 
-    private fun buildSubjectFromFingerprint(projectId: String,
-                                            userId: String,
-                                            moduleId: String,
-                                            fingerprintResponse: FingerprintCaptureResponse,
-                                            timeHelper: TimeHelper): Subject {
+    private fun buildSubjectFromFingerprint(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse,
+        timeHelper: TimeHelper
+    ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
             patientId,
@@ -120,11 +122,13 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         )
     }
 
-    private fun buildSubjectFromFace(projectId: String,
-                                     userId: String,
-                                     moduleId: String,
-                                     faceResponse: FaceCaptureResponse,
-                                     timeHelper: TimeHelper): Subject {
+    private fun buildSubjectFromFace(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        faceResponse: FaceCaptureResponse,
+        timeHelper: TimeHelper
+    ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
             patientId,
@@ -142,15 +146,15 @@ class EnrolmentHelperImpl(private val subjectRepository: SubjectRepository,
         return fingerprintResponse.captureResult.mapNotNull { captureResult ->
             val fingerId = captureResult.identifier
             captureResult.sample?.let { sample ->
-                FingerprintSample(fingerId, sample.template, sample.templateQualityScore)
+                FingerprintSample(fingerId, sample.template, sample.templateQualityScore, sample.format)
             }
         }
     }
 
     private fun extractFaceSamples(faceResponse: FaceCaptureResponse) =
-        faceResponse.capturingResult.mapNotNull { it ->
-            it.result?.let {
-                FaceSample(it.template)
+        faceResponse.capturingResult.mapNotNull { captureResult ->
+            captureResult.result?.let { sample ->
+                FaceSample(sample.template, sample.format)
             }
         }
 }

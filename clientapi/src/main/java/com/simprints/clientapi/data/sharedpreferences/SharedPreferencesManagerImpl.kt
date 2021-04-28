@@ -2,9 +2,15 @@ package com.simprints.clientapi.data.sharedpreferences
 
 import android.content.Context
 import androidx.core.content.edit
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.modality.Modality
 
 
-class SharedPreferencesManagerImpl(context: Context) : SharedPreferencesManager {
+class SharedPreferencesManagerImpl(
+    context: Context,
+    private val corePreferencesManager: PreferencesManager
+) : SharedPreferencesManager {
 
     companion object {
         private const val SHARED_PREF_KEY = "client_api_shared_pref_80094647-bf24-4927-a527-c77b9664a250"
@@ -23,4 +29,9 @@ class SharedPreferencesManagerImpl(context: Context) : SharedPreferencesManager 
         stashSessionId("")
     }
 
+    override val syncDestinationSettings: List<SyncDestinationSetting>
+        get() = corePreferencesManager.syncDestinationSettings
+
+    override val modalities: List<Modality>
+        get() = corePreferencesManager.modalities
 }

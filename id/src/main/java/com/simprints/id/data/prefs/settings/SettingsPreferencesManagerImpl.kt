@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.network.NetworkConstants
@@ -37,7 +38,8 @@ open class SettingsPreferencesManagerImpl(
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
     private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
     fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
-    faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>
+    faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>,
+    syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -240,6 +242,15 @@ open class SettingsPreferencesManagerImpl(
             eventDownSyncSettingSerializer
         )
 
+    override var syncDestinationSettings: List<SyncDestinationSetting>
+        by RemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            SYNC_DESTINATION_SETTINGS_KEY,
+            SYNC_DESTINATION_SETTINGS_DEFAULT,
+            syncDestinationSerializer
+        )
+
     override var fingerprintsToCollect: List<FingerIdentifier>
         by OverridableRemoteConfigComplexPreference(
             prefs,
@@ -327,14 +338,6 @@ open class SettingsPreferencesManagerImpl(
             FACE_NB_OF_FRAMES_CAPTURED_DEFAULT
         )
 
-    override var faceMatchThreshold: Float
-        by RemoteConfigPrimitivePreference(
-            prefs,
-            remoteConfigWrapper,
-            FACE_MATCH_THRESHOLD,
-            FACE_MATCH_THRESHOLD_DEFAULT
-        )
-
     override var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
         by RemoteConfigComplexPreference(
             prefs,
@@ -420,6 +423,9 @@ open class SettingsPreferencesManagerImpl(
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
+        const val SYNC_DESTINATION_SETTINGS_KEY = "SyncDestination"
+        val SYNC_DESTINATION_SETTINGS_DEFAULT = listOf(SyncDestinationSetting.SIMPRINTS)
+
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
 
@@ -453,8 +459,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val FACE_NB_OF_FRAMES_CAPTURED = "FaceNbOfFramesCaptured"
         const val FACE_NB_OF_FRAMES_CAPTURED_DEFAULT = 2
-        const val FACE_MATCH_THRESHOLD = "FaceMatchThreshold"
-        const val FACE_MATCH_THRESHOLD_DEFAULT = 0f
 
         const val FINGERPRINT_CONFIDENCE_THRESHOLDS = "FingerprintConfidenceThresholds"
         val FINGERPRINT_CONFIDENCE_THRESHOLDS_DEFAULT = mapOf(

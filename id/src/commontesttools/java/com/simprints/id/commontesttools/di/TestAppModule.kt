@@ -13,6 +13,8 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.id.data.db.event.local.SessionDataCache
+import com.simprints.id.data.db.event.local.SessionDataCacheImpl
 import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -34,6 +36,7 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
+import dagger.Provides
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -82,6 +85,8 @@ class TestAppModule(
         )
     }
 
+   override fun provideSessionDataCache(app: Application): SessionDataCache = SessionDataCacheImpl(app)
+
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
@@ -123,7 +128,8 @@ class TestAppModule(
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager,
-        validatorFactory: SessionEventValidatorsFactory
+        validatorFactory: SessionEventValidatorsFactory,
+        sessionDataCache: SessionDataCache
     ): EventRepository = sessionEventsManagerRule.resolveDependency {
         super.provideEventRepository(
             ctx,
@@ -133,7 +139,8 @@ class TestAppModule(
             loginInfoManager,
             timeHelper,
             crashReportManager,
-            validatorFactory
+            validatorFactory,
+            sessionDataCache
         )
     }
 

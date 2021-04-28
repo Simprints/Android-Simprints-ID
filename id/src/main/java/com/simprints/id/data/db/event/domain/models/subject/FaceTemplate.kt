@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.event.domain.models.subject
 
-import com.simprints.id.data.db.event.remote.models.subject.ApiFaceTemplate
+import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceTemplate
 
 data class FaceTemplate(val template: String)
 

@@ -7,9 +7,10 @@ import androidx.multidex.MultiDexApplication
 import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.di.*
-import com.simprints.id.tools.logging.LoggingConfigHelper
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
+import com.simprints.id.tools.logging.TimberDebugLoggingConfigHelper
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -26,7 +27,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
 
-    open var loggingConfigHelper: LoggingConfigHelper = NoLoggingConfigHelper()
+    val eventCache: MutableMap<String, Event> = mutableMapOf()
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -43,6 +44,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
             .syncModule(SyncModule())
+            .viewModelModule(ViewModelModule())
             .build()
 
         // Create events for the subjects that are stored in the subjects (old architecture)
@@ -72,6 +74,11 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
     }
 
     fun setUpLogging() {
+        val loggingConfigHelper = if (BuildConfig.DEBUG_MODE)
+            TimberDebugLoggingConfigHelper()
+        else
+            NoLoggingConfigHelper()
+
         if (loggingConfigHelper.loggingNeedsSetUp())
             loggingConfigHelper.setUpLogging()
     }
@@ -121,6 +128,7 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
         factory { component.getSimClientFactory() }
+        factory { component.getLicenseRepository() }
     }
 
     override fun onTerminate() {

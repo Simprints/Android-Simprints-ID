@@ -1,10 +1,16 @@
 package com.simprints.fingerprint.scanner.domain
 
+/**
+ * @param charge Percentage of full charge (0 - 100)
+ * @param voltage Measured voltage in mV
+ * @param current Measured current in mA (negative if discharging, positive if charging)
+ * @param temperature Measured temperature in dK (tenths of Kelvin above 0K)
+ */
 data class BatteryInfo(
-    val charge: Int,        // Percentage of full charge
-    val voltage: Int,       // In mV
-    val current: Int,       // In mA, negative if discharging, positive if charging
-    val temperature: Int    // In dK (tenths of Kelvin above 0K)
+    val charge: Int,
+    val voltage: Int,
+    val current: Int,
+    val temperature: Int
 ) {
 
     fun isLowBattery() = charge <= LOW_BATTERY_CHARGE

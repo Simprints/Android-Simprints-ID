@@ -1,0 +1,24 @@
+apply from: "$rootDir${File.separator}buildSrc${File.separator}signing_properties.gradle"
+
+android {
+    signingConfigs {
+        config {
+            keyAlias key_alias
+            keyPassword key_password
+            storeFile file(store_file)
+            storePassword store_password
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.config
+        }
+        staging {
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
+        }
+    }
+}

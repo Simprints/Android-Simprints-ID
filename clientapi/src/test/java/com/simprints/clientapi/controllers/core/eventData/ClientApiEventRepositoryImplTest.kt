@@ -26,7 +26,7 @@ class ClientApiEventRepositoryImplTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK(relaxed = true) lateinit var coreEventEventsMgrMock: EventRepository
-    private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManagerImpl
+    private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManager
 
     @Before
     fun setup() {
@@ -42,9 +42,9 @@ class ClientApiEventRepositoryImplTest {
             coEvery { coreEventEventsMgrMock.getCurrentCaptureSessionEvent() } returns session
             clientSessionEventsMgr.createSession(IntegrationInfo.ODK)
 
-            coVerify { coreEventEventsMgrMock.createSession(any()) }
+            coVerify { coreEventEventsMgrMock.createSession() }
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEventToCurrentSession(match {
+                coreEventEventsMgrMock.addOrUpdateEvent(match {
                     it is IntentParsingEvent && it.payload.integration == CoreIntegrationInfo.ODK
                 })
             }
@@ -58,7 +58,7 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addAlertScreenEvent(clientApiAlert)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEventToCurrentSession(match {
+                coreEventEventsMgrMock.addOrUpdateEvent(match {
                     println("test ${it is AlertScreenEvent && it.payload.alertType == INVALID_PROJECT_ID}")
                     it is AlertScreenEvent && it.payload.alertType == AlertScreenEventType.INVALID_PROJECT_ID
                 })
@@ -73,7 +73,7 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addSuspiciousIntentEvent(unexpectedKey)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEventToCurrentSession(match {
+                coreEventEventsMgrMock.addOrUpdateEvent(match {
                     it is SuspiciousIntentEvent && it.payload.unexpectedExtras == unexpectedKey
                 })
             }
@@ -88,7 +88,7 @@ class ClientApiEventRepositoryImplTest {
             clientSessionEventsMgr.addInvalidIntentEvent(action, wrongKey)
 
             coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addEventToCurrentSession(withArg {
+                coreEventEventsMgrMock.addOrUpdateEvent(withArg {
                     Truth.assertThat(it).isInstanceOf(InvalidIntentEvent::class.java)
                     Truth.assertThat((it as InvalidIntentEvent).payload.action).isEqualTo(action)
                     Truth.assertThat(it.payload.extras).isEqualTo(wrongKey)

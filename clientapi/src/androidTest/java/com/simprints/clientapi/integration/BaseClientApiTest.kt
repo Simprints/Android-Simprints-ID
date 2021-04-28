@@ -24,7 +24,7 @@ import org.koin.test.mock.declareModule
 
 open class BaseClientApiTest : KoinTest {
 
-    internal val projectIdField = "projectId" to "some_project"
+    internal val projectIdField = "projectId" to "xppPLwmR2eUmyN6LS3SN"
     internal val userIdField = "userId" to "some_user_id"
     internal val moduleIdField = "moduleId" to "some_module_id"
     internal val metadataField = "metadata" to "{\"key\": \"some_metadata\"}"

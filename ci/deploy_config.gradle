@@ -1,0 +1,9 @@
+def deployPropertiesFile = rootProject.file("ci/deploy.properties")
+def deployProperties = new Properties()
+deployProperties.load(new FileInputStream(deployPropertiesFile))
+
+play {
+    serviceAccountCredentials = file("${rootDir}/google_api_key.json")
+    defaultToAppBundles true
+    artifactDir = file("build/outputs/bundle/${deployProperties['BUNDLE_FOLDER']}")
+}

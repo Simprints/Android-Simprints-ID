@@ -3,6 +3,10 @@ package com.simprints.fingerprintscanner.v2.scanner
 import com.simprints.fingerprintscanner.v2.domain.Mode
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
 
+/**
+ * Class for storing the state of the Scanner, as received from communicating from the scanner.
+ * Null values indicate unknown state.
+ */
 data class ScannerState(
     var connected: Boolean?,
     var mode: Mode?,
@@ -13,7 +17,7 @@ data class ScannerState(
     var batteryVoltageMilliVolts: Int?,
     var batteryCurrentMilliAmps: Int?,
     var batteryTemperatureDeciKelvin: Int?,
-    var scanLedState: Boolean? //FALSE = Default
+    var scanLedState: Boolean? // FALSE = Default
 )
 
 fun disconnectedScannerState() =

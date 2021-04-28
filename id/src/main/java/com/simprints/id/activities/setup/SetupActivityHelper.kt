@@ -34,7 +34,7 @@ object SetupActivityHelper {
                 val lastLocation = locations.last()
                 val currentSession = eventRepository.getCurrentCaptureSessionEvent()
                 currentSession.payload.location = Location(lastLocation.latitude, lastLocation.longitude)
-                eventRepository.addEventToCurrentSession(currentSession)
+                eventRepository.addOrUpdateEvent(currentSession)
                 Timber.d("Saving user's location into the current session")
             }
         } catch (t: Throwable) {

@@ -5,6 +5,7 @@ import com.simprints.face.data.db.person.FaceIdentity
 import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.detection.Face
+import com.simprints.face.models.FaceDetection
 import com.simprints.id.tools.utils.generateSequenceN
 import java.util.*
 import kotlin.random.Random
@@ -26,5 +27,5 @@ object FixtureGenerator {
         FaceMatchResult(UUID.randomUUID().toString(), Random.nextFloat() * 100)
 
     fun getFace(rect: Rect = Rect(0, 0, 60, 60), quality: Float = 1f): Face =
-        Face(100, 100, rect, 0f, 0f, quality, Random.nextBytes(20))
+        Face(100, 100, rect, 0f, 0f, quality, Random.nextBytes(20), FaceDetection.TemplateFormat.MOCK)
 }

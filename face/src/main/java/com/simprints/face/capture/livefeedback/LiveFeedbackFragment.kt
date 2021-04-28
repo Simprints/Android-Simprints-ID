@@ -65,8 +65,10 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     }
 
     /**
-     * @process needs to block because frame is a singleton which cannot be released until it's
-     * converted into a preview frame.
+     * This method  needs to block because frame is a singleton which cannot be released until it's
+     * converted into a preview frame. Although it's blocking, this is running in a background thread.
+     * https://natario1.github.io/CameraView/docs/frame-processing
+     *
      * Also the frame sometimes throws IllegalStateException for null width and height
      */
     override fun process(frame: Frame) {

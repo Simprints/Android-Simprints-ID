@@ -1,6 +1,5 @@
 package com.simprints.id.network
 
-import com.simprints.id.BuildConfig.FLAVOR
 import com.test.core.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -12,10 +11,12 @@ open class DefaultOkHttpClientBuilder {
     companion object {
         const val DEVICE_ID_HEADER = "X-Device-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
+        const val USER_AGENT_HEADER = "User-Agent"
     }
 
     open fun get(authToken: String? = null,
-                 deviceId: String): OkHttpClient.Builder =
+                 deviceId: String,
+                 versionName: String): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)
@@ -27,11 +28,12 @@ open class DefaultOkHttpClientBuilder {
                 }
             }
             .apply {
-                if (BuildConfig.DEBUG || FLAVOR == "withLogFile") {
+                if (BuildConfig.DEBUG_MODE) {
                     addInterceptor(buildLoggingInterceptor())
                 }
             }
             .addInterceptor(buildDeviceIdInterceptor(deviceId))
+            .addInterceptor(buildVersionInterceptor(versionName))
 
     private fun buildAuthenticationInterceptor(authToken: String): Interceptor =
         Interceptor { chain ->
@@ -55,4 +57,12 @@ open class DefaultOkHttpClientBuilder {
             level = HttpLoggingInterceptor.Level.HEADERS
         }
     }
+
+    private fun buildVersionInterceptor(versionName: String): Interceptor =
+        Interceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+                .addHeader(USER_AGENT_HEADER, "SimprintsID/$versionName")
+                .build()
+            return@Interceptor chain.proceed(newRequest)
+        }
 }

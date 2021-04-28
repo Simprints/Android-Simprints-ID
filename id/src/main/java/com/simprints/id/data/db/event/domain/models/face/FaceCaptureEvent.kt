@@ -55,7 +55,8 @@ data class FaceCaptureEvent(
             val yaw: Float,
             var roll: Float,
             val quality: Float,
-            val template: String
+            val template: String,
+            val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
         )
 
         enum class Result {
@@ -69,6 +70,6 @@ data class FaceCaptureEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

@@ -7,4 +7,5 @@ interface DashboardSyncCardStateRepository {
     val syncCardStateLiveData: LiveData<DashboardSyncCardState>
 
     suspend fun syncIfRequired()
+
 }

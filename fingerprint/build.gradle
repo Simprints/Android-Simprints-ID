@@ -4,19 +4,14 @@ apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-apply from: "${rootDir}${File.separator}ci${File.separator}signing_config.gradle"
+apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 
 androidExtensions {
     experimental = true
 }
 
 android {
-    compileSdkVersion 29
     defaultConfig {
-        minSdkVersion config.min_sdk
-        targetSdkVersion 29
-        versionCode 1
-        versionName "2019.3.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -28,24 +23,12 @@ android {
         }
 
         staging {
-            initWith release
+            proguardFiles 'proguard-rules-dynamic-features.pro'
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 
         debug {
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
-        }
-    }
-
-    flavorDimensions "mode"
-
-    productFlavors {
-        standard {
-            dimension "mode"
-        }
-
-        withLogFile {
-            dimension "mode"
         }
     }
 
@@ -89,13 +72,6 @@ repositories {
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
-    maven {
-        url "http://178.62.61.39:8081/artifactory/libs-release-local"
-        credentials {
-            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
-            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
-        }
-    }
 }
 
 dependencies {
@@ -110,7 +86,6 @@ dependencies {
 
     // Simprints
     implementation project(':id')
-    implementation project(':libsimprints')
     implementation project(':fingerprintmatcher')
     implementation project(':fingerprintscanner')
     implementation project(':fingerprintscannermock')

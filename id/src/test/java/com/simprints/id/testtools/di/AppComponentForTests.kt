@@ -6,10 +6,16 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenterTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
-import com.simprints.id.di.*
+import com.simprints.id.di.AppComponent
+import com.simprints.id.di.AppModule
+import com.simprints.id.di.DashboardActivityModule
+import com.simprints.id.di.DataModule
+import com.simprints.id.di.PreferencesModule
+import com.simprints.id.di.SecurityModule
+import com.simprints.id.di.SerializerModule
+import com.simprints.id.di.SyncModule
+import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
 import com.simprints.id.services.sync.subjects.down.workers.EventDownSyncCountWorkerTest
@@ -27,7 +33,8 @@ import javax.inject.Singleton
         DataModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
-        SecurityModule::class
+        SecurityModule::class,
+        ViewModelModule::class
     ]
 )
 interface AppComponentForTests : AppComponent {
@@ -43,6 +50,7 @@ interface AppComponentForTests : AppComponent {
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder
+        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponentForTests
     }
@@ -51,12 +59,10 @@ interface AppComponentForTests : AppComponent {
     fun inject(projectSecretManagerTest: ProjectSecretManagerTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
-    fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(subjectsDownSyncCountWorkerTest: EventDownSyncCountWorkerTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
-    fun inject(settingsPreferencePresenterTest: SettingsPreferencePresenterTest)
 
     @ExperimentalCoroutinesApi
     fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)

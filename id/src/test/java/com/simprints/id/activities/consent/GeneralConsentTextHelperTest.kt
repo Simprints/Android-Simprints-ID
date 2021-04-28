@@ -20,42 +20,91 @@ import org.robolectric.annotation.Config
 class GeneralConsentTextHelperTest {
 
     private val context = ApplicationProvider.getApplicationContext() as TestApplication
-    private val generalConsentOptionsJson = JsonHelper().toJson(GeneralConsentOptions())
     private val request = AskConsentRequest(ConsentType.ENROL)
 
-    companion object {
-        private const val GENERAL_CONSENT_ENROL_FINGER_TEXT = "I'd like to use your fingerprints to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I use your fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\""
-        private const val GENERAL_CONSENT_ENROL_FACE_TEXT = "I'd like to take photographs of your face to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your photographs and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I take photographs of your face? Please say \"I accept\", \"I decline\", or \"I have questions.\""
-        private const val GENERAL_CONSENT_ENROL_MULTI_TEXT = "I'd like to use your fingerprints and take photographs of your face to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your fingerprint information, photographs and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I use your fingerprints and take photographs of your face? Please say \"I accept\", \"I decline\", or \"I have questions.\""
 
+    private val fingerprintConsentText = "use your fingerprints"
+    private val faceConsentText = "take photographs of your face"
+    private val defaultGeneralConfigOptions = """
+        {
+          "consent_enrol_only": false,
+          "consent_enrol": true,
+          "consent_id_verify": true,
+          "consent_share_data_no": false,
+          "consent_share_data_yes": true,
+          "consent_collect_yes": true,
+          "consent_privacy_rights": true,
+          "consent_confirmation": true
+        }
+        """.trimIndent()
+
+
+    companion object {
         private const val PROGRAM_NAME = "program_name"
         private const val ORGANIZATION_NAME = "organization_name"
     }
 
     @Test
-    fun getGeneralConsentTextForFinger_shouldReturnCorrectGeneralConsentText() {
-        val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER), mockk(), JsonHelper()).assembleText(request, context)
+    fun `should return consent text only containing consent for fingerprint modality when only fingerprint is used`() {
+        // create text helper to assemble text
+        val generalConsentTextHelper = GeneralConsentTextHelper(
+            defaultGeneralConfigOptions,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FINGER),
+            mockk(),
+            JsonHelper()
+        )
 
-        assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_FINGER_TEXT)
+        // format entire object to get consent text message
+        val generalConsentText = generalConsentTextHelper.assembleText(request, context)
+
+
+        // assert that it contains fingerprint and not face consent
+        assertThat(generalConsentText).contains(fingerprintConsentText)
+        assertThat(generalConsentText).doesNotContain(faceConsentText)
     }
 
     @Test
-    fun getGeneralConsentTextForFace_shouldReturnCorrectGeneralConsentText() {
-        val generalConsentOptionsJson = JsonHelper().toJson(GeneralConsentOptions())
-        val request = AskConsentRequest(ConsentType.ENROL)
+    fun `should return consent text only containing consent for face modality when only face is used`() {
+        // create text helper to assemble text
+        val generalConsentTextHelper = GeneralConsentTextHelper(
+            defaultGeneralConfigOptions,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FACE),
+            mockk(),
+            JsonHelper()
+        )
 
-        val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FACE), mockk(), JsonHelper()).assembleText(request, context)
+        // format entire object to get consent text message
+        val generalConsentText = generalConsentTextHelper.assembleText(request, context)
 
-        assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_FACE_TEXT)
+
+        // assert that it contains face and not fingerprint consent
+        assertThat(generalConsentText).contains(faceConsentText)
+        assertThat(generalConsentText).doesNotContain(fingerprintConsentText)
     }
 
     @Test
-    fun getGeneralConsentTextForMultiModal_shouldReturnCorrectGeneralConsentText() {
-        val generalConsentText = GeneralConsentTextHelper(generalConsentOptionsJson,
-            PROGRAM_NAME, ORGANIZATION_NAME, listOf(Modality.FINGER, Modality.FACE), mockk(), JsonHelper()).assembleText(request, context)
+    fun `should return consent text containing consent for both fingerprint and face modalities, when both are used`() {
+        val consentTextForBoth = "$fingerprintConsentText and $faceConsentText"
 
-        assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_MULTI_TEXT)
+        // create text helper to assemble text
+        val generalConsentTextHelper = GeneralConsentTextHelper(
+            defaultGeneralConfigOptions,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(Modality.FINGER, Modality.FACE),
+            mockk(),
+            JsonHelper()
+        )
+
+        // format entire object to get consent text message
+        val generalConsentText = generalConsentTextHelper.assembleText(request, context)
+
+
+        // assert that it contains consent text for both modalities
+        assertThat(generalConsentText).contains(consentTextForBoth)
     }
 }

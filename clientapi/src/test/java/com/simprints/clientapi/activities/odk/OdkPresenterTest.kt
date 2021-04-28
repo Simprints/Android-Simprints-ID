@@ -10,7 +10,8 @@ import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
@@ -28,6 +29,7 @@ import java.util.*
 class OdkPresenterTest {
 
     private val view = mockk<OdkActivity>(relaxed = true)
+
     @MockK
     lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
 
@@ -93,18 +95,17 @@ class OdkPresenterTest {
 
     @Test
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
-        runBlocking {
-            val registerId = UUID.randomUUID().toString()
-            val sessionId = UUID.randomUUID().toString()
+        val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
 
-            val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
-            coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-            OdkPresenter(view, Enrol, sessionEventsManagerMock, mockk(), mockk()).apply {
-                handleEnrolResponse(EnrolResponse(registerId))
-            }
-
-            verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        OdkPresenter(view, Enrol, sessionEventsManagerMock, mockk(), mockk()).apply {
+            handleEnrolResponse(EnrolResponse(registerId))
         }
+
+        verify(exactly = 1) { view.returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -113,8 +114,9 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5, LOW)
         val highestMatchConfidence = HIGH.toString()
         val sessionId = UUID.randomUUID().toString()
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
 
-        OdkPresenter(view, Identify, mockk(), mockk(), mockk()).apply {
+        OdkPresenter(view, Identify, sessionEventsManagerMock, mockk(), mockk()).apply {
             handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
         }
 
@@ -124,10 +126,12 @@ class OdkPresenterTest {
                 confidenceScoresList = "${id1.confidenceScore} ${id2.confidenceScore}",
                 tierList = "${id1.tier} ${id2.tier}",
                 sessionId = sessionId,
-                matchConfidencesList =  "${id1.matchConfidence} ${id2.matchConfidence}",
+                matchConfidencesList = "${id1.matchConfidence} ${id2.matchConfidence}",
                 highestMatchConfidence = highestMatchConfidence,
-                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
         }
+        coVerify(exactly = 0) { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -148,8 +152,10 @@ class OdkPresenterTest {
                 confidence = verification.matchResult.confidenceScore.toString(),
                 tier = verification.matchResult.tier.toString(),
                 sessionId = sessionId,
-                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
         }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -162,6 +168,7 @@ class OdkPresenterTest {
         OdkPresenter(view, Invalid, sessionEventsManagerMock, mockk(), mockk()).handleResponseError(error)
 
         verify(exactly = 1) { view.returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
@@ -189,7 +196,13 @@ class OdkPresenterTest {
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrolLastBiometricsFactory.getValidSimprintsRequest(IntegrationInfo.ODK)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                EnrolLastBiometricsFactory.getValidSimprintsRequest(
+                    IntegrationInfo.ODK
+                )
+            )
+        }
     }
 
     companion object {

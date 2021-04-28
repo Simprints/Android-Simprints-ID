@@ -9,51 +9,112 @@ import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.libsimprints.BuildConfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
-class ClientApiSessionEventsManagerImpl(private val coreEventRepository: EventRepository,
-                                        private val timeHelper: ClientApiTimeHelper,
-                                        private val dispatcher: CoroutineDispatcher = Dispatchers.IO) :
-    ClientApiSessionEventsManager {
+class ClientApiSessionEventsManagerImpl(
+    private val coreEventRepository: EventRepository,
+    private val timeHelper: ClientApiTimeHelper,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         runBlocking {
-            coreEventRepository.createSession(BuildConfig.VERSION_NAME)
+            coreEventRepository.createSession()
         }
 
-        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())) }
+        inBackground(dispatcher) {
+            coreEventRepository.addOrUpdateEvent(
+                IntentParsingEvent(
+                    timeHelper.now(),
+                    integration.fromDomainToCore()
+                )
+            )
+        }
 
-        return coreEventRepository.getCurrentCaptureSessionEvent().id
+        return getCurrentSessionId()
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
-        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())) }
+        inBackground(dispatcher) {
+            coreEventRepository.addOrUpdateEvent(
+                AlertScreenEvent(
+                    timeHelper.now(),
+                    clientApiAlertType.fromAlertToAlertTypeEvent()
+                )
+            )
+        }
     }
 
+    /**
+     * Since this is the last event before returning to the calling app, we want to make sure that all previous events
+     * were saved already. That's why this is blocking instead of running in background (`inBackground(dispatcher)`).
+     * This should give enough time to previous events to be saved since SQLite queues write attempts.
+     * [https://www.sqlite.org/lockingv3.html]
+     */
     override suspend fun addCompletionCheckEvent(complete: Boolean) {
-        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(CompletionCheckEvent(timeHelper.now(), complete)) }
+        coreEventRepository.addOrUpdateEvent(
+            CompletionCheckEvent(
+                timeHelper.now(),
+                complete
+            )
+        )
     }
 
     override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
-        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras)) }
+        inBackground(dispatcher) {
+            coreEventRepository.addOrUpdateEvent(
+                SuspiciousIntentEvent(
+                    timeHelper.now(),
+                    unexpectedExtras
+                )
+            )
+        }
     }
 
     override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
-        inBackground(dispatcher) { coreEventRepository.addEventToCurrentSession(InvalidIntentEvent(timeHelper.now(), action, extras)) }
+        inBackground(dispatcher) {
+            coreEventRepository.addOrUpdateEvent(
+                InvalidIntentEvent(
+                    timeHelper.now(),
+                    action,
+                    extras
+                )
+            )
+        }
     }
 
     override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.loadEvents(session.id).toList().any {
+        return coreEventRepository.getEventsFromSession(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
+    }
+
+    override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
+        coreEventRepository.getEventsFromSession(sessionId)
+
+    override suspend fun deleteSessionEvents(sessionId: String) {
+        inBackground(dispatcher) {
+            coreEventRepository.deleteSessionEvents(sessionId)
+        }
+    }
+
+    /**
+     * Closes the current session normally, without adding an [ArtificialTerminationEvent].
+     * After calling this method, the currentSessionId will be `null` and calling [getCurrentSessionId] will open
+     * a new session.
+     *
+     * Since this is updating the session, it needs to run blocking instead of in background.
+     */
+    override suspend fun closeCurrentSessionNormally() {
+        coreEventRepository.closeCurrentSession()
     }
 }
 

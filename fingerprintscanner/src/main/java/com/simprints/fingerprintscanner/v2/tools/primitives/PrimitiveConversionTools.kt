@@ -2,8 +2,10 @@ package com.simprints.fingerprintscanner.v2.tools.primitives
 
 import java.nio.ByteOrder
 
+/** Interprets negative bytes as if it where an unsigned byte (e.g. -0x01 -> 0xFF) */
 fun Byte.unsignedToInt() = (this + Byte.MAX_VALUE - Byte.MIN_VALUE + 1) % (Byte.MAX_VALUE - Byte.MIN_VALUE + 1)
 
+/** Interprets negative shorts as if it where an unsigned short (e.g. -0x0001 -> 0xFFFF) */
 fun Short.unsignedToInt() = (this + Short.MAX_VALUE - Short.MIN_VALUE + 1) % (Short.MAX_VALUE - Short.MIN_VALUE + 1)
 
 fun Short.toByteArray(byteOrder: ByteOrder): ByteArray =

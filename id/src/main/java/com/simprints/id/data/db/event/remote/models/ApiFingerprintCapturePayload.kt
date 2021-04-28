@@ -3,27 +3,42 @@ package com.simprints.id.data.db.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.id.data.db.event.domain.models.FingerprintCaptureEvent.FingerprintCapturePayload.Result.*
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.remote.models.ApiFingerprintCapturePayload.ApiResult
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiFingerprintCapturePayload(val id: String,
-                                        override val startTime: Long,
-                                        override val version: Int,
-                                        val endTime: Long,
-                                        val qualityThreshold: Int,
-                                        val finger: ApiFingerIdentifier,
-                                        val result: ApiResult,
-                                        val fingerprint: ApiFingerprint?) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, startTime) {
+data class ApiFingerprintCapturePayload(
+    val id: String,
+    override val startTime: Long,
+    override val version: Int,
+    val endTime: Long,
+    val qualityThreshold: Int,
+    val finger: ApiFingerIdentifier,
+    val result: ApiResult,
+    val fingerprint: ApiFingerprint?
+) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, startTime) {
 
     @Keep
-    data class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
+    data class ApiFingerprint(
+        val finger: ApiFingerIdentifier,
+        val quality: Int,
+        val template: String,
+        val format: FingerprintTemplateFormat
+    ) {
 
         constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
             finger.finger.fromDomainToApi(),
-            finger.quality, finger.template)
+            finger.quality,
+            finger.template,
+            finger.format
+        )
     }
 
     constructor(domainPayload: FingerprintCapturePayload) :

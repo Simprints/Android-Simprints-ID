@@ -1,5 +1,7 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
@@ -28,17 +30,19 @@ fun mockFingerprintCaptureStep(): Step {
         activityName = "com.simprints.id.MyFingerprintActivity",
         bundleKey = "BUNDLE_KEY",
         request = request,
-        result = FingerprintCaptureResponse(captureResult =
-        listOf(
-            FingerprintCaptureResult(
-                FingerIdentifier.LEFT_THUMB,
-                FingerprintCaptureSample(
+        result = FingerprintCaptureResponse(
+            captureResult =
+            listOf(
+                FingerprintCaptureResult(
                     FingerIdentifier.LEFT_THUMB,
-                    templateQualityScore = 10,
-                    template = "template".toByteArray()
+                    FingerprintCaptureSample(
+                        FingerIdentifier.LEFT_THUMB,
+                        templateQualityScore = 10,
+                        template = "template".toByteArray(),
+                        format = FingerprintTemplateFormat.ISO_19794_2
+                    )
                 )
             )
-        )
         ),
         status = Step.Status.COMPLETED
     )
@@ -75,7 +79,7 @@ fun mockFaceCaptureStep(): Step {
         listOf(
             FaceCaptureResult(
                 index = 0,
-                result = FaceCaptureSample("faceId", "faceId".toByteArray(), null)
+                result = FaceCaptureSample("faceId", "faceId".toByteArray(), null, FaceTemplateFormat.RANK_ONE_1_23)
             )
         )
     )

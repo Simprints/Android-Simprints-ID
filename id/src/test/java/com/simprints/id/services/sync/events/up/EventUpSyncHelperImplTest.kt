@@ -49,7 +49,7 @@ class EventUpSyncHelperImplTest {
         runBlockingTest {
             eventUpSyncHelper.countForUpSync(op)
 
-            coVerify { eventRepository.localCount(op.queryEvent) }
+            coVerify { eventRepository.localCount(op.projectId) }
         }
     }
 
@@ -58,7 +58,7 @@ class EventUpSyncHelperImplTest {
         runBlocking {
             eventUpSyncHelper.upSync(this, op).consumeAsFlow().toList()
 
-            coVerify { eventRepository.uploadEvents(op.queryEvent) }
+            coVerify { eventRepository.uploadEvents(op.projectId) }
         }
     }
 

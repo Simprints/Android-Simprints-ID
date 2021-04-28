@@ -11,6 +11,9 @@ import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 
+/**
+ * Helper class for handling MAC addresses and pairing programmatically.
+ */
 class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdapter,
                             private val preferencesManager: FingerprintPreferencesManager,
                             private val scannerGenerationDeterminer: ScannerGenerationDeterminer,

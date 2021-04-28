@@ -68,7 +68,7 @@ class DashboardSyncCardDisplayerImplTest {
 
     @Test
     fun syncCardDisplayer_noModulesSyncState_shouldDisplayTheCorrectUI() {
-        syncCardDisplayer.displayState(SyncNoModules(lastSyncTime))
+        syncCardDisplayer.displayState(SyncHasNoModules(lastSyncTime))
         syncCardRootLayout.assessNoModulesStateSyncUI()
     }
 

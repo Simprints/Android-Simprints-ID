@@ -50,19 +50,16 @@ class OdkPresenter(
         }
     }
 
-    override fun handleResponseError(errorResponse: ErrorResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
-            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, getCurrentSessionIdOrEmpty())
-        }
-    }
-
     override fun handleEnrolResponse(enrol: EnrolResponse) {
         CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enrol.guid, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnRegistration(enrol.guid, currentSessionId, flowCompletedCheck)
         }
     }
 
@@ -82,6 +79,64 @@ class OdkPresenter(
         }
     }
 
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnConfirmation(flowCompletedCheck, currentSessionId)
+        }
+    }
+
+    override fun handleVerifyResponse(verify: VerifyResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnVerification(
+                verify.matchResult.guidFound,
+                verify.matchResult.confidenceScore.toString(),
+                verify.matchResult.tier.toString(),
+                currentSessionId,
+                flowCompletedCheck
+            )
+        }
+    }
+
+    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnExitForm(refusalForm.reason, refusalForm.extra, currentSessionId, flowCompletedCheck)
+        }
+    }
+
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // need to get sessionId before it is closed and null
+            val currentSessionId = sessionEventsManager.getCurrentSessionId()
+
+            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
+            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.closeCurrentSessionNormally()
+
+            view.returnErrorToClient(errorResponse, flowCompletedCheck, currentSessionId)
+        }
+    }
+
     private fun getMatchConfidenceForHighestResult(identifications: List<MatchResult>) =
         when {
             identifications.any { it.matchConfidence == HIGH } -> HIGH
@@ -90,38 +145,6 @@ class OdkPresenter(
             else -> NONE
         }
 
-    override fun handleVerifyResponse(verify: VerifyResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnVerification(
-                verify.matchResult.guidFound,
-                verify.matchResult.confidenceScore.toString(),
-                verify.matchResult.tier.toString(),
-                getCurrentSessionIdOrEmpty(),
-                flowCompletedCheck
-            )
-        }
-    }
-
-    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnExitForm(refusalForm.reason, refusalForm.extra, getCurrentSessionIdOrEmpty(), flowCompletedCheck)
-        }
-    }
-
-    private suspend fun getCurrentSessionIdOrEmpty() = sessionEventsManager.getCurrentSessionId() ?: ""
-
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-
-    override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
-            view.returnConfirmation(flowCompletedCheck, getCurrentSessionIdOrEmpty())
-        }
-    }
 }

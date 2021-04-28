@@ -7,6 +7,7 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buil
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
@@ -33,6 +34,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val EXIT_REASON = "exitReason"
         private const val EXIT_EXTRA = "exitExtra"
         private const val SIMPRINTS_SESSION_ID = "sessionId"
+        private const val SIMPRINTS_EVENTS = "events"
+        private const val SIMPRINTS_SUBJECT_ACTIONS = "subjectActions"
     }
 
     private val action: CommCareAction
@@ -49,77 +52,113 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         loadClientApiKoinModules()
     }
 
-    override fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnRegistration(
+        guid: String,
+        sessionId: String,
+        flowCompletedCheck: Boolean,
+        eventsJson: String?,
+        subjectActions: String?
+    ) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(REGISTRATION_GUID_KEY, guid)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
+            subjectActions?.let { putString(SIMPRINTS_SUBJECT_ACTIONS, subjectActions) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
         sendOkResult(it)
     }
 
-    override fun returnVerification(confidence: Int, tier: Tier, guid: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
+    /**
+     * CommCare expect Identification result in LibSimprints 1.0.12 format.
+     * That's why it is being returned in a different way from others (not inside [COMMCARE_BUNDLE_KEY]).
+     */
+    override fun returnIdentification(
+        identifications: ArrayList<Identification>,
+        sessionId: String,
+        eventsJson: String?
+    ) = Intent().let { intent ->
+        intent.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
+        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
+
+        sendOkResult(intent)
+    }
+
+    override fun returnVerification(
+        confidence: Int,
+        tier: Tier,
+        guid: String,
+        sessionId: String,
+        flowCompletedCheck: Boolean,
+        eventsJson: String?
+    ) = Intent().let {
         val data = Bundle().apply {
             putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(VERIFICATION_CONFIDENCE_KEY, confidence.toString())
             putString(VERIFICATION_TIER_KEY, tier.name)
             putString(VERIFICATION_GUID_KEY, guid)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
         sendOkResult(it)
     }
 
-    override fun returnExitForms(reason: String,
-                                 extra: String,
-                                 sessionId: String,
-                                 flowCompletedCheck: Boolean) = Intent().let {
-
+    override fun returnExitForms(
+        reason: String,
+        extra: String,
+        sessionId: String,
+        flowCompletedCheck: Boolean,
+        eventsJson: String?
+    ) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(EXIT_REASON, reason)
             putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(EXIT_EXTRA, extra)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String) = Intent().let {
+    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?) =
+        Intent().let {
+            val data = Bundle().apply {
+                putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
+                putString(SIMPRINTS_SESSION_ID, sessionId)
+                eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
+            }
+
+            injectDataAsCommCareBundleIntoIntent(it, data)
+            sendOkResult(it)
+        }
+
+    /**
+     * Not being used because CommCare might use CoSync. Next method does the same but with a nullable eventsJson.
+     */
+    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String) {
+        throw InvalidStateForIntentAction("Use the overloaded version with eventsJson")
+    }
+
+    override fun returnErrorToClient(
+        errorResponse: ErrorResponse,
+        flowCompletedCheck: Boolean,
+        sessionId: String,
+        eventsJson: String?
+    ) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(SIMPRINTS_SESSION_ID, sessionId)
+            eventsJson?.let { putString(SIMPRINTS_EVENTS, eventsJson) }
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
-        sendOkResult(it)
-    }
-
-    override fun returnErrorToClient(errorResponse: ErrorResponse,
-                                     flowCompletedCheck: Boolean,
-                                     sessionId: String) = Intent().let {
-
-        val data = Bundle().apply {
-            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
-            putString(SIMPRINTS_SESSION_ID, sessionId)
-        }
-
-        injectDataAsCommCareBundleIntoIntent(it, data)
-        sendOkResult(it)
-    }
-
-    override fun returnIdentification(identifications: ArrayList<Identification>,
-                                      sessionId: String) = Intent().let {
-
-        // CommCare can't process Identifications as standard CommCare Bundle (COMMCARE_BUNDLE_KEY).
-        // It's excepting Identifications results in the LibSimprints format.
-        it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
-        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
-
         sendOkResult(it)
     }
 

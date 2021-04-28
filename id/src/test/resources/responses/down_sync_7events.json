@@ -1,353 +1,361 @@
 [
-    {
-        "id": "0003eaf0-9044-6ead-fd6e-600d1b616ba5",
-        "labels": {
-            "attendantId": [
-                "testAttendant314"
-            ],
-            "mode": [
-                "FINGERPRINT",
-                "FACE"
-            ],
-            "moduleId": [
-                "testModule42"
-            ],
-            "projectId": [
-                "TESTTDHCdwGlyvBVtq3E"
-            ],
-            "subjectId": [
-                "0003eaf0-9044-6ead-fd6e-600d1b616ba5"
-            ]
-        },
-        "payload": {
-            "attendantId": "testAttendant314",
-            "biometricReferences": [
-                {
-                    "templates": [
-                        {
-                            "finger": "LEFT_INDEX_FINGER",
-                            "quality": 55,
-                            "template": "nN33bhY4llJZZFI+3NEsHSDWSDjiNBJCKlc+Pi0HEL/G0TVo3oEHxu+7tOxwze454ExIJnhijFPZxn6pEXjKEJzoaFrN0ncQwsuA7ncQ4BZVfxf7V6YqO6ornrfrv1z0ViYZrItT2yJ5fIdV1NFXb+T2MHxVVQdEs8VZLFI68+QAxLS/gvFKttQ0kjs4UQfGcYSq6tH2vHidTwFtg9F7SZAfzVioC++l7c/7AneN91HBZVCf8q1vChKMXLqaDe7MRIe6nuaRZLGAy/jz5kloBabPFarevp1b0DoFGDTUTzlGDVIwYLPUYqH2myrM2ykbA339GTFZzmYx2+8SQX7px5akcZ35p0bGiNJGAG1odUuqu4DMBMSn4mN3QAzV5BNPNAhPfakbJd+1oeSQOfkKSU0Uh6+qTwW449ZZnjkYRCJn7RI94mFv"
-                        },
-                        {
-                            "finger": "LEFT_THUMB",
-                            "quality": 56,
-                            "template": "uoHuxFvqWsnNhequ0JkpOoic6D3qLaFhXvL5R5i7xyWpJALAcLBP0LzQbtrvQTYfuhm3pdJa6zkCLH1jGOshLKJsTFqBZk+MPb9+ol0ugGsfSh7UpkLemr3lxgWRCNSzsktzg7cvZvkdv5GIDfi5aObd/MJ5AeNrNXOI6wpuobiQhIeVciBNYsO/MaaNBw8y+Tiqq8eQ1LAz1vo/tuvIWhN45KWEX4BXXePYnPB3J9VNNFsDUDE7Ex6hm5v42dWK53g/yWa1XTDDZHA2yTLWJGrsfDybaVbIPiCJ3NP1ZCAD+iBPdR8B1GzFfkKI31IqZPKEqCvTQUirZDV7pOo6OjozAGAlcscgozA+r2oLqb3agCuimDUpPIP1zwPs+AFIusiwI1wmGEh2zg2Yo7G+wPy3flnrjtJ1tZP08op2k5U0kzJCb2l8KA+G"
-                        },
-                        {
-                            "finger": "RIGHT_4TH_FINGER",
-                            "quality": 50,
-                            "template": "gnoXCrttqcGy21pE8lHHIvHLZasSfUpWW8/ckM9Sq+DOLOdsueG4SIUdDr9kANtC8Fx+thOPKBO2YMQdfgHplrqlgPql6SB0iGZ7MGV8L8ly3er7QvNyCeNd/NjDPVrJoEAF71XYX7P7WiQLGunkLEsnoD+87H9Id/y4cr6eWTaj7wfXIG/j4ZXIUHn285BfxxJVE76AGc5owXZYX5xcbrWv0CogXj9jEaxh2zhZ/ETX/8ux6HN3K3JatQV8yS6AEB/qCfSPnZjYg1+1tox3iqaguS0zczYyg6Hc7QBpwEgLUhOKAe7adZwDj4fQKX1NHdVcl3WJH/X8MMkP+XzhiD4id00uppoZAN36n1mmXBjY7kdFkBuZn35oPOtFluWdDO8+4x2A8kc5wUhT4xOgkaFNSYuwskqRgHgJQfePImwDE6vzqhuoT/s="
-                        },
-                        {
-                            "finger": "RIGHT_5TH_FINGER",
-                            "quality": 44,
-                            "template": "bNzfaVB8BKjhcIrY8Q3TSDG0cRXY3sbMUwRW0b4tc0e7xvv9gkkgMJrzeYHWcc7uGoDG0eI61Q+O9OVsmwdJudPembgkyK3loQRhsjQM4UIpGQu8NkGEbAn+9gwmYtTi1ezkzLbjknq5ktHDUxaWPV0PDhNo76cki5HSQRT7Ex1cbA2oJ5mn8sNeQzIoHEDo3VjJfYLgvWZVuugBcFaCLZw2oHUjfhounWZ900jZUzGP3aw0kv52fjkKdmpkldtbycQwOtzbnFnGXXSxR9MfHeBu64MuvoX3LGhMALtQpp/O+3noRxldRmcdu7mTEzuynmZD4v0lQV4X/tstVjplQ1hBug5zGo2W7ObXwcplpRsj0+/dbtmUf9Cck089DkrLd6PWEQOg0vId0WunisR7YiYUj3GKTfBP76JtrPfCJnsJRQy2+9mcJgM="
-                        }
-                    ],
-                    "type": "FingerprintReference"
-                },
-                {
-                    "templates": [
-                        {
-                            "template": "xq98xkmiTbqHdoYcjTP0x7nb/iX3vl1ltNev/w+ZCvzksLSsylKx2DmPMKVeuKnsgGjHElgI7YrpJAxIFR7PqmvwNnwr/y4PCr2G1/sfetE9Jv8DAzL0mcb2D02aQzZ1hjiAUEeTnE0aUiWtlSMj/ijDvZfRcwTd4xxfyHAE0GEnRB+yvuCimOeQ3lL0bZkjR6okrt48xEWBkgsPHNV7UujGjNPBiOSFHzwcJaidBHPPVkAuBhIXHdOo4jVedYB+2YBQqfrqeCLgL1jMvUKYvvGXszc3eQUL+vQuBl+pqe1j8Yr0l74cKqABfPrkCcb50Vi1DQUiNWTXvkmY3+/T7w8hFp3gWoFm70A/f8kYiBaVVd0Y4Kb5/Mu1UE6kg6ScG8O+z9GtYkpzXvpqRLoyQj/AJtNltZQ70hx1nccl1lUx6ftchbfuJX8qng=="
-                        },
-                        {
-                            "template": "xlzqoNui8yoJduJ48HxnyLzt2wR/Ey1m04Gq8+v4GXlJwQgQNPQLLUkZINR9b7+91yLb8CntoVi0DF3It4wNpQOptL2rynVPL5J5NDrJJsOdMEegbOVup4Co4TbbykalKAcQo/BN1TSpjrh3Ho1mstSsg90bpvY7boI0b7Uql5H6W1GUri2NqnLMw/GOIZiHmmXs4fnWXK9t4ah0i1ctrIbseW8VIViiNe9NzE202HJXJX51+nlLdxXbm9m5bQZhGKQxO4YJdmldqCwIQmBW4D6dw45NbJnsxhN+jpIQV5kpYgQXNRqrzeqo54S4Ta9RulZfJIsFpgK6F9eSBqVjn9iyIvDUXfjes6kcsU8dbWq91apxtREacoJh3b0jlcM6jxpJEaGUSVoVTzz68AqvAB7e11rypconzCPg/sg2fs/Pef85ZvvXfqnR"
-                        },
-                        {
-                            "template": "fMrRSQkWArD/F9DrsVY9/ACE5KHzLK+2aB5edHg7Uvd2H6m2SiMM7IUXcctLvjjk+G+NqHbNd2l+M571op9q1DdQB7rzBsC00QuGGHIpz2WaX6pnq9izbf4CSrOeaeuSdKNtpKEBtwpwHjIK1Xbpldch1VpV3lkW0qi2DNli8huVCg+65OjNJUNnp5fK4xhfLHGSEGbpOMb9qnoK899l5z4AxiOvg3l7M5uPjYNXh1sWGZwzKZEVbD5a8JiiR2ixuql2++uGdK5c8W0uUxJQ+QANYXyMoMuHoQ3EifVUsJN4NMCrI7AaK0ACnR5FeJqFixWscj/4JSvbD72+kdd11zkZRRK6xWOqUrypYczZRQcHg6xh8OyPEE1lXaut+VMZXgDiWF/IoLaddHs3p2AeAElPsA/b6fuBcGRxkuV7u+xhidQM74GBTNU="
-                        },
-                        {
-                            "template": "K73VPgGW5U3olOu9AT7B2WH3xaURb/fQnyc1X/V+9wcJ1uHgXsdJhg/oJbYMDnRByrsdJS7ANSydL0b64OBc1CRXtJCTijmpWUZI32WXTE8egrU6Rs6U47G6SF/xnddh7+YIXPBQiwc2Sea5rwT0U8XNNEsZ/EKEeWaR0bVeGLORNHJ28GXPsFZKKfhNboo1T6pIRvW2rsyACuzCDRchO1V9vL/UqMhw117yJkGqs/pnVjcK///tlpjp9NNkkK3DLLL1AK1GgFqm01p5M8t6H6+hu8749pom+DeO2zssgrVkcIM9+MkLr0avkPBucCYL7pl90gX19Qmd3ZZ0YO022q1tnbFDMdSTaQE4Rax/qB71dTbCaspkplxYtAKZ4auxBFfWI5RRhJsFZsb+8byTo+uc4BoVrhaQEM/nafQhQGPoHlFkDrq/sDs="
-                        }
-                    ],
-                    "type": "FaceReference"
-                }
-            ],
-            "moduleId": "testModule42",
-            "projectId": "TESTTDHCdwGlyvBVtq3E",
-            "subjectId": "0003eaf0-9044-6ead-fd6e-600d1b616ba5",
-            "type": "EnrolmentRecordCreation",
-            "version": 0
-        }
+  {
+    "id": "0003eaf0-9044-6ead-fd6e-600d1b616ba5",
+    "labels": {
+      "attendantId": [
+        "testAttendant314"
+      ],
+      "mode": [
+        "FINGERPRINT",
+        "FACE"
+      ],
+      "moduleId": [
+        "testModule42"
+      ],
+      "projectId": [
+        "TESTTDHCdwGlyvBVtq3E"
+      ],
+      "subjectId": [
+        "0003eaf0-9044-6ead-fd6e-600d1b616ba5"
+      ]
     },
-    {
-        "id": "07f22c11-959b-cb1d-b2a1-9bdbfb78a3f5",
-        "labels": {
-            "attendantId": [
-                "attendantID"
-            ],
-            "mode": [
-                "FINGERPRINT",
-                "FACE"
-            ],
-            "moduleId": [
-                "module"
-            ],
-            "projectId": [
-                "TESTp1xVq8qKg9RFqaWx"
-            ],
-            "subjectId": [
-                "59f438df-4445-bc90-4f83-f564e3f7f994"
-            ]
-        },
-        "payload": {
-            "attendantId": "attendantID",
-            "moduleId": "module",
-            "projectId": "TESTp1xVq8qKg9RFqaWx",
-            "subjectId": "59f438df-4445-bc90-4f83-f564e3f7f994",
-            "type": "EnrolmentRecordDeletion",
-            "version": 0
-        }
-    },
-    {
-        "id": "01f56458-c079-4612-b5b7-f0639bfa6ec0",
-        "labels": {
-            "attendantId": [
-                "User A",
-                "User B"
-            ],
-            "mode": [
-                "FINGERPRINT"
-            ],
-            "moduleId": [
-                "module05"
-            ],
-            "projectId": [
-                "TEST6Oai41ps1pBNrzBL"
-            ],
-            "subjectId": [
-                "d6bbb525-e7b9-4ced-a200-d51f2aee8154"
-            ]
-        },
-        "payload": {
-            "enrolmentRecordCreation": {
-                "attendantId": "User B",
-                "biometricReferences": [
-                    {
-                        "templates": [
-                            {
-                                "finger": "LEFT_THUMB",
-                                "quality": 66,
-                                "template": "Rk1SACAyMAAAAADkAAABLAGQAMUAxQEAABBCIYArABeRAIEIABr4AIAmACEaAIBqAHsYAIB8AH4OAIBcAI4LAECLAJEHAICyAJIGAEBSAJaUAIBCAJ4HAIDAALcBAIDgALuEAIEDAMQAAIDVANMHAEC5AN0DAIBbAOUBAECGAPF7AECwAPQAAED3APfxAIA3AQH/AEAtAQZ9AEDvAQ14AED+ARLoAECoATzxAEBRAUP7AEAVAUqGAECxAVj0AEBcAV57AECEAWfuAEC2AWlxAIDZAXDrAIBZAXiCAIC3AYfxAAAA"
-                            },
-                            {
-                                "finger": "LEFT_INDEX_FINGER",
-                                "quality": 71,
-                                "template": "Rk1SACAyMAAAAADkAAABLAGQAMUAxQEAABBHIYArABeUAIEIABr4AIAnACEcAECLAJEHAICyAJIGAEBTAJeNAIBCAJ8KAIDBALcBAIDgALuEAEClAMIAAECmAMeDAECRANEDAIDVANMHAEC5ANwAAIBZAOUDAECGAPF9AECwAPQAAED4APbsAIA3AQH/AEAtAQZ9AIDcAQv1AEDtAQ17AED9ARLqAECqATzxAIBOAUj+AEAVAUqHAECxAVj0AEBbAV57AECFAWjxAEC2AWlxAIDaAXHsAIBZAXiCAIC3AYfyAAAA"
-                            }
-                        ],
-                        "type": "FingerprintReference"
-                    }
-                ],
-                "moduleId": "module05",
-                "projectId": "TEST6Oai41ps1pBNrzBL",
-                "subjectId": "d6bbb525-e7b9-4ced-a200-d51f2aee8154",
-                "type": "EnrolmentRecordCreation"
-            },
-            "enrolmentRecordDeletion": {
-                "attendantId": "User A",
-                "moduleId": "module05",
-                "projectId": "TEST6Oai41ps1pBNrzBL",
-                "subjectId": "d6bbb525-e7b9-4ced-a200-d51f2aee8154",
-                "type": "EnrolmentRecordDeletion"
-            },
-            "type": "EnrolmentRecordMove",
-            "version": 0
-        }
-    },
-    {
-        "id": "0004ec21-755f-4fe5-be54-9a2790dcdb3e",
-        "labels": {
-            "attendantId": [
-                "e87ecb95-8148-42b4-8911-40014d66c9bb"
-            ],
-            "mode": [
-                "FINGERPRINT"
-            ],
-            "moduleId": [
-                "module7"
-            ],
-            "projectId": [
-                "5OnqDKlb7uqsMjkOrxje"
-            ],
-            "subjectId": [
-                "55abe370-cf59-4578-aa22-cf6f824aa1fa"
-            ]
-        },
-        "payload": {
-            "attendantId": "e87ecb95-8148-42b4-8911-40014d66c9bb",
-            "biometricReferences": [
-                {
-                    "templates": [
-                        {
-                            "finger": "RIGHT_4TH_FINGER",
-                            "quality": 59,
-                            "template": "Rk1SACAyMAAAAAEmAAABLAGQAMUAxQEAABBSLIC3ABcDAEBMADMfAEBgAEahAICBAEcaAIC/AGUBAIB1AGudAICxAH4AAIC3AJDxAED7AJLWAEA+AJOqAIDfAJPgAECbAJUOAIBtAJixAIDaAJvNAIAwAJ4uAICLAKG/AECsAKLMAICjAKK9AIDAAKm/AIBhALe/AEDxALfAAICvALsyAECtAMSYAECfAMeKAICQAMv+AIC6AMunAICkANWGAIDlANWvAECJAOAAAICeAOCJAIC7AO2aAICeAPAQAECBAPv4AIC4AP0aAEBrAQHuAEBfAQViAEDiAQobAECAARBxAEBmARP0AEBFARlsAECtARoHAEB6ASVxAECYASn+AECfATP7AAAA"
-                        },
-                        {
-                            "finger": "RIGHT_5TH_FINGER",
-                            "quality": 3,
-                            "template": "Rk1SACAyMAAAAAFWAAABLAGQAMUAxQEAABBVNICDADV1AIDkAERrAIDMAHdpAIBqAH58AIA/AKAaAIEbAKvdAEBGAKsXAIBdALSMAED2AL7aAIDLAMXbAICYAMzWAIBfAM6hAIBwAN3CAIEWAODXAICwAOHNAIEGAOTPAICEAOa8AEDgAOjHAICOAOvCAIBhAPLbAEEhAPPRAIBtAPNJAICYAPa5AECRAPpHAICiAP67AEDKAQBGAECDAQKdAIDiAQNGAEBfAQjlAEEeAQq9AICrAQq5AICIARaYAICiARw2AID5ASI1AEEaASQ1AICQASeWAIEQATYXAIBbAThvAEByAToGAIDxATwfAEEAAUIaAEClAUMhAEDuAUYVAICVAUeTAIDOAUoYAICNAU8TAIC1AU8aAEDVAVgRAEC3AV8RAEDjAWwKAID3AXCHAEDVAYgKAAAA"
-                        }
-                    ],
-                    "type": "FingerprintReference"
-                }
-            ],
-            "moduleId": "module7",
-            "projectId": "5OnqDKlb7uqsMjkOrxje",
-            "subjectId": "55abe370-cf59-4578-aa22-cf6f824aa1fa",
-            "type": "EnrolmentRecordCreation",
-            "version": 0
-        }
-    },
-    {
-        "id": "a22cc6a5-e0ad-4b8c-9659-713193dd947f",
-        "labels": {
-            "attendantId": [
-                "testAttendant314"
-            ],
-            "mode": null,
-            "moduleId": [
-                "updated module"
-            ],
-            "projectId": [
-                "l1RaQYCCQwX63Nhn2ou4"
-            ],
-            "subjectId": [
-                "a06494e8-17b1-ad4d-ce3f-5779bfe4d0c8"
-            ]
-        },
-        "payload": {
-            "attendantId": "testAttendant314",
-            "moduleId": "updated module",
-            "projectId": "l1RaQYCCQwX63Nhn2ou4",
-            "subjectId": "a06494e8-17b1-ad4d-ce3f-5779bfe4d0c8",
-            "type": "EnrolmentRecordDeletion",
-            "version": 0
-        }
-    },
+    "payload": {
+      "attendantId": "testAttendant314",
+      "biometricReferences": [
         {
-        "id": "a3102202-956b-4444-bf3e-75c39cee35ba",
-        "labels": {
-            "attendantId": [
-                "user a"
-            ],
-            "mode": [
-                "FINGERPRINT",
-                "FACE"
-            ],
-            "moduleId": [
-                "module01",
-                "module03"
-            ],
-            "projectId": [
-                "TEST6Oai41ps1pBNrzBL"
-            ],
-            "subjectId": [
-                "5d08d867-fa87-41e4-8df0-98c7256950c7"
-            ]
+          "format": "NEC",
+          "templates": [
+            {
+              "finger": "LEFT_INDEX_FINGER",
+              "quality": 55,
+              "template": "nN33bhY4llJZZFI+3NEsHSDWSDjiNBJCKlc+Pi0HEL/G0TVo3oEHxu+7tOxwze454ExIJnhijFPZxn6pEXjKEJzoaFrN0ncQwsuA7ncQ4BZVfxf7V6YqO6ornrfrv1z0ViYZrItT2yJ5fIdV1NFXb+T2MHxVVQdEs8VZLFI68+QAxLS/gvFKttQ0kjs4UQfGcYSq6tH2vHidTwFtg9F7SZAfzVioC++l7c/7AneN91HBZVCf8q1vChKMXLqaDe7MRIe6nuaRZLGAy/jz5kloBabPFarevp1b0DoFGDTUTzlGDVIwYLPUYqH2myrM2ykbA339GTFZzmYx2+8SQX7px5akcZ35p0bGiNJGAG1odUuqu4DMBMSn4mN3QAzV5BNPNAhPfakbJd+1oeSQOfkKSU0Uh6+qTwW449ZZnjkYRCJn7RI94mFv"
+            },
+            {
+              "finger": "LEFT_THUMB",
+              "quality": 56,
+              "template": "uoHuxFvqWsnNhequ0JkpOoic6D3qLaFhXvL5R5i7xyWpJALAcLBP0LzQbtrvQTYfuhm3pdJa6zkCLH1jGOshLKJsTFqBZk+MPb9+ol0ugGsfSh7UpkLemr3lxgWRCNSzsktzg7cvZvkdv5GIDfi5aObd/MJ5AeNrNXOI6wpuobiQhIeVciBNYsO/MaaNBw8y+Tiqq8eQ1LAz1vo/tuvIWhN45KWEX4BXXePYnPB3J9VNNFsDUDE7Ex6hm5v42dWK53g/yWa1XTDDZHA2yTLWJGrsfDybaVbIPiCJ3NP1ZCAD+iBPdR8B1GzFfkKI31IqZPKEqCvTQUirZDV7pOo6OjozAGAlcscgozA+r2oLqb3agCuimDUpPIP1zwPs+AFIusiwI1wmGEh2zg2Yo7G+wPy3flnrjtJ1tZP08op2k5U0kzJCb2l8KA+G"
+            },
+            {
+              "finger": "RIGHT_4TH_FINGER",
+              "quality": 50,
+              "template": "gnoXCrttqcGy21pE8lHHIvHLZasSfUpWW8/ckM9Sq+DOLOdsueG4SIUdDr9kANtC8Fx+thOPKBO2YMQdfgHplrqlgPql6SB0iGZ7MGV8L8ly3er7QvNyCeNd/NjDPVrJoEAF71XYX7P7WiQLGunkLEsnoD+87H9Id/y4cr6eWTaj7wfXIG/j4ZXIUHn285BfxxJVE76AGc5owXZYX5xcbrWv0CogXj9jEaxh2zhZ/ETX/8ux6HN3K3JatQV8yS6AEB/qCfSPnZjYg1+1tox3iqaguS0zczYyg6Hc7QBpwEgLUhOKAe7adZwDj4fQKX1NHdVcl3WJH/X8MMkP+XzhiD4id00uppoZAN36n1mmXBjY7kdFkBuZn35oPOtFluWdDO8+4x2A8kc5wUhT4xOgkaFNSYuwskqRgHgJQfePImwDE6vzqhuoT/s="
+            },
+            {
+              "finger": "RIGHT_5TH_FINGER",
+              "quality": 44,
+              "template": "bNzfaVB8BKjhcIrY8Q3TSDG0cRXY3sbMUwRW0b4tc0e7xvv9gkkgMJrzeYHWcc7uGoDG0eI61Q+O9OVsmwdJudPembgkyK3loQRhsjQM4UIpGQu8NkGEbAn+9gwmYtTi1ezkzLbjknq5ktHDUxaWPV0PDhNo76cki5HSQRT7Ex1cbA2oJ5mn8sNeQzIoHEDo3VjJfYLgvWZVuugBcFaCLZw2oHUjfhounWZ900jZUzGP3aw0kv52fjkKdmpkldtbycQwOtzbnFnGXXSxR9MfHeBu64MuvoX3LGhMALtQpp/O+3noRxldRmcdu7mTEzuynmZD4v0lQV4X/tstVjplQ1hBug5zGo2W7ObXwcplpRsj0+/dbtmUf9Cck089DkrLd6PWEQOg0vId0WunisR7YiYUj3GKTfBP76JtrPfCJnsJRQy2+9mcJgM="
+            }
+          ],
+          "type": "FingerprintReference"
         },
-        "payload": {
-            "enrolmentRecordCreation": {
-                "attendantId": "user a",
-                "biometricReferences": [
-                    {
-                        "templates": [
-                            {
-                                "finger": "LEFT_THUMB",
-                                "quality": 78,
-                                "template": "Rk1SACAyMAAAAAEIAAABLAGQAMUAxQEAABBOJ0BnAF0uAEC4AGwfAIB7AHkrAECOAIEcAIDLAIUVAIBsAJMlAEC6AJsVAEAXAJyeAEC9AJ+bAEBoAKGqAEDSAKgVAICtAK0RAECMAK8aAIBfALAiAICXALOXAEDWAL4UAIAwAMsbAIC9ANCQAEBhANEeAIBQANebAICUANgVAEApAOQVAIBAAPUUAEDmAPsGAICCAQETAEBjAQQaAEB8AQuWAIDUASgDAICnASsRAEC4ATSUAIB/AUidAIDBAUmXAIDCAVSvAICnAVigAED8AV74AECqAV+uAICiAXGsAEB5AXOqAEC5AXw4AAAA"
-                            },
-                            {
-                                "finger": "LEFT_INDEX_FINGER",
-                                "quality": 80,
-                                "template": "Rk1SACAyMAAAAAEaAAABLAGQAMUAxQEAABBQKoCMAECsAEBnAF0uAEC4AGocAIB7AHkrAIDkAHudAECOAIEcAIDLAIUVAIDoAJEcAIBsAJMlAIC1AJoVAEBnAKGsAEC9AKGYAEDSAKgVAICtAK0RAECMALAcAIBfALEkAICXALKaAEDWAL4UAIAuAMwYAIC9ANCQAIBRANadAICTANkYAIBeANkfAEAmAOUUAIBAAPUVAEDnAPsHAICBAQETAEBiAQMYAED2AQ0HAICAAQ2UAICnASoRAEDYASoAAIC6AS+RAIB+AUeaAIC/AUiXAIClAVahAEDCAVmxAED7AV37AECmAWKqAIB2AWyqAECmAW2sAEC4AXg1AAAA"
-                            }
-                        ],
-                        "type": "FingerprintReference"
-                    },
-                    {
-                        "templates": [],
-                        "type": "FaceReference"
-                    }
-                ],
-                "moduleId": "module03",
-                "projectId": "TEST6Oai41ps1pBNrzBL",
-                "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
-                "type": "EnrolmentRecordCreation"
+        {
+          "format": "RANK_ONE_1_23",
+          "templates": [
+            {
+              "template": "xq98xkmiTbqHdoYcjTP0x7nb/iX3vl1ltNev/w+ZCvzksLSsylKx2DmPMKVeuKnsgGjHElgI7YrpJAxIFR7PqmvwNnwr/y4PCr2G1/sfetE9Jv8DAzL0mcb2D02aQzZ1hjiAUEeTnE0aUiWtlSMj/ijDvZfRcwTd4xxfyHAE0GEnRB+yvuCimOeQ3lL0bZkjR6okrt48xEWBkgsPHNV7UujGjNPBiOSFHzwcJaidBHPPVkAuBhIXHdOo4jVedYB+2YBQqfrqeCLgL1jMvUKYvvGXszc3eQUL+vQuBl+pqe1j8Yr0l74cKqABfPrkCcb50Vi1DQUiNWTXvkmY3+/T7w8hFp3gWoFm70A/f8kYiBaVVd0Y4Kb5/Mu1UE6kg6ScG8O+z9GtYkpzXvpqRLoyQj/AJtNltZQ70hx1nccl1lUx6ftchbfuJX8qng=="
             },
-            "enrolmentRecordDeletion": {
-                "attendantId": "user a",
-                "moduleId": "module01",
-                "projectId": "TEST6Oai41ps1pBNrzBL",
-                "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
-                "type": "EnrolmentRecordDeletion"
+            {
+              "template": "xlzqoNui8yoJduJ48HxnyLzt2wR/Ey1m04Gq8+v4GXlJwQgQNPQLLUkZINR9b7+91yLb8CntoVi0DF3It4wNpQOptL2rynVPL5J5NDrJJsOdMEegbOVup4Co4TbbykalKAcQo/BN1TSpjrh3Ho1mstSsg90bpvY7boI0b7Uql5H6W1GUri2NqnLMw/GOIZiHmmXs4fnWXK9t4ah0i1ctrIbseW8VIViiNe9NzE202HJXJX51+nlLdxXbm9m5bQZhGKQxO4YJdmldqCwIQmBW4D6dw45NbJnsxhN+jpIQV5kpYgQXNRqrzeqo54S4Ta9RulZfJIsFpgK6F9eSBqVjn9iyIvDUXfjes6kcsU8dbWq91apxtREacoJh3b0jlcM6jxpJEaGUSVoVTzz68AqvAB7e11rypconzCPg/sg2fs/Pef85ZvvXfqnR"
             },
-            "type": "EnrolmentRecordMove",
-            "version": 0
+            {
+              "template": "fMrRSQkWArD/F9DrsVY9/ACE5KHzLK+2aB5edHg7Uvd2H6m2SiMM7IUXcctLvjjk+G+NqHbNd2l+M571op9q1DdQB7rzBsC00QuGGHIpz2WaX6pnq9izbf4CSrOeaeuSdKNtpKEBtwpwHjIK1Xbpldch1VpV3lkW0qi2DNli8huVCg+65OjNJUNnp5fK4xhfLHGSEGbpOMb9qnoK899l5z4AxiOvg3l7M5uPjYNXh1sWGZwzKZEVbD5a8JiiR2ixuql2++uGdK5c8W0uUxJQ+QANYXyMoMuHoQ3EifVUsJN4NMCrI7AaK0ACnR5FeJqFixWscj/4JSvbD72+kdd11zkZRRK6xWOqUrypYczZRQcHg6xh8OyPEE1lXaut+VMZXgDiWF/IoLaddHs3p2AeAElPsA/b6fuBcGRxkuV7u+xhidQM74GBTNU="
+            },
+            {
+              "template": "K73VPgGW5U3olOu9AT7B2WH3xaURb/fQnyc1X/V+9wcJ1uHgXsdJhg/oJbYMDnRByrsdJS7ANSydL0b64OBc1CRXtJCTijmpWUZI32WXTE8egrU6Rs6U47G6SF/xnddh7+YIXPBQiwc2Sea5rwT0U8XNNEsZ/EKEeWaR0bVeGLORNHJ28GXPsFZKKfhNboo1T6pIRvW2rsyACuzCDRchO1V9vL/UqMhw117yJkGqs/pnVjcK///tlpjp9NNkkK3DLLL1AK1GgFqm01p5M8t6H6+hu8749pom+DeO2zssgrVkcIM9+MkLr0avkPBucCYL7pl90gX19Qmd3ZZ0YO022q1tnbFDMdSTaQE4Rax/qB71dTbCaspkplxYtAKZ4auxBFfWI5RRhJsFZsb+8byTo+uc4BoVrhaQEM/nafQhQGPoHlFkDrq/sDs="
+            }
+          ],
+          "type": "FaceReference"
         }
-    },
-    {
-        "id": "a3102202-956b-4444-bf3e-75c39cee35ba",
-        "labels": {
-            "attendantId": [
-                "user a"
-            ],
-            "mode": [
-                "FINGERPRINT",
-                "FACE"
-            ],
-            "moduleId": [
-                "module01",
-                "module03"
-            ],
-            "projectId": [
-                "TEST6Oai41ps1pBNrzBL"
-            ],
-            "subjectId": [
-                "5d08d867-fa87-41e4-8df0-98c7256950c7"
-            ]
-        },
-        "payload": {
-            "enrolmentRecordCreation": {
-                "attendantId": "user a",
-                "biometricReferences": [
-                    {
-                        "templates": [
-                            {
-                                "finger": "LEFT_THUMB",
-                                "quality": 78,
-                                "template": "Rk1SACAyMAAAAAEIAAABLAGQAMUAxQEAABBOJ0BnAF0uAEC4AGwfAIB7AHkrAECOAIEcAIDLAIUVAIBsAJMlAEC6AJsVAEAXAJyeAEC9AJ+bAEBoAKGqAEDSAKgVAICtAK0RAECMAK8aAIBfALAiAICXALOXAEDWAL4UAIAwAMsbAIC9ANCQAEBhANEeAIBQANebAICUANgVAEApAOQVAIBAAPUUAEDmAPsGAICCAQETAEBjAQQaAEB8AQuWAIDUASgDAICnASsRAEC4ATSUAIB/AUidAIDBAUmXAIDCAVSvAICnAVigAED8AV74AECqAV+uAICiAXGsAEB5AXOqAEC5AXw4AAAA"
-                            },
-                            {
-                                "finger": "LEFT_INDEX_FINGER",
-                                "quality": 80,
-                                "template": "Rk1SACAyMAAAAAEaAAABLAGQAMUAxQEAABBQKoCMAECsAEBnAF0uAEC4AGocAIB7AHkrAIDkAHudAECOAIEcAIDLAIUVAIDoAJEcAIBsAJMlAIC1AJoVAEBnAKGsAEC9AKGYAEDSAKgVAICtAK0RAECMALAcAIBfALEkAICXALKaAEDWAL4UAIAuAMwYAIC9ANCQAIBRANadAICTANkYAIBeANkfAEAmAOUUAIBAAPUVAEDnAPsHAICBAQETAEBiAQMYAED2AQ0HAICAAQ2UAICnASoRAEDYASoAAIC6AS+RAIB+AUeaAIC/AUiXAIClAVahAEDCAVmxAED7AV37AECmAWKqAIB2AWyqAECmAW2sAEC4AXg1AAAA"
-                            }
-                        ],
-                        "type": "FingerprintReference"
-                    },
-                    {
-                        "templates": [],
-                        "type": "FaceReference"
-                    }
-                ],
-                "moduleId": "module03",
-                "projectId": "TEST6Oai41ps1pBNrzBL",
-                "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
-                "type": "EnrolmentRecordCreation"
-            },
-            "enrolmentRecordDeletion": {
-                "attendantId": "user a",
-                "moduleId": "module01",
-                "projectId": "TEST6Oai41ps1pBNrzBL",
-                "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
-                "type": "EnrolmentRecordDeletion"
-            },
-            "type": "EnrolmentRecordMove",
-            "version": 0
-        }
+      ],
+      "moduleId": "testModule42",
+      "projectId": "TESTTDHCdwGlyvBVtq3E",
+      "subjectId": "0003eaf0-9044-6ead-fd6e-600d1b616ba5",
+      "type": "EnrolmentRecordCreation",
+      "version": 0
     }
+  },
+  {
+    "id": "07f22c11-959b-cb1d-b2a1-9bdbfb78a3f5",
+    "labels": {
+      "attendantId": [
+        "attendantID"
+      ],
+      "mode": [
+        "FINGERPRINT",
+        "FACE"
+      ],
+      "moduleId": [
+        "module"
+      ],
+      "projectId": [
+        "TESTp1xVq8qKg9RFqaWx"
+      ],
+      "subjectId": [
+        "59f438df-4445-bc90-4f83-f564e3f7f994"
+      ]
+    },
+    "payload": {
+      "attendantId": "attendantID",
+      "moduleId": "module",
+      "projectId": "TESTp1xVq8qKg9RFqaWx",
+      "subjectId": "59f438df-4445-bc90-4f83-f564e3f7f994",
+      "type": "EnrolmentRecordDeletion",
+      "version": 0
+    }
+  },
+  {
+    "id": "01f56458-c079-4612-b5b7-f0639bfa6ec0",
+    "labels": {
+      "attendantId": [
+        "User A",
+        "User B"
+      ],
+      "mode": [
+        "FINGERPRINT"
+      ],
+      "moduleId": [
+        "module05"
+      ],
+      "projectId": [
+        "TEST6Oai41ps1pBNrzBL"
+      ],
+      "subjectId": [
+        "d6bbb525-e7b9-4ced-a200-d51f2aee8154"
+      ]
+    },
+    "payload": {
+      "enrolmentRecordCreation": {
+        "attendantId": "User B",
+        "biometricReferences": [
+          {
+            "format": "ISO_19794_2",
+            "templates": [
+              {
+                "finger": "LEFT_THUMB",
+                "quality": 66,
+                "template": "Rk1SACAyMAAAAADkAAABLAGQAMUAxQEAABBCIYArABeRAIEIABr4AIAmACEaAIBqAHsYAIB8AH4OAIBcAI4LAECLAJEHAICyAJIGAEBSAJaUAIBCAJ4HAIDAALcBAIDgALuEAIEDAMQAAIDVANMHAEC5AN0DAIBbAOUBAECGAPF7AECwAPQAAED3APfxAIA3AQH/AEAtAQZ9AEDvAQ14AED+ARLoAECoATzxAEBRAUP7AEAVAUqGAECxAVj0AEBcAV57AECEAWfuAEC2AWlxAIDZAXDrAIBZAXiCAIC3AYfxAAAA"
+              },
+              {
+                "finger": "LEFT_INDEX_FINGER",
+                "quality": 71,
+                "template": "Rk1SACAyMAAAAADkAAABLAGQAMUAxQEAABBHIYArABeUAIEIABr4AIAnACEcAECLAJEHAICyAJIGAEBTAJeNAIBCAJ8KAIDBALcBAIDgALuEAEClAMIAAECmAMeDAECRANEDAIDVANMHAEC5ANwAAIBZAOUDAECGAPF9AECwAPQAAED4APbsAIA3AQH/AEAtAQZ9AIDcAQv1AEDtAQ17AED9ARLqAECqATzxAIBOAUj+AEAVAUqHAECxAVj0AEBbAV57AECFAWjxAEC2AWlxAIDaAXHsAIBZAXiCAIC3AYfyAAAA"
+              }
+            ],
+            "type": "FingerprintReference"
+          }
+        ],
+        "moduleId": "module05",
+        "projectId": "TEST6Oai41ps1pBNrzBL",
+        "subjectId": "d6bbb525-e7b9-4ced-a200-d51f2aee8154",
+        "type": "EnrolmentRecordCreation"
+      },
+      "enrolmentRecordDeletion": {
+        "attendantId": "User A",
+        "moduleId": "module05",
+        "projectId": "TEST6Oai41ps1pBNrzBL",
+        "subjectId": "d6bbb525-e7b9-4ced-a200-d51f2aee8154",
+        "type": "EnrolmentRecordDeletion"
+      },
+      "type": "EnrolmentRecordMove",
+      "version": 0
+    }
+  },
+  {
+    "id": "0004ec21-755f-4fe5-be54-9a2790dcdb3e",
+    "labels": {
+      "attendantId": [
+        "e87ecb95-8148-42b4-8911-40014d66c9bb"
+      ],
+      "mode": [
+        "FINGERPRINT"
+      ],
+      "moduleId": [
+        "module7"
+      ],
+      "projectId": [
+        "5OnqDKlb7uqsMjkOrxje"
+      ],
+      "subjectId": [
+        "55abe370-cf59-4578-aa22-cf6f824aa1fa"
+      ]
+    },
+    "payload": {
+      "attendantId": "e87ecb95-8148-42b4-8911-40014d66c9bb",
+      "biometricReferences": [
+        {
+          "format": "NEC",
+          "templates": [
+            {
+              "finger": "RIGHT_4TH_FINGER",
+              "quality": 59,
+              "template": "Rk1SACAyMAAAAAEmAAABLAGQAMUAxQEAABBSLIC3ABcDAEBMADMfAEBgAEahAICBAEcaAIC/AGUBAIB1AGudAICxAH4AAIC3AJDxAED7AJLWAEA+AJOqAIDfAJPgAECbAJUOAIBtAJixAIDaAJvNAIAwAJ4uAICLAKG/AECsAKLMAICjAKK9AIDAAKm/AIBhALe/AEDxALfAAICvALsyAECtAMSYAECfAMeKAICQAMv+AIC6AMunAICkANWGAIDlANWvAECJAOAAAICeAOCJAIC7AO2aAICeAPAQAECBAPv4AIC4AP0aAEBrAQHuAEBfAQViAEDiAQobAECAARBxAEBmARP0AEBFARlsAECtARoHAEB6ASVxAECYASn+AECfATP7AAAA"
+            },
+            {
+              "finger": "RIGHT_5TH_FINGER",
+              "quality": 3,
+              "template": "Rk1SACAyMAAAAAFWAAABLAGQAMUAxQEAABBVNICDADV1AIDkAERrAIDMAHdpAIBqAH58AIA/AKAaAIEbAKvdAEBGAKsXAIBdALSMAED2AL7aAIDLAMXbAICYAMzWAIBfAM6hAIBwAN3CAIEWAODXAICwAOHNAIEGAOTPAICEAOa8AEDgAOjHAICOAOvCAIBhAPLbAEEhAPPRAIBtAPNJAICYAPa5AECRAPpHAICiAP67AEDKAQBGAECDAQKdAIDiAQNGAEBfAQjlAEEeAQq9AICrAQq5AICIARaYAICiARw2AID5ASI1AEEaASQ1AICQASeWAIEQATYXAIBbAThvAEByAToGAIDxATwfAEEAAUIaAEClAUMhAEDuAUYVAICVAUeTAIDOAUoYAICNAU8TAIC1AU8aAEDVAVgRAEC3AV8RAEDjAWwKAID3AXCHAEDVAYgKAAAA"
+            }
+          ],
+          "type": "FingerprintReference"
+        }
+      ],
+      "moduleId": "module7",
+      "projectId": "5OnqDKlb7uqsMjkOrxje",
+      "subjectId": "55abe370-cf59-4578-aa22-cf6f824aa1fa",
+      "type": "EnrolmentRecordCreation",
+      "version": 0
+    }
+  },
+  {
+    "id": "a22cc6a5-e0ad-4b8c-9659-713193dd947f",
+    "labels": {
+      "attendantId": [
+        "testAttendant314"
+      ],
+      "mode": null,
+      "moduleId": [
+        "updated module"
+      ],
+      "projectId": [
+        "l1RaQYCCQwX63Nhn2ou4"
+      ],
+      "subjectId": [
+        "a06494e8-17b1-ad4d-ce3f-5779bfe4d0c8"
+      ]
+    },
+    "payload": {
+      "attendantId": "testAttendant314",
+      "moduleId": "updated module",
+      "projectId": "l1RaQYCCQwX63Nhn2ou4",
+      "subjectId": "a06494e8-17b1-ad4d-ce3f-5779bfe4d0c8",
+      "type": "EnrolmentRecordDeletion",
+      "version": 0
+    }
+  },
+  {
+    "id": "a3102202-956b-4444-bf3e-75c39cee35ba",
+    "labels": {
+      "attendantId": [
+        "user a"
+      ],
+      "mode": [
+        "FINGERPRINT",
+        "FACE"
+      ],
+      "moduleId": [
+        "module01",
+        "module03"
+      ],
+      "projectId": [
+        "TEST6Oai41ps1pBNrzBL"
+      ],
+      "subjectId": [
+        "5d08d867-fa87-41e4-8df0-98c7256950c7"
+      ]
+    },
+    "payload": {
+      "enrolmentRecordCreation": {
+        "attendantId": "user a",
+        "biometricReferences": [
+          {
+            "format": "ISO_19794_2",
+            "templates": [
+              {
+                "finger": "LEFT_THUMB",
+                "quality": 78,
+                "template": "Rk1SACAyMAAAAAEIAAABLAGQAMUAxQEAABBOJ0BnAF0uAEC4AGwfAIB7AHkrAECOAIEcAIDLAIUVAIBsAJMlAEC6AJsVAEAXAJyeAEC9AJ+bAEBoAKGqAEDSAKgVAICtAK0RAECMAK8aAIBfALAiAICXALOXAEDWAL4UAIAwAMsbAIC9ANCQAEBhANEeAIBQANebAICUANgVAEApAOQVAIBAAPUUAEDmAPsGAICCAQETAEBjAQQaAEB8AQuWAIDUASgDAICnASsRAEC4ATSUAIB/AUidAIDBAUmXAIDCAVSvAICnAVigAED8AV74AECqAV+uAICiAXGsAEB5AXOqAEC5AXw4AAAA"
+              },
+              {
+                "finger": "LEFT_INDEX_FINGER",
+                "quality": 80,
+                "template": "Rk1SACAyMAAAAAEaAAABLAGQAMUAxQEAABBQKoCMAECsAEBnAF0uAEC4AGocAIB7AHkrAIDkAHudAECOAIEcAIDLAIUVAIDoAJEcAIBsAJMlAIC1AJoVAEBnAKGsAEC9AKGYAEDSAKgVAICtAK0RAECMALAcAIBfALEkAICXALKaAEDWAL4UAIAuAMwYAIC9ANCQAIBRANadAICTANkYAIBeANkfAEAmAOUUAIBAAPUVAEDnAPsHAICBAQETAEBiAQMYAED2AQ0HAICAAQ2UAICnASoRAEDYASoAAIC6AS+RAIB+AUeaAIC/AUiXAIClAVahAEDCAVmxAED7AV37AECmAWKqAIB2AWyqAECmAW2sAEC4AXg1AAAA"
+              }
+            ],
+            "type": "FingerprintReference"
+          },
+          {
+            "format": "RANK_ONE_1_23",
+            "templates": [],
+            "type": "FaceReference"
+          }
+        ],
+        "moduleId": "module03",
+        "projectId": "TEST6Oai41ps1pBNrzBL",
+        "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
+        "type": "EnrolmentRecordCreation"
+      },
+      "enrolmentRecordDeletion": {
+        "attendantId": "user a",
+        "moduleId": "module01",
+        "projectId": "TEST6Oai41ps1pBNrzBL",
+        "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
+        "type": "EnrolmentRecordDeletion"
+      },
+      "type": "EnrolmentRecordMove",
+      "version": 0
+    }
+  },
+  {
+    "id": "a3102202-956b-4444-bf3e-75c39cee35ba",
+    "labels": {
+      "attendantId": [
+        "user a"
+      ],
+      "mode": [
+        "FINGERPRINT",
+        "FACE"
+      ],
+      "moduleId": [
+        "module01",
+        "module03"
+      ],
+      "projectId": [
+        "TEST6Oai41ps1pBNrzBL"
+      ],
+      "subjectId": [
+        "5d08d867-fa87-41e4-8df0-98c7256950c7"
+      ]
+    },
+    "payload": {
+      "enrolmentRecordCreation": {
+        "attendantId": "user a",
+        "biometricReferences": [
+          {
+            "format": "NEC",
+            "templates": [
+              {
+                "finger": "LEFT_THUMB",
+                "quality": 78,
+                "template": "Rk1SACAyMAAAAAEIAAABLAGQAMUAxQEAABBOJ0BnAF0uAEC4AGwfAIB7AHkrAECOAIEcAIDLAIUVAIBsAJMlAEC6AJsVAEAXAJyeAEC9AJ+bAEBoAKGqAEDSAKgVAICtAK0RAECMAK8aAIBfALAiAICXALOXAEDWAL4UAIAwAMsbAIC9ANCQAEBhANEeAIBQANebAICUANgVAEApAOQVAIBAAPUUAEDmAPsGAICCAQETAEBjAQQaAEB8AQuWAIDUASgDAICnASsRAEC4ATSUAIB/AUidAIDBAUmXAIDCAVSvAICnAVigAED8AV74AECqAV+uAICiAXGsAEB5AXOqAEC5AXw4AAAA"
+              },
+              {
+                "finger": "LEFT_INDEX_FINGER",
+                "quality": 80,
+                "template": "Rk1SACAyMAAAAAEaAAABLAGQAMUAxQEAABBQKoCMAECsAEBnAF0uAEC4AGocAIB7AHkrAIDkAHudAECOAIEcAIDLAIUVAIDoAJEcAIBsAJMlAIC1AJoVAEBnAKGsAEC9AKGYAEDSAKgVAICtAK0RAECMALAcAIBfALEkAICXALKaAEDWAL4UAIAuAMwYAIC9ANCQAIBRANadAICTANkYAIBeANkfAEAmAOUUAIBAAPUVAEDnAPsHAICBAQETAEBiAQMYAED2AQ0HAICAAQ2UAICnASoRAEDYASoAAIC6AS+RAIB+AUeaAIC/AUiXAIClAVahAEDCAVmxAED7AV37AECmAWKqAIB2AWyqAECmAW2sAEC4AXg1AAAA"
+              }
+            ],
+            "type": "FingerprintReference"
+          },
+          {
+            "format": "RANK_ONE_1_23",
+            "templates": [],
+            "type": "FaceReference"
+          }
+        ],
+        "moduleId": "module03",
+        "projectId": "TEST6Oai41ps1pBNrzBL",
+        "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
+        "type": "EnrolmentRecordCreation"
+      },
+      "enrolmentRecordDeletion": {
+        "attendantId": "user a",
+        "moduleId": "module01",
+        "projectId": "TEST6Oai41ps1pBNrzBL",
+        "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
+        "type": "EnrolmentRecordDeletion"
+      },
+      "type": "EnrolmentRecordMove",
+      "version": 0
+    }
+  }
 ]

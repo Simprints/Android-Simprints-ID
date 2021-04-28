@@ -13,7 +13,7 @@ sealed class DashboardSyncCardState(open val lastTimeSyncSucceed: Date?) {
     data class SyncTryAgain(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
     data class SyncComplete(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
 
-    data class SyncNoModules(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
+    data class SyncHasNoModules(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
     data class SyncOffline(override val lastTimeSyncSucceed: Date?) : DashboardSyncCardState(lastTimeSyncSucceed)
 }
 
