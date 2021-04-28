@@ -8,7 +8,9 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
@@ -17,6 +19,8 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.time.TimeHelper
+import com.simprints.moduleapi.app.responses.IAppErrorReason
+import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -24,11 +28,20 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDL
 
 class OrchestratorActivity : BaseSplitActivity() {
 
-    @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
-    @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var eventSyncManager: EventSyncManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject
+    lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
+
+    @Inject
+    lateinit var syncManager: SyncManager
+
+    @Inject
+    lateinit var eventSyncManager: EventSyncManager
+
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+
+    @Inject
+    lateinit var timeHelper: TimeHelper
 
     lateinit var appRequest: AppRequest
 
@@ -46,9 +59,15 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     private val observerForFinalResponse = Observer<IAppResponse?> {
         it?.let {
-            setResult(RESULT_OK, Intent().apply {
-                putExtra(IAppResponse.BUNDLE_KEY, it)
-            })
+            if (it is IAppErrorResponse && it.reason == IAppErrorReason.UNEXPECTED_ERROR) {
+                AlertActivityHelper.launchAlert(
+                    this@OrchestratorActivity,
+                    AlertType.UNEXPECTED_ERROR
+                )
+            } else
+                setResult(RESULT_OK, Intent().apply {
+                    putExtra(IAppResponse.BUNDLE_KEY, it)
+                })
             finish()
         }
     }
