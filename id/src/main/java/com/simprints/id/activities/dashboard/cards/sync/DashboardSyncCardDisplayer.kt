@@ -14,4 +14,5 @@ interface DashboardSyncCardDisplayer {
     fun displayState(syncCardState: DashboardSyncCardState)
     suspend fun startTickerToUpdateLastSyncText()
     fun stopOngoingTickerToUpdateLastSyncText()
+
 }

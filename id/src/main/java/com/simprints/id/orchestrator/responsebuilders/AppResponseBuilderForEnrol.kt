@@ -4,9 +4,11 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.time.TimeHelper
@@ -16,10 +18,13 @@ class AppResponseBuilderForEnrol(
     private val timeHelper: TimeHelper
 ) : BaseAppResponseBuilder() {
 
-    override suspend fun buildAppResponse(modalities: List<Modality>,
-                                          appRequest: AppRequest,
-                                          steps: List<Step>,
-                                          sessionId: String): AppResponse {
+    override suspend fun buildAppResponse(
+        modalities: List<Modality>,
+        appRequest: AppRequest,
+        steps: List<Step>,
+        sessionId: String
+    ): AppResponse {
+
         super.getErrorOrRefusalResponseIfAny(steps)?.let {
             return it
         }
@@ -35,10 +40,16 @@ class AppResponseBuilderForEnrol(
             request.moduleId,
             fingerprintResponse,
             faceResponse,
-            timeHelper)
+            timeHelper
+        )
 
-        enrolmentHelper.enrol(subject)
-        return AppEnrolResponse(subject.subjectId)
+        return try {
+            enrolmentHelper.enrol(subject)
+            AppEnrolResponse(subject.subjectId)
+        } catch (e: EnrolmentEventValidatorException) {
+            AppErrorResponse(AppErrorResponse.Reason.UNEXPECTED_ERROR)
+        }
+
     }
 
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =

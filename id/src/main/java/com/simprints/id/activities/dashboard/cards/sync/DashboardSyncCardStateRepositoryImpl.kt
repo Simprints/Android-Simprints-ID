@@ -12,18 +12,24 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.id.tools.time.TimeHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
+import kotlin.coroutines.coroutineContext
 
-class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManager,
-                                           val deviceManager: DeviceManager,
-                                           private val preferencesManager: PreferencesManager,
-                                           private val downSyncScopeRepository: EventDownSyncScopeRepository,
-                                           private val cacheSync: EventSyncCache,
-                                           private val timeHelper: TimeHelper) : DashboardSyncCardStateRepository {
+class DashboardSyncCardStateRepositoryImpl(
+    val eventSyncManager: EventSyncManager,
+    val deviceManager: DeviceManager,
+    private val preferencesManager: PreferencesManager,
+    private val downSyncScopeRepository: EventDownSyncScopeRepository,
+    private val cacheSync: EventSyncCache,
+    private val timeHelper: TimeHelper
+) : DashboardSyncCardStateRepository {
 
     override val syncCardStateLiveData = MediatorLiveData<DashboardSyncCardState>()
 
@@ -37,18 +43,22 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
 
     private var isUIBoundToSources = false
 
-    private fun emitNewCardState(isConnected: Boolean,
-                                 isModuleSelectionRequired: Boolean,
-                                 syncState: EventSyncState?) {
+    private fun emitNewCardState(
+        isConnected: Boolean,
+        isModuleSelectionRequired: Boolean,
+        syncState: EventSyncState?
+    ) {
 
-        val syncRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value is SyncConnecting
-        val syncNoRunningAndInfoNotReadyYet = syncState == null && syncCardStateLiveData.value !is SyncConnecting
+        val syncRunningAndInfoNotReadyYet =
+            syncState == null && syncCardStateLiveData.value is SyncConnecting
+        val syncNotRunningAndInfoNotReadyYet =
+            syncState == null && syncCardStateLiveData.value !is SyncConnecting
 
         when {
-            isModuleSelectionRequired -> SyncNoModules(lastTimeSyncSucceed)
+            isModuleSelectionRequired -> SyncHasNoModules(lastTimeSyncSucceed)
             !isConnected -> SyncOffline(lastTimeSyncSucceed)
             syncRunningAndInfoNotReadyYet -> SyncConnecting(lastTimeSyncSucceed, 0, null)
-            syncNoRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed)
+            syncNotRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed)
             syncState == null -> SyncDefault(null) //Useless after the 2 above - just to satisfy nullability in the else
             else -> processRecentSyncState(syncState)
         }.let { newState ->
@@ -69,8 +79,16 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
         return when {
             isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed)
             isSyncCompleted(allSyncStates) -> SyncComplete(lastTimeSyncSucceed)
-            isSyncProcess(allSyncStates) -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
-            isSyncConnecting(allSyncStates) -> SyncConnecting(lastTimeSyncSucceed, syncState.progress, syncState.total)
+            isSyncProcess(allSyncStates) -> SyncProgress(
+                lastTimeSyncSucceed,
+                syncState.progress,
+                syncState.total
+            )
+            isSyncConnecting(allSyncStates) -> SyncConnecting(
+                lastTimeSyncSucceed,
+                syncState.progress,
+                syncState.total
+            )
             isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
             isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed)
             else -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
@@ -100,26 +118,34 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
     }
 
     private fun shouldForceOneTimeSync(): Boolean {
-        val isRunning = syncStateLiveData.value?.let { isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo) } ?: false
+        val isRunning =
+            syncStateLiveData.value?.let { isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo) }
+                ?: false
         val lastUpdate = lastTimeSyncRun ?: lastTimeSyncSucceed
 
         return !isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)
     }
 
     private suspend fun bindUIToSync() {
-        val isModuleSelectionRequired = isModuleSelectionRequired()
+        val scope = coroutineContext
         syncCardStateLiveData.addSource(isConnectedLiveData) { connectivity ->
-            emitNewCardState(
-                connectivity,
-                isModuleSelectionRequired,
-                syncStateLiveData.value)
+            CoroutineScope(scope + SupervisorJob()).launch {
+                emitNewCardState(
+                    connectivity,
+                    isModuleSelectionRequired(),
+                    syncStateLiveData.value
+                )
+            }
         }
 
         syncCardStateLiveData.addSource(syncStateLiveData) { syncState ->
-            emitNewCardState(
-                isConnected(),
-                isModuleSelectionRequired,
-                syncState)
+            CoroutineScope(scope + SupervisorJob()).launch {
+                emitNewCardState(
+                    isConnected(),
+                    isModuleSelectionRequired(),
+                    syncState
+                )
+            }
         }
     }
 
@@ -131,7 +157,8 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
 
-    private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) = allSyncStates.isEmpty()
+    private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.isEmpty()
 
     private fun isSyncProcess(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.any { it.state is EventSyncWorkerState.Running }
@@ -159,7 +186,8 @@ class DashboardSyncCardStateRepositoryImpl(val eventSyncManager: EventSyncManage
 
     private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()
 
-    private suspend fun isModuleSync() = downSyncScopeRepository.getDownSyncScope() is SubjectModuleScope
+    private suspend fun isModuleSync() =
+        downSyncScopeRepository.getDownSyncScope() is SubjectModuleScope
 
     private fun isConnected() = isConnectedLiveData.value ?: true
 
