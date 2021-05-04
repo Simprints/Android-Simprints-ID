@@ -4,6 +4,6 @@ deployProperties.load(new FileInputStream(deployPropertiesFile))
 
 play {
     serviceAccountCredentials = file("${rootDir}/google_api_key.json")
-    defaultToAppBundles true
+    defaultToAppBundles = true
     artifactDir = file("build/outputs/bundle/${deployProperties['BUNDLE_FOLDER']}")
 }
