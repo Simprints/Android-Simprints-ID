@@ -162,19 +162,43 @@ definitions:
                     - bash ./ci/pipeline/setup_gcloud
                     - mv ./*.apk ./ci/pipeline/
                     - cd ./ci/pipeline/
-                    - ./run_all_android_tests.sh universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
+                    - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
         ######################################################################
         # Build a signed Staging bundle with the Playstore upload key, and
-        # deploy it to the internal test track. Also upload the bundle and the
-        # relevant output files to artifacts.
+        # deploy it to Firebase Distribution (simprints-firebase-staging).
+        # Also upload the bundle and the relevant output files to artifacts.
+        #
+        # Signing vars are only available on a deployment step.
+        ######################################################################
+        -   step: &sign-and-deploy-to-staging
+                name: "Sign and deploy Staging build to Staging Environment"
+                deployment: Staging
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - bash ./ci/pipeline/release_setup
+                    - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
+                    - ./gradlew packageStagingUniversalApk
+                    - ./gradlew id:appDistributionUploadStaging
+                artifacts:
+                    - id/build/outputs/**
+
+        ######################################################################
+        # Build a signed Release bundle with the Playstore upload key, and
+        # deploy it to the internal test track.
         #
         # Signing vars are only available on a deployment step.
         ######################################################################
         -   step: &sign-and-deploy-to-internal
-                name: "Sign and deploy Staging build to Internal Track"
+                name: "Sign and deploy Release build to Internal Test Track"
                 deployment: Internal
                 max-time: 30
                 size: 2x
@@ -184,21 +208,20 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup.sh
-                    - echo "BUNDLE_FOLDER=staging" >>ci/deploy.properties
-                    - ./gradlew id:bundleStaging
-                    - ./gradlew id:publishStagingBundle
-                artifacts:
-                    - id/build/outputs/**
+                    - bash ./ci/pipeline/release_setup
+                    - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
+                    - mkdir -p id/src/release
+                    - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
+                    - ./gradlew id:bundleRelease
+                    - ./gradlew id:publishReleaseBundle
 
         ######################################################################
-        # Build a signed Release bundle with the Playstore upload key, and
-        # deploy it to the alpha test track.
+        # Promote the Internal track build to the Alpha Track
         #
         # Signing vars are only available on a deployment step.
         ######################################################################
-        -   step: &sign-and-deploy-to-alpha-testing
-                name: "Sign and deploy Release build to Alpha-Test Track"
+        -   step: &promote-internal-to-alpha
+                name: "Promote Internal Track to Alpha Track"
                 deployment: Alpha
                 max-time: 30
                 size: 2x
@@ -208,12 +231,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup.sh
-                    - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
-                    - mkdir -p id/src/release
-                    - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
-                    - ./gradlew id:bundleRelease
-                    - ./gradlew id:publishReleaseBundle --track Alpha-Test
+                    - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -241,7 +259,9 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
+            -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
+            -   step: *promote-internal-to-alpha
     -   flow: &production_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
@@ -253,10 +273,11 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
-            -   step: *sign-and-deploy-to-alpha-testing
-    -   flow: &ci-test
             -   step: *sign-and-deploy-to-internal
-            -   step: *sign-and-deploy-to-alpha-testing
+            -   step: *promote-internal-to-alpha
+    -   flow: &ci-test
+            -   step: *build-and-sign-universal-apk
+            -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.

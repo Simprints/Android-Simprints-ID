@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./ci/pipeline/install_android.sh
+bash ./ci/pipeline/install_android
 
 git submodule init
 git submodule update

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 root_path=./test-reports/$1
 logs_path=$root_path/logs
 log_file=$logs_path/firebase_logs

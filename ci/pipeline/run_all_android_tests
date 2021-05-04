@@ -1,4 +1,5 @@
 #!/bin/bash
+
 if [ "help" = "$1" ]; then
     echo "Tool to run SID modules' tests on Firebase Test Lab."
     echo "Run tests - ./run_all_android_tests universal.apk module1_name:module1_test_apk ...."
@@ -18,7 +19,7 @@ clear
 # Config
 ######################################################################
         
-single_runner="run_firebase_test_lab.sh"
+single_runner="run_firebase_test_lab"
 device="walleye,version=28,locale=en,orientation=portrait"
 n_attemps_per_module="1"
 root_path="test-reports"

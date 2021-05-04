@@ -7,3 +7,15 @@ play {
     defaultToAppBundles = true
     artifactDir = file("build/outputs/bundle/${deployProperties['BUNDLE_FOLDER']}")
 }
+
+android {
+    buildTypes {
+        staging {
+            firebaseAppDistribution {
+                apkPath = "id/build/outputs/universal_apk/staging/id-staging-universal.apk"
+                serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
+                groups = "pre-release-testers"
+            }
+        }
+    }
+}

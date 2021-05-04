@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
+echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
+
+cat << EOF >> buildSrc/signing_properties.gradle
+ext {
+  store_file = "$rootDir/android-signing-keystore.jks"
+  store_password="${SIGNING_KEYSTORE_PASSWORD}" as String
+  key_alias="${SIGNING_KEY_ALIAS}" as String
+  key_password="${SIGNING_KEY_PASSWORD}" as String
+}
+EOF
+
+cat << EOF >> buildSrc/build_properties.gradle
+ext {
+  VERSION_CODE=${BITBUCKET_BUILD_NUMBER} as Integer
+  VERSION_SUFFIX="${BITBUCKET_DEPLOYMENT_ENVIRONMENT}" as String
+  DEBUGGABLE="${BUILD_IS_DEBUGGABLE}"
+  RELEASE_SAFETYNET_KEY="${RELEASE_SAFETYNET_KEY}"
+  DB_ENCRYPTION="${DB_IS_ENCRYPTED}"
+}
+EOF
