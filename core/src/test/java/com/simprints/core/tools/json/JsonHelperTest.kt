@@ -8,14 +8,14 @@ class JsonHelperTest {
     @Test
     fun validateJson() {
         val json = """{"name": "Test" }"""
-        JsonHelper().validateJsonOrThrow(json)
+        JsonHelper.validateJsonOrThrow(json)
     }
 
     @Test
     fun validateJson_shouldThrownIfInvalid() {
         val json = """{"name": "Test }"""
         shouldThrow<Throwable> {
-            JsonHelper().validateJsonOrThrow(json)
+            JsonHelper.validateJsonOrThrow(json)
         }
     }
 }

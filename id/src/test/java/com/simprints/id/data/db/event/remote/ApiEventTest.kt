@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ApiEventTest {
 
-    private val jackson = JsonHelper().jackson
+    private val jackson = JsonHelper.jackson
 
     @Test
     fun validate_alertScreenEventApiModel() {

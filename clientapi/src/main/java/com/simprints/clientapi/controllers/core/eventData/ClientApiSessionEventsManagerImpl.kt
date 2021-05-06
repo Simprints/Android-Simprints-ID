@@ -23,7 +23,7 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         coreEventRepository.createSession()
-        
+
         inBackground(dispatcher) {
             coreEventRepository.addOrUpdateEvent(
                 IntentParsingEvent(

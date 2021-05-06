@@ -35,7 +35,7 @@ class EventDownSyncWorkersBuilderImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        eventDownSyncWorkersFactory = EventDownSyncWorkersBuilderImpl(eventDownSyncScopeRepository, JsonHelper())
+        eventDownSyncWorkersFactory = EventDownSyncWorkersBuilderImpl(eventDownSyncScopeRepository, JsonHelper)
     }
 
     @Test
@@ -162,7 +162,7 @@ private fun List<WorkRequest>.assertSubjectsDownSyncCountWorkerTagsForPeriodic(c
 
 private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope: EventDownSyncScope) {
     val downloaders = filter { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
-    val jsonHelper = JsonHelper()
+    val jsonHelper = JsonHelper
     val ops = downSyncScope.operations
     ops.forEach { op ->
         assertThat(downloaders.any {
@@ -174,7 +174,7 @@ private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope:
 
 private fun List<WorkRequest>.assertDownSyncCountWorkerInput(downSyncScope: EventDownSyncScope) {
     val counter = first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
-    val jsonHelper = JsonHelper()
+    val jsonHelper = JsonHelper
     assertThat(counter.workSpec.input == workDataOf(INPUT_COUNT_WORKER_DOWN to jsonHelper.toJson(downSyncScope))).isTrue()
 }
 
