@@ -5,13 +5,10 @@ import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.isNotASubjectEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
@@ -88,6 +85,37 @@ open class EventRepositoryImpl(
 
             saveEvent(sessionCaptureEvent, sessionCaptureEvent)
             sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
+
+//            for (i in 1..200) {
+//                saveEvent(
+//                    ConsentEvent(
+//                        timeHelper.now(),
+//                        timeHelper.now(),
+//                        ConsentEvent.ConsentPayload.Type.INDIVIDUAL,
+//                        ConsentEvent.ConsentPayload.Result.ACCEPTED
+//                    ), sessionCaptureEvent
+//                )
+//            }
+//
+//            for (i in 1..50) {
+//                val sessionCaptureEvent2 = SessionCaptureEvent(
+//                    id = UUID.randomUUID().toString(),
+//                    projectId = currentProject,
+//                    createdAt = timeHelper.now(),
+//                    modalities = preferencesManager.modalities.map { it.toMode() },
+//                    appVersionName = appVersionName,
+//                    libVersionName = libSimprintsVersionName,
+//                    language = preferencesManager.language,
+//                    device = Device(
+//                        VERSION.SDK_INT.toString(),
+//                        Build.MANUFACTURER + "_" + Build.MODEL,
+//                        deviceId
+//                    ),
+//                    databaseInfo = DatabaseInfo(sessionCount)
+//                )
+//                saveEvent(sessionCaptureEvent2, sessionCaptureEvent2)
+//            }
+
             sessionCaptureEvent
         }
     }
