@@ -34,7 +34,7 @@ class CommCarePresenterTest {
     }
 
     private val view = mockk<CommCareActivity>()
-    private val jsonHelper = JsonHelper()
+    private val jsonHelper = JsonHelper
 
     @Before
     fun setup() {
