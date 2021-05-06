@@ -85,6 +85,37 @@ open class EventRepositoryImpl(
 
             saveEvent(sessionCaptureEvent, sessionCaptureEvent)
             sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
+
+//            for (i in 1..200) {
+//                saveEvent(
+//                    ConsentEvent(
+//                        timeHelper.now(),
+//                        timeHelper.now(),
+//                        ConsentEvent.ConsentPayload.Type.INDIVIDUAL,
+//                        ConsentEvent.ConsentPayload.Result.ACCEPTED
+//                    ), sessionCaptureEvent
+//                )
+//            }
+//
+//            for (i in 1..1000) {
+//                val sessionCaptureEvent2 = SessionCaptureEvent(
+//                    id = UUID.randomUUID().toString(),
+//                    projectId = currentProject,
+//                    createdAt = timeHelper.now(),
+//                    modalities = preferencesManager.modalities.map { it.toMode() },
+//                    appVersionName = appVersionName,
+//                    libVersionName = libSimprintsVersionName,
+//                    language = preferencesManager.language,
+//                    device = Device(
+//                        VERSION.SDK_INT.toString(),
+//                        Build.MANUFACTURER + "_" + Build.MODEL,
+//                        deviceId
+//                    ),
+//                    databaseInfo = DatabaseInfo(sessionCount)
+//                )
+//                saveEvent(sessionCaptureEvent2, sessionCaptureEvent2)
+//            }
+
             sessionCaptureEvent
         }
     }
@@ -266,15 +297,12 @@ open class EventRepositoryImpl(
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
     private suspend fun closeAllSessions(reason: Reason) {
-
         sessionDataCache.eventCache.clear()
-
         loadSessions(false).collect { closeSession(it, reason) }
     }
 
     override suspend fun closeCurrentSession(reason: Reason?) {
         closeSession(getCurrentCaptureSessionEvent(), reason)
-
         sessionDataCache.eventCache.clear()
     }
 
@@ -294,9 +322,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun loadSessions(isClosed: Boolean): Flow<SessionCaptureEvent> {
-        return eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
-            .map { it as SessionCaptureEvent }
-            .filter { it.payload.sessionIsClosed == isClosed }
+        return eventLocalDataSource.loadAllSessions(isClosed).map { it as SessionCaptureEvent }
     }
 
     private suspend fun loadEventsIntoCache(sessionId: String) {

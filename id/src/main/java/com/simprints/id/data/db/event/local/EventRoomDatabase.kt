@@ -9,7 +9,10 @@ import androidx.room.TypeConverters
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.room.Converters
+import com.simprints.id.data.db.event.local.migrations.EventMigration1to2
+import com.simprints.id.data.db.event.local.migrations.EventMigration2to3
 import com.simprints.id.data.db.event.local.models.DbEvent
+import com.simprints.id.tools.time.TimeHelper
 import net.sqlcipher.database.SupportFactory
 
 @Database(entities = [DbEvent::class], version = 2, exportSchema = true)
@@ -21,13 +24,17 @@ abstract class EventRoomDatabase : RoomDatabase() {
 
     companion object {
 
-        fun getDatabase(context: Context,
-                        factory: SupportFactory,
-                        dbName: String,
-                        crashReportManager: CrashReportManager): EventRoomDatabase {
+        fun getDatabase(
+            context: Context,
+            factory: SupportFactory,
+            dbName: String,
+            crashReportManager: CrashReportManager,
+            timeHelper: TimeHelper
+        ): EventRoomDatabase {
             val builder = Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
                 .addMigrations()
                 .addMigrations(EventMigration1to2(crashReportManager))
+                .addMigrations(EventMigration2to3(crashReportManager, timeHelper))
 
             if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)
