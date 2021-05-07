@@ -4,7 +4,6 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.tools.extensions.getStringWithColumnName
-import com.simprints.id.tools.time.TimeHelper
 
 /**
  * Migration from 2021.1.0 to 2021.1.1. This migration adds a new column that can mark an event as
@@ -12,7 +11,7 @@ import com.simprints.id.tools.time.TimeHelper
  * query and close open sessions instead of reading all sessions and checking their is closed field
  * in the JSON payload.
  */
-class EventMigration2to3(val crashReportManager: CrashReportManager, timeHelper: TimeHelper) :
+class EventMigration2to3(val crashReportManager: CrashReportManager) :
     Migration(2, 3) {
 
     private val sessionType = "SESSION_CAPTURE"

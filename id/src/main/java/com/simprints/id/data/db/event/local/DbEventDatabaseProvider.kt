@@ -3,7 +3,6 @@ package com.simprints.id.data.db.event.local
 import android.content.Context
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.tools.time.TimeHelper
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 import timber.log.Timber
@@ -16,8 +15,7 @@ interface EventDatabaseFactory {
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
     private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-    private val crashReportManager: CrashReportManager,
-    private val timeHelper: TimeHelper
+    private val crashReportManager: CrashReportManager
 ) : EventDatabaseFactory {
 
     override fun build(): EventRoomDatabase {
@@ -29,8 +27,7 @@ class DbEventDatabaseFactoryImpl(
                 ctx,
                 factory,
                 DB_NAME,
-                crashReportManager,
-                timeHelper
+                crashReportManager
             )
         } catch (t: Throwable) {
             Timber.e(t)
