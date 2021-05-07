@@ -6,6 +6,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
+import timber.log.Timber
 
 class FingerSelectionViewModel(private val preferencesManager: PreferencesManager,
                                private val crashReportManager: CrashReportManager) : ViewModel() {
@@ -85,7 +86,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
                         savedPref.firstOrNull { it.finger == finger }?.removable = false
                     }
             } catch (e: NoSuchPreferenceError) {
-                e.printStackTrace()
+                Timber.d(e)
             }
         }
 
