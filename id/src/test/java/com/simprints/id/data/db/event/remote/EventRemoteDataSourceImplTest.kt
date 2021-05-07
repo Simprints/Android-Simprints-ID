@@ -58,7 +58,7 @@ class EventRemoteDataSourceImplTest {
         }
 
         coEvery { simApiClientFactory.buildClient(EventRemoteInterface::class) } returns simApiClient
-        eventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, JsonHelper())
+        eventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, JsonHelper)
     }
 
     @Test

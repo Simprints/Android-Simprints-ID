@@ -41,7 +41,7 @@ class EventDownSyncCountWorkerTest {
     fun setUp() {
         countWorker = TestListenableWorkerBuilder<EventDownSyncCountWorker>(app)
             .setTags(listOf(tagForMasterSyncId))
-            .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(projectDownSyncScope)))
+            .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(projectDownSyncScope)))
             .build() as EventDownSyncCountWorker
 
         app.component = mockk(relaxed = true)
@@ -49,7 +49,7 @@ class EventDownSyncCountWorkerTest {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             eventDownSyncHelper = mockk(relaxed = true)
-            jsonHelper = JsonHelper()
+            jsonHelper = JsonHelper
             eventDownSyncScopeRepository = mockk(relaxed = true)
         }
 
@@ -73,7 +73,7 @@ class EventDownSyncCountWorkerTest {
 
             countWorker.doWork()
 
-            val output = JsonHelper().toJson(listOf(counts))
+            val output = JsonHelper.toJson(listOf(counts))
             val expectedSuccessfulOutput = workDataOf(OUTPUT_COUNT_WORKER_DOWN to output)
             verify { countWorker.resultSetter.success(expectedSuccessfulOutput) }
         }

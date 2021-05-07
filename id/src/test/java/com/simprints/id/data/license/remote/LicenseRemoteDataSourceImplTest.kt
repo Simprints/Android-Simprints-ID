@@ -25,7 +25,7 @@ class LicenseRemoteDataSourceImplTest {
     private val remoteInterface = mockk<LicenseRemoteInterface>()
     private val simApiClient = mockk<SimApiClient<LicenseRemoteInterface>>()
     private val simApiClientFactory = mockk<SimApiClientFactory>()
-    private val licenseRemoteDataSourceImpl = LicenseRemoteDataSourceImpl(simApiClientFactory, JsonHelper())
+    private val licenseRemoteDataSourceImpl = LicenseRemoteDataSourceImpl(simApiClientFactory, JsonHelper)
 
     @Before
     fun setup() {
