@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.simprints.id.data.db.event
 
 import android.os.Build
@@ -33,23 +35,35 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
     coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns 1
 
     // Mock query for session by id
-    coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns flowOf(oldOpenSession)
+    coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns flowOf(
+        oldOpenSession
+    )
 
     // Mock query for events by session id
     //coEvery { eventLocalDataSource.loa(DbLocalEventQuery(sessionId = id)) } returns flowOf(oldOpenSession)
 
     // Mock query for open sessions
-    coEvery { eventLocalDataSource.loadAllFromType(SESSION_CAPTURE) } returns flowOf(oldOpenSession)
+    coEvery {
+        eventLocalDataSource.loadAllFromType(SESSION_CAPTURE)
+        eventLocalDataSource.loadAllSessions(false)
+    } returns flowOf(oldOpenSession)
 
     return oldOpenSession
 }
 
 fun EventRepositoryImplTest.mockDbToBeEmpty() {
     coEvery { eventLocalDataSource.count(type = SESSION_CAPTURE) } returns 0
-    coEvery { eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE) } returns flowOf()
+    coEvery {
+        eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
+        eventLocalDataSource.loadAllSessions(any())
+    } returns flowOf()
 }
 
-fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(sessionId: String, sessionIsClosed: Boolean, nEvents: Int): List<Event> {
+fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(
+    sessionId: String,
+    sessionIsClosed: Boolean,
+    nEvents: Int
+): List<Event> {
     val events = mutableListOf<Event>()
     events.add(createSessionCaptureEvent(sessionId, isClosed = sessionIsClosed))
     repeat(nEvents) {
@@ -73,7 +87,11 @@ fun assertANewSessionCaptureWasAdded(event: Event): Boolean =
         event.payload.modalities == listOf(Modes.FACE, FINGERPRINT) &&
         event.payload.appVersionName == EventRepositoryImplTest.APP_VERSION_NAME &&
         event.payload.language == EventRepositoryImplTest.LANGUAGE &&
-        event.payload.device == Device(VERSION.SDK_INT.toString(), Build.MANUFACTURER + "_" + Build.MODEL, EventRepositoryImplTest.DEVICE_ID) &&
+        event.payload.device == Device(
+        VERSION.SDK_INT.toString(),
+        Build.MANUFACTURER + "_" + Build.MODEL,
+        EventRepositoryImplTest.DEVICE_ID
+    ) &&
         event.payload.databaseInfo == DatabaseInfo(0) &&
         event.payload.endedAt == 0L &&
         !event.payload.sessionIsClosed
@@ -84,16 +102,25 @@ fun assertThatSessionCaptureEventWasClosed(event: Event): Boolean =
 
 fun assertThatArtificialTerminationEventWasAdded(event: Event, id: String): Boolean =
     event is ArtificialTerminationEvent &&
-        event.labels == EventLabels(sessionId = id, deviceId = EventRepositoryImplTest.DEVICE_ID, projectId = DEFAULT_PROJECT_ID) &&
+        event.labels == EventLabels(
+        sessionId = id,
+        deviceId = EventRepositoryImplTest.DEVICE_ID,
+        projectId = DEFAULT_PROJECT_ID
+    ) &&
         event.payload.reason == NEW_SESSION &&
         event.payload.createdAt == EventRepositoryImplTest.NOW
 
-fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(nEventsInTotal: Int, sessionEvent1: String = GUID1, sessionEvent2: String = GUID2): List<Event> {
+fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
+    nEventsInTotal: Int,
+    sessionEvent1: String = GUID1,
+    sessionEvent2: String = GUID2
+): List<Event> {
     val group1 = mockDbToLoadSessionWithEvents(sessionEvent1, true, nEventsInTotal / 2 - 1)
     val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
 
     coEvery {
         eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
+        eventLocalDataSource.loadAllSessions(true)
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
 
     return (group1 + group2)
@@ -124,7 +151,10 @@ suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecord
     return events.toList()
 }
 
-fun EventRepositoryImplTest.verifyArtificialEventWasAdded(id: String, reason: ArtificialTerminationPayload.Reason) {
+fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
+    id: String,
+    reason: ArtificialTerminationPayload.Reason
+) {
     coVerify {
         eventLocalDataSource.insertOrUpdate(match {
             it.type == ARTIFICIAL_TERMINATION &&
