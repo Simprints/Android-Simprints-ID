@@ -32,7 +32,7 @@ object RobolectricTestMocker {
             "some_bucket_url"
         )
 
-        val projectSettings: JsonNode = JsonHelper().jackson.createObjectNode().apply { put("key", "value") }
+        val projectSettings: JsonNode = JsonHelper.jackson.createObjectNode().apply { put("key", "value") }
 
         coEvery { projectLocalDataSource.load(any()) } returns project
         coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project

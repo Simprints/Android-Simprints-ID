@@ -5,13 +5,10 @@ import android.os.Build.VERSION
 import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
+import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventType
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.isNotASubjectEvent
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent

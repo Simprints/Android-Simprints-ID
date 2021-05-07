@@ -56,7 +56,7 @@ object KoinInjector {
             defineBuildersForPresenters()
             defineBuildersForGuidSelectionNotifiers()
             defineBuilderForDeviceManager()
-            factory { JsonHelper() }
+            factory { JsonHelper }
         }
 
     private fun Module.defineBuildersForDomainManagers() {

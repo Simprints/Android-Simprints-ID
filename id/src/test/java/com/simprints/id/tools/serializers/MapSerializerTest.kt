@@ -18,7 +18,7 @@ class MapSerializerTest {
 
     private val intSerializer: Serializer<Int> = mockIntSerializer()
     private val booleanSerializer: Serializer<Boolean> = mockBooleanSerializer()
-    private val mapSerializer = MapSerializer(intSerializer, booleanSerializer, JsonHelper())
+    private val mapSerializer = MapSerializer(intSerializer, booleanSerializer, JsonHelper)
 
     private fun mockIntSerializer(): Serializer<Int> {
         val serializer = mockk<Serializer<Int>>()
