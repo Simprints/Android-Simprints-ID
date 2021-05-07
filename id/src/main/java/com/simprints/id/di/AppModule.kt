@@ -217,10 +217,9 @@ open class AppModule {
     open fun provideDbEventDatabaseFactory(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
-        crashReportManager: CrashReportManager,
-        timeHelper: TimeHelper
+        crashReportManager: CrashReportManager
     ): EventDatabaseFactory =
-        DbEventDatabaseFactoryImpl(ctx, secureDataManager, crashReportManager, timeHelper)
+        DbEventDatabaseFactoryImpl(ctx, secureDataManager, crashReportManager)
 
     @Provides
     @Singleton
