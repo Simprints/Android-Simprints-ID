@@ -16,7 +16,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.CONSENT
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.domain.modality.Modes
@@ -65,15 +64,6 @@ class EventRoomDaoTest {
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
             .allowMainThreadQueries().build()
         eventDao = db.eventDao
-    }
-
-    @Test
-    fun loadByType() {
-        runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), type = CONSENT)
-            addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.loadFromType(type = SESSION_CAPTURE))
-        }
     }
 
     @Test

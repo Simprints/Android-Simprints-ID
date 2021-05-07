@@ -39,12 +39,8 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
         oldOpenSession
     )
 
-    // Mock query for events by session id
-    //coEvery { eventLocalDataSource.loa(DbLocalEventQuery(sessionId = id)) } returns flowOf(oldOpenSession)
-
     // Mock query for open sessions
     coEvery {
-        eventLocalDataSource.loadAllFromType(SESSION_CAPTURE)
         eventLocalDataSource.loadAllSessions(false)
     } returns flowOf(oldOpenSession)
 
@@ -54,7 +50,6 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
 fun EventRepositoryImplTest.mockDbToBeEmpty() {
     coEvery { eventLocalDataSource.count(type = SESSION_CAPTURE) } returns 0
     coEvery {
-        eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
         eventLocalDataSource.loadAllSessions(any())
     } returns flowOf()
 }
@@ -70,9 +65,6 @@ fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(
         events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = GUID1)))
     }
 
-    coEvery {
-        eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
-    } returns events.filterIsInstance<SessionCaptureEvent>().asFlow()
     coEvery {
         eventLocalDataSource.loadAllFromSession(sessionId = sessionId)
     } returns events.asFlow()
@@ -119,7 +111,6 @@ fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
     val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
 
     coEvery {
-        eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
         eventLocalDataSource.loadAllSessions(true)
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
 
@@ -160,15 +151,6 @@ fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
             it.type == ARTIFICIAL_TERMINATION &&
                 it.labels.sessionId == id &&
                 (it as ArtificialTerminationEvent).payload.reason == reason
-        })
-    }
-}
-
-fun EventRepositoryImplTest.verifySessionHasGotUploaded(id: String) {
-    coVerify(exactly = 1) { eventLocalDataSource.loadAllFromSession(sessionId = id) }
-    coVerify {
-        eventRemoteDataSource.post(any(), match {
-            it.any { it.id == id }
         })
     }
 }
