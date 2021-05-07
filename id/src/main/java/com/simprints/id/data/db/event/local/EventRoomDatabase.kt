@@ -15,7 +15,7 @@ import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.tools.time.TimeHelper
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [DbEvent::class], version = 2, exportSchema = true)
+@Database(entities = [DbEvent::class], version = 3, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
