@@ -47,7 +47,7 @@ class EventRoomDaoTest {
             sessionId = GUID1,
             deviceId = GUID1
         ),
-        SESSION_CAPTURE, "", CREATED_AT, ENDED_AT)
+        SESSION_CAPTURE, "", CREATED_AT, ENDED_AT, false)
 
     private lateinit var db: EventRoomDatabase
     private lateinit var eventDao: EventRoomDao
