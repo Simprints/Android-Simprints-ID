@@ -2,7 +2,6 @@ package com.simprints.id.data.db.event.local
 
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,9 +41,9 @@ open class EventLocalDataSourceImpl(
             eventDao.loadAllSessions(isClosed).map { it.fromDbToDomain() }.asFlow()
         }
 
-    override suspend fun loadOldestClosedSession(projectId: String): SessionCaptureEvent? =
+    override suspend fun loadAllClosedSessionIds(projectId: String): List<String> =
         withContext(readingDispatcher) {
-            eventDao.loadOldestClosedSession(projectId)?.fromDbToDomain() as SessionCaptureEvent?
+            eventDao.loadAllClosedSessionIds(projectId)
         }
 
     override suspend fun count(projectId: String): Int = withContext(readingDispatcher) {

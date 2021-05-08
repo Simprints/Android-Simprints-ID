@@ -98,12 +98,34 @@ class EventRoomDaoTest {
     }
 
     @Test
-    fun loadOldestClosedSession() {
+    fun loadAllClosedSessionIds() {
         runBlocking {
-            val oldEvent = event.copy(id = randomUUID(), sessionIsClosed = true, createdAt = 1)
-            val newEvent = event.copy(id = randomUUID(), sessionIsClosed = true, createdAt = 2)
-            addIntoDb(event, oldEvent, newEvent)
-            assertThat(oldEvent).isEqualTo(eventDao.loadOldestClosedSession(DEFAULT_PROJECT_ID))
+            val otherId = randomUUID()
+            val closedEvent = event.copy(
+                id = otherId,
+                sessionIsClosed = true,
+                labels = event.labels.copy(sessionId = otherId)
+            )
+
+            addIntoDb(event, closedEvent)
+            assertThat(listOf(closedEvent.id)).isEqualTo(
+                eventDao.loadAllClosedSessionIds(
+                    DEFAULT_PROJECT_ID
+                )
+            )
+        }
+    }
+
+    @Test
+    fun loadAbandonedEvents() {
+        runBlocking {
+            val closedEvent = event.copy(
+                id = randomUUID(),
+                labels = event.labels.copy(sessionId = null)
+            )
+
+            addIntoDb(event, closedEvent)
+            verifyEvents(listOf(closedEvent), eventDao.loadAbandonedEvents(DEFAULT_PROJECT_ID))
         }
     }
 

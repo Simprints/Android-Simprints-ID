@@ -3,6 +3,8 @@ package com.simprints.id.data.db.event
 import android.os.Build
 import android.os.Build.VERSION
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag.SYNC
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.DATABASE
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
@@ -144,23 +146,21 @@ open class EventRepositoryImpl(
             }
         }
 
-        var session = eventLocalDataSource.loadOldestClosedSession(projectId)
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading session ${session?.id}")
-
-        while (session != null) {
+        eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
             // The events will include the SessionCaptureEvent event
-            eventLocalDataSource.loadAllFromSession(sessionId = session.id).let {
+            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading session $sessionId")
+            eventLocalDataSource.loadAllFromSession(sessionId).let {
                 attemptEventUpload(it, projectId)
                 this.emit(it.size)
             }
-
-            session = eventLocalDataSource.loadOldestClosedSession(projectId)
         }
 
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading abandoned events")
-        val nonSessionEvents = eventLocalDataSource.loadAbandonedEvents(projectId)
-        attemptEventUpload(nonSessionEvents, projectId)
-        this.emit(nonSessionEvents.size)
+        eventLocalDataSource.loadAbandonedEvents(projectId).let {
+            crashReportManager.logMessageForCrashReport(SYNC, DATABASE, message = "Abandoned Events: ${it.size}")
+            attemptEventUpload(it, projectId)
+            this.emit(it.size)
+        }
     }
 
 
