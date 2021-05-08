@@ -103,7 +103,7 @@ class EventRoomDaoTest {
             val oldEvent = event.copy(id = randomUUID(), sessionIsClosed = true, createdAt = 1)
             val newEvent = event.copy(id = randomUUID(), sessionIsClosed = true, createdAt = 2)
             addIntoDb(event, oldEvent, newEvent)
-            assertThat(oldEvent).isEqualTo(eventDao.loadOldestClosedSession())
+            assertThat(oldEvent).isEqualTo(eventDao.loadOldestClosedSession(DEFAULT_PROJECT_ID))
         }
     }
 

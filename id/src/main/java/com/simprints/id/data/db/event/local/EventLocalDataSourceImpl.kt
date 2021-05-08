@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.local
 
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.local.models.fromDbToDomain
 import com.simprints.id.data.db.event.local.models.fromDomainToDb
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,9 +27,9 @@ open class EventLocalDataSourceImpl(
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
-    override suspend fun loadAllFromSession(sessionId: String): Flow<Event> =
+    override suspend fun loadAllFromSession(sessionId: String): List<Event> =
         withContext(readingDispatcher) {
-            eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }.asFlow()
+            eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
         }
 
     override suspend fun loadAllFromProject(projectId: String): Flow<Event> =
@@ -41,9 +42,10 @@ open class EventLocalDataSourceImpl(
             eventDao.loadAllSessions(isClosed).map { it.fromDbToDomain() }.asFlow()
         }
 
-    override suspend fun loadOldestClosedSession(): Event = withContext(readingDispatcher) {
-        eventDao.loadOldestClosedSession().fromDbToDomain()
-    }
+    override suspend fun loadOldestClosedSession(projectId: String): SessionCaptureEvent? =
+        withContext(readingDispatcher) {
+            eventDao.loadOldestClosedSession(projectId)?.fromDbToDomain() as SessionCaptureEvent?
+        }
 
     override suspend fun count(projectId: String): Int = withContext(readingDispatcher) {
         eventDao.countFromProject(projectId = projectId)
@@ -61,6 +63,11 @@ open class EventLocalDataSourceImpl(
     override suspend fun insertOrUpdate(event: Event) = withContext(writingContext) {
         eventDao.insertOrUpdate(event.fromDomainToDb())
     }
+
+    override suspend fun loadAbandonedEvents(projectId: String): List<Event> =
+        withContext(writingContext) {
+            eventDao.loadAbandonedEvents(projectId).map { it.fromDbToDomain() }
+        }
 
     override suspend fun delete(id: String) = withContext(writingContext) {
         eventDao.delete(id = id)
