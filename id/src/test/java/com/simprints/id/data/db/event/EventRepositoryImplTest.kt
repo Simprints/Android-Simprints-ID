@@ -220,7 +220,7 @@ class EventRepositoryImplTest {
             }
         }
     }
-    
+
     @Test
     fun upload_shouldLoadAllEventsPartOfSessionsToUpload() {
         runBlocking {
@@ -280,8 +280,9 @@ class EventRepositoryImplTest {
 
             val progress = eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE / 2)
+            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(progress[2]).isEqualTo(SESSION_BATCH_SIZE / 2)
         }
     }
 
@@ -412,7 +413,8 @@ class EventRepositoryImplTest {
         }
     }
 
-    private fun mockSignedId() = every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+    private fun mockSignedId() =
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 
     companion object {
         const val DEVICE_ID = "DEVICE_ID"
