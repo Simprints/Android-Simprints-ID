@@ -62,7 +62,7 @@ fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(
     val events = mutableListOf<Event>()
     events.add(createSessionCaptureEvent(sessionId, isClosed = sessionIsClosed))
     repeat(nEvents) {
-        events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = GUID1)))
+        events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = sessionId)))
     }
 
     coEvery {
@@ -116,19 +116,13 @@ fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
 
     coEvery {
         eventLocalDataSource.loadAllClosedSessionIds(any())
-    } returns (group1 + group2).map { it.id }.toList()
+    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
 
     coEvery {
         eventLocalDataSource.loadAbandonedEvents(any())
     } returns (group1 + group2).filter { it.labels.sessionId.isNullOrBlank() }
 
     return (group1 + group2)
-}
-
-fun EventRepositoryImplTest.mockDbToLoadOldOpenSession(id: String) {
-    val session = createSessionCaptureEvent(id, timeHelper.now())
-    coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns listOf(session)
-    coEvery { eventLocalDataSource.loadAll() } returns flowOf(session)
 }
 
 fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
@@ -146,6 +140,10 @@ suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecord
     coEvery {
         eventLocalDataSource.loadAllFromProject(projectId = DEFAULT_PROJECT_ID)
     } returns events.asFlow()
+
+    coEvery {
+        eventLocalDataSource.loadAbandonedEvents(any())
+    } returns events.filter { it.labels.sessionId.isNullOrBlank() }
 
     return events.toList()
 }
