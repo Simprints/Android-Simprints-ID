@@ -86,7 +86,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
                         savedPref.firstOrNull { it.finger == finger }?.removable = false
                     }
             } catch (e: NoSuchPreferenceError) {
-                Timber.d(e)
+                Timber.e(e)
             }
         }
 
