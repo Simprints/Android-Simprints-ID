@@ -2,7 +2,6 @@ package com.simprints.id.data.db.event
 
 import android.os.Build
 import android.os.Build.VERSION
-import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.*
@@ -23,12 +22,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.tools.extensions.bufferedChunks
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -139,8 +135,6 @@ open class EventRepositoryImpl(
     ): ReceiveChannel<Event> =
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading")
 
@@ -150,30 +144,43 @@ open class EventRepositoryImpl(
             }
         }
 
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading batches")
-        val batches = createBatches(projectId)
+        var session = eventLocalDataSource.loadOldestClosedSession(projectId)
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading session ${session?.id}")
 
-        batches.collect { events ->
-            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading ${events.size} events in a batch")
-
-            try {
-                uploadEvents(events, projectId)
-                deleteEventsFromDb(events.map { it.id })
-            } catch (t: Throwable) {
-                Timber.d(t)
-                if (t.isClientAndCloudIntegrationIssue()) {
-                    crashReportManager.logException(t)
-                    // We do not delete subject events (pokedex) since they are important.
-                    deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
-                }
+        while (session != null) {
+            // The events will include the SessionCaptureEvent event
+            eventLocalDataSource.loadAllFromSession(sessionId = session.id).let {
+                attemptEventUpload(it, projectId)
+                this.emit(it.size)
             }
-            this.emit(events.size)
+
+            session = eventLocalDataSource.loadOldestClosedSession(projectId)
         }
+
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading abandoned events")
+        val nonSessionEvents = eventLocalDataSource.loadAbandonedEvents(projectId)
+        attemptEventUpload(nonSessionEvents, projectId)
+        this.emit(nonSessionEvents.size)
     }
+
 
     override suspend fun deleteSessionEvents(sessionId: String) {
         reportException {
             eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
+        }
+    }
+
+    private suspend fun attemptEventUpload(events: List<Event>, projectId: String) {
+        try {
+            uploadEvents(events, projectId)
+            deleteEventsFromDb(events.map { it.id })
+        } catch (t: Throwable) {
+            Timber.w(t)
+            if (t.isClientAndCloudIntegrationIssue()) {
+                crashReportManager.logException(t)
+                // We do not delete subject events (pokedex) since they are important.
+                deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
+            }
         }
     }
 
@@ -188,56 +195,6 @@ open class EventRepositoryImpl(
         eventsIds.forEach {
             Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting $it")
             eventLocalDataSource.delete(id = it)
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    @VisibleForTesting
-    suspend fun createBatches(projectId: String): Flow<List<Event>> {
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Creating batches")
-        return flowOf(
-            createBatchesForEventsNotInSessions(projectId),
-            createBatchesForEventsInSessions(projectId)
-        ).flattenConcat()
-    }
-
-    @ExperimentalCoroutinesApi
-    @Deprecated(
-        "Before 2021.1.0, SID could have events not associated with a session in the db like " +
-            "EnrolmentRecordCreationEvent that need to be uploaded. After 2021.1.0, SID doesn't generate " +
-            "EnrolmentRecordCreationEvent anymore during an enrolment and the event is used only for the down-sync " +
-            "(transformed to a subject). So this logic to batch the 'not-related with a session' events is unnecessary " +
-            "from 2021.1.0, but it's still required during the migration from previous app versions since the DB may " +
-            "still have EnrolmentRecordCreationEvents in the db to upload. Once all devices are on 2021.1.0+, this logic" +
-            "can be deleted."
-    )
-    private suspend fun createBatchesForEventsNotInSessions(projectId: String): Flow<List<Event>> {
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Record events to upload")
-
-        val events = eventLocalDataSource
-            .loadAllFromProject(projectId = projectId)
-            .filter { it.labels.sessionId == null }
-            .bufferedChunks(SESSION_BATCH_SIZE)
-
-        return events.map { it.toList() }
-    }
-
-    /**
-     * Each session will create its own Batch. Sessions have between 10 and 20 events, which renders [SESSION_BATCH_SIZE]
-     * pretty much useless, as no 2 sessions will ever be merged. Because of that, it means that each session will
-     * be uploaded individually to BFSID.
-     */
-    private suspend fun createBatchesForEventsInSessions(projectId: String): Flow<List<Event>> {
-        // We don't upload unsigned sessions because the back-end would reject them.
-        val sessionsToUpload: Flow<SessionCaptureEvent> = loadSessions(true)
-            .filter { it.labels.projectId == projectId }
-            .filter { it.labels.projectId != PROJECT_ID_FOR_NOT_SIGNED_IN }
-
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Sessions to upload ${sessionsToUpload.count()}")
-
-        return sessionsToUpload.map { session ->
-            eventLocalDataSource.loadAllFromSession(sessionId = session.id).toList()
         }
     }
 
@@ -295,7 +252,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun loadEventsIntoCache(sessionId: String) {
-        eventLocalDataSource.loadAllFromSession(sessionId).collect {
+        eventLocalDataSource.loadAllFromSession(sessionId).forEach {
             sessionDataCache.eventCache[it.id] = it
         }
     }
