@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.DefaultTestConstants.defaultSubject
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.defaultSubject
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.EventRepository

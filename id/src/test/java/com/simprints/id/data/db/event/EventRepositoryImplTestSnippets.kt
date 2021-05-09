@@ -4,9 +4,9 @@ package com.simprints.id.data.db.event
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.DefaultTestConstants.GUID1
-import com.simprints.id.sampledata.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent

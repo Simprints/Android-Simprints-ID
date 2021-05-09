@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.events_sync.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.DefaultTestConstants
-import com.simprints.id.sampledata.DefaultTestConstants.TIME1
-import com.simprints.id.sampledata.DefaultTestConstants.projectUpSyncScope
+import com.simprints.id.sampledata.SampleDefaults
+import com.simprints.id.sampledata.SampleDefaults.TIME1
+import com.simprints.id.sampledata.SampleDefaults.projectUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
 import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao
@@ -32,7 +32,7 @@ class EventUpSyncScopeRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
         eventUpSyncScopeRepository = EventUpSyncScopeRepositoryImpl(loginInfoManager, upSyncOperationOperationDao)
 
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DefaultTestConstants.DEFAULT_PROJECT_ID
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns SampleDefaults.DEFAULT_PROJECT_ID
         coEvery { upSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 

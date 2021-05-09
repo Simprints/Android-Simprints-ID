@@ -2,14 +2,14 @@ package com.simprints.id.data.db.event.domain.models.session
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
-import com.simprints.id.sampledata.DefaultTestConstants.ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.DefaultTestConstants.GUID1
-import com.simprints.id.sampledata.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.sampledata.SessionCaptureEventSample
 import org.junit.Test
 

@@ -2,7 +2,7 @@ package com.simprints.id.data.db.subject.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.subject.domain.FaceIdentity

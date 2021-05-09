@@ -2,13 +2,13 @@ package com.simprints.id.data.db.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_METADATA
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.sampledata.DefaultTestConstants.GUID1
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_METADATA
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_VERIFICATION
 import com.simprints.id.data.db.event.domain.models.callout.VerificationCalloutEvent.Companion.EVENT_VERSION

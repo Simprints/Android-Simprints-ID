@@ -2,7 +2,7 @@ package com.simprints.id.sampledata
 
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 
 object Vero2InfoSnapshotEventSample : SampleEvent() {
     override fun getEvent(
@@ -10,7 +10,7 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
         subjectId: String,
         isClosed: Boolean
     ): Vero2InfoSnapshotEvent {
-        val labels = EventLabels(sessionId = DefaultTestConstants.GUID1)
+        val labels = EventLabels(sessionId = SampleDefaults.GUID1)
         val versionArg = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version(
             0,
             "cypressApp",

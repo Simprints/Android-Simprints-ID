@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools
 
 import android.util.Base64
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.sampledata.DefaultTestConstants
+import com.simprints.id.sampledata.SampleDefaults
 
 object AndroidDefaultTestConstants {
 
@@ -10,6 +10,6 @@ object AndroidDefaultTestConstants {
     val DEFAULT_REALM_KEY: ByteArray = Base64.decode(DEFAULT_REALM_KEY_STRING, Base64.NO_WRAP)
 
     val DEFAULT_LOCAL_DB_KEY = LocalDbKey(
-        projectId = DefaultTestConstants.DEFAULT_PROJECT_ID,
+        projectId = SampleDefaults.DEFAULT_PROJECT_ID,
         value = DEFAULT_REALM_KEY)
 }

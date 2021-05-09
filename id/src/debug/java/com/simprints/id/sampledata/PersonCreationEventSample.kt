@@ -2,9 +2,9 @@ package com.simprints.id.sampledata
 
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
-import com.simprints.id.sampledata.DefaultTestConstants.GUID1
-import com.simprints.id.sampledata.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 
 object PersonCreationEventSample : SampleEvent() {
     override fun getEvent(

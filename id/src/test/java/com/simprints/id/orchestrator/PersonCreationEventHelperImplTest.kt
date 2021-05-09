@@ -18,7 +18,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.tools.EncodingUtilsTest
 import com.simprints.id.tools.time.TimeHelper
 import io.mockk.MockKAnnotations

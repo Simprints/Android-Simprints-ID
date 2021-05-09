@@ -4,9 +4,9 @@ import com.google.common.truth.Truth
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.id.sampledata.CompletionCheckEventSample
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_ENDED_AT
-import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class CompletionCheckEventTest {
