@@ -7,6 +7,7 @@ import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent.Companion.EVENT_VERSION
+import com.simprints.id.sampledata.PersonCreationEventSample
 import org.junit.Test
 
 class PersonCreationEventTest {
@@ -16,7 +17,7 @@ class PersonCreationEventTest {
         val labels = EventLabels(sessionId = GUID1)
         val fingerprintCaptureEventIds = listOf(GUID1)
         val faceCaptureEventIds = listOf(GUID2)
-        val event = PersonCreationEvent(CREATED_AT, fingerprintCaptureEventIds, GUID1, faceCaptureEventIds, GUID2, labels)
+        val event = PersonCreationEventSample.getEvent()
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

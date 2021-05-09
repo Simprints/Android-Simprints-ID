@@ -2,16 +2,15 @@ package com.simprints.id.data.db.event.domain.models.session
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.commontesttools.events.eventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
-import com.simprints.id.domain.modality.Modes.FACE
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.id.sampledata.DEFAULTS.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.DEFAULTS.GUID1
+import com.simprints.id.sampledata.DEFAULTS.GUID2
+import com.simprints.id.sampledata.SessionCaptureEventSample
 import org.junit.Test
 
 class SessionCaptureEventTest {
@@ -24,21 +23,13 @@ class SessionCaptureEventTest {
         val deviceArg = Device(
             Build.VERSION.SDK_INT.toString(),
             Build.MANUFACTURER + "_" + Build.MODEL,
-            GUID1)
+            GUID1
+        )
 
         val databaseInfoArg = DatabaseInfo(2, recordCount = 2)
         val locationArg = Location(0.0, 0.0)
 
-        val event = SessionCaptureEvent(
-            GUID2,
-            DEFAULT_PROJECT_ID,
-            CREATED_AT,
-            listOf(FINGERPRINT, FACE),
-            appVersionNameArg,
-            libSimprintsVersionNameArg,
-            languageArg,
-            deviceArg,
-            databaseInfoArg)
+        val event = SessionCaptureEventSample.getEvent(GUID2)
         event.payload.location = locationArg
         event.payload.analyticsId = GUID1
         event.payload.endedAt = ENDED_AT
