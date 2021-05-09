@@ -1,9 +1,9 @@
 package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.DefaultTestConstants
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID_2
+import com.simprints.id.sampledata.SampleDefaults
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.encodingUtilsForTests
 import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordDeletionEvent
@@ -35,8 +35,8 @@ import org.junit.Test
 
 class EventDownSyncHelperImplTest {
 
-    private val projectOp = DefaultTestConstants.projectDownSyncScope.operations.first()
-    private val moduleOp = DefaultTestConstants.modulesDownSyncScope.operations.first()
+    private val projectOp = SampleDefaults.projectDownSyncScope.operations.first()
+    private val moduleOp = SampleDefaults.modulesDownSyncScope.operations.first()
 
     private lateinit var downloadEventsChannel: Channel<Event>
 

@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.DefaultTestConstants.GUID1
-import com.simprints.id.sampledata.DefaultTestConstants.GUID2
-import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
-import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent.Companion.EVENT_VERSION
 import com.simprints.id.sampledata.PersonCreationEventSample
