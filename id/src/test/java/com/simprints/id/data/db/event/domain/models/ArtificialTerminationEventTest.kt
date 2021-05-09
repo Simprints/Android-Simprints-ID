@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent

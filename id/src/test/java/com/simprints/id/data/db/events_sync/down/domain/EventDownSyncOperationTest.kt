@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODES
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.modulesDownSyncScope
-import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
-import com.simprints.id.commontesttools.DefaultTestConstants.userDownSyncScope
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODES
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID_2
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.sampledata.DefaultTestConstants.modulesDownSyncScope
+import com.simprints.id.sampledata.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.sampledata.DefaultTestConstants.userDownSyncScope
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import org.junit.Test
 import java.util.*

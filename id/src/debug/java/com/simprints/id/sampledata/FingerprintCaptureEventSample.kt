@@ -4,9 +4,9 @@ import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.sampledata.DEFAULTS.CREATED_AT
-import com.simprints.id.sampledata.DEFAULTS.ENDED_AT
-import com.simprints.id.sampledata.DEFAULTS.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
 
 object FingerprintCaptureEventSample : SampleEvent() {
 

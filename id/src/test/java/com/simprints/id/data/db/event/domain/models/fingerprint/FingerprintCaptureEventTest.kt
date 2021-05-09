@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.Companion.EVENT_VERSION

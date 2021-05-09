@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent.GuidSelectionPayload

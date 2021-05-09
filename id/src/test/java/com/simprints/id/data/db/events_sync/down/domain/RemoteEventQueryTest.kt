@@ -1,12 +1,12 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODES
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULES
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODES
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULES
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.GUID2
 import com.simprints.id.data.db.event.domain.models.EventType.*
 import com.simprints.id.data.db.event.remote.fromDomainToApi
 import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*

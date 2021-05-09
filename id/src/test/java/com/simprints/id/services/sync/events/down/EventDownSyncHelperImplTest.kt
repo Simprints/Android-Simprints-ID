@@ -1,9 +1,9 @@
 package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
+import com.simprints.id.sampledata.DefaultTestConstants
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.encodingUtilsForTests
 import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordDeletionEvent

@@ -8,12 +8,12 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.createEnrolmentEventV1
 import com.simprints.id.data.db.common.RemoteDbManager

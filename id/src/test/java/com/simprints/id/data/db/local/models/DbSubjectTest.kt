@@ -2,9 +2,9 @@ package com.simprints.id.data.db.local.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomFaceSample
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomFingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject

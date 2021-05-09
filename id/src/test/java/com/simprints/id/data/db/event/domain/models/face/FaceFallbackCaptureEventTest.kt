@@ -2,9 +2,9 @@ package com.simprints.id.data.db.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.id.data.db.event.domain.models.face.FaceFallbackCaptureEvent.Companion.EVENT_VERSION

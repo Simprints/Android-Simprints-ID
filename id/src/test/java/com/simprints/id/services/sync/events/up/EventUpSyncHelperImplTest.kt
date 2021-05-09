@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.sampledata.DefaultTestConstants
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.Event
