@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.down.workers
 
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress

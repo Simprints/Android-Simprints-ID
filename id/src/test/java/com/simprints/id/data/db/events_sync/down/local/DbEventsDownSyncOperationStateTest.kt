@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.events_sync.down.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.TIME1
-import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.TIME1
+import com.simprints.id.sampledata.DefaultTestConstants.projectDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
 import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState

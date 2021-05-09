@@ -1,12 +1,12 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.id.sampledata.CompletionCheckEventSample
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
 import org.junit.Test
 
 class CompletionCheckEventTest {
@@ -14,7 +14,7 @@ class CompletionCheckEventTest {
     @Test
     fun create_CompletionCheckEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = CompletionCheckEventSample.getEvent()
+        val event = CompletionCheckEventSample.getEvent(GUID1)
         Truth.assertThat(event.id).isNotNull()
         Truth.assertThat(event.labels).isEqualTo(labels)
         Truth.assertThat(event.type).isEqualTo(COMPLETION_CHECK)

@@ -2,13 +2,6 @@ package com.simprints.id.commontesttools.events
 
 import android.net.NetworkInfo.DetailedState.CONNECTED
 import android.os.Build
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.encodingUtilsForTests
 import com.simprints.id.data.db.event.domain.models.*
@@ -54,11 +47,16 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.id.domain.modality.Modes.FACE
 import com.simprints.id.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
+import com.simprints.id.sampledata.DefaultTestConstants.CREATED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_METADATA
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID_2
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.sampledata.DefaultTestConstants.ENDED_AT
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.GUID2
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
-
-const val CREATED_AT: Long = 1234L
-const val ENDED_AT: Long = 4567L
-const val DEFAULT_ENDED_AT: Long = 0L
 
 val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
 val ENDED_AT_RANGE = LongRange(ENDED_AT - 10, ENDED_AT + 10)

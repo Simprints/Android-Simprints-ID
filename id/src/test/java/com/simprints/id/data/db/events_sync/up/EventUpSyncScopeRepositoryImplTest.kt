@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.events_sync.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants
-import com.simprints.id.commontesttools.DefaultTestConstants.TIME1
-import com.simprints.id.commontesttools.DefaultTestConstants.projectUpSyncScope
+import com.simprints.id.sampledata.DefaultTestConstants
+import com.simprints.id.sampledata.DefaultTestConstants.TIME1
+import com.simprints.id.sampledata.DefaultTestConstants.projectUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
 import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao

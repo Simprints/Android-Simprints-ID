@@ -2,10 +2,10 @@ package com.simprints.id.data.db.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID3
+import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.DefaultTestConstants.GUID3
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
