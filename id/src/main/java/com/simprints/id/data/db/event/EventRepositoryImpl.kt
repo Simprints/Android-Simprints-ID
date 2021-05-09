@@ -205,10 +205,8 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
-        eventsIds.forEach {
-            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting $it")
-            eventLocalDataSource.delete(id = it)
-        }
+        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
+        eventLocalDataSource.delete(eventsIds)
     }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
