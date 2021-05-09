@@ -6,6 +6,7 @@ import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.id.sampledata.CompletionCheckEventSample
 import org.junit.Test
 
 class CompletionCheckEventTest {
@@ -13,7 +14,7 @@ class CompletionCheckEventTest {
     @Test
     fun create_CompletionCheckEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = CompletionCheckEvent(CREATED_AT, true, labels)
+        val event = CompletionCheckEventSample.getEvent()
         Truth.assertThat(event.id).isNotNull()
         Truth.assertThat(event.labels).isEqualTo(labels)
         Truth.assertThat(event.type).isEqualTo(COMPLETION_CHECK)

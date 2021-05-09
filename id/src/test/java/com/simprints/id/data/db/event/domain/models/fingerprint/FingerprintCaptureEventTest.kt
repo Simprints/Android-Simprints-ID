@@ -9,8 +9,8 @@ import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTUR
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.id.sampledata.FingerprintCaptureEventSample
 import org.junit.Test
 
 class FingerprintCaptureEventTest {
@@ -19,15 +19,7 @@ class FingerprintCaptureEventTest {
     fun create_FingerprintCaptureEvent() {
         val labels = EventLabels(sessionId = GUID1)
         val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
-        val event = FingerprintCaptureEvent(
-            CREATED_AT,
-            ENDED_AT,
-            LEFT_THUMB,
-            10,
-            BAD_QUALITY,
-            fingerprint,
-            GUID1,
-            labels)
+        val event = FingerprintCaptureEventSample.getEvent()
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
