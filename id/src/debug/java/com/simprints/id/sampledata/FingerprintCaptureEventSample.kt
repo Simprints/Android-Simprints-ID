@@ -6,16 +6,13 @@ import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTempl
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
 
 object FingerprintCaptureEventSample : SampleEvent() {
 
     override fun getEvent(
-        sessionId: String,
-        subjectId: String,
+        labels: EventLabels,
         isClosed: Boolean
     ): FingerprintCaptureEvent {
-        val labels = EventLabels(sessionId = GUID1)
         val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
             FingerIdentifier.LEFT_THUMB,
             8,
@@ -30,8 +27,7 @@ object FingerprintCaptureEventSample : SampleEvent() {
             10,
             FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
             fingerprint,
-            GUID1,
-            labels
+            labels = labels
         )
     }
 

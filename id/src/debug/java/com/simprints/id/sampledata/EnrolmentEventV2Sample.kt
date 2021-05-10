@@ -11,11 +11,9 @@ import com.simprints.id.sampledata.SampleDefaults.GUID2
 
 object EnrolmentEventV2Sample : SampleEvent() {
     override fun getEvent(
-        sessionId: String,
-        subjectId: String,
+        labels: EventLabels,
         isClosed: Boolean
     ): EnrolmentEventV2 {
-        val labels = EventLabels(sessionId = sessionId)
         return EnrolmentEventV2(
             CREATED_AT,
             GUID1,
