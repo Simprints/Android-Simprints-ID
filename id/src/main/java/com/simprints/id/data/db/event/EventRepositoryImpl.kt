@@ -266,15 +266,12 @@ open class EventRepositoryImpl(
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
     private suspend fun closeAllSessions(reason: Reason) {
-
         sessionDataCache.eventCache.clear()
-
         loadSessions(false).collect { closeSession(it, reason) }
     }
 
     override suspend fun closeCurrentSession(reason: Reason?) {
         closeSession(getCurrentCaptureSessionEvent(), reason)
-
         sessionDataCache.eventCache.clear()
     }
 
@@ -294,9 +291,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun loadSessions(isClosed: Boolean): Flow<SessionCaptureEvent> {
-        return eventLocalDataSource.loadAllFromType(type = SESSION_CAPTURE)
-            .map { it as SessionCaptureEvent }
-            .filter { it.payload.sessionIsClosed == isClosed }
+        return eventLocalDataSource.loadAllSessions(isClosed).map { it as SessionCaptureEvent }
     }
 
     private suspend fun loadEventsIntoCache(sessionId: String) {

@@ -26,25 +26,33 @@ open class EventLocalDataSourceImpl(
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
-    override suspend fun loadAllFromSession(sessionId: String): Flow<Event> = withContext(readingDispatcher) {
-        eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }.asFlow()
-    }
+    override suspend fun loadAllFromSession(sessionId: String): Flow<Event> =
+        withContext(readingDispatcher) {
+            eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }.asFlow()
+        }
 
-    override suspend fun loadAllFromProject(projectId: String): Flow<Event> = withContext(readingDispatcher) {
-        eventDao.loadFromProject(projectId = projectId).map { it.fromDbToDomain() }.asFlow()
-    }
+    override suspend fun loadAllFromProject(projectId: String): Flow<Event> =
+        withContext(readingDispatcher) {
+            eventDao.loadFromProject(projectId = projectId).map { it.fromDbToDomain() }.asFlow()
+        }
 
-    override suspend fun loadAllFromType(type: EventType): Flow<Event> = withContext(readingDispatcher) {
-        eventDao.loadFromType(type = type).map { it.fromDbToDomain() }.asFlow()
+    override suspend fun loadAllSessions(isClosed: Boolean): Flow<Event> =
+        withContext(readingDispatcher) {
+            eventDao.loadAllSessions(isClosed).map { it.fromDbToDomain() }.asFlow()
+        }
+
+    override suspend fun loadOldestClosedSession(): Event = withContext(readingDispatcher) {
+        eventDao.loadOldestClosedSession().fromDbToDomain()
     }
 
     override suspend fun count(projectId: String): Int = withContext(readingDispatcher) {
         eventDao.countFromProject(projectId = projectId)
     }
 
-    override suspend fun count(projectId: String, type: EventType): Int = withContext(readingDispatcher) {
-        eventDao.countFromProjectByType(type = type, projectId = projectId)
-    }
+    override suspend fun count(projectId: String, type: EventType): Int =
+        withContext(readingDispatcher) {
+            eventDao.countFromProjectByType(type = type, projectId = projectId)
+        }
 
     override suspend fun count(type: EventType): Int = withContext(readingDispatcher) {
         eventDao.countFromType(type = type)

@@ -10,16 +10,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
-import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
-import com.simprints.id.activities.qrcapture.tools.CameraFocusManagerImpl
-import com.simprints.id.activities.qrcapture.tools.CameraHelper
-import com.simprints.id.activities.qrcapture.tools.CameraHelperImpl
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetectorImpl
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducerImpl
-import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
-import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilderImpl
+import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -42,13 +33,8 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
-import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
-import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
-import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -314,7 +300,12 @@ open class AppModule {
         preferencesManager: PreferencesManager,
         crashReportManager: CrashReportManager
     ): FetchGuidHelper =
-        FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
+        FetchGuidHelperImpl(
+            downSyncHelper,
+            subjectRepository,
+            preferencesManager,
+            crashReportManager
+        )
 
     @Provides
     open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
@@ -382,7 +373,8 @@ open class AppModule {
         eventRepository: EventRepository,
         timeHelper: TimeHelper,
         encodingUtils: EncodingUtils
-    ): PersonCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
+    ): PersonCreationEventHelper =
+        PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
