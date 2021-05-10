@@ -166,7 +166,11 @@ open class EventRepositoryImpl(
 
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading abandoned events")
         eventLocalDataSource.loadAbandonedEvents(projectId).let {
-            crashReportManager.logMessageForCrashReport(SYNC, DATABASE, message = "Abandoned Events: ${it.size}")
+            crashReportManager.logMessageForCrashReport(
+                SYNC,
+                DATABASE,
+                message = "Abandoned Events: ${it.size}"
+            )
             attemptEventUpload(it, projectId)
             this.emit(it.size)
         }

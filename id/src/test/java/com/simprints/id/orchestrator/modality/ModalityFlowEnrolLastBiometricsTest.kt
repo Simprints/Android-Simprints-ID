@@ -2,11 +2,11 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_METADATA
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_METADATA
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.commontesttools.moduleApi.AppEnrolLastBiometricsRequestApi
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.cache.HotCache

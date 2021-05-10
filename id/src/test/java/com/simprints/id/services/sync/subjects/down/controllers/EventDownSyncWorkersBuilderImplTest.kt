@@ -4,9 +4,9 @@ import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.modulesDownSyncScope
-import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
-import com.simprints.id.commontesttools.DefaultTestConstants.userDownSyncScope
+import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
+import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.services.sync.events.common.*

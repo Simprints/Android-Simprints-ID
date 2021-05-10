@@ -2,14 +2,14 @@ package com.simprints.id.activities.fetchguid
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.defaultSubject
-import com.simprints.id.commontesttools.events.CREATED_AT
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
 import com.simprints.id.tools.time.TimeHelper
