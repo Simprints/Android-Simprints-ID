@@ -10,11 +10,9 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 
 object EnrolmentCalloutEventSample : SampleEvent() {
     override fun getEvent(
-        sessionId: String,
-        subjectId: String,
+        labels: EventLabels,
         isClosed: Boolean
     ): EnrolmentCalloutEvent {
-        val labels = EventLabels(sessionId = sessionId)
         return EnrolmentCalloutEvent(
             CREATED_AT,
             DEFAULT_PROJECT_ID,

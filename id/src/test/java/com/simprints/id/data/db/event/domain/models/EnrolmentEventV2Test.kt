@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.id.sampledata.EnrolmentEventV2Sample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -9,7 +10,6 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.sampledata.EnrolmentEventV2Sample
 import org.junit.Test
 
 class EnrolmentEventV2Test {
@@ -17,7 +17,7 @@ class EnrolmentEventV2Test {
     @Test
     fun create_EnrolmentEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = EnrolmentEventV2Sample.getEvent(GUID1)
+        val event = EnrolmentEventV2Sample.getEvent(labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(EventType.ENROLMENT_V2)

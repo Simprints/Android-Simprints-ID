@@ -14,7 +14,7 @@ class CompletionCheckEventTest {
     @Test
     fun create_CompletionCheckEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = CompletionCheckEventSample.getEvent(GUID1)
+        val event = CompletionCheckEventSample.getEvent(labels)
         Truth.assertThat(event.id).isNotNull()
         Truth.assertThat(event.labels).isEqualTo(labels)
         Truth.assertThat(event.type).isEqualTo(COMPLETION_CHECK)
