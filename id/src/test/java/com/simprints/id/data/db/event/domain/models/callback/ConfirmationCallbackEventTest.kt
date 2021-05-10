@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_CONFIRMATION
 import com.simprints.id.data.db.event.domain.models.callback.ConfirmationCallbackEvent.Companion.EVENT_VERSION

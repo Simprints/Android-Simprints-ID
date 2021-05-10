@@ -2,10 +2,6 @@ package com.simprints.id.data.db.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID3
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
@@ -24,6 +20,10 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.id.sampledata.SampleDefaults.GUID3
 import com.simprints.id.tools.time.TimeHelper
 import io.kotlintest.shouldThrow
 import io.mockk.*
@@ -264,10 +264,11 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            events.forEach {
-                coVerify {
-                    eventLocalDataSource.delete(id = it.id)
-                }
+            coVerify {
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
+                    .map { it.id })
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
+                    .map { it.id })
             }
         }
     }
@@ -295,8 +296,11 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            for (event in events) {
-                coVerify { eventLocalDataSource.delete(id = event.id) }
+            coVerify {
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
+                    .map { it.id })
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
+                    .map { it.id })
             }
         }
     }
@@ -328,13 +332,14 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            for (event in events) {
-                coVerify { eventLocalDataSource.delete(id = event.id) }
+            coVerify {
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
+                    .map { it.id })
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
+                    .map { it.id })
             }
 
-            for (event in subjectEvents) {
-                coVerify(exactly = 0) { eventLocalDataSource.delete(id = event.id) }
-            }
+            coVerify(exactly = 0) { eventLocalDataSource.delete(subjectEvents.map { it.id }) }
         }
     }
 

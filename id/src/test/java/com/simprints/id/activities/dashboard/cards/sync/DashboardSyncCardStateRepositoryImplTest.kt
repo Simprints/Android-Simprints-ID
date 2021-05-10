@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -62,7 +62,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
         every { eventSyncManager.getLastSyncState() } returns syncStateLiveData
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.projectDownSyncScope
         every { preferencesManager.selectedModules } returns emptySet()
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
         every { eventSyncManager.hasSyncEverRunBefore() } returns true
@@ -94,7 +94,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.ON
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -106,7 +106,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -118,7 +118,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.OFF
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -129,8 +129,8 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @Test
     fun modulesSelectedWithSyncByModule_syncStateShouldBeConnecting() = runBlockingTest {
-        every { preferencesManager.selectedModules } returns setOf(DefaultTestConstants.DEFAULT_MODULE_ID)
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.modulesDownSyncScope
+        every { preferencesManager.selectedModules } returns setOf(SampleDefaults.DEFAULT_MODULE_ID)
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
@@ -141,7 +141,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun noModulesSelectedWithSyncByProject_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns DefaultTestConstants.projectDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.projectDownSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()

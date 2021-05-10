@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.Event
@@ -21,7 +21,7 @@ import org.junit.Test
 
 class EventUpSyncHelperImplTest {
 
-    private val op = DefaultTestConstants.projectUpSyncScope.operation
+    private val op = SampleDefaults.projectUpSyncScope.operation
     private lateinit var uploadEventsChannel: Channel<Event>
 
     private lateinit var eventUpSyncHelper: EventUpSyncHelper

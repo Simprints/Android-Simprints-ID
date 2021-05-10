@@ -6,19 +6,19 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.data.db.event.local.models.DbEvent
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID_2
+import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -150,7 +150,7 @@ class EventRoomDaoTest {
     fun deletion() {
         runBlocking {
             addIntoDb(event)
-            db.eventDao.delete(event.id)
+            db.eventDao.delete(listOf(event.id))
             assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(0)
         }
     }

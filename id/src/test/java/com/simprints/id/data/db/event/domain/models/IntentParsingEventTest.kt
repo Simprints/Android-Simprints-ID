@@ -1,14 +1,14 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-
 import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.IntentParsingEventSample
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class IntentParsingEventTest {
@@ -16,7 +16,7 @@ class IntentParsingEventTest {
     @Test
     fun create_IntentParsingEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = IntentParsingEvent(CREATED_AT, COMMCARE, labels)
+        val event = IntentParsingEventSample.getEvent(labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

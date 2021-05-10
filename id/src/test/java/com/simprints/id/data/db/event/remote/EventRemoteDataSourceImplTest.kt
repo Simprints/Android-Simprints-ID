@@ -2,12 +2,12 @@ package com.simprints.id.data.db.event.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.Event
