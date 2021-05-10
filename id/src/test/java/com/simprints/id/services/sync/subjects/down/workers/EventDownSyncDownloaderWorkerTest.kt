@@ -11,7 +11,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants.projectDownSyncScope
+import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -46,7 +46,7 @@ class EventDownSyncDownloaderWorkerTest {
     @Before
     fun setUp() {
         app.component = mockk(relaxed = true)
-        val correctInputData = JsonHelper().toJson(projectDownSyncScope.operations.first())
+        val correctInputData = JsonHelper.toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
         eventDownSyncDownloaderWorker.firebasePerformanceTraceFactory = mockk(relaxed = true)
         eventDownSyncDownloaderWorker.crashReportManager = mockk(relaxed = true)
@@ -133,7 +133,7 @@ class EventDownSyncDownloaderWorkerTest {
             eventDownSyncScopeRepository = mockk(relaxed = true)
             coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as EventDownSyncOperation }
             syncCache = mockk(relaxed = true)
-            jsonHelper = JsonHelper()
+            jsonHelper = JsonHelper
             eventDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncHelper = mockk(relaxed = true)
         }

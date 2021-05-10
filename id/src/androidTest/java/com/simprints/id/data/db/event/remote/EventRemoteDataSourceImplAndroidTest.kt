@@ -8,12 +8,12 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.commontesttools.events.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.createEnrolmentEventV1
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -25,7 +25,6 @@ import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Authoriza
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
@@ -39,6 +38,7 @@ import com.simprints.id.data.db.event.domain.models.face.*
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
@@ -125,8 +125,8 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper(), okHttpClientBuilder),
-            JsonHelper()
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, okHttpClientBuilder),
+            JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100
         every { timeHelper.now() } returns 100

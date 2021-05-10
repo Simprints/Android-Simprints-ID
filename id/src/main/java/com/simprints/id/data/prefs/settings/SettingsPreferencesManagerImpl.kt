@@ -414,12 +414,10 @@ open class SettingsPreferencesManagerImpl(
         const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
 
         const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String =
-            JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String =
-            JsonHelper().toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
 
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true

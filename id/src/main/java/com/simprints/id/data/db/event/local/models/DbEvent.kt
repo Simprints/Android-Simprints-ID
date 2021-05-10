@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 
 @Entity
 data class DbEvent(
@@ -17,7 +18,8 @@ data class DbEvent(
     val type: EventType?,
     var eventJson: String,
     val createdAt: Long,
-    val endedAt: Long
+    val endedAt: Long,
+    val sessionIsClosed: Boolean
 ) {
 
     companion object {
@@ -25,15 +27,21 @@ data class DbEvent(
     }
 }
 
-fun Event.fromDomainToDb(): DbEvent =
-    DbEvent(
+fun Event.fromDomainToDb(): DbEvent {
+    val sessionIsClosed =
+        if (this is SessionCaptureEvent) this.payload.sessionIsClosed
+        else false
+
+    return DbEvent(
         id,
         labels,
         payload.type,
-        JsonHelper().toJson(this),
+        JsonHelper.toJson(this),
         payload.createdAt,
-        payload.endedAt
+        payload.endedAt,
+        sessionIsClosed
     )
+}
 
 fun DbEvent.fromDbToDomain(): Event =
-    JsonHelper().fromJson(this.eventJson, object : TypeReference<Event>() {})
+    JsonHelper.fromJson(this.eventJson, object : TypeReference<Event>() {})
