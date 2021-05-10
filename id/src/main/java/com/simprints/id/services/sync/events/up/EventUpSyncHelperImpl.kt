@@ -40,7 +40,7 @@ class EventUpSyncHelperImpl(
 
 
             } catch (t: Throwable) {
-                Timber.d(t)
+                Timber.e(t)
                 lastOperation =
                     lastOperation.copy(lastState = FAILED, lastSyncTime = timerHelper.now())
                 emitProgress(lastOperation, count)

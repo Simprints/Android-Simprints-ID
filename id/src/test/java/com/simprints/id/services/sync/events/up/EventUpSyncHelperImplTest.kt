@@ -1,12 +1,12 @@
 package com.simprints.id.services.sync.events.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.Event
 import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -56,7 +56,7 @@ class EventUpSyncHelperImplTest {
     @Test
     fun upSync_shouldConsumeRepoEventChannel() {
         runBlocking {
-            eventUpSyncHelper.upSync(this, op).consumeAsFlow().toList()
+            eventUpSyncHelper.upSync(this, op).toList()
 
             coVerify { eventRepository.uploadEvents(op.projectId) }
         }
@@ -72,7 +72,7 @@ class EventUpSyncHelperImplTest {
 
             val channel = eventUpSyncHelper.upSync(this, op)
 
-            val progress = channel.consumeAsFlow().toList()
+            val progress = channel.toList()
             sequenceOfProgress.onEach {
                 assertThat(progress[it].progress).isEqualTo(it)
                 assertThat(progress[it].operation.lastState).isEqualTo(RUNNING)
@@ -90,7 +90,7 @@ class EventUpSyncHelperImplTest {
 
             val channel = eventUpSyncHelper.upSync(this, op)
 
-            val progress = channel.consumeAsFlow().toList()
+            val progress = channel.toList()
             assertThat(progress.first().operation.lastState).isEqualTo(FAILED)
             coVerify(exactly = 1) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
         }
