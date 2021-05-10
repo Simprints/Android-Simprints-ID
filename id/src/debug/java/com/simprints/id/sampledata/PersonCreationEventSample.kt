@@ -8,11 +8,9 @@ import com.simprints.id.sampledata.SampleDefaults.GUID2
 
 object PersonCreationEventSample : SampleEvent() {
     override fun getEvent(
-        sessionId: String,
-        subjectId: String,
+        labels: EventLabels,
         isClosed: Boolean
     ): PersonCreationEvent {
-        val labels = EventLabels(sessionId = GUID1)
         val fingerprintCaptureEventIds = listOf(GUID1)
         val faceCaptureEventIds = listOf(GUID2)
         return PersonCreationEvent(
