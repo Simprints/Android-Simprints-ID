@@ -26,9 +26,9 @@ open class EventLocalDataSourceImpl(
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
-    override suspend fun loadAllFromSession(sessionId: String): Flow<Event> =
+    override suspend fun loadAllFromSession(sessionId: String): List<Event> =
         withContext(readingDispatcher) {
-            eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }.asFlow()
+            eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
         }
 
     override suspend fun loadAllFromProject(projectId: String): Flow<Event> =
@@ -41,9 +41,10 @@ open class EventLocalDataSourceImpl(
             eventDao.loadAllSessions(isClosed).map { it.fromDbToDomain() }.asFlow()
         }
 
-    override suspend fun loadOldestClosedSession(): Event = withContext(readingDispatcher) {
-        eventDao.loadOldestClosedSession().fromDbToDomain()
-    }
+    override suspend fun loadAllClosedSessionIds(projectId: String): List<String> =
+        withContext(readingDispatcher) {
+            eventDao.loadAllClosedSessionIds(projectId)
+        }
 
     override suspend fun count(projectId: String): Int = withContext(readingDispatcher) {
         eventDao.countFromProject(projectId = projectId)
@@ -61,6 +62,11 @@ open class EventLocalDataSourceImpl(
     override suspend fun insertOrUpdate(event: Event) = withContext(writingContext) {
         eventDao.insertOrUpdate(event.fromDomainToDb())
     }
+
+    override suspend fun loadAbandonedEvents(projectId: String): List<Event> =
+        withContext(writingContext) {
+            eventDao.loadAbandonedEvents(projectId).map { it.fromDbToDomain() }
+        }
 
     override suspend fun delete(id: String) = withContext(writingContext) {
         eventDao.delete(id = id)

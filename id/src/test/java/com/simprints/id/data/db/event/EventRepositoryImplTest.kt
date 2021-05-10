@@ -30,7 +30,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -223,21 +222,6 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun createBatches_shouldSplitEventsCorrectlyIntoBatches() {
-        runBlocking {
-            mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE + 3)
-
-            val batches = (eventRepo as EventRepositoryImpl).createBatches(DEFAULT_PROJECT_ID).toList()
-
-            assertThat(batches[0].size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(batches[1].size).isEqualTo(3)
-            assertThat(batches[2].size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(batches[3].size).isEqualTo(SESSION_BATCH_SIZE)
-        }
-    }
-
-    @Test
     fun upload_shouldLoadAllEventsPartOfSessionsToUpload() {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE, GUID1, GUID2)
@@ -296,8 +280,9 @@ class EventRepositoryImplTest {
 
             val progress = eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE / 2)
+            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(progress[2]).isEqualTo(SESSION_BATCH_SIZE / 2)
         }
     }
 
@@ -405,7 +390,7 @@ class EventRepositoryImplTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
-            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns flowOf(
+            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns listOf(
                 session,
                 eventInSession
             )
@@ -428,7 +413,8 @@ class EventRepositoryImplTest {
         }
     }
 
-    private fun mockSignedId() = every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+    private fun mockSignedId() =
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 
     companion object {
         const val DEVICE_ID = "DEVICE_ID"
