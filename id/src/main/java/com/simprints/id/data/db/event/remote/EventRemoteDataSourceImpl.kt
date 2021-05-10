@@ -23,8 +23,10 @@ import timber.log.Timber
 import java.io.InputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory,
-                                private val jsonHelper: JsonHelper) : EventRemoteDataSource {
+class EventRemoteDataSourceImpl(
+    private val simApiClientFactory: SimApiClientFactory,
+    private val jsonHelper: JsonHelper
+) : EventRemoteDataSource {
 
     override suspend fun count(query: ApiRemoteEventQuery): List<EventCount> =
         with(query) {
@@ -41,7 +43,10 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
             }
         }
 
-    override suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<Event> {
+    override suspend fun getEvents(
+        query: ApiRemoteEventQuery,
+        scope: CoroutineScope
+    ): ReceiveChannel<Event> {
         val streaming = takeStreaming(query)
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Stream taken")
 
@@ -89,14 +94,17 @@ class EventRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFac
         }.byteStream()
 
     override suspend fun post(projectId: String, events: List<Event>) {
-        executeCall("EventUpload") {
-            it.uploadEvents(projectId, ApiUploadEventsBody(events.map {
+        executeCall("EventUpload") { remoteInterface ->
+            remoteInterface.uploadEvents(projectId, ApiUploadEventsBody(events.map {
                 it.fromDomainToApi()
             }))
         }
     }
 
-    private suspend fun <T> executeCall(nameCall: String, block: suspend (EventRemoteInterface) -> T): T =
+    private suspend fun <T> executeCall(
+        nameCall: String,
+        block: suspend (EventRemoteInterface) -> T
+    ): T =
         with(getEventsApiClient()) {
             executeCall(nameCall) {
                 block(it)
