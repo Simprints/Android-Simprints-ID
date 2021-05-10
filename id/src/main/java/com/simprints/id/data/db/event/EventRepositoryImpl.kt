@@ -137,6 +137,15 @@ open class EventRepositoryImpl(
     ): ReceiveChannel<Event> =
         eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
+    /**
+     * Note that only the IDs of the SessionCapture events of closed sessions are all held in
+     * memory at once. Events are loaded in memory and uploaded session by session, ensuring the
+     * memory usage stays low. It means that we do not exploit connectivity as aggressively as
+     * possible (we could have a more complex system that always pre-fetches the next batch of
+     * events while we upload the current one), but given the relatively small amount of data to
+     * upload, and how critical this system is, we are happy to trade off speed for reliability
+     * (through simplicity and low resource usage)
+     */
     override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
         Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading")
 
