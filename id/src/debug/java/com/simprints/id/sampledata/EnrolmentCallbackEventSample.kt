@@ -7,11 +7,9 @@ import com.simprints.id.sampledata.SampleDefaults.GUID1
 
 object EnrolmentCallbackEventSample : SampleEvent() {
     override fun getEvent(
-        sessionId: String,
-        subjectId: String,
+        labels: EventLabels,
         isClosed: Boolean
     ): EnrolmentCallbackEvent {
-        val labels = EventLabels(sessionId = sessionId)
         return EnrolmentCallbackEvent(CREATED_AT, GUID1, labels)
     }
 }

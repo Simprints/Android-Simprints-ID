@@ -17,7 +17,7 @@ class ConnectivitySnapshotEventTest {
     fun create_ConnectivitySnapshotEvent() {
         val labels = EventLabels(sessionId = GUID1)
         val connectionState = listOf(Connection("GPRS", DetailedState.CONNECTED))
-        val event = ConnectivitySnapshotEventSample.getEvent(GUID1)
+        val event = ConnectivitySnapshotEventSample.getEvent(labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CONNECTIVITY_SNAPSHOT)

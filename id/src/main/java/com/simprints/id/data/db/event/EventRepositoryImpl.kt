@@ -23,7 +23,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
-import com.simprints.id.sampledata.SessionBuilder
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import com.simprints.id.tools.time.TimeHelper
@@ -84,14 +83,6 @@ open class EventRepositoryImpl(
 
             saveEvent(sessionCaptureEvent, sessionCaptureEvent)
             sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
-
-            for (i in 1..5) {
-                SessionBuilder.buildEnrolmentSession().let {
-                    val session = it.filterIsInstance<SessionCaptureEvent>().first()
-                    it.forEach { saveEvent(it, session) }
-                }
-            }
-
             sessionCaptureEvent
         }
     }

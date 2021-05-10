@@ -6,11 +6,9 @@ import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 
 object CompletionCheckEventSample : SampleEvent() {
     override fun getEvent(
-        sessionId: String,
-        subjectId: String,
+        labels: EventLabels,
         isClosed: Boolean
     ): CompletionCheckEvent {
-        val labels = EventLabels(sessionId = sessionId)
         return CompletionCheckEvent(CREATED_AT, true, labels)
     }
 }
