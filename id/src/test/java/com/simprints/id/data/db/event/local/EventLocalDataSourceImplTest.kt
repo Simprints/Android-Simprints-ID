@@ -79,7 +79,6 @@ class EventLocalDataSourceImplTest {
         eventDao = mockk(relaxed = true)
         eventDatabaseFactory = mockk(relaxed = true)
         coEvery { eventDao.loadAll() } returns emptyList()
-        coEvery { eventDao.loadFromType(any()) } returns emptyList()
         coEvery { eventDao.loadFromProject(any()) } returns emptyList()
         coEvery { eventDao.loadFromSession(any()) } returns emptyList()
         coEvery { eventDao.countFromProject(any()) } returns 0

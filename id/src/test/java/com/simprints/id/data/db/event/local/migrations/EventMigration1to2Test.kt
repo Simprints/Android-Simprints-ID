@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.local
+package com.simprints.id.data.db.event.local.migrations
 
 import android.content.ContentValues
 import android.database.Cursor
@@ -19,6 +19,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.local.EventRoomDatabase
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.extensions.getStringWithColumnName

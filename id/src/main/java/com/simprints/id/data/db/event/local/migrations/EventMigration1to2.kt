@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.local
+package com.simprints.id.data.db.event.local.migrations
 
 import android.database.Cursor
 import androidx.room.migration.Migration
@@ -36,7 +36,11 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
     }
 
     private fun migrateEnrolments(database: SupportSQLiteDatabase) {
-        val enrolmentEventsQuery = database.query("SELECT * FROM DbEvent WHERE type = ?", arrayOf(OLD_ENROLMENT_EVENT_TYPE))
+        val enrolmentEventsQuery = database.query(
+            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(
+                OLD_ENROLMENT_EVENT_TYPE
+            )
+        )
         enrolmentEventsQuery.use {
             while (it.moveToNext()) {
                 val id = it.getStringWithColumnName("id")
@@ -50,11 +54,17 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
      * Initially an enrolment event wasn't included in a session. This takes the old un-versioned
      * enrolment and re-saves their payloads as ENROLMENT_V1.
      */
-    private fun migrateEnrolmentEventPayloadType(it: Cursor, database: SupportSQLiteDatabase, id: String?) {
+    private fun migrateEnrolmentEventPayloadType(
+        it: Cursor,
+        database: SupportSQLiteDatabase,
+        id: String?
+    ) {
         val jsonData = it.getStringWithColumnName(DB_EVENT_JSON_FIELD)
         jsonData?.let {
             val originalJson = JSONObject(jsonData).put(DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1)
-            val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1)
+            val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(
+                DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1
+            )
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
@@ -73,7 +83,10 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
      * being marked as closed.
      */
     private fun migrateSessionClosedInformation(database: SupportSQLiteDatabase) {
-        val sessionCaptureEventsQuery = database.query("SELECT * FROM DbEvent WHERE type = ? AND endedAt > 0", arrayOf(EventType.SESSION_CAPTURE.toString()))
+        val sessionCaptureEventsQuery = database.query(
+            "SELECT * FROM DbEvent WHERE type = ? AND endedAt > 0",
+            arrayOf(EventType.SESSION_CAPTURE.toString())
+        )
 
         sessionCaptureEventsQuery.use {
             while (it.moveToNext()) {
@@ -81,9 +94,14 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
                 val jsonData = it.getStringWithColumnName(DB_EVENT_JSON_FIELD)
                 jsonData?.let {
                     val originalJson = JSONObject(jsonData)
-                    val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(DB_EVENT_PAYLOAD_SESSION_STATUS, true)
+                    val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(
+                        DB_EVENT_PAYLOAD_SESSION_STATUS, true
+                    )
                     val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
-                    database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
+                    database.execSQL(
+                        "UPDATE DbEvent SET eventJson = ? WHERE id = ?",
+                        arrayOf(newJson, id)
+                    )
                 }
             }
         }
