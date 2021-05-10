@@ -44,8 +44,8 @@ interface EventRoomDao {
     @Query("select count(*) from DbEvent where type = :type")
     suspend fun countFromType(type: EventType): Int
 
-    @Query("delete from DbEvent where id = :id")
-    suspend fun delete(id: String)
+    @Query("delete from DbEvent where id in (:ids)")
+    suspend fun delete(ids: List<String>)
 
     @Query("delete from DbEvent where sessionId = :sessionId")
     suspend fun deleteAllFromSession(sessionId: String)

@@ -68,8 +68,8 @@ open class EventLocalDataSourceImpl(
             eventDao.loadAbandonedEvents(projectId).map { it.fromDbToDomain() }
         }
 
-    override suspend fun delete(id: String) = withContext(writingContext) {
-        eventDao.delete(id = id)
+    override suspend fun delete(ids: List<String>) = withContext(writingContext) {
+        eventDao.delete(ids)
     }
 
     override suspend fun deleteAllFromSession(sessionId: String) = withContext(writingContext) {
