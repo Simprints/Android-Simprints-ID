@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(
@@ -23,9 +22,7 @@ class ClientApiSessionEventsManagerImpl(
 ) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
-        runBlocking {
-            coreEventRepository.createSession()
-        }
+        coreEventRepository.createSession()
 
         inBackground(dispatcher) {
             coreEventRepository.addOrUpdateEvent(
@@ -88,7 +85,8 @@ class ClientApiSessionEventsManagerImpl(
         }
     }
 
-    override suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
+    override suspend fun getCurrentSessionId(): String =
+        coreEventRepository.getCurrentCaptureSessionEvent().id
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()

@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.local
+package com.simprints.id.data.db.event.local.migrations
 
 import android.content.ContentValues
 import android.database.Cursor
@@ -19,6 +19,7 @@ import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.id.data.db.event.local.EventRoomDatabase
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.extensions.getStringWithColumnName
@@ -95,7 +96,7 @@ class EventMigration1to2Test {
             databaseInfo = DatabaseInfo(1)
         )
 
-        this.put("eventJson", JsonHelper().toJson(session))
+        this.put("eventJson", JsonHelper.toJson(session))
         this.put("createdAt", 1611584017198)
         this.put("endedAt", endedAt)
     }
@@ -104,7 +105,7 @@ class EventMigration1to2Test {
         val cursor = retrieveCursorWithEventById(db, id)
         assertThat(cursor.getStringWithColumnName("type")).isEqualTo(ENROLMENT_V1.toString())
         val eventJson = cursor.getStringWithColumnName("eventJson")!!
-        val enrolmentEventV2 = JsonHelper().fromJson(eventJson, object : TypeReference<Event>() {})
+        val enrolmentEventV2 = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
         assertThat(enrolmentEventV2).isInstanceOf(EnrolmentEventV1::class.java)
     }
 
@@ -120,7 +121,7 @@ class EventMigration1to2Test {
         assertThat(closedEvent.payload.sessionIsClosed).isTrue()
     }
 
-    private fun getEventFromJson(cursor: Cursor): Event = JsonHelper().fromJson(
+    private fun getEventFromJson(cursor: Cursor): Event = JsonHelper.fromJson(
         cursor.getStringWithColumnName("eventJson")!!,
         object : TypeReference<Event>() {}
     )

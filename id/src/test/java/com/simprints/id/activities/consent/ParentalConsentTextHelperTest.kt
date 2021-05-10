@@ -4,7 +4,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.consent.shortconsent.ParentalConsentOptions
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
@@ -52,7 +51,7 @@ class ParentalConsentTextHelperTest {
             ORGANIZATION_NAME,
             listOf(Modality.FINGER),
             mockk(),
-            JsonHelper()
+            JsonHelper
         )
 
         // format entire object to get consent text message
@@ -73,7 +72,7 @@ class ParentalConsentTextHelperTest {
             ORGANIZATION_NAME,
             listOf(Modality.FACE),
             mockk(),
-            JsonHelper()
+            JsonHelper
         )
 
         // format entire object to get consent text message
@@ -96,7 +95,7 @@ class ParentalConsentTextHelperTest {
             ORGANIZATION_NAME,
             listOf(Modality.FINGER, Modality.FACE),
             mockk(),
-            JsonHelper()
+            JsonHelper
         )
 
         // format entire object to get consent text message
@@ -132,7 +131,7 @@ class ParentalConsentTextHelperTest {
             ORGANIZATION_NAME,
             listOf(Modality.FACE),
             mockk(),
-            JsonHelper()
+            JsonHelper
         )
 
         // format entire object to get consent text message
@@ -168,7 +167,7 @@ class ParentalConsentTextHelperTest {
             ORGANIZATION_NAME,
             listOf(Modality.FACE),
             mockk(),
-            JsonHelper()
+            JsonHelper
         )
 
         // format entire object to get consent text message

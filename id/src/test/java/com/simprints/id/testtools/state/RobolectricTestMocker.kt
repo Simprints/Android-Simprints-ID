@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import com.fasterxml.jackson.databind.JsonNode
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_SECRET
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -32,7 +32,7 @@ object RobolectricTestMocker {
             "some_bucket_url"
         )
 
-        val projectSettings: JsonNode = JsonHelper().jackson.createObjectNode().apply { put("key", "value") }
+        val projectSettings: JsonNode = JsonHelper.jackson.createObjectNode().apply { put("key", "value") }
 
         coEvery { projectLocalDataSource.load(any()) } returns project
         coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project
