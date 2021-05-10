@@ -184,7 +184,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup
+                    - bash ./ci/pipeline/release_setup.sh
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
                     - ./gradlew packageStagingUniversalApk
                     - ./gradlew id:appDistributionUploadStaging
@@ -208,7 +208,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup
+                    - bash ./ci/pipeline/release_setup.sh
                     - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
                     - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
