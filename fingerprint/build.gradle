@@ -92,7 +92,6 @@ dependencies {
 
     // Kotlin
     implementation deps.kotlin.reflect
-    implementation deps.kotlin.anko
 
     // Android X
     implementation deps.androidx.core
@@ -195,6 +194,7 @@ dependencies {
     androidTestImplementation deps.testing.androidx.rules
     androidTestUtil deps.testing.androidx.orchestrator
     androidTestImplementation deps.testing.live_data
+    androidTestImplementation deps.androidx.camerax.core
 
     // Android X navigation components
     androidTestImplementation deps.testing.androidx.navigation

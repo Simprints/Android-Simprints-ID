@@ -11,8 +11,7 @@ apply plugin: 'com.github.triplet.play'
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle"
 apply from: "${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle"
 // Deploy Plugins
-apply plugin: 'com.google.firebase.appdistribution'
-apply from: "${rootDir}${File.separator}ci${File.separator}deploy_config.gradle"
+apply from: "${rootDir}${File.separator}ci${File.separator}deployment${File.separator}deploy_config.gradle"
 
 android {
 
@@ -81,8 +80,10 @@ android {
 
     sourceSets {
         String sharedTestDir = 'src/commontesttools/java'
+        String eventCreators = 'src/debug/java'
         test {
             java.srcDir sharedTestDir
+            java.srcDir eventCreators
         }
         androidTest.java.srcDir sharedTestDir
         androidTest.java.srcDir 'src/androidTest/java'
@@ -137,25 +138,23 @@ dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     api project(':core')
-    implementation project(':fingerprintscanner')
     api project(':moduleapi')
+
     implementation deps.libsimprints
 
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
-    implementation deps.kotlin.anko
-    implementation deps.androidx.legacy
     implementation deps.androidx.room.core
     implementation deps.androidx.room.ktx
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
-    api deps.androidx.security
+    implementation deps.androidx.security
     implementation deps.androidx.camerax.camera2
     implementation deps.androidx.camerax.lifecycle
     implementation deps.androidx.camerax.view
     implementation deps.support.material
-    api deps.arch_components.work
+    implementation deps.arch_components.work
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
@@ -165,15 +164,10 @@ dependencies {
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     implementation deps.retrofit.converterScalars
-    implementation deps.rxjava2.android
     implementation deps.rxjava2.core
-    implementation deps.rxjava2.kotlin
-    kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     kapt deps.dagger.compiler
-    implementation deps.koin.android
     implementation deps.fuzzywuzzy.core
-    implementation deps.rxjava2.tasks
     implementation deps.kronos.kronos
     implementation deps.jackson.core
 
@@ -181,38 +175,38 @@ dependencies {
     implementation deps.rootbeer.core
 
     // Shared
-    api deps.firebase.core
-    api deps.firebase.auth
-    api deps.firebase.config
-    api deps.firebase.perf
-    api deps.firebase.storage
-    api deps.firebase.mlkit
-    api deps.firebase.mlkit_barcode
-    api deps.firebase.crashlytics
+    api deps.firebase.analytics
+    api deps.kotlin.anko
 
-    api deps.timber.core
-    api deps.androidx.core
-    api deps.androidx.multidex
-    api deps.androidx.appcompat
-    api deps.androidx.lifecycle.ktx
-    api deps.androidx.lifecycle.ext
-    api deps.androidx.lifecycle.livedata
-    api deps.androidx.lifecycle.viewmodel
-    api deps.androidx.lifecycle.scope
-    api deps.androidx.ui.constraintlayout
+    // Firebase
+    implementation deps.firebase.auth
+    implementation deps.firebase.config
+    implementation deps.firebase.perf
+    implementation deps.firebase.storage
+    implementation deps.firebase.mlkit
+    implementation deps.firebase.mlkit_barcode
+    implementation deps.firebase.crashlytics
+
+    implementation deps.timber.core
+    implementation deps.androidx.core
+    implementation deps.androidx.multidex
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.lifecycle.ktx
+    implementation deps.androidx.lifecycle.livedata
+    implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.scope
+    implementation deps.androidx.ui.constraintlayout
     api deps.androidx.navigation.dynamicfeatures
-    api deps.androidx.navigation.fragment
-    api deps.androidx.navigation.ui
-    api deps.kotlin.coroutines_android
-    api deps.kotlin.coroutines_play_services
-    api deps.androidx.camerax.core
-    api deps.koin.core
-    api deps.koin.android
+    implementation deps.kotlin.coroutines_android
+    implementation deps.kotlin.coroutines_play_services
+    implementation deps.androidx.camerax.core
+    implementation deps.koin.core
+    implementation deps.koin.android
     api deps.koin.viewmodel
-    api deps.playcore.core
-    api deps.playcore.core_ktx
-    api deps.androidx.sqlite
-    api deps.sqlcipher.core
+    implementation deps.playcore.core
+    implementation deps.playcore.core_ktx
+    implementation deps.androidx.sqlite
+    implementation deps.sqlcipher.core
 
     // ######################################################
     //                      Unit test
@@ -257,6 +251,7 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
     }
+    androidTestImplementation deps.rxjava2.kotlin
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin

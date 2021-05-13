@@ -111,9 +111,24 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew assembleDebug
-                    - bash ./ci/pipeline/install_java_11
+                    - bash ./ci/tools/install_java_11
                     - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
+
+        ######################################################################
+        # Scan all of the projects dependencies and report back if there are
+        # un-used, incorrectly declared, or incorrect transitive dependencies
+        ######################################################################
+        -   step: &dependecy-health-check
+                max-time: 30
+                size: 2x
+                name: "Dependency health check"
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - ./gradlew buildHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
@@ -160,8 +175,8 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - mv ./*.apk ./ci/pipeline/
-                    - cd ./ci/pipeline/
+                    - mv ./*.apk ./ci/firebasetestlab/
+                    - cd ./ci/firebasetestlab/
                     - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
@@ -184,7 +199,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup
+                    - bash ./ci/deployment/release_setup
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
                     - ./gradlew packageStagingUniversalApk
                     - ./gradlew id:appDistributionUploadStaging
@@ -208,8 +223,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup
-                    - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
+                    - bash ./ci/deployment/release_setup
+                    - echo "BUNDLE_FOLDER=release" >>ci/deployment/deploy.properties
                     - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
@@ -244,6 +259,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *dependecy-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -255,6 +271,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *dependecy-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -269,6 +286,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *dependecy-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate

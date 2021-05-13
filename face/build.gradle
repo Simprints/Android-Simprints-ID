@@ -63,6 +63,7 @@ dependencies {
 
     implementation deps.cameraView
     implementation deps.circleImageView
+    implementation deps.timber.core
 
     // Retrofit
     implementation deps.retrofit.core
@@ -71,6 +72,10 @@ dependencies {
     implementation deps.retrofit.converterScalars
 
     // Android X
+    implementation deps.androidx.ui.constraintlayout
+    implementation deps.androidx.camerax.core
+    implementation deps.androidx.multidex
+
     androidTestImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.monitor
     androidTestImplementation deps.testing.androidx.core

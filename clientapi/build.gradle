@@ -61,10 +61,7 @@ dependencies {
 
     implementation deps.support.material
     implementation deps.kotlin.reflect
-    implementation deps.kotlin.anko
-    implementation deps.rxjava2.core
-    implementation deps.rxjava2.android
-    implementation deps.rxjava2.kotlin
+    implementation deps.timber.core
 
     // Kotlin
     implementation deps.androidx.core
