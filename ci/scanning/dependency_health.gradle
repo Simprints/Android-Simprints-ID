@@ -1,0 +1,39 @@
+apply plugin: "com.autonomousapps.dependency-analysis"
+
+dependencyAnalysis {
+    issues {
+        all {
+            onUsedTransitiveDependencies { severity("ignore") }
+            onUnusedDependencies { severity("fail") }
+            onIncorrectConfiguration { severity("fail") }
+            ignoreKtx(true)
+        }
+        project(':id') {
+            onAny {
+                exclude(
+                    // We exclude these APIs in ID because because multiple modules need
+                    // them, and DFMs can't implement the same lib but autonomousapps does not
+                    // recognize this transitive property
+                    'org.koin:koin-android-viewmodel',
+                    'androidx.navigation:navigation-dynamic-features-fragment',
+                    'org.jetbrains.anko:anko',
+                    'io.realm:realm-android-kotlin-extensions',
+                    'io.realm:realm-annotations',
+                    'io.realm:realm-android-library',
+                    'com.google.firebase:firebase-analytics-ktx',
+                    ':moduleapi',
+                    ':core'
+                )
+            }
+        }
+        project(':fingerprintscanner') {
+            onAny {
+                exclude(
+                    // We exclude reflection in the fingerprint scanner because the dependency
+                    // scanner cannot detect reflective global extensions (we should remove these)
+                    'org.jetbrains.kotlin:kotlin-reflect'
+                )
+            }
+        }
+    }
+}

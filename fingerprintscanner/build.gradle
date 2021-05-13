@@ -29,16 +29,13 @@ dependencies {
 
     // Kotlin
     implementation deps.kotlin.reflect
-
-    // Android
-    implementation deps.androidx.appcompat
+    compileOnly deps.androidx.annotation.annotation
 
     // Logging
     implementation deps.timber.core
 
     // RxJava
-    implementation deps.rxjava2.core
-    implementation deps.rxjava2.android
+    api deps.rxjava2.core
     implementation deps.rxjava2.kotlin
 
     // ######################################################

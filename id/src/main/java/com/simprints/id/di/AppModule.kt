@@ -75,6 +75,7 @@ import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
+import com.simprints.libsimprints.BuildConfig.*
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -104,7 +105,7 @@ open class AppModule {
     @Suppress("MissingPermission")
     fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(app).apply {
-            setMinimumSessionDuration(0)
+            this.setSessionTimeoutDuration(0)
         }
 
     @Provides
@@ -251,7 +252,7 @@ open class AppModule {
             crashReportManager,
             timeHelper,
             validatorFactory,
-            com.simprints.libsimprints.BuildConfig.VERSION_NAME,
+            VERSION_NAME,
             sessionDataCache
         )
 
