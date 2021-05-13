@@ -36,6 +36,7 @@ import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import io.reactivex.Completable
@@ -139,9 +140,15 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun shouldWeDoLiveFeedback(): Boolean =
-        scannerManager.onScanner { isLiveFeedbackAvailable() } &&
-            fingerprintPreferencesManager.liveFeedbackOn
+    private fun shouldWeDoLiveFeedback(): Boolean {
+        if (scannerManager.scanner == null) {
+            launchReconnect.postEvent()
+            return false
+        }
+
+        return scannerManager.scanner?.isLiveFeedbackAvailable() == true
+                 && fingerprintPreferencesManager.liveFeedbackOn
+    }
 
     private fun startLiveFeedback(): Completable =
         if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback()) {
@@ -280,7 +287,7 @@ class CollectFingerprintsViewModel(
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
         imageTransferTask =
-            scannerManager.onScanner { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
+            scannerManager.scanner<AcquireImageResponse> { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -531,12 +538,12 @@ class CollectFingerprintsViewModel(
 
     fun handleOnResume() {
         updateState { /* refresh */ }
-        scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
+        runOnScannerOrReconnectScanner { registerTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnPause() {
         stopLiveFeedback().doInBackground()
-        scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
+        runOnScannerOrReconnectScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     fun handleOnBackPressed() {
@@ -570,6 +577,10 @@ class CollectFingerprintsViewModel(
             FingerprintCrashReportTrigger.SCANNER_BUTTON,
             message = message
         )
+    }
+
+    private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {
+        scannerManager.scanner?.block() ?: launchReconnect.postEvent()
     }
 
     companion object {
