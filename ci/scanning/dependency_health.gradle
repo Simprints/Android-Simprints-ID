@@ -14,6 +14,7 @@ dependencyAnalysis {
                     // We exclude these APIs in ID because because multiple modules need
                     // them, and DFMs can't implement the same lib but autonomousapps does not
                     // recognize this transitive property
+                    'org.jetbrains.kotlin:kotlin-stdlib',
                     'org.koin:koin-android-viewmodel',
                     'androidx.navigation:navigation-dynamic-features-fragment',
                     'org.jetbrains.anko:anko',

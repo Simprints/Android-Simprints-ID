@@ -32,15 +32,20 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.libsimprints.Constants
-import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
 import io.mockk.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.util.*
 
+@ExperimentalCoroutinesApi
+@ObsoleteCoroutinesApi
 class CommCareCoSyncPresenterTest {
 
     companion object {
@@ -49,13 +54,23 @@ class CommCareCoSyncPresenterTest {
     }
 
     private val view = mockk<CommCareActivity> {
-        every { extras?.get("projectId") } returns UUID.randomUUID().toString()
+        every { extras } returns mapOf()
+        every { extras?.get(Constants.SIMPRINTS_PROJECT_ID) } returns UUID.randomUUID().toString()
     }
     private val jsonHelper = JsonHelper
 
+
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
     @Before
     fun setup() {
-        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
+        mainThreadSurrogate.close()
     }
 
     @Test
@@ -67,7 +82,13 @@ class CommCareCoSyncPresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                EnrolRequestFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
+                )
+            )
+        }
     }
 
     @Test
@@ -93,9 +114,18 @@ class CommCareCoSyncPresenterTest {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         every { view.verifyExtractor } returns verificationExtractor
 
-        getNewPresenter(Verify, mockSessionManagerToCreateSession()).apply { runBlocking { start() } }
+        getNewPresenter(
+            Verify,
+            mockSessionManagerToCreateSession()
+        ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                VerifyRequestFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
+                )
+            )
+        }
     }
 
     @Test
@@ -104,9 +134,18 @@ class CommCareCoSyncPresenterTest {
         every { view.confirmIdentityExtractor } returns confirmIdentify
         every { view.extras } returns mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
 
-        getNewPresenter(ConfirmIdentity, mockSessionManagerToCreateSession()).apply { runBlocking { start() } }
+        getNewPresenter(
+            ConfirmIdentity,
+            mockSessionManagerToCreateSession()
+        ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                ConfirmIdentityFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
+                )
+            )
+        }
     }
 
     @Test
@@ -127,13 +166,22 @@ class CommCareCoSyncPresenterTest {
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(sessionCaptureEvent)
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            sessionCaptureEvent
+        )
 
         val subjectRepository = mockk<SubjectRepository>()
         coEvery { subjectRepository.load(any()) } returns flowOf()
 
-        getNewPresenter(Enrol, sessionEventsManagerMock, subjectRepository = subjectRepository)
-            .handleEnrolResponse(EnrolResponse(registerId))
+        runBlockingTest {
+            getNewPresenter(
+                Enrol,
+                sessionEventsManagerMock,
+                subjectRepository = subjectRepository,
+                coroutineScope = this
+            )
+                .handleEnrolResponse(EnrolResponse(registerId))
+        }
 
         verify(exactly = 1) {
             view.returnRegistration(
@@ -144,49 +192,78 @@ class CommCareCoSyncPresenterTest {
                 null
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
-    fun `handleRegistration should return valid registration with events and actions`() {
-        val projectId = UUID.randomUUID().toString()
-        val registerId = UUID.randomUUID().toString()
-        val sessionId = UUID.randomUUID().toString()
+    fun `handleRegistration should return valid registration with events and actions`() =
+        runBlockingTest {
+            val projectId = UUID.randomUUID().toString()
+            val registerId = UUID.randomUUID().toString()
+            val sessionId = UUID.randomUUID().toString()
 
-        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
-        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(sessionCaptureEvent)
-
-        val subject = Subject(registerId, projectId, "thales", "mod1", Date(), null, emptyList(), emptyList())
-        val subjectRepository = mockk<SubjectRepository>()
-        coEvery { subjectRepository.load(any()) } returns flowOf(subject)
-
-        getNewPresenter(Enrol, sessionEventsManagerMock, subjectRepository = subjectRepository)
-            .handleEnrolResponse(EnrolResponse(registerId))
-
-        verify(exactly = 1) {
-            view.returnRegistration(
-                registerId,
-                sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK,
-                "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
-                match {
-                    it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
-                    it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
-                    it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
-                    it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
-                }
+            val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+            coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+            coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+                sessionCaptureEvent
             )
+
+            val subject =
+                Subject(
+                    registerId,
+                    projectId,
+                    "thales",
+                    "mod1",
+                    Date(),
+                    null,
+                    emptyList(),
+                    emptyList()
+                )
+            val subjectRepository = mockk<SubjectRepository>()
+            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+            runBlockingTest {
+                getNewPresenter(
+                    Enrol,
+                    sessionEventsManagerMock,
+                    subjectRepository = subjectRepository,
+                    coroutineScope = this
+                ).handleEnrolResponse(EnrolResponse(registerId))
+            }
+
+            verify(exactly = 1) {
+                view.returnRegistration(
+                    registerId,
+                    sessionId,
+                    RETURN_FOR_FLOW_COMPLETED_CHECK,
+                    "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
+                    match {
+                        it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
+                        it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
+                        it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
+                        it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                    }
+                )
+            }
+            coVerify(exactly = 1) {
+                sessionEventsManagerMock.addCompletionCheckEvent(
+                    RETURN_FOR_FLOW_COMPLETED_CHECK
+                )
+            }
+            coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
-        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
-    }
 
     @Test
     fun `handleIdentification should return valid identification with events`() {
-        val id1 = MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH)
-        val id2 = MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5, MatchConfidence.LOW)
+        val id1 =
+            MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH)
+        val id2 =
+            MatchResult(UUID.randomUUID().toString(), 15, Tier.TIER_5, MatchConfidence.LOW)
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
@@ -196,8 +273,10 @@ class CommCareCoSyncPresenterTest {
             identificationCallbackEvent
         )
 
-        getNewPresenter(Identify, sessionEventsManagerMock)
-            .handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
+        runBlockingTest {
+            getNewPresenter(Identify, sessionEventsManagerMock, coroutineScope = this)
+                .handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
+        }
 
         verify(exactly = 1) {
             view.returnIdentification(
@@ -221,10 +300,14 @@ class CommCareCoSyncPresenterTest {
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(guidSelectionEvent)
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            guidSelectionEvent
+        )
 
-        getNewPresenter(Enrol, sessionEventsManagerMock)
-            .handleConfirmationResponse(ConfirmationResponse(true))
+        runBlockingTest {
+            getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
+                .handleConfirmationResponse(ConfirmationResponse(true))
+        }
 
         verify(exactly = 1) {
             view.returnConfirmation(
@@ -233,21 +316,40 @@ class CommCareCoSyncPresenterTest {
                 "{\"events\":[${jsonHelper.toJson(guidSelectionEvent)}]}"
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
     @Test
     fun `handleVerification should return valid verification with events`() {
         val verification =
-            VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
+            VerifyResponse(
+                MatchResult(
+                    UUID.randomUUID().toString(),
+                    100,
+                    Tier.TIER_1,
+                    MatchConfidence.HIGH
+                )
+            )
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(verificationCallbackEvent)
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            verificationCallbackEvent
+        )
 
-        getNewPresenter(Verify, sessionEventsManagerMock).handleVerifyResponse(verification)
+        runBlockingTest {
+            getNewPresenter(
+                Verify,
+                sessionEventsManagerMock,
+                coroutineScope = this
+            ).handleVerifyResponse(verification)
+        }
 
         verify(exactly = 1) {
             view.returnVerification(
@@ -270,10 +372,21 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
 
-        getNewPresenter(Invalid, sessionEventsManagerMock).handleResponseError(error)
+        runBlockingTest {
+            getNewPresenter(
+                Invalid,
+                sessionEventsManagerMock,
+                coroutineScope = this
+            ).handleResponseError(error)
+        }
 
         verify(exactly = 1) {
-            view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, "{\"events\":[]}")
+            view.returnErrorToClient(
+                error,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                sessionId,
+                "{\"events\":[]}"
+            )
         }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
@@ -284,10 +397,14 @@ class CommCareCoSyncPresenterTest {
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            refusalEvent
+        )
 
-        getNewPresenter(Enrol, sessionEventsManagerMock)
-            .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        runBlockingTest {
+            getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
+                .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        }
 
         verify(exactly = 1) {
             view.returnExitForms(
@@ -298,7 +415,11 @@ class CommCareCoSyncPresenterTest {
                 "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
@@ -308,10 +429,14 @@ class CommCareCoSyncPresenterTest {
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            refusalEvent
+        )
 
-        getNewPresenter(Enrol, sessionEventsManagerMock)
-            .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        runBlockingTest {
+            getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
+                .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        }
 
         verify(exactly = 1) {
             view.returnExitForms(
@@ -322,7 +447,11 @@ class CommCareCoSyncPresenterTest {
                 "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
         coVerify(exactly = 1) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
@@ -333,7 +462,9 @@ class CommCareCoSyncPresenterTest {
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(refusalEvent)
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            refusalEvent
+        )
         val sharedPreferences = mockSharedPrefs().apply {
             every { this@apply.syncDestinationSettings } returns listOf(
                 SyncDestinationSetting.COMMCARE,
@@ -341,11 +472,14 @@ class CommCareCoSyncPresenterTest {
             )
         }
 
-        getNewPresenter(
-            Enrol,
-            sessionEventsManagerMock,
-            sharedPreferences
-        ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        runBlockingTest {
+            getNewPresenter(
+                Enrol,
+                sessionEventsManagerMock,
+                sharedPreferences,
+                coroutineScope = this
+            ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        }
 
         verify(exactly = 1) {
             view.returnExitForms(
@@ -356,7 +490,11 @@ class CommCareCoSyncPresenterTest {
                 "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
         coVerify(exactly = 0) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
@@ -381,7 +519,8 @@ class CommCareCoSyncPresenterTest {
         action: CommCareAction,
         clientApiSessionEventsManager: ClientApiSessionEventsManager,
         sharedPreferencesManager: SharedPreferencesManager = mockSharedPrefs(),
-        subjectRepository: SubjectRepository = mockk()
+        subjectRepository: SubjectRepository = mockk(),
+        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
     ): CommCarePresenter = CommCarePresenter(
         view,
         action,
@@ -391,7 +530,8 @@ class CommCareCoSyncPresenterTest {
         subjectRepository,
         mockTimeHelper(),
         mockk(),
-        mockk()
+        mockk(),
+        coroutineScope
     )
 
     private val sessionCaptureEvent = SessionCaptureEvent(
