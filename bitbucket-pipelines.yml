@@ -52,6 +52,7 @@ definitions:
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle

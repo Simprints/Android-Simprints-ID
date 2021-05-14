@@ -8,8 +8,10 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import timber.log.Timber
 
-class FingerSelectionViewModel(private val preferencesManager: PreferencesManager,
-                               private val crashReportManager: CrashReportManager) : ViewModel() {
+class FingerSelectionViewModel(
+    private val preferencesManager: PreferencesManager,
+    private val crashReportManager: CrashReportManager
+) : ViewModel() {
 
     val items = MutableLiveData<List<FingerSelectionItem>>()
 
@@ -56,18 +58,20 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
     fun resetFingerItems() {
         postUpdatedItems {
             clear()
-            addAll(preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems().apply {
-                forEach { it.removable = false }
-            })
+            addAll(
+                preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()
+                    .apply {
+                        forEach { it.removable = false }
+                    })
         }
     }
 
     fun haveSettingsChanged() = determineFingerSelectionItemsFromPrefs() != _items.toList()
 
     fun canSavePreference(): Boolean {
-        val highestNumberOfFingersInItems = _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.max()
-            ?: 1
-        val maxAllowedFingers = QUANTITY_OPTIONS.max() ?: 1
+        val highestNumberOfFingersInItems =
+            _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.maxOrNull() ?: 1
+        val maxAllowedFingers = QUANTITY_OPTIONS.maxOrNull() ?: 1
         return highestNumberOfFingersInItems <= maxAllowedFingers
     }
 
@@ -108,7 +112,11 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         }
 }
 
-data class FingerSelectionItem(var finger: FingerIdentifier, var quantity: Int, var removable: Boolean)
+data class FingerSelectionItem(
+    var finger: FingerIdentifier,
+    var quantity: Int,
+    var removable: Boolean
+)
 
 val ORDERED_FINGERS = listOf(
     FingerIdentifier.LEFT_THUMB,

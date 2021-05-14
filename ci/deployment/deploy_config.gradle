@@ -6,7 +6,6 @@ apply plugin: 'com.google.firebase.appdistribution'
 
 play {
     serviceAccountCredentials = file("${rootDir}/google_api_key.json")
-    defaultToAppBundles = true
     artifactDir = file("build/outputs/bundle/${deployProperties['BUNDLE_FOLDER']}")
 }
 

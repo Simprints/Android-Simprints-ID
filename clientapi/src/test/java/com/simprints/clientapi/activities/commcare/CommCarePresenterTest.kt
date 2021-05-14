@@ -20,12 +20,17 @@ import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
 import io.mockk.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import java.util.*
 
+@ExperimentalCoroutinesApi
 class CommCarePresenterTest {
 
     companion object {
@@ -50,7 +55,13 @@ class CommCarePresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                EnrolRequestFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
+                )
+            )
+        }
     }
 
     @Test
@@ -80,7 +91,13 @@ class CommCarePresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                VerifyRequestFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
+                )
+            )
+        }
     }
 
     @Test
@@ -93,7 +110,13 @@ class CommCarePresenterTest {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                ConfirmIdentityFactory.getValidSimprintsRequest(
+                    INTEGRATION_INFO
+                )
+            )
+        }
     }
 
     @Test
@@ -115,7 +138,13 @@ class CommCarePresenterTest {
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
 
-        getNewPresenter(Enrol, sessionEventsManagerMock).handleEnrolResponse(EnrolResponse(registerId))
+        runBlockingTest {
+            getNewPresenter(
+                Enrol,
+                sessionEventsManagerMock,
+                coroutineScope = this
+            ).handleEnrolResponse(EnrolResponse(registerId))
+        }
 
         verify(exactly = 1) {
             view.returnRegistration(
@@ -126,7 +155,11 @@ class CommCarePresenterTest {
                 null
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
@@ -138,9 +171,16 @@ class CommCarePresenterTest {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockSessionManagerToCreateSession()
-        getNewPresenter(Identify, sessionEventsManagerMock).handleIdentifyResponse(
-            IdentifyResponse(arrayListOf(id1, id2), sessionId)
-        )
+
+        runBlockingTest {
+            getNewPresenter(
+                Identify,
+                sessionEventsManagerMock,
+                coroutineScope = this
+            ).handleIdentifyResponse(
+                IdentifyResponse(arrayListOf(id1, id2), sessionId)
+            )
+        }
 
         verify(exactly = 1) {
             view.returnIdentification(
@@ -161,13 +201,26 @@ class CommCarePresenterTest {
     @Test
     fun `handleVerification should return valid verification`() {
         val verification =
-            VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1, MatchConfidence.HIGH))
+            VerifyResponse(
+                MatchResult(
+                    UUID.randomUUID().toString(),
+                    100,
+                    Tier.TIER_1,
+                    MatchConfidence.HIGH
+                )
+            )
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
 
-        getNewPresenter(Verify, sessionEventsManagerMock).handleVerifyResponse(verification)
+        runBlockingTest {
+            getNewPresenter(
+                Verify,
+                sessionEventsManagerMock,
+                coroutineScope = this
+            ).handleVerifyResponse(verification)
+        }
 
         verify(exactly = 1) {
             view.returnVerification(
@@ -190,7 +243,13 @@ class CommCarePresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
 
-        getNewPresenter(Invalid, sessionEventsManagerMock).handleResponseError(error)
+        runBlockingTest {
+            getNewPresenter(
+                Invalid,
+                sessionEventsManagerMock,
+                coroutineScope = this
+            ).handleResponseError(error)
+        }
 
         verify(exactly = 1) {
             view.returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, null)
@@ -205,8 +264,10 @@ class CommCarePresenterTest {
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
 
-        getNewPresenter(Enrol, sessionEventsManagerMock)
-            .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        runBlockingTest {
+            getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
+                .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        }
 
         verify(exactly = 1) {
             view.returnExitForms(
@@ -235,7 +296,8 @@ class CommCarePresenterTest {
 
     private fun getNewPresenter(
         action: CommCareAction,
-        clientApiSessionEventsManager: ClientApiSessionEventsManager
+        clientApiSessionEventsManager: ClientApiSessionEventsManager,
+        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
     ): CommCarePresenter = CommCarePresenter(
         view,
         action,
@@ -245,6 +307,7 @@ class CommCarePresenterTest {
         mockk(),
         mockk(),
         mockk(),
-        mockk()
+        mockk(),
+        coroutineScope
     )
 }
