@@ -124,15 +124,18 @@ class CollectFingerprintsViewModel(
 
     private fun startObserverForLiveFeedback() {
         state.observeForever {
+            val scanner = scannerManager.scanner
+                ?: return@observeForever launchReconnect.postEvent()
+
             when (it.currentCaptureState()) {
                 CaptureState.NotCollected,
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
                     if (it.isShowingConfirmDialog)
-                        stopLiveFeedback().doInBackground()
+                        stopLiveFeedback(scanner).doInBackground()
                     else
-                        startLiveFeedback().doInBackground()
+                        startLiveFeedback(scanner).doInBackground()
                 }
                 is CaptureState.Scanning,
                 is CaptureState.TransferringImage -> pauseLiveFeedback()
@@ -140,18 +143,12 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun shouldWeDoLiveFeedback(): Boolean {
-        if (scannerManager.scanner == null) {
-            launchReconnect.postEvent()
-            return false
-        }
+    private fun shouldWeDoLiveFeedback(scanner: ScannerWrapper): Boolean =
+        scanner.isLiveFeedbackAvailable() && fingerprintPreferencesManager.liveFeedbackOn
 
-        return scannerManager.scanner?.isLiveFeedbackAvailable() == true
-                 && fingerprintPreferencesManager.liveFeedbackOn
-    }
 
-    private fun startLiveFeedback(): Completable =
-        if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback()) {
+    private fun startLiveFeedback(scanner: ScannerWrapper): Completable =
+        if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback(scanner)) {
             logScannerMessageForCrashReport("startLiveFeedback")
             liveFeedbackState = LiveFeedbackState.START
             stopLiveFeedbackTask?.dispose()
@@ -166,8 +163,8 @@ class CollectFingerprintsViewModel(
         liveFeedbackTask?.dispose()
     }
 
-    private fun stopLiveFeedback(): Completable =
-        if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback()) {
+    private fun stopLiveFeedback(scanner: ScannerWrapper): Completable =
+        if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback(scanner)) {
             logScannerMessageForCrashReport("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.dispose()
@@ -542,8 +539,12 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnPause() {
-        stopLiveFeedback().doInBackground()
-        runOnScannerOrReconnectScanner { unregisterTriggerListener(scannerTriggerListener) }
+        // Don't try to reconnect scanner in onPause, if scanner is null,
+        // reconnection of null scanner will be handled in onResume
+        scannerManager.scanner?.let { scanner ->
+            stopLiveFeedback(scanner).doInBackground()
+            scanner.unregisterTriggerListener(scannerTriggerListener)
+        }
     }
 
     fun handleOnBackPressed() {
