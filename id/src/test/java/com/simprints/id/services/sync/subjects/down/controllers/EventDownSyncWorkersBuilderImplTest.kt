@@ -7,8 +7,8 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImpl
@@ -30,7 +30,7 @@ class EventDownSyncWorkersBuilderImplTest {
 
     private lateinit var eventDownSyncWorkersFactory: EventDownSyncWorkersBuilder
 
-    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     @Before
     fun setUp() {
@@ -160,7 +160,7 @@ private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorker(count: Int)
 private fun List<WorkRequest>.assertSubjectsDownSyncCountWorkerTagsForPeriodic(count: Int) =
     assertThat(count { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }).isEqualTo(count)
 
-private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope: EventDownSyncScope) {
+private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
     val downloaders = filter { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
     val jsonHelper = JsonHelper
     val ops = downSyncScope.operations
@@ -172,7 +172,7 @@ private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope:
     assertThat(downloaders).hasSize(ops.size)
 }
 
-private fun List<WorkRequest>.assertDownSyncCountWorkerInput(downSyncScope: EventDownSyncScope) {
+private fun List<WorkRequest>.assertDownSyncCountWorkerInput(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
     val counter = first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
     val jsonHelper = JsonHelper
     assertThat(counter.workSpec.input == workDataOf(INPUT_COUNT_WORKER_DOWN to jsonHelper.toJson(downSyncScope))).isTrue()

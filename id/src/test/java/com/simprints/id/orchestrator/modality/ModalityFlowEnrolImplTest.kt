@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
@@ -53,7 +53,7 @@ class ModalityFlowEnrolImplTest {
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var consentStepMock: Step
     @MockK lateinit var setupStepMock: Step
-    @MockK lateinit var eventRepository: EventRepository
+    @MockK lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @Before
     fun setUp() {

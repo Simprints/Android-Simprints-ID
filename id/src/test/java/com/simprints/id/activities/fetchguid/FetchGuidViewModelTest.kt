@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
@@ -33,7 +33,7 @@ class FetchGuidViewModelTest {
 
     @MockK private lateinit var fetchGuidHelper: FetchGuidHelper
     @MockK private lateinit var deviceManager: DeviceManager
-    @MockK private lateinit var eventRepository: EventRepository
+    @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @MockK private lateinit var timeHelper: TimeHelper
 
     companion object {

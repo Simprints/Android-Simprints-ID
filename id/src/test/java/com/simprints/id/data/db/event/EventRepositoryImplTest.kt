@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
+import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.id.data.db.event.domain.models.EventLabels
 import com.simprints.id.data.db.event.domain.models.EventType
@@ -43,7 +43,7 @@ import retrofit2.Response
 @ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
 
-    private lateinit var eventRepo: EventRepository
+    private lateinit var eventRepo: com.simprints.eventsystem.event.EventRepository
 
     @MockK
     lateinit var loginInfoManager: LoginInfoManager
@@ -82,7 +82,7 @@ class EventRepositoryImplTest {
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
-        eventRepo = EventRepositoryImpl(
+        eventRepo = com.simprints.eventsystem.event.EventRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
             loginInfoManager,

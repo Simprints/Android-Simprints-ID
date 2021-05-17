@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
@@ -43,7 +43,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var eventRepository: EventRepository
+    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @Inject lateinit var subjectLocalDataSource: SubjectLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest

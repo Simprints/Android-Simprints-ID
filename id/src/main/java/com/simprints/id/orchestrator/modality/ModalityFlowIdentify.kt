@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
@@ -27,7 +27,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
                                private val coreStepProcessor: CoreStepProcessor,
                                private val matchGroup: GROUP,
                                timeHelper: TimeHelper,
-                               eventRepository: EventRepository,
+                               eventRepository: com.simprints.eventsystem.event.EventRepository,
                                consentRequired: Boolean,
                                locationRequired: Boolean,
                                private val modalities: List<Modality>,

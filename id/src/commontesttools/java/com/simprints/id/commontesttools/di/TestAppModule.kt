@@ -9,7 +9,7 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.local.EventDatabaseFactory
 import com.simprints.id.data.db.event.local.EventLocalDataSource
@@ -130,7 +130,7 @@ class TestAppModule(
         crashReportManager: CrashReportManager,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): EventRepository = sessionEventsManagerRule.resolveDependency {
+    ): com.simprints.eventsystem.event.EventRepository = sessionEventsManagerRule.resolveDependency {
         super.provideEventRepository(
             ctx,
             eventLocalDataSource,

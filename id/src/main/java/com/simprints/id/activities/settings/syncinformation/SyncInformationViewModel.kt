@@ -4,9 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
@@ -22,11 +22,11 @@ import timber.log.Timber
 
 class SyncInformationViewModel(
     private val downySyncHelper: EventDownSyncHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
     private val subjectRepository: SubjectRepository,
     private val preferencesManager: PreferencesManager,
     private val projectId: String,
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository
 ) : ViewModel() {
 

@@ -9,7 +9,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
@@ -37,7 +37,7 @@ class SetupActivityTest {
         private const val ACCURACY = 3.0f
     }
 
-    @RelaxedMockK lateinit var mockEventRepository: EventRepository
+    @RelaxedMockK lateinit var mockEventRepository: com.simprints.eventsystem.event.EventRepository
     @RelaxedMockK lateinit var mockLocationManager: LocationManager
 
     private val app = ApplicationProvider.getApplicationContext<Application>()

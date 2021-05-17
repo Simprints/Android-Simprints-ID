@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
@@ -33,7 +33,7 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_UP)
             ?: throw IllegalArgumentException("input required")
         Timber.d("Received $jsonInput")
-        jsonHelper.fromJson<EventUpSyncScope>(jsonInput)
+        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -51,7 +51,7 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
         }
     }
 
-    private suspend fun execute(upSyncScope: EventUpSyncScope): Result {
+    private suspend fun execute(upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
         Timber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
 
@@ -60,7 +60,7 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
 
     }
 
-    private suspend fun getUpCount(upSyncScope: EventUpSyncScope) =
+    private suspend fun getUpCount(upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope) =
         eventUpSyncHelper.countForUpSync(upSyncScope.operation)
 }
 

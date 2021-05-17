@@ -4,7 +4,7 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
@@ -24,7 +24,7 @@ class AuthenticationHelperImpl(
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val eventRepository: EventRepository
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L

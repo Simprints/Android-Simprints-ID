@@ -5,7 +5,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.*
 import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.db.event.domain.models.callout.IdentificationCalloutEvent
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.toList
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(
-    private val coreEventRepository: EventRepository,
+    private val coreEventRepository: com.simprints.eventsystem.event.EventRepository,
     private val timeHelper: ClientApiTimeHelper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ClientApiSessionEventsManager {

@@ -5,7 +5,7 @@ import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -25,7 +25,7 @@ class AlertPresenter(val view: AlertContract.View,
                      private val alertType: AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var eventRepository: EventRepository
+    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var exitFormHelper: ExitFormHelper

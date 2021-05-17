@@ -24,8 +24,8 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationViewM
 import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -52,36 +52,36 @@ open class ViewModelModule {
         ModuleViewModelFactory(repository)
 
     @Provides
-    open fun provideConsentViewModelFactory(eventRepository: EventRepository) =
+    open fun provideConsentViewModelFactory(eventRepository: com.simprints.eventsystem.event.EventRepository) =
         ConsentViewModelFactory(eventRepository)
 
     @Provides
-    open fun provideCoreExitFormViewModelFactory(eventRepository: EventRepository) =
+    open fun provideCoreExitFormViewModelFactory(eventRepository: com.simprints.eventsystem.event.EventRepository) =
         CoreExitFormViewModelFactory(eventRepository)
 
     @Provides
-    open fun provideFingerprintExitFormViewModelFactory(eventRepository: EventRepository) =
+    open fun provideFingerprintExitFormViewModelFactory(eventRepository: com.simprints.eventsystem.event.EventRepository) =
         FingerprintExitFormViewModelFactory(eventRepository)
 
     @Provides
-    open fun provideFaceExitFormViewModelFactory(eventRepository: EventRepository) =
+    open fun provideFaceExitFormViewModelFactory(eventRepository: com.simprints.eventsystem.event.EventRepository) =
         FaceExitFormViewModelFactory(eventRepository)
 
     @Provides
     open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
                                               deviceManager: DeviceManager,
-                                              eventRepository: EventRepository,
+                                              eventRepository: com.simprints.eventsystem.event.EventRepository,
                                               timeHelper: TimeHelper) =
         FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         subjectRepository: SubjectRepository,
         preferencesManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
-        eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+        eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
         eventSyncManager: EventSyncManager
     ) =
@@ -148,7 +148,7 @@ open class ViewModelModule {
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
         preferenceManager: PreferencesManager,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         crashReportManager: CrashReportManager
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(

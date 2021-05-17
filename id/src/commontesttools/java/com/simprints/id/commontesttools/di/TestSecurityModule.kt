@@ -7,7 +7,7 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -53,7 +53,7 @@ class TestSecurityModule(
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         baseUrlProvider: BaseUrlProvider,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
@@ -122,7 +122,7 @@ class TestSecurityModule(
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        eventRepository: EventRepository
+        eventRepository: com.simprints.eventsystem.event.EventRepository
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(

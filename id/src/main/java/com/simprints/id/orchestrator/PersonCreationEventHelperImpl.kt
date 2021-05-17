@@ -1,6 +1,6 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.toList
 
 class PersonCreationEventHelperImpl(
-    val eventRepository: EventRepository,
+    val eventRepository: com.simprints.eventsystem.event.EventRepository,
     val timeHelper: TimeHelper,
     private val encodingUtils: EncodingUtils
 ) : PersonCreationEventHelper {

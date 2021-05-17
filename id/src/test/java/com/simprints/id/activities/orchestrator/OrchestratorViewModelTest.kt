@@ -8,7 +8,7 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -31,7 +31,7 @@ class OrchestratorViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @MockK private lateinit var eventRepositoryMock: EventRepository
+    @MockK private lateinit var eventRepositoryMock: com.simprints.eventsystem.event.EventRepository
     @MockK private lateinit var orchestratorEventsHelperMock: OrchestratorEventsHelper
     @MockK private lateinit var orchestratorManagerMock: OrchestratorManager
     @MockK private lateinit var domainToModuleApiConverter: DomainToModuleApiAppResponse

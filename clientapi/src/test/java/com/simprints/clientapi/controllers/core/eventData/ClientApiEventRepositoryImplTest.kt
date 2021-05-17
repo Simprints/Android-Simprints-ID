@@ -3,7 +3,7 @@ package com.simprints.clientapi.controllers.core.eventData
 import com.google.common.truth.Truth
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
@@ -25,7 +25,7 @@ class ClientApiEventRepositoryImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK(relaxed = true) lateinit var coreEventEventsMgrMock: EventRepository
+    @MockK(relaxed = true) lateinit var coreEventEventsMgrMock: com.simprints.eventsystem.event.EventRepository
     private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManager
 
     @Before

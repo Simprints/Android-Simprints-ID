@@ -4,7 +4,7 @@ import android.content.Context
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
@@ -96,7 +96,7 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         preferenceManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
@@ -123,7 +123,7 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         preferenceManager: PreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
@@ -149,7 +149,7 @@ class OrchestratorModule {
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
         prefs: PreferencesManager,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         loginInfoManager: LoginInfoManager,
         ctx: Context
     ): ModalityFlow =
@@ -201,7 +201,7 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorEventsHelper(
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
         OrchestratorEventsHelperImpl(eventRepository, timeHelper)

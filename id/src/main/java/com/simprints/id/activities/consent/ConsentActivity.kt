@@ -17,7 +17,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.ConsentEvent
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
@@ -52,7 +52,7 @@ class ConsentActivity : BaseSplitActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
-    @Inject lateinit var eventRepository: EventRepository
+    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var jsonHelper: JsonHelper

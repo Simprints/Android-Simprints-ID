@@ -2,9 +2,9 @@ package com.simprints.id.services.sync.events.down
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
@@ -14,7 +14,7 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepository: EventDownSyncScopeRepository,
+class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
                                       private val jsonHelper: JsonHelper) : EventDownSyncWorkersBuilder {
 
 
@@ -28,7 +28,8 @@ class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepository: Event
 
     private fun buildDownSyncWorkers(uniqueSyncID: String?,
                                      uniqueDownSyncID: String,
-                                     downSyncOperation: EventDownSyncOperation): OneTimeWorkRequest =
+                                     downSyncOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+    ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventDownSyncDownloaderWorker::class.java)
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
@@ -37,7 +38,8 @@ class EventDownSyncWorkersBuilderImpl(private val downSyncScopeRepository: Event
 
     private fun buildCountWorker(uniqueSyncID: String?,
                                  uniqueDownSyncID: String,
-                                 eventDownSyncScope: EventDownSyncScope): OneTimeWorkRequest =
+                                 eventDownSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
+    ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventDownSyncCountWorker::class.java)
             .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to jsonHelper.toJson(eventDownSyncScope)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())

@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
@@ -23,7 +23,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
                                     private val timeHelper: TimeHelper,
-                                    private val eventRepository: EventRepository,
+                                    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
                                     private val consentRequired: Boolean,
                                     private val locationRequired: Boolean,
                                     private val modalities: List<Modality>,

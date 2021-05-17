@@ -4,7 +4,7 @@ import com.simprints.id.commontesttools.events.createFaceCaptureEvent
 import com.simprints.id.commontesttools.events.createFingerprintCaptureEvent
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
 import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -77,7 +77,7 @@ class PersonCreationEventHelperImplTest {
     )
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper

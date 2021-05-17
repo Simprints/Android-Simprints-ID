@@ -5,7 +5,7 @@ import com.simprints.id.sampledata.SampleDefaults.defaultSubject
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
@@ -29,7 +29,7 @@ class EnrolmentHelperImplTest {
     lateinit var subjectRepository: SubjectRepository
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper

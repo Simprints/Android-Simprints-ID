@@ -1,6 +1,6 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -20,7 +20,7 @@ private const val TAG = "ENROLMENT"
 
 class EnrolmentHelperImpl(
     private val subjectRepository: SubjectRepository,
-    private val eventRepository: EventRepository,
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
     private val timeHelper: TimeHelper
 ) : EnrolmentHelper {
 

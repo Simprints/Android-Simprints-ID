@@ -4,10 +4,10 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.sampledata.SampleDefaults.TIME1
 import com.simprints.id.sampledata.SampleDefaults.projectUpSyncScope
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
-import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
-import com.simprints.id.data.db.events_sync.up.local.DbEventUpSyncOperationStateDao
-import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationState
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
+import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
+import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import io.mockk.MockKAnnotations
@@ -23,14 +23,18 @@ class EventUpSyncScopeRepositoryImplTest {
 
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var upSyncOperationOperationDao: DbEventUpSyncOperationStateDao
+    @MockK lateinit var upSyncOperationOperationDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 
-    private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
+    private lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        eventUpSyncScopeRepository = EventUpSyncScopeRepositoryImpl(loginInfoManager, upSyncOperationOperationDao)
+        eventUpSyncScopeRepository =
+            com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl(
+                loginInfoManager,
+                upSyncOperationOperationDao
+            )
 
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns SampleDefaults.DEFAULT_PROJECT_ID
         coEvery { upSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
@@ -48,8 +52,14 @@ class EventUpSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun getSyncOperationsWithLastResult(): List<DbEventsUpSyncOperationState> {
+    private fun getSyncOperationsWithLastResult(): List<com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState> {
         val op = projectUpSyncScope.operation
-        return listOf(DbEventsUpSyncOperationState(op.getUniqueKey(), COMPLETE, TIME1))
+        return listOf(
+            com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState(
+                op.getUniqueKey(),
+                COMPLETE,
+                TIME1
+            )
+        )
     }
 }

@@ -9,9 +9,9 @@ import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
+import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
@@ -83,12 +83,16 @@ class FetchGuidHelperImplTest {
             fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
 
             coVerify {
-                downSyncHelper.downSync(any(), EventDownSyncOperation(
-                    RemoteEventQuery(
-                        defaultSubject.projectId,
-                        subjectId = defaultSubject.subjectId,
-                        modes = DEFAULT_MODES,
-                        types = EventDownSyncScope.subjectEvents)))
+                downSyncHelper.downSync(any(),
+                    com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation(
+                        com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery(
+                            defaultSubject.projectId,
+                            subjectId = defaultSubject.subjectId,
+                            modes = DEFAULT_MODES,
+                            types = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.subjectEvents
+                        )
+                    )
+                )
             }
         }
     }

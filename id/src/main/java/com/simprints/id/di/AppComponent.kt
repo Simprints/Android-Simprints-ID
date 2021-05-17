@@ -32,7 +32,7 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationActiv
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
@@ -136,7 +136,7 @@ interface AppComponent {
     fun inject(securityStateWorker: SecurityStateWorker)
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
 
-    fun getSessionEventsManager(): EventRepository
+    fun getSessionEventsManager(): com.simprints.eventsystem.event.EventRepository
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): SubjectRepository

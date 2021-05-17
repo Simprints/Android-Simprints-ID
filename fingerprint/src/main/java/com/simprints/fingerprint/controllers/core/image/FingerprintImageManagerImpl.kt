@@ -2,14 +2,15 @@ package com.simprints.fingerprint.controllers.core.image
 
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.images.repository.ImageRepository
 import timber.log.Timber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
-                                  private val coreEventRepository: EventRepository) : FingerprintImageManager {
+                                  private val coreEventRepository: com.simprints.eventsystem.event.EventRepository
+) : FingerprintImageManager {
 
     override suspend fun save(imageBytes: ByteArray, captureEventId: String, fileExtension: String): FingerprintImageRef? =
         determinePath(captureEventId, fileExtension)?.let { path ->

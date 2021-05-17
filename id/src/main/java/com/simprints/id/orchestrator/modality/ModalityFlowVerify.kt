@@ -2,7 +2,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
@@ -29,7 +29,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
                              private val faceStepProcessor: FaceStepProcessor,
                              private val coreStepProcessor: CoreStepProcessor,
                              timeHelper: TimeHelper,
-                             eventRepository: EventRepository,
+                             eventRepository: com.simprints.eventsystem.event.EventRepository,
                              consentRequired: Boolean,
                              locationRequired: Boolean,
                              private val modalities: List<Modality>,
