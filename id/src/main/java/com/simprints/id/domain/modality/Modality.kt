@@ -1,5 +1,7 @@
 package com.simprints.id.domain.modality
 
+import com.simprints.core.domain.modality.Modes
+
 enum class Modality {
     FACE,
     FINGER;

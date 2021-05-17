@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.common.room
+package com.simprints.eventsystem.common
 
 import androidx.room.TypeConverter
 import com.fasterxml.jackson.core.type.TypeReference
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState
-import com.simprints.id.domain.modality.Modes
 
 class Converters {
 

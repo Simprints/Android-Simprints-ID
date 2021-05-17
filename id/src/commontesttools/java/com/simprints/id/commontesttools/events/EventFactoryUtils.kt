@@ -44,8 +44,8 @@ import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveE
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.id.domain.modality.Modes.FACE
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_METADATA

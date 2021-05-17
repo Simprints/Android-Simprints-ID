@@ -9,8 +9,8 @@ import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.data.db.event.remote.models.ApiEventLabels
 import com.simprints.id.data.db.event.remote.models.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.fromDomainToApi
-import com.simprints.id.domain.modality.Modes.FACE
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import org.junit.Test
 
 class ApiEventLabelsTest {

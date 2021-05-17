@@ -20,8 +20,8 @@ import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FINGER
-import com.simprints.id.domain.modality.Modes.FACE
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest

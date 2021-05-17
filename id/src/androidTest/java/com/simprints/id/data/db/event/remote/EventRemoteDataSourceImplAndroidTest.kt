@@ -46,8 +46,8 @@ import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.domain.modality.Modes.FACE
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder

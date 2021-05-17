@@ -21,6 +21,7 @@ dependencies {
     implementation(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.Kotlin.coroutines_android)
     implementation(Dependencies.Kotlin.serialization_json)
+    implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Timber.core)
 
     testImplementation(Dependencies.Testing.junit)

@@ -29,7 +29,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modes
+import com.simprints.core.domain.modality.Modes
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.libsimprints.Constants
 import io.kotlintest.shouldThrow

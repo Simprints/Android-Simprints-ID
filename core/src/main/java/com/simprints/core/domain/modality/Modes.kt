@@ -1,4 +1,4 @@
-package com.simprints.id.domain.modality
+package com.simprints.core.domain.modality
 
 import androidx.annotation.Keep
 
