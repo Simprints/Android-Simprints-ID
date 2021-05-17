@@ -66,9 +66,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
         every { isLiveFeedbackAvailable() } returns false
     }
-    private val scannerManager: ScannerManager = ScannerManagerImpl(mockk(), mockk(), mockk(), mockk()).also {
-        it.scanner = scanner
-    }
+    private val scannerManager: ScannerManager = ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())
     private val imageManager: FingerprintImageManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
     private val pairingManager: ScannerPairingManager = mockk()
@@ -81,8 +79,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     fun setUp() {
         mockBase64EncodingForSavingTemplateInSession()
 
-        val mockModule = module(override = true) {
-            factory(override = true) { timeHelper }
+        scannerManager.scanner = scanner
+
+        declareModule {
+            factory { timeHelper }
             factory { sessionEventsManager }
             factory { fingerprintAnalyticsManager }
             factory { crashReportManager }
@@ -842,6 +842,17 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleOnBackPressed()
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
     }
+
+    @Test
+    fun shouldLaunch_reconnectActivity_whenScanner_IsNull() {
+        scannerManager.scanner = null
+
+        vm.start(TWO_FINGERS_IDS)
+
+        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        vm.launchReconnect.assertEventReceived()
+    }
+
 
     @Test
     fun backPressed_whileTransferringImage_cancelsTransfer() {
