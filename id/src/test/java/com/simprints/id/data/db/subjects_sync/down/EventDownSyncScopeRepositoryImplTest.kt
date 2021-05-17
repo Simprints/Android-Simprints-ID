@@ -1,10 +1,7 @@
 package com.simprints.id.data.db.subjects_sync.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULES
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
@@ -25,7 +22,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations

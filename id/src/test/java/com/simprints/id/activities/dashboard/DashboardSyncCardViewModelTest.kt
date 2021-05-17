@@ -23,7 +23,7 @@
 //import com.simprints.id.data.db.upsync_info.UpSyncStatus
 //import com.simprints.id.data.prefs.PreferencesManager
 //import com.simprints.id.data.prefs.PreferencesManagerImpl
-//import com.simprints.id.domain.modality.Modes
+//import com.simprints.core.domain.modality.Modes
 //import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.SyncScopesBuilder
 //import com.simprints.id.services.scheduledSync.sync.peopleDownSync.models.PeopleDownSyncTrigger
 //import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.SyncState

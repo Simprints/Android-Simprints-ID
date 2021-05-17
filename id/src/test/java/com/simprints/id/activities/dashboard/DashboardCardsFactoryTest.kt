@@ -16,7 +16,7 @@
 //import com.simprints.id.data.loginInfo.LoginInfoManager
 //import com.simprints.id.data.prefs.PreferencesManager
 //import com.simprints.id.data.prefs.PreferencesManagerImpl
-//import com.simprints.id.domain.modality.Modes
+//import com.simprints.core.domain.modality.Modes
 //import com.simprints.id.testtools.TestApplication
 //import com.simprints.id.testtools.UnitTestConfig
 //import com.simprints.id.testtools.state.RobolectricTestMocker

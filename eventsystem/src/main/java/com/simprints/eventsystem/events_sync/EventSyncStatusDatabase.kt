@@ -6,7 +6,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.simprints.id.data.db.common.room.Converters
+import com.simprints.eventsystem.common.Converters
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState
 import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao

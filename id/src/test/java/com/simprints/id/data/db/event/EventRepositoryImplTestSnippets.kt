@@ -22,11 +22,10 @@ import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import io.mockk.coEvery
 import io.mockk.coVerify
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 
 fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): SessionCaptureEvent {

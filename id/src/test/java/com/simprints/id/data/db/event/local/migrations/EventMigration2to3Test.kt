@@ -14,8 +14,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.local.EventRoomDatabase
-import com.simprints.id.domain.modality.Modes
+import com.simprints.core.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.extensions.getIntWithColumnName
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
