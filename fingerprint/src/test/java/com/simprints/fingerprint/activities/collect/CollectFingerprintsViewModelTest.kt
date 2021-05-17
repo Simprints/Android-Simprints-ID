@@ -81,7 +81,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         scannerManager.scanner = scanner
 
-        declareModule {
+        val mockModule = module(override = true) {
+            factory(override = true) { timeHelper }
             factory { timeHelper }
             factory { sessionEventsManager }
             factory { fingerprintAnalyticsManager }
@@ -95,6 +96,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             factory { scannerFactory }
         }
         loadKoinModules(mockModule)
+
         vm = get()
     }
 
