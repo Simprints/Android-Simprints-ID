@@ -31,6 +31,7 @@ object Dependencies {
             "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
         const val coroutines_play_services =
             "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$kotlin_coroutine_version"
+        const val serialization_json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
     }
 
     object AndroidX {
