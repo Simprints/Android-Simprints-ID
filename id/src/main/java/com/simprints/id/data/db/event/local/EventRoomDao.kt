@@ -19,8 +19,21 @@ interface EventRoomDao {
     @Query("select * from DbEvent where projectId = :projectId order by createdAt desc")
     suspend fun loadFromProject(projectId: String): List<DbEvent>
 
-    @Query("select * from DbEvent where type = :type order by createdAt desc")
-    suspend fun loadFromType(type: EventType?): List<DbEvent>
+    @Query("select * from DbEvent where sessionIsClosed = :isClosed and type = :type")
+    suspend fun loadAllSessions(
+        isClosed: Boolean,
+        type: EventType = EventType.SESSION_CAPTURE
+    ): List<DbEvent>
+
+    @Query("select sessionId from DbEvent where projectId = :projectId and sessionIsClosed = :isClosed and type = :type")
+    suspend fun loadAllClosedSessionIds(
+        projectId: String,
+        isClosed: Boolean = true,
+        type: EventType = EventType.SESSION_CAPTURE
+    ): List<String>
+
+    @Query("select * from DbEvent where projectId = :projectId and sessionId is null")
+    suspend fun loadAbandonedEvents(projectId: String): List<DbEvent>
 
     @Query("select count(*) from DbEvent where projectId = :projectId")
     suspend fun countFromProject(projectId: String): Int
@@ -31,8 +44,8 @@ interface EventRoomDao {
     @Query("select count(*) from DbEvent where type = :type")
     suspend fun countFromType(type: EventType): Int
 
-    @Query("delete from DbEvent where id = :id")
-    suspend fun delete(id: String)
+    @Query("delete from DbEvent where id in (:ids)")
+    suspend fun delete(ids: List<String>)
 
     @Query("delete from DbEvent where sessionId = :sessionId")
     suspend fun deleteAllFromSession(sessionId: String)

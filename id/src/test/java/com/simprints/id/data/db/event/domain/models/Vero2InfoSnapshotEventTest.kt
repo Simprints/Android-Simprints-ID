@@ -1,15 +1,15 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-
 import com.simprints.id.data.db.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Companion.EVENT_VERSION
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.Vero2InfoSnapshotEventSample
 import org.junit.Test
 
 class Vero2InfoSnapshotEventTest {
@@ -19,7 +19,7 @@ class Vero2InfoSnapshotEventTest {
         val labels = EventLabels(sessionId = GUID1)
         val versionArg = Vero2Version(0, "cypressApp", "cypressApi", "stmApp", "stpApi", "un20App", "un20Api")
         val batteryArg = BatteryInfo(0, 1, 2, 3)
-        val event = Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg, labels)
+        val event = Vero2InfoSnapshotEventSample.getEvent(labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

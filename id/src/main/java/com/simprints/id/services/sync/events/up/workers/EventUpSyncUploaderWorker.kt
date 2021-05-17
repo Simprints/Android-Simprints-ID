@@ -18,22 +18,24 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
-// TODO: uncomment userId when multitenancy is properly implemented
-@InternalCoroutinesApi
-class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
+class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
+    SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var upSyncHelper: EventUpSyncHelper
-    @Inject lateinit var eventSyncCache: EventSyncCache
-    @Inject lateinit var jsonHelper: JsonHelper
+    @Inject
+    override lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var upSyncHelper: EventUpSyncHelper
+    @Inject
+    lateinit var eventSyncCache: EventSyncCache
+    @Inject
+    lateinit var jsonHelper: JsonHelper
 
     private val upSyncScope by lazy {
         try {
@@ -46,7 +48,6 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Si
         }
     }
 
-    @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<EventUpSyncUploaderWorker> { it.inject(this@EventUpSyncUploaderWorker) }
@@ -56,15 +57,12 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Si
             var count = eventSyncCache.readProgress(workerId)
 
             crashlyticsLog("Start")
-            val totalUploaded = upSyncHelper.upSync(this, upSyncScope.operation)
-            while (!totalUploaded.isClosedForReceive) {
-                totalUploaded.poll()?.let {
-                    count += it.progress
-                    eventSyncCache.saveProgress(workerId, count)
-                    Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+            upSyncHelper.upSync(this, upSyncScope.operation).collect {
+                count += it.progress
+                eventSyncCache.saveProgress(workerId, count)
+                Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
 
-                    reportCount(count)
-                }
+                reportCount(count)
             }
 
             Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
@@ -97,7 +95,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Si
     }
 }
 
-fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCache): Int? {
+fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
 

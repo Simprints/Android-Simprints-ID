@@ -64,7 +64,7 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
         launchAlert(this, clientApiAlert)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         isActivityRestored = true
     }
@@ -105,11 +105,17 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
-        IAppResponseType.ENROL, IAppResponseType.ENROL_LAST_BIOMETRICS -> presenter.handleEnrolResponse(EnrolResponse(response as IAppEnrolResponse))
+        IAppResponseType.ENROL, IAppResponseType.ENROL_LAST_BIOMETRICS -> presenter.handleEnrolResponse(
+            EnrolResponse(response as IAppEnrolResponse)
+        )
         IAppResponseType.IDENTIFY -> presenter.handleIdentifyResponse(IdentifyResponse(response as IAppIdentifyResponse))
         IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
-        IAppResponseType.CONFIRMATION -> presenter.handleConfirmationResponse(ConfirmationResponse(response as IAppConfirmationResponse))
+        IAppResponseType.CONFIRMATION -> presenter.handleConfirmationResponse(
+            ConfirmationResponse(
+                response as IAppConfirmationResponse
+            )
+        )
         IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
     }
 }

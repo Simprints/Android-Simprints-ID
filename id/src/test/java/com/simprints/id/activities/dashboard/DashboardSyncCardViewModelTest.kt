@@ -8,9 +8,9 @@
 //import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 //import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 //import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
-//import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-//import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-//import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+//import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
+//import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
+//import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
 //import com.simprints.id.commontesttools.di.TestAppModule
 //import com.simprints.id.commontesttools.di.TestDataModule
 //import com.simprints.id.commontesttools.di.TestPreferencesModule

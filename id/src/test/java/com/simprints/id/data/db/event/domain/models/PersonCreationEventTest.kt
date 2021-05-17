@@ -1,12 +1,13 @@
 package com.simprints.id.data.db.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.events.CREATED_AT
-import com.simprints.id.commontesttools.events.DEFAULT_ENDED_AT
 import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.id.data.db.event.domain.models.PersonCreationEvent.Companion.EVENT_VERSION
+import com.simprints.id.sampledata.PersonCreationEventSample
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 
 class PersonCreationEventTest {
@@ -16,7 +17,7 @@ class PersonCreationEventTest {
         val labels = EventLabels(sessionId = GUID1)
         val fingerprintCaptureEventIds = listOf(GUID1)
         val faceCaptureEventIds = listOf(GUID2)
-        val event = PersonCreationEvent(CREATED_AT, fingerprintCaptureEventIds, GUID1, faceCaptureEventIds, GUID2, labels)
+        val event = PersonCreationEventSample.getEvent(labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
