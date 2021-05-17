@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.testtools.common.di.DependencyRule.MockRule
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication

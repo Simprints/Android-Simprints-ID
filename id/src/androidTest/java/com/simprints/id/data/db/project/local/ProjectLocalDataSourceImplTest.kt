@@ -7,7 +7,7 @@ import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import io.mockk.every

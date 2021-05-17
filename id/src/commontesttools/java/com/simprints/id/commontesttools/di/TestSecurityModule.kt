@@ -10,7 +10,7 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider

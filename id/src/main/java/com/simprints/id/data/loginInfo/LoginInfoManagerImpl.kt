@@ -1,5 +1,6 @@
 package com.simprints.id.data.loginInfo
 
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
 

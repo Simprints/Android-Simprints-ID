@@ -1,4 +1,4 @@
-package com.simprints.id.data.loginInfo
+package com.simprints.core.login
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 

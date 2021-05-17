@@ -14,7 +14,7 @@ import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStat
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.services.sync.SyncManager

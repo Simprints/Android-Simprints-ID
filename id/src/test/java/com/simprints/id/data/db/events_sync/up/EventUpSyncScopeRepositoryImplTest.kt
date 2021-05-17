@@ -8,7 +8,7 @@ import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSy
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
