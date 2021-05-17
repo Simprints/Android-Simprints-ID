@@ -44,7 +44,7 @@ def writeWrapScriptToFullyCompileJavaApp(wrapFile) {
 }
 task createProfilingApkAddDir {
     for (String abi : ["armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64", "mips", "mips64"]) {
-        def dir = new File("app/profiling_apk_add_dir/lib/" + abi)
+        def dir = new File("fingerprintmatcher/app/profiling_apk_add_dir/lib/" + abi)
         dir.mkdirs()
         def wrapFile = new File(dir, "wrap.sh")
         writeWrapScriptToFullyCompileJavaApp(wrapFile)
