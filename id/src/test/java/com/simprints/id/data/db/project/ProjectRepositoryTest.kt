@@ -3,7 +3,7 @@ package com.simprints.id.data.db.project
 import android.accounts.NetworkErrorException
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource

@@ -50,7 +50,7 @@ class SecurityStateRemoteDataSourceImplTest {
             VERSION_NAME,
             randomUUID(),
             mockk(),
-            JsonHelper()
+            JsonHelper
         )
 
         every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID

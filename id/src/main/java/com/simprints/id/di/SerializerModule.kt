@@ -73,7 +73,7 @@ class SerializerModule {
 
     @Provides
     @Singleton
-    fun provideJsonHelper(): JsonHelper = JsonHelper()
+    fun provideJsonHelper(): JsonHelper = JsonHelper
 
     @Provides
     @Singleton

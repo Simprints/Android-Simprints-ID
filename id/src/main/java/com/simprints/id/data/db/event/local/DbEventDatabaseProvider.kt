@@ -23,14 +23,19 @@ class DbEventDatabaseFactoryImpl(
             val key = getOrCreateKey(DB_NAME)
             val passphrase: ByteArray = getBytes(key)
             val factory = SupportFactory(passphrase)
-            return EventRoomDatabase.getDatabase(ctx, factory, DB_NAME, crashReportManager)
+            return EventRoomDatabase.getDatabase(
+                ctx,
+                factory,
+                DB_NAME,
+                crashReportManager
+            )
         } catch (t: Throwable) {
             Timber.e(t)
             throw t
         }
     }
 
-    private fun getOrCreateKey(dbName: String): CharArray {
+    private fun getOrCreateKey(@Suppress("SameParameterValue") dbName: String): CharArray {
         return try {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         } catch (t: Throwable) {
@@ -43,4 +48,5 @@ class DbEventDatabaseFactoryImpl(
     companion object {
         private const val DB_NAME = "dbevents"
     }
+
 }

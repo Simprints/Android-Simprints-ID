@@ -32,9 +32,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.libsimprints.Constants
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
@@ -53,7 +51,7 @@ class CommCareCoSyncPresenterTest {
     private val view = mockk<CommCareActivity> {
         every { extras?.get("projectId") } returns UUID.randomUUID().toString()
     }
-    private val jsonHelper = JsonHelper()
+    private val jsonHelper = JsonHelper
 
     @Before
     fun setup() {

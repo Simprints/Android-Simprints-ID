@@ -10,7 +10,7 @@ import com.simprints.id.domain.modality.Modes
 
 class Converters {
 
-    private val jsonHelper = JsonHelper()
+    private val jsonHelper = JsonHelper
 
     @TypeConverter
     fun fromEventPayloadTypeToString(type: EventType?): String? =

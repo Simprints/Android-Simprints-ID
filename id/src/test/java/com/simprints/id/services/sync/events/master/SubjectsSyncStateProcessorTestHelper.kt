@@ -9,7 +9,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.services.sync.events.common.*
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -24,9 +23,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
-import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import java.util.*
@@ -121,7 +118,7 @@ private fun createDownSyncCounterWorker(state: WorkInfo.State,
                                         id: UUID = UUID.randomUUID()) =
     createWorkInfo(
         state,
-        workDataOf(OUTPUT_COUNT_WORKER_DOWN to JsonHelper().toJson(listOf(EventCount(ENROLMENT_RECORD_CREATION, TO_DOWNLOAD)))),
+        workDataOf(OUTPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(listOf(EventCount(ENROLMENT_RECORD_CREATION, TO_DOWNLOAD)))),
         createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWN_COUNTER)),
         workDataOf(),
         id

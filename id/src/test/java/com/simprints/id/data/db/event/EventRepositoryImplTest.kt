@@ -2,10 +2,6 @@ package com.simprints.id.data.db.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID1
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID2
-import com.simprints.id.commontesttools.DefaultTestConstants.GUID3
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
@@ -24,13 +20,16 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.id.sampledata.SampleDefaults.GUID3
 import com.simprints.id.tools.time.TimeHelper
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -223,21 +222,6 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun createBatches_shouldSplitEventsCorrectlyIntoBatches() {
-        runBlocking {
-            mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE + 3)
-
-            val batches = (eventRepo as EventRepositoryImpl).createBatches(DEFAULT_PROJECT_ID).toList()
-
-            assertThat(batches[0].size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(batches[1].size).isEqualTo(3)
-            assertThat(batches[2].size).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(batches[3].size).isEqualTo(SESSION_BATCH_SIZE)
-        }
-    }
-
-    @Test
     fun upload_shouldLoadAllEventsPartOfSessionsToUpload() {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE, GUID1, GUID2)
@@ -280,10 +264,11 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            events.forEach {
-                coVerify {
-                    eventLocalDataSource.delete(id = it.id)
-                }
+            coVerify {
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
+                    .map { it.id })
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
+                    .map { it.id })
             }
         }
     }
@@ -296,8 +281,9 @@ class EventRepositoryImplTest {
 
             val progress = eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE / 2)
+            assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
+            assertThat(progress[2]).isEqualTo(SESSION_BATCH_SIZE / 2)
         }
     }
 
@@ -310,8 +296,11 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            for (event in events) {
-                coVerify { eventLocalDataSource.delete(id = event.id) }
+            coVerify {
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
+                    .map { it.id })
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
+                    .map { it.id })
             }
         }
     }
@@ -343,13 +332,14 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            for (event in events) {
-                coVerify { eventLocalDataSource.delete(id = event.id) }
+            coVerify {
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
+                    .map { it.id })
+                eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
+                    .map { it.id })
             }
 
-            for (event in subjectEvents) {
-                coVerify(exactly = 0) { eventLocalDataSource.delete(id = event.id) }
-            }
+            coVerify(exactly = 0) { eventLocalDataSource.delete(subjectEvents.map { it.id }) }
         }
     }
 
@@ -360,7 +350,7 @@ class EventRepositoryImplTest {
 
             eventRepo.createSession()
 
-            coVerify { eventLocalDataSource.loadAllFromType(SESSION_CAPTURE) }
+            coVerify { eventLocalDataSource.loadAllSessions(false) }
             verifyArtificialEventWasAdded(GUID1, NEW_SESSION)
         }
     }
@@ -384,7 +374,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addOrUpdateEvent(eventInSession)
 
-            coVerify { eventLocalDataSource.loadAllFromType(SESSION_CAPTURE) }
+            coVerify { eventLocalDataSource.loadAllSessions(false) }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
                     eventInSession.copy(
@@ -405,7 +395,7 @@ class EventRepositoryImplTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
-            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns flowOf(
+            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns listOf(
                 session,
                 eventInSession
             )
@@ -428,7 +418,8 @@ class EventRepositoryImplTest {
         }
     }
 
-    private fun mockSignedId() = every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+    private fun mockSignedId() =
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 
     companion object {
         const val DEVICE_ID = "DEVICE_ID"
