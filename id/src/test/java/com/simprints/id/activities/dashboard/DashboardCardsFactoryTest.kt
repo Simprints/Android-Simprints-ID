@@ -13,7 +13,7 @@
 //import com.simprints.id.data.db.project.ProjectRepository
 //import com.simprints.id.data.db.project.domain.Project
 //import com.simprints.id.data.db.people_sync.SyncStatusDatabase
-//import com.simprints.id.data.loginInfo.LoginInfoManager
+//import com.simprints.core.login.LoginInfoManager
 //import com.simprints.id.data.prefs.PreferencesManager
 //import com.simprints.id.data.prefs.PreferencesManagerImpl
 //import com.simprints.core.domain.modality.Modes

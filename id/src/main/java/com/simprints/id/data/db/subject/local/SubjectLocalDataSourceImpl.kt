@@ -11,7 +11,7 @@ import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException

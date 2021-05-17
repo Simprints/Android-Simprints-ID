@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.tools.time.TimeHelper
 import io.mockk.MockKAnnotations

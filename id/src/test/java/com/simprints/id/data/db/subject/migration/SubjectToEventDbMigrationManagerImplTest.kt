@@ -8,7 +8,7 @@ import com.simprints.id.data.db.event.local.EventLocalDataSource
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException

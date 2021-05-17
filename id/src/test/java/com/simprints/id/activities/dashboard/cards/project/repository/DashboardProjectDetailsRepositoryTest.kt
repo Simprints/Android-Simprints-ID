@@ -2,7 +2,7 @@ package com.simprints.id.activities.dashboard.cards.project.repository
 
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import io.mockk.coEvery
 import io.mockk.coVerify
