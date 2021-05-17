@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.events_sync.up
 
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope.ProjectScope
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

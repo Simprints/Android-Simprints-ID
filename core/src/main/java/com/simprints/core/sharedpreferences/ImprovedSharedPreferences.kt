@@ -1,7 +1,5 @@
-package com.simprints.id.data.prefs.improvedSharedPreferences
+package com.simprints.core.sharedpreferences
 
-import com.simprints.id.exceptions.unexpected.MismatchedTypeException
-import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 
 /**
  * Extension of the SharedPreferences interface of the Android framework.
