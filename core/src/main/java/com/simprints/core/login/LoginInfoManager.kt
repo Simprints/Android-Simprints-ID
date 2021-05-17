@@ -1,6 +1,7 @@
 package com.simprints.core.login
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+
 
 interface LoginInfoManager {
 

@@ -1,6 +1,6 @@
 package com.simprints.id.secure.securitystate.local
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.secure.models.SecurityState
 
 class SecurityStateLocalDataSourceImpl(
