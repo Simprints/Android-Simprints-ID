@@ -7,7 +7,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
 import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.commontesttools.TestTimeHelperImpl
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -45,7 +45,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @MockK lateinit var eventSyncManager: EventSyncManager
     @MockK lateinit var deviceManager: DeviceManager
     @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var downSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
     @MockK lateinit var cacheSync: EventSyncCache
     @MockK lateinit var timeHelper: TimeHelper
 

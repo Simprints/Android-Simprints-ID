@@ -26,7 +26,7 @@ import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.databinding.ActivitySetupBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality
@@ -53,7 +53,7 @@ class SetupActivity : BaseSplitActivity() {
     @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
-    @Inject lateinit var eventRepository: EventRepository
+    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager

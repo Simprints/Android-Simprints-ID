@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
@@ -36,7 +36,7 @@ class ModalityFlowIdentifyImplTest {
     @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var eventRepository: EventRepository
+    @MockK lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var consentStepMock: Step

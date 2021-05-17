@@ -11,7 +11,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
@@ -53,7 +53,7 @@ class EventDownSyncCountWorkerTest {
             eventDownSyncScopeRepository = mockk(relaxed = true)
         }
 
-        coEvery { countWorker.eventDownSyncScopeRepository.refreshState(any()) } coAnswers { args.first() as EventDownSyncOperation }
+        coEvery { countWorker.eventDownSyncScopeRepository.refreshState(any()) } coAnswers { args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }
     }
 
     @Test

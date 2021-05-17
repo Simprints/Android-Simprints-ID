@@ -3,9 +3,9 @@ package com.simprints.id.activities.fetchguid
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
+import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.PreferencesManager
@@ -30,12 +30,14 @@ class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
 
                 subjectResultFromDB
             } else {
-                val op = EventDownSyncOperation(
-                    RemoteEventQuery(
+                val op = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation(
+                    com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery(
                         projectId,
                         subjectId = subjectId,
                         modes = preferencesManager.modalities.map { it.toMode() },
-                        types = EventDownSyncScope.subjectEvents))
+                        types = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.subjectEvents
+                    )
+                )
 
                 downSyncHelper.downSync(coroutineScope, op).consumeAsFlow().toList()
 

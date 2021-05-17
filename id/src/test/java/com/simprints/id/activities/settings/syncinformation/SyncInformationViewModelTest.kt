@@ -7,10 +7,10 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.EventCount
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.PreferencesManager
@@ -45,7 +45,7 @@ class SyncInformationViewModelTest {
     lateinit var downySyncHelper: EventDownSyncHelper
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @MockK
     lateinit var subjectRepository: SubjectRepository
@@ -54,7 +54,7 @@ class SyncInformationViewModelTest {
     lateinit var preferencesManager: PreferencesManager
 
     @MockK
-    lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     @MockK
     lateinit var imageRepository: ImageRepository

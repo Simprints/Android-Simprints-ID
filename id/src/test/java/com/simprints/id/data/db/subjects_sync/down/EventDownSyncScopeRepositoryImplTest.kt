@@ -12,15 +12,15 @@ import com.simprints.id.sampledata.SampleDefaults.TIME1
 import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
-import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
-import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
+import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
+import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -48,14 +48,19 @@ class EventDownSyncScopeRepositoryImplTest {
 
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
+    @MockK lateinit var downSyncOperationOperationDao: com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 
-    private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    private lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        eventDownSyncScopeRepository = EventDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationOperationDao)
+        eventDownSyncScopeRepository =
+            com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl(
+                loginInfoManager,
+                preferencesManager,
+                downSyncOperationOperationDao
+            )
 
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { loginInfoManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
@@ -152,9 +157,30 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     private fun getSyncOperationsWithLastResult() =
-        projectDownSyncScope.operations.map { DbEventsDownSyncOperationState(it.getUniqueKey(), LAST_STATE, LAST_EVENT_ID, LAST_SYNC_TIME) } +
-            userDownSyncScope.operations.map { DbEventsDownSyncOperationState(it.getUniqueKey(), LAST_STATE, LAST_EVENT_ID, LAST_SYNC_TIME) } +
-            modulesDownSyncScope.operations.map { DbEventsDownSyncOperationState(it.getUniqueKey(), LAST_STATE, LAST_EVENT_ID, LAST_SYNC_TIME) }
+        projectDownSyncScope.operations.map {
+            com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState(
+                it.getUniqueKey(),
+                LAST_STATE,
+                LAST_EVENT_ID,
+                LAST_SYNC_TIME
+            )
+        } +
+            userDownSyncScope.operations.map {
+                com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState(
+                    it.getUniqueKey(),
+                    LAST_STATE,
+                    LAST_EVENT_ID,
+                    LAST_SYNC_TIME
+                )
+            } +
+            modulesDownSyncScope.operations.map {
+                com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState(
+                    it.getUniqueKey(),
+                    LAST_STATE,
+                    LAST_EVENT_ID,
+                    LAST_SYNC_TIME
+                )
+            }
 
 
     private fun mockGlobalSyncGroup() {
@@ -170,7 +196,7 @@ class EventDownSyncScopeRepositoryImplTest {
         every { preferencesManager.selectedModules } returns DEFAULT_MODULES.toSet()
     }
 
-    private fun assertProjectSyncScope(syncScope: EventDownSyncScope) {
+    private fun assertProjectSyncScope(syncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectProjectScope::class.java)
         with((syncScope as SubjectProjectScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -178,7 +204,7 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun assertUserSyncScope(syncScope: EventDownSyncScope) {
+    private fun assertUserSyncScope(syncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectUserScope::class.java)
         with((syncScope as SubjectUserScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -187,7 +213,7 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun assertModuleSyncScope(syncScope: EventDownSyncScope) {
+    private fun assertModuleSyncScope(syncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectModuleScope::class.java)
         with((syncScope as SubjectModuleScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -196,7 +222,7 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun EventDownSyncOperation.assertProjectSyncOpIsRefreshed() {
+    private fun com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.assertProjectSyncOpIsRefreshed() {
         assertThat(lastEventId).isEqualTo(LAST_EVENT_ID)
         assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         assertThat(state).isEqualTo(LAST_STATE)

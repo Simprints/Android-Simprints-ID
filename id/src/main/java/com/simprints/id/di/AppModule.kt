@@ -18,8 +18,8 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.EventRepositoryImpl
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.event.EventRepositoryImpl
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactoryImpl
 import com.simprints.id.data.db.event.local.*
@@ -241,8 +241,8 @@ open class AppModule {
         crashReportManager: CrashReportManager,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): EventRepository =
-        EventRepositoryImpl(
+    ): com.simprints.eventsystem.event.EventRepository =
+        com.simprints.eventsystem.event.EventRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
             loginInfoManager,
@@ -274,7 +274,7 @@ open class AppModule {
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
-        eventRepository: EventRepository
+        eventRepository: com.simprints.eventsystem.event.EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
@@ -365,13 +365,13 @@ open class AppModule {
     @Provides
     fun provideEnrolmentHelper(
         subjectRepository: SubjectRepository,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         timeHelper: TimeHelper
     ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, timeHelper)
 
     @Provides
     fun providePersonCreationEventHelper(
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         timeHelper: TimeHelper,
         encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =

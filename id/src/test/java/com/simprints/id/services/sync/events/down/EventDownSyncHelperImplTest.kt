@@ -9,10 +9,10 @@ import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEven
 import com.simprints.id.commontesttools.events.createEnrolmentRecordDeletionEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordMoveEvent
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
@@ -42,8 +42,8 @@ class EventDownSyncHelperImplTest {
 
     private lateinit var eventDownSyncHelper: EventDownSyncHelper
     @MockK private lateinit var subjectRepository: SubjectRepository
-    @MockK private lateinit var eventRepository: EventRepository
-    @MockK private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    @MockK private lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
     @MockK private lateinit var timeHelper: TimeHelper
     @MockK private lateinit var preferencesManager: PreferencesManager
     private val subjectFactory = SubjectFactoryImpl(encodingUtilsForTests)

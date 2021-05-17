@@ -1,13 +1,13 @@
 package com.simprints.id.activities.orchestrator
 
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.callback.*
 import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.tools.time.TimeHelper
 
-class OrchestratorEventsHelperImpl(private val eventRepository: EventRepository,
+class OrchestratorEventsHelperImpl(private val eventRepository: com.simprints.eventsystem.event.EventRepository,
                                    private val timeHelper: TimeHelper) : OrchestratorEventsHelper {
 
     override fun addCallbackEventInSessions(appResponse: AppResponse) {

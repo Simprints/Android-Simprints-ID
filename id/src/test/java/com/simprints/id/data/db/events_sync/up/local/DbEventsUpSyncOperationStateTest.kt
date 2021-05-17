@@ -3,9 +3,9 @@ package com.simprints.id.data.db.events_sync.up.local
 import com.google.common.truth.Truth
 import com.simprints.id.sampledata.SampleDefaults.TIME1
 import com.simprints.id.sampledata.SampleDefaults.projectUpSyncScope
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
-import com.simprints.id.data.db.events_sync.up.domain.getUniqueKey
-import com.simprints.id.data.db.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
+import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
 import org.junit.Test
 
 class DbEventsUpSyncOperationStateTest {

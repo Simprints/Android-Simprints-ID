@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2

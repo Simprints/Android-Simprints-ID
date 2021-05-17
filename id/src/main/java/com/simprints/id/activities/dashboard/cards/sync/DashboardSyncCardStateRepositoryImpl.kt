@@ -2,8 +2,8 @@ package com.simprints.id.activities.dashboard.cards.sync
 
 import androidx.lifecycle.MediatorLiveData
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -26,7 +26,7 @@ class DashboardSyncCardStateRepositoryImpl(
     val eventSyncManager: EventSyncManager,
     val deviceManager: DeviceManager,
     private val preferencesManager: PreferencesManager,
-    private val downSyncScopeRepository: EventDownSyncScopeRepository,
+    private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
     private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper
 ) : DashboardSyncCardStateRepository {

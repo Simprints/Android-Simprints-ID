@@ -7,7 +7,7 @@ import com.simprints.id.commontesttools.events.createEnrolmentCalloutEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.callout.*
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
@@ -65,7 +65,7 @@ class CheckLoginFromIntentPresenterTest {
     @MockK lateinit var analyticsManagerMock: AnalyticsManager
     @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
     @MockK lateinit var preferencesManagerMock: PreferencesManager
-    @MockK lateinit var eventRepositoryMock: EventRepository
+    @MockK lateinit var eventRepositoryMock: com.simprints.eventsystem.event.EventRepository
     @MockK lateinit var crashReportManagerMock: CrashReportManager
     @MockK lateinit var securityStateRepositoryMock: SecurityStateRepository
     @MockK lateinit var loginInfoManagerMock: LoginInfoManager

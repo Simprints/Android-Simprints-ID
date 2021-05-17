@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 class FetchGuidViewModel(private val fetchGuidHelper: FetchGuidHelper,
                          private val deviceManager: DeviceManager,
-                         private val eventRepository: EventRepository,
+                         private val eventRepository: com.simprints.eventsystem.event.EventRepository,
                          private val timeHelper: TimeHelper) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()

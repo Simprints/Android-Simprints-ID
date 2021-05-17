@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventSyncState
@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit
 
 class EventSyncManagerImpl(private val ctx: Context,
                            private val eventSyncStateProcessor: EventSyncStateProcessor,
-                           private val downSyncScopeRepository: EventDownSyncScopeRepository,
-                           private val upSyncScopeRepo: EventUpSyncScopeRepository,
+                           private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+                           private val upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
                            private val eventSyncCache: EventSyncCache) : EventSyncManager {
 
     companion object {

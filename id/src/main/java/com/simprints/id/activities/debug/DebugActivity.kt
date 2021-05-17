@@ -14,7 +14,7 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
@@ -35,7 +35,7 @@ class DebugActivity : BaseSplitActivity() {
     @Inject
     lateinit var eventSyncManager: EventSyncManager
     @Inject
-    lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
+    lateinit var dbEventDownSyncOperationStateDao: com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
     @Inject
     lateinit var securityStateRepository: SecurityStateRepository
     @Inject

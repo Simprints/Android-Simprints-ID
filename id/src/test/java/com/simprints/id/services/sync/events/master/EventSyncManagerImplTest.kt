@@ -7,8 +7,8 @@ import androidx.work.*
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
@@ -36,8 +36,8 @@ class EventSyncManagerImplTest {
 
     private lateinit var subjectsSyncManager: EventSyncManagerImpl
     @MockK lateinit var eventSyncStateProcessor: EventSyncStateProcessor
-    @MockK lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
-    @MockK lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
+    @MockK lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
     @MockK lateinit var eventSyncCache: EventSyncCache
 
     private val ctx: Context = ApplicationProvider.getApplicationContext()

@@ -2,14 +2,15 @@ package com.simprints.face.controllers.core.image
 
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.images.repository.ImageRepository
 import timber.log.Timber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
-                           private val coreEventRepository: EventRepository) : FaceImageManager {
+                           private val coreEventRepository: com.simprints.eventsystem.event.EventRepository
+) : FaceImageManager {
 
     override suspend fun save(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
         determinePath(captureEventId)?.let { path ->

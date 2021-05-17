@@ -14,7 +14,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplay
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -49,7 +49,7 @@ open class DashboardActivityModule {
         eventSyncManager: EventSyncManager,
         deviceManager: DeviceManager,
         preferencesManager: PreferencesManager,
-        downSyncScopeRepository: EventDownSyncScopeRepository,
+        downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
         cacheSync: EventSyncCache,
         timeHelper: TimeHelper
     ): DashboardSyncCardStateRepository = DashboardSyncCardStateRepositoryImpl(

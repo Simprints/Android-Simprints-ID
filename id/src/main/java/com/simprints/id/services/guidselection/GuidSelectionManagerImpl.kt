@@ -3,7 +3,7 @@ package com.simprints.id.services.guidselection
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
@@ -17,7 +17,8 @@ class GuidSelectionManagerImpl(val deviceId: String,
                                val analyticsManager: AnalyticsManager,
                                val crashReportManager: CrashReportManager,
                                private val timerHelper: TimeHelper,
-                               val eventRepository: EventRepository) : GuidSelectionManager {
+                               val eventRepository: com.simprints.eventsystem.event.EventRepository
+) : GuidSelectionManager {
 
     override suspend fun handleConfirmIdentityRequest(request: GuidSelectionRequest) {
         try {

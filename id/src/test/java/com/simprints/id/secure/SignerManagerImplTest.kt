@@ -4,7 +4,7 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -33,7 +33,7 @@ class SignerManagerImplTest {
     @MockK lateinit var mockEventSyncManager: EventSyncManager
     @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
     @MockK lateinit var mockLongConsentRepository: LongConsentRepository
-    @MockK lateinit var mockEventRepository: EventRepository
+    @MockK lateinit var mockEventRepository: com.simprints.eventsystem.event.EventRepository
     @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
     @MockK lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
 

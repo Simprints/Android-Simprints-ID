@@ -59,7 +59,7 @@ class EventDownSyncScopeTest {
         }
     }
 
-    private fun checkModuleScope(op: RemoteEventQuery, moduleId: String) {
+    private fun checkModuleScope(op: com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery, moduleId: String) {
         assertThat(op.projectId).isEqualTo(projectDownSyncScope.projectId)
         assertThat(op.modes).isEqualTo(projectDownSyncScope.modes)
         assertThat(op.types).isEqualTo(eventTypes)

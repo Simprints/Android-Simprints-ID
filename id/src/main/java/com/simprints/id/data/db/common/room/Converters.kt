@@ -4,8 +4,8 @@ import androidx.room.TypeConverter
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.id.domain.modality.Modes
 
 class Converters {
