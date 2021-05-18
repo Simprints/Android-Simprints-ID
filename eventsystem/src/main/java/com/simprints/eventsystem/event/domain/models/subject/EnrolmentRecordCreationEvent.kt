@@ -1,6 +1,7 @@
 package com.simprints.eventsystem.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels

@@ -32,7 +32,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import io.mockk.every

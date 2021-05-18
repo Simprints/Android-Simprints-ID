@@ -4,7 +4,7 @@ import android.net.NetworkInfo
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtils
 
 object ConnectivitySnapshotEventSample : SampleEvent() {
 

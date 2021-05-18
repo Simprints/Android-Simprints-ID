@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.domain.models.callback
 
 import androidx.annotation.Keep
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.moduleapi.app.responses.IAppResponseTier
 
 @Keep
-data class CallbackComparisonScore(val guid: String, val confidence: Int, val tier: Tier)
+data class CallbackComparisonScore(val guid: String, val confidence: Int, val tier: IAppResponseTier)

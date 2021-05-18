@@ -1,6 +1,5 @@
 package com.simprints.core.analytics
 
-import android.app.Application
 import android.util.Log
 
 interface CrashReportManager: CoreCrashReportManager {
@@ -26,7 +25,7 @@ interface CoreCrashReportManager {
     fun setFingersSelectedCrashlyticsKey(fingersSelected: List<String>)
 
     companion object {
-        fun build(app: Application): CoreCrashReportManager =
-            app.component.getCrashReportManager()
+//        fun build(app: Application): CoreCrashReportManager =
+//            app.component.getCrashReportManager()
     }
 }

@@ -8,7 +8,7 @@ import com.simprints.id.sampledata.ConnectivitySnapshotEventSample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.tools.utils.SimNetworkUtils.Connection
+import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import org.junit.Test
 
 class ConnectivitySnapshotEventTest {

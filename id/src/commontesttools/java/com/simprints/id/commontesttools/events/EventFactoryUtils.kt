@@ -56,7 +56,7 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.tools.utils.SimNetworkUtils.Connection
+import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 
 val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
 val ENDED_AT_RANGE = LongRange(ENDED_AT - 10, ENDED_AT + 10)

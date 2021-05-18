@@ -1,9 +1,8 @@
 package com.simprints.eventsystem.event.domain.models
 
 
+import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
-import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
-import io.realm.internal.Keep
 import java.util.*
 
 @androidx.annotation.Keep

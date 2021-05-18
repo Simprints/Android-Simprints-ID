@@ -15,6 +15,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":moduleapi"))
 
     implementation(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.core)
