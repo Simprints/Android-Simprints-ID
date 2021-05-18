@@ -1,6 +1,6 @@
 package com.simprints.id.testtools.testingapi.remote
 
-import com.simprints.id.network.SimRemoteInterface
+import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.testtools.testingapi.models.*
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result

@@ -1,5 +1,6 @@
 package com.simprints.id.network
 
+import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.common.RemoteDbManager
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory

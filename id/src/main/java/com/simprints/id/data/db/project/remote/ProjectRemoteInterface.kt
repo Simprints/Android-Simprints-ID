@@ -2,7 +2,7 @@ package com.simprints.eventsystem.project.remote
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.simprints.eventsystem.project.domain.Project
-import com.simprints.id.network.SimRemoteInterface
+import com.simprints.core.network.SimRemoteInterface
 import retrofit2.http.GET
 import retrofit2.http.Path
 
