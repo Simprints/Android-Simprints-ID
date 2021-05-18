@@ -18,7 +18,7 @@ import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.domain.GROUP
+import com.simprints.core.domain.common.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.enablePreference

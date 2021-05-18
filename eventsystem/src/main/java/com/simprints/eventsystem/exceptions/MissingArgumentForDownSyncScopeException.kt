@@ -1,6 +1,7 @@
-package com.simprints.id.exceptions.unexpected
+package com.simprints.eventsystem.exceptions
 
-import com.simprints.id.exceptions.UnexpectedException
+import com.simprints.core.exceptions.UnexpectedException
+
 
 class MissingArgumentForDownSyncScopeException(message: String = "MissingArgumentForDownSyncScopeException")
     : UnexpectedException(message)

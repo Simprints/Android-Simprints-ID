@@ -20,7 +20,7 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.databinding.ActivitySyncInformationBinding
-import com.simprints.id.domain.GROUP
+import com.simprints.core.domain.common.GROUP
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
