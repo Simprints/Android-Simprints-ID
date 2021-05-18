@@ -1,6 +1,5 @@
-package com.simprints.id.network
+package com.simprints.core.network
 
-import com.simprints.core.network.SimRemoteInterface
 import kotlin.reflect.KClass
 
 interface SimApiClientFactory {

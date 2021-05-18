@@ -4,7 +4,6 @@ import com.simprints.id.commontesttools.events.createFaceCaptureEvent
 import com.simprints.id.commontesttools.events.createFingerprintCaptureEvent
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -20,7 +19,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.tools.EncodingUtilsTest
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

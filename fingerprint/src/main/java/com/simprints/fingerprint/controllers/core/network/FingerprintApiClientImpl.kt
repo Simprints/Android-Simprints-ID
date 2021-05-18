@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 
 class FingerprintApiClientImpl<T : FingerprintRemoteInterface>(
     private val simApiClient: SimApiClient<T>

@@ -30,7 +30,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelperImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.tools.utils.EncodingUtilsImpl
 import dagger.Module
@@ -125,13 +125,15 @@ open class SyncModule {
                                         eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
                                         subjectFactory: SubjectFactory,
                                         preferencesManager: PreferencesManager,
-                                        timeHelper: TimeHelper): EventDownSyncHelper =
+                                        timeHelper: TimeHelper
+    ): EventDownSyncHelper =
         EventDownSyncHelperImpl(subjectRepository, eventRepository, eventDownSyncScopeRepository, subjectFactory, preferencesManager, timeHelper)
 
     @Provides
     open fun provideEventUpSyncHelper(eventRepository: com.simprints.eventsystem.event.EventRepository,
                                       eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-                                      timerHelper: TimeHelper): EventUpSyncHelper =
+                                      timerHelper: TimeHelper
+    ): EventUpSyncHelper =
         EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper)
 
     @Provides

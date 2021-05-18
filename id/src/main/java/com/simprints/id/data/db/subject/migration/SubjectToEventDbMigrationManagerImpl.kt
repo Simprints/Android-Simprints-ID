@@ -10,7 +10,7 @@ import com.simprints.eventsystem.subject.local.SubjectQuery
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import kotlinx.coroutines.flow.toList
 import timber.log.Timber
 

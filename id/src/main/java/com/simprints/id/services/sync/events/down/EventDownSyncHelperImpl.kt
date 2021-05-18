@@ -17,7 +17,7 @@ import com.simprints.eventsystem.subject.domain.SubjectAction.Deletion
 import com.simprints.eventsystem.subject.domain.SubjectFactory
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +31,8 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                               private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
                               private val subjectFactory: SubjectFactory,
                               private val preferencesManager: PreferencesManager,
-                              val timeHelper: TimeHelper) : EventDownSyncHelper {
+                              val timeHelper: TimeHelper
+) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation): List<EventCount> =
         eventRepository.countEventsToDownload(operation.queryEvent)

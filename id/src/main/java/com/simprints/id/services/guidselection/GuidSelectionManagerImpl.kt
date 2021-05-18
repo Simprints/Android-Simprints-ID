@@ -3,13 +3,12 @@ package com.simprints.id.services.guidselection
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.tools.ignoreException
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import timber.log.Timber
 
 class GuidSelectionManagerImpl(val deviceId: String,

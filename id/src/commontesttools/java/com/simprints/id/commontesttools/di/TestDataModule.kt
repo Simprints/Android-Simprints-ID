@@ -16,7 +16,7 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
 

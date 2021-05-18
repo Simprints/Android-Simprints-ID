@@ -21,7 +21,7 @@ import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 

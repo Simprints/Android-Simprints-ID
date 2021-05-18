@@ -37,7 +37,7 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,7 +69,8 @@ open class ViewModelModule {
     open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
                                               deviceManager: DeviceManager,
                                               eventRepository: com.simprints.eventsystem.event.EventRepository,
-                                              timeHelper: TimeHelper) =
+                                              timeHelper: TimeHelper
+    ) =
         FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
 
     @Provides

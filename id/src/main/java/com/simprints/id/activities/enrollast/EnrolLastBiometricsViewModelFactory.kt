@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 
 class EnrolLastBiometricsViewModelFactory(val enrolmentHelper: EnrolmentHelper,
                                           val timeHelper: TimeHelper, val preferencesManager: PreferencesManager

@@ -2,8 +2,8 @@ package com.simprints.eventsystem.project.remote
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.simprints.eventsystem.project.domain.Project
-import com.simprints.id.network.SimApiClient
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 
 open class ProjectRemoteDataSourceImpl(
     private val simApiClientFactory: SimApiClientFactory

@@ -1,6 +1,4 @@
-package com.simprints.id.exceptions.unexpected
-
-import com.simprints.core.exceptions.UnexpectedException
+package com.simprints.core.exceptions
 
 class SyncCloudIntegrationException(
     message: String = "SyncCloudIntegrationException",
