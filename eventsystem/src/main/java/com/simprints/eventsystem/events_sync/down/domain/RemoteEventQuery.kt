@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.events_sync.down.domain
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.remote.ApiRemoteEventQuery
-import com.simprints.id.data.db.event.remote.fromDomainToApi
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
-import com.simprints.id.domain.modality.Modes
+import com.simprints.core.domain.modality.Modes
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.remote.ApiRemoteEventQuery
+import com.simprints.eventsystem.event.remote.fromDomainToApi
+
 
 @Keep
 data class RemoteEventQuery(val projectId: String,
@@ -23,6 +23,6 @@ fun RemoteEventQuery.fromDomainToApi() =
         moduleIds = moduleIds,
         subjectId = subjectId,
         lastEventId = lastEventId,
-        modes = modes.map { it.fromDomainToApi() },
+        modes = modes.map {  it.fromDomainToApi() },
         types = types.map { it.fromDomainToApi() }
     )

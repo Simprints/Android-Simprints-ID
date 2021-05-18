@@ -3,12 +3,10 @@ package com.simprints.eventsystem.event.remote.models.subject
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fromDomainToApi
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
 
 @Keep
 @JsonInclude(Include.NON_NULL)
@@ -22,14 +20,14 @@ data class ApiEnrolmentRecordCreationPayload(
     val biometricReferences: List<ApiBiometricReference>?
 ) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordCreation, version, startTime) {
 
-    constructor(payload: EnrolmentRecordCreationPayload) :
+    constructor(payload: EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload) :
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId,
             payload.attendantId, payload.biometricReferences.map { it.fromDomainToApi() })
 }
 
 
 fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
-    EnrolmentRecordCreationPayload(
+    EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
         startTime,
         version,
         subjectId,

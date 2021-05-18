@@ -1,4 +1,4 @@
-package com.simprints.id.data.prefs.events
+package com.simprints.core.sharedpreferences
 
 interface RecentEventsPreferencesManager {
 

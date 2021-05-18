@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.eventsystem.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import java.util.*
 
 @Keep
@@ -20,7 +20,8 @@ data class ArtificialTerminationEvent(
         UUID.randomUUID().toString(),
         labels,
         ArtificialTerminationPayload(createdAt, EVENT_VERSION, reason),
-        ARTIFICIAL_TERMINATION)
+        ARTIFICIAL_TERMINATION
+    )
 
 
     @Keep

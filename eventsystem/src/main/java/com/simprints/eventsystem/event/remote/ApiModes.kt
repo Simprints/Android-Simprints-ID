@@ -1,9 +1,8 @@
 package com.simprints.eventsystem.event.remote
 
-import com.simprints.id.data.db.event.remote.ApiModes.FACE
-import com.simprints.id.data.db.event.remote.ApiModes.FINGERPRINT
-import com.simprints.id.domain.modality.Modes
-import io.realm.internal.Keep
+import androidx.annotation.Keep
+import com.simprints.core.domain.modality.Modes
+
 
 @Keep
 enum class ApiModes {
@@ -13,6 +12,6 @@ enum class ApiModes {
 
 fun Modes.fromDomainToApi(): ApiModes =
     when (this) {
-        Modes.FINGERPRINT -> FINGERPRINT
-        Modes.FACE -> FACE
+        Modes.FINGERPRINT -> ApiModes.FINGERPRINT
+        Modes.FACE -> ApiModes.FACE
     }

@@ -17,7 +17,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRe
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.device.DeviceManager
