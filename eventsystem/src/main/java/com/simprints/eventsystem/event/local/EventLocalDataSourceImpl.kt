@@ -1,14 +1,11 @@
 package com.simprints.eventsystem.event.local
 
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.local.models.fromDbToDomain
-import com.simprints.id.data.db.event.local.models.fromDomainToDb
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 

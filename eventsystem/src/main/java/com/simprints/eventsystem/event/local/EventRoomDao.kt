@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.local.models.DbEvent
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.local.models.DbEvent
 
 @Dao
 interface EventRoomDao {
