@@ -1,4 +1,4 @@
-package com.simprints.id.domain
+package com.simprints.core.domain.common
 
 enum class GROUP {
     GLOBAL,

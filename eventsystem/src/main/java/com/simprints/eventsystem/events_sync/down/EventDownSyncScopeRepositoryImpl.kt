@@ -1,18 +1,22 @@
 package com.simprints.eventsystem.events_sync.down
 
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
+import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
-                                       val preferencesManager: PreferencesManager,
-                                       private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
+class EventDownSyncScopeRepositoryImpl(
+    val loginInfoManager: LoginInfoManager,
+    val preferencesManager: PreferencesManager,
+    private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
 ) : EventDownSyncScopeRepository {
 
 
@@ -48,7 +52,11 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
         withContext(Dispatchers.IO) {
-            downSyncOperationOperationDao.insertOrUpdate(buildFromEventsDownSyncOperationState(syncScopeOperation))
+            downSyncOperationOperationDao.insertOrUpdate(
+                buildFromEventsDownSyncOperationState(
+                    syncScopeOperation
+                )
+            )
         }
     }
 
@@ -61,9 +69,10 @@ class EventDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
 
         return syncScopeOperation.copy(
             queryEvent = syncScopeOperation.queryEvent.copy(lastEventId = state?.lastEventId),
-            lastEventId = state?.lastEventId, 
+            lastEventId = state?.lastEventId,
             lastSyncTime = state?.lastUpdatedTime,
-            state = state?.lastState)
+            state = state?.lastState
+        )
     }
 
     override suspend fun deleteAll() {

@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions
+package com.simprints.core.exceptions
 
 open class UnexpectedException : RuntimeException {
     constructor(message: String, cause: Throwable): super(message, cause)

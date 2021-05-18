@@ -1,6 +1,6 @@
 package com.simprints.id.exceptions.unexpected
 
-import com.simprints.id.exceptions.UnexpectedException
+import com.simprints.core.exceptions.UnexpectedException
 
 class WorkerInjectionFailedException(message: String = "WorkerInjectionFailedException") : UnexpectedException(message) {
 

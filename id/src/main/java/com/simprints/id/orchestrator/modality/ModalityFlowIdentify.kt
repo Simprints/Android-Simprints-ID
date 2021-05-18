@@ -1,9 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.GROUP
+import com.simprints.core.domain.common.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
