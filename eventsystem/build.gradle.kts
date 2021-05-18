@@ -26,6 +26,7 @@ dependencies {
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.Retrofit.okhttp)
     implementation(Dependencies.Retrofit.core)
+    implementation(Dependencies.SqlCipher.core)
 
     testImplementation(Dependencies.Testing.junit)
     androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)

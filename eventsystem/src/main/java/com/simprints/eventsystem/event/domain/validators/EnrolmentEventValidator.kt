@@ -5,7 +5,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException
+import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 
 class EnrolmentEventValidator : EventValidator {
 

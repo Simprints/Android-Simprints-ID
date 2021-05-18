@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.domain.validators
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
-import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
+import com.simprints.eventsystem.exceptions.validator.GuidSelectEventValidatorException
 
 class GuidSelectionEventValidator : EventValidator {
 
