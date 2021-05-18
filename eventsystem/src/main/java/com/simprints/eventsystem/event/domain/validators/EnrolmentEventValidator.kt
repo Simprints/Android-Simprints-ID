@@ -1,10 +1,10 @@
 package com.simprints.eventsystem.event.domain.validators
 
-import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException
 
 class EnrolmentEventValidator : EventValidator {

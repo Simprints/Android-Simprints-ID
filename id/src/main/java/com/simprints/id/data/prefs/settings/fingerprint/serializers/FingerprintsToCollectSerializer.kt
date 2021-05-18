@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.settings.fingerprint.serializers
 
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.eventsystem.subject.domain.FingerIdentifier
 import com.simprints.id.tools.serializers.Serializer
 
 class FingerprintsToCollectSerializer : Serializer<List<FingerIdentifier>> {

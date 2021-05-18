@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.domain.models.subject
 
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
-import com.simprints.id.data.db.subject.domain.FingerIdentifier as PersonFingerIdentifier
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
+import com.simprints.eventsystem.subject.domain.FingerIdentifier as PersonFingerIdentifier
 
 data class FingerprintTemplate(val quality: Int,
                                val template: String,

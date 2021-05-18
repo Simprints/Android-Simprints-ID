@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType.*
 
 @Keep
 enum class ApiEventPayloadType {

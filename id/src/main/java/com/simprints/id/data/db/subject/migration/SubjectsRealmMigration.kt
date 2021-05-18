@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.subject.migration
+package com.simprints.eventsystem.subject.migration
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.subject.local.models.DbFaceSample
-import com.simprints.id.data.db.subject.local.models.DbFingerprintSample
-import com.simprints.id.data.db.subject.local.models.DbSubject
-import com.simprints.id.data.db.subject.migration.oldschemas.*
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.project.local.models.DbProject
+import com.simprints.eventsystem.subject.local.models.DbFaceSample
+import com.simprints.eventsystem.subject.local.models.DbFingerprintSample
+import com.simprints.eventsystem.subject.local.models.DbSubject
+import com.simprints.eventsystem.subject.migration.oldschemas.*
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.FieldAttribute.REQUIRED

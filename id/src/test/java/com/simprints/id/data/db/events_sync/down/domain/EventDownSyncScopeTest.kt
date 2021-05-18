@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.events_sync.down.domain
+package com.simprints.eventsystem.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -7,7 +7,7 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.id.data.db.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.EventType.*
 import org.junit.Test
 
 class EventDownSyncScopeTest {

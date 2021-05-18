@@ -1,7 +1,7 @@
 package com.simprints.id.sampledata
 
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventLabels
 import java.util.*
 
 object SessionBuilder {

@@ -1,14 +1,14 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.EventType.CANDIDATE_READ
 import org.junit.Test
 
 class CandidateReadEventTest {

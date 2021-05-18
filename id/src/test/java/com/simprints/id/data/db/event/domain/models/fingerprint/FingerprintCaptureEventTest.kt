@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.event.domain.models.fingerprint
+package com.simprints.eventsystem.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
+import com.simprints.eventsystem.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.id.sampledata.FingerprintCaptureEventSample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT

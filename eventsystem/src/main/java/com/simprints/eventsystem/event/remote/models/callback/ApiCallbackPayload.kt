@@ -3,17 +3,17 @@ package com.simprints.eventsystem.event.remote.models.callback
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.Callback
-import com.simprints.id.data.db.event.remote.models.callback.ApiCallbackType.*
-import com.simprints.id.data.db.event.remote.models.fromApiToDomain
+import com.simprints.eventsystem.event.domain.models.EventPayload
+import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.Callback
+import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackType.*
+import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 
 @Keep
 @JsonInclude(Include.NON_NULL)

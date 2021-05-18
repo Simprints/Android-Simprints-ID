@@ -1,11 +1,11 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.eventsystem.subject.local.SubjectQuery
 import java.io.Serializable
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent as CoreOneToManyMatchEvent
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent as CoreOneToManyMatchEvent
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
 
 @Keep
 class OneToManyMatchEvent(

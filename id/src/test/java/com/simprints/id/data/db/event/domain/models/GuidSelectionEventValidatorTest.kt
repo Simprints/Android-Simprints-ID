@@ -1,9 +1,9 @@
-//package com.simprints.id.data.db.event.domain.models
+//package com.simprints.eventsystem.event.domain.models
 //
 //import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
-//import com.simprints.id.data.db.event.domain.validators.GuidSelectionEventValidator
-//import com.simprints.id.data.db.event.domain.events.GuidSelectionEvent
-//import com.simprints.id.data.db.event.domain.events.callback.IdentificationCallbackEvent
+//import com.simprints.eventsystem.event.domain.validators.GuidSelectionEventValidator
+//import com.simprints.eventsystem.event.domain.events.GuidSelectionEvent
+//import com.simprints.eventsystem.event.domain.events.callback.IdentificationCallbackEvent
 //import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
 //import com.simprints.id.tools.time.TimeHelperImpl
 //import io.kotlintest.shouldThrow

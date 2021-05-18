@@ -6,7 +6,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.eventsystem.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP

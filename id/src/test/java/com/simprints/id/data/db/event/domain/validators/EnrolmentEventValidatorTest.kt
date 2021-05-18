@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.domain.validators
+package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.id.commontesttools.events.*
 import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException

@@ -1,11 +1,11 @@
 package com.simprints.id.sampledata
 
 import android.os.Build
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.models.session.Device
-import com.simprints.id.data.db.event.domain.models.session.Location
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
+import com.simprints.eventsystem.event.domain.models.session.Device
+import com.simprints.eventsystem.event.domain.models.session.Location
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.core.domain.modality.Modes
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT

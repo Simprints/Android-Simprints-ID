@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.migration
+package com.simprints.eventsystem.subject.migration
 
 interface SubjectToEventMigrationManager {
 

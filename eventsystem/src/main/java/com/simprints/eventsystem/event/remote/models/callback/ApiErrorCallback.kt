@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.event.remote.models.callback
 
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
-import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason
-import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason.GUID_NOT_FOUND_OFFLINE
-import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.GUID_NOT_FOUND_OFFLINE
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
 import io.realm.internal.Keep
 
 @Keep

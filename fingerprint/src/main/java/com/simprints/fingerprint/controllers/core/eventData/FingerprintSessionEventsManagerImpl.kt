@@ -8,7 +8,7 @@ import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.event.domain.models.Event as CoreEvent
+import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
 class FingerprintSessionEventsManagerImpl(private val eventRepository: com.simprints.eventsystem.event.EventRepository) : FingerprintSessionEventsManager {
 

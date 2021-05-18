@@ -4,7 +4,7 @@ import android.Manifest
 import com.google.android.gms.location.LocationRequest
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest

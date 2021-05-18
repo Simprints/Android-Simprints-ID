@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.events_sync.up
+package com.simprints.eventsystem.events_sync.up
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults

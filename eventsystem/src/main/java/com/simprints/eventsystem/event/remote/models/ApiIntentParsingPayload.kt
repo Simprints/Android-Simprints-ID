@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.remote.models
 
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.*
-import com.simprints.id.data.db.event.remote.models.ApiIntentParsingPayload.ApiIntegrationInfo
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.*
+import com.simprints.eventsystem.event.remote.models.ApiIntentParsingPayload.ApiIntegrationInfo
 import io.realm.internal.Keep
 
 @Keep

@@ -8,7 +8,7 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.eventsystem.subject.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting

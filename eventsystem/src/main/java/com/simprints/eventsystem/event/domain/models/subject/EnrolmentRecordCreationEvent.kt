@@ -2,14 +2,14 @@ package com.simprints.eventsystem.event.domain.models.subject
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.domain.uniqueId
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventPayload
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.subject.domain.FaceSample
+import com.simprints.eventsystem.subject.domain.FingerprintSample
+import com.simprints.eventsystem.subject.domain.uniqueId
 import com.simprints.id.domain.modality.Modes
 import java.util.*
 

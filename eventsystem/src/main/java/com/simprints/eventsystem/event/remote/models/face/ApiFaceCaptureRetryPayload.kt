@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.remote.models.face
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceCaptureRetry
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.FaceCaptureRetry
 
 @Keep
 data class ApiFaceCaptureRetryPayload(override val startTime: Long, //Not added on API yet

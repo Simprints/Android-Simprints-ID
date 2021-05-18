@@ -4,12 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
+import com.simprints.eventsystem.SubjectFetchResult
+import com.simprints.eventsystem.SubjectFetchResult.SubjectSource
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.DeviceManager
 import kotlinx.coroutines.Dispatchers

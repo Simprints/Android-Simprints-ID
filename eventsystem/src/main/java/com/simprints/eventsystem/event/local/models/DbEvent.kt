@@ -5,10 +5,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 
 @Entity
 data class DbEvent(

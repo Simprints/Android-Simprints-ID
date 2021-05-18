@@ -3,12 +3,12 @@ package com.simprints.fingerprint.controllers.core.repository
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.eventsystem.subject.domain.FingerprintSample
+import com.simprints.eventsystem.subject.local.FingerprintIdentityLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
-import com.simprints.id.data.db.subject.domain.FingerIdentifier as FingerIdentifierCore
+import com.simprints.eventsystem.subject.domain.FingerIdentifier as FingerIdentifierCore
 
 class FingerprintDbManagerImpl(private val coreFingerprintIdentityLocalDataSource: FingerprintIdentityLocalDataSource) : FingerprintDbManager {
 

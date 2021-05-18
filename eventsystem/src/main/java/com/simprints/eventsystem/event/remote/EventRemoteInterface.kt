@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote
 
-import com.simprints.id.data.db.event.remote.models.ApiEventCount
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.remote.models.ApiEventCount
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.id.network.SimRemoteInterface
 import okhttp3.ResponseBody
 import retrofit2.http.*

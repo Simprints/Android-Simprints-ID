@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.events_sync.down.domain
+package com.simprints.eventsystem.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
@@ -8,9 +8,9 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.remote.fromDomainToApi
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
+import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.remote.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import org.junit.Test
 
 class RemoteEventQueryTest {

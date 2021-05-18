@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.domain.models
 
 
-import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
-import com.simprints.id.data.db.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import io.realm.internal.Keep
 import java.util.*
 

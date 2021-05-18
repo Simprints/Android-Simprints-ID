@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.domain
+package com.simprints.eventsystem.subject.domain
 
 import androidx.annotation.Keep
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier

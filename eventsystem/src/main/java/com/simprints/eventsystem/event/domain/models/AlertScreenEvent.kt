@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.id.data.db.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
+import com.simprints.eventsystem.event.domain.models.EventType.ALERT_SCREEN
 import java.util.*
 
 

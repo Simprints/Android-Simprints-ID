@@ -1,6 +1,6 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package com.simprints.id.data.db.event
+package com.simprints.eventsystem.event
 
 import android.os.Build
 import android.os.Build.VERSION
@@ -10,18 +10,18 @@ import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.ARTIFICIAL_TERMINATION
-import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.models.session.Device
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
+import com.simprints.eventsystem.event.domain.models.session.Device
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import io.mockk.coEvery

@@ -4,13 +4,13 @@ import com.google.common.truth.Truth
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent
-import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent
-import com.simprints.id.data.db.event.domain.models.SuspiciousIntentEvent
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
+import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
+import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.*
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
 
 class ClientApiEventRepositoryImplTest {
     @get:Rule

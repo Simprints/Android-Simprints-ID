@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
-import com.simprints.id.data.db.event.remote.models.ApiAuthenticationPayload.ApiResult
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.eventsystem.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
 data class ApiAuthenticationPayload(override val startTime: Long,

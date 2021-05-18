@@ -1,14 +1,14 @@
-package com.simprints.id.data.db.event.domain.models.subject
+package com.simprints.eventsystem.event.domain.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.id.data.db.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
+import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID

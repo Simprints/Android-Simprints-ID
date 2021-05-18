@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload
-import com.simprints.id.data.db.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.id.data.db.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
-import com.simprints.id.data.db.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.*
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.AlertScreen
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
+import com.simprints.eventsystem.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
+import com.simprints.eventsystem.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.*
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.AlertScreen
 
 
 @Keep

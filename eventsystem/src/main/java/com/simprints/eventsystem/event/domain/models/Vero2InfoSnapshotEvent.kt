@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
-import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
-import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
+import com.simprints.eventsystem.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
 import java.util.*
 
 @Keep

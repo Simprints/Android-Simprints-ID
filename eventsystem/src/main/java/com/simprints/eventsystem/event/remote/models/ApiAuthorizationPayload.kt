@@ -3,11 +3,11 @@ package com.simprints.eventsystem.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
-import com.simprints.id.data.db.event.remote.models.ApiAuthorizationPayload.ApiResult
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.eventsystem.event.remote.models.ApiAuthorizationPayload.ApiResult
 
 
 @Keep

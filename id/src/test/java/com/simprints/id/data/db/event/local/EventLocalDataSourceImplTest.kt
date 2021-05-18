@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.event.local
+package com.simprints.eventsystem.event.local
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*

@@ -1,6 +1,6 @@
-package com.simprints.id.data.db
+package com.simprints.eventsystem
 
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.eventsystem.subject.domain.Subject
 
 data class SubjectFetchResult(val subject: Subject? = null,
                               val subjectSource: SubjectSource) {

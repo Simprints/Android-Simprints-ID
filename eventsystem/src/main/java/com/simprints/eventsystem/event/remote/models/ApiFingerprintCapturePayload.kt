@@ -3,14 +3,14 @@ package com.simprints.eventsystem.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.remote.models.ApiFingerprintCapturePayload.ApiResult
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.remote.models.ApiFingerprintCapturePayload.ApiResult
 
 @Keep
 @JsonInclude(Include.NON_NULL)

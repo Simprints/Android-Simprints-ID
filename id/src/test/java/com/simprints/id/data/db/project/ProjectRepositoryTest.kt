@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.project
+package com.simprints.eventsystem.project
 
 import android.accounts.NetworkErrorException
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.perf.FirebasePerformance
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.eventsystem.project.domain.Project
+import com.simprints.eventsystem.project.local.ProjectLocalDataSource
+import com.simprints.eventsystem.project.remote.ProjectRemoteDataSource
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify

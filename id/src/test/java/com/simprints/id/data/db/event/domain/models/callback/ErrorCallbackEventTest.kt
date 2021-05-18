@@ -1,11 +1,11 @@
-package com.simprints.id.data.db.event.domain.models.callback
+package com.simprints.eventsystem.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventLabels
 
-import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_ERROR
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT

@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.remote.models
 
-import com.simprints.id.data.db.event.remote.models.ApiModality.FACE
-import com.simprints.id.data.db.event.remote.models.ApiModality.FINGERPRINT
-import com.simprints.id.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality
+import com.simprints.eventsystem.event.remote.models.ApiModality.FACE
+import com.simprints.eventsystem.event.remote.models.ApiModality.FINGERPRINT
 
 enum class ApiModality {
     FACE,

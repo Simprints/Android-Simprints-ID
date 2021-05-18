@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.subject.domain
+package com.simprints.eventsystem.subject.domain
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.subject.*
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.subject.*
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.id.tools.utils.EncodingUtils
 
 interface SubjectFactory {

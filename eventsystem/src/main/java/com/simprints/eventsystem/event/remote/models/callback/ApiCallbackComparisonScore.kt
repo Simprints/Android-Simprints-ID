@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.remote.models.callback
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.callback.CallbackComparisonScore
-import com.simprints.id.data.db.event.remote.models.ApiTier
+import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.eventsystem.event.remote.models.ApiTier
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 
 @Keep

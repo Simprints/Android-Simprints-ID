@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.data.db.event.domain.models.EventType.REFUSAL
-import com.simprints.id.data.db.event.domain.models.RefusalEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
+import com.simprints.eventsystem.event.domain.models.EventType.REFUSAL
+import com.simprints.eventsystem.event.domain.models.RefusalEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
 import org.junit.Test
 
 class RefusalEventTest {

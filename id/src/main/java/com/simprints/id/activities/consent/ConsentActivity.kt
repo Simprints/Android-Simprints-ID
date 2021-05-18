@@ -17,11 +17,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.models.ConsentEvent
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type
+import com.simprints.eventsystem.event.domain.models.ConsentEvent
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.databinding.ActivityConsentBinding
 import com.simprints.id.domain.modality.Modality

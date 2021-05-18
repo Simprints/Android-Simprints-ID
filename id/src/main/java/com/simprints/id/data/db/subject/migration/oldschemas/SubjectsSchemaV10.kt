@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.migration.oldschemas
+package com.simprints.eventsystem.subject.migration.oldschemas
 
 //Starting from V10, we would referring Person/People as Subject/Subjects
 object SubjectsSchemaV10 {

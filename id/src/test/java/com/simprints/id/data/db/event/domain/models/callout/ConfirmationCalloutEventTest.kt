@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.event.domain.models.callout
+package com.simprints.eventsystem.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.CALLOUT_CONFIRMATION
-import com.simprints.id.data.db.event.domain.models.callout.ConfirmationCalloutEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent.Companion.EVENT_VERSION
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID

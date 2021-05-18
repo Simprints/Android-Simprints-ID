@@ -5,12 +5,12 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.callout.*
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.callout.*
+import com.simprints.eventsystem.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import com.simprints.id.data.db.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
+import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val deviceId: String,

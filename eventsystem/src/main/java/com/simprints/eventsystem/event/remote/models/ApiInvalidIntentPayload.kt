@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
+import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
 
 @Keep
 @JsonInclude(Include.NON_NULL)

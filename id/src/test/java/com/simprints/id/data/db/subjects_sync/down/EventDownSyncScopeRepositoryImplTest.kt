@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subjects_sync.down
+package com.simprints.eventsystem.subjects_sync.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULES

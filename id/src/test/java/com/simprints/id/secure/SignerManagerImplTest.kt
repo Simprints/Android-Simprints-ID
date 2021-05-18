@@ -3,9 +3,9 @@ package com.simprints.id.secure
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.domain.Project
+import com.simprints.eventsystem.common.RemoteDbManager
+import com.simprints.eventsystem.project.ProjectRepository
+import com.simprints.eventsystem.project.domain.Project
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper

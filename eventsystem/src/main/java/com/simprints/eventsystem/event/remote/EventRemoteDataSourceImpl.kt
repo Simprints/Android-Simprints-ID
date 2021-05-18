@@ -6,11 +6,11 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.remote.models.ApiEvent
-import com.simprints.id.data.db.event.remote.models.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.remote.models.ApiEvent
+import com.simprints.eventsystem.event.remote.models.fromApiToDomain
+import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG

@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.local
 
 import com.simprints.id.Application
-import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.Event
 
 
 class SessionDataCacheImpl(val application: Application) : SessionDataCache {

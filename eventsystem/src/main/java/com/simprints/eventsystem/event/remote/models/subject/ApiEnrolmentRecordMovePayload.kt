@@ -8,12 +8,12 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.*
-import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fromDomainToApi
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.*
+import com.simprints.eventsystem.event.domain.models.subject.fromApiToDomain
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.fromDomainToApi
 
 
 @Keep

@@ -2,7 +2,7 @@ package com.simprints.id.sampledata
 
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.eventsystem.subject.domain.Subject
 import com.simprints.core.domain.modality.Modes
 import java.util.*
 

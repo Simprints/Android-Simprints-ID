@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.migration.oldschemas
+package com.simprints.eventsystem.subject.migration.oldschemas
 
 object PeopleSchemaV2 {
     const val UPDATE_FIELD: String = "updatedAt"

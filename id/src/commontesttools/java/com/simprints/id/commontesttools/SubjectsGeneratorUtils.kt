@@ -1,10 +1,10 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.subject.domain.FaceSample
+import com.simprints.eventsystem.subject.domain.FingerprintSample
+import com.simprints.eventsystem.subject.domain.Subject
 import java.util.*
 import kotlin.random.Random
 

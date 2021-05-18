@@ -2,14 +2,14 @@ package com.simprints.eventsystem.event.domain.models.subject
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
-import com.simprints.id.data.db.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReferenceType
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.face.ApiFaceReference
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
+import com.simprints.eventsystem.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.face.ApiFaceReference
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(

@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.remote.models.face
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceFallbackCapture
+import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.FaceFallbackCapture
 
 
 @Keep

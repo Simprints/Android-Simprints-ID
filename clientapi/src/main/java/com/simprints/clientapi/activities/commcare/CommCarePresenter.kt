@@ -16,11 +16,11 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.eventsystem.subject.domain.Subject
+import com.simprints.eventsystem.subject.local.SubjectQuery
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.toMode
 import com.simprints.libsimprints.Constants

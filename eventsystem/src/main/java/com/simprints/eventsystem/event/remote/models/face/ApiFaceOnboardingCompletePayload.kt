@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.remote.models.face
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.FaceOnboardingComplete
+import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.FaceOnboardingComplete
 
 @Keep
 data class ApiFaceOnboardingCompletePayload(override val startTime: Long, //Not added on API yet

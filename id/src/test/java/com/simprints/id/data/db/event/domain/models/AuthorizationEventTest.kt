@@ -1,12 +1,12 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.EventType.AUTHORIZATION
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT

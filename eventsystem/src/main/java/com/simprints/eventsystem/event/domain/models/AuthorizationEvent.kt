@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
-import com.simprints.id.data.db.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.EventType.AUTHORIZATION
 import java.util.*
 
 @Keep
