@@ -1,6 +1,6 @@
-package com.simprints.eventsystem.project.local
+package com.simprints.id.data.db.project.local
 
-import com.simprints.eventsystem.project.domain.Project
+import com.simprints.id.data.db.project.domain.Project
 
 interface ProjectLocalDataSource {
 

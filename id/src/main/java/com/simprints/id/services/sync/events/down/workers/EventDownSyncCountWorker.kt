@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG

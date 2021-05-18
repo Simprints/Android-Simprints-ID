@@ -2,7 +2,7 @@ package com.simprints.id.services.guidselection
 
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException

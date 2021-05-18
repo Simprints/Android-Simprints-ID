@@ -10,11 +10,11 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.eventsystem.subject.SubjectRepository
-import com.simprints.eventsystem.subject.domain.SubjectAction
-import com.simprints.eventsystem.subject.domain.SubjectAction.Creation
-import com.simprints.eventsystem.subject.domain.SubjectAction.Deletion
-import com.simprints.eventsystem.subject.domain.SubjectFactory
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.SubjectAction
+import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
+import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
+import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.core.tools.time.TimeHelper

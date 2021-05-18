@@ -43,7 +43,7 @@ import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
-import com.simprints.eventsystem.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1

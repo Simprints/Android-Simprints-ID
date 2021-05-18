@@ -16,7 +16,7 @@ import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.createEnrolmentEventV1
-import com.simprints.eventsystem.common.RemoteDbManager
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
@@ -45,7 +45,7 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier

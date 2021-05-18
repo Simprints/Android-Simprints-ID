@@ -22,9 +22,9 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager

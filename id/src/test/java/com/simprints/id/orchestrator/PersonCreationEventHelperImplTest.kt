@@ -7,10 +7,10 @@ import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.subject.domain.FaceSample
-import com.simprints.eventsystem.subject.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.eventsystem.subject.domain.FingerprintSample
-import com.simprints.eventsystem.subject.domain.uniqueId
+import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.uniqueId
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample

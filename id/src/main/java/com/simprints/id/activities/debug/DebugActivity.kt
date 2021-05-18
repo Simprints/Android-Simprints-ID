@@ -14,8 +14,7 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.eventsystem.event.local.EventLocalDataSource
-import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor

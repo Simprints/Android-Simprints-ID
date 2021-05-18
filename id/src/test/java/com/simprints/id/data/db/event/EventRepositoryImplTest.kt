@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.commontesttools.events.createAlertScreenEvent
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels

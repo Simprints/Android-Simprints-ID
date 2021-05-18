@@ -6,12 +6,12 @@
 //import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 //import com.simprints.id.commontesttools.di.TestAppModule
 //import com.simprints.id.commontesttools.di.TestDataModule
-//import com.simprints.eventsystem.common.RemoteDbManager
+//import com.simprints.id.data.db.common.RemoteDbManager
 //import com.simprints.eventsystem.person.PersonRepository
 //import com.simprints.eventsystem.common.models.PeopleCount
 //import com.simprints.eventsystem.person.remote.PersonRemoteDataSource
-//import com.simprints.eventsystem.project.ProjectRepository
-//import com.simprints.eventsystem.project.domain.Project
+//import com.simprints.id.data.db.project.ProjectRepository
+//import com.simprints.id.data.db.project.domain.Project
 //import com.simprints.eventsystem.people_sync.SyncStatusDatabase
 //import com.simprints.core.login.LoginInfoManager
 //import com.simprints.core.sharedpreferences.PreferencesManager

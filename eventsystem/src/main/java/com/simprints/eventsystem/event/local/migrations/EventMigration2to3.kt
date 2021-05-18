@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.tools.extensions.getStringWithColumnName
 
 /**

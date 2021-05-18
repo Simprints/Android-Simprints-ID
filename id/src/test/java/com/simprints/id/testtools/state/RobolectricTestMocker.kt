@@ -7,10 +7,10 @@ import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REAL
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_SECRET
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.eventsystem.common.RemoteDbManager
-import com.simprints.eventsystem.project.domain.Project
-import com.simprints.eventsystem.project.local.ProjectLocalDataSource
-import com.simprints.eventsystem.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery
@@ -22,7 +22,8 @@ object RobolectricTestMocker {
     const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 
     suspend fun mockLoadProject(projectRemoteDataSource: ProjectRemoteDataSource,
-                                projectLocalDataSource: ProjectLocalDataSource): RobolectricTestMocker {
+                                projectLocalDataSource: ProjectLocalDataSource
+    ): RobolectricTestMocker {
 
         val project = Project(
             DEFAULT_PROJECT_ID,
@@ -42,7 +43,8 @@ object RobolectricTestMocker {
     }
 
     fun initLogInStateMock(sharedPrefs: SharedPreferences,
-                           remoteDbManagerMock: RemoteDbManager): RobolectricTestMocker {
+                           remoteDbManagerMock: RemoteDbManager
+    ): RobolectricTestMocker {
 
         every { remoteDbManagerMock.isSignedIn(any(), any()) } answers {
             sharedPrefs.getBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false)

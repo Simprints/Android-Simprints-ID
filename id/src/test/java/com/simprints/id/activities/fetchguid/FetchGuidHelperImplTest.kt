@@ -6,11 +6,11 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.defaultSubject
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.eventsystem.SubjectFetchResult
-import com.simprints.eventsystem.SubjectFetchResult.SubjectSource.*
-import com.simprints.eventsystem.subject.SubjectRepository
-import com.simprints.eventsystem.subject.local.SubjectQuery
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.id.data.db.SubjectFetchResult
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper

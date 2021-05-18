@@ -6,7 +6,7 @@ import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest

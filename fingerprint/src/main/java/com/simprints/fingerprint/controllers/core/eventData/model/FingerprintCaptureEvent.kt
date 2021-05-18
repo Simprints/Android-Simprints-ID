@@ -9,7 +9,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
-import com.simprints.eventsystem.subject.domain.FingerIdentifier as FingerIdentifierCore
+import com.simprints.id.data.db.subject.domain.FingerIdentifier as FingerIdentifierCore
 
 @Keep
 class FingerprintCaptureEvent(

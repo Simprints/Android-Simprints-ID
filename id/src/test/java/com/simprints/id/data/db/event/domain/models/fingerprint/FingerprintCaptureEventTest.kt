@@ -6,7 +6,7 @@ import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTU
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
-import com.simprints.eventsystem.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
 import com.simprints.id.sampledata.FingerprintCaptureEventSample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT

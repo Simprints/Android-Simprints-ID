@@ -16,7 +16,7 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED

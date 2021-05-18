@@ -2,7 +2,7 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper

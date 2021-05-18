@@ -1,9 +1,7 @@
-package com.simprints.id.data.analytics.crashreport
+package com.simprints.core.analytics
 
+import android.app.Application
 import android.util.Log
-import com.simprints.id.Application
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 
 interface CrashReportManager: CoreCrashReportManager {
     fun logExceptionOrSafeException(throwable: Throwable)
@@ -23,9 +21,9 @@ interface CoreCrashReportManager {
     fun setProjectIdCrashlyticsKey(projectId: String)
     fun setUserIdCrashlyticsKey(userId: String)
     fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?)
-    fun setDownSyncTriggersCrashlyticsKey(eventDownSyncSetting: EventDownSyncSetting)
+    fun setDownSyncTriggersCrashlyticsKey(eventDownSyncSetting: String)
     fun setSessionIdCrashlyticsKey(sessionId: String)
-    fun setFingersSelectedCrashlyticsKey(fingersSelected: List<FingerIdentifier>)
+    fun setFingersSelectedCrashlyticsKey(fingersSelected: List<String>)
 
     companion object {
         fun build(app: Application): CoreCrashReportManager =

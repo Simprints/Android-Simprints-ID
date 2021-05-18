@@ -1,9 +1,9 @@
-package com.simprints.eventsystem.subject.local.models
+package com.simprints.id.data.db.subject.local.models
 
 import androidx.annotation.Keep
 import androidx.room.PrimaryKey
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
-import com.simprints.eventsystem.subject.domain.FaceSample
+import com.simprints.id.data.db.subject.domain.FaceSample
 import io.realm.RealmObject
 import io.realm.annotations.Required
 

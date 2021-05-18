@@ -1,10 +1,10 @@
 package com.simprints.id.moduleselection
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.eventsystem.subject.SubjectRepository
-import com.simprints.eventsystem.subject.local.SubjectQuery
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 

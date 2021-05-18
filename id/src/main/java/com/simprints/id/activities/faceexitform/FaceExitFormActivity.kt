@@ -13,9 +13,9 @@ import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Answer
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.databinding.ActivityFaceExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY

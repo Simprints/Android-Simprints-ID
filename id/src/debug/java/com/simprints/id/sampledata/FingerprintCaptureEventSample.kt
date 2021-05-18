@@ -3,7 +3,7 @@ package com.simprints.id.sampledata
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
 

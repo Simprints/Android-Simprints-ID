@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
-import com.simprints.eventsystem.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerprintSample
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*

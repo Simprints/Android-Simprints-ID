@@ -1,7 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import com.simprints.eventsystem.project.ProjectRepository
-import com.simprints.eventsystem.project.domain.Project
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.project.domain.Project
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import io.mockk.coEvery

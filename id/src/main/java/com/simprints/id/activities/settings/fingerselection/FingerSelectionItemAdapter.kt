@@ -14,8 +14,8 @@ import android.widget.Spinner
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
-import com.simprints.eventsystem.subject.domain.FingerIdentifier.*
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
 import com.simprints.id.databinding.ItemFingerSelectionBinding
 import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition

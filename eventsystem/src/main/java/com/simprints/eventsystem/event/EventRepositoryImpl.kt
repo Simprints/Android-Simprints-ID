@@ -5,10 +5,7 @@ import android.os.Build.VERSION
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag.SYNC
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.DATABASE
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
@@ -23,13 +20,8 @@ import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.toMode
 import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
-import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
@@ -209,7 +201,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
+        Timber.tag("SYNC").d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
         eventLocalDataSource.delete(eventsIds)
     }
 

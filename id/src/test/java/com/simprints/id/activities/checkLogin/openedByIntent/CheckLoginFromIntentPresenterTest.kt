@@ -6,13 +6,13 @@ import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.commontesttools.events.createEnrolmentCalloutEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher

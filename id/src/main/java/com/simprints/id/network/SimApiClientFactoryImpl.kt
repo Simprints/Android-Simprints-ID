@@ -4,7 +4,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.common.RemoteDbManager
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import kotlin.reflect.KClass
 

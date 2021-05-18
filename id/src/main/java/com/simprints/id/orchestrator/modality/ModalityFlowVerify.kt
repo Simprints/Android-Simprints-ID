@@ -2,7 +2,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.eventsystem.subject.local.SubjectQuery
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER

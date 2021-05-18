@@ -2,7 +2,7 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 
 class SettingsPreferenceViewModelFactory(
     private val crashReportManager: CrashReportManager

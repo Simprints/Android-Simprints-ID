@@ -1,6 +1,6 @@
-package com.simprints.eventsystem.subject
+package com.simprints.id.data.db.subject
 
-import com.simprints.eventsystem.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.eventsystem.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 
 interface SubjectRepository : SubjectLocalDataSource, FingerprintIdentityLocalDataSource

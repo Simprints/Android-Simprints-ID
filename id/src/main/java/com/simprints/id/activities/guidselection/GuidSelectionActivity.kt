@@ -7,9 +7,9 @@ import android.os.Bundle
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE

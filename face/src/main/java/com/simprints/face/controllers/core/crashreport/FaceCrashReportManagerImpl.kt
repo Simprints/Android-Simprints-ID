@@ -1,6 +1,6 @@
 package com.simprints.face.controllers.core.crashreport
 
-import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
+import com.simprints.core.analytics.CoreCrashReportManager
 
 class FaceCrashReportManagerImpl(private val crashReportManager: CoreCrashReportManager) :
     FaceCrashReportManager {
