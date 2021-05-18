@@ -1,15 +1,11 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
-import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.event.remote.models.subject.ApiEnrolmentRecordMovePayload
-import com.simprints.id.data.db.event.remote.models.subject.fromApiToDomain
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.subject.*
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
+import com.simprints.eventsystem.event.remote.models.subject.*
+import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
 
 @Keep
 data class ApiEvent(val id: String,

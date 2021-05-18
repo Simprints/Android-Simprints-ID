@@ -1,5 +1,6 @@
 package com.simprints.eventsystem.events_sync.down
 
+import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
@@ -20,12 +21,13 @@ class EventDownSyncScopeRepositoryImpl(
 ) : EventDownSyncScopeRepository {
 
 
-    override suspend fun getDownSyncScope(): EventDownSyncScope {
+    override suspend fun getDownSyncScope(
+        modes: List<Modes>,
+        possibleModuleIds: List<String>,
+        syncGroup: GROUP): EventDownSyncScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-        val modes: List<Modes> = preferencesManager.modalities.map { it.toMode() }
 
         val possibleUserId: String? = loginInfoManager.getSignedInUserIdOrEmpty()
-        val possibleModuleIds: List<String> = preferencesManager.selectedModules.toList()
 
         if (projectId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("ProjectId required")
@@ -35,7 +37,7 @@ class EventDownSyncScopeRepositoryImpl(
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
 
-        val syncScope = when (preferencesManager.syncGroup) {
+        val syncScope = when (syncGroup) {
             GROUP.GLOBAL ->
                 SubjectProjectScope(projectId, modes)
             GROUP.USER ->

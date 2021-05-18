@@ -2,57 +2,58 @@ package com.simprints.eventsystem.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.AUTHORIZATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLBACK_CONFIRMATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLBACK_ENROLMENT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLBACK_ERROR_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLBACK_IDENTIFICATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLBACK_REFUSAL_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLBACK_VERIFICATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLOUT_CONFIRMATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLOUT_ENROLMENT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLOUT_IDENTIFICATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLOUT_LAST_BIOMETRICS_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CALLOUT_VERIFICATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CANDIDATE_READ_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.CONSENT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_RECORD_CREATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_RECORD_DELETION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_RECORD_MOVE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_CAPTURE_RETRY_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_FALLBACK_CAPTURE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.GUID_SELECTION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.INTENT_PARSING_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.INVALID_INTENT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ONE_TO_MANY_MATCH_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.ONE_TO_ONE_MATCH_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.REFUSAL_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.SCANNER_CONNECTION_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.SESSION_CAPTURE_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
-import com.simprints.id.data.db.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
-import com.simprints.id.data.db.event.domain.models.callback.*
-import com.simprints.id.data.db.event.domain.models.callout.*
-import com.simprints.id.data.db.event.domain.models.face.*
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.eventsystem.event.domain.models.*
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.AUTHORIZATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLBACK_CONFIRMATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLBACK_ENROLMENT_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLBACK_ERROR_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLBACK_IDENTIFICATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLBACK_REFUSAL_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLBACK_VERIFICATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLOUT_CONFIRMATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLOUT_ENROLMENT_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLOUT_IDENTIFICATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLOUT_LAST_BIOMETRICS_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CALLOUT_VERIFICATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CANDIDATE_READ_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.CONSENT_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_RECORD_CREATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_RECORD_DELETION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_RECORD_MOVE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_RETRY_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_FALLBACK_CAPTURE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.GUID_SELECTION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.INTENT_PARSING_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.INVALID_INTENT_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ONE_TO_MANY_MATCH_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.ONE_TO_ONE_MATCH_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.REFUSAL_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.SCANNER_CONNECTION_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.SESSION_CAPTURE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
+import com.simprints.eventsystem.event.domain.models.callback.*
+import com.simprints.eventsystem.event.domain.models.callout.*
+import com.simprints.eventsystem.event.domain.models.face.*
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
+
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -142,6 +143,6 @@ abstract class Event {
 }
 
 fun EventType.isNotASubjectEvent() =
-    this != ENROLMENT_RECORD_CREATION &&
-        this != ENROLMENT_RECORD_MOVE &&
-        this != ENROLMENT_RECORD_DELETION
+    this != EventType.ENROLMENT_RECORD_CREATION &&
+        this != EventType.ENROLMENT_RECORD_MOVE &&
+        this != EventType.ENROLMENT_RECORD_DELETION

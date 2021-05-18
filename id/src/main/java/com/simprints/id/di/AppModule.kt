@@ -27,7 +27,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager

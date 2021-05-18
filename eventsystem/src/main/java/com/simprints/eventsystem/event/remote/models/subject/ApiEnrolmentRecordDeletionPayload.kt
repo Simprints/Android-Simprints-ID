@@ -1,10 +1,10 @@
 package com.simprints.eventsystem.event.remote.models.subject
 
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
-import io.realm.internal.Keep
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 
 @Keep
 data class ApiEnrolmentRecordDeletionPayload(
@@ -16,12 +16,12 @@ data class ApiEnrolmentRecordDeletionPayload(
     val attendantId: String
 ) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordDeletion, version, startTime) {
 
-    constructor(payload: EnrolmentRecordDeletionPayload) :
+    constructor(payload: EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload) :
         this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId, payload.attendantId)
 }
 
 fun ApiEnrolmentRecordDeletionPayload.fromApiToDomain() =
-    EnrolmentRecordDeletionPayload(
+    EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload(
         startTime,
         version,
         subjectId,

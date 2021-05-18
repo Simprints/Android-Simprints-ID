@@ -4,6 +4,10 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
 import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.*
 import com.simprints.id.data.db.event.domain.models.subject.fromApiToDomain
 import com.simprints.id.data.db.event.remote.models.ApiEventPayload
@@ -36,7 +40,7 @@ data class ApiEnrolmentRecordMovePayload(
         val biometricReferences: List<ApiBiometricReference>?
     )
 
-    constructor(payload: EnrolmentRecordMovePayload) : this(
+    constructor(payload: EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload) : this(
         payload.createdAt,
         payload.eventVersion,
         payload.enrolmentRecordCreation.let {
@@ -49,13 +53,23 @@ data class ApiEnrolmentRecordMovePayload(
 
 
 fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
-    EnrolmentRecordMovePayload(
+    EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload(
         startTime,
         version,
         enrolmentRecordCreation?.let {
-            EnrolmentRecordCreationInMove(it.subjectId, it.projectId, it.moduleId, it.attendantId, it.biometricReferences?.map { it.fromApiToDomain() })
+            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+                it.subjectId,
+                it.projectId,
+                it.moduleId,
+                it.attendantId,
+                it.biometricReferences?.map { it.fromApiToDomain() })
         },
         enrolmentRecordDeletion.let {
-            EnrolmentRecordDeletionInMove(it.subjectId, it.projectId, it.moduleId, it.attendantId)
+            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+                it.subjectId,
+                it.projectId,
+                it.moduleId,
+                it.attendantId
+            )
         }
     )

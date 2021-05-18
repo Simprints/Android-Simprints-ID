@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.domain.modality.Modes
+import com.simprints.core.domain.modality.Modes
 
 @Keep
 data class EventLabels(
