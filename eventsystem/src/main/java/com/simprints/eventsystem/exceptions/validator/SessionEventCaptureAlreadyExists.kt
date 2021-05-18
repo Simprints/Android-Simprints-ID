@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.safe.session.validator
+package com.simprints.eventsystem.exceptions.validator
 
 import com.simprints.id.exceptions.safe.session.SessionDataSourceException
 

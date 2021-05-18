@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.safe.session
+package com.simprints.eventsystem.exceptions
 
 open class SessionDataSourceException : RuntimeException {
     constructor(message: String) : super(message)
