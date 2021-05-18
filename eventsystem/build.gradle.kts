@@ -23,6 +23,8 @@ dependencies {
     implementation(Dependencies.Kotlin.serialization_json)
     implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Timber.core)
+    implementation(Dependencies.Retrofit.okhttp)
+    implementation(Dependencies.Retrofit.core)
 
     testImplementation(Dependencies.Testing.junit)
     androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
