@@ -8,7 +8,7 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
 import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS

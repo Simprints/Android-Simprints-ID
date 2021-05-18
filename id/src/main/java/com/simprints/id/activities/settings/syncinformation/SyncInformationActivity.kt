@@ -18,8 +18,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.sync.events.master.EventSyncManager
