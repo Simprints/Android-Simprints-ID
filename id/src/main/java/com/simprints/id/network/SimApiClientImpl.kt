@@ -1,9 +1,10 @@
 package com.simprints.id.network
 
+import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
                                                     private val authToken: String? = null,
                                                     private val performanceTracer: FirebasePerformanceTraceFactory,
                                                     private val jsonHelper: JsonHelper,
-                                                    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()) : SimApiClient<T> {
+                                                    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()) :
+    SimApiClient<T> {
 
     override val api: T by lazy {
         retrofit.create(service.java)

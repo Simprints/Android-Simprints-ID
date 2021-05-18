@@ -2,8 +2,8 @@ package com.simprints.id.secure.securitystate.remote
 
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClient
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import retrofit2.HttpException

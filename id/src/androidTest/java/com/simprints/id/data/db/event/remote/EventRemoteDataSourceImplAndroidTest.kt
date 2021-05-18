@@ -57,7 +57,7 @@ import com.simprints.id.network.TimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

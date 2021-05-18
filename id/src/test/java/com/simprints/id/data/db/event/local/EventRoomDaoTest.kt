@@ -20,7 +20,7 @@ import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK

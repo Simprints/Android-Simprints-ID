@@ -5,15 +5,14 @@ import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
+import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.remote.models.ApiEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
-import com.simprints.id.network.SimApiClient
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
@@ -48,7 +47,7 @@ class EventRemoteDataSourceImpl(
         scope: CoroutineScope
     ): ReceiveChannel<Event> {
         val streaming = takeStreaming(query)
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Stream taken")
+        Timber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
         return scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
             parseStreamAndEmitEvents(streaming, this)
@@ -60,7 +59,7 @@ class EventRemoteDataSourceImpl(
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REMOTE_SOURCE] Start parsing stream")
+        Timber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Start parsing stream")
 
         try {
             while (parser.nextToken() == START_OBJECT) {

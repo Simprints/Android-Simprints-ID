@@ -1,4 +1,4 @@
-package com.simprints.id.tools.time
+package com.simprints.core.tools.time
 
 import androidx.annotation.Keep
 import java.util.*

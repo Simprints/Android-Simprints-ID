@@ -11,7 +11,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 
 class AppResponseBuilderForEnrol(
     private val enrolmentHelper: EnrolmentHelper,

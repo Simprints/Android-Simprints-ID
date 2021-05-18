@@ -17,7 +17,7 @@ import com.simprints.eventsystem.subject.domain.SubjectAction.Deletion
 import com.simprints.eventsystem.subject.domain.SubjectFactoryImpl
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

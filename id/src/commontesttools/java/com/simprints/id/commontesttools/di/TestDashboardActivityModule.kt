@@ -16,7 +16,7 @@ import com.simprints.id.di.DashboardActivityModule
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestDashboardActivityModule(
@@ -95,8 +95,8 @@ class TestDashboardActivityModule(
     }
 
     override fun provideDashboardSyncCardDisplayer(
-            timeHelper: TimeHelper,
-            ctx: Context
+        timeHelper: TimeHelper,
+        ctx: Context
     ): DashboardSyncCardDisplayer {
         return syncCardDisplayerRule.resolveDependency {
             super.provideDashboardSyncCardDisplayer(timeHelper, ctx)

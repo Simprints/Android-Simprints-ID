@@ -2,6 +2,10 @@ package com.simprints.eventsystem.event
 
 import android.os.Build
 import android.os.Build.VERSION
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag.SYNC
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.DATABASE
@@ -44,7 +48,7 @@ open class EventRepositoryImpl(
     validatorsFactory: SessionEventValidatorsFactory,
     override val libSimprintsVersionName: String,
     private val sessionDataCache: SessionDataCache
-) : com.simprints.eventsystem.event.EventRepository {
+) : EventRepository {
 
     companion object {
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
@@ -55,7 +59,7 @@ open class EventRepositoryImpl(
 
     private val currentProject: String
         get() = if (loginInfoManager.getSignedInProjectIdOrEmpty().isEmpty()) {
-            com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
+            PROJECT_ID_FOR_NOT_SIGNED_IN
         } else {
             loginInfoManager.getSignedInProjectIdOrEmpty()
         }
@@ -147,7 +151,7 @@ open class EventRepositoryImpl(
      * (through simplicity and low resource usage)
      */
     override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading")
+        Timber.tag("SYNC").d("[EVENT_REPO] Uploading")
 
         if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
@@ -157,14 +161,14 @@ open class EventRepositoryImpl(
 
         eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
             // The events will include the SessionCaptureEvent event
-            Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading session $sessionId")
+            Timber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
             eventLocalDataSource.loadAllFromSession(sessionId).let {
                 attemptEventUpload(it, projectId)
                 this.emit(it.size)
             }
         }
 
-        Timber.tag(SYNC_LOG_TAG).d("[EVENT_REPO] Uploading abandoned events")
+        Timber.tag("SYNC").d("[EVENT_REPO] Uploading abandoned events")
         eventLocalDataSource.loadAbandonedEvents(projectId).let {
             crashReportManager.logMessageForCrashReport(
                 SYNC,

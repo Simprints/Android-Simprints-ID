@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
@@ -17,7 +16,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitForm
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,

@@ -7,7 +7,7 @@ import com.simprints.eventsystem.common.RemoteDbManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.models.AuthenticationData

@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator
 import com.simprints.eventsystem.subject.domain.Subject
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 
 interface EnrolmentHelper {
 
@@ -12,7 +12,8 @@ interface EnrolmentHelper {
                      moduleId: String,
                      fingerprintResponse: FingerprintCaptureResponse?,
                      faceResponse: FaceCaptureResponse?,
-                     timeHelper: TimeHelper): Subject
+                     timeHelper: TimeHelper
+    ): Subject
 
     suspend fun enrol(subject: Subject)
 }

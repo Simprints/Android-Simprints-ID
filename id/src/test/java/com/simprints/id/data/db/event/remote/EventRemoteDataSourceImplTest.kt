@@ -16,8 +16,8 @@ import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.remote.models.ApiEventCount
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
-import com.simprints.id.network.SimApiClient
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK

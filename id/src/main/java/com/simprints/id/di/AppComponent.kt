@@ -41,7 +41,7 @@ import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
@@ -53,7 +53,7 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

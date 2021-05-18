@@ -19,7 +19,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.secure.AttestationManager
 import com.simprints.id.secure.AttestationManagerImpl
 import com.simprints.id.secure.AuthManager
@@ -46,7 +46,7 @@ import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
