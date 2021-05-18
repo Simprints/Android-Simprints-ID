@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions
+package com.simprints.core.exceptions
 
 
 open class SimprintsException : RuntimeException {

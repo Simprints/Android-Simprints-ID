@@ -1,6 +1,4 @@
-package com.simprints.id.exceptions.safe
-
-import com.simprints.id.exceptions.SimprintsException
+package com.simprints.core.exceptions
 
 open class SafeException : SimprintsException {
     constructor(message: String, cause: Throwable): super(message, cause)

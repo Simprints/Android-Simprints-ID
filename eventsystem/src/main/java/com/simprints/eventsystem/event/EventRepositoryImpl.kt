@@ -2,10 +2,13 @@ package com.simprints.eventsystem.event
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.extentions.isClientAndCloudIntegrationIssue
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
@@ -20,8 +23,7 @@ import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
-import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
-import com.simprints.id.tools.extensions.isClientAndCloudIntegrationIssue
+import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
@@ -34,12 +36,13 @@ open class EventRepositoryImpl(
     private val loginInfoManager: LoginInfoManager,
     private val eventLocalDataSource: EventLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val preferencesManager: PreferencesManager,
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     override val libSimprintsVersionName: String,
-    private val sessionDataCache: SessionDataCache
+    private val sessionDataCache: SessionDataCache,
+    private val language: String,
+    private val modalities: List<Modes>
 ) : EventRepository {
 
     companion object {
@@ -65,10 +68,10 @@ open class EventRepositoryImpl(
                 id = UUID.randomUUID().toString(),
                 projectId = currentProject,
                 createdAt = timeHelper.now(),
-                modalities = preferencesManager.modalities.map { it.toMode() },
+                modalities = modalities,
                 appVersionName = appVersionName,
                 libVersionName = libSimprintsVersionName,
-                language = preferencesManager.language,
+                language = language,
                 device = Device(
                     VERSION.SDK_INT.toString(),
                     Build.MANUFACTURER + "_" + Build.MODEL,
@@ -163,8 +166,8 @@ open class EventRepositoryImpl(
         Timber.tag("SYNC").d("[EVENT_REPO] Uploading abandoned events")
         eventLocalDataSource.loadAbandonedEvents(projectId).let {
             crashReportManager.logMessageForCrashReport(
-                SYNC,
-                DATABASE,
+                CrashReportTag.SYNC,
+                CrashReportTrigger.DATABASE,
                 message = "Abandoned Events: ${it.size}"
             )
             attemptEventUpload(it, projectId)
@@ -208,7 +211,7 @@ open class EventRepositoryImpl(
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
         sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
             .firstOrNull()
-            ?: loadSessions(false).firstOrNull()?.also { session ->
+            ?: loadSessions(false).first()?.also { session ->
                 loadEventsIntoCache(session.id)
             }
             ?: createSession()

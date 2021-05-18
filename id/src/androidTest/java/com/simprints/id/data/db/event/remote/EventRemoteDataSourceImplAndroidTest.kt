@@ -51,7 +51,7 @@ import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder
-import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.TimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule

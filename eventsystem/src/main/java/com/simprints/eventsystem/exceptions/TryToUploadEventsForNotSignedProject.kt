@@ -1,6 +1,6 @@
-package com.simprints.id.exceptions.safe.sync
+package com.simprints.eventsystem.exceptions
 
-import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.core.exceptions.SafeException
 
 class TryToUploadEventsForNotSignedProject(message: String = "TryToUploadEventsForNotSignedProject") :
     SafeException(message)
