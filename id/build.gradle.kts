@@ -145,6 +145,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
     api(project(":moduleapi"))
+    api(project(":eventsystem"))
     implementation(Dependencies.libsimprints)
 
     implementation(Dependencies.Dagger.core)
