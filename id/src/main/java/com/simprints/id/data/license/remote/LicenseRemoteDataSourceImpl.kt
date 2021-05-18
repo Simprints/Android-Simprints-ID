@@ -3,7 +3,7 @@ package com.simprints.id.data.license.remote
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.core.exceptions.SyncCloudIntegrationException
-import com.simprints.id.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
+import com.simprints.core.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import okhttp3.ResponseBody

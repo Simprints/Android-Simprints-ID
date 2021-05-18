@@ -19,7 +19,7 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
-import com.simprints.id.exceptions.safe.sync.TryToUploadEventsForNotSignedProject
+import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2

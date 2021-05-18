@@ -50,6 +50,7 @@ dependencies {
     api(Dependencies.Testing.Espresso.idling)
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.Jackson.core)
+    implementation(Dependencies.Retrofit.core)
     api(Dependencies.Dagger.javax)
     implementation(Dependencies.Firebase.storage)
 

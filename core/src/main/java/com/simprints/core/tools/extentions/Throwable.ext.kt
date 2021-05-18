@@ -1,6 +1,6 @@
-package com.simprints.id.tools.extensions
+package com.simprints.core.tools.extentions
 
-import com.simprints.id.network.NetworkConstants
+import com.simprints.core.network.NetworkConstants
 import retrofit2.HttpException
 
 fun Throwable.isClientAndCloudIntegrationIssue() =

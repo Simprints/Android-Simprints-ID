@@ -12,7 +12,7 @@ import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.exceptions.safe.MalfunctionException
-import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.core.exceptions.SafeException
 
 open class CrashReportManagerImpl: CrashReportManager {
 
