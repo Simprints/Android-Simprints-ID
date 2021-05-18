@@ -1,12 +1,12 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Result.*
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload.Type.PARENTAL
-import com.simprints.id.data.db.event.remote.models.ApiConsentPayload.ApiResult
-import com.simprints.id.data.db.event.remote.models.ApiConsentPayload.ApiType
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.*
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type.PARENTAL
+import com.simprints.eventsystem.event.remote.models.ApiConsentPayload.ApiResult
+import com.simprints.eventsystem.event.remote.models.ApiConsentPayload.ApiType
 
 @Keep
 data class ApiConsentPayload(override val startTime: Long,

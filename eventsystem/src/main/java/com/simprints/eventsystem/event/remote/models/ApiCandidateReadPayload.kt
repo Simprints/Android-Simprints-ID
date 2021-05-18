@@ -3,12 +3,12 @@ package com.simprints.eventsystem.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiLocalResult
-import com.simprints.id.data.db.event.remote.models.ApiCandidateReadPayload.ApiRemoteResult
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.CandidateRead
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.eventsystem.event.remote.models.ApiCandidateReadPayload.ApiLocalResult
+import com.simprints.eventsystem.event.remote.models.ApiCandidateReadPayload.ApiRemoteResult
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.CandidateRead
 
 @Keep
 @JsonInclude(Include.NON_NULL)

@@ -3,12 +3,12 @@ package com.simprints.eventsystem.event.remote.models.session
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.id.data.db.event.domain.models.session.Location
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
-import com.simprints.id.data.db.event.remote.ApiModes
-import com.simprints.id.data.db.event.remote.fromDomainToApi
-import com.simprints.id.data.db.event.remote.models.ApiEventPayload
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.domain.models.session.Location
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.eventsystem.event.remote.ApiModes
+import com.simprints.eventsystem.event.remote.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.ApiEventPayload
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import java.util.*
 
 

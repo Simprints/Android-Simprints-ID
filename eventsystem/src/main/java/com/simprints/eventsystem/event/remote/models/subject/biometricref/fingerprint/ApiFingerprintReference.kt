@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReferenceType
-import com.simprints.id.data.db.event.remote.models.subject.biometricref.ApiBiometricReferenceType.FingerprintReference
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat.ISO_19794_2
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType
+import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType.FingerprintReference
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat.ISO_19794_2
 import java.util.*
 
 @Keep

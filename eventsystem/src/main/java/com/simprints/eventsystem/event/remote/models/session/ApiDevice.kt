@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.remote.models.session
 
 import android.os.Build
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.session.Device
+import com.simprints.eventsystem.event.domain.models.session.Device
 
 @Keep
 data class ApiDevice(

@@ -1,14 +1,14 @@
-package com.simprints.id.data.db.event.domain.models.face
+package com.simprints.eventsystem.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
 import org.junit.Test
 
 @Keep

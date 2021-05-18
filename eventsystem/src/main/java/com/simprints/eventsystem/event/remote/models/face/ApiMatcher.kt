@@ -1,6 +1,6 @@
 package com.simprints.eventsystem.event.remote.models.face
 
-import com.simprints.id.data.db.event.domain.models.Matcher
+import com.simprints.eventsystem.event.domain.models.Matcher
 
 enum class ApiMatcher {
 

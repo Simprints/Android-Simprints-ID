@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.project
+package com.simprints.eventsystem.project
 
-import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.eventsystem.project.domain.Project
+import com.simprints.eventsystem.project.local.ProjectLocalDataSource
+import com.simprints.eventsystem.project.remote.ProjectRemoteDataSource
 
 interface ProjectRepository: ProjectLocalDataSource, ProjectRemoteDataSource {
     suspend fun loadFromRemoteAndRefreshCache(projectId: String): Project?

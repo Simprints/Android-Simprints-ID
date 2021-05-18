@@ -3,7 +3,7 @@ package com.simprints.id.activities.settings.fingerselection
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.eventsystem.subject.domain.FingerIdentifier
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import timber.log.Timber

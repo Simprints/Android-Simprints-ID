@@ -7,9 +7,9 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper

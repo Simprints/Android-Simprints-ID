@@ -1,16 +1,16 @@
-package com.simprints.id.data.db.subject.local
+package com.simprints.eventsystem.subject.local
 
 import android.content.Context
-import com.simprints.id.data.db.subject.domain.FaceIdentity
-import com.simprints.id.data.db.subject.domain.FingerprintIdentity
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
-import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
-import com.simprints.id.data.db.subject.local.models.DbSubject
-import com.simprints.id.data.db.subject.local.models.fromDbToDomain
-import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
+import com.simprints.eventsystem.subject.domain.FaceIdentity
+import com.simprints.eventsystem.subject.domain.FingerprintIdentity
+import com.simprints.eventsystem.subject.domain.Subject
+import com.simprints.eventsystem.subject.domain.SubjectAction
+import com.simprints.eventsystem.subject.domain.SubjectAction.Creation
+import com.simprints.eventsystem.subject.domain.SubjectAction.Deletion
+import com.simprints.eventsystem.subject.local.models.DbSubject
+import com.simprints.eventsystem.subject.local.models.fromDbToDomain
+import com.simprints.eventsystem.subject.local.models.fromDomainToDb
+import com.simprints.eventsystem.subject.migration.SubjectsRealmConfig
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider

@@ -10,7 +10,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.simprints.clientapi.di.KoinInjector
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.moduleapi.app.responses.IAppResponse
 import io.mockk.coEvery
 import io.mockk.every

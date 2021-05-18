@@ -1,14 +1,14 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.data.db.event.domain.models.EventType.ONE_TO_MANY_MATCH
-import com.simprints.id.data.db.event.domain.models.Matcher.RANK_ONE
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
+import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import com.simprints.eventsystem.event.domain.models.Matcher.RANK_ONE
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
 import org.junit.Test
 
 class OneToManyMatchEventTest {

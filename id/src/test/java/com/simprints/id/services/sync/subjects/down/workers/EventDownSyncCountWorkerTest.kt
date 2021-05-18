@@ -9,8 +9,8 @@ import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker

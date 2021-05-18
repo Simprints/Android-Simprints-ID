@@ -3,7 +3,7 @@ package com.simprints.fingerprint.data.domain.fingerprint
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import java.nio.ByteBuffer

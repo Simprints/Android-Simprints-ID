@@ -6,9 +6,9 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.eventsystem.common.RemoteDbManager
+import com.simprints.eventsystem.project.ProjectRepository
+import com.simprints.eventsystem.project.remote.ProjectRemoteDataSource
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper

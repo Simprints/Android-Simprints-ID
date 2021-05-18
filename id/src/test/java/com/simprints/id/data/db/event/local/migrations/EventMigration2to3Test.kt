@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.local.migrations
+package com.simprints.eventsystem.event.local.migrations
 
 import android.content.ContentValues
 import android.database.Cursor
@@ -11,9 +11,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.models.session.Device
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
+import com.simprints.eventsystem.event.domain.models.session.Device
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.core.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.extensions.getIntWithColumnName

@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.event.remote.events.callback
+package com.simprints.eventsystem.event.remote.events.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent
-import com.simprints.id.data.db.event.remote.models.callback.ApiErrorCallback.ApiReason.*
-import com.simprints.id.data.db.event.remote.models.callback.fromDomainToApi
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.*
+import com.simprints.eventsystem.event.remote.models.callback.fromDomainToApi
 import org.junit.Test
 
 class ApiErrorCallbackTest {

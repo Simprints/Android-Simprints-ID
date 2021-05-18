@@ -1,6 +1,4 @@
-package com.simprints.id.domain.modality
-
-import com.simprints.core.domain.modality.Modes
+package com.simprints.core.domain.modality
 
 enum class Modality {
     FACE,

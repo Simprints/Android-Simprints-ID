@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
-import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload.Answer.*
-import com.simprints.id.data.db.event.remote.models.ApiRefusalPayload.ApiAnswer
+import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload
+import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer.*
+import com.simprints.eventsystem.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
 data class ApiRefusalPayload(override val startTime: Long,

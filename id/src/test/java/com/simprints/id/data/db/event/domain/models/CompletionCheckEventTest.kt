@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.id.sampledata.CompletionCheckEventSample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT

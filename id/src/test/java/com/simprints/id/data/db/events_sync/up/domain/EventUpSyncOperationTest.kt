@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.events_sync.up.domain
+package com.simprints.eventsystem.events_sync.up.domain
 
 import com.google.common.truth.Truth
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey

@@ -1,10 +1,10 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
-import com.simprints.id.data.db.event.remote.models.face.ApiMatcher
-import com.simprints.id.data.db.event.remote.models.face.fromDomainToApi
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
+import com.simprints.eventsystem.event.remote.models.face.ApiMatcher
+import com.simprints.eventsystem.event.remote.models.face.fromDomainToApi
 
 @Keep
 data class ApiOneToManyMatchPayload(override val startTime: Long,

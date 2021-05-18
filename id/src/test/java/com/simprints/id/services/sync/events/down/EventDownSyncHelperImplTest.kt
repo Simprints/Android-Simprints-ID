@@ -9,12 +9,12 @@ import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEven
 import com.simprints.id.commontesttools.events.createEnrolmentRecordDeletionEvent
 import com.simprints.id.commontesttools.events.createEnrolmentRecordMoveEvent
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
-import com.simprints.id.data.db.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
-import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
-import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
+import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.eventsystem.subject.domain.SubjectAction.Creation
+import com.simprints.eventsystem.subject.domain.SubjectAction.Deletion
+import com.simprints.eventsystem.subject.domain.SubjectFactoryImpl
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.id.tools.time.TimeHelper

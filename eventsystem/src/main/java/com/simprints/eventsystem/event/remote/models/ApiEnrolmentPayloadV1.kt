@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EnrolmentEventV1
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV1
 
 @Keep
 data class ApiEnrolmentPayloadV1(override val startTime: Long,

@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote.models.session
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.eventsystem.event.domain.models.session.Location
 
 @Keep
 data class ApiLocation(var latitude: Double = 0.0,

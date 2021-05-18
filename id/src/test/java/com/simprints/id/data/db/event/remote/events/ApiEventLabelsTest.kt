@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.remote.events
+package com.simprints.eventsystem.event.remote.events
 
 import com.google.common.truth.Truth
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -6,9 +6,9 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.data.db.event.remote.models.ApiEventLabels
-import com.simprints.id.data.db.event.remote.models.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.ApiEventLabels
+import com.simprints.eventsystem.event.remote.models.fromApiToDomain
+import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import org.junit.Test

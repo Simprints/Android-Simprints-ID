@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.event.domain.models.callback
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.EventPayload
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.EventType.CALLBACK_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventPayload
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_CONFIRMATION
 import java.util.*
 
 @Keep

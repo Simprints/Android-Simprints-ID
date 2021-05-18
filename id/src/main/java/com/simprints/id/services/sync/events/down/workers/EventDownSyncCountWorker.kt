@@ -10,7 +10,7 @@ import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException

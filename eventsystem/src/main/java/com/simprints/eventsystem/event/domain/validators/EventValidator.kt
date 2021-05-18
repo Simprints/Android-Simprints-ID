@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.domain.validators
 
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 
 interface EventValidator {
 

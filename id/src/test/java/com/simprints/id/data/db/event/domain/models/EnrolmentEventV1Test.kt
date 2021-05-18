@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.GUID1
@@ -6,7 +6,7 @@ import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import org.junit.Test
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 
 class EnrolmentEventV1Test {
 

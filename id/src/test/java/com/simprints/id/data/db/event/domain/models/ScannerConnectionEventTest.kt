@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_CONNECTION
-import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
-import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
+import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_CONNECTION
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.id.sampledata.SampleDefaults.GUID1

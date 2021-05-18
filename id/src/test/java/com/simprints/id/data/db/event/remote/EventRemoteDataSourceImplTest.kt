@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.remote
+package com.simprints.eventsystem.event.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
@@ -9,13 +9,13 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventType
-import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.remote.models.ApiEventCount
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.remote.models.ApiEventCount
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
+import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.network.SimApiClientFactory
 import io.kotlintest.shouldThrow

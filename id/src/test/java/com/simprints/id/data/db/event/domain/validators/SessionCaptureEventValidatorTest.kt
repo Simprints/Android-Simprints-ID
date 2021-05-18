@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event.domain.validators
+package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2

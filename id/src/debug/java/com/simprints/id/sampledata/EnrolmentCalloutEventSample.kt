@@ -1,7 +1,7 @@
 package com.simprints.id.sampledata
 
-import com.simprints.id.data.db.event.domain.models.EventLabels
-import com.simprints.id.data.db.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID

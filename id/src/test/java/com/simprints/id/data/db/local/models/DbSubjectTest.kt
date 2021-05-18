@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.local.models
+package com.simprints.eventsystem.local.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -6,8 +6,8 @@ import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomFaceSample
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomFingerprintSample
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.models.fromDomainToDb
+import com.simprints.eventsystem.subject.domain.Subject
+import com.simprints.eventsystem.subject.local.models.fromDomainToDb
 import org.junit.Test
 import java.util.*
 

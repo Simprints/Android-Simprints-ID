@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.id.sampledata.EnrolmentEventV2Sample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT

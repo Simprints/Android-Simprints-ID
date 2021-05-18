@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
+import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier
+import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier.*
 
 @Keep
 enum class ApiFingerIdentifier {

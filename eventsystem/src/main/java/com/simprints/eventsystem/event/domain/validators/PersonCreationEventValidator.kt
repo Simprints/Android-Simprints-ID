@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.domain.validators
 
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.EventType.PERSON_CREATION
-import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.id.exceptions.safe.session.validator.SessionEventCaptureAlreadyExists
 
 class PersonCreationEventValidator : EventValidator {

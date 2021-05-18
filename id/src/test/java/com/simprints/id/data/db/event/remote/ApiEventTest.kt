@@ -1,14 +1,14 @@
-package com.simprints.id.data.db.event.remote
+package com.simprints.eventsystem.event.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.events.*
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
-import com.simprints.id.data.db.event.remote.models.fromApiToDomain
-import com.simprints.id.data.db.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
+import com.simprints.eventsystem.event.remote.models.fromApiToDomain
+import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject

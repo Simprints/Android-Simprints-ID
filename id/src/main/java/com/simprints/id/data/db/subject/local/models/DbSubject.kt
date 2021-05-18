@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.subject.local.models
+package com.simprints.eventsystem.subject.local.models
 
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.eventsystem.subject.domain.FaceSample
+import com.simprints.eventsystem.subject.domain.FingerprintSample
+import com.simprints.eventsystem.subject.domain.Subject
 import com.simprints.id.tools.extensions.toRealmList
 import io.realm.RealmList
 import io.realm.RealmObject

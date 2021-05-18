@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
+import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 
 @Keep
 data class ApiCompletionCheckPayload(override val startTime: Long,

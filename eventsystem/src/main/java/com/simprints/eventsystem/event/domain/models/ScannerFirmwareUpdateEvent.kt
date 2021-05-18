@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
+import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import java.util.*
 
 @Keep

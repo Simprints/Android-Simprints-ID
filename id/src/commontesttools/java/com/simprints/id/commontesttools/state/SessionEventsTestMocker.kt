@@ -1,7 +1,7 @@
 //package com.simprints.id.commontesttools.state
 //
-//import com.simprints.id.data.db.event.domain.events.session.SessionCaptureEvent
-//import com.simprints.id.data.db.event.local.SessionLocalDataSource
+//import com.simprints.eventsystem.event.domain.events.session.SessionCaptureEvent
+//import com.simprints.eventsystem.event.local.SessionLocalDataSource
 //import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 //import io.mockk.coEvery
 //import io.reactivex.Completable

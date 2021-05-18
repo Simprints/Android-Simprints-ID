@@ -1,10 +1,10 @@
 package com.simprints.id.activities.fetchguid
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.eventsystem.SubjectFetchResult
+import com.simprints.eventsystem.SubjectFetchResult.SubjectSource.*
+import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.eventsystem.subject.local.SubjectQuery
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import kotlinx.coroutines.CoroutineScope

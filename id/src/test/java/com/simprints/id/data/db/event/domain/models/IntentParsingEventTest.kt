@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.event.domain.models
+package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.domain.models.EventType.INTENT_PARSING
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.Companion.EVENT_VERSION
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
+import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.Companion.EVENT_VERSION
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
 import com.simprints.id.sampledata.IntentParsingEventSample
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT

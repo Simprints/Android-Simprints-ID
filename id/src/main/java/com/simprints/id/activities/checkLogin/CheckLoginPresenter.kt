@@ -3,7 +3,7 @@ package com.simprints.id.activities.checkLogin
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.eventsystem.common.RemoteDbManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider

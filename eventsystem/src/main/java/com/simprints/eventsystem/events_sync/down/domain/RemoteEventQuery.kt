@@ -5,6 +5,7 @@ import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.remote.ApiRemoteEventQuery
 import com.simprints.eventsystem.event.remote.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 
 
 @Keep

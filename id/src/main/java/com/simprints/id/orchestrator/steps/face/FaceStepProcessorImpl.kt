@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.eventsystem.subject.local.SubjectQuery
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
