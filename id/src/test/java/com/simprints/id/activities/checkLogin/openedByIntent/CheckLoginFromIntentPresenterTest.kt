@@ -38,7 +38,7 @@ import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK

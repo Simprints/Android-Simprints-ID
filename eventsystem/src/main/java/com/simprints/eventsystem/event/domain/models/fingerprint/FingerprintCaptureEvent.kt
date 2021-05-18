@@ -5,9 +5,8 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
+import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier
 import java.util.*
 
 @Keep

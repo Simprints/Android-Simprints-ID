@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
-import com.simprints.id.tools.time.TimeHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
 import java.util.*
 
 @Keep
@@ -23,7 +23,8 @@ data class ConnectivitySnapshotEvent(
         UUID.randomUUID().toString(),
         labels,
         ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, networkType, connections),
-        CONNECTIVITY_SNAPSHOT)
+        CONNECTIVITY_SNAPSHOT
+    )
 
     @Keep
     data class ConnectivitySnapshotPayload(
@@ -36,14 +37,17 @@ data class ConnectivitySnapshotEvent(
     ) : EventPayload() {
 
         companion object {
-            fun buildEvent(simNetworkUtils: SimNetworkUtils,
-                           timeHelper: TimeHelper): ConnectivitySnapshotEvent {
+            fun buildEvent(
+                simNetworkUtils: SimNetworkUtils,
+                timeHelper: TimeHelper
+            ): ConnectivitySnapshotEvent {
 
                 return simNetworkUtils.let {
                     ConnectivitySnapshotEvent(
                         timeHelper.now(),
                         it.mobileNetworkType ?: "",
-                        it.connectionsStates)
+                        it.connectionsStates
+                    )
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.simprints.eventsystem.event
 
-import android.app.Application
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
@@ -47,7 +46,7 @@ interface EventRepository {
     suspend fun deleteSessionEvents(sessionId: String)
 
     companion object {
-        fun build(app: Application): EventRepository =
-            app.component.getSessionEventsManager()
+//        fun build(app: Application): EventRepository =
+//            app.component.getSessionEventsManager()
     }
 }

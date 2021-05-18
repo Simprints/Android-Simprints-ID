@@ -1,14 +1,14 @@
 package com.simprints.eventsystem.event.domain.models.session
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.modality.toMode
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.domain.modality.toMode
 import java.util.*
 
 @Keep

@@ -1,4 +1,4 @@
-package com.simprints.id.tools.utils
+package com.simprints.core.tools.utils
 
 import android.net.NetworkInfo
 import androidx.annotation.Keep

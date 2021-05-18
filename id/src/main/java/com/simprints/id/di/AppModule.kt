@@ -71,7 +71,7 @@ import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import com.simprints.libsimprints.BuildConfig.*
 import dagger.Module

@@ -1,13 +1,15 @@
 package com.simprints.id.activities.orchestrator
 
 import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.*
-import com.simprints.core.tools.time.TimeHelper
 
-class OrchestratorEventsHelperImpl(private val eventRepository: com.simprints.eventsystem.event.EventRepository,
-                                   private val timeHelper: TimeHelper
+class OrchestratorEventsHelperImpl(
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val timeHelper: TimeHelper
 ) : OrchestratorEventsHelper {
 
     override fun addCallbackEventInSessions(appResponse: AppResponse) {
@@ -42,8 +44,10 @@ class OrchestratorEventsHelperImpl(private val eventRepository: com.simprints.ev
 
     private fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
         with(appVerifyResponse.matchingResult) {
-            VerificationCallbackEvent(timeHelper.now(),
-                CallbackComparisonScore(guidFound, confidence, tier))
+            VerificationCallbackEvent(
+                timeHelper.now(),
+                CallbackComparisonScore(guidFound, confidence, tier)
+            )
         }
 
     private fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
@@ -51,11 +55,17 @@ class OrchestratorEventsHelperImpl(private val eventRepository: com.simprints.ev
             RefusalCallbackEvent(
                 timeHelper.now(),
                 answer.reason.name,
-                answer.optionalText)
+                answer.optionalText
+            )
         }
 
     private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
-        ErrorCallbackEvent(timeHelper.now(), fromAppResponseErrorReasonToEventReason(appErrorResponse.reason))
+        ErrorCallbackEvent(
+            timeHelper.now(),
+            fromAppResponseErrorReasonToEventReason(
+                fromDomainToModuleApiAppErrorResponse(appErrorResponse).reason
+            )
+        )
 
     private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
         ConfirmationCallbackEvent(timeHelper.now(), appResponse.identificationOutcome)

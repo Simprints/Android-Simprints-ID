@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.unexpected.session.validator
+package com.simprints.eventsystem.exceptions
 
 import com.simprints.core.exceptions.UnexpectedException
 
