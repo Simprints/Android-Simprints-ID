@@ -1,13 +1,14 @@
 package com.simprints.id.data.secure
 
 import android.util.Base64
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 
 @Deprecated("Use SecureLocalDbKeyProviderImpl")
 open class LegacyLocalDbKeyProviderImpl(private val keystoreManager: KeystoreManager,
-                                        private val prefsManager: PreferencesManager)
+                                        private val prefsManager: PreferencesManager
+)
     : LegacyLocalDbKeyProvider {
 
     companion object {

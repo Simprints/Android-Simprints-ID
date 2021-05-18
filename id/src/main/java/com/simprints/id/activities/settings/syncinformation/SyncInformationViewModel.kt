@@ -4,14 +4,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON

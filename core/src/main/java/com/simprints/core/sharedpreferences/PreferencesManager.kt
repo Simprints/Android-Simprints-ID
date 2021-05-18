@@ -1,4 +1,4 @@
-package com.simprints.id.data.prefs
+package com.simprints.core.sharedpreferences
 
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager

@@ -9,12 +9,9 @@ import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
-import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress

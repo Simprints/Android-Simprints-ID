@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType.*

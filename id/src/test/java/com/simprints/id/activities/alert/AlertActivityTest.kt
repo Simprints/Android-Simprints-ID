@@ -24,9 +24,8 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality

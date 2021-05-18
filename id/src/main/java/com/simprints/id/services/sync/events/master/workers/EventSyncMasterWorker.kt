@@ -3,8 +3,7 @@ package com.simprints.id.services.sync.events.master.workers
 import android.content.Context
 import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache

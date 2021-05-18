@@ -8,10 +8,9 @@ import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardPr
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.DashboardActivityModule
 import com.simprints.id.services.sync.events.master.EventSyncManager

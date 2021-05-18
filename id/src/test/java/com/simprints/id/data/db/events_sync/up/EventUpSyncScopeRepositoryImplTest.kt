@@ -6,10 +6,8 @@ import com.simprints.id.sampledata.SampleDefaults.TIME1
 import com.simprints.id.sampledata.SampleDefaults.projectUpSyncScope
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
-import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
-import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

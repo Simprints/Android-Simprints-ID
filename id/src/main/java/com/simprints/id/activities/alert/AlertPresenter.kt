@@ -1,13 +1,11 @@
 package com.simprints.id.activities.alert
 
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.AlertScreenEvent
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertActivityViewModel.*

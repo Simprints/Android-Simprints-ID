@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 
 class PrivacyNoticeViewModelFactory(
     private val longConsentRepository: LongConsentRepository,

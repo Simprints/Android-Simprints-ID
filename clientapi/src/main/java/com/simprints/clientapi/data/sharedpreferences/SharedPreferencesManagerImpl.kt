@@ -2,7 +2,7 @@ package com.simprints.clientapi.data.sharedpreferences
 
 import android.content.Context
 import androidx.core.content.edit
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 

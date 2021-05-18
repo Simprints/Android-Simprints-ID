@@ -1,17 +1,12 @@
 package com.simprints.eventsystem.events_sync.down
 
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.domain.modality.toMode
-import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

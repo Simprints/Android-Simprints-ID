@@ -8,7 +8,7 @@ import br.com.concretesolutions.kappuccino.custom.recyclerView.RecyclerViewInter
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.every

@@ -12,7 +12,7 @@ import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning

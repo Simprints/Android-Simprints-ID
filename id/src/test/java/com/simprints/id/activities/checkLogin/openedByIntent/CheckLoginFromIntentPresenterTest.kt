@@ -7,7 +7,6 @@ import com.simprints.id.commontesttools.events.createEnrolmentCalloutEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.data.db.event.domain.models.callout.*
 import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
 import com.simprints.id.data.db.event.domain.models.session.Device
@@ -15,7 +14,7 @@ import com.simprints.id.data.db.event.domain.models.session.Location
 import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.modality.Modality
