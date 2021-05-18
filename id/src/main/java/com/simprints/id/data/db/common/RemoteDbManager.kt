@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.common
+package com.simprints.id.data.db.common
 
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 

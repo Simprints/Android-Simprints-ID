@@ -1,6 +1,6 @@
-package com.simprints.eventsystem.subject.local
+package com.simprints.id.data.db.subject.local
 
-import com.simprints.eventsystem.subject.domain.FingerprintIdentity
+import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import kotlinx.coroutines.flow.Flow
 import java.io.Serializable

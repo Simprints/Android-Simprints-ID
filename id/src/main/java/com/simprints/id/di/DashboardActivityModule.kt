@@ -14,7 +14,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplay
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl
-import com.simprints.eventsystem.project.ProjectRepository
+import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager

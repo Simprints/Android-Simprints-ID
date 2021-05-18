@@ -8,7 +8,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
-import com.simprints.eventsystem.subject.SubjectRepository
+import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS

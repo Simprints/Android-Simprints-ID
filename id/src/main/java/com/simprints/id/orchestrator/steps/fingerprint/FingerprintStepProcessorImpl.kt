@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.eventsystem.subject.local.SubjectQuery
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest

@@ -41,6 +41,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(Dependencies.libsimprints)
 
     api(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.Lifecycle.java8)

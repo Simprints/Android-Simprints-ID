@@ -25,8 +25,8 @@ import com.simprints.eventsystem.event.domain.models.callback.VerificationCallba
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.subject.SubjectRepository
-import com.simprints.eventsystem.subject.domain.Subject
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.modality.Modality
 import com.simprints.core.domain.modality.Modes

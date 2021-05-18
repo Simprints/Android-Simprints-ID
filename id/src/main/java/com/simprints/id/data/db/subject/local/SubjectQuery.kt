@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.subject.local
+package com.simprints.id.data.db.subject.local
 
 import androidx.annotation.Keep
 import java.io.Serializable

@@ -5,12 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.eventsystem.RealmTestsBase
-import com.simprints.eventsystem.subject.domain.FaceIdentity
-import com.simprints.eventsystem.subject.domain.FingerprintIdentity
-import com.simprints.eventsystem.subject.local.models.DbSubject
-import com.simprints.eventsystem.subject.local.models.fromDbToDomain
-import com.simprints.eventsystem.subject.local.models.fromDomainToDb
+import com.simprints.id.data.db.subject.domain.FaceIdentity
+import com.simprints.id.data.db.subject.domain.FingerprintIdentity
+import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.id.data.db.subject.local.*
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
@@ -144,7 +143,9 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
 
         val fingerprintIdentityLocalDataSource = (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
-        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(SubjectQuery()).toList()
+        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(
+            SubjectQuery()
+        ).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
                 verifyIdentity(fakePerson1, get(0))

@@ -1,7 +1,7 @@
-package com.simprints.eventsystem.subject.local
+package com.simprints.id.data.db.subject.local
 
-import com.simprints.eventsystem.subject.domain.Subject
-import com.simprints.eventsystem.subject.domain.SubjectAction
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.SubjectAction
 import kotlinx.coroutines.flow.Flow
 
 interface SubjectLocalDataSource : FaceIdentityLocalDataSource, FingerprintIdentityLocalDataSource {

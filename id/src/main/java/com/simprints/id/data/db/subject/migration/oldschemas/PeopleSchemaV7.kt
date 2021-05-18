@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.subject.migration.oldschemas
+package com.simprints.id.data.db.subject.migration.oldschemas
 
 object PeopleSchemaV7 {
 

@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.settings.fingerprint.serializers
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import org.junit.Test
 
 class FingerprintsToCollectSerializerTest {

@@ -2,8 +2,8 @@ package com.simprints.id.activities.fetchguid
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.SubjectFetchResult
-import com.simprints.eventsystem.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.data.db.SubjectFetchResult
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult

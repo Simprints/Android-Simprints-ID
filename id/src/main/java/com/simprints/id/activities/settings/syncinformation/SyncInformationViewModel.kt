@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.eventsystem.event.domain.models.EventType.*
-import com.simprints.eventsystem.subject.SubjectRepository
-import com.simprints.eventsystem.subject.local.SubjectQuery
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper

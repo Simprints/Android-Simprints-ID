@@ -2,10 +2,9 @@ package com.simprints.eventsystem
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.eventsystem.subject.migration.SubjectsRealmConfig
-import com.simprints.eventsystem.subject.domain.Subject
-import com.simprints.eventsystem.subject.local.models.DbSubject
-import com.simprints.eventsystem.subject.local.models.fromDomainToDb
+import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.secure.LocalDbKey
 import io.realm.Realm
 import io.realm.RealmConfiguration

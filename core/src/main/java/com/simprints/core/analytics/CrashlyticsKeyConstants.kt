@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.crashreport
+package com.simprints.core.analytics
 
 class CrashlyticsKeyConstants {
     companion object {

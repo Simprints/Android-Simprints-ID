@@ -3,9 +3,9 @@ package com.simprints.id.di
 import android.content.Context
 import androidx.work.WorkManager
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.subject.SubjectRepository
-import com.simprints.eventsystem.subject.domain.SubjectFactory
-import com.simprints.eventsystem.subject.domain.SubjectFactoryImpl
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.SubjectFactory
+import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder

@@ -1,7 +1,7 @@
-package com.simprints.eventsystem.subject.migration
+package com.simprints.id.data.db.subject.migration
 
-import com.simprints.eventsystem.subject.migration.SubjectsRealmMigration
-import com.simprints.eventsystem.subject.migration.SubjectsRealmMigration.Companion.REALM_SCHEMA_VERSION
+import com.simprints.id.data.db.subject.migration.SubjectsRealmMigration
+import com.simprints.id.data.db.subject.migration.SubjectsRealmMigration.Companion.REALM_SCHEMA_VERSION
 import io.realm.RealmConfiguration
 import com.simprints.id.BuildConfig
 

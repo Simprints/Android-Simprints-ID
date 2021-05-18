@@ -1,8 +1,8 @@
 package com.simprints.id.network
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.project.domain.Project
-import com.simprints.eventsystem.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.network.NetworkConstants.Companion.BASE_URL_SUFFIX

@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
-import com.simprints.eventsystem.subject.local.SubjectQuery
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 

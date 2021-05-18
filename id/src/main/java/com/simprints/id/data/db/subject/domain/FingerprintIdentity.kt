@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.subject.domain
+package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

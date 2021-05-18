@@ -1,11 +1,12 @@
 package com.simprints.id.activities.checkLogin
 
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.eventsystem.common.RemoteDbManager
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType.*
@@ -14,7 +15,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.core.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
     component: AppComponent) {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var preferencesManager: IdPreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var crashReportManager: CrashReportManager

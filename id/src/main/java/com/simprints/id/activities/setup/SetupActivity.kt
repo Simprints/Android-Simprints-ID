@@ -25,8 +25,7 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.databinding.ActivitySetupBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.modality.Modality

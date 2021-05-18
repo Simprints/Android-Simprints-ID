@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.local
 
 import android.content.Context
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory

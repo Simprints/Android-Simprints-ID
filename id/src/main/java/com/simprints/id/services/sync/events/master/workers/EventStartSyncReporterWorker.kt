@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

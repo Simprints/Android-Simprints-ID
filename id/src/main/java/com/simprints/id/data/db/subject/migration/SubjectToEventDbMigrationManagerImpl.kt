@@ -1,16 +1,16 @@
-package com.simprints.eventsystem.subject.migration
+package com.simprints.id.data.db.subject.migration
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.local.EventLocalDataSource
-import com.simprints.eventsystem.subject.domain.Subject
-import com.simprints.eventsystem.subject.domain.SubjectAction.Creation
-import com.simprints.eventsystem.subject.local.SubjectLocalDataSource
-import com.simprints.eventsystem.subject.local.SubjectQuery
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
-import com.simprints.core.tools.time.TimeHelper
 import kotlinx.coroutines.flow.toList
 import timber.log.Timber
 
@@ -26,8 +26,9 @@ class SubjectToEventDbMigrationManagerImpl(
     private val eventLocal: EventLocalDataSource,
     val timeHelper: TimeHelper,
     val crashReportManager: CrashReportManager,
-    val preferencesManager: PreferencesManager,
-    private val subjectLocal: SubjectLocalDataSource) : SubjectToEventMigrationManager {
+    val preferencesManager: IdPreferencesManager,
+    private val subjectLocal: SubjectLocalDataSource
+) : SubjectToEventMigrationManager {
 
     override suspend fun migrateSubjectToSyncToEventsDb() {
         try {

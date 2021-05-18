@@ -1,10 +1,10 @@
-package com.simprints.eventsystem.subject.local.models
+package com.simprints.id.data.db.subject.local.models
 
 import androidx.annotation.Keep
 import androidx.room.PrimaryKey
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
-import com.simprints.eventsystem.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import io.realm.RealmObject
 import io.realm.annotations.Required
 

@@ -1,17 +1,18 @@
 package com.simprints.id.data.analytics.crashreport
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
-import com.simprints.eventsystem.subject.domain.FingerIdentifier
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MODULE_IDS
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.PROJECT_ID
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.SafeException
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 
 open class CrashReportManagerImpl: CrashReportManager {
 
@@ -60,15 +61,15 @@ open class CrashReportManagerImpl: CrashReportManager {
         crashlyticsInstance.setCustomKey(MODULE_IDS, moduleIds.toString())
     }
 
-    override fun setDownSyncTriggersCrashlyticsKey(eventDownSyncSetting: EventDownSyncSetting) {
-        crashlyticsInstance.setCustomKey(SUBJECTS_DOWN_SYNC_TRIGGERS, eventDownSyncSetting.toString())
+    override fun setDownSyncTriggersCrashlyticsKey(eventDownSyncSetting: String) {
+        crashlyticsInstance.setCustomKey(SUBJECTS_DOWN_SYNC_TRIGGERS, eventDownSyncSetting)
     }
 
     override fun setSessionIdCrashlyticsKey(sessionId: String) {
         crashlyticsInstance.setCustomKey(SESSION_ID, sessionId)
     }
 
-    override fun setFingersSelectedCrashlyticsKey(fingersSelected: List<FingerIdentifier>) {
+    override fun setFingersSelectedCrashlyticsKey(fingersSelected: List<String>) {
         crashlyticsInstance.setCustomKey(FINGERS_SELECTED, fingersSelected.toString())
     }
 }

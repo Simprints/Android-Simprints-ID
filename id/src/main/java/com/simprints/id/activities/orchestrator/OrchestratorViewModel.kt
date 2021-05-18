@@ -4,8 +4,7 @@ import android.content.Intent
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
