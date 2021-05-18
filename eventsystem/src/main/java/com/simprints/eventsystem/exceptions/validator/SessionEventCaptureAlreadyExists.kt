@@ -1,5 +1,5 @@
 package com.simprints.eventsystem.exceptions.validator
 
-import com.simprints.id.exceptions.safe.session.SessionDataSourceException
+import com.simprints.eventsystem.exceptions.SessionDataSourceException
 
 class SessionEventCaptureAlreadyExists(message: String): SessionDataSourceException(message)
