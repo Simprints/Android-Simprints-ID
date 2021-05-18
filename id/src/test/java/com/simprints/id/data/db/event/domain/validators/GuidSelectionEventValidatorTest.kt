@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.domain.validators
 import com.simprints.id.commontesttools.events.createGuidSelectionEvent
 import com.simprints.id.commontesttools.events.createIdentificationCallbackEvent
 import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
+import com.simprints.eventsystem.exceptions.validator.GuidSelectEventValidatorException
 import io.kotlintest.shouldThrow
 import org.junit.Before
 import org.junit.Test
