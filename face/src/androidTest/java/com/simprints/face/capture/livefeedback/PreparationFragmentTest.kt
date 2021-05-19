@@ -19,10 +19,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
-import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class PreparationFragmentTest  {
+class PreparationFragmentTest {
 
     private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)

@@ -39,7 +39,7 @@ class LiveFeedbackFragmentTest : KoinTest {
     }
 
     @Test
-    fun renameThisTest() {
+    fun openingLiveFeedBackScreenShowsCorrectText() {
         val navController: NavHostController = TestNavHostController(
             ApplicationProvider.getApplicationContext()
         )
@@ -51,6 +51,7 @@ class LiveFeedbackFragmentTest : KoinTest {
             Navigation.setViewNavController(liveFeedbackFragment.requireView(), navController)
         }
 
+        // Is this test really useful for the UI??
         onView(
             allOf(
                 withId(R.id.capture_feedback_txt_title),
@@ -58,7 +59,6 @@ class LiveFeedbackFragmentTest : KoinTest {
             )
         )
             .check(matches(isDisplayed()))
-
     }
 }
 
