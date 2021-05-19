@@ -23,6 +23,7 @@ object Dependencies {
     private const val robolectric_version = "4.3.1"
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
+    private const val fragment_version = "1.3.3"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -60,7 +61,7 @@ object Dependencies {
         object UI {
             const val constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
             const val cardview = "androidx.cardview:cardview:1.0.0"
-            const val fragment = "androidx.fragment:fragment:1.1.0-alpha04"
+            const val fragment = "androidx.fragment:fragment:$fragment_version"
             const val preference = "androidx.preference:preference:1.1.1"
             const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
         }
@@ -245,6 +246,11 @@ object Dependencies {
         const val live_data = "com.jraska.livedata:testing-ktx:1.1.0"
         const val kappuccino = "br.com.concretesolutions:kappuccino:1.2.1"
         const val awaitility = "org.awaitility:awaitility-kotlin:4.0.1"
+
+        // Navigation
+        const val fragment_testing = "androidx.fragment:fragment-testing:$fragment_version"
+        const val navigation_testing =
+            "androidx.navigation:navigation-testing:$androidx_navigation_version"
     }
 
     // For Tee-d stream
