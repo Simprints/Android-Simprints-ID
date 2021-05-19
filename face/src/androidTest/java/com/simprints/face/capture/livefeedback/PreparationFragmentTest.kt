@@ -11,7 +11,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.R
-import com.simprints.face.capture.livefeedback.PreparationFragment
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import io.mockk.mockk
@@ -25,7 +24,6 @@ import org.koin.test.KoinTest
 @RunWith(AndroidJUnit4::class)
 class PreparationFragmentTest : KoinTest {
 
-    private lateinit var navController: NavHostController
     private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)
 
@@ -35,13 +33,13 @@ class PreparationFragmentTest : KoinTest {
             single { faceTimeHelper }
             single { faceSessionEventsManager }
         })
-        navController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
-        )
     }
 
     @Test
     fun testNavigationFromPreparationToLiveFeedBackFragment() {
+        val navController: NavHostController = TestNavHostController(
+            ApplicationProvider.getApplicationContext()
+        )
         val prepFragScenario =
             launchFragmentInContainer<PreparationFragment>()
 
