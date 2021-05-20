@@ -2,14 +2,17 @@ package com.simprints.id.data.secure
 
 import android.content.SharedPreferences
 import android.util.Base64.*
-import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 import timber.log.Timber
 
 open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
                                         private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
-                                        private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider) : SecureLocalDbKeyProvider {
+                                        private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider) :
+    SecureLocalDbKeyProvider {
 
     companion object {
         const val SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER = "REALM_KEY"

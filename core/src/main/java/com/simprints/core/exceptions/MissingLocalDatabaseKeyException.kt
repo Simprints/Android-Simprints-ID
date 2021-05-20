@@ -1,5 +1,3 @@
-package com.simprints.id.exceptions.safe.secure
-
-import com.simprints.core.exceptions.SafeException
+package com.simprints.core.exceptions
 
 class MissingLocalDatabaseKeyException(message: String = "MissingLocalDatabaseKeyException") : SafeException(message)

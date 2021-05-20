@@ -5,7 +5,7 @@ import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.DbSubject
-import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.core.security.LocalDbKey
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

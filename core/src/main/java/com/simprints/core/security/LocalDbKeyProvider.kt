@@ -1,6 +1,6 @@
-package com.simprints.id.data.secure
+package com.simprints.core.security
 
-import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 
 interface LocalDbKeyProvider {
 

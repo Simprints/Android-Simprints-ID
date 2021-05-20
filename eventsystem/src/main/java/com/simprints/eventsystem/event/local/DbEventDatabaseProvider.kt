@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.local
 
 import android.content.Context
 import com.simprints.core.analytics.CrashReportManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 import timber.log.Timber

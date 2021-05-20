@@ -7,7 +7,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
