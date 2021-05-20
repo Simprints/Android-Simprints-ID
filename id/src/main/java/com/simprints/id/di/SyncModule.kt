@@ -6,6 +6,13 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
+import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
@@ -54,8 +61,8 @@ open class SyncModule {
     @Provides
     open fun provideEventUpSyncScopeRepo(
         loginInfoManager: LoginInfoManager,
-        dbEventUpSyncOperationStateDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
-    ): com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository =
+        dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao
+    ): EventUpSyncScopeRepository =
         com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl(
             loginInfoManager,
             dbEventUpSyncOperationStateDao
@@ -65,8 +72,8 @@ open class SyncModule {
     open fun providePeopleSyncManager(
         ctx: Context,
         eventSyncStateProcessor: EventSyncStateProcessor,
-        downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-        upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+        downSyncScopeRepository: EventDownSyncScopeRepository,
+        upSyncScopeRepo: EventUpSyncScopeRepository,
         eventSyncCache: EventSyncCache
     ): EventSyncManager =
         EventSyncManagerImpl(
@@ -90,9 +97,9 @@ open class SyncModule {
     open fun provideEventDownSyncScopeRepo(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        downSyncOperationStateDao: com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
-    ): com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository =
-        com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl(
+        downSyncOperationStateDao: DbEventDownSyncOperationStateDao
+    ) =
+        EventDownSyncScopeRepositoryImpl(
             loginInfoManager,
             preferencesManager,
             downSyncOperationStateDao
@@ -100,7 +107,7 @@ open class SyncModule {
 
     @Provides
     open fun provideDownSyncWorkerBuilder(
-        downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+        downSyncScopeRepository: EventDownSyncScopeRepository,
         jsonHelper: JsonHelper,
         preferencesManager: IdPreferencesManager
     ): EventDownSyncWorkersBuilder =
@@ -109,17 +116,17 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleUpSyncWorkerBuilder(
-        upSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+        upSyncScopeRepository: EventUpSyncScopeRepository,
         jsonHelper: JsonHelper
     ): EventUpSyncWorkersBuilder =
         EventUpSyncWorkersBuilderImpl(upSyncScopeRepository, jsonHelper)
 
     @Provides
-    open fun providePeopleUpSyncDao(database: com.simprints.eventsystem.events_sync.EventSyncStatusDatabase): com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao =
+    open fun providePeopleUpSyncDao(database: EventSyncStatusDatabase) =
         database.upSyncOperationsDaoDb
 
     @Provides
-    open fun providePeopleDownSyncDao(database: com.simprints.eventsystem.events_sync.EventSyncStatusDatabase): com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao =
+    open fun providePeopleDownSyncDao(database: EventSyncStatusDatabase) =
         database.downSyncOperationsDao
 
     @Provides
@@ -139,8 +146,8 @@ open class SyncModule {
     @Provides
     open fun provideEventDownSyncHelper(
         subjectRepository: SubjectRepository,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
-        eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+        eventRepository: EventRepository,
+        eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         subjectFactory: SubjectFactory,
         preferencesManager: IdPreferencesManager,
         timeHelper: TimeHelper
@@ -156,8 +163,8 @@ open class SyncModule {
 
     @Provides
     open fun provideEventUpSyncHelper(
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
-        eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+        eventRepository: EventRepository,
+        eventUpSyncScopeRepo: EventUpSyncScopeRepository,
         timerHelper: TimeHelper
     ): EventUpSyncHelper =
         EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper)
