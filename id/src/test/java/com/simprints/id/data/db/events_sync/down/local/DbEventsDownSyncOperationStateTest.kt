@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.events_sync.down.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.TIME1
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState

@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
-import com.simprints.id.sampledata.SampleDefaults
+import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager

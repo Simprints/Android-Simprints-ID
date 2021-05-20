@@ -5,10 +5,10 @@ import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_CONNECTIO
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.ScannerConnectionEventSample
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.ScannerConnectionEventSample
 import org.junit.Test
 
 class ScannerConnectionEventTest {

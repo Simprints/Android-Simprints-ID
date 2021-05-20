@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.events.createPersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
-import com.simprints.id.sampledata.SampleDefaults
+import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.core.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

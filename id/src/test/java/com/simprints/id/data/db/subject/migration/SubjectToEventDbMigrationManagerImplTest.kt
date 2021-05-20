@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.subject.migration
 
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.defaultSubject
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.defaultSubject
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.local.EventLocalDataSource

@@ -6,10 +6,10 @@ import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Comp
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.Vero2InfoSnapshotEventSample
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.Vero2InfoSnapshotEventSample
 import org.junit.Test
 
 class Vero2InfoSnapshotEventTest {

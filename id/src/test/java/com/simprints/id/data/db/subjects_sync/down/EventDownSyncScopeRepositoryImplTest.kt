@@ -1,14 +1,14 @@
 package com.simprints.eventsystem.subjects_sync.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULES
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.TIME1
-import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULES
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
+import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey

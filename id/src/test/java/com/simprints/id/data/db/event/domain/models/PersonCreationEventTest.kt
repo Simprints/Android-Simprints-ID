@@ -3,11 +3,11 @@ package com.simprints.eventsystem.event.domain.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent.Companion.EVENT_VERSION
-import com.simprints.id.sampledata.PersonCreationEventSample
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.PersonCreationEventSample
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 
 class PersonCreationEventTest {

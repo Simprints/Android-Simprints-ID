@@ -10,7 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.RandomGenerator

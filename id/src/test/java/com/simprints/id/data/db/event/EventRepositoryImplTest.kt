@@ -20,10 +20,10 @@ import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.sampledata.SampleDefaults.GUID3
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.core.tools.time.TimeHelper
 import io.kotlintest.shouldThrow
 import io.mockk.*

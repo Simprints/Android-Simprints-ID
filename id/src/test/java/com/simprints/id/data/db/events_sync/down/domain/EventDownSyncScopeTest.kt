@@ -1,12 +1,12 @@
 package com.simprints.eventsystem.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import org.junit.Test
 

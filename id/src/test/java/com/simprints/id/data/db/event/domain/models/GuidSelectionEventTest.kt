@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent.GuidSelectionPayload

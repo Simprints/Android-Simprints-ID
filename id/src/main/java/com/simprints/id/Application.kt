@@ -1,14 +1,10 @@
 package com.simprints.id
 
 import android.content.Context
-import androidx.camera.camera2.Camera2Config
-import androidx.camera.core.CameraXConfig
-import androidx.multidex.MultiDexApplication
 import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.di.*
 import com.simprints.id.tools.logging.NoLoggingConfigHelper
 import com.simprints.id.tools.logging.TimberDebugLoggingConfigHelper
