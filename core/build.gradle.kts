@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("kotlin-parcelize")
 }
 
 apply {
@@ -41,6 +42,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":moduleapi"))
     implementation(Dependencies.libsimprints)
 
     api(Dependencies.AndroidX.appcompat)

@@ -13,6 +13,8 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -25,10 +27,8 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.databinding.ActivitySetupBinding
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse

@@ -2,14 +2,14 @@ package com.simprints.clientapi.data.sharedpreferences
 
 import android.content.Context
 import androidx.core.content.edit
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.domain.modality.Modality
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 
 
 class SharedPreferencesManagerImpl(
     context: Context,
-    private val corePreferencesManager: PreferencesManager
+    private val corePreferencesManager: IdPreferencesManager
 ) : SharedPreferencesManager {
 
     companion object {

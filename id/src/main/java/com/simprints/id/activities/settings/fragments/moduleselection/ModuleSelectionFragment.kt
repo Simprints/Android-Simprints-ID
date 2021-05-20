@@ -16,18 +16,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.databinding.FragmentModuleSelectionBinding
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.core.tools.extentions.hideKeyboard
-import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.databinding.FragmentModuleSelectionBinding
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
@@ -36,7 +36,7 @@ import javax.inject.Inject
 
 class ModuleSelectionFragment: Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var preferencesManager: IdPreferencesManager
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
     @Inject lateinit var eventSyncManager: EventSyncManager
 

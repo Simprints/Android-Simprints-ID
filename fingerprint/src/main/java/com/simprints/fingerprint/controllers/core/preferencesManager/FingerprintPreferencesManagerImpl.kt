@@ -3,12 +3,12 @@ package com.simprints.fingerprint.controllers.core.preferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy as IdCaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy as IdSaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration as IdScannerGeneration
 
-class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager) : FingerprintPreferencesManager {
+class FingerprintPreferencesManagerImpl(private val prefs: IdPreferencesManager) : FingerprintPreferencesManager {
 
     override var lastScannerUsed: String = prefs.lastScannerUsed
         set(value) {

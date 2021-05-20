@@ -3,9 +3,9 @@ package com.simprints.id.activities.settings.fingerselection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportManager
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 
-class FingerSelectionViewModelFactory(private val preferencesManager: PreferencesManager,
+class FingerSelectionViewModelFactory(private val preferencesManager: IdPreferencesManager,
                                       private val crashReportManager: CrashReportManager
 ) : ViewModelProvider.Factory {
 

@@ -2,12 +2,14 @@ package com.simprints.id.di
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
@@ -30,7 +32,6 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelperImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.tools.utils.EncodingUtilsImpl
 import dagger.Module
@@ -44,13 +45,16 @@ open class SyncModule {
         WorkManager.getInstance(ctx)
 
     @Provides
-    open fun providePeopleSyncStateProcessor(ctx: Context,
-                                             eventSyncCache: EventSyncCache): EventSyncStateProcessor =
+    open fun providePeopleSyncStateProcessor(
+        ctx: Context,
+        eventSyncCache: EventSyncCache
+    ): EventSyncStateProcessor =
         EventSyncStateProcessorImpl(ctx, eventSyncCache)
 
     @Provides
-    open fun provideEventUpSyncScopeRepo(loginInfoManager: LoginInfoManager,
-                                         dbEventUpSyncOperationStateDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
+    open fun provideEventUpSyncScopeRepo(
+        loginInfoManager: LoginInfoManager,
+        dbEventUpSyncOperationStateDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
     ): com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository =
         com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl(
             loginInfoManager,
@@ -58,12 +62,20 @@ open class SyncModule {
         )
 
     @Provides
-    open fun providePeopleSyncManager(ctx: Context,
-                                      eventSyncStateProcessor: EventSyncStateProcessor,
-                                      downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-                                      upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-                                      eventSyncCache: EventSyncCache): EventSyncManager =
-        EventSyncManagerImpl(ctx, eventSyncStateProcessor, downSyncScopeRepository, upSyncScopeRepo, eventSyncCache)
+    open fun providePeopleSyncManager(
+        ctx: Context,
+        eventSyncStateProcessor: EventSyncStateProcessor,
+        downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+        upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+        eventSyncCache: EventSyncCache
+    ): EventSyncManager =
+        EventSyncManagerImpl(
+            ctx,
+            eventSyncStateProcessor,
+            downSyncScopeRepository,
+            upSyncScopeRepo,
+            eventSyncCache
+        )
 
     @Provides
     open fun provideSyncManager(
@@ -87,14 +99,19 @@ open class SyncModule {
         )
 
     @Provides
-    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-                                          jsonHelper: JsonHelper): EventDownSyncWorkersBuilder =
-        EventDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper)
+    open fun provideDownSyncWorkerBuilder(
+        downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+        jsonHelper: JsonHelper,
+        preferencesManager: IdPreferencesManager
+    ): EventDownSyncWorkersBuilder =
+        EventDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper, preferencesManager)
 
 
     @Provides
-    open fun providePeopleUpSyncWorkerBuilder(upSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-                                              jsonHelper: JsonHelper): EventUpSyncWorkersBuilder =
+    open fun providePeopleUpSyncWorkerBuilder(
+        upSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+        jsonHelper: JsonHelper
+    ): EventUpSyncWorkersBuilder =
         EventUpSyncWorkersBuilderImpl(upSyncScopeRepository, jsonHelper)
 
     @Provides
@@ -120,19 +137,28 @@ open class SyncModule {
         SubjectFactoryImpl(encodingUtils)
 
     @Provides
-    open fun provideEventDownSyncHelper(subjectRepository: SubjectRepository,
-                                        eventRepository: com.simprints.eventsystem.event.EventRepository,
-                                        eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-                                        subjectFactory: SubjectFactory,
-                                        preferencesManager: PreferencesManager,
-                                        timeHelper: TimeHelper
+    open fun provideEventDownSyncHelper(
+        subjectRepository: SubjectRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+        subjectFactory: SubjectFactory,
+        preferencesManager: IdPreferencesManager,
+        timeHelper: TimeHelper
     ): EventDownSyncHelper =
-        EventDownSyncHelperImpl(subjectRepository, eventRepository, eventDownSyncScopeRepository, subjectFactory, preferencesManager, timeHelper)
+        EventDownSyncHelperImpl(
+            subjectRepository,
+            eventRepository,
+            eventDownSyncScopeRepository,
+            subjectFactory,
+            preferencesManager,
+            timeHelper
+        )
 
     @Provides
-    open fun provideEventUpSyncHelper(eventRepository: com.simprints.eventsystem.event.EventRepository,
-                                      eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-                                      timerHelper: TimeHelper
+    open fun provideEventUpSyncHelper(
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+        timerHelper: TimeHelper
     ): EventUpSyncHelper =
         EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper)
 

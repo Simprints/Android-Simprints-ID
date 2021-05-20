@@ -3,7 +3,7 @@ package com.simprints.id.activities.orchestrator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportManager
-import com.simprints.id.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.orchestrator.OrchestratorManager
 

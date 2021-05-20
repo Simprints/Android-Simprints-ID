@@ -9,22 +9,23 @@ import android.view.View
 import android.widget.TabHost
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
-import com.simprints.id.R
-import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.Application
+import com.simprints.id.R
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.databinding.ActivityConsentBinding
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
@@ -35,7 +36,6 @@ import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.tools.LocationManager
-import com.simprints.core.tools.time.TimeHelper
 import javax.inject.Inject
 
 class ConsentActivity : BaseSplitActivity() {
@@ -49,7 +49,7 @@ class ConsentActivity : BaseSplitActivity() {
 
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var preferencesManager: IdPreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
     @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @Inject lateinit var locationManager: LocationManager

@@ -5,11 +5,11 @@ import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
 
 class ModuleRepositoryImpl(
-    val preferencesManager: PreferencesManager,
+    val preferencesManager: IdPreferencesManager,
     val crashReportManager: CrashReportManager,
     private val subjectRepository: SubjectRepository
 ): ModuleRepository {

@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.subject.migration
 
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent

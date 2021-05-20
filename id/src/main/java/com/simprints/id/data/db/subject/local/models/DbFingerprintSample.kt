@@ -2,9 +2,10 @@ package com.simprints.id.data.db.subject.local.models
 
 import androidx.annotation.Keep
 import androidx.room.PrimaryKey
+import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import io.realm.RealmObject
 import io.realm.annotations.Required
 
@@ -31,10 +32,10 @@ open class DbFingerprintSample(
 
 fun DbFingerprintSample.fromDbToDomain(): FingerprintSample =
     FingerprintSample(
-        fingerIdentifier = FingerIdentifier.values()[fingerIdentifier],
+        fingerIdentifier = IFingerIdentifier.values()[fingerIdentifier],
         template = template,
         templateQualityScore = templateQualityScore,
-        format = FingerprintTemplateFormat.valueOf(format)
+        format = IFingerprintTemplateFormat.valueOf(format)
     )
 
 fun FingerprintSample.fromDomainToDb(): DbFingerprintSample =

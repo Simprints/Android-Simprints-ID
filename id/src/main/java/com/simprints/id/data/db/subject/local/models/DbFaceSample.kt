@@ -2,8 +2,9 @@ package com.simprints.id.data.db.subject.local.models
 
 import androidx.annotation.Keep
 import androidx.room.PrimaryKey
+import com.simprints.core.domain.face.FaceSample
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.subject.domain.FaceSample
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import io.realm.RealmObject
 import io.realm.annotations.Required
 
@@ -24,7 +25,7 @@ open class DbFaceSample(
 ) : RealmObject()
 
 fun DbFaceSample.fromDbToDomain(): FaceSample =
-    FaceSample(template = template, format = FaceTemplateFormat.valueOf(format))
+    FaceSample(template = template, format = IFaceTemplateFormat.valueOf(format))
 
 fun FaceSample.fromDomainToDb(): DbFaceSample =
     DbFaceSample(

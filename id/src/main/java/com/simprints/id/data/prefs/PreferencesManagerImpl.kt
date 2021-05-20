@@ -2,10 +2,9 @@ package com.simprints.id.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl.Companion.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER
 
@@ -13,7 +12,7 @@ import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl.Companion.SHARE
 class PreferencesManagerImpl(settings: SettingsPreferencesManager,
                              lastEvents: RecentEventsPreferencesManager,
                              context: Context)
-    : PreferencesManager,
+    : IdPreferencesManager,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents {
 

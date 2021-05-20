@@ -1,29 +1,20 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
-import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.FlowProvider
-import com.simprints.id.orchestrator.ModalityFlowFactory
-import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
-import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.PersonCreationEventHelper
+import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
-import com.simprints.id.orchestrator.modality.ModalityFlow
-import com.simprints.id.orchestrator.modality.ModalityFlowConfirmIdentity
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolLastBiometrics
-import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.modality.*
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelper
@@ -35,7 +26,6 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.core.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -53,14 +43,14 @@ class OrchestratorModule {
     @Provides
     fun provideFaceStepProcessor(
         faceRequestFactory: FaceRequestFactory,
-        preferenceManager: PreferencesManager
+        preferenceManager: IdPreferencesManager
     ): FaceStepProcessor =
         FaceStepProcessorImpl(faceRequestFactory, preferenceManager)
 
     @Provides
     fun provideFingerprintStepProcessor(
         fingerprintRequestFactory: FingerprintRequestFactory,
-        preferenceManager: PreferencesManager
+        preferenceManager: IdPreferencesManager
     ): FingerprintStepProcessor =
         FingerprintStepProcessorImpl(fingerprintRequestFactory, preferenceManager)
 
@@ -95,8 +85,8 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
-        preferenceManager: PreferencesManager,
+        eventRepository: EventRepository,
+        preferenceManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
     ): ModalityFlow =
@@ -122,8 +112,8 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
-        preferenceManager: PreferencesManager,
+        eventRepository: EventRepository,
+        preferenceManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         ctx: Context
     ): ModalityFlow =
@@ -147,8 +137,8 @@ class OrchestratorModule {
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
         timeHelper: TimeHelper,
-        prefs: PreferencesManager,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        prefs: IdPreferencesManager,
+        eventRepository: EventRepository,
         loginInfoManager: LoginInfoManager,
         ctx: Context
     ): ModalityFlow =
@@ -200,7 +190,7 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorEventsHelper(
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventRepository: EventRepository,
         timeHelper: TimeHelper
     ): OrchestratorEventsHelper =
         OrchestratorEventsHelperImpl(eventRepository, timeHelper)
@@ -209,7 +199,7 @@ class OrchestratorModule {
     fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper,
-        preferenceManager: PreferencesManager,
+        preferenceManager: IdPreferencesManager,
         enrolResponseAdjudicationHelper: EnrolResponseAdjudicationHelper
     ): AppResponseFactory = AppResponseFactoryImpl(
         enrolmentHelper,
@@ -227,7 +217,7 @@ class OrchestratorModule {
     ): FlowProvider = orchestratorManagerImpl
 
     @Provides
-    fun provideEnrolAdjudicationActionHelper(prefs: PreferencesManager): EnrolResponseAdjudicationHelper =
+    fun provideEnrolAdjudicationActionHelper(prefs: IdPreferencesManager): EnrolResponseAdjudicationHelper =
         EnrolResponseAdjudicationHelperImpl(prefs.fingerprintConfidenceThresholds, prefs.faceConfidenceThresholds)
 
 }
