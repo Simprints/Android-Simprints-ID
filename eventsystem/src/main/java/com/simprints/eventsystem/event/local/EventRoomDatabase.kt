@@ -6,11 +6,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.BuildConfig
 import com.simprints.eventsystem.common.Converters
 import com.simprints.eventsystem.event.local.migrations.EventMigration1to2
 import com.simprints.eventsystem.event.local.migrations.EventMigration2to3
 import com.simprints.eventsystem.event.local.models.DbEvent
+import net.sqlcipher.database.SupportFactory
 
 
 @Database(entities = [DbEvent::class], version = 3, exportSchema = true)

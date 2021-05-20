@@ -1,6 +1,6 @@
 package com.simprints.eventsystem.event.remote.models.callout
 
-import io.realm.internal.Keep
+import androidx.annotation.Keep
 
 @Keep
 enum class ApiCalloutIntegrationInfo {

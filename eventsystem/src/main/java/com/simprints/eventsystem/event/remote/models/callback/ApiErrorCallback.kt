@@ -1,12 +1,12 @@
 package com.simprints.eventsystem.event.remote.models.callback
 
+import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
 import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason
 import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.GUID_NOT_FOUND_OFFLINE
 import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
-import io.realm.internal.Keep
 
 @Keep
 data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.Error) {

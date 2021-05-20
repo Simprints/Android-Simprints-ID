@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
-import com.simprints.id.tools.utils.SimNetworkUtils
 
 
 @Keep
