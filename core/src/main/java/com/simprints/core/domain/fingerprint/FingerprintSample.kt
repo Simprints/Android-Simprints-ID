@@ -1,17 +1,18 @@
-package com.simprints.id.data.db.subject.domain
+package com.simprints.core.domain.fingerprint
 
 import android.os.Parcelable
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize
 data class FingerprintSample(
-    val fingerIdentifier: FingerIdentifier,
+    val fingerIdentifier: IFingerIdentifier,
     val template: ByteArray,
     val templateQualityScore: Int,
-    val format: FingerprintTemplateFormat
+    val format: IFingerprintTemplateFormat
 ) : Parcelable {
 
     @IgnoredOnParcel

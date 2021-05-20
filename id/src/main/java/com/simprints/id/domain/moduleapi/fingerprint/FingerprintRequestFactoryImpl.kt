@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
@@ -9,7 +9,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 
 class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
 
-    override fun buildFingerprintCaptureRequest(prefs: PreferencesManager): FingerprintCaptureRequest =
+    override fun buildFingerprintCaptureRequest(prefs: IdPreferencesManager): FingerprintCaptureRequest =
         with(prefs) {
             FingerprintCaptureRequest(
                 fingerprintsToCapture = fingerprintsToCollect

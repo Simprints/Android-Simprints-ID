@@ -1,6 +1,10 @@
 package com.simprints.eventsystem.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.face.uniqueId
+import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.Event
@@ -8,10 +12,8 @@ import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.eventsystem.subject.domain.FaceSample
-import com.simprints.eventsystem.subject.domain.FingerprintSample
-import com.simprints.eventsystem.subject.domain.uniqueId
-import com.simprints.id.domain.modality.Modes
+import com.simprints.eventsystem.event.domain.models.face.fromModuleApiToDomain
+import com.simprints.eventsystem.event.domain.models.fingerprint.fromModuleApiToDomain
 import java.util.*
 
 @Keep
@@ -91,10 +93,10 @@ data class EnrolmentRecordCreationEvent(
                         FingerprintTemplate(
                             it.templateQualityScore,
                             EncodingUtils.byteArrayToBase64(it.template),
-                            it.fingerIdentifier.fromSubjectToEvent()
+                            it.fingerIdentifier
                         )
                     },
-                    fingerprintSamples.first().format
+                    fingerprintSamples.first().format.fromModuleApiToDomain()
                 )
             } else {
                 null
@@ -109,7 +111,7 @@ data class EnrolmentRecordCreationEvent(
                             EncodingUtils.byteArrayToBase64(it.template)
                         )
                     },
-                    faceSamples.first().format
+                    faceSamples.first().format.fromModuleApiToDomain()
                 )
             } else {
                 null

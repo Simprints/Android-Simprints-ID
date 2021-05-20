@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.id.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
@@ -10,7 +11,6 @@ import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolAdjudicationAction
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelper
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.core.tools.time.TimeHelper
 
 class AppResponseFactoryImpl(
     private val enrolmentHelper: EnrolmentHelper,

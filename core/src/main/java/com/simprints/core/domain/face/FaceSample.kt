@@ -1,13 +1,13 @@
-package com.simprints.id.data.db.subject.domain
+package com.simprints.core.domain.face
 
 import android.os.Parcelable
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize
-data class FaceSample(val template: ByteArray, val format: FaceTemplateFormat) : Parcelable {
+data class FaceSample(val template: ByteArray, val format: IFaceTemplateFormat) : Parcelable {
 
     @IgnoredOnParcel
     val id: String by lazy {

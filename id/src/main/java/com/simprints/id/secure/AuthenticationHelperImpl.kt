@@ -7,6 +7,7 @@ import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -14,6 +15,7 @@ import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import timber.log.Timber
 import java.io.IOException
 
@@ -22,7 +24,7 @@ class AuthenticationHelperImpl(
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val eventRepository: com.simprints.eventsystem.event.EventRepository
+    private val eventRepository: EventRepository
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L

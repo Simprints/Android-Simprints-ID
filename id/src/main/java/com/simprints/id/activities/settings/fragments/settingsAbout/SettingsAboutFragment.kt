@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.id.Application
@@ -19,7 +20,6 @@ import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.packageVersionName

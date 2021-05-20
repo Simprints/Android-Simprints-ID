@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
@@ -18,9 +19,9 @@ import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
-import com.simprints.core.domain.common.GROUP
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -32,7 +33,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     lateinit var viewModelFactory: SyncInformationViewModelFactory
 
     @Inject
-    lateinit var preferencesManager: PreferencesManager
+    lateinit var preferencesManager: IdPreferencesManager
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager

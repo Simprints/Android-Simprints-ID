@@ -2,10 +2,11 @@ package com.simprints.id.sampledata
 
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 object FingerprintCaptureEventSample : SampleEvent() {
 
@@ -13,8 +14,8 @@ object FingerprintCaptureEventSample : SampleEvent() {
         labels: EventLabels,
         isClosed: Boolean
     ): FingerprintCaptureEvent {
-        val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-            FingerIdentifier.LEFT_THUMB,
+        val fingerprint = Fingerprint(
+            IFingerIdentifier.LEFT_THUMB,
             8,
             "template",
             FingerprintTemplateFormat.ISO_19794_2
@@ -23,7 +24,7 @@ object FingerprintCaptureEventSample : SampleEvent() {
         return FingerprintCaptureEvent(
             CREATED_AT,
             ENDED_AT,
-            FingerIdentifier.LEFT_THUMB,
+            IFingerIdentifier.LEFT_THUMB,
             10,
             FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
             fingerprint,

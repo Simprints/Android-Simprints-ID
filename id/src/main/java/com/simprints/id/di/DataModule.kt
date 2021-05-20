@@ -1,12 +1,16 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.analytics.CrashReportManager
-import com.simprints.id.data.consent.longconsent.*
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.id.data.consent.longconsent.*
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -29,12 +33,8 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -150,7 +150,7 @@ open class DataModule {
         eventLocal: EventLocalDataSource,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager,
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         subjectLocal: SubjectLocalDataSource
     ): SubjectToEventMigrationManager =
         SubjectToEventDbMigrationManagerImpl(

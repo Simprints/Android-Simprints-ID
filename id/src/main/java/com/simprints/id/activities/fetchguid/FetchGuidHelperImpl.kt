@@ -1,11 +1,12 @@
 package com.simprints.id.activities.fetchguid
 
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.toMode
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -14,7 +15,7 @@ import timber.log.Timber
 
 class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
                           val subjectRepository: SubjectRepository,
-                          val preferencesManager: PreferencesManager,
+                          val preferencesManager: IdPreferencesManager,
                           val crashReportManager: CrashReportManager
 ) : FetchGuidHelper {
 

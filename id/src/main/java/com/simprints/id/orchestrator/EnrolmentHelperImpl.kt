@@ -1,15 +1,16 @@
 package com.simprints.id.orchestrator
 
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
+import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.core.tools.time.TimeHelper
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
@@ -37,7 +38,8 @@ class EnrolmentHelperImpl(
         Timber.tag(TAG).d("Register events for enrolments")
 
         val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
-        val personCreationEvent = eventRepository.getEventsFromSession(currentSession).filterIsInstance<PersonCreationEvent>().first()
+        val personCreationEvent = eventRepository.getEventsFromSession(currentSession)
+            .filterIsInstance<PersonCreationEvent>().first()
 
         eventRepository.addOrUpdateEvent(
             EnrolmentEventV2(
@@ -72,7 +74,13 @@ class EnrolmentHelperImpl(
             }
 
             fingerprintResponse != null -> {
-                buildSubjectFromFingerprint(projectId, userId, moduleId, fingerprintResponse, timeHelper)
+                buildSubjectFromFingerprint(
+                    projectId,
+                    userId,
+                    moduleId,
+                    fingerprintResponse,
+                    timeHelper
+                )
             }
 
             faceResponse != null -> {
@@ -145,7 +153,12 @@ class EnrolmentHelperImpl(
         return fingerprintResponse.captureResult.mapNotNull { captureResult ->
             val fingerId = captureResult.identifier
             captureResult.sample?.let { sample ->
-                FingerprintSample(fingerId, sample.template, sample.templateQualityScore, sample.format)
+                FingerprintSample(
+                    fingerId.fromDomainToModuleApi(),
+                    sample.template,
+                    sample.templateQualityScore,
+                    sample.format.fromDomainToModuleApi()
+                )
             }
         }
     }
@@ -153,7 +166,7 @@ class EnrolmentHelperImpl(
     private fun extractFaceSamples(faceResponse: FaceCaptureResponse) =
         faceResponse.capturingResult.mapNotNull { captureResult ->
             captureResult.result?.let { sample ->
-                FaceSample(sample.template, sample.format)
+                FaceSample(sample.template, sample.format.fromDomainToModuleApi())
             }
         }
 }

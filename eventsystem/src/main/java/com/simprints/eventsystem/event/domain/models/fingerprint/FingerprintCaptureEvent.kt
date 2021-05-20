@@ -6,7 +6,7 @@ import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import java.util.*
 
 @Keep
@@ -20,7 +20,7 @@ data class FingerprintCaptureEvent(
     constructor(
         createdAt: Long,
         endTime: Long,
-        finger: FingerIdentifier,
+        finger: IFingerIdentifier,
         qualityThreshold: Int,
         result: FingerprintCapturePayload.Result,
         fingerprint: FingerprintCapturePayload.Fingerprint?,
@@ -38,7 +38,7 @@ data class FingerprintCaptureEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,
-        val finger: FingerIdentifier,
+        val finger: IFingerIdentifier,
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
@@ -48,7 +48,7 @@ data class FingerprintCaptureEvent(
 
         @Keep
         data class Fingerprint(
-            val finger: FingerIdentifier,
+            val finger: IFingerIdentifier,
             val quality: Int,
             val template: String,
             val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2

@@ -5,6 +5,7 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemp
 import com.simprints.eventsystem.event.domain.models.fingerprint.fromModuleApiToDomain
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
+import com.simprints.id.data.db.subject.domain.fromModuleApiToDomain
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.domain.moduleapi.images.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.images.fromModuleApiToDomain
@@ -43,7 +44,7 @@ fun FingerprintCaptureSample.fromDomainToModuleApi(): IFingerprintSample {
 
 fun IFingerprintSample.fromModuleApiToDomain(): FingerprintCaptureSample {
     return FingerprintCaptureSample(
-        com.simprints.id.data.db.subject.domain.fromModuleApiToDomain(),
+        fingerIdentifier.fromModuleApiToDomain(),
         template,
         templateQualityScore,
         format.fromModuleApiToDomain(),

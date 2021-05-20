@@ -5,6 +5,7 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -42,6 +43,7 @@ import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.license.repository.LicenseRepository
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.securitystate.SecurityStateWorker
@@ -134,8 +136,9 @@ interface AppComponent {
     fun inject(setupActivity: SetupActivity)
     fun inject(securityStateWorker: SecurityStateWorker)
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
+    fun inject(preferencesManager: IdPreferencesManager)
 
-    fun getSessionEventsManager(): com.simprints.eventsystem.event.EventRepository
+    fun getSessionEventsManager(): EventRepository
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): SubjectRepository

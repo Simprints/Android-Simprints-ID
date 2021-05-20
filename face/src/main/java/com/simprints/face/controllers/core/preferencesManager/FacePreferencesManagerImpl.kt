@@ -1,8 +1,8 @@
 package com.simprints.face.controllers.core.preferencesManager
 
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 
-class FacePreferencesManagerImpl(private val prefs: PreferencesManager) : FacePreferencesManager {
+class FacePreferencesManagerImpl(private val prefs: IdPreferencesManager) : FacePreferencesManager {
     override var maxRetries: Int = prefs.faceMaxRetries
         set(value) {
             field = value

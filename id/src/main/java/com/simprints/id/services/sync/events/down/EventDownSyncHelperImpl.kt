@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync.events.down
 
 import androidx.annotation.VisibleForTesting
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType.*
@@ -15,9 +16,8 @@ import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactory
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.core.tools.time.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,7 +30,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                               val eventRepository: com.simprints.eventsystem.event.EventRepository,
                               private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
                               private val subjectFactory: SubjectFactory,
-                              private val preferencesManager: PreferencesManager,
+                              private val preferencesManager: IdPreferencesManager,
                               val timeHelper: TimeHelper
 ) : EventDownSyncHelper {
 

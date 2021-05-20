@@ -4,35 +4,44 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.lyft.kronos.AndroidClockFactory
+import com.simprints.core.analytics.CoreCrashReportManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.toMode
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.eventsystem.EventSystemApplication
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.event.EventRepositoryImpl
+import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
+import com.simprints.eventsystem.event.local.*
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.core.analytics.CoreCrashReportManager
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
-import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
-import com.simprints.eventsystem.event.local.*
-import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
-import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.*
-import com.simprints.core.security.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -41,8 +50,6 @@ import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.BaseUrlProviderImpl
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
@@ -70,11 +77,9 @@ import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
-import com.simprints.libsimprints.BuildConfig.*
+import com.simprints.libsimprints.BuildConfig.VERSION_NAME
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -113,7 +118,10 @@ open class AppModule {
         RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
-    open fun provideSessionDataCache(app: Application): SessionDataCache = SessionDataCacheImpl(app)
+    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache = SessionDataCacheImpl(app)
+
+    @Provides
+    open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
 
     @Provides
     @Singleton
@@ -234,30 +242,31 @@ open class AppModule {
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        preferencesManager: PreferencesManager,
+        idPreferencesManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): com.simprints.eventsystem.event.EventRepository =
-        com.simprints.eventsystem.event.EventRepositoryImpl(
+    ): EventRepository =
+        EventRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
             loginInfoManager,
             eventLocalDataSource,
             eventRemoteDataSource,
-            preferencesManager,
             crashReportManager,
             timeHelper,
             validatorFactory,
             VERSION_NAME,
-            sessionDataCache
+            sessionDataCache,
+            idPreferencesManager.language,
+            idPreferencesManager.modalities.map { it.toMode() }
         )
 
     @Provides
     fun provideModuleRepository(
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         crashReportManager: CrashReportManager,
         subjectRepository: SubjectRepository
     ): ModuleRepository = ModuleRepositoryImpl(
@@ -273,7 +282,7 @@ open class AppModule {
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
-        eventRepository: com.simprints.eventsystem.event.EventRepository
+        eventRepository: EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
@@ -297,7 +306,7 @@ open class AppModule {
     open fun provideGuidFetchGuidHelper(
         downSyncHelper: EventDownSyncHelper,
         subjectRepository: SubjectRepository,
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         crashReportManager: CrashReportManager
     ): FetchGuidHelper =
         FetchGuidHelperImpl(
@@ -364,13 +373,13 @@ open class AppModule {
     @Provides
     fun provideEnrolmentHelper(
         subjectRepository: SubjectRepository,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventRepository: EventRepository,
         timeHelper: TimeHelper
     ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, timeHelper)
 
     @Provides
     fun providePersonCreationEventHelper(
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventRepository: EventRepository,
         timeHelper: TimeHelper,
         encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =
@@ -378,5 +387,6 @@ open class AppModule {
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
+
 }
 

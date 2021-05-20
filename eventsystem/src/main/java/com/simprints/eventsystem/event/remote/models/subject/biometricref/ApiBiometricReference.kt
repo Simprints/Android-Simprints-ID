@@ -5,15 +5,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.eventsystem.event.domain.models.subject.BiometricReference
 import com.simprints.eventsystem.event.domain.models.subject.FaceTemplate
-import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier
 import com.simprints.eventsystem.event.domain.models.subject.FingerprintTemplate
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.face.ApiFaceReference
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.face.ApiFaceTemplate
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat.RANK_ONE_1_23
-import com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint.ApiFingerIdentifier.*
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat.ISO_19794_2
 import com.simprints.eventsystem.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.eventsystem.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
 
@@ -55,20 +51,9 @@ fun BiometricReference.fromDomainToApi() = when (this) {
 fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 
 fun FingerprintTemplate.fromDomainToApi() =
-    ApiFingerprintTemplate(quality, template, finger.fromDomainToApi())
+    ApiFingerprintTemplate(quality, template, finger)
 
-fun FingerIdentifier.fromDomainToApi() = when (this) {
-    FingerIdentifier.RIGHT_5TH_FINGER -> RIGHT_5TH_FINGER
-    FingerIdentifier.RIGHT_4TH_FINGER -> RIGHT_4TH_FINGER
-    FingerIdentifier.RIGHT_3RD_FINGER -> RIGHT_3RD_FINGER
-    FingerIdentifier.RIGHT_INDEX_FINGER -> RIGHT_INDEX_FINGER
-    FingerIdentifier.RIGHT_THUMB -> RIGHT_THUMB
-    FingerIdentifier.LEFT_THUMB -> LEFT_THUMB
-    FingerIdentifier.LEFT_INDEX_FINGER -> LEFT_INDEX_FINGER
-    FingerIdentifier.LEFT_3RD_FINGER -> LEFT_3RD_FINGER
-    FingerIdentifier.LEFT_4TH_FINGER -> LEFT_4TH_FINGER
-    FingerIdentifier.LEFT_5TH_FINGER -> LEFT_5TH_FINGER
-}
+
 
 
 

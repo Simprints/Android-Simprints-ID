@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.toList
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(
-    private val coreEventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ClientApiSessionEventsManager {
