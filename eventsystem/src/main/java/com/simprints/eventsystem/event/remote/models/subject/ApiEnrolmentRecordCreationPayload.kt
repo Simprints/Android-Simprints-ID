@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.domain.models.subject.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
@@ -22,8 +23,13 @@ data class ApiEnrolmentRecordCreationPayload(
 ) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordCreation, version, startTime) {
 
     constructor(payload: EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload) :
-        this(payload.createdAt, payload.eventVersion, payload.subjectId, payload.projectId, payload.moduleId,
-            payload.attendantId, payload.biometricReferences.map { it.fromDomainToApi() })
+        this(payload.createdAt,
+            payload.eventVersion,
+            payload.subjectId,
+            payload.projectId,
+            payload.moduleId,
+            payload.attendantId,
+            payload.biometricReferences.map { it.fromDomainToApi() })
 }
 
 
@@ -35,5 +41,5 @@ fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
         projectId,
         moduleId,
         attendantId,
-        biometricReferences?.map { it it.fromApiToDomain() } ?: emptyList()
+        biometricReferences?.map { it.fromApiToDomain() } ?: emptyList()
     )
