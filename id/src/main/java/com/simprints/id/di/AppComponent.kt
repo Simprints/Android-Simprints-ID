@@ -145,6 +145,7 @@ interface AppComponent {
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
+    fun getIdPreferencesManager(): IdPreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper

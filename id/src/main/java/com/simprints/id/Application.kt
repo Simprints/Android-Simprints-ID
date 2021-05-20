@@ -122,6 +122,7 @@ open class Application : CoreApplication() {
         factory { component.getImageRepository() }
         factory { component.getSimClientFactory() }
         factory { component.getLicenseRepository() }
+        factory { component.getIdPreferencesManager() }
     }
 
     override fun onTerminate() {
