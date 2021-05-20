@@ -1,10 +1,10 @@
 package com.simprints.eventsystem.event.remote.models
 
+import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.*
 import com.simprints.eventsystem.event.remote.models.ApiIntentParsingPayload.ApiIntegrationInfo
-import io.realm.internal.Keep
 
 @Keep
 data class ApiIntentParsingPayload(override val startTime: Long,

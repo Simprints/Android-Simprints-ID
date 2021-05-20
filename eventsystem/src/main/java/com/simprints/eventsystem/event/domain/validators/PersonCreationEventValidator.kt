@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.domain.validators
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.id.exceptions.safe.session.validator.SessionEventCaptureAlreadyExists
+import com.simprints.eventsystem.exceptions.validator.SessionEventCaptureAlreadyExists
 
 class PersonCreationEventValidator : EventValidator {
 

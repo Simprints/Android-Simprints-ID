@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
-import com.simprints.eventsystem.event.remote.models.ApiEventPayload
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
-import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.*
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.eventsystem.event.domain.models.subject.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
@@ -57,7 +55,7 @@ fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
         startTime,
         version,
         enrolmentRecordCreation?.let {
-            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+            EnrolmentRecordCreationInMove(
                 it.subjectId,
                 it.projectId,
                 it.moduleId,
@@ -65,7 +63,7 @@ fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
                 it.biometricReferences?.map { it.fromApiToDomain() })
         },
         enrolmentRecordDeletion.let {
-            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+            EnrolmentRecordDeletionInMove(
                 it.subjectId,
                 it.projectId,
                 it.moduleId,

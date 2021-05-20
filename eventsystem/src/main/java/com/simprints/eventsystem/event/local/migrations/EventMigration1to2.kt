@@ -4,9 +4,9 @@ import android.database.Cursor
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
-import com.simprints.id.tools.extensions.getStringWithColumnName
 import org.json.JSONObject
 import timber.log.Timber
 

@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.local.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.analytics.CrashReportManager
-import com.simprints.id.tools.extensions.getStringWithColumnName
+import com.simprints.core.tools.extentions.getStringWithColumnName
 
 /**
  * Migration from 2021.1.0 to 2021.1.1. This migration adds a new column that can mark an event as

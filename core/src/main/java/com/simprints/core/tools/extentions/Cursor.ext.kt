@@ -1,4 +1,4 @@
-package com.simprints.id.tools.extensions
+package com.simprints.core.tools.extentions
 
 import android.database.Cursor
 
