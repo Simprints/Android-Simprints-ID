@@ -17,7 +17,7 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.secure.AttestationManager

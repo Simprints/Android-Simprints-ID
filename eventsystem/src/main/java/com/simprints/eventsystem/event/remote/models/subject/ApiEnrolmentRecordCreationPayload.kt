@@ -35,5 +35,5 @@ fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
         projectId,
         moduleId,
         attendantId,
-        biometricReferences?.map { it.fromApiToDomain() } ?: emptyList()
+        biometricReferences?.map { it it.fromApiToDomain() } ?: emptyList()
     )

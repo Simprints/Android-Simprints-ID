@@ -23,7 +23,7 @@ import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider

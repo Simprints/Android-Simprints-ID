@@ -1,4 +1,4 @@
-package com.simprints.id.data.secure
+package com.simprints.core.security
 
 interface SecureLocalDbKeyProvider: LocalDbKeyProvider {
 

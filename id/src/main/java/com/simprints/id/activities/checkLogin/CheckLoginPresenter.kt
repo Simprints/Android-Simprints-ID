@@ -7,7 +7,7 @@ import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException

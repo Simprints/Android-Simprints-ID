@@ -13,7 +13,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.core.network.SimApiClientFactory
