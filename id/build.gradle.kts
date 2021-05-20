@@ -29,13 +29,6 @@ android {
         testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
 
         ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                //Required by Room to be able to export the db schemas
-                arguments["room.schemaLocation"] = "$projectDir/schemas"
-            }
-        }
     }
 
     lintOptions.warning("InvalidPackage")
