@@ -9,9 +9,9 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl.Companion.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER
 
 
-class PreferencesManagerImpl(settings: SettingsPreferencesManager,
-                             lastEvents: RecentEventsPreferencesManager,
-                             context: Context)
+class IdPreferencesManagerImpl(settings: SettingsPreferencesManager,
+                               lastEvents: RecentEventsPreferencesManager,
+                               context: Context)
     : IdPreferencesManager,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents {

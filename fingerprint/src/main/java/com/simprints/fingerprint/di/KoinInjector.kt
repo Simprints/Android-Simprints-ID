@@ -1,7 +1,14 @@
 package com.simprints.fingerprint.di
 
 import android.bluetooth.BluetoothAdapter
+import android.content.SharedPreferences
 import android.nfc.NfcAdapter
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.simprints.core.tools.constants.SharedPrefsConstants
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -60,11 +67,30 @@ import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManagerImpl
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
+import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
+import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
+import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
+import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
+import com.simprints.id.tools.serializers.*
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -115,6 +141,7 @@ object KoinInjector {
             defineBuildersForFingerprintManagers()
             defineBuildersForDomainClasses()
             defineBuildersForPresentersAndViewModels()
+            definePreferencesManager()
         }
 
 
@@ -122,7 +149,6 @@ object KoinInjector {
      * These are classes that are wrappers of ones that appear in the main app module
      */
     private fun Module.defineBuildersForFingerprintManagers() {
-        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
@@ -193,11 +219,102 @@ object KoinInjector {
 
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { CollectFingerprintsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+        viewModel {
+            CollectFingerprintsViewModel(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
         viewModel { OtaViewModel(get(), get(), get(), get(), get()) }
         viewModel { OtaRecoveryViewModel(get()) }
     }
+
+    private fun Module.definePreferencesManager() {
+        single<IdPreferencesManager> { IdPreferencesManagerImpl(get(), get(), get()) }
+        single<SettingsPreferencesManager> {
+            SettingsPreferencesManagerImpl(
+                get(),
+                get(),
+                get(named("GroupSerializer")),
+                get(named("ModalitiesSerializer")),
+                get(named("LanguagesStringArraySerializer")),
+                get(named("ModuleIdOptionsStringSetSerializer")),
+                get(named("PeopleDownSyncSettingSerializer")),
+                get(named("CaptureFingerprintStrategySerializer")),
+                get(named("SaveFingerprintImagesStrategySerializer")),
+                get(named("ScannerGenerationsSerializer")),
+                get(named("FingerprintsToCollectSerializer")),
+                get(named("FingerprintConfidenceThresholdsSerializer")),
+                get(named("FaceConfidenceThresholdsSerializer")),
+                get(named("SyncDestinationSerializer"))
+            )
+        }
+        factory<Serializer<GROUP>>(named("GroupSerializer")) { EnumSerializer(GROUP::class.java) }
+        factory<Serializer<Array<String>>>(named("LanguagesStringArraySerializer")) { LanguagesStringArraySerializer() }
+        factory<Serializer<Set<String>>>(named("ModuleIdOptionsStringSetSerializer")) { ModuleIdOptionsStringSetSerializer() }
+        factory<Serializer<EventDownSyncSetting>>(named("PeopleDownSyncSettingSerializer")) {
+            EnumSerializer(
+                EventDownSyncSetting::class.java
+            )
+        }
+        factory<Serializer<List<SyncDestinationSetting>>>(named("SyncDestinationSerializer")) { SyncDestinationListSerializer() }
+        factory<Serializer<List<Modality>>>(named("ModalitiesSerializer")) { ModalitiesListSerializer() }
+        factory<Serializer<CaptureFingerprintStrategy>>(named("CaptureFingerprintStrategySerializer")) {
+            EnumSerializer(
+                CaptureFingerprintStrategy::class.java
+            )
+        }
+        factory<Serializer<SaveFingerprintImagesStrategy>>(named("SaveFingerprintImagesStrategySerializer")) {
+            EnumSerializer(
+                SaveFingerprintImagesStrategy::class.java
+            )
+        }
+        factory<Serializer<List<ScannerGeneration>>>(named("ScannerGenerationsSerializer")) { ScannerGenerationsSerializer() }
+        factory<Serializer<List<FingerIdentifier>>>(named("FingerprintsToCollectSerializer")) { FingerprintsToCollectSerializer() }
+        factory<Serializer<Map<FingerprintConfidenceThresholds, Int>>>(named("FingerprintConfidenceThresholdsSerializer")) {
+            MapSerializer(
+                get(named("FingerprintConfidenceSerializer")),
+                get(named("IntSerializer")),
+                get()
+            )
+        }
+        factory<Serializer<Map<FaceConfidenceThresholds, Int>>>(named("FaceConfidenceThresholdsSerializer")) {
+            MapSerializer(
+                get(named("FaceConfidenceSerializer")),
+                get(named("IntSerializer")),
+                get()
+            )
+        }
+        factory<Serializer<FingerprintConfidenceThresholds>>(named("FingerprintConfidenceSerializer")) {
+            EnumSerializer(
+                FingerprintConfidenceThresholds::class.java
+            )
+        }
+        factory<Serializer<FaceConfidenceThresholds>>(named("FaceConfidenceSerializer")) {
+            EnumSerializer(
+                FaceConfidenceThresholds::class.java
+            )
+        }
+        factory<Serializer<Int>>(named("IntSerializer")) { IntegerSerializer() }
+        factory { JsonHelper }
+        single<RecentEventsPreferencesManager> { RecentEventsPreferencesManagerImpl(get()) }
+        single<ImprovedSharedPreferences> { ImprovedSharedPreferencesImpl(get()) }
+        factory<SharedPreferences> {
+            androidApplication().getSharedPreferences(
+                SharedPrefsConstants.PREF_FILE_NAME,
+                SharedPrefsConstants.PREF_MODE
+            )
+        }
+        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
+    }
+
 }

@@ -12,7 +12,7 @@ import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import com.simprints.id.Application
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.IdPreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
@@ -112,7 +112,7 @@ open class PreferencesModule {
         lastEventsPreferencesManager: RecentEventsPreferencesManager,
         app: Application
     ): PreferencesManager =
-        PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+        IdPreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
 
     @Provides
     @Singleton
@@ -121,6 +121,6 @@ open class PreferencesModule {
         lastEventsPreferencesManager: RecentEventsPreferencesManager,
         app: Application
     ): IdPreferencesManager =
-        PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+        IdPreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
 
 }
