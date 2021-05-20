@@ -1,13 +1,15 @@
 package com.simprints.id.sampledata
 
-import com.simprints.id.commontesttools.models.TestCalloutCredentials
+import com.simprints.eventsystem.sampledata.SampleDefaults
+import com.simprints.id.data.db.subject.domain.Subject
 
-//object DEFAULTS {
-//
-//    val DEFAULT_TEST_CALLOUT_CREDENTIALS = TestCalloutCredentials(
-//        projectId = DEFAULT_PROJECT_ID,
-//        moduleId = DEFAULT_MODULE_ID,
-//        userId = DEFAULT_USER_ID
-//    )
-//
-//}
+object DEFAULTS {
+
+    val defaultSubject = Subject(
+        SampleDefaults.GUID1,
+        SampleDefaults.DEFAULT_PROJECT_ID,
+        SampleDefaults.GUID2,
+        SampleDefaults.DEFAULT_MODULE_ID
+    )
+
+}

@@ -1,6 +1,5 @@
 package com.simprints.eventsystem.sampledata
 
-import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.core.domain.modality.Modes
 import java.util.*
 
@@ -51,5 +50,4 @@ object SampleDefaults {
         DEFAULT_MODES
     )
 
-    val defaultSubject = Subject(GUID1, DEFAULT_PROJECT_ID, GUID2, DEFAULT_MODULE_ID)
 }
