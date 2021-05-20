@@ -4,9 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.id.data.db.subject.SubjectRepository

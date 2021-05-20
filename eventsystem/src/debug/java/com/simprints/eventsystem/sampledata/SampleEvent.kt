@@ -1,4 +1,4 @@
-package com.simprints.id.sampledata
+package com.simprints.eventsystem.sampledata
 
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels

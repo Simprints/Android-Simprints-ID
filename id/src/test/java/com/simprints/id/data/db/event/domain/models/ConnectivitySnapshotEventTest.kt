@@ -4,10 +4,10 @@ import android.net.NetworkInfo.DetailedState
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
-import com.simprints.id.sampledata.ConnectivitySnapshotEventSample
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.ConnectivitySnapshotEventSample
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import org.junit.Test
 

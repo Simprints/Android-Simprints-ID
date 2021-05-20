@@ -1,8 +1,8 @@
-package com.simprints.id.sampledata
+package com.simprints.eventsystem.sampledata
 
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 
 object ScannerConnectionEventSample : SampleEvent() {
     override fun getEvent(

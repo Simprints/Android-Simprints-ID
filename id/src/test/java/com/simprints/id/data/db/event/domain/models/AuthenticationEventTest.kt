@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo

@@ -7,8 +7,8 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.defaultSubject
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
 import com.simprints.core.tools.time.TimeHelper

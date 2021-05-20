@@ -2,12 +2,12 @@ package com.simprints.eventsystem.events_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODES
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULES
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULES
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.remote.fromDomainToApi
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*

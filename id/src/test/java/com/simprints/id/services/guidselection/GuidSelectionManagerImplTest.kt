@@ -1,10 +1,10 @@
 package com.simprints.id.services.guidselection
 
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent

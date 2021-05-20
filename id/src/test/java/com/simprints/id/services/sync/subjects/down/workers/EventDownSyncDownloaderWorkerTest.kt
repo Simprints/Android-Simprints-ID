@@ -11,7 +11,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS

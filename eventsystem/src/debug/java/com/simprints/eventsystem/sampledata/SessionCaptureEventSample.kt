@@ -1,4 +1,4 @@
-package com.simprints.id.sampledata
+package com.simprints.eventsystem.sampledata
 
 import android.os.Build
 import com.simprints.eventsystem.event.domain.models.EventLabels
@@ -7,9 +7,9 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.core.domain.modality.Modes
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 
 object SessionCaptureEventSample : SampleEvent() {
 

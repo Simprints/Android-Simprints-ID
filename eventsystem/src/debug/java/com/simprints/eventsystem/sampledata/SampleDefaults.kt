@@ -1,4 +1,4 @@
-package com.simprints.id.sampledata
+package com.simprints.eventsystem.sampledata
 
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.core.domain.modality.Modes

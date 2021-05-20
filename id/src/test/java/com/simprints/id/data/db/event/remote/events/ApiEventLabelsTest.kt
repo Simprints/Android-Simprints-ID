@@ -1,11 +1,11 @@
 package com.simprints.eventsystem.event.remote.events
 
 import com.google.common.truth.Truth
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.event.remote.models.ApiEventLabels
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi

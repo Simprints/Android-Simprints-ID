@@ -5,10 +5,10 @@ import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
-import com.simprints.id.sampledata.IntentParsingEventSample
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.IntentParsingEventSample
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class IntentParsingEventTest {

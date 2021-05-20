@@ -2,8 +2,8 @@ package com.simprints.eventsystem.events_sync.up.domain
 
 import com.google.common.truth.Truth
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.projectUpSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectUpSyncScope
 import org.junit.Test
 import java.util.*
 

@@ -1,11 +1,11 @@
-package com.simprints.id.sampledata
+package com.simprints.eventsystem.sampledata
 
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 object FingerprintCaptureEventSample : SampleEvent() {

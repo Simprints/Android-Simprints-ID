@@ -7,10 +7,10 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCapt
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.id.sampledata.FingerprintCaptureEventSample
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.FingerprintCaptureEventSample
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class FingerprintCaptureEventTest {

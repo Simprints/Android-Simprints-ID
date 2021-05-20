@@ -7,9 +7,9 @@ import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 @Keep

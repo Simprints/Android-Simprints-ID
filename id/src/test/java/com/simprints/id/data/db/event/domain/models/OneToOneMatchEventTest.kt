@@ -1,9 +1,9 @@
 package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_ONE_MATCH
 import com.simprints.eventsystem.event.domain.models.Matcher.RANK_ONE
 import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent.Companion.EVENT_VERSION
