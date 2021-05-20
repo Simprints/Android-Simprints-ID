@@ -45,6 +45,9 @@ dependencies {
 
     api(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.Lifecycle.java8)
+    api(Dependencies.AndroidX.multidex)
+    implementation(Dependencies.AndroidX.CameraX.core)
+    api(Dependencies.AndroidX.CameraX.camera2)
 
     implementation(Dependencies.Kotlin.coroutines_android)
     api(Dependencies.Testing.Espresso.idling)

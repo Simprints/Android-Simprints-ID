@@ -5,6 +5,7 @@ import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.multidex.MultiDexApplication
 import com.google.android.play.core.splitcompat.SplitCompat
+import com.simprints.core.CoreApplication
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.eventsystem.event.domain.models.Event
@@ -22,12 +23,10 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import timber.log.Timber
 
-open class Application : MultiDexApplication(), CameraXConfig.Provider {
+open class Application : CoreApplication() {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
-
-    val eventCache: MutableMap<String, Event> = mutableMapOf()
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -82,8 +81,6 @@ open class Application : MultiDexApplication(), CameraXConfig.Provider {
         if (loggingConfigHelper.loggingNeedsSetUp())
             loggingConfigHelper.setUpLogging()
     }
-
-    override fun getCameraXConfig(): CameraXConfig = Camera2Config.defaultConfig()
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
     // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#reason-handling
