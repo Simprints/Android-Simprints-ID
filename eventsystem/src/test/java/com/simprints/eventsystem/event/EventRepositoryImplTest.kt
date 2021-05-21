@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.event
+package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
@@ -43,7 +43,7 @@ import retrofit2.Response
 @ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
 
-    private lateinit var eventRepo: com.simprints.eventsystem.event.EventRepository
+    private lateinit var eventRepo: EventRepository
 
     @MockK
     lateinit var loginInfoManager: LoginInfoManager
@@ -82,7 +82,7 @@ class EventRepositoryImplTest {
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
-        eventRepo = com.simprints.eventsystem.event.EventRepositoryImpl(
+        eventRepo = EventRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
             loginInfoManager,
