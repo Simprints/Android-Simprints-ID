@@ -211,7 +211,7 @@ open class EventRepositoryImpl(
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
         sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
             .firstOrNull()
-            ?: loadSessions(false).first()?.also { session ->
+            ?: loadSessions(false).firstOrNull()?.also { session ->
                 loadEventsIntoCache(session.id)
             }
             ?: createSession()

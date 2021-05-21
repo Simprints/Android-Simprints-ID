@@ -41,5 +41,7 @@ dependencies {
     implementation(Dependencies.SqlCipher.core)
 
     testImplementation(Dependencies.Testing.junit)
+    testImplementation(Dependencies.Testing.truth)
+    testImplementation(Dependencies.Testing.Mockk.android)
     androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
 }
