@@ -1,6 +1,6 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package com.simprints.eventsystem.event
+package com.simprints.id.data.db.event
 
 import android.os.Build
 import android.os.Build.VERSION
@@ -24,8 +24,10 @@ import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.eventsystem.event.EventRepositoryImplTest
 import io.mockk.coEvery
 import io.mockk.coVerify
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 
 fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): SessionCaptureEvent {

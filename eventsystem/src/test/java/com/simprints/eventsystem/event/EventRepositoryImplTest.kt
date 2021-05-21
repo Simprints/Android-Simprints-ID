@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.event
+package com.simprints.id.data.db.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
@@ -25,6 +25,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.id.data.db.event.*
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
