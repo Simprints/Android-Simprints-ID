@@ -1,15 +1,11 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package com.simprints.id.data.db.event
+package com.simprints.eventsystem.event
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.id.commontesttools.events.createAlertScreenEvent
-import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
@@ -22,9 +18,12 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.core.domain.modality.Modes
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.eventsystem.event.EventRepositoryImplTest
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.id.commontesttools.events.createAlertScreenEvent
+import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
+import com.simprints.id.commontesttools.events.createSessionCaptureEvent
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.asFlow
