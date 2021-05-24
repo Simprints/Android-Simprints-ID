@@ -1,4 +1,4 @@
-package com.simprints.uicomponents.widgets
+package com.simprints.face.widgets
 
 import android.content.Context
 import android.content.res.TypedArray

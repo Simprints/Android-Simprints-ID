@@ -19,8 +19,8 @@ import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import com.simprints.uicomponents.models.PreviewFrame
-import com.simprints.uicomponents.models.Size
+import com.simprints.face.models.PreviewFrame
+import com.simprints.face.models.Size
 import io.mockk.*
 import org.junit.Rule
 import org.junit.Test

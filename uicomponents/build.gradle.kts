@@ -13,9 +13,6 @@ android {
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    externalNativeBuild {
-        ndkBuild.path("jni/Application.mk")
-    }
 }
 
 dependencies {

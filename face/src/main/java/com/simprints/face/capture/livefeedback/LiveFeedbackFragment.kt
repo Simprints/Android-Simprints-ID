@@ -16,7 +16,7 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
-import com.simprints.uicomponents.models.Size
+import com.simprints.face.models.Size
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf

@@ -1,4 +1,4 @@
-package com.simprints.uicomponents.widgets
+package com.simprints.face.widgets
 
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
