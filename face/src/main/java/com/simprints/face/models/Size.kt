@@ -1,4 +1,4 @@
-package com.simprints.uicomponents.models
+package com.simprints.face.models
 
 import android.graphics.Point
 

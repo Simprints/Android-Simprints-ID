@@ -5,7 +5,7 @@ import android.graphics.Rect
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
-import com.simprints.uicomponents.models.PreviewFrame
+import com.simprints.face.models.PreviewFrame
 import io.rankone.rocsdk.embedded.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

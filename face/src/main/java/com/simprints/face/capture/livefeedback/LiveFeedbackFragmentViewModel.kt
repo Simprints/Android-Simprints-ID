@@ -15,9 +15,9 @@ import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.FaceTarget
 import com.simprints.face.models.SymmetricTarget
-import com.simprints.uicomponents.models.FloatRange
-import com.simprints.uicomponents.models.PreviewFrame
-import com.simprints.uicomponents.models.Size
+import com.simprints.face.models.FloatRange
+import com.simprints.face.models.PreviewFrame
+import com.simprints.face.models.Size
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

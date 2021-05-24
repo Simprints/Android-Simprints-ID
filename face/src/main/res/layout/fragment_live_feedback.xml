@@ -44,7 +44,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.simprints.uicomponents.widgets.DashedCircularProgress
+    <com.simprints.face.widgets.DashedCircularProgress
         android:id="@+id/capture_progress"
         android:layout_width="242dp"
         android:layout_height="242dp"

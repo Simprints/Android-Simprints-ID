@@ -28,6 +28,10 @@ android {
         animationsDisabled = true
     }
 
+    externalNativeBuild {
+        ndkBuild.path("jni/Application.mk")
+    }
+
     buildFeatures.viewBinding = true
 }
 
