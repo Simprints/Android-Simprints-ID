@@ -7,5 +7,4 @@ include ':id',
     ':face',
     ':core',
     ':clientapi',
-    ':moduleapi',
-    ':uicomponents'
+    ':moduleapi'
