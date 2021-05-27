@@ -51,7 +51,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         setContentView(R.layout.activity_collect_fingerprints)
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(CollectFingerprintsTaskRequest.BUNDLE_KEY)
+        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(
+            CollectFingerprintsTaskRequest.BUNDLE_KEY
+        )
             ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
         vm.start(fingerprintRequest.fingerprintsToCapture)
@@ -161,7 +163,12 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun CollectFingerprintsState.listenForSplashScreen() {
         if (isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
-                startActivity(Intent(this@CollectFingerprintsActivity, SplashScreenActivity::class.java))
+                startActivity(
+                    Intent(
+                        this@CollectFingerprintsActivity,
+                        SplashScreenActivity::class.java
+                    )
+                )
                 overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
                 hasSplashScreenBeenTriggered = true
             }
@@ -172,14 +179,20 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun launchConnectScannerActivityForReconnect() {
         val intent = Intent(this, ConnectScannerActivity::class.java).apply {
-            putExtra(ConnectScannerTaskRequest.BUNDLE_KEY, ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT))
+            putExtra(
+                ConnectScannerTaskRequest.BUNDLE_KEY,
+                ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT)
+            )
         }
         startActivityForResult(intent, RequestCode.CONNECT.value)
     }
 
     private fun setResultAndFinishSuccess(fingerprints: List<Fingerprint>) {
         setResultAndFinish(ResultCode.OK, Intent().apply {
-            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, CollectFingerprintsTaskResult(fingerprints))
+            putExtra(
+                CollectFingerprintsTaskResult.BUNDLE_KEY,
+                CollectFingerprintsTaskResult(fingerprints)
+            )
         })
     }
 
@@ -209,5 +222,10 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         if (!vm.state().currentCaptureState().isCommunicating()) {
             launchRefusalActivity()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        confirmDialog?.dismiss()
     }
 }
