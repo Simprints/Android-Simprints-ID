@@ -52,7 +52,10 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         val component = (requireActivity().application as Application).component
         component.inject(this)
 
-        settingsAboutViewModel = ViewModelProvider(this, settingsAboutViewModelFactory).get(SettingsAboutViewModel::class.java)
+        settingsAboutViewModel = ViewModelProvider(
+            this,
+            settingsAboutViewModelFactory
+        ).get(SettingsAboutViewModel::class.java)
         setTextInLayout()
         setPreferenceListeners()
 
@@ -90,7 +93,8 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         getAppVersionPreference()?.title = getString(R.string.preference_app_version_title)
         getDeviceIdPreference()?.title = getString(R.string.preference_device_id_title)
         getScannerVersionPreference()?.title = getString(R.string.preference_scanner_version_title)
-        getSyncAndSearchConfigurationPreference()?.title = getString(R.string.preference_sync_and_search_title)
+        getSyncAndSearchConfigurationPreference()?.title =
+            getString(R.string.preference_sync_and_search_title)
         getLogoutPreference()?.title = getString(R.string.preference_logout_title)
     }
 
@@ -215,6 +219,13 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private fun finishSettings() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsAboutActivity).finishActivityBecauseLogout()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (buildConfirmationDialogForLogout().isShowing) {
+            buildConfirmationDialogForLogout().dismiss()
         }
     }
 }
