@@ -37,7 +37,7 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_refusal)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         title = getString(R.string.refusal_label)
 
         setTextInLayout()
