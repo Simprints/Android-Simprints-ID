@@ -26,7 +26,7 @@ class ConnectScannerActivity : FingerprintActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect_scanner)
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val connectScannerRequest: ConnectScannerTaskRequest =
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
