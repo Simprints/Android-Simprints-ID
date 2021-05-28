@@ -68,6 +68,17 @@ class FingerSelectionActivity : BaseSplitActivity() {
         }
     )
 
+    private val settingsSaveConfirmationDialog =
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
+            .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
+                viewModel.savePreference()
+                super.onBackPressed()
+            }
+            .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
+            .setCancelable(false)
+            .create()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
@@ -148,7 +159,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
     override fun onBackPressed() {
         if (viewModel.haveSettingsChanged()) {
             if (viewModel.canSavePreference()) {
-                buildSettingsSaveConfirmationDialog().show()
+                settingsSaveConfirmationDialog.show()
             } else {
                 showToast(R.string.finger_selection_invalid)
             }
@@ -157,25 +168,14 @@ class FingerSelectionActivity : BaseSplitActivity() {
         }
     }
 
-    private fun buildSettingsSaveConfirmationDialog() =
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
-            .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
-                viewModel.savePreference()
-                super.onBackPressed()
-            }
-            .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
-            .setCancelable(false)
-            .create()
-
     companion object {
         private const val MAXIMUM_NUMBER_OF_ITEMS = 10
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (buildSettingsSaveConfirmationDialog().isShowing) {
-            buildSettingsSaveConfirmationDialog().dismiss()
+        if (settingsSaveConfirmationDialog.isShowing) {
+            settingsSaveConfirmationDialog.dismiss()
         }
     }
 }
