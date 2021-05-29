@@ -36,6 +36,17 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
+    private val confirmModuleSelectionDialog =
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.confirm_module_selection_title))
+            .setMessage(getModulesSelectedTextForDialog())
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.confirm_module_selection_yes))
+            { _, _ -> handleModulesConfirmClick() }
+            .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
+            { _, _ -> handleModuleSelectionCancelClick() }
+            .create()
+
     @Inject
     lateinit var preferencesManager: PreferencesManager
 
@@ -200,7 +211,7 @@ class ModuleSelectionFragment(
     fun showModuleSelectionDialogIfNecessary() {
         if (isModuleSelectionChanged()) {
             activity?.runOnUiThreadIfStillRunning {
-                buildConfirmModuleSelectionDialog().show()
+                confirmModuleSelectionDialog.show()
             }
         } else {
             activity?.finish()
@@ -213,17 +224,6 @@ class ModuleSelectionFragment(
             else -> map { it.name }.toSet() != preferencesManager.selectedModules
         }
     }
-
-    private fun buildConfirmModuleSelectionDialog() =
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.confirm_module_selection_title))
-            .setMessage(getModulesSelectedTextForDialog())
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.confirm_module_selection_yes))
-            { _, _ -> handleModulesConfirmClick() }
-            .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
-            { _, _ -> handleModuleSelectionCancelClick() }
-            .create()
 
     private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
         modules.filter { it.isSelected }.forEach { module ->
@@ -286,8 +286,8 @@ class ModuleSelectionFragment(
 
     override fun onDestroy() {
         super.onDestroy()
-        if (buildConfirmModuleSelectionDialog().isShowing) {
-            buildConfirmModuleSelectionDialog().dismiss()
+        if (confirmModuleSelectionDialog.isShowing) {
+            confirmModuleSelectionDialog.dismiss()
         }
     }
 }
