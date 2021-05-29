@@ -30,6 +30,19 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private lateinit var packageVersionName: String
     private lateinit var deviceId: String
+    private val confirmationDialogForLogout: AlertDialog =
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.confirmation_logout_title))
+            .setMessage(getString(R.string.confirmation_logout_message))
+            .setPositiveButton(
+                getString(R.string.logout)
+            ) { _, _ ->
+                settingsAboutViewModel.logout()
+                finishSettings()
+            }
+            .setNegativeButton(
+                getString(R.string.confirmation_logout_cancel), null
+            ).create()
 
     @Inject
     lateinit var recentEventsManager: RecentEventsPreferencesManager
@@ -139,7 +152,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private fun showConfirmationDialogForLogout() {
         activity?.runOnUiThreadIfStillRunning {
-            buildConfirmationDialogForLogout().show()
+            confirmationDialogForLogout.show()
         }
     }
 
@@ -202,20 +215,6 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         preference.summary = deviceId
     }
 
-    internal fun buildConfirmationDialogForLogout(): AlertDialog =
-        AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.confirmation_logout_title))
-            .setMessage(getString(R.string.confirmation_logout_message))
-            .setPositiveButton(
-                getString(R.string.logout)
-            ) { _, _ ->
-                settingsAboutViewModel.logout()
-                finishSettings()
-            }
-            .setNegativeButton(
-                getString(R.string.confirmation_logout_cancel), null
-            ).create()
-
     private fun finishSettings() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsAboutActivity).finishActivityBecauseLogout()
@@ -224,8 +223,8 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (buildConfirmationDialogForLogout().isShowing) {
-            buildConfirmationDialogForLogout().dismiss()
+        if (confirmationDialogForLogout.isShowing) {
+            confirmationDialogForLogout.dismiss()
         }
     }
 }
