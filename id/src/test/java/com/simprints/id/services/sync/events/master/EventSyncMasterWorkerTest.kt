@@ -8,7 +8,7 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
 import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS
@@ -29,9 +29,9 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -53,7 +53,7 @@ class EventSyncMasterWorkerTest {
         get() = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
 
     private lateinit var masterWorker: EventSyncMasterWorker
-    private val preferencesManager = mockk<PreferencesManager>(relaxed = true) {
+    private val preferencesManager = mockk<IdPreferencesManager>(relaxed = true) {
         every { eventDownSyncSetting } returns ON
         every { syncDestinationSettings } returns listOf(SIMPRINTS)
     }

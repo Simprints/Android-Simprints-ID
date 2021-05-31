@@ -4,22 +4,22 @@ import android.content.Intent
 import android.widget.Button
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.domain.modality.Modality
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
-import com.simprints.testtools.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
@@ -36,7 +36,7 @@ class ConsentActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject lateinit var preferencesManagerSpy: PreferencesManager
+    @Inject lateinit var preferencesManagerSpy: IdPreferencesManager
 
     private val preferencesModule by lazy {
         TestPreferencesModule(

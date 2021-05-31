@@ -9,14 +9,13 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.data.exitform.FingerprintExitFormReason
-import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.*
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith

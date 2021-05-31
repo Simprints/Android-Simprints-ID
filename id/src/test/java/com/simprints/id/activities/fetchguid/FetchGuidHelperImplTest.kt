@@ -1,20 +1,20 @@
 package com.simprints.id.activities.fetchguid
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.Modality
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.defaultSubject
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.domain.modality.Modality.FINGER
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress
+import com.simprints.id.testtools.TestData.defaultSubject
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -33,7 +33,7 @@ class FetchGuidHelperImplTest {
 
     @MockK lateinit var downSyncHelper: EventDownSyncHelper
     @MockK lateinit var subjectRepository: SubjectRepository
-    @MockK lateinit var preferencesManager: PreferencesManager
+    @MockK lateinit var preferencesManager: IdPreferencesManager
     @MockK lateinit var crashReportManager: CrashReportManager
 
     private lateinit var downloadEventsChannel: Channel<EventDownSyncProgress>
@@ -43,7 +43,7 @@ class FetchGuidHelperImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
-        coEvery { preferencesManager.modalities } returns listOf(FINGER)
+        coEvery { preferencesManager.modalities } returns listOf(Modality.FINGER)
         runBlocking {
             mockProgressEmission(emptyList())
         }

@@ -2,9 +2,9 @@ package com.simprints.id.data.consent.longconsent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

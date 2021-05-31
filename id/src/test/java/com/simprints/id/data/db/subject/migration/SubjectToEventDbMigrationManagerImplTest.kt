@@ -1,20 +1,19 @@
-package com.simprints.eventsystem.subject.migration
+package com.simprints.id.data.db.subject.migration
 
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.defaultSubject
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.toMode
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
+import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.db.subject.migration.SubjectToEventDbMigrationManagerImpl
-import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -30,7 +29,7 @@ class SubjectToEventDbMigrationManagerImplTest {
     @MockK lateinit var eventLocal: EventLocalDataSource
     @MockK lateinit var timeHelper: TimeHelper
     @MockK lateinit var crashReportManager: CrashReportManager
-    @MockK lateinit var preferencesManager: PreferencesManager
+    @MockK lateinit var preferencesManager: IdPreferencesManager
     @MockK lateinit var subjectLocal: SubjectLocalDataSource
 
     private lateinit var migrationManager: SubjectToEventMigrationManager

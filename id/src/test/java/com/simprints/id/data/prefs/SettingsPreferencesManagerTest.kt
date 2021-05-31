@@ -9,10 +9,10 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
 import io.mockk.verify
 import org.junit.Assert

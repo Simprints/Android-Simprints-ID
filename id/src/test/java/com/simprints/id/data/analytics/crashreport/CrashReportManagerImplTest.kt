@@ -17,8 +17,8 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.testtools.TestApplication
-import com.simprints.testtools.ShadowAndroidXMultiDex
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -146,10 +146,10 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
         val crashReportManagerSpy = spyk(CrashReportManagerImpl())
         val crashlyticsInstanceMock: FirebaseCrashlytics = mockk()
         val testFingersSelected = listOf(
-            FingerIdentifier.LEFT_3RD_FINGER,
-            FingerIdentifier.LEFT_4TH_FINGER,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_4TH_FINGER
+            FingerIdentifier.LEFT_3RD_FINGER.toString(),
+            FingerIdentifier.LEFT_4TH_FINGER.toString(),
+            FingerIdentifier.LEFT_THUMB.toString(),
+            FingerIdentifier.RIGHT_4TH_FINGER.toString()
         )
 
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock

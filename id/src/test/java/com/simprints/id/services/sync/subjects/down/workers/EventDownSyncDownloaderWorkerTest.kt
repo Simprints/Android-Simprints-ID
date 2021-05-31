@@ -10,9 +10,9 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -20,8 +20,8 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloade
 import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
-import com.simprints.testtools.TestApplication
-import com.simprints.testtools.ShadowAndroidXMultiDex
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
