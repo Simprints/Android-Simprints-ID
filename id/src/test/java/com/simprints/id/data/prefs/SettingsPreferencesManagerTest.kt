@@ -2,17 +2,17 @@ package com.simprints.id.data.prefs
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.domain.GROUP
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.every
 import io.mockk.verify
 import org.junit.Assert

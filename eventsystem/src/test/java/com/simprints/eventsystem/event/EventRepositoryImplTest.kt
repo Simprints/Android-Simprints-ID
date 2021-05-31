@@ -1,9 +1,14 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.createAlertScreenEvent
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
@@ -15,22 +20,20 @@ import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsF
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.domain.modality.Modality.FACE
-import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.db.event.*
 import io.kotlintest.shouldThrow
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.verify
+import io.mockk.coVerify
+import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -40,7 +43,6 @@ import org.junit.jupiter.api.DisplayName
 import retrofit2.HttpException
 import retrofit2.Response
 
-@ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
 
     private lateinit var eventRepo: EventRepository
@@ -53,9 +55,6 @@ class EventRepositoryImplTest {
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
-
-    @MockK
-    lateinit var preferencesManager: PreferencesManager
 
     @MockK
     lateinit var crashReportManager: CrashReportManager
@@ -77,8 +76,6 @@ class EventRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() } returns NOW
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { preferencesManager.modalities } returns listOf(FACE, FINGER)
-        every { preferencesManager.language } returns LANGUAGE
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
@@ -88,12 +85,13 @@ class EventRepositoryImplTest {
             loginInfoManager,
             eventLocalDataSource,
             eventRemoteDataSource,
-            preferencesManager,
             crashReportManager,
             timeHelper,
             sessionEventValidatorsFactory,
             LIB_VERSION_NAME,
-            sessionDataCache
+            sessionDataCache,
+            LANGUAGE,
+            listOf(Modes.FACE, Modes.FINGERPRINT)
         )
 
         runBlocking {

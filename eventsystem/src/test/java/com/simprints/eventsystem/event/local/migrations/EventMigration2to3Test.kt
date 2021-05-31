@@ -9,14 +9,15 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.core.domain.modality.Modes
-import com.simprints.id.testtools.TestApplication
-import com.simprints.id.tools.extensions.getIntWithColumnName
+import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.mockk
 import org.junit.Rule
@@ -26,7 +27,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(application = EventSystemApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration2to3Test {
 
     @get:Rule

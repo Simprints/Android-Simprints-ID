@@ -1,13 +1,13 @@
 package com.simprints.eventsystem.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_VERIFICATION
 import com.simprints.eventsystem.event.domain.models.callback.VerificationCallbackEvent.Companion.EVENT_VERSION
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import org.junit.Test
 
 class VerificationCallbackEventTest {

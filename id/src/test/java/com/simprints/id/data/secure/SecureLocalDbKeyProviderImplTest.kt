@@ -12,9 +12,9 @@ import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.kotlintest.shouldThrow
 import io.mockk.every
 import io.mockk.mockk

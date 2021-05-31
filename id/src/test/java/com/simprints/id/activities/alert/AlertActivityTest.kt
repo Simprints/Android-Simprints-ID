@@ -16,6 +16,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.simprints.core.domain.modality.Modality
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
@@ -24,13 +26,11 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.TestApplication
 import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -52,7 +52,7 @@ class AlertActivityTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @Inject lateinit var eventEventManagerMock: com.simprints.eventsystem.event.EventRepository
-    @Inject lateinit var preferencesManagerSpy: PreferencesManager
+    @Inject lateinit var preferencesManagerSpy: IdPreferencesManager
 
     private val preferencesModule by lazy {
         TestPreferencesModule(

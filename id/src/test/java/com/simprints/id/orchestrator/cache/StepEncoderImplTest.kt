@@ -14,9 +14,9 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.testtools.common.mock.mockTemplate
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.After

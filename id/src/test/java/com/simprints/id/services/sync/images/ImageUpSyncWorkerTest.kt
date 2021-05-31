@@ -6,7 +6,7 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

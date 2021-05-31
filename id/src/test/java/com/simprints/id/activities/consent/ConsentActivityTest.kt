@@ -15,11 +15,11 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every

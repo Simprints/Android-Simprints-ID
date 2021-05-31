@@ -1,11 +1,11 @@
-package com.simprints.eventsystem.events_sync.up.local
+package com.simprints.eventsystem.event_sync.up.local
 
 import com.google.common.truth.Truth
-import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
-import com.simprints.eventsystem.sampledata.SampleDefaults.projectUpSyncScope
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
+import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectUpSyncScope
 import org.junit.Test
 
 class DbEventsUpSyncOperationStateTest {

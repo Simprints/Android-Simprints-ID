@@ -5,8 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
@@ -14,11 +12,10 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+//@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase

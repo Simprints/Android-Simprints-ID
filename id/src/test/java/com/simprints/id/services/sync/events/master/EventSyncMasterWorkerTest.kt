@@ -29,9 +29,9 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before

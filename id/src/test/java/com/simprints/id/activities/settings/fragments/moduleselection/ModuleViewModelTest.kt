@@ -4,8 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.TestApplication
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.After

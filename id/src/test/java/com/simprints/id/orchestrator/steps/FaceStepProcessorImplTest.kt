@@ -13,7 +13,7 @@ import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import io.mockk.*
 import io.mockk.impl.annotations.MockK

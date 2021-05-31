@@ -15,10 +15,23 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 //Required by Room to be able to export the db schemas
-                arguments["room.schemaLocation"] = "$projectDir/schemas"
+                arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
             }
         }
     }
+
+    sourceSets {
+        // Adds exported room schema location as test app assets.
+        getByName("debug") {
+            assets.srcDirs("$projectDir/schemas")
+        }
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
 }
 
 dependencies {
@@ -41,7 +54,17 @@ dependencies {
     implementation(Dependencies.SqlCipher.core)
 
     testImplementation(Dependencies.Testing.junit)
+    testImplementation(Dependencies.Testing.AndroidX.ext_junit)
+    testImplementation(Dependencies.Testing.coroutines_test)
+    testImplementation(Dependencies.Testing.Robolectric.core)
+    testImplementation(Dependencies.Testing.AndroidX.runner)
+    testImplementation(Dependencies.Testing.AndroidX.room)
+    testImplementation(Dependencies.Testing.Robolectric.multidex)
+    testImplementation(project(":core"))
+    testImplementation(project(":testtools"))
+    testImplementation(Dependencies.Testing.kotlin)
     testImplementation(Dependencies.Testing.truth)
     testImplementation(Dependencies.Testing.Mockk.android)
+    testImplementation(Dependencies.Testing.coroutines_test)
     androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
 }

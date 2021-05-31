@@ -8,7 +8,6 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemp
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -16,6 +15,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_3RD_FINGER
 import org.junit.Test
 
 class EnrolmentRecordMoveEventTest {

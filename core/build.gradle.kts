@@ -39,9 +39,9 @@ android {
     }
 
     sourceSets {
-        val sharedTestDir = "src/testtools/java"
+        val sharedTestDir = "src/test/java/com/simprints/testtools"
 
-        named("test") {
+        named("debug") {
             java.srcDir(sharedTestDir)
         }
     }
@@ -74,6 +74,7 @@ dependencies {
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.coroutines_test)
     testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.Robolectric.core)
     testImplementation(project(":testtools"))
 
     androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
