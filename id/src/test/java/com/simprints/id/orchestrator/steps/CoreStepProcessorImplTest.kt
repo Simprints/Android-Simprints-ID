@@ -16,7 +16,7 @@ import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.*
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith

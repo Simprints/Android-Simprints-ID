@@ -5,11 +5,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.local.models.DbEvent
-import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -19,9 +20,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID_2
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.id.testtools.TestApplication
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
@@ -29,11 +27,10 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+//@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventRoomDaoTest {
 
     val event = DbEvent(

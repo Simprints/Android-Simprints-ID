@@ -1,7 +1,6 @@
 package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.eventsystem.*
-import com.simprints.id.commontesttools.events.*
 import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import io.kotlintest.shouldThrow
 import org.junit.Before

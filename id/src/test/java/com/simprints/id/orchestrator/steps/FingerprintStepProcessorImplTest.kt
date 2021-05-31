@@ -15,7 +15,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CA
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
 import io.mockk.*

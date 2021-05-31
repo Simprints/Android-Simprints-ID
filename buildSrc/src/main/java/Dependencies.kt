@@ -20,7 +20,7 @@ object Dependencies {
     private const val koin_version = "2.2.2"
     private const val rootbeer_version = "0.0.7"
     private const val mockito_version = "3.2.4"
-    private const val robolectric_version = "4.3.1"
+    private const val robolectric_version = "4.4"
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
 
@@ -187,9 +187,9 @@ object Dependencies {
         const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
 
         object Robolectric {
-
             const val core = "org.robolectric:robolectric:$robolectric_version"
             const val multidex = "org.robolectric:multidex:3.4.2"
+            const val annotation = "org.robolectric:annotations:$robolectric_version"
         }
 
         const val truth = "com.google.truth:truth:0.42"

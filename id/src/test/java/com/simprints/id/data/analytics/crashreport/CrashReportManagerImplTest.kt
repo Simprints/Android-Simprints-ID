@@ -17,8 +17,8 @@ import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.TestApplication
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk

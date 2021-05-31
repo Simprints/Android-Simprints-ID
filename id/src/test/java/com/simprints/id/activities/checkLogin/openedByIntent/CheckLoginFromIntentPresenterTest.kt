@@ -2,28 +2,22 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.os.Build
 import android.os.Build.VERSION
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.createEnrolmentCalloutEvent
 import com.simprints.eventsystem.createSessionCaptureEvent
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.core.analytics.CrashReportManager
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigFetcher
-import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.FINGER
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
@@ -33,12 +27,18 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigFetcher
+import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.secure.models.SecurityState.Status
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -63,8 +63,8 @@ class CheckLoginFromIntentPresenterTest {
     @MockK lateinit var remoteConfigFetcherMock: RemoteConfigFetcher
     @MockK lateinit var analyticsManagerMock: AnalyticsManager
     @MockK lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
-    @MockK lateinit var preferencesManagerMock: PreferencesManager
-    @MockK lateinit var eventRepositoryMock: com.simprints.eventsystem.event.EventRepository
+    @MockK lateinit var preferencesManagerMock: IdPreferencesManager
+    @MockK lateinit var eventRepositoryMock: EventRepository
     @MockK lateinit var crashReportManagerMock: CrashReportManager
     @MockK lateinit var securityStateRepositoryMock: SecurityStateRepository
     @MockK lateinit var loginInfoManagerMock: LoginInfoManager
@@ -268,7 +268,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
             coEvery { analyticsManagerMock.getAnalyticsId() } returns GUID1
             coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
-            every { preferencesManagerMock.modalities } returns listOf(FINGER, Modality.FACE)
+            every { preferencesManagerMock.modalities } returns listOf(Modality.FINGER, Modality.FACE)
 
             presenter.handleSignedInUser()
 

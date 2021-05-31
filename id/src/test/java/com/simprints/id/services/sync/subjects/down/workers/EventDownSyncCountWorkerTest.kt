@@ -11,15 +11,14 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.TestApplication
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before

@@ -6,7 +6,7 @@ import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk

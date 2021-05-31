@@ -7,7 +7,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.mockk
 import org.junit.Test

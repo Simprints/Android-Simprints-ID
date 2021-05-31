@@ -14,8 +14,8 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.TestApplication
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest

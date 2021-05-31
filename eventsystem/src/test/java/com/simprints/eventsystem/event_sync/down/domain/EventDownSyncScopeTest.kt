@@ -1,13 +1,14 @@
-package com.simprints.eventsystem.events_sync.down.domain
+package com.simprints.eventsystem.event_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.eventsystem.event.domain.models.EventType.*
 import org.junit.Test
 
 class EventDownSyncScopeTest {
@@ -59,7 +60,7 @@ class EventDownSyncScopeTest {
         }
     }
 
-    private fun checkModuleScope(op: com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery, moduleId: String) {
+    private fun checkModuleScope(op: RemoteEventQuery, moduleId: String) {
         assertThat(op.projectId).isEqualTo(projectDownSyncScope.projectId)
         assertThat(op.modes).isEqualTo(projectDownSyncScope.modes)
         assertThat(op.types).isEqualTo(eventTypes)

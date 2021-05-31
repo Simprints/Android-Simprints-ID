@@ -2,13 +2,13 @@ package com.simprints.id.secure
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

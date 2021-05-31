@@ -16,11 +16,11 @@ import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.testtools.common.livedata.testObserver
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

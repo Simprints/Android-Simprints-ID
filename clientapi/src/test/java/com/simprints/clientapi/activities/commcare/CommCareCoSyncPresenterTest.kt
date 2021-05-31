@@ -16,6 +16,8 @@ import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.eventsystem.event.domain.models.RefusalEvent
@@ -28,10 +30,8 @@ import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
-import com.simprints.core.domain.modality.Modes
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
 import com.simprints.libsimprints.Constants
+import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import io.kotlintest.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.*

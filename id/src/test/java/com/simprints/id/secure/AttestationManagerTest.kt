@@ -10,9 +10,9 @@ import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.INVALID_CLAIMS
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
 import com.simprints.id.secure.models.Nonce
-import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.TestApplication
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

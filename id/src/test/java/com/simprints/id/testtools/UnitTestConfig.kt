@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.commontesttools.di.*
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
+import com.simprints.testtools.TestApplication
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.injectClassFromComponent
 import com.simprints.testtools.unit.BaseUnitTestConfig

@@ -5,20 +5,16 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.*
-import com.simprints.id.commontesttools.events.*
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+//@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ApiEventTest {
 
     private val jackson = JsonHelper.jackson

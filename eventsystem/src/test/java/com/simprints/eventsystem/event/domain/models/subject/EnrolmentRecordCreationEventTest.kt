@@ -1,18 +1,19 @@
 package com.simprints.eventsystem.event.domain.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_3RD_FINGER
 import org.junit.Test
 
 class EnrolmentRecordCreationEventTest {

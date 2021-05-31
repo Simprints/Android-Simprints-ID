@@ -17,7 +17,7 @@
 //import com.simprints.core.sharedpreferences.PreferencesManager
 //import com.simprints.id.data.prefs.PreferencesManagerImpl
 //import com.simprints.core.domain.modality.Modes
-//import com.simprints.id.testtools.TestApplication
+//import com.simprints.testtools.TestApplication
 //import com.simprints.id.testtools.UnitTestConfig
 //import com.simprints.id.testtools.state.RobolectricTestMocker
 //import com.simprints.testtools.common.di.DependencyRule
@@ -26,7 +26,7 @@
 //import com.simprints.testtools.common.syntax.mock
 //import com.simprints.testtools.common.syntax.whenever
 //import com.simprints.testtools.common.syntax.wheneverOnSuspend
-//import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+//import com.simprints.testtools.ShadowAndroidXMultiDex
 //import com.simprints.testtools.unit.robolectric.getSharedPreferences
 //import io.reactivex.Single
 //import kotlinx.coroutines.runBlocking
