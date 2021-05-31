@@ -14,8 +14,8 @@ import com.simprints.id.sampledata.SampleDefaults.GUID1
 import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
-import com.simprints.id.commontesttools.events.createEnrolmentEventV1
+import com.simprints.eventsystem.buildFakeBiometricReferences
+import com.simprints.eventsystem.createEnrolmentEventV1
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload

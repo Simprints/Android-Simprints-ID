@@ -1,7 +1,7 @@
-package com.simprints.id.commontesttools
+package com.simprints.testtools
 
 import com.google.common.io.BaseEncoding
-import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtils
 
 // EncodingUtilsImpl uses android.util.Base64 that is available only with android sdk
 // and that requires Robolectric

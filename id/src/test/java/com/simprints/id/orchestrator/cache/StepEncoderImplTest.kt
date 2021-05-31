@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.cache
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.commontesttools.FingerprintGeneratorUtils
+import com.simprints.testtools.biometrics.FingerprintGeneratorUtils
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier

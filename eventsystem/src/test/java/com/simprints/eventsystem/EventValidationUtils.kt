@@ -1,13 +1,13 @@
-package com.simprints.id.commontesttools.events
+package com.simprints.eventsystem
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.extentions.isGuid
 import com.simprints.eventsystem.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
 import com.simprints.eventsystem.event.remote.models.ApiArtificialTerminationPayload.ApiReason
 import com.simprints.eventsystem.event.remote.models.ApiAuthenticationPayload
 import com.simprints.eventsystem.event.remote.models.ApiRefusalPayload
 import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackType
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutType
-import com.simprints.id.tools.extensions.isGuid
 import org.json.JSONArray
 import org.json.JSONObject
 

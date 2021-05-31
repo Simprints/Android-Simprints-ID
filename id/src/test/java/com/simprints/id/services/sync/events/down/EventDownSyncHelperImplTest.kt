@@ -1,23 +1,24 @@
 package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.createEnrolmentRecordCreationEvent
+import com.simprints.eventsystem.createEnrolmentRecordDeletionEvent
+import com.simprints.eventsystem.createEnrolmentRecordMoveEvent
+import com.simprints.eventsystem.createPersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.encodingUtilsForTests
-import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
-import com.simprints.id.commontesttools.events.createEnrolmentRecordDeletionEvent
-import com.simprints.id.commontesttools.events.createEnrolmentRecordMoveEvent
-import com.simprints.id.commontesttools.events.createPersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
-import com.simprints.core.tools.time.TimeHelper
+import com.simprints.testtools.encodingUtilsForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -41,9 +42,9 @@ class EventDownSyncHelperImplTest {
     private lateinit var eventDownSyncHelper: EventDownSyncHelper
     @MockK private lateinit var subjectRepository: SubjectRepository
     @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-    @MockK private lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    @MockK private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
     @MockK private lateinit var timeHelper: TimeHelper
-    @MockK private lateinit var preferencesManager: PreferencesManager
+    @MockK private lateinit var preferencesManager: IdPreferencesManager
     private val subjectFactory = SubjectFactoryImpl(encodingUtilsForTests)
 
     @Before

@@ -7,7 +7,7 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemp
 import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtils
 
 interface SubjectFactory {
 

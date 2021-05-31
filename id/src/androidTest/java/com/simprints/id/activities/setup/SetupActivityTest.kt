@@ -8,8 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.createSessionCaptureEvent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest

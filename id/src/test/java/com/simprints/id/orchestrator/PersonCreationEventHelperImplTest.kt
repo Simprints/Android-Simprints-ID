@@ -1,9 +1,9 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.commontesttools.events.createFaceCaptureEvent
-import com.simprints.id.commontesttools.events.createFingerprintCaptureEvent
-import com.simprints.id.commontesttools.events.createPersonCreationEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import com.simprints.eventsystem.createFaceCaptureEvent
+import com.simprints.eventsystem.createFingerprintCaptureEvent
+import com.simprints.eventsystem.createPersonCreationEvent
+import com.simprints.eventsystem.createSessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat

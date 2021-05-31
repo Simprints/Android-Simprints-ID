@@ -39,8 +39,8 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelperImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.id.tools.utils.EncodingUtils
-import com.simprints.id.tools.utils.EncodingUtilsImpl
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import dagger.Module
 import dagger.Provides
 
