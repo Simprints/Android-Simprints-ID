@@ -1,4 +1,4 @@
-package biometrics
+package com.simprints.testtools.biometrics
 
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.libsimprints.FingerIdentifier
