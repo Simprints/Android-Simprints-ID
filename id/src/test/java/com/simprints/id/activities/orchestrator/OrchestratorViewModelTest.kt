@@ -7,8 +7,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.createSessionCaptureEvent
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest

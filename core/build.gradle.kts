@@ -38,6 +38,14 @@ android {
         viewBinding = true
     }
 
+    sourceSets {
+        val sharedTestDir = "src/testtools/java"
+
+        named("test") {
+            java.srcDir(sharedTestDir)
+        }
+    }
+
 }
 
 dependencies {

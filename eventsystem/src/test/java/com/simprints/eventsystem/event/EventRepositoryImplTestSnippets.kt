@@ -21,9 +21,9 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCrea
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.id.commontesttools.events.createAlertScreenEvent
-import com.simprints.id.commontesttools.events.createEnrolmentRecordCreationEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import com.simprints.eventsystem.createAlertScreenEvent
+import com.simprints.eventsystem.createEnrolmentRecordCreationEvent
+import com.simprints.eventsystem.createSessionCaptureEvent
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.asFlow

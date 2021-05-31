@@ -3,8 +3,8 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.os.Build
 import android.os.Build.VERSION
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.commontesttools.events.createEnrolmentCalloutEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
+import com.simprints.eventsystem.createEnrolmentCalloutEvent
+import com.simprints.eventsystem.createSessionCaptureEvent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.callout.*

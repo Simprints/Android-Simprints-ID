@@ -1,9 +1,11 @@
-package com.simprints.id.commontesttools.events
+package com.simprints.eventsystem
 
 import android.net.NetworkInfo.DetailedState.CONNECTED
 import android.os.Build
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.commontesttools.encodingUtilsForTests
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -42,21 +44,22 @@ import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.eventsystem.event.domain.models.subject.FingerIdentifier.LEFT_3RD_FINGER
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier.TIER_1
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_METADATA
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.core.tools.utils.SimNetworkUtils.Connection
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_3RD_FINGER
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
+import com.simprints.testtools.biometrics.FingerprintGeneratorUtils
+import com.simprints.testtools.encodingUtilsForTests
+import kotlin.random.Random
 
 val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
 val ENDED_AT_RANGE = LongRange(ENDED_AT - 10, ENDED_AT + 10)
@@ -233,11 +236,11 @@ fun buildFakeBiometricReferences(): List<BiometricReference> {
 }
 
 fun buildFakeFingerprintTemplate() = encodingUtilsForTests.byteArrayToBase64(
-    SubjectsGeneratorUtils.getRandomFingerprintSample().template
+    FingerprintGeneratorUtils.generateRandomFingerprint().template
 )
 
 private fun buildFakeFaceTemplate() = encodingUtilsForTests.byteArrayToBase64(
-    SubjectsGeneratorUtils.getRandomFaceSample().template
+    FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23).template
 )
 
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
