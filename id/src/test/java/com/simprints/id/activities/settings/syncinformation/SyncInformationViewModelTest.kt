@@ -3,15 +3,16 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
@@ -48,7 +49,7 @@ class SyncInformationViewModelTest {
     lateinit var subjectRepository: SubjectRepository
 
     @MockK
-    lateinit var preferencesManager: PreferencesManager
+    lateinit var preferencesManager: IdPreferencesManager
 
     @MockK
     lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -105,7 +106,7 @@ class SyncInformationViewModelTest {
         every { preferencesManager.eventDownSyncSetting } returns ON
         every { preferencesManager.canSyncToSimprints() } returns true
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
-        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } returns projectDownSyncScope
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns projectDownSyncScope
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
@@ -176,7 +177,7 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
-        coEvery { eventDownSyncScopeRepository.getDownSyncScope() } throws IOException()
+        coEvery { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } throws IOException()
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         viewModel.fetchSyncInformation()

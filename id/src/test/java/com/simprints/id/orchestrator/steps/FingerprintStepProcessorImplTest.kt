@@ -3,8 +3,8 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.domain.GROUP
+import com.simprints.core.domain.common.GROUP
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
@@ -15,7 +15,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CA
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
 import io.mockk.*
@@ -30,7 +30,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
-    private lateinit var preferencesManagerMock: PreferencesManager
+    private lateinit var preferencesManagerMock: IdPreferencesManager
 
     private val fingerprintRequestFactory: FingerprintRequestFactory = FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor

@@ -1,6 +1,9 @@
 package com.simprints.eventsystem.subjects_sync.down
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULES
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
@@ -14,6 +17,11 @@ import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
 import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
@@ -37,7 +45,7 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var preferencesManager: PreferencesManager
+    @MockK lateinit var preferencesManager: IdPreferencesManager
     @MockK lateinit var downSyncOperationOperationDao: com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 
     private lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository

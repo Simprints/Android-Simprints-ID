@@ -6,7 +6,7 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.secure.models.SecurityState
-import com.simprints.testtools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

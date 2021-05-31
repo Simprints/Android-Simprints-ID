@@ -29,8 +29,8 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.TestApplication
 import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
