@@ -3,6 +3,9 @@ package com.simprints.id.activities.fetchguid
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
+import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
@@ -81,12 +84,12 @@ class FetchGuidHelperImplTest {
 
             coVerify {
                 downSyncHelper.downSync(any(),
-                    com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation(
-                        com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery(
+                    EventDownSyncOperation(
+                        RemoteEventQuery(
                             defaultSubject.projectId,
-                            subjectId = defaultSubject.subjectId,
+                            subjectId = GUID1,
                             modes = DEFAULT_MODES,
-                            types = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.subjectEvents
+                            types = EventDownSyncScope.subjectEvents
                         )
                     )
                 )

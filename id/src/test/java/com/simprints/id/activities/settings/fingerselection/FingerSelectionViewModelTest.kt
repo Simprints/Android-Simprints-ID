@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
 import com.simprints.id.data.prefs.IdPreferencesManager
 import io.mockk.every
 import io.mockk.mockk
@@ -24,17 +25,17 @@ class FingerSelectionViewModelTest {
     @Test
     fun start_loadsStartingFingerStateCorrectly() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 2, false),
-                FingerSelectionItem(FingerIdentifier.RIGHT_THUMB, 2, true)
+                FingerSelectionItem(LEFT_THUMB, 2, false),
+                FingerSelectionItem(RIGHT_THUMB, 2, true)
             )
         ).inOrder()
     }
@@ -42,10 +43,10 @@ class FingerSelectionViewModelTest {
     @Test
     fun addFinger_correctlyUpdatesState() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -53,9 +54,9 @@ class FingerSelectionViewModelTest {
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 2, false),
-                FingerSelectionItem(FingerIdentifier.RIGHT_THUMB, 2, true),
-                FingerSelectionItem(FingerIdentifier.LEFT_INDEX_FINGER, 1, true)
+                FingerSelectionItem(LEFT_THUMB, 2, false),
+                FingerSelectionItem(RIGHT_THUMB, 2, true),
+                FingerSelectionItem(LEFT_INDEX_FINGER, 1, true)
             )
         ).inOrder()
     }
@@ -63,11 +64,11 @@ class FingerSelectionViewModelTest {
     @Test
     fun removeItem_correctlyUpdatesState() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.LEFT_INDEX_FINGER
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB,
+            LEFT_INDEX_FINGER
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -75,8 +76,8 @@ class FingerSelectionViewModelTest {
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 2, false),
-                FingerSelectionItem(FingerIdentifier.LEFT_INDEX_FINGER, 1, true)
+                FingerSelectionItem(LEFT_THUMB, 2, false),
+                FingerSelectionItem(LEFT_INDEX_FINGER, 1, true)
             )
         ).inOrder()
     }
@@ -84,11 +85,11 @@ class FingerSelectionViewModelTest {
     @Test
     fun moveItem_correctlyUpdatesState() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.LEFT_INDEX_FINGER
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB,
+            LEFT_INDEX_FINGER
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -96,9 +97,9 @@ class FingerSelectionViewModelTest {
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.RIGHT_THUMB, 2, true),
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 2, false),
-                FingerSelectionItem(FingerIdentifier.LEFT_INDEX_FINGER, 1, true)
+                FingerSelectionItem(RIGHT_THUMB, 2, true),
+                FingerSelectionItem(LEFT_THUMB, 2, false),
+                FingerSelectionItem(LEFT_INDEX_FINGER, 1, true)
             )
         ).inOrder()
     }
@@ -106,10 +107,10 @@ class FingerSelectionViewModelTest {
     @Test
     fun changeFingerSelection_correctlyUpdatesState() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -117,7 +118,7 @@ class FingerSelectionViewModelTest {
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 2, false),
+                FingerSelectionItem(LEFT_THUMB, 2, false),
                 FingerSelectionItem(FingerIdentifier.RIGHT_INDEX_FINGER, 2, true)
             )
         ).inOrder()
@@ -126,10 +127,10 @@ class FingerSelectionViewModelTest {
     @Test
     fun changeQuantitySelection_correctlyUpdatesState() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -137,8 +138,8 @@ class FingerSelectionViewModelTest {
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 2, false),
-                FingerSelectionItem(FingerIdentifier.RIGHT_THUMB, 5, true)
+                FingerSelectionItem(LEFT_THUMB, 2, false),
+                FingerSelectionItem(RIGHT_THUMB, 5, true)
             )
         ).inOrder()
     }
@@ -146,11 +147,11 @@ class FingerSelectionViewModelTest {
     @Test
     fun resetFingerItems_correctlyUpdatesState() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.LEFT_INDEX_FINGER
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB,
+            LEFT_INDEX_FINGER
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -158,7 +159,7 @@ class FingerSelectionViewModelTest {
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
-                FingerSelectionItem(FingerIdentifier.LEFT_THUMB, 1, false)
+                FingerSelectionItem(LEFT_THUMB, 1, false)
             )
         ).inOrder()
     }
@@ -166,10 +167,10 @@ class FingerSelectionViewModelTest {
     @Test
     fun haveSettingsChanged_determinesCorrectValue() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -187,12 +188,12 @@ class FingerSelectionViewModelTest {
     @Test
     fun canSavePreference_withinLimit_returnsTrue() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB,
+            LEFT_THUMB, LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -202,20 +203,20 @@ class FingerSelectionViewModelTest {
     @Test
     fun canSavePreference_overLimit_returnsFalse() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.RIGHT_THUMB,
-            FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB,
+            LEFT_THUMB,
+            LEFT_THUMB,
+            RIGHT_THUMB,
+            RIGHT_THUMB,
+            RIGHT_THUMB,
+            LEFT_THUMB,
+            LEFT_THUMB,
+            LEFT_THUMB,
+            RIGHT_THUMB,
+            RIGHT_THUMB,
+            RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -225,10 +226,10 @@ class FingerSelectionViewModelTest {
     @Test
     fun savePreference_savesPreferenceAndCrashReportInfoCorrectly() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
-            FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(FingerIdentifier.LEFT_THUMB)
+        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
 
         viewModel.start()
         viewModel.addNewFinger()
@@ -240,28 +241,24 @@ class FingerSelectionViewModelTest {
 
         assertThat(prefSlot.captured).containsExactlyElementsIn(
             listOf(
-                FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-                FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
-                FingerIdentifier.LEFT_INDEX_FINGER
+                LEFT_THUMB, LEFT_THUMB,
+                RIGHT_THUMB, RIGHT_THUMB,
+                LEFT_INDEX_FINGER
             )
         ).inOrder()
 
-        val crashReportSlot = slot<List<FingerIdentifier>>()
+        val crashReportSlot = slot<List<String>>()
         verify {
             crashReportManagerMock.setFingersSelectedCrashlyticsKey(
-                listOf(
-                    capture(
-                        crashReportSlot
-                    ).toString()
-                )
+                capture(crashReportSlot)
             )
         }
 
         assertThat(crashReportSlot.captured).containsExactlyElementsIn(
             listOf(
-                FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_THUMB,
-                FingerIdentifier.RIGHT_THUMB, FingerIdentifier.RIGHT_THUMB,
-                FingerIdentifier.LEFT_INDEX_FINGER
+                LEFT_THUMB.toString(), LEFT_THUMB.toString(),
+                RIGHT_THUMB.toString(), RIGHT_THUMB.toString(),
+                LEFT_INDEX_FINGER.toString()
             )
         ).inOrder()
     }

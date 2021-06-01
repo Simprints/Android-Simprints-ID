@@ -5,14 +5,13 @@ import java.util.*
 
 // EncodingUtilsImpl uses android.util.Base64 that is available only with android sdk
 // and that requires Robolectric
-val encodingUtilsForTests = EncodingUtilsImplForTests()
-
-class EncodingUtilsImplForTests: EncodingUtils {
+object EncodingUtilsImplForTests: EncodingUtils {
 
     private val encoder = Base64.getEncoder()
     private val decoder = Base64.getDecoder()
 
-    override fun byteArrayToBase64(bytes: ByteArray): String = encoder.encodeToString(bytes)
+    override fun byteArrayToBase64(bytes: ByteArray): String =
+        encoder.encodeToString(bytes)
 
     override fun base64ToBytes(base64: String): ByteArray = decoder.decode(base64)
 }

@@ -4,6 +4,7 @@ import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.id.data.db.subject.domain.Subject
@@ -28,7 +29,8 @@ class SubjectToEventDbMigrationManagerImpl(
     val timeHelper: TimeHelper,
     val crashReportManager: CrashReportManager,
     val preferencesManager: IdPreferencesManager,
-    private val subjectLocal: SubjectLocalDataSource
+    private val subjectLocal: SubjectLocalDataSource,
+    private val encoder: EncodingUtils
 ) : SubjectToEventMigrationManager {
 
     override suspend fun migrateSubjectToSyncToEventsDb() {
@@ -64,7 +66,7 @@ class SubjectToEventDbMigrationManagerImpl(
             subject.moduleId,
             subject.attendantId,
             preferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+            EnrolmentRecordCreationEvent.buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples, encoder)
         )
     }
 

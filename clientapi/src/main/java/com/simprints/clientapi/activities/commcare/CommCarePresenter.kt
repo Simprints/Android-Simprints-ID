@@ -17,6 +17,8 @@ import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -42,7 +44,8 @@ class CommCarePresenter(
     private val timeHelper: ClientApiTimeHelper,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager,
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
     view,
     sessionEventsManager,
@@ -241,7 +244,7 @@ class CommCarePresenter(
             moduleId,
             attendantId,
             sharedPreferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples)
+            EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder)
         )
     }
 
