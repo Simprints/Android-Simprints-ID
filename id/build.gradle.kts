@@ -104,11 +104,6 @@ android {
             java.srcDir(sharedTestDir)
             java.srcDir("src/androidTest/java")
         }
-
-        // Adds exported room schema location as test app assets.
-        named("debug") {
-            assets.srcDirs("$projectDir/schemas")
-        }
     }
 
     testOptions {
@@ -140,6 +135,8 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     implementation(Dependencies.libsimprints)
+
+    testImplementation(project(":eventsystem"))
 
     implementation(Dependencies.Dagger.core)
     implementation(Dependencies.Kotlin.reflect)
