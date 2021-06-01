@@ -33,7 +33,7 @@ definitions:
         # Run the ID unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-id-unit-tests
-                name: "Run Id & Core unit tests"
+                name: "Run Id, Core & Event System unit tests"
                 size: 2x
                 max-time: 30
                 caches:
@@ -43,9 +43,11 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportDebug
+                    - ./gradlew eventsystem:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
                     - core/build/reports/**
+                    - eventsystem/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.

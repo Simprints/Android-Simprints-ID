@@ -209,7 +209,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
                     }
                 }
                 true
@@ -227,7 +227,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
                     }
                 }
                 true
@@ -245,7 +245,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
                     }
                 }
                 true
@@ -334,7 +334,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
                     }
                 }
                 true
@@ -364,7 +364,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
                     }
                     true
                 }
@@ -452,7 +452,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(tooFarFace.quality)
                         assertThat(it.yaw).isEqualTo(tooFarFace.yaw)
                         assertThat(it.yaw).isEqualTo(tooFarFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(tooFarFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(tooFarFace.template))
                     }
                     true
                 }
@@ -483,7 +483,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template).isEqualTo(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
+                        assertThat(it.template).containsMatch(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template))
                     }
                     true
                 }
