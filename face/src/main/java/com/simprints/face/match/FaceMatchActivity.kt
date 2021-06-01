@@ -31,7 +31,7 @@ class FaceMatchActivity : FaceActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_match)
         setTextInLayout()
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val faceRequest: FaceMatchRequest =
             this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
