@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
@@ -24,7 +25,6 @@ import com.simprints.id.activities.settings.fragments.moduleselection.tools.Modu
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.fragment_module_selection.*
@@ -36,9 +36,26 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
-    @Inject lateinit var eventSyncManager: EventSyncManager
+    private val confirmModuleSelectionDialog by lazy {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.confirm_module_selection_title))
+            .setMessage(getModulesSelectedTextForDialog())
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.confirm_module_selection_yes))
+            { _, _ -> handleModulesConfirmClick() }
+            .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
+            { _, _ -> handleModuleSelectionCancelClick() }
+            .create()
+    }
+
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+
+    @Inject
+    lateinit var viewModelFactory: ModuleViewModelFactory
+
+    @Inject
+    lateinit var eventSyncManager: EventSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -90,8 +107,10 @@ class ModuleSelectionFragment(
     private fun configureRecyclerView() {
         rvModules.adapter = adapter
         val context = requireContext()
-        val dividerItemDecoration = DividerItemDecoration(context,
-            DividerItemDecoration.VERTICAL).apply {
+        val dividerItemDecoration = DividerItemDecoration(
+            context,
+            DividerItemDecoration.VERTICAL
+        ).apply {
             val colour = ContextCompat.getColor(context, R.color.simprints_light_grey)
             setDrawable(ColorDrawable(colour))
         }
@@ -193,7 +212,7 @@ class ModuleSelectionFragment(
     fun showModuleSelectionDialogIfNecessary() {
         if (isModuleSelectionChanged()) {
             activity?.runOnUiThreadIfStillRunning {
-                buildConfirmModuleSelectionDialog().show()
+                confirmModuleSelectionDialog.show()
             }
         } else {
             activity?.finish()
@@ -206,17 +225,6 @@ class ModuleSelectionFragment(
             else -> map { it.name }.toSet() != preferencesManager.selectedModules
         }
     }
-
-    private fun buildConfirmModuleSelectionDialog() =
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.confirm_module_selection_title))
-            .setMessage(getModulesSelectedTextForDialog())
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.confirm_module_selection_yes))
-            { _, _ -> handleModulesConfirmClick() }
-            .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
-            { _, _ -> handleModuleSelectionCancelClick() }
-            .create()
 
     private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
         modules.filter { it.isSelected }.forEach { module ->
@@ -274,6 +282,13 @@ class ModuleSelectionFragment(
             if (!hasFocus)
                 rvModules?.scrollToPosition(0)
             // The safe call above is necessary only when the 'up' action bar button is clicked
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (confirmModuleSelectionDialog.isShowing) {
+            confirmModuleSelectionDialog.dismiss()
         }
     }
 }
