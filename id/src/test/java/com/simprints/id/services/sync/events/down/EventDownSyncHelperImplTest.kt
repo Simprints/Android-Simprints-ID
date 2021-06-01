@@ -18,7 +18,7 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
-import com.simprints.testtools.encodingUtilsForTests
+import com.simprints.testtools.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -45,7 +45,7 @@ class EventDownSyncHelperImplTest {
     @MockK private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
     @MockK private lateinit var timeHelper: TimeHelper
     @MockK private lateinit var preferencesManager: IdPreferencesManager
-    private val subjectFactory = SubjectFactoryImpl(encodingUtilsForTests)
+    private val subjectFactory = SubjectFactoryImpl(EncodingUtilsImplForTests)
 
     @Before
     fun setup() {

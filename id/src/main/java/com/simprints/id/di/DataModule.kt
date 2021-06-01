@@ -7,6 +7,7 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
@@ -151,7 +152,8 @@ open class DataModule {
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager,
         preferencesManager: IdPreferencesManager,
-        subjectLocal: SubjectLocalDataSource
+        subjectLocal: SubjectLocalDataSource,
+        encoder: EncodingUtils
     ): SubjectToEventMigrationManager =
         SubjectToEventDbMigrationManagerImpl(
             loginInfoManager,
@@ -159,7 +161,8 @@ open class DataModule {
             timeHelper,
             crashReportManager,
             preferencesManager,
-            subjectLocal
+            subjectLocal,
+            encoder
         )
 
     @Provides

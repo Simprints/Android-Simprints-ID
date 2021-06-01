@@ -14,8 +14,10 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
+import com.simprints.testtools.EncodingUtilsImplForTests
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
@@ -23,14 +25,21 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class SubjectToEventDbMigrationManagerImplTest {
 
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var eventLocal: EventLocalDataSource
-    @MockK lateinit var timeHelper: TimeHelper
-    @MockK lateinit var crashReportManager: CrashReportManager
-    @MockK lateinit var preferencesManager: IdPreferencesManager
-    @MockK lateinit var subjectLocal: SubjectLocalDataSource
+    @MockK
+    lateinit var loginInfoManager: LoginInfoManager
+    @MockK
+    lateinit var eventLocal: EventLocalDataSource
+    @MockK
+    lateinit var timeHelper: TimeHelper
+    @MockK
+    lateinit var crashReportManager: CrashReportManager
+    @MockK
+    lateinit var preferencesManager: IdPreferencesManager
+    @MockK
+    lateinit var subjectLocal: SubjectLocalDataSource
 
     private lateinit var migrationManager: SubjectToEventMigrationManager
 
@@ -44,7 +53,9 @@ class SubjectToEventDbMigrationManagerImplTest {
             timeHelper,
             crashReportManager,
             preferencesManager,
-            subjectLocal)
+            subjectLocal,
+            EncodingUtilsImplForTests
+        )
 
         mockUUID()
     }
@@ -99,7 +110,11 @@ class SubjectToEventDbMigrationManagerImplTest {
                 subjectIntoDb.moduleId,
                 subjectIntoDb.attendantId,
                 preferencesManager.modalities.map { it.toMode() },
-                EnrolmentRecordCreationEvent.buildBiometricReferences(subjectIntoDb.fingerprintSamples, subjectIntoDb.faceSamples)
+                EnrolmentRecordCreationEvent.buildBiometricReferences(
+                    subjectIntoDb.fingerprintSamples,
+                    subjectIntoDb.faceSamples,
+                    EncodingUtilsImplForTests
+                )
             )
 
             coVerify(exactly = 1) {
@@ -113,7 +128,10 @@ class SubjectToEventDbMigrationManagerImplTest {
         runBlockingTest {
             mockUserIsSignedIn()
             val subjectIntoDb = defaultSubject.copy(toSync = true)
-            coEvery { subjectLocal.load(any()) } returnsMany listOf(flowOf(subjectIntoDb), emptyFlow())
+            coEvery { subjectLocal.load(any()) } returnsMany listOf(
+                flowOf(subjectIntoDb),
+                emptyFlow()
+            )
 
             migrationManager.migrateSubjectToSyncToEventsDb()
             migrationManager.migrateSubjectToSyncToEventsDb()

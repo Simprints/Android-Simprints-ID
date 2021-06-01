@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.collect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
@@ -32,6 +31,7 @@ import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.testtools.EncodingUtilsImplForTests
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -101,8 +101,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     private fun mockBase64EncodingForSavingTemplateInSession() {
-        mockkStatic(EncodingUtils::class)
-        every { EncodingUtils.byteArrayToBase64(any()) } returns "BASE64TEMPLATE"
+        mockkStatic(EncodingUtilsImplForTests::class)
+        every { EncodingUtilsImplForTests.byteArrayToBase64(any()) } returns "BASE64TEMPLATE"
     }
 
     @Test

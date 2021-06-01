@@ -6,6 +6,8 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
@@ -39,8 +41,6 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelperImpl
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.EncodingUtilsImpl
 import dagger.Module
 import dagger.Provides
 
@@ -137,7 +137,7 @@ open class SyncModule {
         )
 
     @Provides
-    open fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl()
+    open fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl
 
     @Provides
     open fun provideSubjectFactory(encodingUtils: EncodingUtils): SubjectFactory =

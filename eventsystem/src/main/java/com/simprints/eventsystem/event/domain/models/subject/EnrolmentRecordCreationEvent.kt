@@ -6,7 +6,7 @@ import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
@@ -70,29 +70,33 @@ data class EnrolmentRecordCreationEvent(
 
         fun buildBiometricReferences(
             fingerprintSamples: List<FingerprintSample>,
-            faceSamples: List<FaceSample>
+            faceSamples: List<FaceSample>,
+            encoder: EncodingUtils
         ): List<BiometricReference> {
             val biometricReferences = mutableListOf<BiometricReference>()
 
-            buildFingerprintReference(fingerprintSamples)?.let {
+            buildFingerprintReference(fingerprintSamples, encoder)?.let {
                 biometricReferences.add(it)
             }
 
-            buildFaceReference(faceSamples)?.let {
+            buildFaceReference(faceSamples, encoder)?.let {
                 biometricReferences.add(it)
             }
 
             return biometricReferences
         }
 
-        private fun buildFingerprintReference(fingerprintSamples: List<FingerprintSample>) =
+        private fun buildFingerprintReference(
+            fingerprintSamples: List<FingerprintSample>,
+            encoder: EncodingUtils
+        ) =
             if (fingerprintSamples.isNotEmpty()) {
                 FingerprintReference(
                     fingerprintSamples.uniqueId() ?: "",
                     fingerprintSamples.map {
                         FingerprintTemplate(
                             it.templateQualityScore,
-                            EncodingUtils.byteArrayToBase64(it.template),
+                            encoder.byteArrayToBase64(it.template),
                             it.fingerIdentifier
                         )
                     },
@@ -102,13 +106,16 @@ data class EnrolmentRecordCreationEvent(
                 null
             }
 
-        private fun buildFaceReference(faceSamples: List<FaceSample>) =
+        private fun buildFaceReference(
+            faceSamples: List<FaceSample>,
+            encoder: EncodingUtils
+        ) =
             if (faceSamples.isNotEmpty()) {
                 FaceReference(
                     faceSamples.uniqueId() ?: "",
                     faceSamples.map {
                         FaceTemplate(
-                            EncodingUtils.byteArrayToBase64(it.template)
+                            encoder.byteArrayToBase64(it.template)
                         )
                     },
                     faceSamples.first().format.fromModuleApiToDomain()

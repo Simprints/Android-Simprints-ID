@@ -21,7 +21,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
-import com.simprints.id.tools.EncodingUtilsTest
+import com.simprints.testtools.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -45,7 +45,7 @@ class PersonCreationEventHelperImplTest {
     private val fingerprintSample = FingerprintCaptureSample(
         FingerIdentifier.LEFT_THUMB,
         templateQualityScore = 10,
-        template = EncodingUtilsTest().base64ToBytes(
+        template = EncodingUtilsImplForTests.base64ToBytes(
             fingerprintCaptureEvent.payload.fingerprint?.template
                 ?: ""
         ),
@@ -54,7 +54,7 @@ class PersonCreationEventHelperImplTest {
 
     private val faceSample = FaceCaptureSample(
         "face_id",
-        EncodingUtilsTest().base64ToBytes(faceCaptureEvent.payload.face?.template ?: ""),
+        EncodingUtilsImplForTests.base64ToBytes(faceCaptureEvent.payload.face?.template ?: ""),
         null,
         FaceTemplateFormat.RANK_ONE_1_23
     )
@@ -94,7 +94,7 @@ class PersonCreationEventHelperImplTest {
         coEvery { timeHelper.now() } returns CREATED_AT
 
 
-        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsTest())
+        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsImplForTests)
     }
 
     @Test

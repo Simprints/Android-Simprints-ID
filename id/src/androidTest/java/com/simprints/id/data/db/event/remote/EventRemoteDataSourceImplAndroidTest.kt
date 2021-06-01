@@ -4,7 +4,6 @@ import android.net.NetworkInfo
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID

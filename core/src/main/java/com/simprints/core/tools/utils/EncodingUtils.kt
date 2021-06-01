@@ -7,7 +7,7 @@ interface EncodingUtils {
     fun base64ToBytes(base64: String): ByteArray
 }
 
-class EncodingUtilsImpl : EncodingUtils {
+object EncodingUtilsImpl : EncodingUtils {
 
     //Do not use in unit test - android.util.Base64 requires android sdk
     override fun byteArrayToBase64(bytes: ByteArray): String =

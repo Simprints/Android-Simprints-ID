@@ -57,8 +57,8 @@ import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
+import com.simprints.testtools.EncodingUtilsImplForTests
 import com.simprints.testtools.biometrics.FingerprintGeneratorUtils
-import com.simprints.testtools.encodingUtilsForTests
 import kotlin.random.Random
 
 val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
@@ -235,11 +235,11 @@ fun buildFakeBiometricReferences(): List<BiometricReference> {
     return listOf(fingerprintReference, faceReference)
 }
 
-fun buildFakeFingerprintTemplate() = encodingUtilsForTests.byteArrayToBase64(
+fun buildFakeFingerprintTemplate() = EncodingUtilsImplForTests.byteArrayToBase64(
     FingerprintGeneratorUtils.generateRandomFingerprint().template
 )
 
-private fun buildFakeFaceTemplate() = encodingUtilsForTests.byteArrayToBase64(
+private fun buildFakeFaceTemplate() = EncodingUtilsImplForTests.byteArrayToBase64(
     FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23).template
 )
 
