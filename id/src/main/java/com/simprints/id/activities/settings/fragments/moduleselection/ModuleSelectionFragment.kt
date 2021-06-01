@@ -36,7 +36,7 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(R.layout.fragment_module_selection), ModuleSelectionListener, ChipClickListener {
 
-    private val confirmModuleSelectionDialog =
+    private val confirmModuleSelectionDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.confirm_module_selection_title))
             .setMessage(getModulesSelectedTextForDialog())
@@ -46,6 +46,7 @@ class ModuleSelectionFragment(
             .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
             { _, _ -> handleModuleSelectionCancelClick() }
             .create()
+    }
 
     @Inject
     lateinit var preferencesManager: PreferencesManager

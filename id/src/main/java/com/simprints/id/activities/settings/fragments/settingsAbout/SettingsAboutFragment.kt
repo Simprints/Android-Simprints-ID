@@ -30,7 +30,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private lateinit var packageVersionName: String
     private lateinit var deviceId: String
-    private val confirmationDialogForLogout: AlertDialog =
+    private val confirmationDialogForLogout: AlertDialog by lazy {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.confirmation_logout_title))
             .setMessage(getString(R.string.confirmation_logout_message))
@@ -43,6 +43,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
             .setNegativeButton(
                 getString(R.string.confirmation_logout_cancel), null
             ).create()
+    }
 
     @Inject
     lateinit var recentEventsManager: RecentEventsPreferencesManager
