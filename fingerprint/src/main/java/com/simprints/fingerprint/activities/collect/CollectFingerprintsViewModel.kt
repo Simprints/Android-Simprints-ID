@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
@@ -55,7 +55,8 @@ class CollectFingerprintsViewModel(
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
-    private val startingStateDeterminer: StartingStateDeterminer
+    private val startingStateDeterminer: StartingStateDeterminer,
+    private val encoder: EncodingUtils
 ) : ViewModel() {
 
     val state = MutableLiveData<CollectFingerprintsState>()
@@ -322,7 +323,7 @@ class CollectFingerprintsViewModel(
                     FingerprintCaptureEvent.Fingerprint(
                         id,
                         it.qualityScore,
-                        EncodingUtilsImpl.byteArrayToBase64(it.template),
+                        encoder.byteArrayToBase64(it.template),
                         FingerprintTemplateFormat.ISO_19794_2
                     )
                 }
