@@ -6,10 +6,10 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.simprints.core.domain.modality.Modality
+import com.simprints.eventsystem.createSessionCaptureEvent
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.eventsystem.createSessionCaptureEvent
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse

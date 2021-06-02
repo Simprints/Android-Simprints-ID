@@ -8,7 +8,7 @@ import br.com.concretesolutions.kappuccino.custom.recyclerView.RecyclerViewInter
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.every
@@ -22,7 +22,7 @@ class ModuleSelectionActivityAndroidTest {
         settingsPreferencesManagerRule = DependencyRule.SpykRule
     )
 
-    private lateinit var preferencesManagerSpy: PreferencesManager
+    private lateinit var preferencesManagerSpy: IdPreferencesManager
 
     private val moduleOptions = setOf("a", "b", "c", "d", "e")
     private val selectedModules = setOf("b")
@@ -30,7 +30,7 @@ class ModuleSelectionActivityAndroidTest {
     @Before
     fun setUp() {
         AndroidTestConfig(this, null, preferencesModule = preferencesModule).fullSetup()
-        preferencesManagerSpy = app.component.getPreferencesManager()
+        preferencesManagerSpy = app.component.getIdPreferencesManager()
     }
 
     @Test

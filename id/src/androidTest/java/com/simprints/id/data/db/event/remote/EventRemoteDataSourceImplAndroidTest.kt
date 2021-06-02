@@ -4,18 +4,17 @@ import android.net.NetworkInfo
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.buildFakeBiometricReferences
 import com.simprints.eventsystem.createEnrolmentEventV1
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
@@ -44,20 +43,23 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.id.commontesttools.SubjectsGeneratorUtils
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder
-import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.TimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.moduleapi.app.responses.IAppResponseTier
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -208,12 +210,12 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addFingerprintCaptureEvent() {
         FingerprintCapturePayload.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
-                val fakeTemplate = EncodingUtils.byteArrayToBase64(
+                val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
                     SubjectsGeneratorUtils.getRandomFingerprintSample().template
                 )
 
                 val fingerprint = FingerprintCapturePayload.Fingerprint(
-                    fingerIdentifier,
+                    fingerIdentifier.fromDomainToModuleApi(),
                     0,
                     fakeTemplate,
                     FingerprintTemplateFormat.ISO_19794_2
@@ -222,7 +224,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 val event = FingerprintCaptureEvent(
                     DEFAULT_TIME,
                     DEFAULT_TIME,
-                    fingerIdentifier,
+                    fingerIdentifier.fromDomainToModuleApi(),
                     0,
                     result,
                     fingerprint,
@@ -237,7 +239,7 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addFaceCaptureEvent() {
         FaceCapturePayload.Result.values().forEachIndexed { index, result ->
-            val template = EncodingUtils.byteArrayToBase64(
+            val template = EncodingUtilsImpl.byteArrayToBase64(
                 SubjectsGeneratorUtils.getRandomFaceSample().template
             )
 
@@ -432,13 +434,13 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addCallbackVerificationEvent() {
-        Tier.values().forEach {
+        IAppResponseTier.values().forEach {
             add(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(randomUUID(), 0, it), eventLabels))
         }
     }
 
     private fun MutableList<Event>.addCallbackIdentificationEvent() {
-        Tier.values().forEach {
+        IAppResponseTier.values().forEach {
             add(IdentificationCallbackEvent(DEFAULT_TIME, randomUUID(), listOf(CallbackComparisonScore(randomUUID(), 0, it)), eventLabels))
         }
     }
