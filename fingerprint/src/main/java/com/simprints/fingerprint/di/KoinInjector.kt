@@ -2,6 +2,8 @@ package com.simprints.fingerprint.di
 
 import android.bluetooth.BluetoothAdapter
 import android.nfc.NfcAdapter
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -189,11 +191,13 @@ object KoinInjector {
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
         }
+        single<EncodingUtils> { EncodingUtilsImpl }
 
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
+                get(),
                 get(),
                 get(),
                 get(),
