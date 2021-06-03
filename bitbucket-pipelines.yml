@@ -131,7 +131,15 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew buildHealth
+                    - ./gradlew :eventsystem:projectHealth
+                    - ./gradlew :core:projectHealth
+                    - ./gradlew :clientapi:projectHealth
+                    - ./gradlew :face:projectHealth
+                    - ./gradlew :fingerprint:projectHealth
+                    - ./gradlew :fingerprintscanner:projectHealth
+                    - ./gradlew :fingerprintmatcher:projectHealth
+                    - ./gradlew :fingerprintscannermock:projectHealth
+                    - ./gradlew :moduleapi:projectHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download

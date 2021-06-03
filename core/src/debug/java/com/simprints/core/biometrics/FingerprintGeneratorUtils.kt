@@ -1,7 +1,6 @@
 package com.simprints.core.biometrics
 
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import java.nio.ByteBuffer

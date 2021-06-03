@@ -38,23 +38,21 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":moduleapi"))
-    implementation(Dependencies.libsimprints)
+    api(project(":core"))
+    api(project(":moduleapi"))
 
-    implementation(Dependencies.AndroidX.Room.core)
+    api(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Room.ktx)
     kapt(Dependencies.AndroidX.Room.compiler)
 
-    implementation(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.Kotlin.coroutines_android)
     implementation(Dependencies.Kotlin.serialization_json)
     implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Timber.core)
-    implementation(Dependencies.Retrofit.okhttp)
-    implementation(Dependencies.Retrofit.core)
-    implementation(Dependencies.SqlCipher.core)
+    api(Dependencies.Retrofit.okhttp)
+    api(Dependencies.Retrofit.core)
+    api(Dependencies.SqlCipher.core)
 
     testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.AndroidX.ext_junit)

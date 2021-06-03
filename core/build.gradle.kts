@@ -42,14 +42,13 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":moduleapi"))
-    implementation(Dependencies.libsimprints)
+    api(project(":moduleapi"))
 
     api(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.Lifecycle.java8)
     api(Dependencies.AndroidX.multidex)
-    implementation(Dependencies.AndroidX.CameraX.core)
-    api(Dependencies.AndroidX.CameraX.camera2)
+    api(Dependencies.AndroidX.CameraX.core)
+    implementation(Dependencies.AndroidX.CameraX.camera2)
 
     implementation(Dependencies.Kotlin.coroutines_android)
     api(Dependencies.Testing.Espresso.idling)

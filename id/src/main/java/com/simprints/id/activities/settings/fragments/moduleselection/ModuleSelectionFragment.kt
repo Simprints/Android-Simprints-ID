@@ -55,7 +55,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     lateinit var preferencesManager: IdPreferencesManager
     @Inject
     lateinit var eventSyncManager: EventSyncManager
-    
+
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
     private val chipHelper by lazy { ModuleChipHelper(requireContext(), listener = this) }
