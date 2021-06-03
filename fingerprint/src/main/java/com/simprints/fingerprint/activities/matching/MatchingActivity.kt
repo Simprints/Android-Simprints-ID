@@ -38,7 +38,7 @@ class MatchingActivity : FingerprintActivity() {
         setContentView(binding.root)
 
         setTextInLayout()
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         observeResult()
         observeProgress()
