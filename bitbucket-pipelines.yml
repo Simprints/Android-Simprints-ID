@@ -122,7 +122,7 @@ definitions:
         # Scan all of the projects dependencies and report back if there are
         # un-used, incorrectly declared, or incorrect transitive dependencies
         ######################################################################
-        -   step: &dependecy-health-check
+        -   step: &dependency-health-check
                 max-time: 30
                 size: 2x
                 name: "Dependency health check"
@@ -262,7 +262,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *dependecy-health-check
+                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -274,7 +274,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *dependecy-health-check
+                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -289,7 +289,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *dependecy-health-check
+                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
