@@ -25,6 +25,9 @@ android {
         getByName("debug") {
             assets.srcDirs("$projectDir/schemas")
         }
+        getByName("test") {
+            java.srcDirs("$projectDir/src/debug/java")
+        }
     }
 
     testOptions {
