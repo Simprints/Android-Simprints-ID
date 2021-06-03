@@ -32,7 +32,7 @@ import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.testtools.EncodingUtilsImplForTests
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single

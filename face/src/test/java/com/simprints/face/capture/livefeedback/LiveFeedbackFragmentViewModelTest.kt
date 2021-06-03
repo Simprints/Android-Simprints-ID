@@ -16,7 +16,7 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
-import com.simprints.testtools.EncodingUtilsImplForTests
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.uicomponents.models.PreviewFrame

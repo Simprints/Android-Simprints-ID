@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.domain.validators
 
-import com.simprints.eventsystem.createGuidSelectionEvent
-import com.simprints.eventsystem.createIdentificationCallbackEvent
-import com.simprints.eventsystem.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createGuidSelectionEvent
+import com.simprints.eventsystem.sampledata.createIdentificationCallbackEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.eventsystem.exceptions.validator.GuidSelectEventValidatorException
 import io.kotlintest.shouldThrow
 import org.junit.Before

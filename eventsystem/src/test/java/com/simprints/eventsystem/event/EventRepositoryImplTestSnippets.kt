@@ -21,9 +21,10 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCrea
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.eventsystem.createAlertScreenEvent
-import com.simprints.eventsystem.createEnrolmentRecordCreationEvent
-import com.simprints.eventsystem.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createAlertScreenEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentRecordCreationEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.asFlow
@@ -134,7 +135,7 @@ fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
 suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecordEvents: Int): List<Event> {
     val events = mutableListOf<EnrolmentRecordCreationEvent>()
     (0 until nPersonRecordEvents).forEach { _ ->
-        events += createEnrolmentRecordCreationEvent()
+        events += createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
     }
 
     coEvery {

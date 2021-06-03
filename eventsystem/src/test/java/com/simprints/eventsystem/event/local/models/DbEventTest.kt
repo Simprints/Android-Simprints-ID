@@ -1,7 +1,8 @@
 package com.simprints.eventsystem.event.local.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.*
+import com.simprints.eventsystem.sampledata.*
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import org.junit.Test
 
 class DbEventTest {
@@ -143,7 +144,7 @@ class DbEventTest {
 
     @Test
     fun convert_EnrolmentRecordCreationEvent() {
-        val original = createEnrolmentRecordCreationEvent()
+        val original = createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
         val transformed = (original.fromDomainToDb().fromDbToDomain())
 
         assertThat(original).isEqualTo(transformed)
@@ -159,7 +160,7 @@ class DbEventTest {
 
     @Test
     fun convert_EnrolmentRecordMoveEvent() {
-        val original = createEnrolmentRecordMoveEvent()
+        val original = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
         val transformed = (original.fromDomainToDb().fromDbToDomain())
 
         assertThat(original).isEqualTo(transformed)

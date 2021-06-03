@@ -5,10 +5,10 @@ import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.createFaceCaptureEvent
-import com.simprints.eventsystem.createFingerprintCaptureEvent
-import com.simprints.eventsystem.createPersonCreationEvent
-import com.simprints.eventsystem.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
+import com.simprints.eventsystem.sampledata.createPersonCreationEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -21,7 +21,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
-import com.simprints.testtools.EncodingUtilsImplForTests
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

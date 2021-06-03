@@ -38,14 +38,6 @@ android {
         viewBinding = true
     }
 
-    sourceSets {
-        val sharedTestDir = "src/test/java/com/simprints/testtools"
-
-        named("debug") {
-            java.srcDir(sharedTestDir)
-        }
-    }
-
 }
 
 dependencies {

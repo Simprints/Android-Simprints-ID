@@ -1,10 +1,10 @@
 package com.simprints.id.testtools
 
+import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import com.simprints.testtools.biometrics.FingerprintGeneratorUtils
 import java.util.*
 import kotlin.random.Random
 

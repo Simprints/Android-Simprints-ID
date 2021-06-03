@@ -7,7 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.core.domain.modality.Modality
-import com.simprints.eventsystem.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission

@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.createEnrolmentRecordDeletionEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentRecordDeletionEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import org.junit.Test
