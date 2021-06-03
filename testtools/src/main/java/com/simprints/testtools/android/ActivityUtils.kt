@@ -11,7 +11,7 @@ import androidx.test.runner.lifecycle.Stage
 fun runActivityOnUiThread(activityTestRule: ActivityTestRule<*>) {
     val activity = activityTestRule.activity
     val wakeUpDevice = Runnable {
-        activity.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+        activity.window?.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }

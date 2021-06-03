@@ -37,10 +37,14 @@ class LoginActivity : BaseSplitActivity() {
 
     private val binding by viewBinding(ActivityLoginBinding::inflate)
 
-    @Inject lateinit var viewModelFactory: LoginViewModelFactory
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var loginActivityHelper: LoginActivityHelper
-    @Inject lateinit var baseUrlProvider: BaseUrlProvider
+    @Inject
+    lateinit var viewModelFactory: LoginViewModelFactory
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var loginActivityHelper: LoginActivityHelper
+    @Inject
+    lateinit var baseUrlProvider: BaseUrlProvider
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -248,6 +252,11 @@ class LoginActivity : BaseSplitActivity() {
             putExtra(LoginActivityResponse.BUNDLE_KEY, appErrorResponse)
         })
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        progressDialog.dismiss()
     }
 
     private companion object {
