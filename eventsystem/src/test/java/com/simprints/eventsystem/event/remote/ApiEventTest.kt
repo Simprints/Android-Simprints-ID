@@ -9,6 +9,8 @@ import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.sampledata.*
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -210,7 +212,7 @@ class ApiEventTest {
 
     @Test
     fun validate_enrolmentRecordCreationEventApiModel() {
-        val event = createEnrolmentRecordCreationEvent()
+        val event = createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
@@ -220,7 +222,7 @@ class ApiEventTest {
 
     @Test
     fun validate_enrolmentRecordMoveEventApiModel() {
-        val event = createEnrolmentRecordMoveEvent()
+        val event = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 

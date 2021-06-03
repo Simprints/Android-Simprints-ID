@@ -136,8 +136,6 @@ dependencies {
     api(project(":eventsystem"))
     implementation(Dependencies.libsimprints)
 
-    testImplementation(project(":eventsystem"))
-
     implementation(Dependencies.Dagger.core)
     implementation(Dependencies.Kotlin.reflect)
     api(Dependencies.Kotlin.anko)
@@ -208,6 +206,8 @@ dependencies {
     // ######################################################
 
     testImplementation(project(":fingerprintscannermock"))
+    testImplementation(project(":eventsystem"))
+
     testImplementation(Dependencies.Testing.retrofit)
     testImplementation(Dependencies.Testing.junit) {
         exclude("com.android.support")

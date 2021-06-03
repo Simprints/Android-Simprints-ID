@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.eventsystem.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.eventsystem.exceptions.validator.SessionEventCaptureAlreadyExists
 import io.kotlintest.shouldThrow
 import org.junit.Test

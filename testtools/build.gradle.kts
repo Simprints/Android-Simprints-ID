@@ -19,6 +19,7 @@ System.setProperty("org.mockito.mock.android", "true")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":core"))
 
     api(Dependencies.AndroidX.multidex)
     implementation(Dependencies.Timber.core)

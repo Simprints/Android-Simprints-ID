@@ -2,14 +2,10 @@ package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.createEnrolmentRecordCreationEvent
-import com.simprints.eventsystem.createEnrolmentRecordDeletionEvent
-import com.simprints.eventsystem.createEnrolmentRecordMoveEvent
-import com.simprints.eventsystem.createPersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.eventsystem.sampledata.SampleDefaults
+import com.simprints.eventsystem.sampledata.*
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -18,7 +14,7 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
-import com.simprints.testtools.EncodingUtilsImplForTests
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -121,7 +117,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun downSync_shouldProcessRecordCreationEvent() {
         runBlocking {
-            val event = createEnrolmentRecordCreationEvent()
+            val event = createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(event))
 
             eventDownSyncHelper.downSync(this, projectOp).consumeAsFlow().toList()
@@ -145,7 +141,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectFromModulesUnderSyncing_theOriginalModuleSyncShouldDoNothing() {
         runBlocking {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent()
+            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
             every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
 
@@ -160,7 +156,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() {
         runBlocking {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent()
+            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
             every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
 
@@ -178,7 +174,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() {
         runBlocking {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent()
+            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
             every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
 
@@ -195,7 +191,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectToAModuleUnderSyncing_shouldPerformCreationOnly() {
         runBlocking {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent()
+            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
             every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID_2)
 

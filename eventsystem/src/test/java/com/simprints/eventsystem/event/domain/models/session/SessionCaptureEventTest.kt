@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.domain.models.session
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.eventLabels
+import com.simprints.eventsystem.sampledata.eventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT

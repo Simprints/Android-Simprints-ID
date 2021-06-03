@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.createPersonCreationEvent
+import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.eventsystem.sampledata.SampleDefaults

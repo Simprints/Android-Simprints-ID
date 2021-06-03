@@ -10,8 +10,8 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.eventsystem.createEnrolmentCalloutEvent
-import com.simprints.eventsystem.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo

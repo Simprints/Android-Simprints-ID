@@ -13,8 +13,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.buildFakeBiometricReferences
-import com.simprints.eventsystem.createEnrolmentEventV1
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
@@ -48,6 +46,8 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.buildFakeBiometricReferences
+import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
@@ -60,6 +60,7 @@ import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -414,7 +415,7 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(EnrolmentRecordCreationEvent(
-            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
+            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(EncodingUtilsImplForTests),
             EventLabels(subjectId = GUID1, projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
         )
     }
