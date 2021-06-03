@@ -539,7 +539,7 @@ class CollectFingerprintsViewModel(
         // Don't try to reconnect scanner in onPause, if scanner is null,
         // reconnection of null scanner will be handled in onResume
         scannerManager.scanner?.let { scanner ->
-            stopLiveFeedback(scanner).doInBackground()
+            stopLiveFeedback(scanner)
             scanner.unregisterTriggerListener(scannerTriggerListener)
         }
     }
