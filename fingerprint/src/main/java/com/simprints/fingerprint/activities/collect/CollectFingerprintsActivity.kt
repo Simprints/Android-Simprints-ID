@@ -37,7 +37,7 @@ import com.simprints.fingerprint.tools.extensions.showToast
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class CollectFingerprintsActivity: FingerprintActivity() {
+class CollectFingerprintsActivity : FingerprintActivity() {
 
     private val masterFlowManager: MasterFlowManager by inject()
 
@@ -54,10 +54,11 @@ class CollectFingerprintsActivity: FingerprintActivity() {
         setContentView(binding.root)
         mainContentBinding = binding.mainContent
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(CollectFingerprintsTaskRequest.BUNDLE_KEY)
-            ?: throw InvalidRequestForCollectFingerprintsActivityException()
+        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(
+            CollectFingerprintsTaskRequest.BUNDLE_KEY
+        ) ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
         vm.start(fingerprintRequest.fingerprintsToCapture)
 
@@ -214,5 +215,10 @@ class CollectFingerprintsActivity: FingerprintActivity() {
         if (!vm.state().currentCaptureState().isCommunicating()) {
             launchRefusalActivity()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        confirmDialog?.dismiss()
     }
 }
