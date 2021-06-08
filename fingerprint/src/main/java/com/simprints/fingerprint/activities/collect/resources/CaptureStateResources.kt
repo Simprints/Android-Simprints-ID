@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect.resources
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
+import com.simprints.core.R as CR
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 
 @StringRes
@@ -32,15 +33,15 @@ fun CaptureState.buttonTextColour(): Int =
 @ColorRes
 fun CaptureState.buttonBackgroundColour(): Int =
     when (this) {
-        is CaptureState.NotCollected -> R.color.simprints_grey
+        is CaptureState.NotCollected -> CR.color.simprints_grey
         is CaptureState.Scanning,
-        is CaptureState.TransferringImage -> R.color.simprints_blue
+        is CaptureState.TransferringImage -> CR.color.simprints_blue
         is CaptureState.Skipped,
-        is CaptureState.NotDetected -> R.color.simprints_red
+        is CaptureState.NotDetected -> CR.color.simprints_red
         is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-            R.color.simprints_green
+            CR.color.simprints_green
         } else {
-            R.color.simprints_red
+            CR.color.simprints_red
         }
     }
 
@@ -69,15 +70,15 @@ fun CaptureState.resultTextColour(): Int =
         is CaptureState.NotCollected,
         is CaptureState.Scanning -> android.R.color.white
         is CaptureState.TransferringImage -> if (scanResult.isGoodScan()) {
-            R.color.simprints_green
+            CR.color.simprints_green
         } else {
-            R.color.simprints_red
+            CR.color.simprints_red
         }
         is CaptureState.Skipped,
-        is CaptureState.NotDetected -> R.color.simprints_red
+        is CaptureState.NotDetected -> CR.color.simprints_red
         is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-            R.color.simprints_green
+            CR.color.simprints_green
         } else {
-            R.color.simprints_red
+            CR.color.simprints_red
         }
     }

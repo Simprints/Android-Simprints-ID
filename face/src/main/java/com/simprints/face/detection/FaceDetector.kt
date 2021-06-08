@@ -1,7 +1,7 @@
 package com.simprints.face.detection
 
 import android.graphics.Bitmap
-import com.simprints.uicomponents.models.PreviewFrame
+import com.simprints.face.models.PreviewFrame
 
 interface FaceDetector {
 

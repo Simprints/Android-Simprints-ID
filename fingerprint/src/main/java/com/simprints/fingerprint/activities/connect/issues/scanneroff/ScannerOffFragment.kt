@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.core.R as CR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -86,7 +87,7 @@ class ScannerOffFragment : FingerprintFragment() {
             tryAgainButton.visibility = View.VISIBLE
             tryAgainButton.isEnabled = false
             tryAgainButton.text = getString(R.string.scanner_on)
-            tryAgainButton.setBackgroundColor(resources.getColor(R.color.simprints_green, null))
+            tryAgainButton.setBackgroundColor(resources.getColor(CR.color.simprints_green, null))
         }
 
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)

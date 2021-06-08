@@ -16,12 +16,12 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
-import com.simprints.uicomponents.models.Size
+import com.simprints.face.models.Size
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
-import com.simprints.uicomponents.R as UCR
+
 
 class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProcessor {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
@@ -117,10 +117,10 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
             captureOverlay.drawWhiteTarget()
 
             captureTitle.setTextColor(
-                ContextCompat.getColor(requireContext(), UCR.color.capture_grey_blue)
+                ContextCompat.getColor(requireContext(), R.color.capture_grey_blue)
             )
             captureFeedbackTxtExplanation.setTextColor(
-                ContextCompat.getColor(requireContext(), UCR.color.capture_grey_blue)
+                ContextCompat.getColor(requireContext(), R.color.capture_grey_blue)
             )
         }
     }
@@ -151,7 +151,7 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
                 true,
-                ContextCompat.getDrawable(requireContext(), UCR.drawable.ic_checked_white_18dp)
+                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
         toggleCaptureButtons(true)
@@ -164,7 +164,7 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
                 true,
-                ContextCompat.getDrawable(requireContext(), UCR.drawable.ic_checked_white_18dp)
+                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
 
@@ -222,8 +222,8 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
     private fun renderProgressBar(valid: Boolean) {
         binding.apply {
             val progressColor =
-                if (valid) UCR.color.capture_green
-                else UCR.color.capture_grey
+                if (valid) R.color.capture_green
+                else R.color.capture_grey
 
             captureProgress.progressColor = ContextCompat.getColor(
                 requireContext(),
