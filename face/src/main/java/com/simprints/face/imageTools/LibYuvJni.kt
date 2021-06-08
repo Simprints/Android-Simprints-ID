@@ -1,7 +1,7 @@
 package com.simprints.uicomponents.imageTools
 
 import android.graphics.Rect
-import com.simprints.uicomponents.models.Size
+import com.simprints.face.models.Size
 
 class LibYuvJni {
 

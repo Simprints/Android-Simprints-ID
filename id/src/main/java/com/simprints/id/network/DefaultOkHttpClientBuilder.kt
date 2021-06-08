@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.test.core.BuildConfig
+import com.simprints.core.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
