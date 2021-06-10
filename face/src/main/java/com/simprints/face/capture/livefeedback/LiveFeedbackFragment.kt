@@ -5,7 +5,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.otaliastudios.cameraview.frame.FrameProcessor
@@ -48,12 +47,12 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
     }
 
     private fun bindViewModel() {
-        vm.currentDetection.observe(viewLifecycleOwner, Observer {
+        vm.currentDetection.observe(viewLifecycleOwner, {
             renderCurrentDetection(it)
 //            renderDebugInfo(it.face)
         })
 
-        vm.capturingState.observe(viewLifecycleOwner, Observer {
+        vm.capturingState.observe(viewLifecycleOwner, {
             when (it) {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
                     renderCapturingNotStarted()
@@ -61,8 +60,6 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
                     renderCapturing()
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED ->
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
-                LiveFeedbackFragmentViewModel.CapturingState.FINISHED_FAILED ->
-                    findNavController().navigate(R.id.action_liveFeedbackFragment_to_retryFragment)
             }
         })
     }
