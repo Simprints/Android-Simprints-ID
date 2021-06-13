@@ -110,14 +110,6 @@ class DbEventTest {
     }
 
     @Test
-    fun convert_FaceCaptureRetryEvent() {
-        val original = createFaceCaptureRetryEvent()
-        val transformed = original.fromDomainToDb().fromDbToDomain()
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
     fun convert_FaceFallbackCaptureEvent() {
         val original = createFaceFallbackCaptureEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
