@@ -11,7 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.getStringPlural
+import com.simprints.core.tools.extentions.getQuantityString
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
@@ -110,39 +110,39 @@ class FaceMatchActivity : FaceActivity() {
     }
 
     private fun renderFinished(matchState: Finished) {
-        binding.faceMatchTvMatchingProgressStatus1.text = getStringPlural(
-            R.string.face_match_matched_candidates_quantity_key,
+        binding.faceMatchTvMatchingProgressStatus1.text = getQuantityString(
+            R.plurals.face_match_matched_candidates,
             matchState.candidatesMatched,
             arrayOf(matchState.candidatesMatched)
         )
 
         binding.faceMatchTvMatchingProgressStatus2.isVisible = true
-        binding.faceMatchTvMatchingProgressStatus2.text = getStringPlural(
-            R.string.face_match_returned_results_quantity_key,
+        binding.faceMatchTvMatchingProgressStatus2.text = getQuantityString(
+            R.plurals.face_match_returned_results,
             matchState.returnSize,
             arrayOf(matchState.returnSize)
         )
 
         if (matchState.veryGoodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus1.isVisible = true
-            binding.faceMatchTvMatchingResultStatus1.text = getStringPlural(
-                R.string.face_match_tier1or2_matches_quantity_key,
+            binding.faceMatchTvMatchingResultStatus1.text = getQuantityString(
+                R.plurals.face_match_tier1or2_matches,
                 matchState.veryGoodMatches,
                 arrayOf(matchState.veryGoodMatches)
             )
         }
         if (matchState.goodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus2.isVisible = true
-            binding.faceMatchTvMatchingResultStatus2.text = getStringPlural(
-                R.string.face_match_tier3_matches_quantity_key,
+            binding.faceMatchTvMatchingResultStatus2.text = getQuantityString(
+                R.plurals.face_match_tier3_matches,
                 matchState.goodMatches,
                 arrayOf(matchState.goodMatches)
             )
         }
         if (matchState.veryGoodMatches < 1 && matchState.goodMatches < 1 || matchState.fairMatches > 1) {
             binding.faceMatchTvMatchingResultStatus3.isVisible = true
-            binding.faceMatchTvMatchingResultStatus3.text = getStringPlural(
-                R.string.face_match_tier4_matches_quantity_key,
+            binding.faceMatchTvMatchingResultStatus3.text = getQuantityString(
+                R.plurals.face_match_tier4_matches,
                 matchState.fairMatches,
                 arrayOf(matchState.fairMatches)
             )
