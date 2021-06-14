@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.steps.Step
 
@@ -19,7 +18,12 @@ interface ModalityFlow {
 
     fun getNextStepToLaunch(): Step?
 
-    suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step?
+    suspend fun handleIntentResult(
+        appRequest: AppRequest,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Step?
 
     fun restoreState(stepsToRestore: List<Step>)
 }

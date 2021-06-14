@@ -1,12 +1,13 @@
 package com.simprints.id.data.consent.longconsent
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import java.io.BufferedReader
 import java.io.File
 
 class LongConsentLocalDataSourceImpl(absolutePath: String,
-                                     private val loginInfoManager: LoginInfoManager) : LongConsentLocalDataSource {
+                                     private val loginInfoManager: LoginInfoManager
+) : LongConsentLocalDataSource {
 
     companion object {
         const val FILE_PATH = "long-consents"

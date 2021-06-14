@@ -2,11 +2,12 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 
-class FingerSelectionViewModelFactory(private val preferencesManager: PreferencesManager,
-                                      private val crashReportManager: CrashReportManager) : ViewModelProvider.Factory {
+class FingerSelectionViewModelFactory(private val preferencesManager: IdPreferencesManager,
+                                      private val crashReportManager: CrashReportManager
+) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

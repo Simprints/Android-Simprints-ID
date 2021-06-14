@@ -1,11 +1,11 @@
 package com.simprints.id.activities.consent
 
 import android.content.Context
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.R
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.shortconsent.ParentalConsentOptions
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 

@@ -1,6 +1,6 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK

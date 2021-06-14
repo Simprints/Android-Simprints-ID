@@ -6,9 +6,9 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.firebase.perf.metrics.Trace
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory

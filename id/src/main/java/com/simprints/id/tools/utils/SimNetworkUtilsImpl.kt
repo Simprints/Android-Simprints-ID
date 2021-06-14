@@ -3,7 +3,8 @@ package com.simprints.id.tools.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.telephony.TelephonyManager
-import com.simprints.id.tools.utils.SimNetworkUtils.Connection
+import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 
 open class SimNetworkUtilsImpl(val ctx: Context) : SimNetworkUtils {
 

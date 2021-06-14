@@ -2,7 +2,7 @@ package com.simprints.id.testtools.testingapi.remote
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.network.SimApiClientImpl
-import com.simprints.id.network.SimRemoteInterface
+import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.network.TimberLogger
 import io.mockk.mockk
 import okhttp3.logging.HttpLoggingInterceptor

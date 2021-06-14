@@ -1,6 +1,6 @@
 package com.simprints.id.tools.serializers
 
-import com.simprints.id.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality
 
 class ModalitiesListSerializer : Serializer<List<Modality>> {
 

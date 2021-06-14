@@ -1,6 +1,7 @@
 package com.simprints.id.data.loginInfo
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
 
 open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) : LoginInfoManager {

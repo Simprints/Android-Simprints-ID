@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.common
 
 import com.google.firebase.auth.FirebaseAuth
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.tools.extensions.awaitTask

@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.crashreport
 
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.*
+import com.simprints.core.analytics.CrashReportTrigger.*
 
 enum class FingerprintCrashReportTrigger {
     UI,

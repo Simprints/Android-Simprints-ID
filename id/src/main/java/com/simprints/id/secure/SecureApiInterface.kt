@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.id.network.SimRemoteInterface
+import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.secure.models.AuthRequestBody
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.ApiAuthenticationData

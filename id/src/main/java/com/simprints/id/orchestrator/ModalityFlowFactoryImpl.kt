@@ -1,6 +1,6 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest

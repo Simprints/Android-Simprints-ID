@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("kotlin-parcelize")
 }
 
 apply {
@@ -41,14 +42,19 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    api(project(":moduleapi"))
 
     api(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.Lifecycle.java8)
+    api(Dependencies.AndroidX.multidex)
+    api(Dependencies.AndroidX.CameraX.core)
+    implementation(Dependencies.AndroidX.CameraX.camera2)
 
     implementation(Dependencies.Kotlin.coroutines_android)
     api(Dependencies.Testing.Espresso.idling)
     implementation(Dependencies.Timber.core)
     implementation(Dependencies.Jackson.core)
+    implementation(Dependencies.Retrofit.core)
     api(Dependencies.Dagger.javax)
     implementation(Dependencies.Firebase.storage)
 
@@ -59,6 +65,7 @@ dependencies {
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.coroutines_test)
     testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.Robolectric.core)
     testImplementation(project(":testtools"))
 
     androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)

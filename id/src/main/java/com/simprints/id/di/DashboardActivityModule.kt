@@ -1,6 +1,11 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSourceImpl
 import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
@@ -14,15 +19,11 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplay
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 
@@ -48,7 +49,7 @@ open class DashboardActivityModule {
     open fun provideDashboardSyncCardStateRepository(
         eventSyncManager: EventSyncManager,
         deviceManager: DeviceManager,
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         downSyncScopeRepository: EventDownSyncScopeRepository,
         cacheSync: EventSyncCache,
         timeHelper: TimeHelper

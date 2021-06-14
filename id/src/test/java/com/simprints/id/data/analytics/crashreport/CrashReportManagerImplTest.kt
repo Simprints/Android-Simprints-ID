@@ -4,13 +4,15 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
-import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MODULE_IDS
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.PROJECT_ID
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -144,10 +146,10 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
         val crashReportManagerSpy = spyk(CrashReportManagerImpl())
         val crashlyticsInstanceMock: FirebaseCrashlytics = mockk()
         val testFingersSelected = listOf(
-            FingerIdentifier.LEFT_3RD_FINGER,
-            FingerIdentifier.LEFT_4TH_FINGER,
-            FingerIdentifier.LEFT_THUMB,
-            FingerIdentifier.RIGHT_4TH_FINGER
+            FingerIdentifier.LEFT_3RD_FINGER.toString(),
+            FingerIdentifier.LEFT_4TH_FINGER.toString(),
+            FingerIdentifier.LEFT_THUMB.toString(),
+            FingerIdentifier.RIGHT_4TH_FINGER.toString()
         )
 
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock
@@ -163,7 +165,7 @@ class CrashReportManagerImplTest : AutoCloseKoinTest() {
         val testDownSyncSetting = EventDownSyncSetting.EXTRA
 
         every { crashReportManagerSpy.crashlyticsInstance } returns crashlyticsInstanceMock
-        crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncSetting)
+        crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncSetting.toString())
 
         verify(atLeast = 1) { crashlyticsInstanceMock.setCustomKey(SUBJECTS_DOWN_SYNC_TRIGGERS, testDownSyncSetting.toString()) }
     }

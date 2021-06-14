@@ -1,15 +1,12 @@
 package com.simprints.id.activities.fetchguid
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.domain.modality.toMode
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.toMode
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -18,8 +15,9 @@ import timber.log.Timber
 
 class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
                           val subjectRepository: SubjectRepository,
-                          val preferencesManager: PreferencesManager,
-                          val crashReportManager: CrashReportManager) : FetchGuidHelper {
+                          val preferencesManager: IdPreferencesManager,
+                          val crashReportManager: CrashReportManager
+) : FetchGuidHelper {
 
     override suspend fun loadFromRemoteIfNeeded(coroutineScope: CoroutineScope, projectId: String, subjectId: String): SubjectFetchResult {
         return try {
@@ -30,12 +28,14 @@ class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
 
                 subjectResultFromDB
             } else {
-                val op = EventDownSyncOperation(
-                    RemoteEventQuery(
+                val op = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation(
+                    com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery(
                         projectId,
                         subjectId = subjectId,
                         modes = preferencesManager.modalities.map { it.toMode() },
-                        types = EventDownSyncScope.subjectEvents))
+                        types = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.subjectEvents
+                    )
+                )
 
                 downSyncHelper.downSync(coroutineScope, op).consumeAsFlow().toList()
 

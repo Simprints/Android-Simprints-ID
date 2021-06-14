@@ -14,8 +14,8 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
