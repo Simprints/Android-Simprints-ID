@@ -394,16 +394,6 @@ class ApiEventTest {
         validateFaceCaptureConfirmationEventApiModel(json)
     }
 
-    @Test
-    fun validate_FaceCaptureRetryEventApiModel() {
-        val event = createFaceCaptureRetryEvent()
-        val apiEvent = event.fromDomainToApi()
-        val json = JSONObject(jackson.writeValueAsString(apiEvent))
-
-        validateFaceCaptureRetryEventApiModel(json)
-    }
-
-
     // Never invoked, but used to enforce the implementation of a test for every event event class
     fun enforceThatAnyTestHasATest() {
         val type: ApiEventPayloadType? = null
@@ -439,7 +429,6 @@ class ApiEventTest {
             FaceFallbackCapture -> validate_FaceFallbackCaptureEventApiModel()
             FaceCapture -> validate_FaceCaptureEventApiModel()
             FaceCaptureConfirmation -> validate_FaceCaptureConfirmationEventApiModel()
-            FaceCaptureRetry -> validate_FaceCaptureRetryEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

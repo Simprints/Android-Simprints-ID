@@ -8,12 +8,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
 import com.simprints.id.commontesttools.events.createEnrolmentEventV1
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -54,6 +49,11 @@ import com.simprints.id.network.DefaultOkHttpClientBuilder
 import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.TimberLogger
+import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.sampledata.SampleDefaults.GUID1
+import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -270,11 +270,6 @@ class EventRemoteDataSourceImplAndroidTest {
 
             add(event)
         }
-    }
-
-    private fun MutableList<Event>.addFaceCaptureRetryEvent() {
-        val event = FaceCaptureRetryEvent(DEFAULT_TIME, DEFAULT_TIME + 100, eventLabels)
-        add(event)
     }
 
     private fun MutableList<Event>.addFaceFallbackCaptureEvent() {
@@ -510,7 +505,6 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
             FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
-            FACE_CAPTURE_RETRY -> addFaceCaptureRetryEvent()
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
             ENROLMENT_V1 -> { }
