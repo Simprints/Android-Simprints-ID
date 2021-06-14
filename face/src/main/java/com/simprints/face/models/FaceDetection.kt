@@ -6,7 +6,6 @@ import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import com.simprints.uicomponents.models.PreviewFrame
 import java.util.*
 
 data class FaceDetection(

@@ -1,9 +1,9 @@
-package com.simprints.uicomponents.models
+package com.simprints.face.models
 
 /**
  * A range of values of type `Float`.
  */
-public class FloatRange(
+class FloatRange(
     override val start: Float,
     override val endInclusive: Float
 ) : ClosedRange<Float>

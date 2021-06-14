@@ -12,7 +12,7 @@ class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository)
     FaceSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        fromDomainToCore(event)?.let {
+        fromDomainToCore(event).let {
             inBackground {
                 eventRepository.addOrUpdateEvent(it)
             }
@@ -22,19 +22,18 @@ class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository)
     override fun addEvent(event: Event) {
         runBlocking {
             ignoreException {
-                fromDomainToCore(event)?.let {
+                fromDomainToCore(event).let {
                     eventRepository.addOrUpdateEvent(it)
                 }
             }
         }
     }
 
-    private fun fromDomainToCore(event: Event): CoreEvent? =
+    private fun fromDomainToCore(event: Event): CoreEvent =
         when (event.type) {
             FACE_ONBOARDING_COMPLETE -> (event as FaceOnboardingCompleteEvent).fromDomainToCore()
             FACE_FALLBACK_CAPTURE -> (event as FaceFallbackCaptureEvent).fromDomainToCore()
             FACE_CAPTURE_CONFIRMATION -> (event as FaceCaptureConfirmationEvent).fromDomainToCore()
-            FACE_CAPTURE_RETRY -> (event as FaceCaptureRetryEvent).fromDomainToCore()
             FACE_CAPTURE -> (event as FaceCaptureEvent).fromDomainToCore()
             ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
             ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()

@@ -8,5 +8,4 @@ include ':id',
     ':core',
     ':clientapi',
     ':moduleapi',
-    ':uicomponents',
     ':eventsystem'

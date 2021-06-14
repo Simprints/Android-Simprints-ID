@@ -1,4 +1,4 @@
-package com.simprints.uicomponents.widgets
+package com.simprints.face.widgets
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -6,8 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import com.simprints.uicomponents.R
 import com.simprints.core.tools.extentions.dpToPx
+import com.simprints.face.R
 
 /**
  * This is a variant of circular progress bar that have spaces between bars (as opposed to a filled

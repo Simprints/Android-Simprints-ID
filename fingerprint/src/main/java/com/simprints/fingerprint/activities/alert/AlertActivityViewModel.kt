@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.alert
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.simprints.core.R as CR
 import com.simprints.fingerprint.R
 
 enum class AlertActivityViewModel(val type: Type,
@@ -101,19 +102,19 @@ enum class AlertActivityViewModel(val type: Type,
                       @DrawableRes val hintDrawable: Int? = null) {
 
         class BluetoothError(title: Int = R.string.error_occurred_title,
-                             backgroundColor: Int = R.color.simprints_blue,
+                             backgroundColor: Int = CR.color.simprints_blue,
                              mainDrawable: Int = R.drawable.bt_error_icon,
                              hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         class ScannerError(title: Int,
-                           backgroundColor: Int = R.color.simprints_blue,
+                           backgroundColor: Int = CR.color.simprints_blue,
                            mainDrawable: Int = R.drawable.scanner_error_icon,
                            hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         class UnexpectedError(title: Int = R.string.error_occurred_title,
-                              backgroundColor: Int = R.color.simprints_red,
+                              backgroundColor: Int = CR.color.simprints_red,
                               mainDrawable: Int = R.drawable.error_icon,
                               hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)

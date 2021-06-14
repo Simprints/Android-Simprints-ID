@@ -113,7 +113,6 @@ object KoinInjector {
         viewModel { FaceOrchestratorViewModel(get()) }
         viewModel {
             FaceCaptureViewModel(
-                get<FacePreferencesManager>().maxRetries,
                 get<FacePreferencesManager>().shouldSaveFaceImages,
                 get(),
                 get()
