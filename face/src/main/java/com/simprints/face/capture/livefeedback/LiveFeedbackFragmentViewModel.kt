@@ -12,12 +12,7 @@ import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
-import com.simprints.face.models.FaceDetection
-import com.simprints.face.models.FaceTarget
-import com.simprints.face.models.SymmetricTarget
-import com.simprints.face.models.FloatRange
-import com.simprints.face.models.PreviewFrame
-import com.simprints.face.models.Size
+import com.simprints.face.models.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -179,7 +174,7 @@ class LiveFeedbackFragmentViewModel(
         allDeferredEvents.awaitAll()
     }
 
-    enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED, FINISHED_FAILED }
+    enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
 
     companion object {
         private const val VALID_ROLL_DELTA = 15f

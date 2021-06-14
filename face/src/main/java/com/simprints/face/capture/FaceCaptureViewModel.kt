@@ -8,7 +8,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.CAPTURE
-import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.RETRY
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_CAPTURE
 import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
@@ -23,14 +22,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class FaceCaptureViewModel(
-    private val maxRetries: Int,
     private val shouldSaveFaceImages: Boolean,
     private val faceImageManager: FaceImageManager,
     private val crashReportManager: FaceCrashReportManager
 ) : ViewModel() {
     var faceDetections = listOf<FaceDetection>()
 
-    val retryFlowEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val recaptureEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val exitFormEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val unexpectedErrorEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -41,9 +38,6 @@ class FaceCaptureViewModel(
         MutableLiveData()
 
     var attemptNumber: Int = 0
-
-    val canRetry: Boolean
-        get() = attemptNumber++ < maxRetries
 
     var samplesToCapture = 1
 
@@ -74,15 +68,6 @@ class FaceCaptureViewModel(
     fun handleBackButton(backButtonContext: BackButtonContext) {
         when (backButtonContext) {
             CAPTURE -> startExitForm()
-            RETRY -> handleRetry(true)
-        }
-    }
-
-    fun handleRetry(isBackButton: Boolean) {
-        if (canRetry) {
-            if (isBackButton) startExitForm() else retryFlow()
-        } else {
-            finishFlowWithFailedRetries()
         }
     }
 
@@ -98,15 +83,6 @@ class FaceCaptureViewModel(
 
     private fun startExitForm() {
         exitFormEvent.send()
-    }
-
-    private fun retryFlow() {
-        faceDetections = listOf()
-        retryFlowEvent.send()
-    }
-
-    private fun finishFlowWithFailedRetries() {
-        flowFinished()
     }
 
     private fun startNewAnalyticsSession() {

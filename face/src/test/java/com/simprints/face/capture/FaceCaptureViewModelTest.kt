@@ -36,7 +36,6 @@ class FaceCaptureViewModelTest {
     )
 
     private fun buildViewModel(shouldSaveFaceImages: Boolean) = FaceCaptureViewModel(
-        maxRetries = 0,
         shouldSaveFaceImages = shouldSaveFaceImages,
         faceImageManager = faceImageManager,
         crashReportManager = crashReportManager
