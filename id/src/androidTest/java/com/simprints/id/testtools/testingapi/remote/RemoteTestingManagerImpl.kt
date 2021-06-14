@@ -67,7 +67,7 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
             OneToManyMatch, PersonCreation, AlertScreen, GuidSelection, ConnectivitySnapshot, Refusal, CandidateRead,
             ScannerConnection, Vero2InfoSnapshot, ScannerFirmwareUpdate, InvalidIntent, SuspiciousIntent, IntentParsing,
             CompletionCheck, SessionCapture, FaceOnboardingComplete, FaceFallbackCapture, FaceCapture,
-            FaceCaptureConfirmation, FaceCaptureRetry,
+            FaceCaptureConfirmation,
             null -> {
                 // ADD TEST FOR NEW EVENT IN THIS CLASS
             }

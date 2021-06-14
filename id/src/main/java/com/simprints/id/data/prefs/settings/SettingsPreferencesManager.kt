@@ -49,7 +49,6 @@ interface SettingsPreferencesManager {
     var fingerprintQualityThreshold: Int
     var apiBaseUrl: String
 
-    var faceMaxRetries: Int
     var faceQualityThreshold: Float
     var faceNbOfFramesCaptured: Int
 
