@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.sessionState.scannerAttributes
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 
 

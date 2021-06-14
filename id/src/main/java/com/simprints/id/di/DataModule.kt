@@ -1,13 +1,17 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.id.data.consent.longconsent.*
-import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.remote.EventRemoteDataSource
-import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
-import com.simprints.id.data.db.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -30,12 +34,8 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -142,8 +142,8 @@ open class DataModule {
 
     @Provides
     @Singleton
-    open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
-        EventSyncStatusDatabase.getDatabase(ctx)
+    open fun provideEventsSyncStatusDatabase(ctx: Context): com.simprints.eventsystem.events_sync.EventSyncStatusDatabase =
+        com.simprints.eventsystem.events_sync.EventSyncStatusDatabase.getDatabase(ctx)
 
     @Provides
     open fun provideSubjectToEventMigrationManager(
@@ -151,8 +151,9 @@ open class DataModule {
         eventLocal: EventLocalDataSource,
         timeHelper: TimeHelper,
         crashReportManager: CrashReportManager,
-        preferencesManager: PreferencesManager,
-        subjectLocal: SubjectLocalDataSource
+        preferencesManager: IdPreferencesManager,
+        subjectLocal: SubjectLocalDataSource,
+        encoder: EncodingUtils
     ): SubjectToEventMigrationManager =
         SubjectToEventDbMigrationManagerImpl(
             loginInfoManager,
@@ -160,7 +161,8 @@ open class DataModule {
             timeHelper,
             crashReportManager,
             preferencesManager,
-            subjectLocal
+            subjectLocal,
+            encoder
         )
 
     @Provides

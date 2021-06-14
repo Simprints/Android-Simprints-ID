@@ -1,8 +1,8 @@
 package com.simprints.id.domain.moduleapi.face.responses.entities
 
 import android.os.Parcelable
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.face.fromModuleApiToDomain
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.face.fromModuleApiToDomain
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.domain.moduleapi.images.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.images.fromModuleApiToDomain

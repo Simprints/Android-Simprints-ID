@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.preferenceType.remoteConfig
 
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.tools.serializers.Serializer
 import java.security.InvalidParameterException

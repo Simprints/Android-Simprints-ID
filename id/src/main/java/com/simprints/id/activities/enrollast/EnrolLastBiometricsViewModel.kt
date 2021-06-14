@@ -11,14 +11,14 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
-import com.simprints.id.exceptions.unexpected.session.validator.EnrolmentEventValidatorException
+import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import timber.log.Timber
 
 class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,

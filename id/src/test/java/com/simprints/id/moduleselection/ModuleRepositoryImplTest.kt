@@ -2,9 +2,9 @@ package com.simprints.id.moduleselection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.testtools.TestApplication
 import io.mockk.coVerify
@@ -23,7 +23,7 @@ import org.robolectric.annotation.Config
 @ExperimentalCoroutinesApi
 class ModuleRepositoryImplTest {
 
-    private val mockPreferencesManager: PreferencesManager = mockk(relaxed = true)
+    private val mockPreferencesManager: IdPreferencesManager = mockk(relaxed = true)
     private val mockCrashReportManager: CrashReportManager = mockk(relaxed = true)
     private val mockSubjectRepository: SubjectRepository = mockk(relaxed = true)
 

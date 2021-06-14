@@ -24,7 +24,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.databinding.FragmentModuleSelectionBinding
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -50,11 +50,9 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     @Inject
-    lateinit var preferencesManager: PreferencesManager
-
-    @Inject
     lateinit var viewModelFactory: ModuleViewModelFactory
-
+    @Inject
+    lateinit var preferencesManager: IdPreferencesManager
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 

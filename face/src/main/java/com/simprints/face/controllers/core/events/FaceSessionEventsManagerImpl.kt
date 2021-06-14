@@ -1,12 +1,12 @@
 package com.simprints.face.controllers.core.events
 
 import com.simprints.core.tools.extentions.inBackground
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.EventType.*
-import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.tools.ignoreException
 import kotlinx.coroutines.runBlocking
-import com.simprints.id.data.db.event.domain.models.Event as CoreEvent
+import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
 class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository) :
     FaceSessionEventsManager {

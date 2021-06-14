@@ -1,6 +1,6 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector

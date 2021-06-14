@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.subject.local.models
 
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.tools.extensions.toRealmList
 import io.realm.RealmList

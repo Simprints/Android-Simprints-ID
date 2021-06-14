@@ -5,10 +5,8 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -35,7 +33,7 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncHelper: EventDownSyncHelper
-    @Inject lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     @Inject lateinit var syncCache: EventSyncCache
     @Inject lateinit var jsonHelper: JsonHelper
@@ -45,7 +43,7 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
     private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
-        jsonHelper.fromJson<EventDownSyncOperation>(jsonInput)
+        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation>(jsonInput)
     }
 
     private suspend fun getDownSyncOperation() =

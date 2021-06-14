@@ -7,4 +7,5 @@ include ':id',
     ':face',
     ':core',
     ':clientapi',
-    ':moduleapi'
+    ':moduleapi',
+    ':eventsystem'

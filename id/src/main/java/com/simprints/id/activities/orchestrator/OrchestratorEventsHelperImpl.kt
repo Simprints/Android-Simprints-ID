@@ -1,14 +1,17 @@
 package com.simprints.id.activities.orchestrator
 
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.callback.*
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.domain.models.callback.*
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.*
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.moduleapi.app.responses.IAppResponseTier
 
-class OrchestratorEventsHelperImpl(private val eventRepository: EventRepository,
-                                   private val timeHelper: TimeHelper) : OrchestratorEventsHelper {
+class OrchestratorEventsHelperImpl(
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val timeHelper: TimeHelper
+) : OrchestratorEventsHelper {
 
     override fun addCallbackEventInSessions(appResponse: AppResponse) {
         val callbackEvent = when (appResponse.type) {
@@ -36,14 +39,20 @@ class OrchestratorEventsHelperImpl(private val eventRepository: EventRepository,
                 timeHelper.now(),
                 sessionId,
                 identifications.map {
-                    CallbackComparisonScore(it.guidFound, it.confidence, it.tier)
+                    CallbackComparisonScore(
+                        it.guidFound,
+                        it.confidence,
+                        IAppResponseTier.valueOf(it.tier.name)
+                    )
                 })
         }
 
     private fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
         with(appVerifyResponse.matchingResult) {
-            VerificationCallbackEvent(timeHelper.now(),
-                CallbackComparisonScore(guidFound, confidence, tier))
+            VerificationCallbackEvent(
+                timeHelper.now(),
+                CallbackComparisonScore(guidFound, confidence, IAppResponseTier.valueOf(tier.name))
+            )
         }
 
     private fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
@@ -51,11 +60,17 @@ class OrchestratorEventsHelperImpl(private val eventRepository: EventRepository,
             RefusalCallbackEvent(
                 timeHelper.now(),
                 answer.reason.name,
-                answer.optionalText)
+                answer.optionalText
+            )
         }
 
     private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
-        ErrorCallbackEvent(timeHelper.now(), fromAppResponseErrorReasonToEventReason(appErrorResponse.reason))
+        ErrorCallbackEvent(
+            timeHelper.now(),
+            fromAppResponseErrorReasonToEventReason(
+                fromDomainToModuleApiAppErrorResponse(appErrorResponse).reason
+            )
+        )
 
     private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
         ConfirmationCallbackEvent(timeHelper.now(), appResponse.identificationOutcome)

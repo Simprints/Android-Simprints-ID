@@ -1,5 +1,5 @@
 package com.simprints.id.services.sync.events.up
 
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
 
-data class EventUpSyncProgress(val operation: EventUpSyncOperation, val progress: Int)
+data class EventUpSyncProgress(val operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation, val progress: Int)

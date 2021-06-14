@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.tools.extensions.awaitTask
 import org.json.JSONException

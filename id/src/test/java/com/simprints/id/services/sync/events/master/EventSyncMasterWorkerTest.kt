@@ -8,7 +8,7 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
 import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS
@@ -53,7 +53,7 @@ class EventSyncMasterWorkerTest {
         get() = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
 
     private lateinit var masterWorker: EventSyncMasterWorker
-    private val preferencesManager = mockk<PreferencesManager>(relaxed = true) {
+    private val preferencesManager = mockk<IdPreferencesManager>(relaxed = true) {
         every { eventDownSyncSetting } returns ON
         every { syncDestinationSettings } returns listOf(SIMPRINTS)
     }

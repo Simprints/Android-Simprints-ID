@@ -1,12 +1,12 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.*
@@ -28,7 +28,7 @@ class ProjectAuthenticatorImplTest {
     @MockK private lateinit var projectSecretManager: ProjectSecretManager
     @MockK private lateinit var signerManager: SignerManager
     @MockK private lateinit var remoteConfigWrapper: RemoteConfigWrapper
-    @MockK private lateinit var preferencesManagerMock: PreferencesManager
+    @MockK private lateinit var preferencesManagerMock: IdPreferencesManager
     @MockK private lateinit var safetyNetClient: SafetyNetClient
     @MockK private lateinit var authenticationDataManagerMock: AuthenticationDataManager
     @MockK private lateinit var attestationManagerMock: AttestationManager

@@ -10,10 +10,9 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -131,7 +130,7 @@ class EventDownSyncDownloaderWorkerTest {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             eventDownSyncScopeRepository = mockk(relaxed = true)
-            coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as EventDownSyncOperation }
+            coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }
             syncCache = mockk(relaxed = true)
             jsonHelper = JsonHelper
             eventDownSyncDownloaderTask = mockk(relaxed = true)

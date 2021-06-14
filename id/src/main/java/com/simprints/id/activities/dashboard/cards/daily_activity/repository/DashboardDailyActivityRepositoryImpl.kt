@@ -4,7 +4,7 @@ import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActi
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 
 class DashboardDailyActivityRepositoryImpl(
     private val localDataSource: DailyActivityLocalDataSource,

@@ -1,6 +1,6 @@
 package com.simprints.id.data.license.remote
 
-import com.simprints.id.network.SimRemoteInterface
+import com.simprints.core.network.SimRemoteInterface
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

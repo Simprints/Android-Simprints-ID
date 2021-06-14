@@ -5,10 +5,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -42,7 +41,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
             Timber.d("Received $jsonInput")
-            jsonHelper.fromJson<EventUpSyncScope>(jsonInput)
+            jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException(t.message ?: "")
         }

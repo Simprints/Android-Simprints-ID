@@ -1,6 +1,6 @@
 package com.simprints.id.exceptions.unexpected.preferences
 
-import com.simprints.id.exceptions.UnexpectedException
+import com.simprints.core.exceptions.UnexpectedException
 
 class NoSuchPreferenceError(message: String = "NoSuchPreferenceError") : UnexpectedException(message) {
 

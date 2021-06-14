@@ -5,15 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
@@ -38,7 +35,6 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedExce
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -59,7 +55,8 @@ class CollectFingerprintsViewModel(
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
-    private val startingStateDeterminer: StartingStateDeterminer
+    private val startingStateDeterminer: StartingStateDeterminer,
+    private val encoder: EncodingUtils
 ) : ViewModel() {
 
     val state = MutableLiveData<CollectFingerprintsState>()
@@ -326,7 +323,7 @@ class CollectFingerprintsViewModel(
                     FingerprintCaptureEvent.Fingerprint(
                         id,
                         it.qualityScore,
-                        EncodingUtils.byteArrayToBase64(it.template),
+                        encoder.byteArrayToBase64(it.template),
                         FingerprintTemplateFormat.ISO_19794_2
                     )
                 }
