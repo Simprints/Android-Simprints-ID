@@ -56,11 +56,6 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.TimberLogger
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
