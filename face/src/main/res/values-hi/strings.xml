@@ -2,9 +2,6 @@
 <resources>
     <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली\?</string>
     <string name="exit_form_return_to_face_capture">चेहरे की फ़ोटो लें</string>
-    <string name="face_match_returned_results_other">%d परिणाम आए।</string>
-    <string name="face_match_tier4_matches_one">%d मेल</string>
-    <string name="face_match_tier4_matches_other">%d मेल खाते हैं</string>
     <string name="error_licence_invalid_title">लाइसेंस अमान्य है</string>
     <string name="error_licence_invalid_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
     <string name="error_licence_missing_title">बायोमेट्रिक लाइसेंस नहीं है</string>
@@ -49,15 +46,37 @@
     <string name="capture_title_too_close">बहुत पास हैं</string>
     <string name="capture_title_face_too_far">बहुत दूर हैं</string>
     <string name="matching_x_records">% S रिकॉर्ड से मिलान</string>
+
+
     <string name="face_match_matching_candidates">उम्मीदवार में से मिलान हो रहा हैं</string>
-    <string name="face_match_matched_candidates_one">"%d  उम्मीदवार से तुलना की गई"</string>
-    <string name="face_match_matched_candidates_other">"%d  उम्मीदवारों से तुलना की गई"</string>
-    <string name="face_match_returned_results_one">%d परिणाम आए।</string>
-    <string name="face_match_tier1or2_matches_zero">कोई बहुत अच्छा मेल नहीं है</string>
-    <string name="face_match_tier1or2_matches_one">%d बहुत अच्छा मेल</string>
-    <string name="face_match_tier1or2_matches_other">%d बहुत अच्छा मेल हैं</string>
-    <string name="face_match_tier3_matches_zero">कोई अच्छा मेल नहीं</string>
-    <string name="face_match_tier3_matches_one">%d अच्छा मेल है</string>
-    <string name="face_match_tier3_matches_other">%d अच्छे मेल हैं</string>
-    <string name="face_match_tier4_matches_zero">कोई मेल नही</string>
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">"%d  उम्मीदवार से तुलना की गई"</item>
+        <item quantity="other">"%d  उम्मीदवारों से तुलना की गई"</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">%d परिणाम आए।</item>
+        <item quantity="other">%d परिणाम आए।</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">कोई बहुत अच्छा मेल नहीं है</item>
+        <item quantity="one">%d बहुत अच्छा मेल</item>
+        <item quantity="other">%d बहुत अच्छा मेल हैं</item>
+    </plurals>
+
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">कोई अच्छा मेल नहीं</item>
+        <item quantity="one">%d अच्छा मेल है</item>
+        <item quantity="other">%d अच्छे मेल हैं</item>
+    </plurals>
+
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">कोई मेल नही</item>
+        <item quantity="one">%d मेल</item>
+        <item quantity="other">%d मेल खाते हैं</item>
+    </plurals>
+
 </resources>

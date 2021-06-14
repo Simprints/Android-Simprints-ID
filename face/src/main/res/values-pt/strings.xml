@@ -3,16 +3,7 @@
     <string name="why_did_you_skip_face_capture">Por que pulou a captura de rosto\?</string>
     <string name="exit_form_return_to_face_capture">Capturar rosto</string>
     <string name="face_match_loading_candidates">Carregando candidatos…</string>
-    <string name="face_match_returned_results_other">Retornou %d resultados.</string>
     <string name="face_match_please_wait">Espere enquanto procedemos com a identificação</string>
-    <string name="face_match_tier1or2_matches_one">%d combinação muito boa</string>
-    <string name="face_match_tier1or2_matches_other">%d combinações muito boas</string>
-    <string name="face_match_tier3_matches_zero">Sem boas combinações</string>
-    <string name="face_match_tier3_matches_one">%d boa combinação</string>
-    <string name="face_match_tier3_matches_other">%d boas combinações</string>
-    <string name="face_match_tier4_matches_zero">Sem combinações</string>
-    <string name="face_match_tier4_matches_one">%d combinação</string>
-    <string name="face_match_tier4_matches_other">%d combinações</string>
     <string name="error_licence_invalid_title">Licença inválida</string>
     <string name="error_licence_invalid_message">A licença facial é inválida, entre em contacto com o administrador do sistema</string>
     <string name="error_licence_missing_title">Licença ausente</string>
@@ -54,10 +45,39 @@
     <string name="capture_title_face_too_far">Muito longe</string>
     <string name="matching_x_records">Comparando com %s registos</string>
     <string name="face_match_matching_candidates">Candidatos correspondentes</string>
-    <string name="face_match_matched_candidates_one">Comparado com %d candidato.</string>
-    <string name="face_match_matched_candidates_other">Comparado com %d candidatos.</string>
-    <string name="face_match_returned_results_one">Retornou %d resultados.</string>
-    <string name="face_match_tier1or2_matches_zero">Sem combinações muito boas</string>
+
+
+
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">Comparado com %d candidato.</item>
+        <item quantity="other">Comparado com %d candidatos.</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">Retornou %d resultados.</item>
+        <item quantity="other">Retornou %d resultados.</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">Sem combinações muito boas</item>
+        <item quantity="one">%d combinação muito boa</item>
+        <item quantity="other">%d combinações muito boas</item>
+    </plurals>
+
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">Sem boas combinações</item>
+        <item quantity="one">%d boa combinação</item>
+        <item quantity="other">%d boas combinações</item>
+    </plurals>
+
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">Sem combinações</item>
+        <item quantity="one">%d combinação</item>
+        <item quantity="other">%d combinações</item>
+    </plurals>
+
     <string name="retry_tips">Veja como pode corrigir o problema:
 \n
 \n1. Certifique-se estar num espaço bem iluminado. 
