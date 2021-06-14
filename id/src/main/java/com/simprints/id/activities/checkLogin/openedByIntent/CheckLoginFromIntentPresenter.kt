@@ -2,6 +2,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
 import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
@@ -24,7 +25,6 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
-import com.simprints.core.tools.utils.SimNetworkUtils
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -47,8 +47,10 @@ class CheckLoginFromIntentPresenter(
 
     @Inject
     lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+
     @Inject
     lateinit var subjectLocalDataSource: SubjectLocalDataSource
+
     @Inject
     lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
@@ -246,19 +248,15 @@ class CheckLoginFromIntentPresenter(
 
         updateProjectInCurrentSession()
 
-        inBackground {
-            ignoreException {
-                Timber.d("[CHECK_LOGIN] Updating events")
 
-                updateDatabaseCountsInCurrentSession()
-                addAuthorizedEventInCurrentSession()
-                initAnalyticsKeyInCrashManager()
-                updateAnalyticsIdInCurrentSession()
-            }
-        }
+        Timber.d("[CHECK_LOGIN] Updating events")
+
+        updateDatabaseCountsInCurrentSession()
+        addAuthorizedEventInCurrentSession()
+        initAnalyticsKeyInCrashManager()
+        updateAnalyticsIdInCurrentSession()
 
         Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
-
         Timber.d("[CHECK_LOGIN] Moving to orchestrator")
         view.openOrchestratorActivity(appRequest)
     }
