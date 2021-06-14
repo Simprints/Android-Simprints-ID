@@ -139,8 +139,6 @@ fun createFaceCaptureEvent(): FaceCaptureEvent {
 
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, eventLabels)
 
-fun createFaceCaptureRetryEvent() = FaceCaptureRetryEvent(CREATED_AT, ENDED_AT, eventLabels)
-
 fun createFaceOnboardingCompleteEvent() =
     FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT, eventLabels)
 

@@ -29,7 +29,6 @@ import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLME
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
-import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_RETRY_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_FALLBACK_CAPTURE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY
@@ -47,7 +46,10 @@ import com.simprints.eventsystem.event.domain.models.EventType.Companion.SUSPICI
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
 import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callout.*
-import com.simprints.eventsystem.event.domain.models.face.*
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
@@ -84,7 +86,6 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
         name = FACE_CAPTURE_CONFIRMATION_KEY
     ),
     JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FaceCaptureRetryEvent::class, name = FACE_CAPTURE_RETRY_KEY),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FaceOnboardingCompleteEvent::class,

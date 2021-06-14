@@ -723,15 +723,4 @@ fun validateFaceCaptureConfirmationEventApiModel(json: JSONObject) {
     }
 }
 
-fun validateFaceCaptureRetryEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "FaceCaptureRetry")
-    with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
-        assertThat(getLong("startTime")).isNotNull()
-        assertThat(getLong("endTime")).isNotNull()
-        assertThat(length()).isEqualTo(4)
-    }
-}
-
-
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

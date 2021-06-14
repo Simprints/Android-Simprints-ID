@@ -72,9 +72,7 @@ enum class ApiEventPayloadType {
     /* key added: FACE_CAPTURE_KEY */
     FaceCapture,
     /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
-    FaceCaptureConfirmation,
-    /* key added: FACE_CAPTURE_RETRY_KEY */
-    FaceCaptureRetry;
+    FaceCaptureConfirmation;
 
     companion object {
         const val ENROLMENT_RECORD_CREATION_KEY = "EnrolmentRecordCreation"
@@ -108,7 +106,6 @@ enum class ApiEventPayloadType {
         const val FACE_FALLBACK_CAPTURE_KEY = "FaceFallbackCapture"
         const val FACE_CAPTURE_KEY = "FaceCapture"
         const val FACE_CAPTURE_CONFIRMATION_KEY = "FaceCaptureConfirmation"
-        const val FACE_CAPTURE_RETRY_KEY = "FaceCaptureRetry"
     }
 }
 
@@ -154,7 +151,6 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
     FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
-    FACE_CAPTURE_RETRY -> ApiEventPayloadType.FaceCaptureRetry
 }
 
 
@@ -188,7 +184,6 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
     ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
     ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
-    ApiEventPayloadType.FaceCaptureRetry -> FACE_CAPTURE_RETRY
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

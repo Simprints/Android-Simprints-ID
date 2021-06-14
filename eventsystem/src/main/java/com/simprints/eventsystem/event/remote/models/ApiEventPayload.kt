@@ -15,7 +15,6 @@ import com.simprints.eventsystem.event.domain.models.EnrolmentEventV1
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType.*
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
@@ -40,9 +39,9 @@ import com.simprints.eventsystem.event.domain.models.callout.IdentificationCallo
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -50,7 +49,10 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutPayload
-import com.simprints.eventsystem.event.remote.models.face.*
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureConfirmationPayload
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceFallbackCapturePayload
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceOnboardingCompletePayload
 import com.simprints.eventsystem.event.remote.models.session.ApiSessionCapturePayload
 import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
@@ -60,7 +62,6 @@ import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordM
 @JsonSubTypes(
     JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = ApiFaceCaptureRetryPayload::class, name = Companion.FACE_CAPTURE_RETRY_KEY),
     JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
     JsonSubTypes.Type(value = ApiSessionCapturePayload::class, name = Companion.SESSION_CAPTURE_KEY),
@@ -129,7 +130,6 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
         FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
         FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
-        FACE_CAPTURE_RETRY -> ApiFaceCaptureRetryPayload(this as FaceCaptureRetryPayload)
         SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
         CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
         CALLOUT_IDENTIFICATION -> ApiCalloutPayload(this as IdentificationCalloutPayload)

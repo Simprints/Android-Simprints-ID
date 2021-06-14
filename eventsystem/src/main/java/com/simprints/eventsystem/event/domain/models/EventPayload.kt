@@ -2,7 +2,6 @@ package com.simprints.eventsystem.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
@@ -12,7 +11,6 @@ import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent.Comple
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.EventType.Companion
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
@@ -24,6 +22,7 @@ import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.Scan
 import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
 import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
@@ -36,9 +35,9 @@ import com.simprints.eventsystem.event.domain.models.callout.IdentificationCallo
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureRetryEvent.FaceCaptureRetryPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -59,7 +58,6 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = VerificationCalloutPayload::class, name = EventType.CALLOUT_VERIFICATION_KEY),
     JsonSubTypes.Type(value = FaceCaptureConfirmationPayload::class, name = EventType.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = FaceCapturePayload::class, name = EventType.FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FaceCaptureRetryPayload::class, name = EventType.FACE_CAPTURE_RETRY_KEY),
     JsonSubTypes.Type(value = FaceFallbackCapturePayload::class, name = EventType.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceOnboardingCompletePayload::class, name = EventType.FACE_ONBOARDING_COMPLETE_KEY),
     JsonSubTypes.Type(value = SessionCapturePayload::class, name = EventType.SESSION_CAPTURE_KEY),
