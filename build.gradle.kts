@@ -15,7 +15,7 @@ buildscript {
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:4.1.3")
+        classpath("com.android.tools.build:gradle:4.2.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
 
         // CI Scanning & Retry
@@ -42,7 +42,7 @@ buildscript {
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
 
         // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.4.0")
+        classpath("com.github.triplet.gradle:play-publisher:3.4.0-agp4.2")
         classpath("com.google.firebase:firebase-appdistribution-gradle:2.1.1")
     }
 
