@@ -35,7 +35,8 @@ import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.C
 class CheckLoginFromIntentPresenter(
     val view: CheckLoginFromIntentContract.View,
     val deviceId: String,
-    component: AppComponent
+    component: AppComponent,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) :
     CheckLoginPresenter(view, component),
     CheckLoginFromIntentContract.Presenter {
@@ -249,9 +250,8 @@ class CheckLoginFromIntentPresenter(
 
         updateProjectInCurrentSession()
 
-
         Timber.d("[CHECK_LOGIN] Updating events")
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(dispatcher).launch {
             awaitAll(
                 async { updateDatabaseCountsInCurrentSession() },
                 async { addAuthorizedEventInCurrentSession() },
