@@ -251,7 +251,6 @@ class CheckLoginFromIntentPresenter(
 
 
         Timber.d("[CHECK_LOGIN] Updating events")
-
         CoroutineScope(Dispatchers.IO).launch {
             awaitAll(
                 async { updateDatabaseCountsInCurrentSession() },
@@ -259,13 +258,11 @@ class CheckLoginFromIntentPresenter(
                 async { initAnalyticsKeyInCrashManager() },
                 async { updateAnalyticsIdInCurrentSession() }
             )
+        }.join()
 
-            withContext(Dispatchers.Main){
-                Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
-                Timber.d("[CHECK_LOGIN] Moving to orchestrator")
-                view.openOrchestratorActivity(appRequest)
-            }
-        }
+        Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
+        Timber.d("[CHECK_LOGIN] Moving to orchestrator")
+        view.openOrchestratorActivity(appRequest)
     }
 
     private suspend fun addAuthorizedEventInCurrentSession() {
