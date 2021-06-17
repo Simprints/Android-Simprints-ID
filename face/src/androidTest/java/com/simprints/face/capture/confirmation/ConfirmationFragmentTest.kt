@@ -1,24 +1,24 @@
 package com.simprints.face.capture.confirmation
 
-import android.widget.ImageView
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.face.models.FaceDetection
+import com.simprints.uicomponents.models.PreviewFrame
+import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
@@ -31,7 +31,29 @@ import org.koin.dsl.module
 @RunWith(AndroidJUnit4::class)
 class ConfirmationFragmentTest {
 
-    private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true)
+    private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true) {
+        every {
+            faceDetections
+        } returns listOf(
+            FaceDetection(
+                frame = PreviewFrame(
+                    width = 100,
+                    height = 100,
+                    format = 0,
+                    mirrored = false,
+                    bytes = byteArrayOf()
+                ),
+                face = null,
+                status = FaceDetection.Status.VALID,
+                securedImageRef = null,
+                detectionStartTime = 0,
+                isFallback = false,
+                id = "",
+                detectionEndTime = 0
+            )
+        )
+    }
+
     private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)
 
@@ -56,9 +78,6 @@ class ConfirmationFragmentTest {
         confirmationScenario.onFragment { confirmationFragment ->
             navController.setGraph(R.navigation.capture_graph)
             Navigation.setViewNavController(confirmationFragment.requireView(), navController)
-            confirmationFragment.view?.findViewById<ImageView>(R.id.confirmation_img)?.setImageResource(
-                org.jetbrains.anko.generated.anko.R.id.image
-            )
         }
 
         onView(
