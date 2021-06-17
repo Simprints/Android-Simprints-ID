@@ -16,8 +16,7 @@ import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
-import com.simprints.face.models.FaceDetection
-import com.simprints.uicomponents.models.PreviewFrame
+import com.simprints.face.utils.mockFaceDetectionList
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
@@ -34,24 +33,7 @@ class ConfirmationFragmentTest {
     private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true) {
         every {
             faceDetections
-        } returns listOf(
-            FaceDetection(
-                frame = PreviewFrame(
-                    width = 100,
-                    height = 100,
-                    format = 0,
-                    mirrored = false,
-                    bytes = byteArrayOf()
-                ),
-                face = null,
-                status = FaceDetection.Status.VALID,
-                securedImageRef = null,
-                detectionStartTime = 0,
-                isFallback = false,
-                id = "",
-                detectionEndTime = 0
-            )
-        )
+        } returns mockFaceDetectionList
     }
 
     private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
