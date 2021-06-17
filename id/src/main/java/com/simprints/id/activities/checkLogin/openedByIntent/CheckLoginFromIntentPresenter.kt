@@ -25,6 +25,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -34,7 +35,8 @@ import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.C
 class CheckLoginFromIntentPresenter(
     val view: CheckLoginFromIntentContract.View,
     val deviceId: String,
-    component: AppComponent
+    component: AppComponent,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) :
     CheckLoginPresenter(view, component),
     CheckLoginFromIntentContract.Presenter {
@@ -248,13 +250,15 @@ class CheckLoginFromIntentPresenter(
 
         updateProjectInCurrentSession()
 
-
         Timber.d("[CHECK_LOGIN] Updating events")
-
-        updateDatabaseCountsInCurrentSession()
-        addAuthorizedEventInCurrentSession()
-        initAnalyticsKeyInCrashManager()
-        updateAnalyticsIdInCurrentSession()
+        CoroutineScope(dispatcher).launch {
+            awaitAll(
+                async { updateDatabaseCountsInCurrentSession() },
+                async { addAuthorizedEventInCurrentSession() },
+                async { initAnalyticsKeyInCrashManager() },
+                async { updateAnalyticsIdInCurrentSession() }
+            )
+        }.join()
 
         Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
         Timber.d("[CHECK_LOGIN] Moving to orchestrator")
