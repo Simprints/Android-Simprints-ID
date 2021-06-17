@@ -8,7 +8,6 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.domain.modality.Modality
-import com.simprints.core.tools.extentions.getStringArray
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -115,8 +114,8 @@ import javax.inject.Inject
     }
 
     private fun getLanguageCodeAndNamePairs(): Map<String, String> {
-        val languageCodes = requireActivity().getStringArray(R.array.language_values)
-        val languageNames = requireActivity().getStringArray(R.array.language_array)
+        val languageCodes = requireActivity().resources.getStringArray(R.array.language_values)
+        val languageNames = requireActivity().resources.getStringArray(R.array.language_array)
         return languageCodes.zip(languageNames).toMap()
     }
 
