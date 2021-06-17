@@ -42,6 +42,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -51,6 +52,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class CheckLoginFromIntentPresenterTest {
 
     @get:Rule
@@ -60,26 +62,37 @@ class CheckLoginFromIntentPresenterTest {
 
     @MockK
     lateinit var view: CheckLoginFromIntentContract.View
+
     @MockK
     lateinit var appComponent: AppComponent
+
     @MockK
     lateinit var remoteConfigFetcherMock: RemoteConfigFetcher
+
     @MockK
     lateinit var analyticsManagerMock: AnalyticsManager
+
     @MockK
     lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
+
     @MockK
     lateinit var preferencesManagerMock: IdPreferencesManager
+
     @MockK
     lateinit var eventRepositoryMock: EventRepository
+
     @MockK
     lateinit var crashReportManagerMock: CrashReportManager
+
     @MockK
     lateinit var securityStateRepositoryMock: SecurityStateRepository
+
     @MockK
     lateinit var loginInfoManagerMock: LoginInfoManager
+
     @MockK
     lateinit var timeHelperMock: TimeHelper
+
     @MockK
     lateinit var simNetworkUtilsMock: SimNetworkUtils
 
@@ -312,11 +325,12 @@ class CheckLoginFromIntentPresenterTest {
     }
 
     @Test
-    fun presenter_setup_shouldAddInfoToSession() {
+    fun presenter_setup_shouldAddInfoToSessionThenCallOrchestrator() {
         runBlockingTest {
             presenter.handleSignedInUser()
 
             coVerify(exactly = 3) { eventRepositoryMock.addOrUpdateEvent(any()) }
+            verify(exactly = 1) { view.openOrchestratorActivity(any()) }
         }
     }
 
@@ -334,7 +348,6 @@ class CheckLoginFromIntentPresenterTest {
     fun presenter_signedIn_updateCurrentSession() {
         runBlocking {
             val subjectCount = 3
-            val analyticsId = "analyticsId"
             val projectId = DEFAULT_PROJECT_ID
 
             val session = createSessionCaptureEvent(projectId = GUID1)
