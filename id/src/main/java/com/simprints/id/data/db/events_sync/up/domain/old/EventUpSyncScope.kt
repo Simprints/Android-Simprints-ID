@@ -13,12 +13,12 @@ import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope as NewEve
 @Deprecated(message = "This is used to support old data-upload format, should be replaced with EventUpSyncScope",
     replaceWith = ReplaceWith(
         expression = "EventUpSyncScope(input)",
-        imports = arrayOf("org.apache.commons.lang3.StringUtils"))
+        imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope"))
 )
 abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
 
     @Keep
-    @Deprecated(message = "This is used to support old data-upload format, should be replaced with EventUpSyncScope",
+    @Deprecated(message = "This is used to support old data-upload format, should be replaced with new ProjectScope",
         replaceWith = ReplaceWith(
             expression = "EventUpSyncScope.ProjectScope(input)",
             imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.ProjectScope"))

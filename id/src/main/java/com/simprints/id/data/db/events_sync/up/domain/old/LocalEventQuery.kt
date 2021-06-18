@@ -1,7 +1,11 @@
 package com.simprints.id.data.db.events_sync.up.domain.old
 
+import androidx.annotation.Keep
 import com.simprints.id.data.db.event.domain.models.EventType
 
+
+@Keep
+@Deprecated(message = "This is used to support old data-upload format, should not be used going forward")
 data class LocalEventQuery(val projectId: String? = null,
                            val id: String? = null,
                            val type: EventType? = null,
