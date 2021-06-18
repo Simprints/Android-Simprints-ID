@@ -1,13 +1,12 @@
-package com.simprints.id.data.db.events_sync.up.domain
+package com.simprints.id.services.sync.events.up.workers
 
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
+import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
-import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
 import org.junit.Test
 
-class EventUpSyncScopeTest {
+class EventUpSyncUploaderWorkerTest {
+
 
     @Test
     fun eventUpSyncScope_canDeserializeOldFormat() {
@@ -29,8 +28,8 @@ class EventUpSyncScopeTest {
         expectedScope.operation.lastState = EventUpSyncOperation.UpSyncState.FAILED
         expectedScope.operation.lastSyncTime = 1620103325620
 
-//        val scope = handleParsing(jsonInput)
-//        assertThat(scope).isEqualTo(expectedScope)
+        val scope = EventUpSyncUploaderWorker.parseUpSyncInput(jsonInput)
+        assertThat(scope).isEqualTo(expectedScope)
     }
 
     @Test
@@ -51,8 +50,8 @@ class EventUpSyncScopeTest {
         expectedScope.operation.lastState = EventUpSyncOperation.UpSyncState.FAILED
         expectedScope.operation.lastSyncTime = 1620103325620
 
-//        val scope = handleParsing(jsonInput)
-//        assertThat(scope).isEqualTo(expectedScope)
+        val scope = EventUpSyncUploaderWorker.parseUpSyncInput(jsonInput)
+        assertThat(scope).isEqualTo(expectedScope)
     }
 
 }
