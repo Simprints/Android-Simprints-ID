@@ -1,12 +1,16 @@
 package com.simprints.id.services.sync.events.up.workers
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
+import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
+import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -42,7 +46,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
             Timber.d("Received $jsonInput")
-            jsonHelper.fromJson<EventUpSyncScope>(jsonInput)
+            parseUpSyncInput(jsonInput)
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException(t.message ?: "")
         }
@@ -92,6 +96,17 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         const val INPUT_UP_SYNC = "INPUT_UP_SYNC"
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
+
+
+        // TODO throw this away... thank you
+        fun parseUpSyncInput(input: String): EventUpSyncScope {
+            return try {
+                JsonHelper.fromJson<EventUpSyncScope>(input)
+            } catch(ex: MissingKotlinParameterException) {
+                val result =  JsonHelper.fromJson<OldEventUpSyncScope>(input)
+                result.toNewScope()
+            }
+        }
     }
 }
 
