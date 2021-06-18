@@ -15,7 +15,7 @@ ext {
      * on, and the version of the BFSID API being used. Read more about our versioning here:
      * https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+Simprints+ID
      */
-    VERSION_NAME = "2021.1.1"
+    VERSION_NAME = "2021.1.2"
 
     /**
      * Build type. The version code describes which build type was used for the build.
