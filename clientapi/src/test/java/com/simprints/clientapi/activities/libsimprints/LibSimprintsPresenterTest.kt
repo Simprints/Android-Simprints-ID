@@ -1,9 +1,12 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Identify
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Invalid
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
 import com.simprints.clientapi.domain.responses.EnrolResponse
@@ -15,17 +18,27 @@ import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
+import com.simprints.clientapi.requestFactories.EnrolRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class LibSimprintsPresenterTest {
 
@@ -35,6 +48,7 @@ class LibSimprintsPresenterTest {
 
     @MockK
     lateinit var view: LibSimprintsActivity
+
     @MockK
     lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
 
@@ -57,12 +71,22 @@ class LibSimprintsPresenterTest {
             Enrol,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).apply {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrolRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                EnrolRequestFactory.getValidSimprintsRequest(
+                    STANDARD
+                )
+            )
+        }
     }
 
     @Test
@@ -75,12 +99,22 @@ class LibSimprintsPresenterTest {
             Identify,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).apply {
             runBlocking { start() }
         }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                IdentifyRequestFactory.getValidSimprintsRequest(
+                    STANDARD
+                )
+            )
+        }
     }
 
     @Test
@@ -93,10 +127,20 @@ class LibSimprintsPresenterTest {
             Verify,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                VerifyRequestFactory.getValidSimprintsRequest(
+                    STANDARD
+                )
+            )
+        }
     }
 
     @Test
@@ -109,10 +153,20 @@ class LibSimprintsPresenterTest {
             ConfirmIdentity,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                ConfirmIdentityFactory.getValidSimprintsRequest(
+                    STANDARD
+                )
+            )
+        }
     }
 
     @Test
@@ -125,10 +179,20 @@ class LibSimprintsPresenterTest {
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
-        verify(exactly = 1) { view.sendSimprintsRequest(EnrolLastBiometricsFactory.getValidSimprintsRequest(STANDARD)) }
+        verify(exactly = 1) {
+            view.sendSimprintsRequest(
+                EnrolLastBiometricsFactory.getValidSimprintsRequest(
+                    STANDARD
+                )
+            )
+        }
     }
 
     @Test
@@ -137,6 +201,10 @@ class LibSimprintsPresenterTest {
             view,
             Invalid,
             clientApiSessionEventsManager,
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk(),
             mockk()
         ).apply {
@@ -159,6 +227,10 @@ class LibSimprintsPresenterTest {
             Enrol,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).handleEnrolResponse(EnrolResponse(registerId))
 
@@ -168,7 +240,9 @@ class LibSimprintsPresenterTest {
                     assertThat(it.guid).isEqualTo(registerId)
                 },
                 sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK)
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                eventsJson = null, subjectActions = null
+            )
         }
         verifyCompletionCheckEventWasAdded()
         coVerify { clientApiSessionEventsManager.closeCurrentSessionNormally() }
@@ -186,6 +260,10 @@ class LibSimprintsPresenterTest {
             Identify,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
@@ -201,7 +279,9 @@ class LibSimprintsPresenterTest {
                     }
                 },
                 sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK)
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                eventsJson = null
+            )
         }
 
         verifyCompletionCheckEventWasAdded()
@@ -210,7 +290,14 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
-        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1, MatchConfidence.HIGH))
+        val verification = VerifyResponse(
+            MatchResult(
+                UUID.randomUUID().toString(),
+                100,
+                TIER_1,
+                MatchConfidence.HIGH
+            )
+        )
         val sessionId = UUID.randomUUID().toString()
 
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionId
@@ -221,6 +308,10 @@ class LibSimprintsPresenterTest {
             Verify,
             clientApiSessionEventsManager,
             mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk()
         ).apply {
             handleVerifyResponse(verification)
@@ -229,7 +320,8 @@ class LibSimprintsPresenterTest {
         val libVerification = Verification(
             verification.matchResult.confidenceScore,
             Tier.valueOf(verification.matchResult.tier.name),
-            verification.matchResult.guidFound)
+            verification.matchResult.guidFound
+        )
 
         verify(exactly = 1) {
             view.returnVerification(
@@ -239,7 +331,9 @@ class LibSimprintsPresenterTest {
                     assertThat(it.guid).isEqualTo(libVerification.guid)
                 },
                 sessionId,
-                RETURN_FOR_FLOW_COMPLETED_CHECK)
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                eventsJson = null
+            )
         }
         verifyCompletionCheckEventWasAdded()
         coVerify { clientApiSessionEventsManager.closeCurrentSessionNormally() }
@@ -254,6 +348,10 @@ class LibSimprintsPresenterTest {
             view,
             Invalid,
             clientApiSessionEventsManager,
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
             mockk(),
             mockk()
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
