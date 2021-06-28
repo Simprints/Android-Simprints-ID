@@ -1,24 +1,49 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import androidx.annotation.Keep
 import com.simprints.clientapi.Constants
+import com.simprints.libsimprints.Constants as LibSimprintsConstants
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Identify
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Invalid
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Verify
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class LibSimprintsPresenter(
@@ -26,7 +51,12 @@ class LibSimprintsPresenter(
     private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
+    private val timeHelper: ClientApiTimeHelper,
+    crashReportManager: ClientApiCrashReportManager,
+    private val subjectRepository: SubjectRepository,
+    private val jsonHelper: JsonHelper,
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
     view,
     sessionEventsManager,
@@ -61,7 +91,11 @@ class LibSimprintsPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             sessionEventsManager.closeCurrentSessionNormally()
 
-            view.returnRegistration(Registration(enrol.guid), currentSessionId, flowCompletedCheck)
+            view.returnRegistration(
+                Registration(enrol.guid), currentSessionId, flowCompletedCheck,
+                getEventsJsonForSession(currentSessionId),
+                getEnrolmentCreationEventForSubject(enrol.guid)
+            )
         }
     }
 
@@ -142,8 +176,54 @@ class LibSimprintsPresenter(
         }
     }
 
-
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
+
+    private suspend fun getEventsJsonForSession(sessionId: String): String? =
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
+            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
+            jsonHelper.toJson(GenericCoSyncEvents(events))
+        } else {
+            null
+        }
+
+    private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
+        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
+
+        val recordCreationEvent =
+            subjectRepository.load(
+                SubjectQuery(
+                    projectId = getProjectIdFromRequest(),
+                    subjectId = subjectId
+                )
+            )
+                .firstOrNull()
+                ?.fromSubjectToEnrolmentCreationEvent()
+                ?: return null
+
+        return jsonHelper.toJson(GenericCoSyncEvents(listOf(recordCreationEvent)))
+    }
+
+    private fun getProjectIdFromRequest() =
+        view.extras?.get(LibSimprintsConstants.SIMPRINTS_PROJECT_ID) as String
+
+    private fun Subject.fromSubjectToEnrolmentCreationEvent(): EnrolmentRecordCreationEvent {
+        return EnrolmentRecordCreationEvent(
+            timeHelper.now(),
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId,
+            sharedPreferencesManager.modalities.map { it.toMode() },
+            EnrolmentRecordCreationEvent.buildBiometricReferences(
+                fingerprintSamples,
+                faceSamples,
+                encoder
+            )
+        )
+    }
+
+    @Keep
+    private data class GenericCoSyncEvents(val events: List<Event>)
 }
 
