@@ -357,7 +357,7 @@ class LibSimprintsPresenterTest {
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
 
         verify(exactly = 1) {
-            view.returnErrorToClient(any(), RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId)
+            view.returnErrorToClient(any(), RETURN_FOR_FLOW_COMPLETED_CHECK, sessionId, null)
         }
         verifyCompletionCheckEventWasAdded()
         coVerify { clientApiSessionEventsManager.closeCurrentSessionNormally() }
