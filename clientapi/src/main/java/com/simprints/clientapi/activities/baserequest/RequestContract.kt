@@ -37,8 +37,7 @@ interface RequestContract {
          * if it's null.
          */
         fun returnErrorToClient(
-            errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String,
-            eventsJson: String?
+            errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String
         )
     }
 
