@@ -187,7 +187,10 @@ class LibSimprintsPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             sessionEventsManager.closeCurrentSessionNormally()
 
-            view.returnErrorToClient(errorResponse, flowCompletedCheck, currentSessionId)
+            view.returnErrorToClient(
+                errorResponse, flowCompletedCheck, currentSessionId,
+                getEventsJsonForSession(currentSessionId)
+            )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
