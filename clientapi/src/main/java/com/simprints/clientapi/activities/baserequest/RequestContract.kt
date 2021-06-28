@@ -2,9 +2,18 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.extractors.*
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
+import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 
 interface RequestContract {
 
@@ -27,7 +36,10 @@ interface RequestContract {
          * is functionally the same as this, but you can pass a nullable eventJson that won't be included in the response
          * if it's null.
          */
-        fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String)
+        fun returnErrorToClient(
+            errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String,
+            eventsJson: String?
+        )
     }
 
     interface Presenter {

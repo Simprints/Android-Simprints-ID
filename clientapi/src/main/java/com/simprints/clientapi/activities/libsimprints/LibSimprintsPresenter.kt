@@ -2,7 +2,6 @@ package com.simprints.clientapi.activities.libsimprints
 
 import androidx.annotation.Keep
 import com.simprints.clientapi.Constants
-import com.simprints.libsimprints.Constants as LibSimprintsConstants
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Identify
@@ -45,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import com.simprints.libsimprints.Constants as LibSimprintsConstants
 
 class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
@@ -96,6 +96,7 @@ class LibSimprintsPresenter(
                 getEventsJsonForSession(currentSessionId),
                 getEnrolmentCreationEventForSubject(enrol.guid)
             )
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -103,13 +104,16 @@ class LibSimprintsPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnIdentification(ArrayList(identify.identifications.map {
-                Identification(
-                    it.guidFound,
-                    it.confidenceScore,
-                    it.tier.fromDomainToLibsimprintsTier()
-                )
-            }), identify.sessionId, flowCompletedCheck)
+            view.returnIdentification(
+                ArrayList(identify.identifications.map {
+                    Identification(
+                        it.guidFound,
+                        it.confidenceScore,
+                        it.tier.fromDomainToLibsimprintsTier()
+                    )
+                }), identify.sessionId, flowCompletedCheck,
+                getEventsJsonForSession(identify.sessionId)
+            )
         }
     }
 
@@ -123,7 +127,11 @@ class LibSimprintsPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             sessionEventsManager.closeCurrentSessionNormally()
 
-            view.returnConfirmation(flowCompletedCheck, currentSessionId)
+            view.returnConfirmation(
+                flowCompletedCheck, currentSessionId,
+                getEventsJsonForSession(currentSessionId)
+            )
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -142,8 +150,13 @@ class LibSimprintsPresenter(
                     matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound
                 )
-                view.returnVerification(verification, currentSessionId, flowCompletedCheck)
+                view.returnVerification(
+                    verification, currentSessionId, flowCompletedCheck,
+                    getEventsJsonForSession(currentSessionId)
+                )
             }
+
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -158,8 +171,10 @@ class LibSimprintsPresenter(
 
             view.returnRefusalForms(
                 RefusalForm(refusalForm.reason, refusalForm.extra),
-                currentSessionId, flowCompletedCheck
+                currentSessionId, flowCompletedCheck,
+                getEventsJsonForSession(currentSessionId)
             )
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -173,6 +188,7 @@ class LibSimprintsPresenter(
             sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnErrorToClient(errorResponse, flowCompletedCheck, currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -221,6 +237,17 @@ class LibSimprintsPresenter(
                 encoder
             )
         )
+    }
+
+    /**
+     * Delete the events if returning to a cosync project but not Simprints
+     */
+    private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
+            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
+        ) {
+            sessionEventsManager.deleteSessionEvents(sessionId)
+        }
     }
 
     @Keep
