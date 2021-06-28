@@ -24,22 +24,29 @@ interface LibSimprintsContract {
         fun returnIdentification(
             identifications: ArrayList<Identification>,
             sessionId: String,
-            flowCompletedCheck: Boolean
+            flowCompletedCheck: Boolean,
+            eventsJson: String?
         )
 
         fun returnVerification(
             verification: Verification,
             sessionId: String,
-            flowCompletedCheck: Boolean
+            flowCompletedCheck: Boolean,
+            eventsJson: String?
         )
 
         fun returnRefusalForms(
             refusalForm: RefusalForm,
             sessionId: String,
-            flowCompletedCheck: Boolean
+            flowCompletedCheck: Boolean,
+            eventsJson: String?
         )
 
-        fun returnConfirmation(identificationOutcome: Boolean, sessionId: String)
+        fun returnConfirmation(
+            identificationOutcome: Boolean,
+            sessionId: String,
+            eventsJson: String?
+        )
 
     }
 
