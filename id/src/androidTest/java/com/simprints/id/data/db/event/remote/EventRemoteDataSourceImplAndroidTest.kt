@@ -401,7 +401,6 @@ class EventRemoteDataSourceImplAndroidTest {
         )
 
         event.payload.location = Location(0.0, 0.0)
-        event.payload.analyticsId = "analyticsId"
         event.payload.uploadedAt = 1
         event.payload.endedAt = 1
 

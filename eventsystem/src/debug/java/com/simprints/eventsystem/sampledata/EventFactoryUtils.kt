@@ -173,7 +173,6 @@ fun createSessionCaptureEvent(
         databaseInfoArg
     ).apply {
         payload.location = locationArg
-        payload.analyticsId = GUID1
         payload.endedAt = ENDED_AT
         payload.sessionIsClosed = isClosed
     }
