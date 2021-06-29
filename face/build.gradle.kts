@@ -125,7 +125,6 @@ dependencies {
 
     // Navigation
     androidTestImplementation(Dependencies.Testing.navigation_testing)
-    debugImplementation(Dependencies.Testing.fragment_testing)
 
     // Mockk
     testImplementation(Dependencies.Testing.Mockk.core)
