@@ -66,7 +66,6 @@ data class SessionCaptureEvent(
         val device: Device,
         val databaseInfo: DatabaseInfo,
         var location: Location? = null,
-        var analyticsId: String? = null,
         override var endedAt: Long = 0,
         var uploadedAt: Long = 0,
         override val type: EventType = SESSION_CAPTURE,
