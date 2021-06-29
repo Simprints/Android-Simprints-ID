@@ -3,9 +3,9 @@ package com.simprints.id.data.license.remote
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
-import com.simprints.id.network.SimApiClient
-import com.simprints.id.network.SimApiClientFactory
+import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.network.SimApiClient
+import com.simprints.core.network.SimApiClientFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runBlockingTest

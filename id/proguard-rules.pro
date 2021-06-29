@@ -48,9 +48,9 @@
 
 # These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
--keep class com.simprints.id.data.db.event.remote.models.** { *; }
--keep class com.simprints.id.data.db.event.domain.models.** { *; }
--keep class com.simprints.id.data.db.event.local.** { *; }
+-keep class com.simprints.eventsystem.event.remote.models.** { *; }
+-keep class com.simprints.eventsystem.event.domain.models.** { *; }
+-keep class com.simprints.eventsystem.event.local.** { *; }
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
@@ -85,12 +85,12 @@
 }
 # https://github.com/Kotlin/kotlinx.coroutines/issues/1270
 -dontwarn kotlinx.coroutines.flow.**
--dontwarn com.simprints.id.data.db.person.local.**
+-dontwarn com.simprints.eventsystem.person.local.**
 -dontwarn com.simprints.id.services.scheduledSync.people.up.workers.**
 -dontwarn com.simprints.id.tools.extensions.**
 -dontwarn com.simprints.id.activities.settings.syncinformation.**
 -dontwarn com.simprints.id.activities.consent.**
--dontwarn com.simprints.id.data.db.session.**
+-dontwarn com.simprints.eventsystem.session.**
 
 # https://github.com/Kotlin/kotlinx.coroutines/issues/2046
 -dontwarn java.lang.instrument.ClassFileTransformer

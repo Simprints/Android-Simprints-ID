@@ -9,11 +9,9 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
@@ -44,13 +42,13 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var eventDownSyncHelper: EventDownSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
-    @Inject lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
             ?: throw IllegalArgumentException("input required")
         Timber.d("Received $jsonInput")
-        jsonHelper.fromJson<EventDownSyncScope>(jsonInput)
+        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope>(jsonInput)
     }
 
     override suspend fun doWork(): Result =
@@ -67,7 +65,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
             }
         }
 
-    private suspend fun execute(downSyncScope: EventDownSyncScope): Result {
+    private suspend fun execute(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope): Result {
         return try {
 
             val downCount = getDownCount(downSyncScope)
@@ -110,7 +108,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
         } ?: false
     }
 
-    private suspend fun getDownCount(downSyncScope: EventDownSyncScope) =
+    private suspend fun getDownCount(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) =
         downSyncScope.operations.map {
             val opWithLastState = eventDownSyncScopeRepository.refreshState(it)
             eventDownSyncHelper.countForDownSync(opWithLastState)

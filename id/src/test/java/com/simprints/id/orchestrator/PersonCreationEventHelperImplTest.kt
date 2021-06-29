@@ -1,26 +1,27 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.commontesttools.events.createFaceCaptureEvent
-import com.simprints.id.commontesttools.events.createFingerprintCaptureEvent
-import com.simprints.id.commontesttools.events.createPersonCreationEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.PersonCreationEvent
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
-import com.simprints.id.data.db.subject.domain.FingerprintSample
-import com.simprints.id.data.db.subject.domain.uniqueId
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.face.uniqueId
+import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.uniqueId
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
+import com.simprints.eventsystem.sampledata.createPersonCreationEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.id.data.db.subject.domain.FingerIdentifier
+import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.tools.EncodingUtilsTest
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -42,9 +43,9 @@ class PersonCreationEventHelperImplTest {
         createFaceCaptureEvent().let { it.copy(labels = it.labels.copy(sessionId = currentSession.id)) }
 
     private val fingerprintSample = FingerprintCaptureSample(
-        LEFT_THUMB,
+        FingerIdentifier.LEFT_THUMB,
         templateQualityScore = 10,
-        template = EncodingUtilsTest().base64ToBytes(
+        template = EncodingUtilsImplForTests.base64ToBytes(
             fingerprintCaptureEvent.payload.fingerprint?.template
                 ?: ""
         ),
@@ -53,7 +54,7 @@ class PersonCreationEventHelperImplTest {
 
     private val faceSample = FaceCaptureSample(
         "face_id",
-        EncodingUtilsTest().base64ToBytes(faceCaptureEvent.payload.face?.template ?: ""),
+        EncodingUtilsImplForTests.base64ToBytes(faceCaptureEvent.payload.face?.template ?: ""),
         null,
         FaceTemplateFormat.RANK_ONE_1_23
     )
@@ -61,7 +62,7 @@ class PersonCreationEventHelperImplTest {
     private val fingerprintCaptureResponse = FingerprintCaptureResponse(
         captureResult = listOf(
             FingerprintCaptureResult(
-                LEFT_THUMB,
+                FingerIdentifier.LEFT_THUMB,
                 fingerprintSample
             )
         )
@@ -77,7 +78,7 @@ class PersonCreationEventHelperImplTest {
     )
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -93,7 +94,7 @@ class PersonCreationEventHelperImplTest {
         coEvery { timeHelper.now() } returns CREATED_AT
 
 
-        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsTest())
+        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsImplForTests)
     }
 
     @Test
@@ -121,10 +122,10 @@ class PersonCreationEventHelperImplTest {
                         fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
                         fingerprintReferenceId = listOf(
                             FingerprintSample(
-                                fingerprintSample.fingerIdentifier,
+                                fingerprintSample.fingerIdentifier.fromDomainToModuleApi(),
                                 fingerprintSample.template,
                                 fingerprintSample.templateQualityScore,
-                                fingerprintSample.format
+                                fingerprintSample.format.fromDomainToModuleApi()
                             )
                         ).uniqueId(),
                         faceCaptureIds = null,
@@ -149,7 +150,7 @@ class PersonCreationEventHelperImplTest {
                         fingerprintCaptureIds = null,
                         fingerprintReferenceId = null,
                         faceCaptureIds = listOf(faceCaptureEvent.id),
-                        faceReferenceId = listOf(FaceSample(faceSample.template, faceSample.format)).uniqueId()
+                        faceReferenceId = listOf(FaceSample(faceSample.template, faceSample.format.fromDomainToModuleApi())).uniqueId()
                     ).copy(id = it.id)
                 })
             }
@@ -175,14 +176,14 @@ class PersonCreationEventHelperImplTest {
                         fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
                         fingerprintReferenceId = listOf(
                             FingerprintSample(
-                                fingerprintSample.fingerIdentifier,
+                                fingerprintSample.fingerIdentifier.fromDomainToModuleApi(),
                                 fingerprintSample.template,
                                 fingerprintSample.templateQualityScore,
-                                fingerprintSample.format
+                                fingerprintSample.format.fromDomainToModuleApi()
                             )
                         ).uniqueId(),
                         faceCaptureIds = listOf(faceCaptureEvent.id),
-                        faceReferenceId = listOf(FaceSample(faceSample.template, faceSample.format)).uniqueId()
+                        faceReferenceId = listOf(FaceSample(faceSample.template, faceSample.format.fromDomainToModuleApi())).uniqueId()
                     ).copy(id = it.id)
                 })
             }

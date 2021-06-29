@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.subject.domain
 
 import android.os.Parcelable
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
 import kotlinx.parcelize.Parcelize
 import java.util.*
 

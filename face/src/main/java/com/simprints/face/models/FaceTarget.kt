@@ -1,7 +1,6 @@
 package com.simprints.face.models
 
 import com.simprints.face.detection.Face
-import com.simprints.uicomponents.models.FloatRange
 import kotlin.math.abs
 
 data class FaceTarget(

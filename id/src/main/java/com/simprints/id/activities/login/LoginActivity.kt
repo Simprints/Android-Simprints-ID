@@ -18,10 +18,10 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag
+import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -37,10 +37,14 @@ class LoginActivity : BaseSplitActivity() {
 
     private val binding by viewBinding(ActivityLoginBinding::inflate)
 
-    @Inject lateinit var viewModelFactory: LoginViewModelFactory
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var loginActivityHelper: LoginActivityHelper
-    @Inject lateinit var baseUrlProvider: BaseUrlProvider
+    @Inject
+    lateinit var viewModelFactory: LoginViewModelFactory
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var loginActivityHelper: LoginActivityHelper
+    @Inject
+    lateinit var baseUrlProvider: BaseUrlProvider
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -248,6 +252,11 @@ class LoginActivity : BaseSplitActivity() {
             putExtra(LoginActivityResponse.BUNDLE_KEY, appErrorResponse)
         })
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        progressDialog.dismiss()
     }
 
     private companion object {

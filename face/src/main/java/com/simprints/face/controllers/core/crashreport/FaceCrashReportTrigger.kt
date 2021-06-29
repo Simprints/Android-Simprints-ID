@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.crashreport
 
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.NETWORK
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.UI
+import com.simprints.core.analytics.CrashReportTrigger.NETWORK
+import com.simprints.core.analytics.CrashReportTrigger.UI
 
 enum class FaceCrashReportTrigger {
     UI,

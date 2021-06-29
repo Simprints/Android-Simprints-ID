@@ -1,6 +1,6 @@
 package com.simprints.face.controllers.core.crashreport
 
-import com.simprints.id.data.analytics.crashreport.CrashReportTag.*
+import com.simprints.core.analytics.CrashReportTag.*
 
 enum class FaceCrashReportTag {
     FACE_LICENSE,

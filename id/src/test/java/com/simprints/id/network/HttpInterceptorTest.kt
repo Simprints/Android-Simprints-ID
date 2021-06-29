@@ -18,6 +18,8 @@ class HttpInterceptorTest {
     @Before
     fun setup() {
         // setup & start mock server with enqueued mock response
+        // https://github.com/robolectric/robolectric/pull/5849
+        System.setProperty("javax.net.ssl.trustStore", "NONE")
         mockWebServer = MockWebServer()
         mockWebServer.start()
         mockWebServer.enqueue(MockResponse())

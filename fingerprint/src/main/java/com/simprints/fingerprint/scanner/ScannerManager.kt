@@ -19,8 +19,6 @@ interface ScannerManager {
     var currentScannerId: String?
     var currentMacAddress: String?
 
-    /** Helper function for accessing [scanner] method without null-check */
-    fun <T> onScanner(method: ScannerWrapper.() -> T): T
     /** Helper function for accessing [scanner] Completable without null-check */
     fun scanner(method: ScannerWrapper.() -> Completable): Completable
     /** Helper function for accessing [scanner] Single without null-check */

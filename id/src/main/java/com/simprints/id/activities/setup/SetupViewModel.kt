@@ -10,9 +10,9 @@ import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag.ID_SETUP
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger.NETWORK
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashReportTag.ID_SETUP
+import com.simprints.core.analytics.CrashReportTrigger.NETWORK
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.trace
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +22,8 @@ import timber.log.Timber
 
 @ExperimentalCoroutinesApi
 class SetupViewModel(val deviceManager: DeviceManager,
-                     private val crashReportManager: CrashReportManager) : ViewModel() {
+                     private val crashReportManager: CrashReportManager
+) : ViewModel() {
 
     internal val scope by lazy { viewModelScope }
     private val modalityDownloadTrace by lazy { trace("modalityDownload") }

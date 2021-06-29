@@ -29,13 +29,6 @@ android {
         testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
 
         ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                //Required by Room to be able to export the db schemas
-                arguments["room.schemaLocation"] = "$projectDir/schemas"
-            }
-        }
     }
 
     lintOptions.warning("InvalidPackage")
@@ -111,11 +104,6 @@ android {
             java.srcDir(sharedTestDir)
             java.srcDir("src/androidTest/java")
         }
-
-        // Adds exported room schema location as test app assets.
-        named("debug") {
-            assets.srcDirs("$projectDir/schemas")
-        }
     }
 
     testOptions {
@@ -145,6 +133,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
     api(project(":moduleapi"))
+    api(project(":eventsystem"))
     implementation(Dependencies.libsimprints)
 
     implementation(Dependencies.Dagger.core)
@@ -217,6 +206,8 @@ dependencies {
     // ######################################################
 
     testImplementation(project(":fingerprintscannermock"))
+    testImplementation(project(":eventsystem"))
+
     testImplementation(Dependencies.Testing.retrofit)
     testImplementation(Dependencies.Testing.junit) {
         exclude("com.android.support")

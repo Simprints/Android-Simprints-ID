@@ -1,6 +1,6 @@
 object Dependencies {
 
-    const val kotlin_version = "1.4.32"
+    const val kotlin_version = "1.5.10"
     const val androidx_navigation_version = "2.3.0-alpha04"
 
     private const val kotlin_coroutine_version = "1.3.1"
@@ -32,6 +32,7 @@ object Dependencies {
             "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
         const val coroutines_play_services =
             "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$kotlin_coroutine_version"
+        const val serialization_json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
     }
 
     object AndroidX {
@@ -187,9 +188,9 @@ object Dependencies {
         const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
 
         object Robolectric {
-
             const val core = "org.robolectric:robolectric:$robolectric_version"
             const val multidex = "org.robolectric:multidex:3.4.2"
+            const val annotation = "org.robolectric:annotations:$robolectric_version"
         }
 
         const val truth = "com.google.truth:truth:0.42"

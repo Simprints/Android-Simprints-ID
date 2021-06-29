@@ -2,16 +2,19 @@ package com.simprints.id.di
 
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import com.simprints.id.Application
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
@@ -20,9 +23,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -111,6 +112,15 @@ open class PreferencesModule {
         lastEventsPreferencesManager: RecentEventsPreferencesManager,
         app: Application
     ): PreferencesManager =
-        PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+        IdPreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+
+    @Provides
+    @Singleton
+    open fun provideIdPreferencesManager(
+        settingsPreferencesManager: SettingsPreferencesManager,
+        lastEventsPreferencesManager: RecentEventsPreferencesManager,
+        app: Application
+    ): IdPreferencesManager =
+        IdPreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
 
 }

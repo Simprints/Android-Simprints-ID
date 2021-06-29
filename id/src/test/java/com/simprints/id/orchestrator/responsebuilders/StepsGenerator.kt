@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest

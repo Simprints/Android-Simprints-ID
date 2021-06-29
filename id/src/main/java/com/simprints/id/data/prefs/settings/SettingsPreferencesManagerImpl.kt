@@ -1,11 +1,14 @@
 package com.simprints.id.data.prefs.settings
 
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.network.NetworkConstants
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
@@ -15,11 +18,8 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.Overr
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import com.simprints.id.network.NetworkConstants
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -314,14 +314,6 @@ open class SettingsPreferencesManagerImpl(
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
-    override var faceMaxRetries: Int
-        by RemoteConfigPrimitivePreference(
-            prefs,
-            remoteConfigWrapper,
-            FACE_MAX_RETRIES,
-            FACE_MAX_RETRIES_DEFAULT
-        )
-
     override var faceQualityThreshold: Float
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -467,7 +459,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val API_BASE_URL_KEY = "ApiBaseUrl"
 
-        const val FACE_MAX_RETRIES = "FaceMaxRetries"
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f

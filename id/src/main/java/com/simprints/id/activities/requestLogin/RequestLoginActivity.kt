@@ -5,7 +5,7 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.databinding.ActivityFrontBinding
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName

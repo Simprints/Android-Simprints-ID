@@ -1,17 +1,16 @@
 package com.simprints.id.services.guidselection
 
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -31,7 +30,7 @@ class GuidSelectionManagerImplTest {
     @MockK private lateinit var analyticsManager: AnalyticsManager
     @MockK private lateinit var crashReportManager: CrashReportManager
     @MockK private lateinit var timerHelper: TimeHelper
-    @MockK private lateinit var eventRepository: EventRepository
+    @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @Before
     fun setUp() {

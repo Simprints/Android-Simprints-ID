@@ -2,9 +2,8 @@ package com.simprints.id.activities.setup
 
 import android.Manifest
 import com.google.android.gms.location.LocationRequest
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.session.Location
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
@@ -23,8 +22,9 @@ object SetupActivityHelper {
         }
 
     internal suspend fun storeUserLocationIntoCurrentSession(locationManager: LocationManager,
-                                                             eventRepository: EventRepository,
-                                                             crashReportManager: CrashReportManager) {
+                                                             eventRepository: com.simprints.eventsystem.event.EventRepository,
+                                                             crashReportManager: CrashReportManager
+    ) {
         try {
             val locationRequest = LocationRequest().apply {
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY
