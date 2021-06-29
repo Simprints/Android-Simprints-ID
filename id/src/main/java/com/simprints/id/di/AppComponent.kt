@@ -1,5 +1,11 @@
 package com.simprints.id.di
 
+import com.simprints.core.analytics.CoreCrashReportManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -31,18 +37,14 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.license.repository.LicenseRepository
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
@@ -54,7 +56,6 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
-import com.simprints.id.tools.time.TimeHelper
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -135,6 +136,7 @@ interface AppComponent {
     fun inject(setupActivity: SetupActivity)
     fun inject(securityStateWorker: SecurityStateWorker)
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
+    fun inject(preferencesManager: IdPreferencesManager)
 
     fun getSessionEventsManager(): EventRepository
     fun getCrashReportManager(): CoreCrashReportManager
@@ -143,6 +145,7 @@ interface AppComponent {
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
+    fun getIdPreferencesManager(): IdPreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper

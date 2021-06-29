@@ -2,12 +2,12 @@ package com.simprints.id.secure
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.secure.models.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -22,7 +22,7 @@ class ProjectAuthenticatorImpl(
     private val signerManager: SignerManager,
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentRepository: LongConsentRepository,
-    private val preferencesManager: PreferencesManager,
+    private val preferencesManager: IdPreferencesManager,
     private val attestationManager: AttestationManager,
     private val authenticationDataManager: AuthenticationDataManager
 ) : ProjectAuthenticator {

@@ -7,11 +7,11 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
+import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.core.tools.extentions.hideKeyboard
-import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
 import org.jetbrains.anko.inputMethodManager
@@ -39,7 +39,7 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         title = getString(R.string.refusal_label)
 
         setTextInLayout()

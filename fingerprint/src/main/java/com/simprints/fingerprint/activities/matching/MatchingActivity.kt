@@ -9,7 +9,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.extentions.getStringPlural
+import com.simprints.core.tools.extentions.getQuantityString
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
@@ -38,7 +38,7 @@ class MatchingActivity : FingerprintActivity() {
         setContentView(binding.root)
 
         setTextInLayout()
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         observeResult()
         observeProgress()
@@ -74,24 +74,24 @@ class MatchingActivity : FingerprintActivity() {
         })
 
         viewModel.matchBeginningSummary.observe(this, Observer {
-            binding.tvMatchingProgressStatus1.text = getStringPlural(R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
+            binding.tvMatchingProgressStatus1.text = getQuantityString(R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
             binding.tvMatchingProgressStatus2.setText(R.string.matching_fingerprints)
         })
 
         viewModel.matchFinishedSummary.observe(this, Observer {
-            binding.tvMatchingProgressStatus2.text = getStringPlural(R.string.returned_results_quantity_key, it.returnSize, arrayOf(it.returnSize))
+            binding.tvMatchingProgressStatus2.text = getQuantityString(R.plurals.returned_results, it.returnSize, arrayOf(it.returnSize))
 
             if (it.veryGoodMatches > 0) {
                 binding.tvMatchingResultStatus1.visibility = View.VISIBLE
-                binding.tvMatchingResultStatus1.text = getStringPlural(R.string.tier1or2_matches_quantity_key, it.veryGoodMatches, arrayOf(it.veryGoodMatches))
+                binding.tvMatchingResultStatus1.text = getQuantityString(R.plurals.tier1or2_matches, it.veryGoodMatches, arrayOf(it.veryGoodMatches))
             }
             if (it.goodMatches > 0) {
                 binding.tvMatchingResultStatus2.visibility = View.VISIBLE
-                binding.tvMatchingResultStatus2.text = getStringPlural(R.string.tier3_matches_quantity_key, it.goodMatches, arrayOf(it.goodMatches))
+                binding.tvMatchingResultStatus2.text = getQuantityString(R.plurals.tier3_matches, it.goodMatches, arrayOf(it.goodMatches))
             }
             if (it.veryGoodMatches < 1 && it.goodMatches < 1 || it.fairMatches > 1) {
                 binding.tvMatchingResultStatus3.visibility = View.VISIBLE
-                binding.tvMatchingResultStatus3.text = getStringPlural(R.string.tier4_matches_quantity_key, it.fairMatches, arrayOf(it.fairMatches))
+                binding.tvMatchingResultStatus3.text = getQuantityString(R.plurals.tier4_matches, it.fairMatches, arrayOf(it.fairMatches))
             }
             setIdentificationProgress(100)
         })

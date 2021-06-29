@@ -3,7 +3,7 @@ package com.simprints.id.data.consent.longconsent
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StreamDownloadTask
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.tools.extensions.awaitTask
 
 class LongConsentRemoteDataSourceImpl(private val loginInfoManager: LoginInfoManager) : LongConsentRemoteDataSource {

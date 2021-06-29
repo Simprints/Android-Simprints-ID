@@ -3,14 +3,14 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.modality.toMode
+import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
@@ -22,9 +22,9 @@ import timber.log.Timber
 
 class SyncInformationViewModel(
     private val downySyncHelper: EventDownSyncHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
     private val subjectRepository: SubjectRepository,
-    private val preferencesManager: PreferencesManager,
+    private val preferencesManager: IdPreferencesManager,
     private val projectId: String,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository
@@ -92,7 +92,11 @@ class SyncInformationViewModel(
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
-            val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope()
+            val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope(
+                preferencesManager.modalities.map { it.toMode() },
+                preferencesManager.moduleIdOptions.toList(),
+                preferencesManager.syncGroup
+            )
             var creationsToDownload = 0
             var deletionsToDownload = 0
 

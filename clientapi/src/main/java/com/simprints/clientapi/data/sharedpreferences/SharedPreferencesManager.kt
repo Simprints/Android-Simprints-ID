@@ -1,7 +1,7 @@
 package com.simprints.clientapi.data.sharedpreferences
 
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 
 
 interface SharedPreferencesManager {

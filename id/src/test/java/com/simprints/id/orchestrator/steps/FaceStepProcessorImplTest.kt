@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
-    @MockK lateinit var preferencesManagerMock: PreferencesManager
+    @MockK lateinit var preferencesManagerMock: IdPreferencesManager
 
     private val faceRequestFactory: FaceRequestFactory = FaceRequestFactoryImpl()
     private lateinit var faceStepProcess: FaceStepProcessor

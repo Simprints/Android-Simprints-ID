@@ -116,11 +116,13 @@ class ConnectScannerViewModel(
             scannerManager.scanner { sensorWakeUp() }) { updateBluetoothConnectivityEventWithVeroInfoIfNecessary() }
 
     private fun updateBluetoothConnectivityEventWithVeroInfoIfNecessary() {
-        scannerManager.let {
-            if (scannerManager.onScanner { versionInformation() }.generation == ScannerGeneration.VERO_1) {
-                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.onScanner { versionInformation() }.computeMasterVersion().toString())
+        scannerManager.scanner?.run {
+            if (versionInformation().generation == ScannerGeneration.VERO_1) {
+                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
+                    versionInformation().computeMasterVersion().toString()
+                )
             }
-        }
+        } ?: retryConnect()
     }
 
     private fun veroTask(progress: Int, @StringRes messageRes: Int, crashReportMessage: String,
@@ -181,9 +183,11 @@ class ConnectScannerViewModel(
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
         preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
-        preferencesManager.lastScannerVersion = scannerManager.onScanner { versionInformation() }.computeMasterVersion().toString()
-        analyticsManager.logScannerProperties(scannerManager.currentMacAddress
-            ?: "", scannerManager.currentScannerId ?: "")
+        preferencesManager.lastScannerVersion = scannerManager.scanner?.versionInformation()?.computeMasterVersion().toString()
+        analyticsManager.logScannerProperties(
+            scannerManager.currentMacAddress ?: "",
+            scannerManager.currentScannerId ?: ""
+        )
         scannerConnected.postEvent(true)
     }
 
@@ -216,30 +220,33 @@ class ConnectScannerViewModel(
     }
 
     private fun addBluetoothConnectivityEvent() {
-        with(scannerManager) {
+        scannerManager.scanner?.run {
             sessionEventsManager.addEventInBackground(
                 ScannerConnectionEvent(
                     timeHelper.now(),
                     ScannerConnectionEvent.ScannerInfo(
-                        currentScannerId ?: "",
-                        currentMacAddress ?: "",
-                        ScannerConnectionEvent.ScannerGeneration.get(onScanner { versionInformation().generation }),
-                        null)))
-        }
+                        scannerManager.currentScannerId ?: "",
+                        scannerManager.currentMacAddress ?: "",
+                        ScannerConnectionEvent.ScannerGeneration.get(versionInformation().generation),
+                        null
+                    )
+                )
+            )
+        } ?: retryConnect()
     }
 
     private fun addInfoSnapshotEventIfNecessary() {
-        with(scannerManager) {
-            if (onScanner { versionInformation().generation } == ScannerGeneration.VERO_2) {
+        scannerManager.scanner?.run {
+            if (versionInformation().generation == ScannerGeneration.VERO_2) {
                 sessionEventsManager.addEventInBackground(
                     Vero2InfoSnapshotEvent(
                         timeHelper.now(),
-                        Vero2InfoSnapshotEvent.Vero2Version.get(onScanner { versionInformation() }),
-                        Vero2InfoSnapshotEvent.BatteryInfo.get(onScanner { batteryInformation() })
+                        Vero2InfoSnapshotEvent.Vero2Version.get(versionInformation()),
+                        Vero2InfoSnapshotEvent.BatteryInfo.get(batteryInformation())
                     )
                 )
             }
-        }
+        } ?: retryConnect()
     }
 
     private fun logMessageForCrashReport(message: String) {

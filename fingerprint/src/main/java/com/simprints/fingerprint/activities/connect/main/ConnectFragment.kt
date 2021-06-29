@@ -19,7 +19,11 @@ abstract class ConnectFragment(@LayoutRes private val layout: Int) : Fingerprint
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(layout, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,4 +77,9 @@ abstract class ConnectFragment(@LayoutRes private val layout: Int) : Fingerprint
                 onYes = { connectScannerViewModel.handleScannerDisconnectedYesClick() },
                 onNo = { connectScannerViewModel.handleScannerDisconnectedNoClick() }
             )
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scannerErrorConfirmationDialog?.dismiss()
+    }
 }

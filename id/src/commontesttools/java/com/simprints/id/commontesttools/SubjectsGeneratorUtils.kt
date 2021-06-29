@@ -1,10 +1,11 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FaceSample
-import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
+import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
+import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import java.util.*
 import kotlin.random.Random
 
@@ -63,11 +64,11 @@ object SubjectsGeneratorUtils {
             commonFingerprint.fingerIdentifier,
             commonFingerprint.template,
             commonFingerprint.templateQualityScore,
-            FingerprintTemplateFormat.ISO_19794_2
+            IFingerprintTemplateFormat.ISO_19794_2
         )
     }
 
-    fun getRandomFaceSample() = FaceSample(Random.nextBytes(64), FaceTemplateFormat.RANK_ONE_1_23)
+    fun getRandomFaceSample() = FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23)
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
         return Calendar.getInstance().apply {
@@ -75,6 +76,4 @@ object SubjectsGeneratorUtils {
         }.time
     }
 
-    private fun <T> List<T>.takeRandom(): T =
-        this[Random.nextInt(this.size)]
 }

@@ -17,8 +17,8 @@ android {
     }
 
     buildTypes {
-        getByName("profiling") {
-            initWith(getByName("debug"))
+        getByName(BuildParams.BuildTypes.profiling) {
+            initWith(getByName(BuildParams.BuildTypes.debug))
         }
     }
 
@@ -32,7 +32,7 @@ dependencies {
 
     // Kotlin
     implementation(Dependencies.Kotlin.coroutines_android)
-    compileOnly (Dependencies.AndroidX.Annotation.annotation)
+    compileOnly(Dependencies.AndroidX.Annotation.annotation)
 
     testImplementation(Dependencies.Testing.junit)
 }

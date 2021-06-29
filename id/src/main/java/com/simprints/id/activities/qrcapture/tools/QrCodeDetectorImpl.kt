@@ -7,7 +7,7 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOption
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.simprints.id.activities.qrcapture.model.RawImage
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.tools.extensions.awaitTask
 
 class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : QrCodeDetector {

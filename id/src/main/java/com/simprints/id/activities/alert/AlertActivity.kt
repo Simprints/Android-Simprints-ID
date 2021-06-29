@@ -41,7 +41,7 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
         (application as Application).component.inject(this)
         title = getString(R.string.alert_title)
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val app = application as Application
 
         injectDependencies(app.component)

@@ -1,8 +1,8 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import android.os.Parcelable
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.fromModuleApiToDomain
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.fromModuleApiToDomain
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.data.db.subject.domain.fromModuleApiToDomain

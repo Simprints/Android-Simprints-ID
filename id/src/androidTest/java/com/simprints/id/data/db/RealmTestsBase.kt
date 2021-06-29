@@ -1,12 +1,12 @@
-package com.simprints.id.data.db
+package com.simprints.eventsystem
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.simprints.core.security.LocalDbKey
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

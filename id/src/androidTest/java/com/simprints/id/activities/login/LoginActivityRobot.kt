@@ -23,7 +23,7 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.QrCodeResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every

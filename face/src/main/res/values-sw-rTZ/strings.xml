@@ -33,19 +33,36 @@
     <string name="face_match_please_wait">Tafadhali subiri tunapoendelea na utambulisho</string>
     <string name="face_match_loading_candidates">Inapakia wateja...</string>
     <string name="face_match_matching_candidates">Inafananisha mteja</string>
-    <string name="face_match_matched_candidates_one">Inalinganisha kwa mteja %d</string>
-    <string name="face_match_matched_candidates_other">Inalinganisha kwa mteja %d</string>
-    <string name="face_match_returned_results_one">Matokeo yamerudi %d</string>
-    <string name="face_match_returned_results_other">Matokeo yamerudi %d</string>
-    <string name="face_match_tier1or2_matches_zero">Hakuna inazofanana nayo vizuri sana</string>
-    <string name="face_match_tier1or2_matches_one">%d inafanana vizuri</string>
-    <string name="face_match_tier1or2_matches_other">%d inafananisha vizuri sana</string>
-    <string name="face_match_tier3_matches_zero">Hakuna inazofanana nayo vizuri</string>
-    <string name="face_match_tier3_matches_one">%d inayofanana nayo vizuri</string>
-    <string name="face_match_tier3_matches_other">%d inayofanana nazo vizuri</string>
-    <string name="face_match_tier4_matches_zero">Hakuna zinazofanana nayo</string>
-    <string name="face_match_tier4_matches_one">"%d inayofanana "</string>
-    <string name="face_match_tier4_matches_other">"%d inayofanana "</string>
+
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">Inalinganisha kwa mteja %d</item>
+        <item quantity="other">Inalinganisha kwa mteja %d</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">Matokeo yamerudi %d</item>
+        <item quantity="other">Matokeo yamerudi %d</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">Hakuna inazofanana nayo vizuri sana</item>
+        <item quantity="one">%d inafanana vizuri</item>
+        <item quantity="other">%d inafananisha vizuri sana</item>
+    </plurals>
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">Hakuna inazofanana nayo vizuri</item>
+        <item quantity="one">%d inayofanana nayo vizuri</item>
+        <item quantity="other">%d inayofanana nazo vizuri</item>
+    </plurals>
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">Hakuna zinazofanana nayo</item>
+        <item quantity="one">"%d inayofanana "</item>
+        <item quantity="other">"%d inayofanana "</item>
+    </plurals>
+
+
     <string name="error_licence_invalid_title">Leseni batili</string>
     <string name="error_licence_invalid_message">Leseni ya uchukuaji wa picha ya sura ni batili, tafadhali wasiliana na msimazi wa mfumo huu</string>
     <string name="error_licence_invalid_button">Funga</string>

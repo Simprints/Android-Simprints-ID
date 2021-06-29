@@ -89,7 +89,7 @@ class MatchingViewModelTest : KoinTest {
         assertNotNull(result)
         result?.let { matchingResult ->
             assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, matchingResult.results.size)
-            val highestScoreCandidate = matchingResult.results.maxBy { it.confidence }?.guid
+            val highestScoreCandidate = matchingResult.results.maxByOrNull { it.confidence }?.guid
             assertThat(highestScoreCandidate).isEqualTo(probeFingerprintRecord.personId)
         }
         coVerify { dbManagerMock.loadPeople(query) }

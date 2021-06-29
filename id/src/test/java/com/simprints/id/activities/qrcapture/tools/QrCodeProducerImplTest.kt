@@ -1,7 +1,7 @@
 package com.simprints.id.activities.qrcapture.tools
 
 import androidx.camera.core.ImageProxy
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.analytics.CrashReportManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi

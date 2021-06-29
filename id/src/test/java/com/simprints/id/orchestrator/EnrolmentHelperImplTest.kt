@@ -1,16 +1,15 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.defaultSubject
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.commontesttools.events.createPersonCreationEvent
-import com.simprints.id.commontesttools.events.createSessionCaptureEvent
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.EnrolmentEventV2
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.sampledata.createPersonCreationEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
+import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -29,7 +28,7 @@ class EnrolmentHelperImplTest {
     lateinit var subjectRepository: SubjectRepository
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper

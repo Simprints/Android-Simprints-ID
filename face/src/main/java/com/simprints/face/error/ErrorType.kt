@@ -5,8 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.face.R
-import com.simprints.id.R as IDR
-import com.simprints.uicomponents.R as UIR
+import com.simprints.core.R as CR
 
 @Keep
 enum class ErrorType(
@@ -21,28 +20,28 @@ enum class ErrorType(
         R.string.error_licence_missing_title,
         R.string.error_licence_missing_message,
         R.string.error_close_button,
-        IDR.color.simprints_grey,
-        UIR.drawable.ic_exclamation_92dp
+        CR.color.simprints_grey,
+        R.drawable.ic_exclamation_92dp
     ),
     LICENSE_INVALID(
         R.string.error_licence_invalid_title,
         R.string.error_licence_invalid_message,
         R.string.error_close_button,
-        IDR.color.simprints_grey,
-        UIR.drawable.ic_exclamation_92dp
+        CR.color.simprints_grey,
+        R.drawable.ic_exclamation_92dp
     ),
     CONFIGURATION_ERROR(
         R.string.error_configuration_error_title,
         R.string.error_configuration_error_message,
         R.string.error_close_button,
-        IDR.color.simprints_grey,
-        UIR.drawable.ic_exclamation_92dp
+        CR.color.simprints_grey,
+        R.drawable.ic_exclamation_92dp
     ),
     UNEXPECTED_ERROR(
         R.string.error_unexpected_error_title,
         R.string.error_unexpected_error_message,
         R.string.error_close_button,
-        IDR.color.simprints_red,
-        UIR.drawable.ic_exclamation_92dp
+        CR.color.simprints_red,
+        R.drawable.ic_exclamation_92dp
     )
 }

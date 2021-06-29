@@ -2,8 +2,8 @@ package com.simprints.id.services.sync.events.up
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
@@ -13,7 +13,7 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: EventUpSyncScopeRepository,
+class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
                                     private val jsonHelper: JsonHelper) : EventUpSyncWorkersBuilder {
 
 
@@ -25,7 +25,8 @@ class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: EventUpSy
 
     private fun buildUpSyncWorkers(uniqueSyncID: String?,
                                    uniqueUpSyncId: String,
-                                   upSyncScope: EventUpSyncScope): OneTimeWorkRequest =
+                                   upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+    ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncUploaderWorker::class.java)
             .setInputData(workDataOf(INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope)))
             .upSyncWorker(uniqueSyncID, uniqueUpSyncId, getUpSyncWorkerConstraints())
@@ -35,7 +36,8 @@ class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: EventUpSy
 
     private fun buildCountWorker(uniqueSyncID: String?,
                                  uniqueUpSyncID: String,
-                                 upSyncScope: EventUpSyncScope): OneTimeWorkRequest =
+                                 upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+    ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncCountWorker::class.java)
             .setInputData(workDataOf(INPUT_COUNT_WORKER_UP to jsonHelper.toJson(upSyncScope)))
             .upSyncWorker(uniqueSyncID, uniqueUpSyncID)

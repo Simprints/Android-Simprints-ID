@@ -2,6 +2,7 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 

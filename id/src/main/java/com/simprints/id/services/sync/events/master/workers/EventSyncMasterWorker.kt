@@ -2,8 +2,9 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.*
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
@@ -11,7 +12,6 @@ import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
-import com.simprints.id.tools.time.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -45,7 +45,7 @@ open class EventSyncMasterWorker(
     lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
 
     @Inject
-    lateinit var preferenceManager: PreferencesManager
+    lateinit var preferenceManager: IdPreferencesManager
 
     @Inject
     lateinit var eventSyncCache: EventSyncCache

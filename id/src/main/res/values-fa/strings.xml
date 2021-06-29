@@ -92,8 +92,10 @@
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
 
-    <string name="test_loaded_candidates_one"> فرد یا اشتراک کننده آماده است %d</string>
-    <string name="test_loaded_candidates_other"> افراد یا اشتراک کنندگان آماده شدند %d</string>
+    <plurals name="test_loaded_candidates">
+        <item quantity="one"> فرد یا اشتراک کننده آماده است %d</item>
+        <item quantity="other"> افراد یا اشتراک کنندگان آماده شدند %d</item>
+    </plurals>
 
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">شامل شدن</item>

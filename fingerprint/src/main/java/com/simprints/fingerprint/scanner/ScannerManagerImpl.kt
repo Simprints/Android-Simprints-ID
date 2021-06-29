@@ -22,8 +22,6 @@ class ScannerManagerImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
     override var currentScannerId: String? = null
     override var currentMacAddress: String? = null
 
-    override fun <T> onScanner(method: ScannerWrapper.() -> T): T =
-        delegateToScannerOrThrow(method)
 
     override fun scanner(method: ScannerWrapper.() -> Completable): Completable =
         Completable.defer { delegateToScannerOrThrow(method) }

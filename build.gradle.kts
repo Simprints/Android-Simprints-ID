@@ -15,25 +15,25 @@ buildscript {
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:4.1.3")
+        classpath("com.android.tools.build:gradle:4.2.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
 
         // CI Scanning & Retry
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1")
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
         classpath("org.ow2.asm:asm:9.0")
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.72.0")
+        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.73.0")
         classpath("org.gradle:test-retry-gradle-plugin:1.2.0")
 
         // Firebase
-        classpath("com.google.gms:google-services:4.3.5")
-        classpath("com.google.firebase:perf-plugin:1.3.5")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.5.2")
+        classpath("com.google.gms:google-services:4.3.8")
+        classpath("com.google.firebase:perf-plugin:1.4.0")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.0")
 
         // Dependency Publishing
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.10.0")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.24.4")
 
         // Realm Database
         classpath("io.realm:realm-gradle-plugin:10.4.0")
@@ -42,8 +42,8 @@ buildscript {
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
 
         // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.4.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:2.1.1")
+        classpath("com.github.triplet.gradle:play-publisher:3.4.0-agp4.2")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:2.1.2")
     }
 
 }
