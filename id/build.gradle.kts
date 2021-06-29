@@ -171,7 +171,7 @@ dependencies {
     implementation(Dependencies.Rootbeer.core)
 
     // Firebase
-    api (Dependencies.Firebase.analytics)
+    api(Dependencies.Firebase.analytics)
     implementation(Dependencies.Firebase.auth)
     implementation(Dependencies.Firebase.config)
     implementation(Dependencies.Firebase.perf)
@@ -288,6 +288,8 @@ dependencies {
     }
     androidTestImplementation(Dependencies.Testing.kappuccino)
 
+    // Navigation
+    androidTestImplementation(Dependencies.Testing.navigation_testing)
 }
 
 kapt {
