@@ -70,6 +70,9 @@ dependencies {
     implementation(Dependencies.Retrofit.okhttp)
     implementation(Dependencies.Retrofit.converterScalars)
 
+    // Fragment
+    implementation(Dependencies.AndroidX.UI.fragment)
+
     // Android X
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.CameraX.core)
@@ -119,6 +122,9 @@ dependencies {
 
     // Kotlin
     testImplementation(Dependencies.Testing.coroutines_test)
+
+    // Navigation
+    androidTestImplementation(Dependencies.Testing.navigation_testing)
 
     // Mockk
     testImplementation(Dependencies.Testing.Mockk.core)
