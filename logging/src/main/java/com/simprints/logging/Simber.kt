@@ -38,7 +38,7 @@ object Simber {
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
-     * connected to a server. Basically use it to report successes or events that we need to be
+     * connected to a server. Basically use it to report events that we need to be
      * aware of.
      * DEBUG: Is sent to Log.i
      * STAGING: Is sent to Log.i & sent to Firebase Analytics

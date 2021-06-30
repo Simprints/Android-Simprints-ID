@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator.generateFaceMatchResults
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
@@ -24,8 +23,7 @@ import org.junit.Test
 import java.util.*
 
 class FaceOrchestratorViewModelTest {
-    private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
-    private val viewModel = spyk(FaceOrchestratorViewModel(faceCrashReportManager))
+    private val viewModel = spyk(FaceOrchestratorViewModel())
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
