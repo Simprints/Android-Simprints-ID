@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
     kotlin("android")
     kotlin("kapt")
@@ -9,6 +8,7 @@ plugins {
     id("com.github.triplet.play")
     id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 apply {
@@ -179,7 +179,6 @@ dependencies {
     implementation(Dependencies.Firebase.storage)
     implementation(Dependencies.Firebase.mlkit)
     implementation(Dependencies.Firebase.mlkit_barcode)
-    implementation(Dependencies.Firebase.crashlytics)
 
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.multidex)

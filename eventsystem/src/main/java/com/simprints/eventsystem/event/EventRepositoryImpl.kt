@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.extentions.isClientAndCloudIntegrationIssue
@@ -165,11 +164,7 @@ open class EventRepositoryImpl(
 
         Simber.tag("SYNC").d("[EVENT_REPO] Uploading abandoned events")
         eventLocalDataSource.loadAbandonedEvents(projectId).let {
-            crashReportManager.logMessageForCrashReport(
-                CrashReportTag.SYNC,
-                CrashReportTrigger.DATABASE,
-                message = "Abandoned Events: ${it.size}"
-            )
+            Simber.tag(CrashReportTag.SYNC.name).i("Abandoned Events: ${it.size}")
             attemptEventUpload(it, projectId)
             this.emit(it.size)
         }
