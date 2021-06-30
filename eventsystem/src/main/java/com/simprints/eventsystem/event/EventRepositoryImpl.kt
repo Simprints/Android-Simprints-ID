@@ -24,10 +24,10 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import java.util.*
 
 open class EventRepositoryImpl(
@@ -102,7 +102,7 @@ open class EventRepositoryImpl(
         }
 
         val endTime = System.currentTimeMillis()
-        Timber.v("Save event: ${event.type} = ${endTime - startTime}ms")
+        Simber.v("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
     private suspend fun saveEvent(event: Event, session: SessionCaptureEvent) {
@@ -146,7 +146,7 @@ open class EventRepositoryImpl(
      * (through simplicity and low resource usage)
      */
     override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
-        Timber.tag("SYNC").d("[EVENT_REPO] Uploading")
+        Simber.tag("SYNC").d("[EVENT_REPO] Uploading")
 
         if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
@@ -156,14 +156,14 @@ open class EventRepositoryImpl(
 
         eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
             // The events will include the SessionCaptureEvent event
-            Timber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
+            Simber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
             eventLocalDataSource.loadAllFromSession(sessionId).let {
                 attemptEventUpload(it, projectId)
                 this.emit(it.size)
             }
         }
 
-        Timber.tag("SYNC").d("[EVENT_REPO] Uploading abandoned events")
+        Simber.tag("SYNC").d("[EVENT_REPO] Uploading abandoned events")
         eventLocalDataSource.loadAbandonedEvents(projectId).let {
             crashReportManager.logMessageForCrashReport(
                 CrashReportTag.SYNC,
@@ -187,7 +187,7 @@ open class EventRepositoryImpl(
             uploadEvents(events, projectId)
             deleteEventsFromDb(events.map { it.id })
         } catch (t: Throwable) {
-            Timber.w(t)
+            Simber.w(t)
             if (t.isClientAndCloudIntegrationIssue()) {
                 crashReportManager.logException(t)
                 // We do not delete subject events (pokedex) since they are important.
@@ -204,7 +204,7 @@ open class EventRepositoryImpl(
     }
 
     private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
-        Timber.tag("SYNC").d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
+        Simber.tag("SYNC").d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
         eventLocalDataSource.delete(eventsIds)
     }
 
@@ -271,7 +271,7 @@ open class EventRepositoryImpl(
         try {
             block()
         } catch (t: Throwable) {
-            Timber.d(t)
+            Simber.d(t)
             crashReportManager.logExceptionOrSafeException(t)
             throw t
         }

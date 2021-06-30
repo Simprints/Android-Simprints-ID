@@ -59,10 +59,10 @@ dependencies {
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":id"))
+    implementation(project(":logging"))
 
     implementation(Dependencies.cameraView)
     implementation(Dependencies.circleImageView)
-    implementation(Dependencies.Timber.core)
 
     // Retrofit
     implementation(Dependencies.Retrofit.core)

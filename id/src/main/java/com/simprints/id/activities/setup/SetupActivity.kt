@@ -37,10 +37,10 @@ import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
@@ -107,7 +107,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun observeNetworkState() {
         viewModel.getDeviceNetworkLiveData().observe(this, Observer {
-            Timber.d("Setup - Observing network $it")
+            Simber.d("Setup - Observing network $it")
             if (it == DeviceOffline && viewModel.getViewStateLiveData().value != ModalitiesInstalled) {
                 launchAlertIfNecessary()
             }
@@ -140,7 +140,7 @@ class SetupActivity : BaseSplitActivity() {
             try {
                 storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
             } catch (t: Throwable) {
-                Timber.d(t)
+                Simber.d(t)
             }
         }
     }
@@ -149,7 +149,7 @@ class SetupActivity : BaseSplitActivity() {
         val permissions = extractPermissionsFromRequest(setupRequest)
 
         if (permissions.all { hasPermission(it) }) {
-            Timber.d("All permissions are granted")
+            Simber.d("All permissions are granted")
             performPermissionActionsAndFinish()
         } else {
             requestPermissionsIfRequired(permissions, PERMISSIONS_REQUEST_CODE)
@@ -158,7 +158,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun performPermissionActionsAndFinish() {
         lifecycleScope.launch {
-            Timber.d("Adding location to session")
+            Simber.d("Adding location to session")
             collectLocationInBackground()
             setResultAndFinish(SETUP_COMPLETE_FLAG)
         }

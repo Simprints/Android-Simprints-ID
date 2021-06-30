@@ -4,7 +4,9 @@ import timber.log.Timber
 
 /**
  * A very lightweight wrapper around Timber in case we ever decide to use a different logging
- * library. https://github.com/JakeWharton/timber
+ * library.
+ * @see <a href="URL#https://github.com/JakeWharton/timber">Timber</a>
+ * @see <a href="URL#https://simprints.atlassian.net/l/c/jwGUtYwe">Further Documentation</a>
  */
 object Simber {
 
@@ -19,7 +21,7 @@ object Simber {
      */
     fun v(t: Throwable) = Timber.v(t)
     fun v(message: String, args: Any? = null) = Timber.v(message, args)
-    fun v(t: Throwable, message: String, args: Any) = Timber.v(t, message, args)
+    fun v(t: Throwable, message: String, args: Any? = null) = Timber.v(t, message, args)
 
     /**
      * Use this for debugging purposes. If you want to print out a bunch of messages so you can log
@@ -30,8 +32,8 @@ object Simber {
      * RELEASE: Is ignored
      */
     fun d(t: Throwable) = Timber.d(t)
-    fun d(message: String, args: Any) = Timber.d(message, args)
-    fun d(t: Throwable, message: String, args: Any) = Timber.d(t, message, args)
+    fun d(message: String, args: Any? = null) = Timber.d(message, args)
+    fun d(t: Throwable, message: String, args: Any? = null) = Timber.d(t, message, args)
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
@@ -42,8 +44,8 @@ object Simber {
      * RELEASE: Is sent to Firebase Analytics
      */
     fun i(t: Throwable) = Timber.i(t)
-    fun i(message: String, args: Any) = Timber.i(message, args)
-    fun i(t: Throwable, message: String, args: Any) = Timber.i(t, message, args)
+    fun i(message: String, args: Any? = null) = Timber.i(message, args)
+    fun i(t: Throwable, message: String, args: Any? = null) = Timber.i(t, message, args)
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -55,8 +57,8 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun w(t: Throwable) = Timber.w(t)
-    fun w(message: String, args: Any) = Timber.w(message, args)
-    fun w(t: Throwable, message: String, args: Any) = Timber.w(t, message, args)
+    fun w(message: String, args: Any? = null) = Timber.w(message, args)
+    fun w(t: Throwable, message: String, args: Any? = null) = Timber.w(t, message, args)
 
     /**
      * This is for when bad stuff happens. Use this tag in places like inside a catch statement.
@@ -66,8 +68,8 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun e(t: Throwable) = Timber.e(t)
-    fun e(message: String, args: Any) = Timber.e(message, args)
-    fun e(t: Throwable, message: String, args: Any) = Timber.e(t, message, args)
+    fun e(message: String, args: Any? = null) = Timber.e(message, args)
+    fun e(t: Throwable, message: String, args: Any? = null) = Timber.e(t, message, args)
 
     /**
      * Adds a custom tag to the log.

@@ -2,6 +2,7 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.logging.Simber
 import timber.log.Timber
 import java.util.*
 import kotlin.reflect.KProperty
@@ -15,7 +16,7 @@ class DatePreference(private val prefs: ImprovedSharedPreferences,
     }
 
     private var value: Date? by lazyVar {
-        Timber.d("DatePreference read $key from Shared Preferences")
+        Simber.d("DatePreference read $key from Shared Preferences")
         val longTime: Long = prefs.getPrimitive(key, defValue?.time
             ?: NULL_DATE)
         if (longTime > NULL_DATE) {

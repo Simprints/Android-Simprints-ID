@@ -84,6 +84,7 @@ dependencies {
     implementation(project(":fingerprintmatcher"))
     implementation(project(":fingerprintscanner"))
     implementation(project(":fingerprintscannermock"))
+    implementation(project(":logging"))
 
     // Kotlin
     implementation(Dependencies.Kotlin.reflect)
@@ -111,9 +112,6 @@ dependencies {
     implementation(Dependencies.RxJava2.android)
     implementation(Dependencies.RxJava2.core)
     implementation(Dependencies.RxJava2.kotlin)
-
-    // Timber
-    implementation(Dependencies.Timber.core)
 
     // Play Services
     implementation(Dependencies.PlayServices.location)

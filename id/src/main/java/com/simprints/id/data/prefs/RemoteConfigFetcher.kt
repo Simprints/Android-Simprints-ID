@@ -3,7 +3,7 @@ package com.simprints.id.data.prefs
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.simprints.id.BuildConfig
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class RemoteConfigFetcher(private val remoteConfig: FirebaseRemoteConfig) {
 
@@ -23,9 +23,9 @@ class RemoteConfigFetcher(private val remoteConfig: FirebaseRemoteConfig) {
     private fun doFetchInBackgroundAndActivate(cacheExpirationSeconds: Long? = null) {
         getFetchTask(cacheExpirationSeconds).addOnSuccessListener {
             remoteConfig.activateFetched()
-            Timber.d("FirebaseRemoteConfig : Fetched and activated settings")
+            Simber.d("FirebaseRemoteConfig : Fetched and activated settings")
         }
-        Timber.d("FirebaseRemoteConfig : Fetching settings...")
+        Simber.d("FirebaseRemoteConfig : Fetching settings...")
     }
 
     private fun getFetchTask(cacheExpirationSeconds: Long?) =

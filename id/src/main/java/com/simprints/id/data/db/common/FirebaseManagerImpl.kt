@@ -5,9 +5,9 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.tools.extensions.awaitTask
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteDbManager {
 
@@ -18,7 +18,7 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     override suspend fun signIn(token: String) {
         cacheTokenClaims(token)
         val result = firebaseAuth.signInWithCustomToken(token).awaitTask()
-        Timber.d(result.user?.uid)
+        result.user?.uid?.let { Simber.d(it) }
     }
 
     override fun signOut() {
