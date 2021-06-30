@@ -31,10 +31,10 @@ dependencies {
 
     // Kotlin
     implementation(Dependencies.Kotlin.reflect)
-    compileOnly(Dependencies.AndroidX.Annotation.annotation)
+    implementation(Dependencies.AndroidX.Annotation.annotation)
 
     // Logging
-    implementation(project(":logging"))
+    api(project(":logging"))
 
     // RxJava
     api(Dependencies.RxJava2.core)

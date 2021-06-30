@@ -242,8 +242,6 @@ dependencies {
     //                      Android test
     // ######################################################
 
-    androidTestImplementation(project(":logging"))
-
     androidTestImplementation(project(":fingerprintscannermock")) {
         exclude("org.apache.maven")
         exclude("org.mockito")
