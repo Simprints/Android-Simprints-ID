@@ -41,6 +41,8 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
 
+    implementation(project(":logging"))
+
     api(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Room.ktx)
     kapt(Dependencies.AndroidX.Room.compiler)
@@ -49,7 +51,7 @@ dependencies {
     implementation(Dependencies.Kotlin.coroutines_android)
     implementation(Dependencies.Kotlin.serialization_json)
     implementation(Dependencies.Jackson.core)
-    implementation(Dependencies.Timber.core)
+
     api(Dependencies.Retrofit.okhttp)
     api(Dependencies.Retrofit.core)
     api(Dependencies.SqlCipher.core)

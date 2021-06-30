@@ -25,9 +25,9 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
+import com.simprints.logging.Simber
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
@@ -70,7 +70,7 @@ class CheckLoginFromIntentPresenter(
             setLastUser()
             setSessionIdCrashlyticsKey()
         } catch (t: Throwable) {
-            Timber.d(t)
+            Simber.d(t)
             crashReportManager.logExceptionOrSafeException(t)
             view.openAlertActivityForError(AlertType.UNEXPECTED_ERROR)
             setupFailed = true
@@ -234,7 +234,7 @@ class CheckLoginFromIntentPresenter(
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
         super.handleSignedInUser()
-        Timber.d("[CHECK_LOGIN] User is signed in")
+        Simber.d("[CHECK_LOGIN] User is signed in")
 
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User
@@ -250,7 +250,7 @@ class CheckLoginFromIntentPresenter(
 
         updateProjectInCurrentSession()
 
-        Timber.d("[CHECK_LOGIN] Updating events")
+        Simber.d("[CHECK_LOGIN] Updating events")
         CoroutineScope(dispatcher).launch {
             awaitAll(
                 async { updateDatabaseCountsInCurrentSession() },
@@ -260,14 +260,14 @@ class CheckLoginFromIntentPresenter(
             )
         }.join()
 
-        Timber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
-        Timber.d("[CHECK_LOGIN] Moving to orchestrator")
+        Simber.d("[CHECK_LOGIN] Current session updated ${eventRepository.getCurrentCaptureSessionEvent()}")
+        Simber.d("[CHECK_LOGIN] Moving to orchestrator")
         view.openOrchestratorActivity(appRequest)
     }
 
     private suspend fun addAuthorizedEventInCurrentSession() {
         eventRepository.addOrUpdateEvent(buildAuthorizationEvent(AuthorizationResult.AUTHORIZED))
-        Timber.d("[CHECK_LOGIN] Added authorised event")
+        Simber.d("[CHECK_LOGIN] Added authorised event")
     }
 
     private suspend fun updateProjectInCurrentSession() {
@@ -285,7 +285,7 @@ class CheckLoginFromIntentPresenter(
             eventRepository.addOrUpdateEvent(it)
         }
 
-        Timber.d("[CHECK_LOGIN] Updated projectId in current session")
+        Simber.d("[CHECK_LOGIN] Updated projectId in current session")
     }
 
     private suspend fun updateDatabaseCountsInCurrentSession() {
@@ -295,7 +295,7 @@ class CheckLoginFromIntentPresenter(
         payload.databaseInfo.recordCount = subjectLocalDataSource.count()
 
         eventRepository.addOrUpdateEvent(currentSessionEvent)
-        Timber.d("[CHECK_LOGIN] Updated Database count in current session")
+        Simber.d("[CHECK_LOGIN] Updated Database count in current session")
     }
 
     private fun initAnalyticsKeyInCrashManager() {
@@ -306,14 +306,14 @@ class CheckLoginFromIntentPresenter(
             setDownSyncTriggersCrashlyticsKey(preferencesManager.eventDownSyncSetting.toString())
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerprintsToCollect.map { it.toString() })
         }
-        Timber.d("[CHECK_LOGIN] Added keys in CrashManager")
+        Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 
     private suspend fun updateAnalyticsIdInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
         currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
         eventRepository.addOrUpdateEvent(currentSessionEvent)
-        Timber.d("[CHECK_LOGIN] Updated analytics id in current session")
+        Simber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 
     private fun buildAuthorizationEvent(result: AuthorizationResult) =

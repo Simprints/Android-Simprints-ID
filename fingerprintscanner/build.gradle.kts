@@ -34,7 +34,7 @@ dependencies {
     compileOnly(Dependencies.AndroidX.Annotation.annotation)
 
     // Logging
-    implementation(Dependencies.Timber.core)
+    implementation(project(":logging"))
 
     // RxJava
     api(Dependencies.RxJava2.core)

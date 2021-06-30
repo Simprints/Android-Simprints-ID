@@ -8,7 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.DeviceManager
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private val eventsManager: ClientApiSessionEventsManager,
@@ -47,7 +47,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         addSuspiciousEventIfRequired(request)
         view.sendSimprintsRequest(request)
     } catch (exception: InvalidRequestException) {
-        Timber.d(exception)
+        Simber.d(exception)
         logInvalidSessionInBackground()
         handleInvalidRequest(exception)
     }

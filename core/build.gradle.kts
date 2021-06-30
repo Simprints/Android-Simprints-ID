@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":moduleapi"))
+    implementation(project(":logging"))
 
     api(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.AndroidX.Lifecycle.java8)
@@ -52,7 +53,6 @@ dependencies {
 
     implementation(Dependencies.Kotlin.coroutines_android)
     api(Dependencies.Testing.Espresso.idling)
-    implementation(Dependencies.Timber.core)
     implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Retrofit.core)
     api(Dependencies.Dagger.javax)

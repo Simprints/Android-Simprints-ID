@@ -134,6 +134,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     api(project(":eventsystem"))
+    implementation(project(":logging"))
     implementation(Dependencies.libsimprints)
 
     implementation(Dependencies.Dagger.core)
@@ -160,6 +161,7 @@ dependencies {
     implementation(Dependencies.Retrofit.okhttp)
     implementation(Dependencies.Retrofit.converterScalars)
     implementation(Dependencies.RxJava2.core)
+    implementation(project(mapOf("path" to ":")))
     kapt(Dependencies.AndroidX.Room.compiler)
     kapt(Dependencies.Dagger.compiler)
     implementation(Dependencies.Koin.android)
@@ -180,7 +182,6 @@ dependencies {
     implementation(Dependencies.Firebase.mlkit_barcode)
     implementation(Dependencies.Firebase.crashlytics)
 
-    implementation(Dependencies.Timber.core)
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.multidex)
     implementation(Dependencies.AndroidX.appcompat)
@@ -233,6 +234,7 @@ dependencies {
     testImplementation(Dependencies.Testing.work)
     testImplementation(Dependencies.Testing.coroutines_test)
     kaptTest(Dependencies.Dagger.compiler)
+    testImplementation(project(":logging"))
     testImplementation(project(":testtools")) {
         exclude("org.mockito:mockito-android")
     }
@@ -240,6 +242,8 @@ dependencies {
     // ######################################################
     //                      Android test
     // ######################################################
+
+    androidTestImplementation(project(":logging"))
 
     androidTestImplementation(project(":fingerprintscannermock")) {
         exclude("org.apache.maven")
