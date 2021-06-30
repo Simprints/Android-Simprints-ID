@@ -288,8 +288,7 @@ dependencies {
     }
     androidTestImplementation(Dependencies.Testing.kappuccino)
 
-    // Navigation
-    androidTestImplementation(Dependencies.Testing.navigation_testing)
+    debugImplementation(Dependencies.Testing.fragment_testing)
 }
 
 kapt {
