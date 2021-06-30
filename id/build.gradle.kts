@@ -161,7 +161,6 @@ dependencies {
     implementation(Dependencies.Retrofit.okhttp)
     implementation(Dependencies.Retrofit.converterScalars)
     implementation(Dependencies.RxJava2.core)
-    implementation(project(mapOf("path" to ":")))
     kapt(Dependencies.AndroidX.Room.compiler)
     kapt(Dependencies.Dagger.compiler)
     implementation(Dependencies.Koin.android)

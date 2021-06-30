@@ -17,11 +17,11 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
 import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.logging.Simber
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import kotlin.concurrent.schedule
 
 class OtaViewModel(
@@ -47,7 +47,7 @@ class OtaViewModel(
                 it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
             }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onNext = { otaStep ->
-                    Timber.d(otaStep.toString())
+                    Simber.d(otaStep.toString())
                     currentStep = otaStep
                     progress.postValue(otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size))
                 },
@@ -70,7 +70,7 @@ class OtaViewModel(
     }
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
-        Timber.e(e)
+        Simber.e(e)
         crashReportManager.logExceptionOrSafeException(e)
         if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             otaFailed.postEvent()

@@ -12,8 +12,8 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.logging.Simber
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 class RefusalPresenter(private val view: RefusalContract.View,
                        private val crashReportManager: FingerprintCrashReportManager,
@@ -95,7 +95,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                     RefusalAnswer.fromRefusalFormReason(refusalReason),
                     refusalText))
             } catch (t: Throwable) {
-                Timber.d(t)
+                Simber.d(t)
                 crashReportManager.logExceptionOrSafeException(t)
             }
         }

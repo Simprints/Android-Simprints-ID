@@ -35,6 +35,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedExce
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -43,7 +44,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
@@ -410,7 +410,7 @@ class CollectFingerprintsViewModel(
             else -> {
                 updateCaptureState { toNotCollected() }
                 crashReportManager.logExceptionOrSafeException(e)
-                Timber.e(e)
+                Simber.e(e)
                 launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
             }
         }
@@ -557,10 +557,10 @@ class CollectFingerprintsViewModel(
     }
 
     private fun Completable.doInBackground() =
-        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Timber.e(it) })
+        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Simber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
-        Timber.d(message)
+        Simber.d(message)
         crashReportManager.logMessageForCrashReport(
             FingerprintCrashReportTag.FINGER_CAPTURE,
             FingerprintCrashReportTrigger.UI,
@@ -569,7 +569,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun logScannerMessageForCrashReport(message: String) {
-        Timber.d(message)
+        Simber.d(message)
         crashReportManager.logMessageForCrashReport(
             FingerprintCrashReportTag.FINGER_CAPTURE,
             FingerprintCrashReportTrigger.SCANNER_BUTTON,

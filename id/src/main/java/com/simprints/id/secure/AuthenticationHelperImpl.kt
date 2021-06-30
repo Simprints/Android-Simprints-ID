@@ -1,22 +1,22 @@
 package com.simprints.id.secure
 
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
-import timber.log.Timber
+import com.simprints.logging.Simber
 import java.io.IOException
 
 class AuthenticationHelperImpl(
@@ -46,7 +46,7 @@ class AuthenticationHelperImpl(
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
             Result.AUTHENTICATED
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             crashReportManager.logExceptionOrSafeException(t)
 
             extractResultFromException(t).also { signInResult ->

@@ -28,11 +28,11 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 
 class ConnectScannerViewModel(
     private val crashReportManager: FingerprintCrashReportManager,
@@ -138,7 +138,7 @@ class ConnectScannerViewModel(
             }
 
     private fun manageVeroErrors(e: Throwable) {
-        Timber.d(e)
+        Simber.d(e)
         scannerConnected.postEvent(false)
         launchAlertOrScannerIssueOrShowDialog(e)
         if (e !is FingerprintSafeException) {

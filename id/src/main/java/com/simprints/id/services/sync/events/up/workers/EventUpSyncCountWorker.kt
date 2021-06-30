@@ -4,15 +4,15 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -31,20 +31,20 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
     private val upSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_UP)
             ?: throw IllegalArgumentException("input required")
-        Timber.d("Received $jsonInput")
+        Simber.d("Received $jsonInput")
         jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<EventUpSyncCountWorker> { it.inject(this@EventUpSyncCountWorker) }
-            Timber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
 
             crashlyticsLog("Start - $upSyncScope")
 
             execute(upSyncScope)
         } catch (t: Throwable) {
-            Timber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Failed ${t.message}")
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Failed ${t.message}")
 
             fail(t)
         }
@@ -52,7 +52,7 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
 
     private suspend fun execute(upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
-        Timber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
+        Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
 
         return success(workDataOf(
             OUTPUT_COUNT_WORKER_UP to upCount), "Total to upload: $upCount")
