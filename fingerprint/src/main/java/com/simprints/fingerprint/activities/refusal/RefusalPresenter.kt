@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
@@ -112,7 +111,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     private fun logAsMalfunctionInCrashReportIfAppNotWorking(refusalText: String) {
         if (reason == SCANNER_NOT_WORKING) {
-            crashReportManager.logMalfunction(refusalText)
+            Simber.w(refusalText)
         }
     }
 
@@ -148,6 +147,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(REFUSAL, UI, message = message)
+        Simber.tag(REFUSAL.name).i(message)
     }
 }

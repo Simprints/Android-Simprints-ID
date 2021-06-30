@@ -12,8 +12,7 @@ import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDetermi
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
@@ -560,21 +559,11 @@ class CollectFingerprintsViewModel(
         subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Simber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
-        Simber.d(message)
-        crashReportManager.logMessageForCrashReport(
-            FingerprintCrashReportTag.FINGER_CAPTURE,
-            FingerprintCrashReportTrigger.UI,
-            message = message
-        )
+        Simber.tag(FINGER_CAPTURE.name).i(message)
     }
 
     private fun logScannerMessageForCrashReport(message: String) {
-        Simber.d(message)
-        crashReportManager.logMessageForCrashReport(
-            FingerprintCrashReportTag.FINGER_CAPTURE,
-            FingerprintCrashReportTrigger.SCANNER_BUTTON,
-            message = message
-        )
+        Simber.tag(FINGER_CAPTURE.name).i(message)
     }
 
     private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {
