@@ -21,13 +21,13 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
 import com.simprints.fingerprintmatcher.domain.TemplateFormat
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
 import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
@@ -85,7 +85,7 @@ class MatchingViewModel(private val fingerprintMatcher: FingerprintMatcher,
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
-        Timber.e(e)
+        Simber.e(e)
         crashReportManager.logExceptionOrSafeException(e)
         hasMatchFailed.postValue(true)
         result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))

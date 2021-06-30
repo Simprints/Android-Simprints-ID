@@ -6,7 +6,7 @@ import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class FingerSelectionViewModel(
     private val preferencesManager: IdPreferencesManager,
@@ -90,7 +90,7 @@ class FingerSelectionViewModel(
                         savedPref.firstOrNull { it.finger == finger }?.removable = false
                     }
             } catch (e: NoSuchPreferenceError) {
-                Timber.e(e)
+                Simber.e(e)
             }
         }
 

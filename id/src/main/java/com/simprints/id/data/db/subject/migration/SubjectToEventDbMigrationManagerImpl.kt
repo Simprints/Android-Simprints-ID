@@ -13,8 +13,8 @@ import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.toList
-import timber.log.Timber
 
 @Deprecated("To be removed once 2020.3.2 is not supported anymore.")
 /**
@@ -53,7 +53,7 @@ class SubjectToEventDbMigrationManagerImpl(
                 }
             }
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             crashReportManager.logException(MigrationToNewEventArchitectureException(cause = t))
         }
     }

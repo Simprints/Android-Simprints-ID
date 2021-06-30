@@ -4,22 +4,22 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 import com.simprints.id.services.guidselection.GuidSelectionManager
-import com.simprints.core.tools.time.TimeHelper
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 class GuidSelectionActivity : BaseSplitActivity() {
@@ -42,7 +42,7 @@ class GuidSelectionActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
         injectDependencies()
-        Timber.d("GuidSelectionActivity started")
+        Simber.d("GuidSelectionActivity started")
 
         guidSelectionRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
@@ -63,13 +63,13 @@ class GuidSelectionActivity : BaseSplitActivity() {
     private suspend fun handleGuidSelectionRequest() {
         try {
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
-            Timber.d("Added Guid Selection Event")
+            Simber.d("Added Guid Selection Event")
             crashReportManager.logMessageForCrashReport(
                 CrashReportTag.SESSION,
                 CrashReportTrigger.UI, message = "Added Guid Selection Event"
             )
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             crashReportManager.logException(t)
         }
     }
@@ -81,7 +81,7 @@ class GuidSelectionActivity : BaseSplitActivity() {
             putExtra(CORE_STEP_BUNDLE, response)
         })
 
-        Timber.d("GuidSelectionActivity done")
+        Simber.d("GuidSelectionActivity done")
         finish()
     }
 

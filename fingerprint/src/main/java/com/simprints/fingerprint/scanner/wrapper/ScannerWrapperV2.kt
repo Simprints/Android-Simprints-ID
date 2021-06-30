@@ -23,12 +23,12 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
-import timber.log.Timber
 import java.io.IOException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -246,12 +246,12 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
         is IOException -> { // Disconnected or timed-out communications with Scanner
-            Timber.d(e, "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException")
+            Simber.d(e, "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException")
             ScannerDisconnectedException()
         }
         is IllegalStateException, // We're calling scanner methods out of order somehow
         is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
-            Timber.e(e)
+            Simber.e(e)
             crashReportManager.logExceptionOrSafeException(e)
             UnexpectedScannerException(e)
         }

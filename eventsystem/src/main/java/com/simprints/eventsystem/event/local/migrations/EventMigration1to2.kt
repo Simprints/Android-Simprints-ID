@@ -7,8 +7,8 @@ import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.logging.Simber
 import org.json.JSONObject
-import timber.log.Timber
 
 /**
  * The 2021.1.0 (room v2) introduced:
@@ -25,13 +25,13 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Timber.d("Migrating room db from schema 1 to schema 2.")
+            Simber.d("Migrating room db from schema 1 to schema 2.")
             migrateEnrolments(database)
             migrateSessionClosedInformation(database)
-            Timber.d("Migration from schema 1 to schema 2 done.")
+            Simber.d("Migration from schema 1 to schema 2 done.")
         } catch (t: Throwable) {
             crashReportManager.logException(t)
-            Timber.d(t)
+            Simber.d(t)
         }
     }
 

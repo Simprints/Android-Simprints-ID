@@ -3,9 +3,9 @@ package com.simprints.eventsystem.event.local
 import android.content.Context
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.logging.Simber
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
-import timber.log.Timber
 
 interface EventDatabaseFactory {
     fun build(): EventRoomDatabase
@@ -30,7 +30,7 @@ class DbEventDatabaseFactoryImpl(
                 crashReportManager
             )
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             throw t
         }
     }
@@ -39,7 +39,7 @@ class DbEventDatabaseFactoryImpl(
         return try {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         } catch (t: Throwable) {
-            Timber.d(t.message)
+            t.message?.let { Simber.d(it) }
             secureLocalDbKeyProvider.setLocalDatabaseKey(dbName)
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         }.value.decodeToString().toCharArray()

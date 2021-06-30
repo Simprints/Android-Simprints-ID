@@ -17,9 +17,9 @@ import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.error.ErrorType
+import com.simprints.logging.Simber
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import timber.log.Timber
 
 class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportManager) : ViewModel() {
     val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> = MutableLiveData()
@@ -64,7 +64,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
     }
 
     fun missingLicense() {
-        Timber.d("License is missing")
+        Simber.d("License is missing")
         crashReportManager.logMessageForCrashReport(
             FACE_LICENSE,
             UI,
@@ -74,7 +74,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
     }
 
     fun invalidLicense() {
-        Timber.d("License is invalid")
+        Simber.d("License is invalid")
         crashReportManager.logMessageForCrashReport(
             FACE_LICENSE,
             UI,
@@ -87,7 +87,7 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
         if (isSuccess) {
             flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(FaceConfigurationResponse()))
         } else {
-            Timber.d("Configuration error. Error Code = $errorCode")
+            Simber.d("Configuration error. Error Code = $errorCode")
             crashReportManager.logMessageForCrashReport(
                 FACE_LICENSE,
                 UI,

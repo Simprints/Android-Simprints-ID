@@ -31,6 +31,7 @@ object Simber {
      * STAGING: Is sent to Log.d
      * RELEASE: Is ignored
      */
+    @JvmStatic
     fun d(t: Throwable) = Timber.d(t)
     fun d(message: String, args: Any? = null) = Timber.d(message, args)
     fun d(t: Throwable, message: String, args: Any? = null) = Timber.d(t, message, args)

@@ -13,12 +13,12 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.remote.models.ApiEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import timber.log.Timber
 import java.io.InputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,7 +47,7 @@ class EventRemoteDataSourceImpl(
         scope: CoroutineScope
     ): ReceiveChannel<Event> {
         val streaming = takeStreaming(query)
-        Timber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
+        Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
         return scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
             parseStreamAndEmitEvents(streaming, this)
@@ -59,7 +59,7 @@ class EventRemoteDataSourceImpl(
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
-        Timber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Start parsing stream")
+        Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Start parsing stream")
 
         try {
             while (parser.nextToken() == START_OBJECT) {
@@ -71,7 +71,7 @@ class EventRemoteDataSourceImpl(
             channel.close()
 
         } catch (t: Throwable) {
-            Timber.d(t)
+            Simber.d(t)
             parser.close()
             channel.close(t)
         }
