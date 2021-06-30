@@ -1,6 +1,5 @@
 package com.simprints.core.tools.coroutines
 
-import com.simprints.logging.Simber
 import kotlinx.coroutines.delay
 
 suspend fun <T> retryIO(
@@ -15,9 +14,6 @@ suspend fun <T> retryIO(
         try {
             return runBlock()
         } catch (t: Throwable) {
-            Simber.e("IO failed")
-            Simber.e(t)
-
             if (!retryIf(t)) {
                 throw t
             }
