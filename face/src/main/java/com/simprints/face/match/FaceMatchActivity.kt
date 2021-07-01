@@ -11,7 +11,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.extentions.getQuantityString
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
@@ -110,41 +109,41 @@ class FaceMatchActivity : FaceActivity() {
     }
 
     private fun renderFinished(matchState: Finished) {
-        binding.faceMatchTvMatchingProgressStatus1.text = getQuantityString(
+        binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
             R.plurals.face_match_matched_candidates,
             matchState.candidatesMatched,
-            arrayOf(matchState.candidatesMatched)
+            matchState.candidatesMatched
         )
 
         binding.faceMatchTvMatchingProgressStatus2.isVisible = true
-        binding.faceMatchTvMatchingProgressStatus2.text = getQuantityString(
+        binding.faceMatchTvMatchingProgressStatus2.text = resources.getQuantityString(
             R.plurals.face_match_returned_results,
             matchState.returnSize,
-            arrayOf(matchState.returnSize)
+            matchState.returnSize
         )
 
         if (matchState.veryGoodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus1.isVisible = true
-            binding.faceMatchTvMatchingResultStatus1.text = getQuantityString(
+            binding.faceMatchTvMatchingResultStatus1.text = resources.getQuantityString(
                 R.plurals.face_match_tier1or2_matches,
                 matchState.veryGoodMatches,
-                arrayOf(matchState.veryGoodMatches)
+                matchState.veryGoodMatches
             )
         }
         if (matchState.goodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus2.isVisible = true
-            binding.faceMatchTvMatchingResultStatus2.text = getQuantityString(
+            binding.faceMatchTvMatchingResultStatus2.text = resources.getQuantityString(
                 R.plurals.face_match_tier3_matches,
                 matchState.goodMatches,
-                arrayOf(matchState.goodMatches)
+                matchState.goodMatches
             )
         }
         if (matchState.veryGoodMatches < 1 && matchState.goodMatches < 1 || matchState.fairMatches > 1) {
             binding.faceMatchTvMatchingResultStatus3.isVisible = true
-            binding.faceMatchTvMatchingResultStatus3.text = getQuantityString(
+            binding.faceMatchTvMatchingResultStatus3.text = resources.getQuantityString(
                 R.plurals.face_match_tier4_matches,
                 matchState.fairMatches,
-                arrayOf(matchState.fairMatches)
+                matchState.fairMatches
             )
         }
 
