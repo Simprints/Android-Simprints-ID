@@ -2,11 +2,12 @@ package com.simprints.id.services.securitystate
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.Application
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.id.Application
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -31,7 +32,7 @@ class SecurityStateWorker(
             securityStateProcessor.processSecurityState(securityState)
             success()
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
+            Simber.e(t)
             success()
         }
     }

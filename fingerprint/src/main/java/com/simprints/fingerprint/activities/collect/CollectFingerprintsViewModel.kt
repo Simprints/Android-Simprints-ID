@@ -11,7 +11,6 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.*
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -50,7 +49,6 @@ class CollectFingerprintsViewModel(
     private val scannerManager: ScannerManager,
     private val fingerprintPreferencesManager: FingerprintPreferencesManager,
     private val imageManager: FingerprintImageManager,
-    private val crashReportManager: FingerprintCrashReportManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
@@ -408,7 +406,6 @@ class CollectFingerprintsViewModel(
             is NoFingerDetectedException -> handleNoFingerDetected()
             else -> {
                 updateCaptureState { toNotCollected() }
-                crashReportManager.logExceptionOrSafeException(e)
                 Simber.e(e)
                 launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
             }
@@ -518,7 +515,7 @@ class CollectFingerprintsViewModel(
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension()
             )
         } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
-            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
+            Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
             null
         } else null
 

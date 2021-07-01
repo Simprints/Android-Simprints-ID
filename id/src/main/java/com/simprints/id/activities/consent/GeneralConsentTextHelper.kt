@@ -8,6 +8,7 @@ import com.simprints.id.R
 import com.simprints.id.data.consent.shortconsent.GeneralConsentOptions
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
+import com.simprints.logging.Simber
 
 data class GeneralConsentTextHelper(val generalConsentOptionsJson: String,
                                     val programName: String,
@@ -107,9 +108,9 @@ data class GeneralConsentTextHelper(val generalConsentOptionsJson: String,
     private fun isSingleModality() = modalities.size == 1
 
     private fun buildGeneralConsentOptions() = try {
-        jsonHelper.fromJson<GeneralConsentOptions>(generalConsentOptionsJson)
+        jsonHelper.fromJson(generalConsentOptionsJson)
     } catch (e: Throwable) {
-        crashReportManager.logExceptionOrSafeException(Exception("Malformed General Consent Text Error", e))
+        Simber.e(Exception("Malformed General Consent Text Error", e))
         GeneralConsentOptions()
     }
 }

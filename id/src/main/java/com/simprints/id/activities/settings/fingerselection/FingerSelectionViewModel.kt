@@ -3,6 +3,7 @@ package com.simprints.id.activities.settings.fingerselection
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
@@ -78,7 +79,7 @@ class FingerSelectionViewModel(
     fun savePreference() {
         val fingerprintsToCollect = _items.toFingerIdentifiers()
         preferencesManager.fingerprintsToCollect = fingerprintsToCollect
-        crashReportManager.setFingersSelectedCrashlyticsKey(fingerprintsToCollect.map { it.name })
+        Simber.tag(FINGERS_SELECTED, true).i(fingerprintsToCollect.map { it.name }.toString())
     }
 
     private fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =

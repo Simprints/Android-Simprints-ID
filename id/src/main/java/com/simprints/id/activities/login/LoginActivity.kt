@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
@@ -170,11 +169,7 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.LOGIN,
-            CrashReportTrigger.UI,
-            message = message
-        )
+        Simber.tag(CrashReportTag.LOGIN.name).i(message)
     }
 
     private fun signIn() {

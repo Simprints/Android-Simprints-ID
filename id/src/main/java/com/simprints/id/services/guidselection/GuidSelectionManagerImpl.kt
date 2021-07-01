@@ -25,8 +25,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
             saveGuidSelectionEvent(request)
             reportToAnalytics(request, true)
         } catch (t: Throwable) {
-            Simber.d(t)
-            crashReportManager.logExceptionOrSafeException(t)
+            Simber.e(t)
             reportToAnalytics(request, false)
         }
     }

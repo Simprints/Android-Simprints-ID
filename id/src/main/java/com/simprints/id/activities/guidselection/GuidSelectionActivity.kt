@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.Application
@@ -63,11 +62,7 @@ class GuidSelectionActivity : BaseSplitActivity() {
     private suspend fun handleGuidSelectionRequest() {
         try {
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
-            Simber.d("Added Guid Selection Event")
-            crashReportManager.logMessageForCrashReport(
-                CrashReportTag.SESSION,
-                CrashReportTrigger.UI, message = "Added Guid Selection Event"
-            )
+            Simber.tag(CrashReportTag.SESSION.name).i("Added Guid Selection Event")
         } catch (t: Throwable) {
             Simber.e(t)
             crashReportManager.logException(t)

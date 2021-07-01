@@ -56,7 +56,6 @@ class LibSimprintsPresenterTest {
             view,
             Enrol,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply {
             runBlocking { start() }
@@ -74,7 +73,6 @@ class LibSimprintsPresenterTest {
             view,
             Identify,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply {
             runBlocking { start() }
@@ -92,7 +90,6 @@ class LibSimprintsPresenterTest {
             view,
             Verify,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
@@ -108,7 +105,6 @@ class LibSimprintsPresenterTest {
             view,
             ConfirmIdentity,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
@@ -124,7 +120,6 @@ class LibSimprintsPresenterTest {
             view,
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
@@ -137,7 +132,6 @@ class LibSimprintsPresenterTest {
             view,
             Invalid,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply {
             runBlocking {
@@ -158,7 +152,6 @@ class LibSimprintsPresenterTest {
             view,
             Enrol,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).handleEnrolResponse(EnrolResponse(registerId))
 
@@ -185,7 +178,6 @@ class LibSimprintsPresenterTest {
             view,
             Identify,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
@@ -220,7 +212,6 @@ class LibSimprintsPresenterTest {
             view,
             Verify,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).apply {
             handleVerifyResponse(verification)
@@ -254,7 +245,6 @@ class LibSimprintsPresenterTest {
             view,
             Invalid,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
 

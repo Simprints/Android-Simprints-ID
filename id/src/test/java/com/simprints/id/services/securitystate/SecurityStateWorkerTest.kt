@@ -10,7 +10,6 @@ import com.simprints.id.testtools.TestApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -61,15 +60,6 @@ class SecurityStateWorkerTest {
         val result = worker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-    }
-
-    @Test
-    fun whenAnExceptionIsThrown_shouldLogToCrashReport() = runBlocking {
-        mockException()
-
-        worker.doWork()
-
-        verify { worker.crashReportManager.logExceptionOrSafeException(any()) }
     }
 
     private fun mockSuccess() {

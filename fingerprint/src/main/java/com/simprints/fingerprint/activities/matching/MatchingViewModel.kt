@@ -86,7 +86,6 @@ class MatchingViewModel(private val fingerprintMatcher: FingerprintMatcher,
 
     private fun handleMatchFailed(e: Throwable) {
         Simber.e(e)
-        crashReportManager.logExceptionOrSafeException(e)
         hasMatchFailed.postValue(true)
         result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))
     }

@@ -5,7 +5,6 @@ import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -14,6 +13,7 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
@@ -28,6 +28,7 @@ import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -43,20 +44,18 @@ class CommCarePresenter(
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager,
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
     view,
     sessionEventsManager,
     deviceManager,
-    crashReportManager
 ), CommCareContract.Presenter {
 
     override suspend fun start() {
         if (action !is CommCareActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {

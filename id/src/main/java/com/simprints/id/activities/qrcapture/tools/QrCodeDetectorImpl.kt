@@ -6,9 +6,10 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.id.tools.extensions.awaitTask
+import com.simprints.logging.Simber
 
 class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : QrCodeDetector {
 
@@ -21,7 +22,7 @@ class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : Q
             val qrCodes = firebaseDetector.detectInImage(firebaseImage).awaitTask()
             return qrCodes?.firstOrNull { !it.rawValue.isNullOrEmpty() }?.rawValue
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
+            Simber.e(t)
             null
         }
     }

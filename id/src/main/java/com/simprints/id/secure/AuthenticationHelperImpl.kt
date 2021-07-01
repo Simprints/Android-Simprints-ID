@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
@@ -47,7 +46,6 @@ class AuthenticationHelperImpl(
             Result.AUTHENTICATED
         } catch (t: Throwable) {
             Simber.e(t)
-            crashReportManager.logExceptionOrSafeException(t)
 
             extractResultFromException(t).also { signInResult ->
                 logMessageForCrashReportWithNetworkTrigger("Sign in reason - $signInResult")
@@ -79,11 +77,7 @@ class AuthenticationHelperImpl(
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.LOGIN,
-            CrashReportTrigger.NETWORK,
-            message = message
-        )
+        Simber.tag(CrashReportTag.LOGIN.name).i(message)
     }
 
     private fun addEventAndUpdateProjectIdIfRequired(

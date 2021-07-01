@@ -2,7 +2,6 @@ package com.simprints.id.activities.alert
 
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
@@ -16,6 +15,7 @@ import com.simprints.id.domain.alert.AlertActivityViewModel.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.logging.Simber
 import javax.inject.Inject
 
 class AlertPresenter(
@@ -173,10 +173,6 @@ class AlertPresenter(
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.ALERT,
-            CrashReportTrigger.UI,
-            message = alertViewModel.name
-        )
+        Simber.tag(CrashReportTag.ALERT.name).i(alertViewModel.name)
     }
 }

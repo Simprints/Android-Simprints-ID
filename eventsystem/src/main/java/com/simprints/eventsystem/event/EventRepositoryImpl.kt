@@ -266,8 +266,7 @@ open class EventRepositoryImpl(
         try {
             block()
         } catch (t: Throwable) {
-            Simber.d(t)
-            crashReportManager.logExceptionOrSafeException(t)
+            Simber.e(t)
             throw t
         }
 

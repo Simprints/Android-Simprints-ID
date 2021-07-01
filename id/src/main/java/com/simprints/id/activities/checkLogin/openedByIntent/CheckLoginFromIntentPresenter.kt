@@ -1,6 +1,11 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MODULE_IDS
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.PROJECT_ID
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
@@ -70,8 +75,7 @@ class CheckLoginFromIntentPresenter(
             setLastUser()
             setSessionIdCrashlyticsKey()
         } catch (t: Throwable) {
-            Simber.d(t)
-            crashReportManager.logExceptionOrSafeException(t)
+            Simber.e(t)
             view.openAlertActivityForError(AlertType.UNEXPECTED_ERROR)
             setupFailed = true
         }
@@ -299,13 +303,13 @@ class CheckLoginFromIntentPresenter(
     }
 
     private fun initAnalyticsKeyInCrashManager() {
-        crashReportManager.apply {
-            setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
-            setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
-            setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-            setDownSyncTriggersCrashlyticsKey(preferencesManager.eventDownSyncSetting.toString())
-            setFingersSelectedCrashlyticsKey(preferencesManager.fingerprintsToCollect.map { it.toString() })
-        }
+        Simber.tag(PROJECT_ID, true).i(loginInfoManager.getSignedInProjectIdOrEmpty())
+        Simber.tag(USER_ID, true).i(loginInfoManager.getSignedInUserIdOrEmpty())
+        Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
+        Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
+            .i(preferencesManager.eventDownSyncSetting.toString())
+        Simber.tag(FINGERS_SELECTED, true)
+            .i(preferencesManager.fingerprintsToCollect.map { it.toString() }.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 

@@ -11,7 +11,7 @@ class SettingsPreferenceViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(SettingsPreferenceViewModel::class.java))
-            SettingsPreferenceViewModel(crashReportManager) as T
+            SettingsPreferenceViewModel() as T
         else
             throw IllegalArgumentException("SettingsPreferenceViewModel not found")
     }
