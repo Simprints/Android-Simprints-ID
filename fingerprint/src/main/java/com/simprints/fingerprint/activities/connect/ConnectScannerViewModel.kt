@@ -159,7 +159,7 @@ class ConnectScannerViewModel(
         scannerConnected.postEvent(false)
         launchAlertOrScannerIssueOrShowDialog(e)
         if (e !is FingerprintSafeException) {
-            crashReportManager.logExceptionOrSafeException(e)
+            Simber.e(e)
         }
     }
 

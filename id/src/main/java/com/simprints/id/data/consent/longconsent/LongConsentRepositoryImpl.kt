@@ -26,8 +26,7 @@ class LongConsentRepositoryImpl(
                 downloadLongConsentFromFirebaseStorage(this, language)
             }
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
-            Simber.d(t)
+            Simber.e(t)
             emit(Failed(language, t))
         }
     }
@@ -59,8 +58,7 @@ class LongConsentRepositoryImpl(
             flowCollector.emit(Succeed(language, file.readText()))
 
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
-            Simber.d(t)
+            Simber.e(t)
             flowCollector.emit(Failed(language, t))
         }
     }

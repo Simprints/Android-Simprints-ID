@@ -2,15 +2,16 @@ package com.simprints.clientapi.controllers.core.crashreport
 
 import com.simprints.clientapi.exceptions.ClientApiSafeException
 import com.simprints.core.analytics.CoreCrashReportManager
+import com.simprints.logging.Simber
 
 class ClientApiCrashReportManagerImpl(private val coreCrashReportManager: CoreCrashReportManager)
     : ClientApiCrashReportManager {
 
     override fun logExceptionOrSafeException(throwable: Throwable) =
         if (throwable is ClientApiSafeException) {
-            coreCrashReportManager.logSafeException(throwable)
+            Simber.i(throwable)
         } else {
-            coreCrashReportManager.logException(throwable)
+            Simber.e(throwable)
         }
 
     override fun setSessionIdCrashlyticsKey(sessionId: String) {

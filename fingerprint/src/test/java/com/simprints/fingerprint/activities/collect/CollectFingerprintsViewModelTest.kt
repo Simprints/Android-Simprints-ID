@@ -939,7 +939,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
-    fun unexpectedErrorWhileScanning_launchesAlertAndReportsCrash() {
+    fun unexpectedErrorWhileScanning_launchesAlert() {
         mockScannerSetUiIdle()
         captureFingerprintResponses(UNKNOWN_ERROR)
         noImageTransfer()
@@ -948,7 +948,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleScanButtonPressed()
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
 
-        verify { crashReportManager.logExceptionOrSafeException(any()) }
         vm.launchAlert.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
     }
 

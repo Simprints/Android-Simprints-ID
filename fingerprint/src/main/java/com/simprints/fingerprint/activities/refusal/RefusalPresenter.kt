@@ -94,8 +94,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                     RefusalAnswer.fromRefusalFormReason(refusalReason),
                     refusalText))
             } catch (t: Throwable) {
-                Simber.d(t)
-                crashReportManager.logExceptionOrSafeException(t)
+                Simber.e(t)
             }
         }
     }

@@ -2,11 +2,11 @@ package com.simprints.id.moduleselection
 
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.logging.Simber
 
 class ModuleRepositoryImpl(
     val preferencesManager: IdPreferencesManager,
@@ -49,9 +49,7 @@ class ModuleRepositoryImpl(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message
-        )
+        Simber.tag(CrashReportTag.SETTINGS.name).i(message)
     }
 
 }

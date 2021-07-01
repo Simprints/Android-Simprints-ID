@@ -116,8 +116,6 @@ class OtaViewModelTest {
         assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
         assertThat(capturedEvents[1].failureReason).isNotEmpty()
 
-        verify { crashReportManagerMock.logExceptionOrSafeException(ofType<OtaFailedException>()) }
-
         otaViewModel.otaRecovery.assertEventReceivedWithContentAssertions {
             assertThat(it.recoveryStrategy).isEqualTo(OtaRecoveryStrategy.HARD_RESET)
             assertThat(it.remainingOtas).isEqualTo(listOf(AvailableOta.STM, AvailableOta.UN20))
@@ -137,8 +135,6 @@ class OtaViewModelTest {
         assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
         assertThat(capturedEvents[1].failureReason).isNotEmpty()
 
-        verify { crashReportManagerMock.logExceptionOrSafeException(ofType<OtaFailedException>()) }
-
         otaViewModel.otaFailed.assertEventReceived()
     }
 
@@ -154,8 +150,6 @@ class OtaViewModelTest {
         assertThat(capturedEvents[2].chip).isEqualTo("un20")
         assertThat(capturedEvents[2].targetAppVersion).isEqualTo(NEW_UN20_STRING)
         assertThat(capturedEvents[2].failureReason).isNotEmpty()
-
-        verify { crashReportManagerMock.logExceptionOrSafeException(ofType<OtaFailedException>()) }
 
         otaViewModel.otaRecovery.assertEventWithContentNeverReceived()
 

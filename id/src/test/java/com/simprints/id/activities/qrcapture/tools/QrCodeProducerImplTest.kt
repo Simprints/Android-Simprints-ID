@@ -46,16 +46,6 @@ class QrCodeProducerImplTest {
     }
 
     @Test
-    fun whenDetectorThrowsException_shouldLogToCrashReport() {
-        every { mockImageProxy.image } returns mockk()
-        coEvery { mockQrCodeDetector.detectInImage(any()) } throws Throwable()
-
-        qrCodeProducer.analyze(mockImageProxy)
-
-        coVerify { mockCrashReportManager.logExceptionOrSafeException(any()) }
-    }
-
-    @Test
     fun withSuccessfulScan_shouldCloseImageProxy() {
         every { mockImageProxy.image } returns mockk()
         coEvery { mockQrCodeDetector.detectInImage(any()) } returns "mock_value"

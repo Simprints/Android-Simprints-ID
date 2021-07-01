@@ -7,7 +7,6 @@ import androidx.work.WorkerParameters
 import com.google.firebase.perf.metrics.Trace
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
@@ -75,10 +74,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.d("$tag - $message")
-
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "$tag - $message")
+        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message")
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {
@@ -86,7 +82,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
             Simber.d(t)
             // IOExceptions are about network issues, so they are not worth to report
             if (it !is IOException || it !is CancellationException) {
-                crashReportManager.logExceptionOrSafeException(it)
+                Simber.e(t)
             }
         }
     }

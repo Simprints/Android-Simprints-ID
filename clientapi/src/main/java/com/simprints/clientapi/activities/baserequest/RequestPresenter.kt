@@ -3,7 +3,6 @@ package com.simprints.clientapi.activities.baserequest
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.*
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.*
@@ -12,8 +11,7 @@ import com.simprints.logging.Simber
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private val eventsManager: ClientApiSessionEventsManager,
-                                private val deviceManager: DeviceManager,
-                                protected val crashReportManager: ClientApiCrashReportManager)
+                                private val deviceManager: DeviceManager)
     : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
@@ -62,7 +60,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     private fun handleRootedDevice(exception: RootedDeviceException) {
-        crashReportManager.logExceptionOrSafeException(exception)
+        Simber.e(exception)
         view.handleClientRequestError(ROOTED_DEVICE)
     }
 

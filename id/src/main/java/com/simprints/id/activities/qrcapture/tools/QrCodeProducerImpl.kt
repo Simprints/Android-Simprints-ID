@@ -4,8 +4,9 @@ import androidx.camera.core.AspectRatio
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.core.analytics.CrashReportManager
+import com.simprints.id.activities.qrcapture.model.RawImage
+import com.simprints.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
@@ -46,7 +47,7 @@ class QrCodeProducerImpl(
                             }
                         }
                     } catch (t: Throwable) {
-                        crashReportManager.logExceptionOrSafeException(t)
+                        Simber.e(t)
                     }
                 }
             }

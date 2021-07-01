@@ -11,7 +11,6 @@ import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag.ID_SETUP
-import com.simprints.core.analytics.CrashReportTrigger.NETWORK
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.trace
@@ -101,7 +100,7 @@ class SetupViewModel(val deviceManager: DeviceManager,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(ID_SETUP, NETWORK, message = message)
+        Simber.tag(ID_SETUP.name).i(message)
     }
 
     fun reStartDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {

@@ -4,7 +4,6 @@ import android.Manifest
 import com.google.android.gms.location.LocationRequest
 import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.session.Location
-import com.simprints.id.exceptions.safe.FailedToRetrieveUserLocation
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.tools.LocationManager
@@ -38,7 +37,7 @@ object SetupActivityHelper {
                 Simber.d("Saving user's location into the current session")
             }
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(FailedToRetrieveUserLocation(t))
+           Simber.e(t)
         }
     }
 }

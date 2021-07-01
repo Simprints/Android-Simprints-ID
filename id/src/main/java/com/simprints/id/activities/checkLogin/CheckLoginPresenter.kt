@@ -54,7 +54,6 @@ abstract class CheckLoginPresenter(
                 }
                 else -> {
                     Simber.e(t)
-                    crashReportManager.logExceptionOrSafeException(t)
                     view.openAlertActivityForError(UNEXPECTED_ERROR)
                 }
             }

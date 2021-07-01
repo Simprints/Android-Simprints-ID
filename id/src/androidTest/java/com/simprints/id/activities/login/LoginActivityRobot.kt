@@ -16,6 +16,7 @@ import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displ
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.sentIntent
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.stubIntent
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -23,11 +24,9 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.QrCodeResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every
-import io.mockk.verify
 import org.hamcrest.CoreMatchers.not
 
 const val USER_ID = "user_id"
@@ -266,16 +265,6 @@ class LoginActivityAssertions(
             result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
 
         assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
-    }
-
-    fun messageIsLoggedToCrashReport(message: String) {
-        verify {
-            mockCrashReportManager.logMessageForCrashReport(
-                any(),
-                any(),
-                message = message
-            )
-        }
     }
 
     private fun assertToastIsDisplayed(message: String) {

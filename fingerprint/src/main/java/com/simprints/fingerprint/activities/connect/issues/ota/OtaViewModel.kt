@@ -71,7 +71,6 @@ class OtaViewModel(
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
         Simber.e(e)
-        crashReportManager.logExceptionOrSafeException(e)
         if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             otaFailed.postEvent()
         } else {

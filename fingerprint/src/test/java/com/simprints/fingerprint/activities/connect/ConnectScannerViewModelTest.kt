@@ -248,7 +248,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEventAndLogsCrashlytics() {
+    fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEvent() {
         val error = Error("Oops")
         setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, error)
@@ -260,7 +260,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(false)
         launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
-        verify { crashReportManager.logExceptionOrSafeException(eq(error)) }
     }
 
     @Test

@@ -252,7 +252,6 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         is IllegalStateException, // We're calling scanner methods out of order somehow
         is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
             Simber.e(e)
-            crashReportManager.logExceptionOrSafeException(e)
             UnexpectedScannerException(e)
         }
         is ScannerV2OtaFailedException -> { // Wrap the OTA failed exception to fingerprint domain exception
