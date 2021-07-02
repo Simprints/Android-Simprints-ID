@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -38,7 +41,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         try {
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
-            Timber.d("Received $jsonInput")
+            Simber.d("Received $jsonInput")
             parseUpSyncInput(jsonInput)
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException(t.message ?: "")
