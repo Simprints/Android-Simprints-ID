@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.extentions.getQuantityString
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
@@ -74,24 +73,24 @@ class MatchingActivity : FingerprintActivity() {
         })
 
         viewModel.matchBeginningSummary.observe(this, Observer {
-            binding.tvMatchingProgressStatus1.text = getQuantityString(R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
+            binding.tvMatchingProgressStatus1.text = resources.getQuantityString(R.plurals.loaded_candidates_result, it.matchSize, it.matchSize)
             binding.tvMatchingProgressStatus2.setText(R.string.matching_fingerprints)
         })
 
         viewModel.matchFinishedSummary.observe(this, Observer {
-            binding.tvMatchingProgressStatus2.text = getQuantityString(R.plurals.returned_results, it.returnSize, arrayOf(it.returnSize))
+            binding.tvMatchingProgressStatus2.text = resources.getQuantityString(R.plurals.returned_results, it.returnSize, it.returnSize)
 
             if (it.veryGoodMatches > 0) {
                 binding.tvMatchingResultStatus1.visibility = View.VISIBLE
-                binding.tvMatchingResultStatus1.text = getQuantityString(R.plurals.tier1or2_matches, it.veryGoodMatches, arrayOf(it.veryGoodMatches))
+                binding.tvMatchingResultStatus1.text = resources.getQuantityString(R.plurals.tier1or2_matches, it.veryGoodMatches, it.veryGoodMatches)
             }
             if (it.goodMatches > 0) {
                 binding.tvMatchingResultStatus2.visibility = View.VISIBLE
-                binding.tvMatchingResultStatus2.text = getQuantityString(R.plurals.tier3_matches, it.goodMatches, arrayOf(it.goodMatches))
+                binding.tvMatchingResultStatus2.text = resources.getQuantityString(R.plurals.tier3_matches, it.goodMatches, it.goodMatches)
             }
             if (it.veryGoodMatches < 1 && it.goodMatches < 1 || it.fairMatches > 1) {
                 binding.tvMatchingResultStatus3.visibility = View.VISIBLE
-                binding.tvMatchingResultStatus3.text = getQuantityString(R.plurals.tier4_matches, it.fairMatches, arrayOf(it.fairMatches))
+                binding.tvMatchingResultStatus3.text = resources.getQuantityString(R.plurals.tier4_matches, it.fairMatches, it.fairMatches)
             }
             setIdentificationProgress(100)
         })
