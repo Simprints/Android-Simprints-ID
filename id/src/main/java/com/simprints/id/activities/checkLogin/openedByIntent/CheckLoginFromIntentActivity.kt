@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
+import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
@@ -14,8 +16,6 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
-import com.simprints.core.analytics.CrashReportManager
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -24,7 +24,6 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -59,7 +58,7 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         when {
             potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
             appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(appErrorResponseForLoginScreen)
-            else -> runBlocking {
+            else -> lifecycleScope.launchWhenCreated {
                 viewPresenter.checkSignedInStateIfPossible()
             }
         }
