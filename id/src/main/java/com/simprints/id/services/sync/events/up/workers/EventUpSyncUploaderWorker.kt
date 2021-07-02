@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.tools.json.JsonHelper
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.analytics.CrashReportManager
-import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
+import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
 
 class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -41,7 +45,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
             Timber.d("Received $jsonInput")
-            jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
+            parseUpSyncInput(jsonInput)
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException(t.message ?: "")
         }
@@ -91,6 +95,17 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         const val INPUT_UP_SYNC = "INPUT_UP_SYNC"
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
+
+
+        // TODO throw this away... thank you
+        fun parseUpSyncInput(input: String): EventUpSyncScope {
+            return try {
+                JsonHelper.fromJson(input)
+            } catch(ex: MissingKotlinParameterException) {
+                val result =  JsonHelper.fromJson<OldEventUpSyncScope>(input)
+                result.toNewScope()
+            }
+        }
     }
 }
 
