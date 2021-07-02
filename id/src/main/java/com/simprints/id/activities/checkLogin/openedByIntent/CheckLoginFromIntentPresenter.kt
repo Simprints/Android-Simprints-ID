@@ -260,8 +260,7 @@ class CheckLoginFromIntentPresenter(
             awaitAll(
                 async { updateDatabaseCountsInCurrentSession() },
                 async { addAuthorizedEventInCurrentSession() },
-                async { initAnalyticsKeyInCrashManager() },
-                async { updateAnalyticsIdInCurrentSession() }
+                async { initAnalyticsKeyInCrashManager() }
             )
         }.join()
 

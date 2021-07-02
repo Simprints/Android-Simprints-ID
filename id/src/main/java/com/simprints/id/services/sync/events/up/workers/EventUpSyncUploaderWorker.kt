@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
 
 class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -37,8 +38,8 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         try {
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
-            Simber.d("Received $jsonInput")
-            jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
+            Timber.d("Received $jsonInput")
+            parseUpSyncInput(jsonInput)
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException(t.message ?: "")
         }
@@ -88,6 +89,17 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         const val INPUT_UP_SYNC = "INPUT_UP_SYNC"
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
+
+
+        // TODO throw this away... thank you
+        fun parseUpSyncInput(input: String): EventUpSyncScope {
+            return try {
+                JsonHelper.fromJson(input)
+            } catch(ex: MissingKotlinParameterException) {
+                val result =  JsonHelper.fromJson<OldEventUpSyncScope>(input)
+                result.toNewScope()
+            }
+        }
     }
 }
 
