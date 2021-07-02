@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -31,7 +30,6 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
 
     override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var downSyncHelper: EventDownSyncHelper
     @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 

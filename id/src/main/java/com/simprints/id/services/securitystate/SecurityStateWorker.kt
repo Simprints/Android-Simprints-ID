@@ -2,7 +2,6 @@ package com.simprints.id.services.securitystate
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.Application
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
@@ -19,7 +18,6 @@ class SecurityStateWorker(
 
     override val tag: String = SecurityStateWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var repository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
 

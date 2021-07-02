@@ -2,7 +2,6 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
@@ -112,7 +111,6 @@ class TestSecurityModule(
     }
 
     override fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
@@ -120,7 +118,6 @@ class TestSecurityModule(
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(
-                crashReportManager,
                 loginInfoManager,
                 timeHelper,
                 projectAuthenticator,

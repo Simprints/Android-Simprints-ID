@@ -1,6 +1,5 @@
 package com.simprints.id.activities.checkLogin
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.time.TimeHelper
@@ -28,7 +27,6 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var preferencesManager: IdPreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider

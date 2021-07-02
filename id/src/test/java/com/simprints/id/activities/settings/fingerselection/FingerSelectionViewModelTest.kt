@@ -2,7 +2,6 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
 import com.simprints.id.data.prefs.IdPreferencesManager
@@ -19,8 +18,7 @@ class FingerSelectionViewModelTest {
     val rule = InstantTaskExecutorRule()
 
     private val prefsMock: IdPreferencesManager = mockk()
-    private val crashReportManagerMock: CrashReportManager = mockk()
-    private val viewModel = FingerSelectionViewModel(prefsMock, crashReportManagerMock)
+    private val viewModel = FingerSelectionViewModel(prefsMock)
 
     @Test
     fun start_loadsStartingFingerStateCorrectly() {
@@ -224,7 +222,7 @@ class FingerSelectionViewModelTest {
     }
 
     @Test
-    fun savePreference_savesPreferenceAndCrashReportInfoCorrectly() {
+    fun savePreference_savesPreference() {
         every { prefsMock.fingerprintsToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
@@ -244,21 +242,6 @@ class FingerSelectionViewModelTest {
                 LEFT_THUMB, LEFT_THUMB,
                 RIGHT_THUMB, RIGHT_THUMB,
                 LEFT_INDEX_FINGER
-            )
-        ).inOrder()
-
-        val crashReportSlot = slot<List<String>>()
-        verify {
-            crashReportManagerMock.setFingersSelectedCrashlyticsKey(
-                capture(crashReportSlot)
-            )
-        }
-
-        assertThat(crashReportSlot.captured).containsExactlyElementsIn(
-            listOf(
-                LEFT_THUMB.toString(), LEFT_THUMB.toString(),
-                RIGHT_THUMB.toString(), RIGHT_THUMB.toString(),
-                LEFT_INDEX_FINGER.toString()
             )
         ).inOrder()
     }

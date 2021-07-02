@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.subject.migration
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
@@ -27,7 +26,6 @@ class SubjectToEventDbMigrationManagerImpl(
     val loginInfoManager: LoginInfoManager,
     private val eventLocal: EventLocalDataSource,
     val timeHelper: TimeHelper,
-    val crashReportManager: CrashReportManager,
     val preferencesManager: IdPreferencesManager,
     private val subjectLocal: SubjectLocalDataSource,
     private val encoder: EncodingUtils
@@ -53,8 +51,7 @@ class SubjectToEventDbMigrationManagerImpl(
                 }
             }
         } catch (t: Throwable) {
-            Simber.e(t)
-            crashReportManager.logException(MigrationToNewEventArchitectureException(cause = t))
+            Simber.e(MigrationToNewEventArchitectureException(cause = t))
         }
     }
 

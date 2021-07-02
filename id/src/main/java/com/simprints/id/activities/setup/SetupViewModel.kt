@@ -9,7 +9,6 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag.ID_SETUP
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.tools.device.DeviceManager
@@ -20,8 +19,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
-class SetupViewModel(val deviceManager: DeviceManager,
-                     private val crashReportManager: CrashReportManager
+class SetupViewModel(
+    val deviceManager: DeviceManager
 ) : ViewModel() {
 
     internal val scope by lazy { viewModelScope }

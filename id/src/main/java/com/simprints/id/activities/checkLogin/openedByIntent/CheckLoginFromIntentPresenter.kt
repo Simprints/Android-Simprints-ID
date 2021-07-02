@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MODULE_IDS
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.PROJECT_ID
+import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.core.tools.extentions.inBackground
@@ -338,7 +339,7 @@ class CheckLoginFromIntentPresenter(
     @SuppressLint("CheckResult")
     private suspend fun setSessionIdCrashlyticsKey() {
         ignoreException {
-            crashReportManager.setSessionIdCrashlyticsKey(eventRepository.getCurrentCaptureSessionEvent().id)
+            Simber.tag(SESSION_ID, true).i(eventRepository.getCurrentCaptureSessionEvent().id)
         }
     }
 }

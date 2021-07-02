@@ -6,12 +6,11 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.id.tools.extensions.awaitTask
 import com.simprints.logging.Simber
 
-class QrCodeDetectorImpl(private val crashReportManager: CrashReportManager) : QrCodeDetector {
+class QrCodeDetectorImpl : QrCodeDetector {
 
     override suspend fun detectInImage(rawImage: RawImage): String? {
         val firebaseRotation = degreesToFirebaseRotation(rawImage.rotationDegrees)

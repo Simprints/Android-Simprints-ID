@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
@@ -27,8 +26,6 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
 
-    @Inject
-    override lateinit var crashReportManager: CrashReportManager
     @Inject
     lateinit var upSyncHelper: EventUpSyncHelper
     @Inject

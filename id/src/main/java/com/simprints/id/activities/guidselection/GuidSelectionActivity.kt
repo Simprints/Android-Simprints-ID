@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
@@ -31,9 +30,6 @@ class GuidSelectionActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var guidSelectionManager: GuidSelectionManager
-
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
 
     private lateinit var guidSelectionRequest: GuidSelectionRequest
 
@@ -65,7 +61,6 @@ class GuidSelectionActivity : BaseSplitActivity() {
             Simber.tag(CrashReportTag.SESSION.name).i("Added Guid Selection Event")
         } catch (t: Throwable) {
             Simber.e(t)
-            crashReportManager.logException(t)
         }
     }
 

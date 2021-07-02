@@ -2,7 +2,6 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.*
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
@@ -34,9 +33,6 @@ open class EventSyncMasterWorker(
     }
 
     override val tag: String = EventSyncMasterWorker::class.java.simpleName
-
-    @Inject
-    override lateinit var crashReportManager: CrashReportManager
 
     @Inject
     lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder

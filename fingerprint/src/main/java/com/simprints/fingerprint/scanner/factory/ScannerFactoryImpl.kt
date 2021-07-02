@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.scanner.factory
 
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
@@ -18,7 +17,6 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
                          private val preferencesManager: FingerprintPreferencesManager,
-                         private val crashReportManager: FingerprintCrashReportManager,
                          private val scannerUiHelper: ScannerUiHelper,
                          private val serialNumberConverter: SerialNumberConverter,
                          private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
@@ -60,7 +58,6 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
             connectionHelper,
             cypressOtaHelper,
             stmOtaHelper,
-            un20OtaHelper,
-            crashReportManager
+            un20OtaHelper
         )
 }

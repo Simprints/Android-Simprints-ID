@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.refusal
 
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
@@ -14,10 +13,11 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.logging.Simber
 import kotlinx.coroutines.runBlocking
 
-class RefusalPresenter(private val view: RefusalContract.View,
-                       private val crashReportManager: FingerprintCrashReportManager,
-                       private val sessionEventsManager: FingerprintSessionEventsManager,
-                       private val timeHelper: FingerprintTimeHelper) : RefusalContract.Presenter {
+class RefusalPresenter(
+    private val view: RefusalContract.View,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val timeHelper: FingerprintTimeHelper
+) : RefusalContract.Presenter {
 
     private var reason: RefusalFormReason = OTHER
     private var refusalStartTime: Long = 0

@@ -1,6 +1,5 @@
 package com.simprints.id.activities.alert
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.inBackground
@@ -24,8 +23,6 @@ class AlertPresenter(
     private val alertType: AlertType
 ) : AlertContract.Presenter {
 
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
     @Inject
     lateinit var eventRepository: EventRepository
     @Inject

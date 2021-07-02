@@ -1,7 +1,6 @@
 package com.simprints.eventsystem.event.local
 
 import android.content.Context
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.logging.Simber
 import net.sqlcipher.database.SQLiteDatabase.getBytes
@@ -14,8 +13,7 @@ interface EventDatabaseFactory {
 @OptIn(ExperimentalStdlibApi::class)
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
-    private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-    private val crashReportManager: CrashReportManager
+    private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider
 ) : EventDatabaseFactory {
 
     override fun build(): EventRoomDatabase {
@@ -26,8 +24,7 @@ class DbEventDatabaseFactoryImpl(
             return EventRoomDatabase.getDatabase(
                 ctx,
                 factory,
-                DB_NAME,
-                crashReportManager
+                DB_NAME
             )
         } catch (t: Throwable) {
             Simber.e(t)

@@ -1,6 +1,5 @@
 package com.simprints.id.activities.fetchguid
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.toMode
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
@@ -15,8 +14,7 @@ import kotlinx.coroutines.flow.toList
 
 class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
                           val subjectRepository: SubjectRepository,
-                          val preferencesManager: IdPreferencesManager,
-                          val crashReportManager: CrashReportManager
+                          val preferencesManager: IdPreferencesManager
 ) : FetchGuidHelper {
 
     override suspend fun loadFromRemoteIfNeeded(coroutineScope: CoroutineScope, projectId: String, subjectId: String): SubjectFetchResult {
@@ -55,7 +53,6 @@ class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
             }
         } catch (t: Throwable) {
             Simber.e(t)
-            crashReportManager.logException(t)
             SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         }
     }

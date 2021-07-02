@@ -4,7 +4,6 @@ import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonA
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.LOW_BATTERY
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.*
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
@@ -12,11 +11,12 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.logging.Simber
 import java.util.concurrent.atomic.AtomicBoolean
 
-class AlertPresenter(val view: AlertContract.View,
-                     private val crashReportManager: FingerprintCrashReportManager,
-                     private val sessionManager: FingerprintSessionEventsManager,
-                     private val timeHelper: FingerprintTimeHelper,
-                     private val alertType: FingerprintAlert) : AlertContract.Presenter {
+class AlertPresenter(
+    val view: AlertContract.View,
+    private val sessionManager: FingerprintSessionEventsManager,
+    private val timeHelper: FingerprintTimeHelper,
+    private val alertType: FingerprintAlert
+) : AlertContract.Presenter {
 
     private val alertViewModel =  AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 

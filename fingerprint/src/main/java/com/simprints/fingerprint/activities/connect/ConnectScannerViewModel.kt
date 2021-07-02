@@ -13,7 +13,6 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.SCANNER_SETUP
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -35,7 +34,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 class ConnectScannerViewModel(
-    private val crashReportManager: FingerprintCrashReportManager,
     private val scannerManager: ScannerManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,

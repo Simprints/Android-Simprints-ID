@@ -2,17 +2,13 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.logging.Simber
 
-class FingerSelectionViewModel(
-    private val preferencesManager: IdPreferencesManager,
-    private val crashReportManager: CrashReportManager
-) : ViewModel() {
+class FingerSelectionViewModel(private val preferencesManager: IdPreferencesManager) : ViewModel() {
 
     val items = MutableLiveData<List<FingerSelectionItem>>()
 

@@ -3,7 +3,6 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.commontesttools.time.MockTimer
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -38,7 +37,6 @@ class OtaViewModelTest {
 
     private val firmwareLocalDataSource: FirmwareLocalDataSource = mockk()
     private val sessionEventsManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val crashReportManagerMock: FingerprintCrashReportManager = mockk(relaxed = true)
     private val mockTimer = MockTimer()
     private val timeHelperMock: FingerprintTimeHelper = mockk(relaxed = true) {
         every { newTimer() } returns mockTimer
@@ -48,7 +46,12 @@ class OtaViewModelTest {
         it.scanner = scannerMock
     }
 
-    private val otaViewModel = OtaViewModel(scannerManager, firmwareLocalDataSource, sessionEventsManagerMock, crashReportManagerMock, timeHelperMock)
+    private val otaViewModel = OtaViewModel(
+        scannerManager,
+        firmwareLocalDataSource,
+        sessionEventsManagerMock,
+        timeHelperMock
+    )
 
     @Before
     fun setup() {

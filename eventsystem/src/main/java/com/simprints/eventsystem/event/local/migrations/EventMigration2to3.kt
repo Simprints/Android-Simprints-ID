@@ -2,8 +2,8 @@ package com.simprints.eventsystem.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.logging.Simber
 
 /**
  * Migration from 2021.1.0 to 2021.1.1. This migration adds a new column that can mark an event as
@@ -11,8 +11,7 @@ import com.simprints.core.tools.extentions.getStringWithColumnName
  * query and close open sessions instead of reading all sessions and checking their is closed field
  * in the JSON payload.
  */
-class EventMigration2to3(val crashReportManager: CrashReportManager) :
-    Migration(2, 3) {
+class EventMigration2to3 : Migration(2, 3) {
 
     private val sessionType = "SESSION_CAPTURE"
     private val idColumn = "id"
@@ -31,7 +30,7 @@ class EventMigration2to3(val crashReportManager: CrashReportManager) :
              */
             updateTableToCloseClosedSessions(database)
         } catch (ex: Exception) {
-            crashReportManager.logException(ex)
+            Simber.e(ex)
             throw ex
         }
     }

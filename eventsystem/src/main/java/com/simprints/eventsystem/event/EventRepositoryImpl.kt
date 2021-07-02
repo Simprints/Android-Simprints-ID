@@ -2,7 +2,6 @@ package com.simprints.eventsystem.event
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
@@ -35,7 +34,6 @@ open class EventRepositoryImpl(
     private val loginInfoManager: LoginInfoManager,
     private val eventLocalDataSource: EventLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     override val libSimprintsVersionName: String,
@@ -149,7 +147,7 @@ open class EventRepositoryImpl(
 
         if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
-                crashReportManager.logException(it)
+                Simber.e(it)
             }
         }
 
@@ -184,7 +182,7 @@ open class EventRepositoryImpl(
         } catch (t: Throwable) {
             Simber.w(t)
             if (t.isClientAndCloudIntegrationIssue()) {
-                crashReportManager.logException(t)
+                Simber.e(t)
                 // We do not delete subject events (pokedex) since they are important.
                 deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
             }

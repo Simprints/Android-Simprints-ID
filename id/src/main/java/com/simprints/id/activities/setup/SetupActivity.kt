@@ -13,7 +13,6 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
@@ -50,7 +49,6 @@ import kotlin.math.min
 class SetupActivity : BaseSplitActivity() {
 
     @Inject lateinit var locationManager: LocationManager
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
     @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
@@ -138,7 +136,7 @@ class SetupActivity : BaseSplitActivity() {
     private fun collectLocationInBackground() {
         inBackground(Dispatchers.Main) {
             try {
-                storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+                storeUserLocationIntoCurrentSession(locationManager, eventRepository)
             } catch (t: Throwable) {
                 Simber.d(t)
             }

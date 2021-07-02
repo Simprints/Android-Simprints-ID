@@ -16,7 +16,6 @@ import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displ
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.sentIntent
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.stubIntent
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -49,14 +48,12 @@ fun LoginActivityAndroidTest.loginActivity(
 
     return LoginActivityRobot(
         activityScenario,
-        mockCrashReportManager,
         mockLoginActivityHelper
     ).apply(block)
 }
 
 class LoginActivityRobot(
     private val activityScenario: ActivityScenario<LoginActivity>,
-    private val mockCrashReportManager: CrashReportManager,
     private val mockLoginActivityHelper: LoginActivityHelper
 ) {
 
@@ -142,7 +139,7 @@ class LoginActivityRobot(
     }
 
     infix fun assert(assertion: LoginActivityAssertions.() -> Unit) {
-        LoginActivityAssertions(activityScenario, mockCrashReportManager).apply(assertion)
+        LoginActivityAssertions(activityScenario).apply(assertion)
     }
 
     private fun shouldHaveMandatoryCredentials(result: Boolean) {
@@ -170,8 +167,7 @@ class LoginActivityRobot(
 }
 
 class LoginActivityAssertions(
-    private val activityScenario: ActivityScenario<LoginActivity>,
-    private val mockCrashReportManager: CrashReportManager
+    private val activityScenario: ActivityScenario<LoginActivity>
 ) {
 
     fun userIdFieldHasText(text: String) {

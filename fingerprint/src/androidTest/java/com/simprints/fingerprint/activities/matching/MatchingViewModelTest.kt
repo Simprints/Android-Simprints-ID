@@ -7,7 +7,6 @@ import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -47,7 +46,6 @@ class MatchingViewModelTest : KoinTest {
     val taskExecutorRule = InstantTaskExecutorRule()
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
-    private val crashReportManagerMock: FingerprintCrashReportManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
     private val mockMatcher: FingerprintMatcher = mockk()
 
@@ -70,7 +68,6 @@ class MatchingViewModelTest : KoinTest {
         acquireFingerprintKoinModules()
         loadKoinModules(module(override = true) {
             factory { dbManagerMock }
-            factory { crashReportManagerMock }
             factory { masterFlowManager }
             factory<FingerprintPreferencesManager> { mockk(relaxed = true) }
             factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }

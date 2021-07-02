@@ -4,7 +4,6 @@ import androidx.camera.core.AspectRatio
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,8 +13,7 @@ import java.util.concurrent.Executors
 
 @ExperimentalCoroutinesApi
 class QrCodeProducerImpl(
-    private val qrCodeDetector: QrCodeDetector,
-    private val crashReportManager: CrashReportManager
+    private val qrCodeDetector: QrCodeDetector
 ) : QrCodeProducer, ImageAnalysis.Analyzer {
 
     override val useCase by lazy {

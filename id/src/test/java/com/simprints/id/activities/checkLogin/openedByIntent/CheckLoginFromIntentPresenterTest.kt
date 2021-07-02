@@ -2,7 +2,6 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
@@ -82,9 +81,6 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var eventRepositoryMock: EventRepository
 
     @MockK
-    lateinit var crashReportManagerMock: CrashReportManager
-
-    @MockK
     lateinit var securityStateRepositoryMock: SecurityStateRepository
 
     @MockK
@@ -132,7 +128,6 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
             coEvery { analyticsManager.getAnalyticsId() } returns GUID1
-            crashReportManager = crashReportManagerMock
             securityStateRepository = securityStateRepositoryMock
             val channel = Channel<Status>(capacity = Channel.UNLIMITED)
             coEvery { securityStateRepositoryMock.securityStatusChannel } returns channel
@@ -226,18 +221,6 @@ class CheckLoginFromIntentPresenterTest {
             presenter.setup()
 
             coVerify { preferencesManagerMock.lastUserUsed = DEFAULT_USER_ID }
-        }
-    }
-
-
-    @Test
-    fun presenter_setupIsCalled_shouldSetSessionIdInCrashlytics() {
-        runBlockingTest {
-            val session = createSessionCaptureEvent()
-            coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
-            presenter.setup()
-
-            coVerify { crashReportManagerMock.setSessionIdCrashlyticsKey(session.id) }
         }
     }
 

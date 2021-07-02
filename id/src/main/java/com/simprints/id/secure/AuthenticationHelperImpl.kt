@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.extentions.inBackground
@@ -19,7 +18,6 @@ import com.simprints.logging.Simber
 import java.io.IOException
 
 class AuthenticationHelperImpl(
-    private val crashReportManager: CrashReportManager,
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,

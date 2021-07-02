@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.id.Application
@@ -25,9 +24,6 @@ import javax.inject.Inject
 class LoginActivityAndroidTest {
 
     @Inject
-    lateinit var mockCrashReportManager: CrashReportManager
-
-    @Inject
     lateinit var mockAuthenticationHelper: AuthenticationHelper
 
     @MockK
@@ -36,7 +32,7 @@ class LoginActivityAndroidTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     private val appModule by lazy {
-        TestAppModule(app, crashReportManagerRule = DependencyRule.MockkRule)
+        TestAppModule(app)
     }
 
     private val securityModule by lazy {

@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.controllers.v2.*
@@ -33,15 +32,16 @@ import java.io.IOException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerWrapperV2(private val scannerV2: ScannerV2,
-                       private val scannerUiHelper: ScannerUiHelper,
-                       private val macAddress: String,
-                       private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
-                       private val connectionHelper: ConnectionHelper,
-                       private val cypressOtaHelper: CypressOtaHelper,
-                       private val stmOtaHelper: StmOtaHelper,
-                       private val un20OtaHelper: Un20OtaHelper,
-                       private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
+class ScannerWrapperV2(
+    private val scannerV2: com.simprints.fingerprintscanner.v2.scanner.Scanner,
+    private val scannerUiHelper: ScannerUiHelper,
+    private val macAddress: String,
+    private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
+    private val connectionHelper: ConnectionHelper,
+    private val cypressOtaHelper: CypressOtaHelper,
+    private val stmOtaHelper: StmOtaHelper,
+    private val un20OtaHelper: Un20OtaHelper
+) : ScannerWrapper {
 
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -28,7 +27,6 @@ class OtaViewModel(
     private val scannerManager: ScannerManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val crashReportManager: FingerprintCrashReportManager,
     private val timeHelper: FingerprintTimeHelper
 ) : ViewModel() {
 
