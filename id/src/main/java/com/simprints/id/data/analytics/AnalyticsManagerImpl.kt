@@ -5,13 +5,10 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
                            private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
-
-    override suspend fun getAnalyticsId(): String = firebaseAnalytics.appInstanceId.await()
 
     override fun logCallout(appRequest: AppRequest.AppRequestFlow) {
         val actionName = when (appRequest) {
@@ -19,7 +16,6 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
             is AppIdentifyRequest -> "IDENTIFY"
             is AppVerifyRequest -> "VERIFY"
         }
-
 
         Timber.d("AnalyticsManagerImpl.logCallout(appRequest=$appRequest)")
         val bundle = Bundle()
