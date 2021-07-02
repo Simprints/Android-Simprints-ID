@@ -1,7 +1,7 @@
 package com.simprints.face.utils
 
 import com.simprints.face.models.FaceDetection
-import com.simprints.uicomponents.models.PreviewFrame
+import com.simprints.face.models.PreviewFrame
 
 val mockFaceDetectionList = listOf(
     FaceDetection(

@@ -23,7 +23,8 @@ dependencyAnalysis {
                     'io.realm:realm-android-library',
                     'com.google.firebase:firebase-analytics-ktx',
                     ':moduleapi',
-                    ':core'
+                    ':core',
+                    'androidx.fragment:fragment-testing'
                 )
             }
         }

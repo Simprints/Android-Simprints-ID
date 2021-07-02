@@ -124,8 +124,7 @@
     <string name="please_wait">Please wait while we proceed to identification</string>
     <!-- Loading text -->
     <string name="loading_candidates">Loading candidates…</string>
-    <string name="loaded_candidates_quantity_key" translatable="false">loaded_candidates</string>
-    <plurals name="loaded_candidates">
+    <plurals name="loaded_candidates_result">
         <item quantity="one">Loaded %d candidate.</item>
         <item quantity="other">Loaded %d candidates.</item>
     </plurals>
