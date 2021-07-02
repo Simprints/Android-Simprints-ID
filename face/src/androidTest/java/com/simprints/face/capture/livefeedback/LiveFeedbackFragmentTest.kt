@@ -1,5 +1,6 @@
 package com.simprints.face.capture.livefeedback
 
+import android.os.Build
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavHostController
 import androidx.navigation.Navigation
@@ -11,6 +12,11 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject
+import androidx.test.uiautomator.UiObjectNotFoundException
+import androidx.test.uiautomator.UiSelector
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import io.mockk.mockk
@@ -22,15 +28,18 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
+import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class LiveFeedbackFragmentTest : KoinTest {
 
+    private lateinit var device: UiDevice
     private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true)
     private val liveFeedBackVm: LiveFeedbackFragmentViewModel = mockk(relaxed = true)
 
     @Before
     fun setUp() {
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         loadKoinModules(
             module(override = true) {
                 viewModel { faceCaptureViewModel }
@@ -50,7 +59,8 @@ class LiveFeedbackFragmentTest : KoinTest {
             navController.setGraph(R.navigation.capture_graph)
             Navigation.setViewNavController(liveFeedbackFragment.requireView(), navController)
         }
-
+        allowPermissionsIfNeeded("Only this time")
+        allowPermissionsIfNeeded("Allow")
         // Is this test really useful for the UI??
         onView(
             allOf(
@@ -59,6 +69,19 @@ class LiveFeedbackFragmentTest : KoinTest {
             )
         )
             .check(matches(isDisplayed()))
+    }
+
+    private fun allowPermissionsIfNeeded(text: String) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            val allowPermissions = device.findObject(UiSelector().text(text))
+            if (allowPermissions.exists()) {
+                try {
+                    allowPermissions.click()
+                } catch (e: UiObjectNotFoundException) {
+                    Timber.e(e, "There is no permissions dialog to interact with.")
+                }
+            }
+        }
     }
 }
 
