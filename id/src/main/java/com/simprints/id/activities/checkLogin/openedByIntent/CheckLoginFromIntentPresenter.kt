@@ -255,8 +255,7 @@ class CheckLoginFromIntentPresenter(
             awaitAll(
                 async { updateDatabaseCountsInCurrentSession() },
                 async { addAuthorizedEventInCurrentSession() },
-                async { initAnalyticsKeyInCrashManager() },
-                async { updateAnalyticsIdInCurrentSession() }
+                async { initAnalyticsKeyInCrashManager() }
             )
         }.join()
 
@@ -307,13 +306,6 @@ class CheckLoginFromIntentPresenter(
             setFingersSelectedCrashlyticsKey(preferencesManager.fingerprintsToCollect.map { it.toString() })
         }
         Timber.d("[CHECK_LOGIN] Added keys in CrashManager")
-    }
-
-    private suspend fun updateAnalyticsIdInCurrentSession() {
-        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
-        eventRepository.addOrUpdateEvent(currentSessionEvent)
-        Timber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 
     private fun buildAuthorizationEvent(result: AuthorizationResult) =

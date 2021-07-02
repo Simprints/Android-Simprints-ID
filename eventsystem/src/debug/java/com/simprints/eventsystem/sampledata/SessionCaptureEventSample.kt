@@ -1,15 +1,14 @@
 package com.simprints.eventsystem.sampledata
 
 import android.os.Build
+import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 
 object SessionCaptureEventSample : SampleEvent() {
 
@@ -41,7 +40,6 @@ object SessionCaptureEventSample : SampleEvent() {
             databaseInfoArg
         )
         event.payload.location = locationArg
-        event.payload.analyticsId = GUID1
         event.payload.endedAt = ENDED_AT
         event.payload.sessionIsClosed = isClosed
 
