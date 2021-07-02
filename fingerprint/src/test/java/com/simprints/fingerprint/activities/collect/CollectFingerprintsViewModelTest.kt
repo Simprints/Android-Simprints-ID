@@ -10,7 +10,6 @@ import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -59,7 +58,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
-    private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
         every { qualityThreshold } returns 60
         every { liveFeedbackOn } returns false
@@ -88,7 +86,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
             factory { timeHelper }
             factory { sessionEventsManager }
             factory { fingerprintAnalyticsManager }
-            factory { crashReportManager }
             factory { preferencesManager }
             factory { scannerManager }
             factory { imageManager }

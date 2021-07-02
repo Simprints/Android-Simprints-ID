@@ -1,6 +1,5 @@
 package com.simprints.id.services.guidselection
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
@@ -14,7 +13,6 @@ import com.simprints.logging.Simber
 class GuidSelectionManagerImpl(val deviceId: String,
                                val loginInfoManager: LoginInfoManager,
                                val analyticsManager: AnalyticsManager,
-                               val crashReportManager: CrashReportManager,
                                private val timerHelper: TimeHelper,
                                val eventRepository: com.simprints.eventsystem.event.EventRepository
 ) : GuidSelectionManager {

@@ -85,7 +85,6 @@ class EventRepositoryImplTest {
             loginInfoManager,
             eventLocalDataSource,
             eventRemoteDataSource,
-            crashReportManager,
             timeHelper,
             sessionEventValidatorsFactory,
             LIB_VERSION_NAME,

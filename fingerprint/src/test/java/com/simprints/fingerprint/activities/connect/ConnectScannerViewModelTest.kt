@@ -6,7 +6,6 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -49,7 +48,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
-    private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
     private val pairingManager: ScannerPairingManager = mockk()
@@ -64,7 +62,6 @@ class ConnectScannerViewModelTest : KoinTest {
             factory { mockk<FingerprintTimeHelper>(relaxed = true) }
             factory { sessionEventsManager }
             factory { fingerprintAnalyticsManager }
-            factory { crashReportManager }
             factory { preferencesManager }
             factory { bluetoothAdapter }
             factory { pairingManager }

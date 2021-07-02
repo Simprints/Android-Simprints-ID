@@ -29,7 +29,6 @@ class SecurityStateWorkerTest {
         worker = TestListenableWorkerBuilder<SecurityStateWorker>(app).build().apply {
             repository = mockk()
             securityStateProcessor = mockk()
-            crashReportManager = mockk(relaxed = true)
         }
         app.component = mockk(relaxed = true)
     }

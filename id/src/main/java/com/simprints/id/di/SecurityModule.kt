@@ -3,7 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
@@ -128,14 +127,12 @@ open class SecurityModule {
 
     @Provides
     open fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
         eventRepository: com.simprints.eventsystem.event.EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
-            crashReportManager,
             loginInfoManager,
             timeHelper,
             projectAuthenticator,

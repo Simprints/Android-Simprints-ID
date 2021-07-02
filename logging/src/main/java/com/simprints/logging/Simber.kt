@@ -41,8 +41,8 @@ object Simber {
      * connected to a server. Basically use it to report events that we need to be
      * aware of.
      * DEBUG: Is sent to Log.i
-     * STAGING: Is sent to Log.i & sent to Firebase Analytics
-     * RELEASE: Is sent to Firebase Analytics
+     * STAGING: Is sent to Log.i & sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
+     * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
     fun i(t: Throwable) = Timber.i(t)
     fun i(message: String, args: Any? = null) = Timber.i(message, args)

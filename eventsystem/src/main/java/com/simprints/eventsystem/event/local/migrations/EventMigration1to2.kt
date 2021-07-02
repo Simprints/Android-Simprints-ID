@@ -3,7 +3,6 @@ package com.simprints.eventsystem.event.local.migrations
 import android.database.Cursor
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
@@ -21,7 +20,7 @@ import org.json.JSONObject
  * 3) Adding a sessionIsClosed field to the SessionCaptureEvent domain class in order to stop using
  * endedAt to mark a sessiona as closed.
  */
-class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration(1, 2) {
+class EventMigration1to2 : Migration(1, 2) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
@@ -30,8 +29,7 @@ class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration
             migrateSessionClosedInformation(database)
             Simber.d("Migration from schema 1 to schema 2 done.")
         } catch (t: Throwable) {
-            crashReportManager.logException(t)
-            Simber.d(t)
+            Simber.e(t)
         }
     }
 

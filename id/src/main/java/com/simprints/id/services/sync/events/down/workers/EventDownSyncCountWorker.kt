@@ -8,7 +8,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
@@ -39,7 +38,6 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
         WorkManager.getInstance(context)
     }
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var eventDownSyncHelper: EventDownSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
     @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository

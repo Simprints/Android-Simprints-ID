@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import com.simprints.core.analytics.CoreCrashReportManager
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
@@ -139,7 +138,6 @@ interface AppComponent {
     fun inject(preferencesManager: IdPreferencesManager)
 
     fun getSessionEventsManager(): EventRepository
-    fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): SubjectRepository
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource

@@ -1,16 +1,15 @@
 package com.simprints.id.services.guidselection
 
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.core.analytics.CrashReportManager
-import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
-import com.simprints.core.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -28,14 +27,13 @@ class GuidSelectionManagerImplTest {
 
     @MockK private lateinit var loginInfoManager: LoginInfoManager
     @MockK private lateinit var analyticsManager: AnalyticsManager
-    @MockK private lateinit var crashReportManager: CrashReportManager
     @MockK private lateinit var timerHelper: TimeHelper
     @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        guidSelectionManager = GuidSelectionManagerImpl(DEFAULT_DEVICE_ID, loginInfoManager, analyticsManager, crashReportManager, timerHelper, eventRepository)
+        guidSelectionManager = GuidSelectionManagerImpl(DEFAULT_DEVICE_ID, loginInfoManager, analyticsManager, timerHelper, eventRepository)
         every { timerHelper.now() } returns CREATED_AT
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
@@ -80,14 +78,4 @@ class GuidSelectionManagerImplTest {
         }
     }
 
-    @Test
-    fun handleConfirmIdentityRequest_somethingWrongHappens_shouldLogException() {
-        runBlocking {
-            every { loginInfoManager.isProjectIdSignedIn(any()) } throws Throwable("Error")
-
-            guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
-
-            coVerify(exactly = 1) { crashReportManager.logExceptionOrSafeException(any()) }
-        }
-    }
 }

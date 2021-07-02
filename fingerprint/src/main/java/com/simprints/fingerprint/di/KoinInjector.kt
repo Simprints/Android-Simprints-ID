@@ -161,7 +161,6 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(),
                 get()
             )
         }
@@ -183,15 +182,15 @@ object KoinInjector {
 
     private fun Module.defineBuildersForPresentersAndViewModels() {
         factory<AlertContract.Presenter> { (view: AlertContract.View, fingerprintAlert: FingerprintAlert) ->
-            AlertPresenter(view, get(), get(), get(), fingerprintAlert)
+            AlertPresenter(view, get(), get(), fingerprintAlert)
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
-            RefusalPresenter(view, get(), get(), get())
+            RefusalPresenter(view, get(), get())
         }
         single<EncodingUtils> { EncodingUtilsImpl }
 
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
                 get(),
@@ -204,10 +203,10 @@ object KoinInjector {
                 get()
             )
         }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
-        viewModel { OtaViewModel(get(), get(), get(), get(), get()) }
+        viewModel { OtaViewModel(get(), get(), get(), get()) }
         viewModel { OtaRecoveryViewModel(get()) }
     }
 

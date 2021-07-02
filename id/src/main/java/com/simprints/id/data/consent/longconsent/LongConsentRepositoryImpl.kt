@@ -1,6 +1,5 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.Flow
@@ -9,8 +8,7 @@ import kotlinx.coroutines.flow.flow
 
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
-    private val longConsentRemoteDataSource: LongConsentRemoteDataSource,
-    private val crashReportManager: CrashReportManager
+    private val longConsentRemoteDataSource: LongConsentRemoteDataSource
 ) : LongConsentRepository {
 
     companion object {

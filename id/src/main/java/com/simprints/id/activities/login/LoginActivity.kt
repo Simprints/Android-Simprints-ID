@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -38,8 +37,6 @@ class LoginActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var viewModelFactory: LoginViewModelFactory
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
     @Inject
     lateinit var loginActivityHelper: LoginActivityHelper
     @Inject

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
@@ -33,8 +32,6 @@ class FaceExitFormActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var timeHelper: TimeHelper
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
     @Inject
     lateinit var faceExitFormViewModelFactory: FaceExitFormViewModelFactory
 

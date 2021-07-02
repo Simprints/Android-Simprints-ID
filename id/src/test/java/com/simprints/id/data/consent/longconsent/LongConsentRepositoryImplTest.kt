@@ -37,8 +37,7 @@ class LongConsentRepositoryImplTest {
 
     private val longConsentRepository = LongConsentRepositoryImpl(
         longConsentLocalDataSourceMock,
-        longConsentRemoteDataSourceMock,
-        mockk()
+        longConsentRemoteDataSourceMock
     )
 
     @Test

@@ -1,7 +1,6 @@
 package com.simprints.id.activities.consent
 
 import android.content.Context
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.R
@@ -14,7 +13,6 @@ data class ParentalConsentTextHelper(val parentalConsentOptionsJson: String,
                                      val programName: String,
                                      val organizationName: String,
                                      val modalities: List<Modality>,
-                                     val crashReportManager: CrashReportManager,
                                      val jsonHelper: JsonHelper) {
 
     private val parentalConsentOptions by lazy {

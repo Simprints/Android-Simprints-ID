@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -24,7 +23,6 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
 
     override val tag: String = EventUpSyncCountWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var eventUpSyncHelper: EventUpSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
 

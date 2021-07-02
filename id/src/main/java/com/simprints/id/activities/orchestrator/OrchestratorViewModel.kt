@@ -4,8 +4,8 @@ import android.content.Intent
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
@@ -16,9 +16,8 @@ class OrchestratorViewModel(
     private val orchestratorManager: OrchestratorManager,
     private val orchestratorEventsHelper: OrchestratorEventsHelper,
     private val modalities: List<Modality>,
-    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
-    private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
-    private val crashReportManager: CrashReportManager
+    private val eventRepository: EventRepository,
+    private val domainToModuleApiConverter: DomainToModuleApiAppResponse
 ) : ViewModel() {
 
     val ongoingStep = orchestratorManager.ongoingStep

@@ -5,7 +5,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.firebase.perf.metrics.Trace
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
@@ -22,8 +21,6 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     abstract val tag: String
     var resultSetter: WorkerResultSetter = WorkerResultSetterImpl()
     var firebasePerformanceTraceFactory: FirebasePerformanceTraceFactory = FirebasePerformanceTraceFactoryImpl()
-
-    abstract var crashReportManager: CrashReportManager
 
     private var workerTrace: Trace? = null
 

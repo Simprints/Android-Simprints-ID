@@ -77,10 +77,9 @@ open class Application : CoreApplication() {
             if (e is UndeliverableException) {
                 exceptionToPrint = e.cause
             }
+            Simber.e(e)
             Simber.d("Undeliverable exception received", exceptionToPrint)
-
             exceptionToPrint.printStackTrace()
-            component.getCrashReportManager().logException(e)
         }
     }
 
@@ -98,7 +97,6 @@ open class Application : CoreApplication() {
         factory { component.getPreferencesManager() }
         factory { component.getAnalyticsManager() }
         factory { component.getSessionEventsManager() }
-        factory { component.getCrashReportManager() }
         factory { component.getTimeHelper() }
         factory { component.getFingerprintRecordLocalDataSource() }
         factory { component.getFaceIdentityLocalDataSource() }
