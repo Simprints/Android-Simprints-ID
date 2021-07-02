@@ -5,8 +5,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 
 interface AnalyticsManager {
 
-    suspend fun getAnalyticsId(): String
-
     fun logCallout(appRequest: AppRequest.AppRequestFlow)
 
     fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String)

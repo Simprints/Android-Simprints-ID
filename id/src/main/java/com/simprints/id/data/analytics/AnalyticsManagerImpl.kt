@@ -11,8 +11,6 @@ import kotlinx.coroutines.tasks.await
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
                            private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
 
-    override suspend fun getAnalyticsId(): String = firebaseAnalytics.appInstanceId.await()
-
     override fun logCallout(appRequest: AppRequest.AppRequestFlow) {
         val actionName = when (appRequest) {
             is AppEnrolRequest -> "ENROL"

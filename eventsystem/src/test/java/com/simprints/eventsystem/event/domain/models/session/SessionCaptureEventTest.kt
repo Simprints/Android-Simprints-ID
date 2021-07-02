@@ -2,7 +2,6 @@ package com.simprints.eventsystem.event.domain.models.session
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.eventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
@@ -10,6 +9,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SessionCaptureEventSample
+import com.simprints.eventsystem.sampledata.eventLabels
 import org.junit.Test
 
 class SessionCaptureEventTest {
@@ -30,7 +30,6 @@ class SessionCaptureEventTest {
 
         val event = SessionCaptureEventSample.getEvent(eventLabels)
         event.payload.location = locationArg
-        event.payload.analyticsId = GUID1
         event.payload.endedAt = ENDED_AT
 
         assertThat(event.id).isNotNull()
@@ -47,7 +46,6 @@ class SessionCaptureEventTest {
             assertThat(language).isEqualTo(languageArg)
             assertThat(device).isEqualTo(deviceArg)
             assertThat(databaseInfo).isEqualTo(databaseInfoArg)
-            assertThat(analyticsId).isEqualTo(GUID1)
             assertThat(location).isEqualTo(locationArg)
         }
     }
