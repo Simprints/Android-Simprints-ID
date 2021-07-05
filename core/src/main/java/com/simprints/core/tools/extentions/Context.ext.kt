@@ -12,15 +12,3 @@ fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 fun Context.showToast(@StringRes resId: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, this.resources.getText(resId), duration).show()
 }
-
-fun Context.getQuantityString(
-    @PluralsRes resId: Int,
-    quantity: Int,
-    params: Array<Any>
-): String = this.resources.getQuantityString(resId, quantity, params)
-
-fun Context.getQuantityString(@PluralsRes resId: Int, quantity: Int): String {
-    return resources.getQuantityString(resId, quantity)
-}
-
-fun Context.getStringArray(res: Int): Array<String> = resources.getStringArray(res)
