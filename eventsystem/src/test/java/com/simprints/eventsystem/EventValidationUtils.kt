@@ -556,13 +556,12 @@ fun validateSessionCaptureApiModel(json: JSONObject) {
         assertThat(getJSONArray("modalities").length()).isEqualTo(2)
         assertThat(getString("appVersionName")).isNotNull()
         assertThat(getString("libVersionName")).isNotNull()
-        assertThat(getString("analyticsId")).isNotNull()
         assertThat(getString("language")).isNotNull()
         validateDeviceApiModel(getJSONObject("device"))
         validateDatabaseInfoApiModel(getJSONObject("databaseInfo"))
         validateLocationApiModel(getJSONObject("location"))
 
-        assertThat(length()).isEqualTo(15)
+        assertThat(length()).isEqualTo(14)
     }
 }
 

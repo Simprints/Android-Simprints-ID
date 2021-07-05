@@ -131,7 +131,6 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
             coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
-            coEvery { analyticsManager.getAnalyticsId() } returns GUID1
             crashReportManager = crashReportManagerMock
             securityStateRepository = securityStateRepositoryMock
             val channel = Channel<Status>(capacity = Channel.UNLIMITED)
@@ -329,7 +328,7 @@ class CheckLoginFromIntentPresenterTest {
         runBlockingTest {
             presenter.handleSignedInUser()
 
-            coVerify(exactly = 3) { eventRepositoryMock.addOrUpdateEvent(any()) }
+            coVerify(exactly = 2) { eventRepositoryMock.addOrUpdateEvent(any()) }
             verify(exactly = 1) { view.openOrchestratorActivity(any()) }
         }
     }
@@ -354,7 +353,6 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
             coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
-            coEvery { analyticsManagerMock.getAnalyticsId() } returns GUID1
             coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
             every { preferencesManagerMock.modalities } returns listOf(
                 Modality.FINGER,
@@ -386,7 +384,6 @@ class CheckLoginFromIntentPresenterTest {
                 databaseInfoArg
             ).apply {
                 payload.location = locationArg
-                payload.analyticsId = GUID1
                 payload.endedAt = ENDED_AT
             }
 
