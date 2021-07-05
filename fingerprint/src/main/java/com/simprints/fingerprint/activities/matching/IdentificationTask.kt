@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
@@ -82,7 +82,7 @@ class IdentificationTask(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(MATCHING.name).i(message)
+        Simber.tag(CrashReportTag.MATCHING.name).i(message)
     }
 
     companion object {

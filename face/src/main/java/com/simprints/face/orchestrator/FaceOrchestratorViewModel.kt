@@ -2,9 +2,9 @@ package com.simprints.face.orchestrator
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_LICENSE
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
 import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
@@ -65,12 +65,12 @@ class FaceOrchestratorViewModel : ViewModel() {
     }
 
     fun missingLicense() {
-        Simber.tag(FACE_LICENSE.name).i("License is missing")
+        Simber.tag(CrashReportTag.FACE_LICENSE.name).i("License is missing")
         errorEvent.send(ErrorType.LICENSE_MISSING)
     }
 
     fun invalidLicense() {
-        Simber.tag(FACE_LICENSE.name).i("License is invalid")
+        Simber.tag(CrashReportTag.FACE_LICENSE.name).i("License is invalid")
         errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
@@ -82,7 +82,7 @@ class FaceOrchestratorViewModel : ViewModel() {
                 )
             )
         } else {
-            Simber.tag(FACE_LICENSE.name)
+            Simber.tag(CrashReportTag.FACE_LICENSE.name)
                 .i("Error with configuration download. Error Code = $errorCode")
             errorEvent.send(ErrorType.CONFIGURATION_ERROR.apply {
                 this.errorCode = errorCode

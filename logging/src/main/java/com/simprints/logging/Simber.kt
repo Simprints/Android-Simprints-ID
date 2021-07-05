@@ -62,8 +62,10 @@ object Simber {
     fun w(t: Throwable, message: String, args: Any? = null) = Timber.w(t, message, args)
 
     /**
-     * This is for when bad stuff happens. Use this tag in places like inside a catch statement.
-     * You know that an error has occurred and therefore you're logging an error.
+     * This is for when bad stuff happens. You know that an error has occurred and therefore you're
+     * logging an error. NOTE: There is an important difference between Exceptions and Errors.
+     * Exceptions are used to pass information and handle logic, but this doesn't mean they are bad.
+     * We only log Exceptions as errors when we know the product is not behaving and expected.
      * DEBUG: Is sent to Log.e
      * STAGING: Is sent to Log.e & sent to Firebase Crashlytics
      * RELEASE: Is sent to Firebase Crashlytics

@@ -10,18 +10,24 @@ internal class CrashReportingTree(private val crashlytics: FirebaseCrashlytics) 
     override fun log(priority: Int, tag: String?, message: String?, t: Throwable?) {
         if (priority == Log.VERBOSE || priority == Log.DEBUG) return
 
-        if (tag != null && message != null && tag.contains(USER_PROPERTY_TAG)){
+        if (tag != null && message != null && tag.contains(USER_PROPERTY_TAG)) {
             val originalTag = tag.removePrefix(USER_PROPERTY_TAG)
             crashlytics.setCustomKey(originalTag, message)
         }
 
-        if (priority == Log.WARN || priority == Log.ERROR || priority == Log.INFO) {
+        if (priority == Log.INFO) {
             message?.let { crashlytics.log(it) }
         }
 
         if (priority == Log.WARN || priority == Log.ERROR) {
-            t?.let { crashlytics.recordException(it) }
+            if (t != null) {
+                message?.let { crashlytics.log(it) }
+                crashlytics.recordException(t)
+            } else if (message != null) {
+                crashlytics.recordException(Exception(message))
+            }
         }
+
     }
 
 }

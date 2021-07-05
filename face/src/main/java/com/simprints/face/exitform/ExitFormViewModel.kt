@@ -2,10 +2,10 @@ package com.simprints.face.exitform
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.REFUSAL
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 import com.simprints.logging.Simber
@@ -68,7 +68,7 @@ class ExitFormViewModel(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(REFUSAL.name).i(message)
+        Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 
     private fun logExitFormEvent() {
