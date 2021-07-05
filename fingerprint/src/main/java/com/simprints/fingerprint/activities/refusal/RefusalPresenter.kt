@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.activities.refusal
 
 import android.annotation.SuppressLint
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
@@ -146,6 +146,6 @@ class RefusalPresenter(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(REFUSAL.name).i(message)
+        Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 }

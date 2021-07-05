@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.utils.EncodingUtils
@@ -11,7 +12,6 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.*
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
@@ -556,11 +556,11 @@ class CollectFingerprintsViewModel(
         subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Simber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
-        Simber.tag(FINGER_CAPTURE.name).i(message)
+        Simber.tag(CrashReportTag.FINGER_CAPTURE.name).i(message)
     }
 
     private fun logScannerMessageForCrashReport(message: String) {
-        Simber.tag(FINGER_CAPTURE.name).i(message)
+        Simber.tag(CrashReportTag.FINGER_CAPTURE.name).i(message)
     }
 
     private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {

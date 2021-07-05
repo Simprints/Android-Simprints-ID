@@ -3,11 +3,11 @@ package com.simprints.face.match
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_MATCHING
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.MatchEntry
 import com.simprints.face.controllers.core.events.model.Matcher
@@ -72,7 +72,7 @@ class FaceMatchViewModel(
     }
 
     private suspend fun loadCandidates(queryForCandidates: Serializable): Flow<FaceIdentity> {
-        Simber.tag(FACE_MATCHING.name).i("Loading candidates")
+        Simber.tag(CrashReportTag.FACE_MATCHING.name).i("Loading candidates")
         matchState.value = MatchState.LoadingCandidates
         return faceDbManager.loadPeople(queryForCandidates)
     }
@@ -81,7 +81,7 @@ class FaceMatchViewModel(
         probeFaceSamples: List<FaceSample>,
         candidates: Flow<FaceIdentity>
     ): Flow<FaceMatchResult> {
-        Simber.tag(FACE_MATCHING.name).i("Matching probe against candidates")
+        Simber.tag(CrashReportTag.FACE_MATCHING.name).i("Matching probe against candidates")
         matchState.postValue(MatchState.Matching)
         return getConcurrentMatchResultsForCandidates(probeFaceSamples, candidates)
     }

@@ -1,11 +1,11 @@
 package com.simprints.id.moduleselection
 
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MODULE_IDS
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.logging.Simber
 
 class ModuleRepositoryImpl(

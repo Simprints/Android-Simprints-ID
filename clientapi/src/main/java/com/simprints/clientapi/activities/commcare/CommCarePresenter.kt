@@ -13,7 +13,6 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
@@ -28,6 +27,7 @@ import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

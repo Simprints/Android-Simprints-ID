@@ -3,12 +3,12 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.CAPTURE
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_CAPTURE
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
@@ -70,7 +70,7 @@ class FaceCaptureViewModel(
     }
 
     fun recapture() {
-        Simber.tag(FACE_CAPTURE.name).i("Starting face recapture flow")
+        Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face recapture flow")
         faceDetections = listOf()
         recaptureEvent.send()
     }
@@ -80,11 +80,11 @@ class FaceCaptureViewModel(
     }
 
     private fun startNewAnalyticsSession() {
-        Simber.tag(FACE_CAPTURE.name).i("Starting face capture flow")
+        Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face capture flow")
     }
 
     private fun saveFaceDetections() {
-        Simber.tag(FACE_CAPTURE.name).i("Saving captures to disk")
+        Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Saving captures to disk")
         faceDetections.forEach { saveImage(it, it.id) }
     }
 

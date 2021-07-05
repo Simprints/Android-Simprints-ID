@@ -1,12 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.MODULE_IDS
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.PROJECT_ID
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SESSION_ID
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.SUBJECTS_DOWN_SYNC_TRIGGERS
-import com.simprints.core.analytics.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
@@ -31,6 +25,12 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.PROJECT_ID
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
 import com.simprints.logging.Simber
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -311,13 +311,6 @@ class CheckLoginFromIntentPresenter(
         Simber.tag(FINGERS_SELECTED, true)
             .i(preferencesManager.fingerprintsToCollect.map { it.toString() }.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
-    }
-
-    private suspend fun updateAnalyticsIdInCurrentSession() {
-        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        currentSessionEvent.payload.analyticsId = analyticsManager.getAnalyticsId()
-        eventRepository.addOrUpdateEvent(currentSessionEvent)
-        Simber.d("[CHECK_LOGIN] Updated analytics id in current session")
     }
 
     private fun buildAuthorizationEvent(result: AuthorizationResult) =

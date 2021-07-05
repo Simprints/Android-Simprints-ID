@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
@@ -13,8 +14,6 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.SCANNER_SETUP
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnapshotEvent
@@ -271,11 +270,11 @@ class ConnectScannerViewModel(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(SCANNER_SETUP.name).i(message)
+        Simber.tag(CrashReportTag.SCANNER_SETUP.name).i(message)
     }
 
     fun logScannerErrorDialogShownToCrashReport() {
-        Simber.tag(FingerprintCrashReportTag.ALERT.name).i("Scanner error confirm dialog shown")
+        Simber.tag(CrashReportTag.ALERT.name).i("Scanner error confirm dialog shown")
     }
 
     override fun onCleared() {
