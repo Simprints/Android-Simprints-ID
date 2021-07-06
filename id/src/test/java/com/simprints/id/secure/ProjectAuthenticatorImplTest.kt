@@ -112,7 +112,7 @@ class ProjectAuthenticatorImplTest {
     private fun mockManagers() {
         coEvery { authenticationDataManagerMock.requestAuthenticationData(any(), any()) } returns AuthenticationData(Nonce(""), PublicKeyString(""))
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
-        coEvery { authManagerMock.requestAuthToken(any()) } returns Token("")
+        coEvery { authManagerMock.requestAuthToken(any()) } returns Token("", "", "", "")
         coEvery { projectRemoteDataSourceMock.loadProjectRemoteConfigSettingsJsonString(any()) } returns mockk()
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
         every { attestationManagerMock.requestAttestation(any(), any()) } returns AttestToken("google_attestation")
