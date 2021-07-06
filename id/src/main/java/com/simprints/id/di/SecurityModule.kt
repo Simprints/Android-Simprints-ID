@@ -67,7 +67,6 @@ open class SecurityModule {
         syncManager,
         securityStateScheduler,
         longConsentRepository,
-        eventRepository,
         baseUrlProvider,
         remoteConfigWrapper
     )

@@ -1,19 +1,19 @@
 package com.simprints.id.secure
 
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -24,21 +24,35 @@ import org.junit.Test
 
 class SignerManagerImplTest {
 
-    @MockK lateinit var mockProjectRepository: ProjectRepository
-    @MockK lateinit var mockRemoteDbManager: RemoteDbManager
-    @MockK lateinit var mockLoginInfoManager: LoginInfoManager
-    @MockK lateinit var mockPreferencesManager: PreferencesManager
-    @MockK lateinit var mockSyncManager: SyncManager
-    @MockK lateinit var mockEventSyncManager: EventSyncManager
-    @MockK lateinit var mockSecurityStateScheduler: SecurityStateScheduler
-    @MockK lateinit var mockLongConsentRepository: LongConsentRepository
-    @MockK lateinit var mockEventRepository: com.simprints.eventsystem.event.EventRepository
-    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
-    @MockK lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
+    @MockK
+    lateinit var mockProjectRepository: ProjectRepository
+    @MockK
+    lateinit var mockRemoteDbManager: RemoteDbManager
+    @MockK
+    lateinit var mockLoginInfoManager: LoginInfoManager
+    @MockK
+    lateinit var mockPreferencesManager: PreferencesManager
+    @MockK
+    lateinit var mockSyncManager: SyncManager
+    @MockK
+    lateinit var mockEventSyncManager: EventSyncManager
+    @MockK
+    lateinit var mockSecurityStateScheduler: SecurityStateScheduler
+    @MockK
+    lateinit var mockLongConsentRepository: LongConsentRepository
+    @MockK
+    lateinit var mockBaseUrlProvider: BaseUrlProvider
+    @MockK
+    lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
 
     private lateinit var signerManager: SignerManagerImpl
 
-    private val token = Token("some_token")
+    private val token = Token(
+        "some_token",
+        "some_project_id",
+        "some_api_key",
+        "some_application_id"
+    )
 
     @Before
     fun setup() {
@@ -53,7 +67,6 @@ class SignerManagerImplTest {
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
-            mockEventRepository,
             mockBaseUrlProvider,
             mockRemoteConfigWrapper
         )
@@ -67,7 +80,7 @@ class SignerManagerImplTest {
 
         signIn()
 
-        coVerify { mockRemoteDbManager.signIn(token.value) }
+        coVerify { mockRemoteDbManager.signIn(token) }
     }
 
     @Test
@@ -213,7 +226,7 @@ class SignerManagerImplTest {
         }
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
-        coEvery { mockRemoteDbManager.signIn(token.value) }.apply {
+        coEvery { mockRemoteDbManager.signIn(token) }.apply {
             if (error) {
                 this.throws(Throwable("Failed to store credentials"))
             } else {
@@ -248,8 +261,11 @@ class SignerManagerImplTest {
         }
 
     private fun verifyUpSyncGotPaused() = verify { mockSyncManager.cancelBackgroundSyncs() }
-    private fun verifyStoredCredentialsGotCleaned() = verify { mockLoginInfoManager.cleanCredentials() }
+    private fun verifyStoredCredentialsGotCleaned() =
+        verify { mockLoginInfoManager.cleanCredentials() }
+
     private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
-    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
+    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() =
+        verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 }
