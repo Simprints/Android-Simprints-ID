@@ -10,7 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
+import com.simprints.id.domain.SyncDestinationSetting.COSYNCCALLINGAPP
 import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
@@ -167,7 +167,7 @@ class EventSyncMasterWorkerTest {
     fun doWork_cantSyncSimprints() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
-        mockSyncDestinationSetting(COMMCARE)
+        mockSyncDestinationSetting(COSYNCCALLINGAPP)
 
         masterWorker.doWork()
 

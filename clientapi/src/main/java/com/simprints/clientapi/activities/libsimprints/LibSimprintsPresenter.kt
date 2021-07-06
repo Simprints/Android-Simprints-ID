@@ -199,7 +199,7 @@ class LibSimprintsPresenter(
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COSYNCCALLINGAPP)) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(GenericCoSyncEvents(events))
         } else {
@@ -207,7 +207,7 @@ class LibSimprintsPresenter(
         }
 
     private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
+        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COSYNCCALLINGAPP)) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -246,7 +246,7 @@ class LibSimprintsPresenter(
      * Delete the events if returning to a cosync project but not Simprints
      */
     private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COSYNCCALLINGAPP) &&
             !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
         ) {
             sessionEventsManager.deleteSessionEvents(sessionId)
