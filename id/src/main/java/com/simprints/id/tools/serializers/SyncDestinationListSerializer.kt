@@ -12,7 +12,7 @@ class SyncDestinationListSerializer : Serializer<List<SyncDestinationSetting>> {
             .filter { it.isNotEmpty() }
             .mapNotNull {
                 when (it) {
-                    COMMCARE -> SyncDestinationSetting.COMMCARE
+                    COSYNCCALLINGAPP -> SyncDestinationSetting.COSYNCCALLINGAPP
                     SIMPRINTS -> SyncDestinationSetting.SIMPRINTS
                     else -> null
                 }
@@ -20,7 +20,7 @@ class SyncDestinationListSerializer : Serializer<List<SyncDestinationSetting>> {
 
     companion object {
         private const val separator = ","
-        private const val COMMCARE = "COMMCARE"
+        private const val COSYNCCALLINGAPP = "COMMCARE"
         private const val SIMPRINTS = "SIMPRINTS"
     }
 }
