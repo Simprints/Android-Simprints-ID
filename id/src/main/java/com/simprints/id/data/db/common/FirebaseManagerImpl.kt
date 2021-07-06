@@ -31,10 +31,10 @@ open class FirebaseManagerImpl(
         clearCachedTokenClaims()
 
         try {
+            getCoreAuth().signOut()
             // On legacy projects they may not have a separate Core Firebase Project, so we try to
             // log out on both just in case.
-            getCoreAuth().signOut()
-            FirebaseAuth.getInstance().signOut()
+            getLegacyAuth().signOut()
         } catch (ex: Exception) {
             Timber.d(ex)
         }
@@ -56,8 +56,10 @@ open class FirebaseManagerImpl(
         withContext(Dispatchers.IO) {
             val result = try {
                 getCoreAuth().getAccessToken(false).awaitTask()
-            } catch (ex: Exception) {
-                FirebaseAuth.getInstance().getAccessToken(false).awaitTask()
+            } catch (ex: IllegalStateException) {
+                // Projects that were signed in and then updated to 2021.2.0 need to check the
+                // previous Firebase project until they login again.
+                getLegacyAuth().getAccessToken(false).awaitTask()
             }
 
             result.token?.let {
@@ -93,6 +95,12 @@ open class FirebaseManagerImpl(
     }
 
     private fun getCoreAuth() = FirebaseAuth.getInstance(Firebase.app(CORE_BACKEND_PROJECT))
+
+    @Deprecated(
+        message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
+        replaceWith = ReplaceWith("getCoreAuth()")
+    )
+    private fun getLegacyAuth() = FirebaseAuth.getInstance()
 
     companion object {
         private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
