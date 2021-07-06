@@ -14,7 +14,6 @@ class SyncDestinationListSerializer : Serializer<List<SyncDestinationSetting>> {
                 when (it) {
                     COMMCARE -> SyncDestinationSetting.COMMCARE
                     SIMPRINTS -> SyncDestinationSetting.SIMPRINTS
-                    COSYNC -> SyncDestinationSetting.COSYNC
                     else -> null
                 }
             }
@@ -23,6 +22,5 @@ class SyncDestinationListSerializer : Serializer<List<SyncDestinationSetting>> {
         private const val separator = ","
         private const val COMMCARE = "COMMCARE"
         private const val SIMPRINTS = "SIMPRINTS"
-        private const val COSYNC = "COSYNC"
     }
 }

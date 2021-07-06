@@ -18,19 +18,9 @@ class SyncDestinationListSerializerTest {
     }
 
     @Test
-    fun `serializing a list - cosync item`() {
-        val destinationList = listOf(SyncDestinationSetting.COSYNC)
-        val expectedString = "COSYNC"
-
-        val serializedDestinations = syncDestinationListSerializer.serialize(destinationList)
-
-        assertThat(serializedDestinations).isEqualTo(expectedString)
-    }
-
-    @Test
     fun `serializing a list - three items`() {
-        val destinationList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS, SyncDestinationSetting.COSYNC)
-        val expectedString = "COMMCARE,SIMPRINTS,COSYNC"
+        val destinationList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
+        val expectedString = "COMMCARE,SIMPRINTS"
 
         val serializedDestinations = syncDestinationListSerializer.serialize(destinationList)
 
@@ -47,18 +37,9 @@ class SyncDestinationListSerializerTest {
     }
 
     @Test
-    fun `deserializing a list - cosync item`() {
-        val destinationString = "COSYNC"
-        val expectedList = listOf(SyncDestinationSetting.COSYNC)
-
-        val deserializedDestinations = syncDestinationListSerializer.deserialize(destinationString)
-        assertThat(deserializedDestinations).isEqualTo(expectedList)
-    }
-
-    @Test
     fun `deserializing a list - three items`() {
-        val destinationString = "COMMCARE,SIMPRINTS, COSYNC"
-        val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS, SyncDestinationSetting.COSYNC)
+        val destinationString = "COMMCARE,SIMPRINTS"
+        val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
 
         val deserializedDestinations = syncDestinationListSerializer.deserialize(destinationString)
         assertThat(deserializedDestinations).isEqualTo(expectedList)
@@ -67,10 +48,9 @@ class SyncDestinationListSerializerTest {
     @Test
     fun `deserializing a list - bad format`() {
         val destinationString = """     COMMCARE   ,
-                        SIMPRINTS,
-                        COSYNC
+                        SIMPRINTS
             """
-        val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS, SyncDestinationSetting.COSYNC)
+        val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
 
         val deserializedDestinations = syncDestinationListSerializer.deserialize(destinationString)
         assertThat(deserializedDestinations).isEqualTo(expectedList)
@@ -79,7 +59,7 @@ class SyncDestinationListSerializerTest {
     @Test
     fun `deserializing a list - inexistent option`() {
         val destinationString = "COMMCARE, DHIS2, COSYNC, SIMPRINTS 2, SIMPRINTS"
-        val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.COSYNC, SyncDestinationSetting.SIMPRINTS)
+        val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
 
         val deserializedDestinations = syncDestinationListSerializer.deserialize(destinationString)
         assertThat(deserializedDestinations).isEqualTo(expectedList)
