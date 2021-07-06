@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.common
 
 import android.content.Context
+import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.app
 import com.google.firebase.ktx.initialize
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
@@ -23,18 +23,18 @@ open class FirebaseManagerImpl(
     override suspend fun signIn(token: Token) {
         cacheTokenClaims(token.value)
         initializeCoreProject(token)
-        val result = getCoreAuth().signInWithCustomToken(token.value).awaitTask()
-        Timber.d(result.user?.uid)
+        val result =
+            FirebaseAuth.getInstance(getCoreApp()).signInWithCustomToken(token.value).awaitTask()
+        Timber.d("Signed in with: ${result.user?.uid}")
     }
 
     override fun signOut() {
         clearCachedTokenClaims()
 
         try {
-            getCoreAuth().signOut()
             // On legacy projects they may not have a separate Core Firebase Project, so we try to
             // log out on both just in case.
-            getLegacyAuth().signOut()
+            FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
         } catch (ex: Exception) {
             Timber.d(ex)
         }
@@ -54,13 +54,10 @@ open class FirebaseManagerImpl(
 
     override suspend fun getCurrentToken(): String =
         withContext(Dispatchers.IO) {
-            val result = try {
-                getCoreAuth().getAccessToken(false).awaitTask()
-            } catch (ex: IllegalStateException) {
-                // Projects that were signed in and then updated to 2021.2.0 need to check the
-                // previous Firebase project until they login again.
-                getLegacyAuth().getAccessToken(false).awaitTask()
-            }
+            // Projects that were signed in and then updated to 2021.2.0 need to check the
+            // previous Firebase project until they login again.
+            val result =
+                FirebaseAuth.getInstance(getLegacyAppFallback()).getAccessToken(false).awaitTask()
 
             result.token?.let {
                 cacheTokenClaims(it)
@@ -94,18 +91,31 @@ open class FirebaseManagerImpl(
         loginInfoManager.clearCachedTokenClaims()
     }
 
-    private fun getCoreAuth() = FirebaseAuth.getInstance(Firebase.app(CORE_BACKEND_PROJECT))
-
-    @Deprecated(
-        message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
-        replaceWith = ReplaceWith("getCoreAuth()")
-    )
-    private fun getLegacyAuth() = FirebaseAuth.getInstance()
-
     companion object {
         private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
         private const val TOKEN_USER_ID_CLAIM = "userId"
 
-        const val CORE_BACKEND_PROJECT = "coreBackendFirebaseProject"
+        private const val CORE_BACKEND_PROJECT = "coreBackendFirebaseProject"
+
+        /**
+         * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only
+         * initialized once the client has logged in.
+         * @see signIn
+         * @return FirebaseApp
+         * @throws IllegalStateException if not initialized
+         */
+        fun getCoreApp() = FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
+
+        @Deprecated(
+            message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
+            replaceWith = ReplaceWith("getCoreApp()")
+        )
+        fun getLegacyAppFallback() = try {
+            getCoreApp()
+        } catch (ex: IllegalStateException) {
+            // CORE_BACKEND_PROJECT doesn't exist
+            FirebaseApp.getInstance()
+        }
+
     }
 }
