@@ -23,7 +23,7 @@ open class FirebaseManagerImpl(
     override suspend fun signIn(token: Token) {
         cacheTokenClaims(token.value)
         initializeCoreProject(token)
-        val result = getFirebaseAuth().signInWithCustomToken(token.value).awaitTask()
+        val result = getCoreAuth().signInWithCustomToken(token.value).awaitTask()
         Timber.d(result.user?.uid)
     }
 
@@ -31,9 +31,9 @@ open class FirebaseManagerImpl(
         clearCachedTokenClaims()
 
         try {
-            // On legacy project they may not have a separate Core Firebase Project, so we try to
+            // On legacy projects they may not have a separate Core Firebase Project, so we try to
             // log out on both just in case.
-            getFirebaseAuth().signOut()
+            getCoreAuth().signOut()
             FirebaseAuth.getInstance().signOut()
         } catch (ex: Exception) {
             Timber.d(ex)
@@ -54,7 +54,12 @@ open class FirebaseManagerImpl(
 
     override suspend fun getCurrentToken(): String =
         withContext(Dispatchers.IO) {
-            val result = getFirebaseAuth().getAccessToken(false).awaitTask()
+            val result = try {
+                getCoreAuth().getAccessToken(false).awaitTask()
+            } catch (ex: Exception) {
+                FirebaseAuth.getInstance().getAccessToken(false).awaitTask()
+            }
+
             result.token?.let {
                 cacheTokenClaims(it)
                 it
@@ -87,7 +92,7 @@ open class FirebaseManagerImpl(
         loginInfoManager.clearCachedTokenClaims()
     }
 
-    private fun getFirebaseAuth() = FirebaseAuth.getInstance(Firebase.app(CORE_BACKEND_PROJECT))
+    private fun getCoreAuth() = FirebaseAuth.getInstance(Firebase.app(CORE_BACKEND_PROJECT))
 
     companion object {
         private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
