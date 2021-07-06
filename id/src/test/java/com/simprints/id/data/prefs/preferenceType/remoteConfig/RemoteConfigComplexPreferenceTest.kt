@@ -33,12 +33,6 @@ class RemoteConfigComplexPreferenceTest {
     }
 
     @Test
-    fun `return correct value of cosync`() {
-        every { prefs.getPrimitive(enumClass.name, "SIMPRINTS") } returns "COSYNC"
-        Truth.assertThat(syncLocationSetting).isEqualTo(SyncDestinationSetting.COSYNC)
-    }
-
-    @Test
     fun `return default value if deserialization fails`() {
         every { prefs.getPrimitive(enumClass.name, "SIMPRINTS") } returns "UNKNOWN"
         Truth.assertThat(syncLocationSetting).isEqualTo(SyncDestinationSetting.SIMPRINTS)
