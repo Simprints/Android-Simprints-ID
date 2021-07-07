@@ -32,6 +32,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Constants
@@ -215,7 +216,11 @@ class CommCarePresenter(
                 )
             )
                 .firstOrNull()
-                ?.fromSubjectToEnrolmentCreationEvent()
+                ?.fromSubjectToEnrolmentCreationEvent(
+                    now = timeHelper.now(),
+                    modalities = sharedPreferencesManager.modalities,
+                    encoder = encoder
+                )
                 ?: return null
 
         return jsonHelper.toJson(CommCareEvents(listOf(recordCreationEvent)))
@@ -244,22 +249,6 @@ class CommCarePresenter(
 
     private fun getProjectIdFromRequest() =
         view.extras?.get(Constants.SIMPRINTS_PROJECT_ID) as String
-
-    private fun Subject.fromSubjectToEnrolmentCreationEvent(): EnrolmentRecordCreationEvent {
-        return EnrolmentRecordCreationEvent(
-            timeHelper.now(),
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            sharedPreferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(
-                fingerprintSamples,
-                faceSamples,
-                encoder
-            )
-        )
-    }
 
     @Keep
     private data class CommCareEvents(val events: List<Event>)
