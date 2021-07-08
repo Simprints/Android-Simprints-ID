@@ -146,7 +146,7 @@ dependencies {
     testImplementation(Dependencies.Testing.Espresso.contrib)
 
     // Kotlin
-    testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.KoTest.kotlin)
     testImplementation(Dependencies.Testing.coroutines_test)
 
     // Mocking and assertion frameworks

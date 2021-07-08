@@ -85,7 +85,7 @@ dependencies {
     testImplementation(Dependencies.Testing.AndroidX.core)
     testImplementation(Dependencies.Testing.AndroidX.ext_junit)
     testImplementation(Dependencies.Testing.Mockk.core)
-    testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.KoTest.kotlin)
 
     testImplementation(Dependencies.Testing.Espresso.intents)
     testImplementation(Dependencies.Koin.core_ext)

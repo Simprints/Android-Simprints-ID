@@ -34,7 +34,7 @@ dependencies {
     implementation(Dependencies.AndroidX.Annotation.annotation)
 
     // Logging
-    api(project(":logging"))
+    implementation(project(":logging"))
 
     // RxJava
     api(Dependencies.RxJava2.core)
