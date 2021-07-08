@@ -122,7 +122,6 @@ object Dependencies {
     }
 
     object Firebase {
-        const val analytics = "com.google.firebase:firebase-analytics-ktx:18.0.3"
         const val auth = "com.google.firebase:firebase-auth:19.2.0"
         const val config = "com.google.firebase:firebase-config:19.1.3"
         const val perf = "com.google.firebase:firebase-perf:19.0.5"

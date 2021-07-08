@@ -25,13 +25,7 @@ open class FirebaseManagerImpl(
         initializeCoreProject(token)
         val result =
             FirebaseAuth.getInstance(getCoreApp()).signInWithCustomToken(token.value).awaitTask()
-        Timber.d("Signed in with: ${result.user?.uid}")
-    }
-
-    override suspend fun signIn(token: String) {
-        cacheTokenClaims(token)
-        val result = firebaseAuth.signInWithCustomToken(token).awaitTask()
-        result.user?.uid?.let { Simber.d(it) }
+        Simber.d("Signed in with: ${result.user?.uid}")
     }
 
     override fun signOut() {

@@ -18,15 +18,11 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":core"))
-
-    implementation(Dependencies.AndroidX.core)
-    implementation(Dependencies.AndroidX.appcompat)
 
     // We specifically don't include Crashlytics, Analytics and Timber in the central buildSrc
     // module because we do not want or expect these dependencies to be used in multiple modules
-    implementation("com.google.firebase:firebase-crashlytics:17.1.1")
-    implementation(Dependencies.Firebase.analytics)
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.1.0")
+    implementation("com.google.firebase:firebase-analytics-ktx:19.0.0")
 
     //4.7.1 breaks realm:
     // https://github.com/realm/realm-java/issues/6153

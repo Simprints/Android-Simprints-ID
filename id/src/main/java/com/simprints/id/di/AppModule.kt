@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
@@ -100,14 +99,6 @@ open class AppModule {
     @Singleton
     open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
         LoginInfoManagerImpl(improvedSharedPreferences)
-
-    @Provides
-    @Singleton
-    @Suppress("MissingPermission")
-    fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
-        FirebaseAnalytics.getInstance(app).apply {
-            this.setSessionTimeoutDuration(0)
-        }
 
     @Provides
     @Singleton

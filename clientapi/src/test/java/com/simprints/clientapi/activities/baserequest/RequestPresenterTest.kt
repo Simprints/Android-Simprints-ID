@@ -75,32 +75,6 @@ class RequestPresenterTest {
     }
 
     @Test
-    fun withRootedDevice_shouldLogException() = runBlockingTest {
-        val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
-        val exception = RootedDeviceException()
-        every { mockDeviceManager.checkIfDeviceIsRooted() } throws exception
-        val presSpy = spyk(ImplRequestPresenter(
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockDeviceManager
-        ))
-        val presenter = ImplRequestPresenter(
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockDeviceManager
-        )
-
-        val mockPresenter = mockk<RequestPresenter>(relaxed = true)
-        mockPresenter.start()
-
-        presenter.start()
-
-        verify(exactly = 1) {
-            presSpy
-        }
-    }
-
-    @Test
     fun withRootedDevice_shouldShowAlertScreen() = runBlockingTest {
         val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
