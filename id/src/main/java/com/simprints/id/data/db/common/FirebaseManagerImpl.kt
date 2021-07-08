@@ -1,29 +1,38 @@
 package com.simprints.id.data.db.common
 
+import android.content.Context
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
+import com.simprints.id.secure.models.Token
 import com.simprints.id.tools.extensions.awaitTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteDbManager {
+open class FirebaseManagerImpl(
+    val loginInfoManager: LoginInfoManager,
+    val context: Context
+) : RemoteDbManager {
 
-    private val firebaseAuth: FirebaseAuth by lazy {
-        FirebaseAuth.getInstance()
-    }
-
-    override suspend fun signIn(token: String) {
-        cacheTokenClaims(token)
-        val result = firebaseAuth.signInWithCustomToken(token).awaitTask()
-        Timber.d(result.user?.uid)
+    override suspend fun signIn(token: Token) {
+        cacheTokenClaims(token.value)
+        initializeCoreProject(token)
+        val result =
+            FirebaseAuth.getInstance(getCoreApp()).signInWithCustomToken(token.value).awaitTask()
+        Timber.d("Signed in with: ${result.user?.uid}")
     }
 
     override fun signOut() {
         clearCachedTokenClaims()
-        firebaseAuth.signOut()
+            // On legacy projects they may not have a separate Core Firebase Project, so we try to
+            // log out on both just in case.
+        FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
     }
 
     override fun isSignedIn(projectId: String, userId: String): Boolean {
@@ -40,7 +49,11 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
 
     override suspend fun getCurrentToken(): String =
         withContext(Dispatchers.IO) {
-            val result = firebaseAuth.getAccessToken(false).awaitTask()
+            // Projects that were signed in and then updated to 2021.2.0 need to check the
+            // previous Firebase project until they login again.
+            val result =
+                FirebaseAuth.getInstance(getLegacyAppFallback()).getAccessToken(false).awaitTask()
+
             result.token?.let {
                 cacheTokenClaims(it)
                 it
@@ -60,6 +73,15 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
         }
     }
 
+    private fun getFirebaseOptions(token: Token): FirebaseOptions = FirebaseOptions.Builder()
+        .setProjectId(token.projectId)
+        .setApplicationId(token.applicationId)
+        .setApiKey(token.apiKey)
+        .build()
+
+    private fun initializeCoreProject(token: Token) =
+        Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
+
     private fun clearCachedTokenClaims() {
         loginInfoManager.clearCachedTokenClaims()
     }
@@ -67,5 +89,28 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     companion object {
         private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
         private const val TOKEN_USER_ID_CLAIM = "userId"
+
+        private const val CORE_BACKEND_PROJECT = "coreBackendFirebaseProject"
+
+        /**
+         * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only
+         * initialized once the client has logged in.
+         * @see signIn
+         * @return FirebaseApp
+         * @throws IllegalStateException if not initialized
+         */
+        fun getCoreApp() = FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
+
+        @Deprecated(
+            message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
+            replaceWith = ReplaceWith("getCoreApp()")
+        )
+        fun getLegacyAppFallback() = try {
+            getCoreApp()
+        } catch (ex: IllegalStateException) {
+            // CORE_BACKEND_PROJECT doesn't exist
+            FirebaseApp.getInstance()
+        }
+
     }
 }
