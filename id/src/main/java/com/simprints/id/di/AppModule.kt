@@ -91,8 +91,10 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
-        FirebaseManagerImpl(loginInfoManager)
+    open fun provideRemoteDbManager(
+        loginInfoManager: LoginInfoManager,
+        context: Context
+    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
 
     @Provides
     @Singleton
