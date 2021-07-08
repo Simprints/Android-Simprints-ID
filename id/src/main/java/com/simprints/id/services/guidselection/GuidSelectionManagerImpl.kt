@@ -4,7 +4,6 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.tools.ignoreException
@@ -12,7 +11,6 @@ import com.simprints.logging.Simber
 
 class GuidSelectionManagerImpl(val deviceId: String,
                                val loginInfoManager: LoginInfoManager,
-                               val analyticsManager: AnalyticsManager,
                                private val timerHelper: TimeHelper,
                                val eventRepository: com.simprints.eventsystem.event.EventRepository
 ) : GuidSelectionManager {
@@ -21,10 +19,8 @@ class GuidSelectionManagerImpl(val deviceId: String,
         try {
             checkRequest(request)
             saveGuidSelectionEvent(request)
-            reportToAnalytics(request, true)
         } catch (t: Throwable) {
             Simber.e(t)
-            reportToAnalytics(request, false)
         }
     }
 
@@ -37,13 +33,4 @@ class GuidSelectionManagerImpl(val deviceId: String,
             val event = GuidSelectionEvent(timerHelper.now(), request.selectedGuid)
             inBackground { eventRepository.addOrUpdateEvent(event) }
         }
-
-
-    private fun reportToAnalytics(request: GuidSelectionRequest, callbackSent: Boolean) =
-        analyticsManager.logGuidSelectionWorker(
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            request.sessionId,
-            deviceId,
-            request.selectedGuid,
-            callbackSent)
 }

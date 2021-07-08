@@ -29,8 +29,6 @@ import com.simprints.id.Application
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -119,14 +117,6 @@ open class AppModule {
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
-
-    @Provides
-    @Singleton
-    open fun provideAnalyticsManager(
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        firebaseAnalytics: FirebaseAnalytics
-    ): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, firebaseAnalytics)
 
     @Provides
     @Singleton
@@ -262,14 +252,12 @@ open class AppModule {
     open fun provideGuidSelectionManager(
         context: Context,
         loginInfoManager: LoginInfoManager,
-        analyticsManager: AnalyticsManager,
         timeHelper: TimeHelper,
         eventRepository: EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
             loginInfoManager,
-            analyticsManager,
             timeHelper,
             eventRepository
         )

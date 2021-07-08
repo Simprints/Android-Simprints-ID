@@ -13,7 +13,6 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnapshotEvent
@@ -26,6 +25,8 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
+import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
 import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -37,7 +38,6 @@ class ConnectScannerViewModel(
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val preferencesManager: FingerprintPreferencesManager,
-    private val analyticsManager: FingerprintAnalyticsManager,
     private val nfcManager: NfcManager
 ) : ViewModel() {
 
@@ -204,10 +204,10 @@ class ConnectScannerViewModel(
         preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
         preferencesManager.lastScannerVersion =
             scannerManager.scanner?.versionInformation()?.computeMasterVersion().toString()
-        analyticsManager.logScannerProperties(
-            scannerManager.currentMacAddress ?: "",
-            scannerManager.currentScannerId ?: ""
-        )
+
+        Simber.tag(MAC_ADDRESS, true).i(scannerManager.currentMacAddress ?: "")
+        Simber.tag(SCANNER_ID, true).i(scannerManager.currentScannerId ?: "")
+
         scannerConnected.postEvent(true)
     }
 

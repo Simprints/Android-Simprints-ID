@@ -19,8 +19,6 @@ import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.activities.refusal.RefusalContract
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -122,7 +120,6 @@ object KoinInjector {
      */
     private fun Module.defineBuildersForFingerprintManagers() {
         single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
-        factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
@@ -190,7 +187,7 @@ object KoinInjector {
         single<EncodingUtils> { EncodingUtilsImpl }
 
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
                 get(),

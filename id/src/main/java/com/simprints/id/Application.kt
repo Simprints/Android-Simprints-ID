@@ -95,7 +95,6 @@ open class Application : CoreApplication() {
 
     private fun Module.defineBuildersForCoreManagers() {
         factory { component.getPreferencesManager() }
-        factory { component.getAnalyticsManager() }
         factory { component.getSessionEventsManager() }
         factory { component.getTimeHelper() }
         factory { component.getFingerprintRecordLocalDataSource() }

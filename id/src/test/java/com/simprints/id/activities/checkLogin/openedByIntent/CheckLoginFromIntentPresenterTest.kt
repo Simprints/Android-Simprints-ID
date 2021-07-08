@@ -26,7 +26,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -69,9 +68,6 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var remoteConfigFetcherMock: RemoteConfigFetcher
 
     @MockK
-    lateinit var analyticsManagerMock: AnalyticsManager
-
-    @MockK
     lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
 
     @MockK
@@ -104,7 +100,6 @@ class CheckLoginFromIntentPresenterTest {
             testCoroutineRule.testCoroutineDispatcher
         ).apply {
             remoteConfigFetcher = remoteConfigFetcherMock
-            analyticsManager = analyticsManagerMock
             subjectLocalDataSource = subjectLocalDataSourceMock
             coEvery { subjectLocalDataSource.count(any()) } returns 0
 
@@ -119,7 +114,6 @@ class CheckLoginFromIntentPresenterTest {
             preferencesManager = preferencesManagerMock.apply {
                 every { language } returns "EN"
             }
-            analyticsManager = analyticsManagerMock
             eventRepository = eventRepositoryMock
             timeHelper = timeHelperMock
             coEvery { timeHelper.now() } returns CREATED_AT
@@ -127,7 +121,6 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
             coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
-            coEvery { analyticsManager.getAnalyticsId() } returns GUID1
             securityStateRepository = securityStateRepositoryMock
             val channel = Channel<Status>(capacity = Channel.UNLIMITED)
             coEvery { securityStateRepositoryMock.securityStatusChannel } returns channel
@@ -153,57 +146,6 @@ class CheckLoginFromIntentPresenterTest {
             presenter.setup()
 
             coVerify(exactly = 1) { view.parseRequest() }
-        }
-    }
-
-    @Test
-    fun presenter_setupIsCalledWithAMainFlow_shouldExtractParamsForAnalyticsManager() {
-        runBlockingTest {
-            val appRequest = AppEnrolRequest(
-                DEFAULT_PROJECT_ID,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                DEFAULT_METADATA
-            )
-            every { view.parseRequest() } returns appRequest
-
-            presenter.setup()
-
-            coVerify(exactly = 1) { analyticsManagerMock.logCallout(appRequest) }
-            coVerify(exactly = 1) {
-                analyticsManagerMock.logUserProperties(
-                    DEFAULT_USER_ID,
-                    DEFAULT_PROJECT_ID,
-                    DEFAULT_MODULE_ID,
-                    DEFAULT_DEVICE_ID
-                )
-            }
-        }
-    }
-
-    @Test
-    fun presenter_setupIsCalledWithAFollowUpRequest_shouldNotExtractParamsForAnalyticsManager() {
-        runBlockingTest {
-            val appRequest = AppEnrolLastBiometricsRequest(
-                DEFAULT_PROJECT_ID,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                DEFAULT_METADATA,
-                GUID1
-            )
-            every { view.parseRequest() } returns appRequest
-
-            presenter.setup()
-
-            coVerify(exactly = 0) { analyticsManagerMock.logCallout(any()) }
-            coVerify(exactly = 0) {
-                analyticsManagerMock.logUserProperties(
-                    any(),
-                    any(),
-                    any(),
-                    any()
-                )
-            }
         }
     }
 

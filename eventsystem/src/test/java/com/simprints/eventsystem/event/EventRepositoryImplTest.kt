@@ -3,12 +3,10 @@
 package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
@@ -25,12 +23,9 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
+import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import io.kotlintest.shouldThrow
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.verify
-import io.mockk.coVerify
-import io.mockk.MockKAnnotations
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
@@ -55,9 +50,6 @@ class EventRepositoryImplTest {
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
-
-    @MockK
-    lateinit var crashReportManager: CrashReportManager
 
     @MockK
     lateinit var timeHelper: TimeHelper

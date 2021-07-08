@@ -25,6 +25,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
+import com.simprints.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.PROJECT_ID
@@ -191,8 +192,10 @@ class CheckLoginFromIntentPresenter(
     private fun extractSessionParametersForAnalyticsManager() =
         with(appRequest) {
             if (this is AppRequestFlow) {
-                analyticsManager.logCallout(this)
-                analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+                Simber.tag(AnalyticsUserProperties.USER_ID,true).i(userId)
+                Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
+                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId)
+                Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
             }
         }
 
