@@ -129,7 +129,6 @@ object Dependencies {
         const val storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
         const val mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
         const val mlkit_barcode = "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
-        const val crashlytics = "com.google.firebase:firebase-crashlytics:17.1.1"
     }
 
     object Retrofit {
@@ -143,13 +142,6 @@ object Dependencies {
 
     object Jackson {
         const val core = "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
-    }
-
-    object Timber {
-        const val core = "com.jakewharton.timber:timber:4.5.1"
-        //4.7.1 breaks realm:
-        // https://github.com/realm/realm-java/issues/6153
-        // https://github.com/JakeWharton/timber/issues/295
     }
 
     object RxJava2 {

@@ -35,7 +35,6 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
@@ -144,7 +143,6 @@ interface AppComponent {
     fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getIdPreferencesManager(): IdPreferencesManager
-    fun getAnalyticsManager(): AnalyticsManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getImageRepository(): ImageRepository

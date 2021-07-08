@@ -4,7 +4,6 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppComponent
@@ -26,7 +25,6 @@ abstract class CheckLoginPresenter(
 
     @Inject lateinit var preferencesManager: IdPreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider

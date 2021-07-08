@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -47,7 +46,6 @@ class ConnectScannerViewModelTest : KoinTest {
     val rule = InstantTaskExecutorRule()
 
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
     private val pairingManager: ScannerPairingManager = mockk()
@@ -61,7 +59,6 @@ class ConnectScannerViewModelTest : KoinTest {
         val mockModule = module(override = true) {
             factory { mockk<FingerprintTimeHelper>(relaxed = true) }
             factory { sessionEventsManager }
-            factory { fingerprintAnalyticsManager }
             factory { preferencesManager }
             factory { bluetoothAdapter }
             factory { pairingManager }
@@ -128,7 +125,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
         assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
-        verify { fingerprintAnalyticsManager.logScannerProperties(any(), any()) }
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
@@ -147,7 +143,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
         assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
-        verify { fingerprintAnalyticsManager.logScannerProperties(any(), any()) }
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
