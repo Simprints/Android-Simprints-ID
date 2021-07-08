@@ -64,7 +64,6 @@ dependencies {
     testImplementation(Dependencies.Testing.AndroidX.room)
     testImplementation(Dependencies.Testing.Robolectric.multidex)
     testImplementation(project(":testtools"))
-    testImplementation(project(":logging"))
     androidTestImplementation(project(":testtools"))
     testImplementation(Dependencies.Testing.kotlin)
     testImplementation(Dependencies.Testing.truth)
