@@ -7,6 +7,7 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
 import com.simprints.logging.Simber
+import com.simprints.logging.SimberBuilder
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -63,6 +64,7 @@ open class Application : CoreApplication() {
         createComponent()
         handleUndeliverableExceptionInRxJava()
         initKoin()
+        SimberBuilder.initialize(this)
     }
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
