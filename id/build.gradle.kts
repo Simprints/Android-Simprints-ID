@@ -172,7 +172,6 @@ dependencies {
     implementation(Dependencies.Rootbeer.core)
 
     // Firebase
-    api(Dependencies.Firebase.analytics)
     implementation(Dependencies.Firebase.auth)
     implementation(Dependencies.Firebase.config)
     implementation(Dependencies.Firebase.perf)

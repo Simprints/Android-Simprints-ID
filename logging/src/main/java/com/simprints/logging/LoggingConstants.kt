@@ -2,6 +2,12 @@ package com.simprints.logging
 
 object LoggingConstants {
 
+    /**
+     * These keys have been separate into two groups of constants because of legacy reasons.
+     * They used to be captured in two separate managers, and in order not to break the backwards
+     * compatibility of Analytics and Crashlytics we have kept the original keys. These can be
+     * merged into a single set a keys on the next Firebase overhaul.
+     */
     object CrashReportingCustomKeys {
         const val PROJECT_ID = "Project ID"
         const val USER_ID = "User ID"
@@ -9,7 +15,6 @@ object LoggingConstants {
         const val SUBJECTS_DOWN_SYNC_TRIGGERS = "People down sync triggers"
         const val SESSION_ID = "Session ID"
         const val FINGERS_SELECTED = "Fingers selected"
-        const val MALFUNCTION_MESSAGE = "Malfunction report"
     }
 
     object AnalyticsUserProperties {
