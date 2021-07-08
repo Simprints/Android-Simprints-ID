@@ -176,7 +176,11 @@ object Dependencies {
     // Testing
     object Testing {
         const val junit = "junit:junit:4.13"
-        const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
+
+        object KoTest {
+            const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
+            const val kotlin_assert = "io.kotest:kotest-assertions-core:4.6.0"
+        }
 
         object Robolectric {
             const val core = "org.robolectric:robolectric:$robolectric_version"

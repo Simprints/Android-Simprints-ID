@@ -24,7 +24,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -34,7 +34,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.DisplayName
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -235,7 +234,6 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("The repo should throw if sessions for a not signed project are requested to be uploaded")
     fun upload_shouldNotUploadSessionsForNotSignedProject() {
         runBlocking {
             shouldThrow<TryToUploadEventsForNotSignedProject> {

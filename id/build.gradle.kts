@@ -222,7 +222,7 @@ dependencies {
     testImplementation(Dependencies.Testing.Espresso.intents)
     testImplementation(Dependencies.Testing.Espresso.contrib)
     testImplementation(Dependencies.Testing.truth)
-    testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.KoTest.kotlin)
 
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.koin)

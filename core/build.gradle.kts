@@ -63,7 +63,7 @@ dependencies {
     testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.coroutines_test)
-    testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.KoTest.kotlin)
     testImplementation(Dependencies.Testing.Robolectric.core)
     testImplementation(project(":testtools"))
 

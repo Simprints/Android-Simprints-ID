@@ -15,7 +15,6 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-//@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase
