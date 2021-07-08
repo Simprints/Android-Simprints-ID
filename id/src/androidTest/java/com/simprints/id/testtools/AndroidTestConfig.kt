@@ -62,7 +62,6 @@ class AndroidTestConfig<T : Any>(
     }
 
     private fun initModules() = also {
-        app.setUpLogging()
         app.handleUndeliverableExceptionInRxJava()
     }
 
