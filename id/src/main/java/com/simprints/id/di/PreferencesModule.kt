@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.SharedPreferences
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
@@ -35,10 +34,6 @@ import javax.inject.Singleton
 @Module
 @JvmSuppressWildcards(false)
 open class PreferencesModule {
-
-    @Provides
-    @Singleton
-    open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
     @Provides
     @Singleton
