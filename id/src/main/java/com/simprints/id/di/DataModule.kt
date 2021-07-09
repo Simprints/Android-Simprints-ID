@@ -10,6 +10,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.consent.longconsent.*
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
@@ -139,8 +140,8 @@ open class DataModule {
 
     @Provides
     @Singleton
-    open fun provideEventsSyncStatusDatabase(ctx: Context): com.simprints.eventsystem.events_sync.EventSyncStatusDatabase =
-        com.simprints.eventsystem.events_sync.EventSyncStatusDatabase.getDatabase(ctx)
+    open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
+        EventSyncStatusDatabase.getDatabase(ctx)
 
     @Provides
     open fun provideSubjectToEventMigrationManager(

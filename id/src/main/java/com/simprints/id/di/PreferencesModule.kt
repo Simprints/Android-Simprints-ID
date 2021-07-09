@@ -62,8 +62,8 @@ open class PreferencesModule {
     @Provides
     @Singleton
     fun provideRemoteConfigWrapper(
-        remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences
-    ): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
+        prefs: ImprovedSharedPreferences
+    ): RemoteConfigWrapper = RemoteConfigWrapper(prefs)
 
     @Provides
     @Singleton
