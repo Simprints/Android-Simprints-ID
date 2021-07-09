@@ -49,7 +49,7 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
-    fun provideRemoteConfigWrapper(
+    open fun provideRemoteConfigWrapper(
         prefs: ImprovedSharedPreferences
     ): RemoteConfigWrapper = RemoteConfigWrapper(prefs)
 
