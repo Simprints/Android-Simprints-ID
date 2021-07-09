@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
@@ -16,7 +16,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
 import io.mockk.verify
 import org.junit.Assert
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,30 +26,32 @@ import javax.inject.Inject
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SettingsPreferencesManagerTest {
 
-    @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig
-    @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
+    @Inject
+    lateinit var remoteConfigSpy: RemoteConfigWrapper
+
+    @Inject
+    lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private val preferencesModule by lazy {
-        TestPreferencesModule(remoteConfigRule = DependencyRule.SpykRule)
+        // Because of this rule, the injections above are Spyk
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpykRule)
     }
 
     @Before
     fun setup() {
-        UnitTestConfig(this, null, preferencesModule).fullSetup()
-
-        every { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } returns true
+        UnitTestConfig(this, preferencesModule = preferencesModule).fullSetup()
     }
 
     @Test
     fun fetchingRemoteConfigPrimitive_worksAndDoesNotGetOverridden() {
         val originalValue = settingsPreferencesManager.logoExists
-        assertEquals(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT, originalValue)
+        assertThat(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT).isEqualTo(originalValue)
 
         settingsPreferencesManager.logoExists = !originalValue
 
         val newValue = settingsPreferencesManager.logoExists
 
-        assertEquals(originalValue, newValue)
+        assertThat(originalValue).isEqualTo(newValue)
 
         verify(exactly = 2) { remoteConfigSpy.getBoolean(SettingsPreferencesManagerImpl.LOGO_EXISTS_KEY) }
     }
@@ -58,7 +59,7 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingOverridableRemoteConfigPrimitive_worksAndBecomesOverridden() {
         val originalValue = settingsPreferencesManager.language
-        assertEquals(SHARED_PREFS_LANGUAGE_DEFAULT, originalValue)
+        assertThat(SHARED_PREFS_LANGUAGE_DEFAULT).isEqualTo(originalValue)
 
         settingsPreferencesManager.language = SHARED_PREFS_LANGUAGE_DEFAULT + "q"
 
@@ -72,13 +73,13 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingRemoteConfigEnum_worksAndDoesNotGetOverridden() {
         val oldMatchGroup = settingsPreferencesManager.matchGroup
-        assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, oldMatchGroup)
+        assertThat(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT).isEqualTo(oldMatchGroup)
 
         settingsPreferencesManager.matchGroup = GROUP.MODULE
 
         val newMatchGroup = settingsPreferencesManager.matchGroup
 
-        assertEquals(oldMatchGroup, newMatchGroup)
+        assertThat(oldMatchGroup).isEqualTo(newMatchGroup)
 
         verify(exactly = 2) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) }
     }
@@ -89,7 +90,7 @@ class SettingsPreferencesManagerTest {
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
-        assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, matchGroup)
+        assertThat(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT).isEqualTo(matchGroup)
     }
 
     @Test
@@ -98,19 +99,19 @@ class SettingsPreferencesManagerTest {
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
-        assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, matchGroup)
+        assertThat(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT).isEqualTo(matchGroup)
     }
 
     @Test
     fun fetchingOverridableRemoteConfigFingersToCollect_worksAndBecomesOverridden() {
         val oldFingersToCollect = settingsPreferencesManager.fingerprintsToCollect
-        assertEquals(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT, oldFingersToCollect)
+        assertThat(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT).isEqualTo(oldFingersToCollect)
 
         settingsPreferencesManager.fingerprintsToCollect = NON_DEFAULT_FINGERS_TO_COLLECT
 
         val newFingerStatus = settingsPreferencesManager.fingerprintsToCollect
 
-        assertEquals(NON_DEFAULT_FINGERS_TO_COLLECT, newFingerStatus)
+        assertThat(NON_DEFAULT_FINGERS_TO_COLLECT).isEqualTo(newFingerStatus)
 
         verify(exactly = 1) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_KEY) }
     }
@@ -121,12 +122,13 @@ class SettingsPreferencesManagerTest {
 
         val fingerStatus = settingsPreferencesManager.fingerprintsToCollect
 
-        assertEquals(NON_DEFAULT_FINGERS_TO_COLLECT, fingerStatus)
+        assertThat(NON_DEFAULT_FINGERS_TO_COLLECT).isEqualTo(fingerStatus)
     }
 
     companion object {
 
-        private const val NON_DEFAULT_FINGERS_TO_COLLECT_SERIALIZED = "RIGHT_4TH_FINGER,RIGHT_5TH_FINGER,LEFT_THUMB,LEFT_5TH_FINGER"
+        private const val NON_DEFAULT_FINGERS_TO_COLLECT_SERIALIZED =
+            "RIGHT_4TH_FINGER,RIGHT_5TH_FINGER,LEFT_THUMB,LEFT_5TH_FINGER"
         private val NON_DEFAULT_FINGERS_TO_COLLECT = listOf(
             FingerIdentifier.RIGHT_4TH_FINGER,
             FingerIdentifier.RIGHT_5TH_FINGER,
