@@ -13,7 +13,6 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.IdPreferencesManagerImpl
-import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
@@ -40,12 +39,6 @@ open class PreferencesModule {
     @Provides
     @Singleton
     open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-
-    @Provides
-    @Singleton
-    fun provideRemoteConfigFetcher(
-        remoteConfig: FirebaseRemoteConfig
-    ): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
     @Provides
     @Singleton
