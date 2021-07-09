@@ -1,11 +1,10 @@
 package com.simprints.face.controllers.core.image
 
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.images.repository.ImageRepository
-import timber.log.Timber
+import com.simprints.logging.Simber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
@@ -14,13 +13,13 @@ class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
 
     override suspend fun save(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
         determinePath(captureEventId)?.let { path ->
-            Timber.d("Saving face image ${path.compose()}")
+            Simber.d("Saving face image ${path.compose()}")
             val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
 
             return if (securedImageRef != null) {
                 SecuredImageRef(securedImageRef.relativePath.toDomain())
             } else {
-                Timber.e("Saving image failed for captureId $captureEventId")
+                Simber.e("Saving image failed for captureId $captureEventId")
                 null
             }
         }
@@ -35,7 +34,7 @@ class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
                 PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FACES_PATH, "$captureEventId.jpg"
             ))
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             null
         }
 

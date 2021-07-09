@@ -16,9 +16,9 @@ import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestView {
 
@@ -79,7 +79,7 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Timber.d("RequestActivity: onActivityResult")
+        Simber.d("RequestActivity: onActivityResult")
         val isUnsuccessfulResponse = resultCode != Activity.RESULT_OK || data == null
 
         if (isUnsuccessfulResponse)

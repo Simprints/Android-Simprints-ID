@@ -9,11 +9,11 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseState
 import com.simprints.id.data.license.repository.LicenseVendor
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class ConfigurationViewModel(
     private val licenseRepository: LicenseRepository,
@@ -29,7 +29,7 @@ class ConfigurationViewModel(
     }
 
     fun deleteInvalidLicense() {
-        Timber.d("License is invalid, deleting it")
+        Simber.d("License is invalid, deleting it")
         licenseRepository.deleteCachedLicense()
     }
 

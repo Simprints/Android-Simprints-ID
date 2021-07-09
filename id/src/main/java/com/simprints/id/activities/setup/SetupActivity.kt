@@ -13,7 +13,6 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
@@ -37,10 +36,10 @@ import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
@@ -50,7 +49,6 @@ import kotlin.math.min
 class SetupActivity : BaseSplitActivity() {
 
     @Inject lateinit var locationManager: LocationManager
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
     @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
@@ -107,7 +105,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun observeNetworkState() {
         viewModel.getDeviceNetworkLiveData().observe(this, Observer {
-            Timber.d("Setup - Observing network $it")
+            Simber.d("Setup - Observing network $it")
             if (it == DeviceOffline && viewModel.getViewStateLiveData().value != ModalitiesInstalled) {
                 launchAlertIfNecessary()
             }
@@ -138,9 +136,9 @@ class SetupActivity : BaseSplitActivity() {
     private fun collectLocationInBackground() {
         inBackground(Dispatchers.Main) {
             try {
-                storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+                storeUserLocationIntoCurrentSession(locationManager, eventRepository)
             } catch (t: Throwable) {
-                Timber.d(t)
+                Simber.d(t)
             }
         }
     }
@@ -149,7 +147,7 @@ class SetupActivity : BaseSplitActivity() {
         val permissions = extractPermissionsFromRequest(setupRequest)
 
         if (permissions.all { hasPermission(it) }) {
-            Timber.d("All permissions are granted")
+            Simber.d("All permissions are granted")
             performPermissionActionsAndFinish()
         } else {
             requestPermissionsIfRequired(permissions, PERMISSIONS_REQUEST_CODE)
@@ -158,7 +156,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun performPermissionActionsAndFinish() {
         lifecycleScope.launch {
-            Timber.d("Adding location to session")
+            Simber.d("Adding location to session")
             collectLocationInBackground()
             setResultAndFinish(SETUP_COMPLETE_FLAG)
         }

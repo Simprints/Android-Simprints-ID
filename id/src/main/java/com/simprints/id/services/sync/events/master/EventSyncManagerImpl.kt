@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.id.BuildConfig
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventSyncState
@@ -13,9 +11,9 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class EventSyncManagerImpl(private val ctx: Context,
@@ -39,7 +37,7 @@ class EventSyncManagerImpl(private val ctx: Context,
         wm.getAllSubjectsSyncWorkersInfo().get().size > 0
 
     override fun sync() {
-        Timber.tag(SYNC_LOG_TAG).d("[SCHEDULER] One time events master worker")
+        Simber.tag(SYNC_LOG_TAG).d("[SCHEDULER] One time events master worker")
 
         wm.beginUniqueWork(
             MASTER_SYNC_SCHEDULER_ONE_TIME,
@@ -49,7 +47,7 @@ class EventSyncManagerImpl(private val ctx: Context,
     }
 
     override fun scheduleSync() {
-        Timber.tag(SYNC_LOG_TAG).d("[SCHEDULER] Periodic events master worker")
+        Simber.tag(SYNC_LOG_TAG).d("[SCHEDULER] Periodic events master worker")
 
         wm.enqueueUniquePeriodicWork(
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,

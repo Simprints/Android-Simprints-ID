@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
@@ -98,9 +97,8 @@ open class ViewModelModule {
 
     @Provides
     open fun provideFingerSelectionViewModelFactory(
-        preferencesManager: IdPreferencesManager,
-        crashReportManager: CrashReportManager
-    ) = FingerSelectionViewModelFactory(preferencesManager, crashReportManager)
+        preferencesManager: IdPreferencesManager
+    ) = FingerSelectionViewModelFactory(preferencesManager)
 
     @Provides
     open fun providePrivacyNoticeViewModelFactory(
@@ -119,15 +117,12 @@ open class ViewModelModule {
     @ExperimentalCoroutinesApi
     @Provides
     open fun provideSetupViewModelFactory(
-        deviceManager: DeviceManager,
-        crashReportManager: CrashReportManager
-    ) = SetupViewModelFactory(deviceManager, crashReportManager)
+        deviceManager: DeviceManager
+    ) = SetupViewModelFactory(deviceManager)
 
     @Provides
-    open fun provideSettingsPreferenceViewModelFactory(
-        crashReportManager: CrashReportManager
-    ): SettingsPreferenceViewModelFactory {
-        return SettingsPreferenceViewModelFactory(crashReportManager)
+    open fun provideSettingsPreferenceViewModelFactory(): SettingsPreferenceViewModelFactory {
+        return SettingsPreferenceViewModelFactory()
     }
 
     @Provides
@@ -149,16 +144,14 @@ open class ViewModelModule {
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
         preferenceManager: IdPreferencesManager,
-        eventRepository: EventRepository,
-        crashReportManager: CrashReportManager
+        eventRepository: EventRepository
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
             eventRepository,
-            DomainToModuleApiAppResponse,
-            crashReportManager
+            DomainToModuleApiAppResponse
         )
     }
 

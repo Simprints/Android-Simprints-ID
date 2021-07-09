@@ -530,7 +530,6 @@ class CommCareCoSyncPresenterTest {
         subjectRepository,
         mockTimeHelper(),
         mockk(),
-        mockk(),
         coroutineScope
     )
 

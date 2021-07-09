@@ -18,12 +18,12 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
@@ -67,7 +67,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
                 close()
 
             } catch (t: Throwable) {
-                Timber.d(t)
+                Simber.d(t)
 
                 lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                 emitProgress(lastOperation, count)
@@ -103,7 +103,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
         subjectRepository.performActions(actions)
 
-        Timber.tag(SYNC_LOG_TAG).d("[DOWN_SYNC_HELPER] batch processed")
+        Simber.tag(SYNC_LOG_TAG).d("[DOWN_SYNC_HELPER] batch processed")
 
         return if (batchOfEventsToProcess.size > 0) {
             lastOperation.copy(state = RUNNING, lastEventId = batchOfEventsToProcess.last().id, lastSyncTime = timeHelper.now())
@@ -114,7 +114,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
 
 
     private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation, count: Int) {
-        Timber.d("[DOWN_SYNC_HELPER] Emit progress")
+        Simber.d("[DOWN_SYNC_HELPER] Emit progress")
 
         if (!this.isClosedForSend) {
             withContext(Dispatchers.IO) {

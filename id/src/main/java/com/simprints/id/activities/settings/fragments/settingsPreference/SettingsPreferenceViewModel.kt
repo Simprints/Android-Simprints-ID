@@ -1,15 +1,12 @@
 package com.simprints.id.activities.settings.fragments.settingsPreference
 
 import androidx.lifecycle.ViewModel
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
+import com.simprints.logging.Simber
 
-class SettingsPreferenceViewModel(
-    private val crashReportManager: CrashReportManager
-) : ViewModel() {
+class SettingsPreferenceViewModel : ViewModel() {
 
     fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message)
+        Simber.tag(CrashReportTag.SETTINGS.name).i(message)
     }
 }

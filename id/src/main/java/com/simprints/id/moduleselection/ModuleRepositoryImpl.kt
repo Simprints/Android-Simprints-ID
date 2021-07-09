@@ -1,16 +1,15 @@
 package com.simprints.id.moduleselection
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
+import com.simprints.logging.Simber
 
 class ModuleRepositoryImpl(
     val preferencesManager: IdPreferencesManager,
-    val crashReportManager: CrashReportManager,
     private val subjectRepository: SubjectRepository
 ): ModuleRepository {
 
@@ -45,13 +44,11 @@ class ModuleRepositoryImpl(
     }
 
     private fun setCrashlyticsKeyForModules() {
-        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+        Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message
-        )
+        Simber.tag(CrashReportTag.SETTINGS.name).i(message)
     }
 
 }
