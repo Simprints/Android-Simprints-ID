@@ -99,13 +99,3 @@ The wrapper additionally handles the registering of local defaults. This
 means if the remote config defaults are not accessible, then the local
 defaults can be used as fall-back. This can occur if settings have been
 removed online but older versions of the app are still relying on them.
-
-#### Remote Config Fetcher
-
-The [`RemoteConfigFetcher`](./RemoteConfigFetcher.kt) is used to
-schedule a refresh of the remote config values in the remote config SDK.
-There is a cache at play meaning that remote refreshes will not occur
-more often than 12 hours by default.
-
-To force a refresh e.g. for testing purposes, it's sufficient to log out
-and back in.

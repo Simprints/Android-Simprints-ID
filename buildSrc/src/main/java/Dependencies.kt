@@ -123,7 +123,6 @@ object Dependencies {
 
     object Firebase {
         const val auth = "com.google.firebase:firebase-auth:19.2.0"
-        const val config = "com.google.firebase:firebase-config:19.1.3"
         const val perf = "com.google.firebase:firebase-perf:19.0.5"
         const val storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
         const val mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
