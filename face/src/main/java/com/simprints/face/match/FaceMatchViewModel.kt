@@ -3,13 +3,11 @@ package com.simprints.face.match
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.concurrentMap
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.MatchEntry
 import com.simprints.face.controllers.core.events.model.Matcher
@@ -25,6 +23,7 @@ import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.match.rankone.RankOneFaceMatcher
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -34,7 +33,6 @@ class FaceMatchViewModel(
     private val masterFlowManager: MasterFlowManager,
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
-    private val crashReportManager: FaceCrashReportManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val faceTimeHelper: FaceTimeHelper,
     private val dispatcherProvider: DispatcherProvider
@@ -74,11 +72,7 @@ class FaceMatchViewModel(
     }
 
     private suspend fun loadCandidates(queryForCandidates: Serializable): Flow<FaceIdentity> {
-        crashReportManager.logMessageForCrashReport(
-            FaceCrashReportTag.FACE_MATCHING,
-            FaceCrashReportTrigger.UI,
-            message = "Loading candidates"
-        )
+        Simber.tag(CrashReportTag.FACE_MATCHING.name).i("Loading candidates")
         matchState.value = MatchState.LoadingCandidates
         return faceDbManager.loadPeople(queryForCandidates)
     }
@@ -87,11 +81,7 @@ class FaceMatchViewModel(
         probeFaceSamples: List<FaceSample>,
         candidates: Flow<FaceIdentity>
     ): Flow<FaceMatchResult> {
-        crashReportManager.logMessageForCrashReport(
-            FaceCrashReportTag.FACE_MATCHING,
-            FaceCrashReportTrigger.UI,
-            message = "Matching probe against candidates"
-        )
+        Simber.tag(CrashReportTag.FACE_MATCHING.name).i("Matching probe against candidates")
         matchState.postValue(MatchState.Matching)
         return getConcurrentMatchResultsForCandidates(probeFaceSamples, candidates)
     }

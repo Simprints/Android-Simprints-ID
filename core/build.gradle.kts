@@ -52,7 +52,6 @@ dependencies {
 
     implementation(Dependencies.Kotlin.coroutines_android)
     api(Dependencies.Testing.Espresso.idling)
-    implementation(Dependencies.Timber.core)
     implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Retrofit.core)
     api(Dependencies.Dagger.javax)
@@ -62,10 +61,8 @@ dependencies {
 
     testImplementation(Dependencies.Testing.truth)
     testImplementation(Dependencies.Testing.junit)
-    testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.coroutines_test)
-    testImplementation(Dependencies.Testing.kotlin)
-    testImplementation(Dependencies.Testing.Robolectric.core)
+    testImplementation(Dependencies.Testing.KoTest.kotlin_assert)
     testImplementation(project(":testtools"))
 
     androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)

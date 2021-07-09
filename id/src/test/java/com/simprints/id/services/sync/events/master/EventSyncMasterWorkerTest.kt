@@ -73,7 +73,6 @@ class EventSyncMasterWorkerTest {
 
     private fun mockDependencies() {
         with(masterWorker) {
-            crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             downSyncWorkerBuilder = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)

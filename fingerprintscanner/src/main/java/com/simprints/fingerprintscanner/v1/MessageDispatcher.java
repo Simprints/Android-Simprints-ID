@@ -2,10 +2,10 @@ package com.simprints.fingerprintscanner.v1;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_STATUS;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_TYPE;
+import com.simprints.logging.Simber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
-
-import timber.log.Timber;
 
 class MessageDispatcher extends Thread {
 
@@ -109,7 +107,7 @@ class MessageDispatcher extends Thread {
             try {
                 pendingRequest.lock.wait(timeOutMs);
             } catch (InterruptedException e) {
-                Timber.d(e);
+                Simber.d(e);
                 throw new RuntimeException();
             }
 
@@ -144,7 +142,7 @@ class MessageDispatcher extends Thread {
             try {
                 pendingRequest.lock.wait(timeOutMs);
             } catch (InterruptedException e) {
-                Timber.d(e);
+                Simber.d(e);
                 return MESSAGE_STATUS.ERROR;
             }
 

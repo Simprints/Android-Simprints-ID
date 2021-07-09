@@ -1,7 +1,6 @@
 package com.simprints.face.capture
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.models.FaceDetection
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -24,8 +23,6 @@ class FaceCaptureViewModelTest {
         coEvery { save(any(), any()) } returns null
     }
 
-    private val crashReportManager: FaceCrashReportManager = mockk(relaxed = true)
-
     private val faceDetections = listOf<FaceDetection>(
         mockk(relaxed = true) {
             every { id } returns "FAKE_ID"
@@ -37,8 +34,7 @@ class FaceCaptureViewModelTest {
 
     private fun buildViewModel(shouldSaveFaceImages: Boolean) = FaceCaptureViewModel(
         shouldSaveFaceImages = shouldSaveFaceImages,
-        faceImageManager = faceImageManager,
-        crashReportManager = crashReportManager
+        faceImageManager = faceImageManager
     )
 
     @Test

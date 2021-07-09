@@ -30,7 +30,6 @@ dependencies {
     implementation(Dependencies.CommonsIO.commons_io)
 
     // Unit tests
-    testImplementation(project(":testtools"))
     testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.Robolectric.core)
     testImplementation(Dependencies.RxJava2.android)

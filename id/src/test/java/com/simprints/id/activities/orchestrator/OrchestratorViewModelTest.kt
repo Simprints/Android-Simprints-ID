@@ -63,7 +63,7 @@ class OrchestratorViewModelTest {
         vm = OrchestratorViewModel(
             orchestratorManagerMock, orchestratorEventsHelperMock, listOf(
                 FACE
-            ), eventRepositoryMock, domainToModuleApiConverter, mockk(relaxed = true)
+            ), eventRepositoryMock, domainToModuleApiConverter
         )
     }
 

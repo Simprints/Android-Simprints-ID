@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.subject.migration
 
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
@@ -11,7 +10,6 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -35,8 +33,6 @@ class SubjectToEventDbMigrationManagerImplTest {
     @MockK
     lateinit var timeHelper: TimeHelper
     @MockK
-    lateinit var crashReportManager: CrashReportManager
-    @MockK
     lateinit var preferencesManager: IdPreferencesManager
     @MockK
     lateinit var subjectLocal: SubjectLocalDataSource
@@ -51,7 +47,6 @@ class SubjectToEventDbMigrationManagerImplTest {
             loginInfoManager,
             eventLocal,
             timeHelper,
-            crashReportManager,
             preferencesManager,
             subjectLocal,
             EncodingUtilsImplForTests
@@ -156,18 +151,6 @@ class SubjectToEventDbMigrationManagerImplTest {
             coVerify(exactly = 1) {
                 subjectLocal.performActions(listOf(Creation(subjectIntoDb.copy(toSync = false))))
             }
-        }
-    }
-
-    @Test
-    fun migrationFails_shouldReportTheIssue() {
-        runBlockingTest {
-            mockUserIsSignedIn()
-            coEvery { loginInfoManager.getSignedInProjectIdOrEmpty() } throws Throwable("test")
-
-            migrationManager.migrateSubjectToSyncToEventsDb()
-
-            verify(exactly = 1) { crashReportManager.logException(any<MigrationToNewEventArchitectureException>()) }
         }
     }
 

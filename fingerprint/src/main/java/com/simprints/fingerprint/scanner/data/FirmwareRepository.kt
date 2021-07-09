@@ -5,17 +5,17 @@ import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class FirmwareRepository(private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
                          private val firmwareLocalDataSource: FirmwareLocalDataSource) {
 
     suspend fun updateStoredFirmwareFilesWithLatest() {
         val savedVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
-        Timber.d("Saved firmware versions: $savedVersions")
+        Simber.d("Saved firmware versions: $savedVersions")
 
         val downloadableFirmwares = firmwareRemoteDataSource.getDownloadableFirmwares(savedVersions)
-        Timber.d("Firmwares available for download: $downloadableFirmwares")
+        Simber.d("Firmwares available for download: $downloadableFirmwares")
 
         val cypressToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.CYPRESS, savedVersions.cypress)
         val stmToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.STM, savedVersions.stm)

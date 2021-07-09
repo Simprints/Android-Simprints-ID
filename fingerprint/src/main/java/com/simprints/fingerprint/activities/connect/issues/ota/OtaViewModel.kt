@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -17,18 +16,17 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
 import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.logging.Simber
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import kotlin.concurrent.schedule
 
 class OtaViewModel(
     private val scannerManager: ScannerManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val crashReportManager: FingerprintCrashReportManager,
     private val timeHelper: FingerprintTimeHelper
 ) : ViewModel() {
 
@@ -47,7 +45,7 @@ class OtaViewModel(
                 it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
             }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onNext = { otaStep ->
-                    Timber.d(otaStep.toString())
+                    Simber.d(otaStep.toString())
                     currentStep = otaStep
                     progress.postValue(otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size))
                 },
@@ -70,8 +68,7 @@ class OtaViewModel(
     }
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
-        Timber.e(e)
-        crashReportManager.logExceptionOrSafeException(e)
+        Simber.e(e)
         if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             otaFailed.postEvent()
         } else {

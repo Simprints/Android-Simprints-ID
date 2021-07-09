@@ -307,7 +307,6 @@ class CommCarePresenterTest {
         mockk(),
         mockk(),
         mockk(),
-        mockk(),
         coroutineScope
     )
 }

@@ -15,10 +15,10 @@ import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class SyncInformationViewModel(
     private val downySyncHelper: EventDownSyncHelper,
@@ -111,7 +111,7 @@ class SyncInformationViewModel(
             DownSyncCounts(creationsToDownload, deletionsToDownload)
 
         } catch (t: Throwable) {
-            Timber.d(t)
+            Simber.d(t)
             null
         }
 

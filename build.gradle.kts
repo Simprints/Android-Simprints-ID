@@ -22,13 +22,13 @@ buildscript {
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1")
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
         classpath("org.ow2.asm:asm:9.0")
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.73.0")
+        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.74.0")
         classpath("org.gradle:test-retry-gradle-plugin:1.2.0")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.8")
         classpath("com.google.firebase:perf-plugin:1.4.0")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.0")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.1")
 
         // Dependency Publishing
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")

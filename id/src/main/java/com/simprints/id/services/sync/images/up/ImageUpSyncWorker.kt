@@ -2,10 +2,10 @@ package com.simprints.id.services.sync.images.up
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.Application
-import com.simprints.core.analytics.CrashReportManager
+import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -17,7 +17,6 @@ class ImageUpSyncWorker(
 
     override val tag: String = ImageUpSyncWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var imageRepository: ImageRepository
 
     override suspend fun doWork(): Result =
@@ -28,7 +27,7 @@ class ImageUpSyncWorker(
             val success = try {
                 imageRepository.uploadStoredImagesAndDelete()
             } catch (ex: Exception) {
-                crashReportManager.logExceptionOrSafeException(ex)
+                Simber.e(ex)
                 false
             }
 
