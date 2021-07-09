@@ -356,10 +356,6 @@ open class SettingsPreferencesManagerImpl(
             faceConfidenceThresholdsSerializer
         )
 
-    init {
-        remoteConfigWrapper.registerAllPreparedDefaultValues()
-    }
-
     override fun getRemoteConfigStringPreference(key: String) = remoteConfigWrapper.getString(key)
         ?: throw NoSuchPreferenceError.forKey(key)
 
