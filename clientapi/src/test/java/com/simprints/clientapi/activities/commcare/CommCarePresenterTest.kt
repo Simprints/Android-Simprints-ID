@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
+import com.google.common.truth.Truth
 import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
@@ -10,11 +11,8 @@ import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrolRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.*
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -282,6 +280,32 @@ class CommCarePresenterTest {
             sessionEventsManagerMock.addCompletionCheckEvent(CommCareCoSyncPresenterTest.RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+    }
+
+
+    @Test
+    fun shouldNot_closeSession_whenHandling_responseFrom_enrolConfirmID_request() {
+        val newSessionId = "session_id_changed"
+        val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
+        every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns "sessionId"
+
+        coEvery { sessionEventsManagerMock.closeCurrentSessionNormally() } answers {
+            // return a new sessionId if closeSession is called
+            coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns newSessionId
+        }
+
+        runBlockingTest {
+            getNewPresenter(ConfirmIdentity, sessionEventsManagerMock, coroutineScope = this)
+                .handleConfirmationResponse(mockk())
+
+
+            val sessionId = sessionEventsManagerMock.getCurrentSessionId()
+            Truth.assertThat(sessionId).isNotEqualTo(newSessionId)
+            coVerify(exactly = 0) { sessionEventsManagerMock.closeCurrentSessionNormally() }
+        }
     }
 
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
