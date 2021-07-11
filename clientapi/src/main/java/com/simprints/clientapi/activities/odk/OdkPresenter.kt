@@ -57,7 +57,11 @@ class OdkPresenter(
 
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
+
+            // TODO comment with link to ticket
+            if (action != EnrolLastBiometrics) {
+                sessionEventsManager.closeCurrentSessionNormally()
+            }
 
             view.returnRegistration(enrol.guid, currentSessionId, flowCompletedCheck)
         }
@@ -86,7 +90,6 @@ class OdkPresenter(
 
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnConfirmation(flowCompletedCheck, currentSessionId)
         }
