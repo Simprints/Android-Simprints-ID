@@ -59,7 +59,12 @@ class LibSimprintsPresenter(
 
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
+
+
+            // TODO comment with link to ticket
+            if (action != EnrolLastBiometrics) {
+                sessionEventsManager.closeCurrentSessionNormally()
+            }
 
             view.returnRegistration(Registration(enrol.guid), currentSessionId, flowCompletedCheck)
         }
@@ -87,7 +92,6 @@ class LibSimprintsPresenter(
 
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnConfirmation(flowCompletedCheck, currentSessionId)
         }
