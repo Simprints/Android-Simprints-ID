@@ -4,6 +4,7 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.RootedDeviceException
@@ -42,10 +43,23 @@ class RequestPresenterTest {
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>(relaxed = true).apply {
-                every { this@apply.build() } returns EnrolRequest(projectIdField, userIdField, moduleIdField, metadataField, extraField)
+                every { this@apply.build() } returns EnrolRequest(
+                    projectIdField,
+                    userIdField,
+                    moduleIdField,
+                    metadataField,
+                    extraField
+                )
             }
 
-            val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))
+            val presenter = ImplRequestPresenter(
+                mockk(relaxed = true),
+                clientApiSessionEventsManagerMock,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true)
+            )
             presenter.validateAndSendRequest(requestBuilder)
 
             coVerify(exactly = 1) {
@@ -58,10 +72,23 @@ class RequestPresenterTest {
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>().apply {
-                every { this@apply.build() } returns EnrolRequest(projectIdField, userIdField, moduleIdField, metadataField, emptyMap())
+                every { this@apply.build() } returns EnrolRequest(
+                    projectIdField,
+                    userIdField,
+                    moduleIdField,
+                    metadataField,
+                    emptyMap()
+                )
             }
 
-            val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))
+            val presenter = ImplRequestPresenter(
+                mockk(relaxed = true),
+                clientApiSessionEventsManagerMock,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true)
+            )
             presenter.validateAndSendRequest(requestBuilder)
 
             coVerify(exactly = 0) {
@@ -80,7 +107,9 @@ class RequestPresenterTest {
             mockk(relaxed = true),
             mockk(relaxed = true),
             mockDeviceManager,
-            mockCrashReportManager
+            mockCrashReportManager,
+            mockk(relaxed = true),
+            mockk(relaxed = true)
         )
 
         presenter.start()
@@ -95,7 +124,14 @@ class RequestPresenterTest {
         val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
-        val presenter = ImplRequestPresenter(mockView, mockk(relaxed = true), mockDeviceManager, mockk(relaxed = true))
+        val presenter = ImplRequestPresenter(
+            mockView,
+            mockk(relaxed = true),
+            mockDeviceManager,
+            mockk(relaxed = true),
+            mockk(relaxed = true),
+            mockk(relaxed = true)
+        )
 
         presenter.start()
 
@@ -108,8 +144,17 @@ class ImplRequestPresenter(
     view: RequestContract.RequestView,
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
-) : RequestPresenter(view, clientApiSessionEventsManager, deviceManager, crashReportManager) {
+    crashReportManager: ClientApiCrashReportManager,
+    sharedPreferencesManager: SharedPreferencesManager,
+    sessionEventsManager: ClientApiSessionEventsManager
+) : RequestPresenter(
+    view = view,
+    eventsManager = clientApiSessionEventsManager,
+    deviceManager = deviceManager,
+    crashReportManager = crashReportManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
+) {
 
     override suspend fun start() {
         runIfDeviceIsNotRooted {}
