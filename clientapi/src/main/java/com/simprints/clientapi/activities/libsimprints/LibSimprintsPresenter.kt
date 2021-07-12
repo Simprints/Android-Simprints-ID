@@ -61,7 +61,9 @@ class LibSimprintsPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
 
 
-            // TODO comment with link to ticket
+            // There is a bug that creates a malformed session on multiple callouts
+            // of EnrolLastBiometrics, this tries to fix that, here is a ticket detailing the issue:
+            // https://simprints.atlassian.net/browse/CORE-612
             if (action != EnrolLastBiometrics) {
                 sessionEventsManager.closeCurrentSessionNormally()
             }
