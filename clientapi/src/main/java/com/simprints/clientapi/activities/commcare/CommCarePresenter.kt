@@ -23,15 +23,12 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.SyncDestinationSetting
@@ -198,7 +195,7 @@ class CommCarePresenter(
      * When changing events, make sure they still fit in.
      */
     private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COSYNCCALLINGAPP)) {
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CommCareEvents(events))
         } else {
@@ -206,7 +203,7 @@ class CommCarePresenter(
         }
 
     private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COSYNCCALLINGAPP)) return null
+        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -240,7 +237,7 @@ class CommCarePresenter(
      * Delete the events if returning to CommCare but not Simprints
      */
     private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COSYNCCALLINGAPP) &&
+        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
             !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
         ) {
             sessionEventsManager.deleteSessionEvents(sessionId)
