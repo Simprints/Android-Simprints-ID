@@ -24,15 +24,13 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Identification
@@ -217,7 +215,11 @@ class LibSimprintsPresenter(
                 )
             )
                 .firstOrNull()
-                ?.fromSubjectToEnrolmentCreationEvent()
+                ?.fromSubjectToEnrolmentCreationEvent(
+                    now = timeHelper.now(),
+                    modalities = sharedPreferencesManager.modalities,
+                    encoder = encoder
+                )
                 ?: return null
 
         return jsonHelper.toJson(GenericCoSyncEvents(listOf(recordCreationEvent)))
@@ -225,22 +227,6 @@ class LibSimprintsPresenter(
 
     private fun getProjectIdFromRequest() =
         view.extras?.get(LibSimprintsConstants.SIMPRINTS_PROJECT_ID) as String
-
-    private fun Subject.fromSubjectToEnrolmentCreationEvent(): EnrolmentRecordCreationEvent {
-        return EnrolmentRecordCreationEvent(
-            timeHelper.now(),
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            sharedPreferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(
-                fingerprintSamples,
-                faceSamples,
-                encoder
-            )
-        )
-    }
 
     /**
      * Delete the events if returning to a cosync project but not Simprints
