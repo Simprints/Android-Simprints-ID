@@ -55,7 +55,9 @@ abstract class RequestPresenter(
     private val eventsManager: ClientApiSessionEventsManager,
     private val deviceManager: DeviceManager,
     protected val crashReportManager: ClientApiCrashReportManager,
-    private val encoder: EncodingUtils = EncodingUtilsImpl
+    private val encoder: EncodingUtils = EncodingUtilsImpl,
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val sessionEventsManager: ClientApiSessionEventsManager
 ) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
@@ -143,8 +145,6 @@ abstract class RequestPresenter(
      */
     override suspend fun getEventsJsonForSession(
         sessionId: String,
-        sharedPreferencesManager: SharedPreferencesManager,
-        sessionEventsManager: ClientApiSessionEventsManager,
         jsonHelper: JsonHelper
     ): String? =
         if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
@@ -156,7 +156,6 @@ abstract class RequestPresenter(
 
     override suspend fun getEnrolmentCreationEventForSubject(
         subjectId: String,
-        sharedPreferencesManager: SharedPreferencesManager,
         subjectRepository: SubjectRepository,
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
@@ -178,17 +177,13 @@ abstract class RequestPresenter(
                 )
                 ?: return null
 
-        return jsonHelper?.toJson(CoSyncEvents(listOf(recordCreationEvent)))
+        return jsonHelper.toJson(CoSyncEvents(listOf(recordCreationEvent)))
     }
 
     /**
      * Delete the events if returning to CommCare but not Simprints
      */
-    override suspend fun deleteSessionEventsIfNeeded(
-        sessionId: String,
-        sharedPreferencesManager: SharedPreferencesManager,
-        sessionEventsManager: ClientApiSessionEventsManager
-    ) {
+    override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
         if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
             !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
         ) {

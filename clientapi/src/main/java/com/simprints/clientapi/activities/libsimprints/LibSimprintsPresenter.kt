@@ -43,12 +43,14 @@ class LibSimprintsPresenter(
     crashReportManager: ClientApiCrashReportManager,
     private val subjectRepository: SubjectRepository,
     private val jsonHelper: JsonHelper,
-    private val sharedPreferencesManager: SharedPreferencesManager
+    sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     deviceManager = deviceManager,
-    crashReportManager = crashReportManager
+    crashReportManager = crashReportManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
 ), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
@@ -80,16 +82,15 @@ class LibSimprintsPresenter(
 
             view.returnRegistration(
                 Registration(enrol.guid), currentSessionId, flowCompletedCheck,
-                getSessionEventsJson(currentSessionId),
+                getEventsJsonForSession(currentSessionId, jsonHelper),
                 getEnrolmentCreationEventForSubject(
                     enrol.guid,
-                    sharedPreferencesManager = sharedPreferencesManager,
                     subjectRepository = subjectRepository,
                     timeHelper = timeHelper,
                     jsonHelper = jsonHelper
                 )
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -105,7 +106,7 @@ class LibSimprintsPresenter(
                         it.tier.fromDomainToLibsimprintsTier()
                     )
                 }), identify.sessionId, flowCompletedCheck,
-                getSessionEventsJson(identify.sessionId)
+                getEventsJsonForSession(identify.sessionId, jsonHelper)
             )
         }
     }
@@ -121,9 +122,9 @@ class LibSimprintsPresenter(
 
             view.returnConfirmation(
                 flowCompletedCheck, currentSessionId,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -144,11 +145,11 @@ class LibSimprintsPresenter(
                 )
                 view.returnVerification(
                     verification, currentSessionId, flowCompletedCheck,
-                    getSessionEventsJson(currentSessionId)
+                    getEventsJsonForSession(currentSessionId, jsonHelper)
                 )
             }
 
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -164,9 +165,9 @@ class LibSimprintsPresenter(
             view.returnRefusalForms(
                 RefusalForm(refusalForm.reason, refusalForm.extra),
                 currentSessionId, flowCompletedCheck,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -181,29 +182,13 @@ class LibSimprintsPresenter(
 
             view.returnErrorToClient(
                 errorResponse, flowCompletedCheck, currentSessionId,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-
-    /*These two methods are just convenience methods to avoid calling methods with long argument lists
-    * multiple times*/
-    private suspend fun deleteSessionEventsIfRequired(sessionId: String) =
-        deleteSessionEventsIfNeeded(
-            sessionId = sessionId,
-            sharedPreferencesManager = sharedPreferencesManager,
-            sessionEventsManager = sessionEventsManager
-        )
-
-    private suspend fun getSessionEventsJson(sessionId: String) = getEventsJsonForSession(
-        sessionId = sessionId,
-        sharedPreferencesManager = sharedPreferencesManager,
-        sessionEventsManager = sessionEventsManager,
-        jsonHelper = jsonHelper
-    )
 }
 

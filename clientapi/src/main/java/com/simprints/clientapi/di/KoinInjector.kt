@@ -74,7 +74,7 @@ object KoinInjector {
             LibSimprintsPresenter(view, action, get(), get(), get(), get(), get(), get(), get())
         }
         factory<OdkContract.Presenter> { (view: OdkContract.View, action: OdkAction) ->
-            OdkPresenter(view, action, get(), get(), get())
+            OdkPresenter(view, action, get(), get(), get(), get())
         }
         factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: CommCareAction) ->
             CommCarePresenter(
