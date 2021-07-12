@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit
 class RemoteConfigSchedulerImpl(context: Context) : RemoteConfigScheduler {
     companion object {
         private const val WORK_NAME = "remote-config-work"
+        const val WORK_NAME_ONE_TIME = "remote-config-work-one-time"
         private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
@@ -19,7 +20,7 @@ class RemoteConfigSchedulerImpl(context: Context) : RemoteConfigScheduler {
         Simber.d("[REMOTE_CONFIG] One time sync starting")
 
         workManager.enqueueUniqueWork(
-            WORK_NAME,
+            WORK_NAME_ONE_TIME,
             ExistingWorkPolicy.KEEP,
             buildOneTimeRequest()
         )
