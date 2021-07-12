@@ -196,6 +196,8 @@ class LibSimprintsPresenter(
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
+    /*We are using COMMCARE as the sync destination temporarily for all cosync projects untill
+    * the backend completes a more granular control then this will be removed*/
     private suspend fun getEventsJsonForSession(sessionId: String): String? =
         if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
