@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.libsimprints
 
-import androidx.annotation.Keep
 import com.simprints.clientapi.Constants
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
@@ -26,23 +25,14 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
-import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import com.simprints.libsimprints.Constants as LibSimprintsConstants
 
 class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
@@ -53,13 +43,12 @@ class LibSimprintsPresenter(
     crashReportManager: ClientApiCrashReportManager,
     private val subjectRepository: SubjectRepository,
     private val jsonHelper: JsonHelper,
-    private val sharedPreferencesManager: SharedPreferencesManager,
-    private val encoder: EncodingUtils = EncodingUtilsImpl
+    private val sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
-    view,
-    sessionEventsManager,
-    deviceManager,
-    crashReportManager
+    view = view,
+    eventsManager = sessionEventsManager,
+    deviceManager = deviceManager,
+    crashReportManager = crashReportManager
 ), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
@@ -91,10 +80,16 @@ class LibSimprintsPresenter(
 
             view.returnRegistration(
                 Registration(enrol.guid), currentSessionId, flowCompletedCheck,
-                getEventsJsonForSession(currentSessionId),
-                getEnrolmentCreationEventForSubject(enrol.guid)
+                getSessionEventsJson(currentSessionId),
+                getEnrolmentCreationEventForSubject(
+                    enrol.guid,
+                    sharedPreferencesManager = sharedPreferencesManager,
+                    subjectRepository = subjectRepository,
+                    timeHelper = timeHelper,
+                    jsonHelper = jsonHelper
+                )
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -110,11 +105,10 @@ class LibSimprintsPresenter(
                         it.tier.fromDomainToLibsimprintsTier()
                     )
                 }), identify.sessionId, flowCompletedCheck,
-                getEventsJsonForSession(identify.sessionId)
+                getSessionEventsJson(identify.sessionId)
             )
         }
     }
-
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -127,9 +121,9 @@ class LibSimprintsPresenter(
 
             view.returnConfirmation(
                 flowCompletedCheck, currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -150,11 +144,11 @@ class LibSimprintsPresenter(
                 )
                 view.returnVerification(
                     verification, currentSessionId, flowCompletedCheck,
-                    getEventsJsonForSession(currentSessionId)
+                    getSessionEventsJson(currentSessionId)
                 )
             }
 
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -170,9 +164,9 @@ class LibSimprintsPresenter(
             view.returnRefusalForms(
                 RefusalForm(refusalForm.reason, refusalForm.extra),
                 currentSessionId, flowCompletedCheck,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -187,61 +181,29 @@ class LibSimprintsPresenter(
 
             view.returnErrorToClient(
                 errorResponse, flowCompletedCheck, currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
     private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
-    /*We are using COMMCARE as the sync destination temporarily for all cosync projects untill
-    * the backend completes a more granular control then this will be removed*/
-    private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
-            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
-            jsonHelper.toJson(GenericCoSyncEvents(events))
-        } else {
-            null
-        }
+    /*These two methods are just convenience methods to avoid calling methods with long argument lists
+    * multiple times*/
+    private suspend fun deleteSessionEventsIfRequired(sessionId: String) =
+        deleteSessionEventsIfNeeded(
+            sessionId = sessionId,
+            sharedPreferencesManager = sharedPreferencesManager,
+            sessionEventsManager = sessionEventsManager
+        )
 
-    private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
-
-        val recordCreationEvent =
-            subjectRepository.load(
-                SubjectQuery(
-                    projectId = getProjectIdFromRequest(),
-                    subjectId = subjectId
-                )
-            )
-                .firstOrNull()
-                ?.fromSubjectToEnrolmentCreationEvent(
-                    now = timeHelper.now(),
-                    modalities = sharedPreferencesManager.modalities,
-                    encoder = encoder
-                )
-                ?: return null
-
-        return jsonHelper.toJson(GenericCoSyncEvents(listOf(recordCreationEvent)))
-    }
-
-    private fun getProjectIdFromRequest() =
-        view.extras?.get(LibSimprintsConstants.SIMPRINTS_PROJECT_ID) as String
-
-    /**
-     * Delete the events if returning to a cosync project but not Simprints
-     */
-    private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
-        ) {
-            sessionEventsManager.deleteSessionEvents(sessionId)
-        }
-    }
-
-    @Keep
-    private data class GenericCoSyncEvents(val events: List<Event>)
+    private suspend fun getSessionEventsJson(sessionId: String) = getEventsJsonForSession(
+        sessionId = sessionId,
+        sharedPreferencesManager = sharedPreferencesManager,
+        sessionEventsManager = sessionEventsManager,
+        jsonHelper = jsonHelper
+    )
 }
 

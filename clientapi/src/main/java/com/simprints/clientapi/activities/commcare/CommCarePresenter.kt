@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.commcare
 
-import androidx.annotation.Keep
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction
@@ -25,20 +24,12 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
-import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class CommCarePresenter(
@@ -51,13 +42,12 @@ class CommCarePresenter(
     private val timeHelper: ClientApiTimeHelper,
     deviceManager: DeviceManager,
     crashReportManager: ClientApiCrashReportManager,
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val encoder: EncodingUtils = EncodingUtilsImpl
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 ) : RequestPresenter(
-    view,
-    sessionEventsManager,
-    deviceManager,
-    crashReportManager
+    view = view,
+    eventsManager = sessionEventsManager,
+    deviceManager = deviceManager,
+    crashReportManager = crashReportManager
 ), CommCareContract.Presenter {
 
     override suspend fun start() {
@@ -89,10 +79,16 @@ class CommCarePresenter(
                 enrol.guid,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getEventsJsonForSession(currentSessionId),
-                getEnrolmentCreationEventForSubject(enrol.guid)
+                getSessionEventsJson(currentSessionId),
+                getEnrolmentCreationEventForSubject(
+                    enrol.guid,
+                    sharedPreferencesManager = sharedPreferencesManager,
+                    subjectRepository = subjectRepository,
+                    timeHelper = timeHelper,
+                    jsonHelper = jsonHelper
+                )
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -111,7 +107,7 @@ class CommCarePresenter(
             sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(ArrayList(identify.identifications.map {
                 Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
-            }), identify.sessionId, getEventsJsonForSession(identify.sessionId))
+            }), identify.sessionId, getSessionEventsJson(identify.sessionId))
         }
     }
 
@@ -126,9 +122,9 @@ class CommCarePresenter(
             view.returnConfirmation(
                 RETURN_FOR_FLOW_COMPLETED,
                 currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -146,9 +142,9 @@ class CommCarePresenter(
                 verify.matchResult.guidFound,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -165,9 +161,9 @@ class CommCarePresenter(
                 refusalForm.extra,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
     }
 
@@ -184,43 +180,10 @@ class CommCarePresenter(
                 errorResponse,
                 flowCompletedCheck,
                 currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getSessionEventsJson(currentSessionId)
             )
-            deleteSessionEventsIfNeeded(currentSessionId)
+            deleteSessionEventsIfRequired(currentSessionId)
         }
-    }
-
-    /**
-     * Be aware that Android Intents have a cap at around 500KB of data that can be returned.
-     * When changing events, make sure they still fit in.
-     */
-    private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
-            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
-            jsonHelper.toJson(CommCareEvents(events))
-        } else {
-            null
-        }
-
-    private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
-
-        val recordCreationEvent =
-            subjectRepository.load(
-                SubjectQuery(
-                    projectId = getProjectIdFromRequest(),
-                    subjectId = subjectId
-                )
-            )
-                .firstOrNull()
-                ?.fromSubjectToEnrolmentCreationEvent(
-                    now = timeHelper.now(),
-                    modalities = sharedPreferencesManager.modalities,
-                    encoder = encoder
-                )
-                ?: return null
-
-        return jsonHelper.toJson(CommCareEvents(listOf(recordCreationEvent)))
     }
 
     private suspend fun checkAndProcessSessionId() {
@@ -233,20 +196,20 @@ class CommCarePresenter(
         processConfirmIdentityRequest()
     }
 
-    /**
-     * Delete the events if returning to CommCare but not Simprints
-     */
-    private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
-        ) {
-            sessionEventsManager.deleteSessionEvents(sessionId)
-        }
-    }
+    /*These two methods are just convenience methods to avoid calling methods with long argument lists
+    * multiple times. It is cleaner than adding nullable dependencies to the RequestPresenter so that
+    * the odk presenter has no errors*/
+    private suspend fun deleteSessionEventsIfRequired(sessionId: String) =
+        deleteSessionEventsIfNeeded(
+            sessionId = sessionId,
+            sharedPreferencesManager = sharedPreferencesManager,
+            sessionEventsManager = sessionEventsManager
+        )
 
-    private fun getProjectIdFromRequest() =
-        view.extras?.get(Constants.SIMPRINTS_PROJECT_ID) as String
-
-    @Keep
-    private data class CommCareEvents(val events: List<Event>)
+    private suspend fun getSessionEventsJson(sessionId: String) = getEventsJsonForSession(
+        sessionId = sessionId,
+        sharedPreferencesManager = sharedPreferencesManager,
+        sessionEventsManager = sessionEventsManager,
+        jsonHelper = jsonHelper
+    )
 }

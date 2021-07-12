@@ -7,6 +7,8 @@ import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.responses.ConfirmationResponse
 import com.simprints.clientapi.domain.responses.EnrolResponse
@@ -14,6 +16,9 @@ import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.subject.SubjectRepository
 
 interface RequestContract {
 
@@ -56,6 +61,26 @@ interface RequestContract {
         fun handleResponseError(errorResponse: ErrorResponse)
         suspend fun validateAndSendRequest(builder: ClientRequestBuilder)
         fun handleConfirmationResponse(response: ConfirmationResponse)
-    }
+        suspend fun getEventsJsonForSession(
+            sessionId: String,
+            sharedPreferencesManager: SharedPreferencesManager,
+            sessionEventsManager: ClientApiSessionEventsManager,
+            jsonHelper: JsonHelper
+        ): String?
 
+        fun getProjectIdFromRequest(): String
+        suspend fun getEnrolmentCreationEventForSubject(
+            subjectId: String,
+            sharedPreferencesManager: SharedPreferencesManager,
+            subjectRepository: SubjectRepository,
+            timeHelper: ClientApiTimeHelper,
+            jsonHelper: JsonHelper
+        ): String?
+
+        suspend fun deleteSessionEventsIfNeeded(
+            sessionId: String,
+            sharedPreferencesManager: SharedPreferencesManager,
+            sessionEventsManager: ClientApiSessionEventsManager
+        )
+    }
 }
