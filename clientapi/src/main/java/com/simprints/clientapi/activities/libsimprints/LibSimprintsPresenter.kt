@@ -57,7 +57,14 @@ class LibSimprintsPresenter(
 
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
+
+
+            // There is a bug that creates a malformed session on multiple callouts
+            // of EnrolLastBiometrics, this tries to fix that, here is a ticket detailing the issue:
+            // https://simprints.atlassian.net/browse/CORE-612
+            if (action != EnrolLastBiometrics) {
+                sessionEventsManager.closeCurrentSessionNormally()
+            }
 
             view.returnRegistration(Registration(enrol.guid), currentSessionId, flowCompletedCheck)
         }
@@ -85,7 +92,6 @@ class LibSimprintsPresenter(
 
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnConfirmation(flowCompletedCheck, currentSessionId)
         }
