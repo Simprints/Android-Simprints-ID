@@ -7,7 +7,10 @@ import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
 import com.simprints.clientapi.domain.responses.entities.MatchResult
@@ -214,7 +217,7 @@ class OdkPresenterTest {
         }
 
 
-        OdkPresenter(view, ConfirmIdentity, clientApiSessionEventsManager, mockk(), mockk()).apply {
+        OdkPresenter(view, ConfirmIdentity, clientApiSessionEventsManager, mockk()).apply {
             runBlocking {
               handleConfirmationResponse(mockk())
             }
@@ -245,7 +248,6 @@ class OdkPresenterTest {
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
             mockk(),
-            mockk()
         ).apply { runBlocking { handleEnrolResponse(mockk()) } }
 
         runBlocking {

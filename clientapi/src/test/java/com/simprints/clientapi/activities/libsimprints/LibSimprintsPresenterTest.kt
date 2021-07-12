@@ -278,7 +278,6 @@ class LibSimprintsPresenterTest {
             view,
             ConfirmIdentity,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).handleConfirmationResponse(mockk())
 
@@ -308,7 +307,6 @@ class LibSimprintsPresenterTest {
             view,
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
-            mockk(),
             mockk()
         ).handleEnrolResponse(mockk())
 

@@ -61,10 +61,10 @@ open class BaseClientApiTest : KoinTest {
         })
     }
 
-    private fun buildDummySessionEventsManagerMock(): com.simprints.eventsystem.event.EventRepository {
+    private fun buildDummySessionEventsManagerMock(): EventRepository {
         val sessionMock = mockk<SessionCaptureEvent>(relaxed = true)
         every { sessionMock.id } returns ""
-        val repo = mockk<com.simprints.eventsystem.event.EventRepository>(relaxed = true)
+        val repo = mockk<EventRepository>(relaxed = true)
         coEvery { repo.getCurrentCaptureSessionEvent() } returns sessionMock
         return repo
     }
