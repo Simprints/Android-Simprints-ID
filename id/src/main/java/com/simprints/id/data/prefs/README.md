@@ -3,7 +3,7 @@
 The module presents access to shared preferences and remote config via
 [`PreferencesManager`](./PreferencesManager.kt).
 
-### Preference Types
+## Preference Types
 
 [`SettingsPreferencesManager`](./settings/SettingsPreferencesManager.kt)
 is the primary sub-interface that handles persisted settings, that
@@ -23,17 +23,21 @@ read/writable preferences that are stored locally only.
 
 There is also
 [`RemoteConfigPrimitivePreference`](./preferenceType/remoteConfig/RemoteConfigPrimitivePreference.kt)
-(and its
-[complex counterpart](./preferenceType/remoteConfig/RemoteConfigComplexPreference.kt))
+(and its [complex counterpart](./preferenceType/remoteConfig/RemoteConfigComplexPreference.kt))
 which instead retrieves the setting remotely only. Note that despite
 appearing as a `var` in the interface, the setters of these properties
 do not change the property as the getter will always retrieve the
-property from the remote config.
+property from the remote config. This preference tries first to get the
+preference from RemoteConfig. Failing to do that, it returns the default
+value that was added to it during creation. This means if the remote
+config defaults are not accessible or non existent, then the local
+defaults can be used as fall-back. This can occur if settings have been
+removed online but older versions of the app are still relying on them.
+This is tightly coupled to RemoteConfigWrapper, explained below.
 
 Finally, there is a combination of these preference types:
 [`OverridableRemoteConfigPrimitivePreference`](./preferenceType/remoteConfig/overridable/OverridableRemoteConfigPrimitivePreference.kt)
-and its
-[complex counterpart](./preferenceType/remoteConfig/overridable/OverridableRemoteConfigComplexPreference.kt)).
+and its [complex counterpart](./preferenceType/remoteConfig/overridable/OverridableRemoteConfigComplexPreference.kt)).
 These act like `RemoteConfigPrimitivePreference`s, where the setting is
 retrieved from remote config. This is until when the setter on the
 property is called at any time, in which case the new value is saved and
@@ -50,52 +54,22 @@ by default. The moment the setter for the preference is called, this
 flag is set to true, which controls the subsequent behaviour transition
 from a remote-seeking pref to a local one.
 
-### Remote Config
+## Remote Config
 
-#### Remote Config Wrapper
+### Remote Config Wrapper
 
-For preference types that retrieve settings from remote config, the
-`FirebaseRemoteConfig` from the Firebase SDK is currently used. This
-used is used not only to deliver settings remotely, but also to specify
-particular settings on a project-by-project based.
+SID downloads settings from BFSID during login and save them as JSON in
+shared preferences. Every time a config is needed that has a RemoteConfig
+type, SID parses the JSON and return the correct value. If no value is
+found the wrapper returns `null` and expects classes using it to know how
+to handle that.
 
-This is achieved by setting a custom User Property in the Firebase
-Analytics SDK called `project_id` to the project ID used at Simprints
-login. Customisation is then possible thanks to using this user property
-as a custom condition for a given project.
+### Remote Config Worker
 
-The is a problem with this approach - upon login, it may take up to an
-hour before the Firebase Analytics custom user properties kick-in. This
-is too late for a variety of use cases, as many project-specific actions
-need to occur as soon as login succeeds, such as downloading appropriate
-dynamic features for the project and syncing appropriate records.
+There is a background worker that keeps running and download new
+configurations as they are created in BFSID. This worker runs at the same
+frequency as other workers by using the value in
+`BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES`.
 
-This problem has been solved with the following actions:
-
-1. Upon login, a request is made to our custom back-end to query the
-   remote config settings for a project and download and save them all
-   as JSON so they can be used immediately by the app.
-2. A remote config setting called `ProjectSpecificMode` is set to `true`
-   for the project, whilst the default in remote config is
-   `false`.
-
-Before the Firebase Analytics user property kicks-in, retrieving the
-`ProjectSpecificMode` value from the remote config SDK will yield
-`false`. If this is the case, settings are retrieved from the JSON saved
-at login. Once `ProjectSpecificMode` becomes `true`, we know that at
-this point the analytics user property has become active and we can now
-read settings from the remote config SDK, knowing for certain that we
-are receiving the custom settings for the project. At this point, online
-updates to remote config will eventually be reflected in the remote
-config SDK.
-
-This switching is handled by the
-[`RemoteConfigWrapper`](./RemoteConfigWrapper.kt). When a setting is
-needed from remote config, calls go through this wrapper that checks
-`ProjectSpecificMode`. If it is `false` it uses the JSON values; if it
-is `true` it uses the remote config SDK values.
-
-The wrapper additionally handles the registering of local defaults. This
-means if the remote config defaults are not accessible, then the local
-defaults can be used as fall-back. This can occur if settings have been
-removed online but older versions of the app are still relying on them.
+Every time the worker runs the new JSON will be saved in the shared
+preference. Next time the config is used it will be the updated version.
