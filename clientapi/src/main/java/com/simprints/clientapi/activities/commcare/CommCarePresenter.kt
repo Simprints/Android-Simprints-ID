@@ -47,7 +47,9 @@ class CommCarePresenter(
     view = view,
     eventsManager = sessionEventsManager,
     deviceManager = deviceManager,
-    crashReportManager = crashReportManager
+    crashReportManager = crashReportManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
 ), CommCareContract.Presenter {
 
     override suspend fun start() {
@@ -79,16 +81,15 @@ class CommCarePresenter(
                 enrol.guid,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getSessionEventsJson(currentSessionId),
+                getEventsJsonForSession(currentSessionId, jsonHelper),
                 getEnrolmentCreationEventForSubject(
                     enrol.guid,
-                    sharedPreferencesManager = sharedPreferencesManager,
                     subjectRepository = subjectRepository,
                     timeHelper = timeHelper,
                     jsonHelper = jsonHelper
                 )
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -107,7 +108,7 @@ class CommCarePresenter(
             sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(ArrayList(identify.identifications.map {
                 Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
-            }), identify.sessionId, getSessionEventsJson(identify.sessionId))
+            }), identify.sessionId, getEventsJsonForSession(identify.sessionId, jsonHelper))
         }
     }
 
@@ -122,9 +123,9 @@ class CommCarePresenter(
             view.returnConfirmation(
                 RETURN_FOR_FLOW_COMPLETED,
                 currentSessionId,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -142,9 +143,9 @@ class CommCarePresenter(
                 verify.matchResult.guidFound,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -161,9 +162,9 @@ class CommCarePresenter(
                 refusalForm.extra,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -180,9 +181,9 @@ class CommCarePresenter(
                 errorResponse,
                 flowCompletedCheck,
                 currentSessionId,
-                getSessionEventsJson(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
-            deleteSessionEventsIfRequired(currentSessionId)
+            deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
@@ -195,21 +196,4 @@ class CommCarePresenter(
 
         processConfirmIdentityRequest()
     }
-
-    /*These two methods are just convenience methods to avoid calling methods with long argument lists
-    * multiple times. It is cleaner than adding nullable dependencies to the RequestPresenter so that
-    * the odk presenter has no errors*/
-    private suspend fun deleteSessionEventsIfRequired(sessionId: String) =
-        deleteSessionEventsIfNeeded(
-            sessionId = sessionId,
-            sharedPreferencesManager = sharedPreferencesManager,
-            sessionEventsManager = sessionEventsManager
-        )
-
-    private suspend fun getSessionEventsJson(sessionId: String) = getEventsJsonForSession(
-        sessionId = sessionId,
-        sharedPreferencesManager = sharedPreferencesManager,
-        sessionEventsManager = sessionEventsManager,
-        jsonHelper = jsonHelper
-    )
 }
