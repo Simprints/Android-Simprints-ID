@@ -11,9 +11,7 @@ class ProjectRepositoryImpl(
     private val projectRemoteDataSource: ProjectRemoteDataSource,
     private val remoteConfigWrapper: RemoteConfigWrapper,
     private val performanceTracker: FirebasePerformance = FirebasePerformance.getInstance()
-) : ProjectRepository,
-    ProjectLocalDataSource by projectLocalDataSource,
-    ProjectRemoteDataSource by projectRemoteDataSource {
+) : ProjectRepository {
 
     override suspend fun loadFromRemoteAndRefreshCache(projectId: String): Project? {
         val trace = performanceTracker.newTrace("refreshProjectInfoWithServer").apply { start() }
