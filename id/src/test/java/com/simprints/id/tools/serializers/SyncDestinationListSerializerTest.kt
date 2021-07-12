@@ -18,7 +18,7 @@ class SyncDestinationListSerializerTest {
     }
 
     @Test
-    fun `serializing a list - three items`() {
+    fun `serializing a list - two items`() {
         val destinationList =
             listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
         val expectedString = "COMMCARE,SIMPRINTS"
@@ -38,7 +38,7 @@ class SyncDestinationListSerializerTest {
     }
 
     @Test
-    fun `deserializing a list - three items`() {
+    fun `deserializing a list - two items`() {
         val destinationString = "COMMCARE,SIMPRINTS"
         val expectedList = listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
 
