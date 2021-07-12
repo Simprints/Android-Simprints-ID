@@ -467,7 +467,7 @@ class CommCareCoSyncPresenterTest {
         )
         val sharedPreferences = mockSharedPrefs().apply {
             every { this@apply.syncDestinationSettings } returns listOf(
-                SyncDestinationSetting.COSYNCCALLINGAPP,
+                SyncDestinationSetting.COMMCARE,
                 SyncDestinationSetting.SIMPRINTS
             )
         }
@@ -507,7 +507,7 @@ class CommCareCoSyncPresenterTest {
     private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
-        every { this@apply.syncDestinationSettings } returns listOf(SyncDestinationSetting.COSYNCCALLINGAPP)
+        every { this@apply.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
         every { this@apply.modalities } returns listOf(Modality.FACE)
     }
 
