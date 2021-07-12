@@ -18,18 +18,33 @@ import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.EventRepositoryImpl
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
-import com.simprints.eventsystem.event.local.*
+import com.simprints.eventsystem.event.local.DbEventDatabaseFactoryImpl
+import com.simprints.eventsystem.event.local.EventDatabaseFactory
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.event.local.EventLocalDataSourceImpl
+import com.simprints.eventsystem.event.local.SessionDataCache
+import com.simprints.eventsystem.event.local.SessionDataCacheImpl
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
-import com.simprints.id.activities.qrcapture.tools.*
+import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
+import com.simprints.id.activities.qrcapture.tools.CameraFocusManagerImpl
+import com.simprints.id.activities.qrcapture.tools.CameraHelper
+import com.simprints.id.activities.qrcapture.tools.CameraHelperImpl
+import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
+import com.simprints.id.activities.qrcapture.tools.QrCodeDetectorImpl
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
+import com.simprints.id.activities.qrcapture.tools.QrCodeProducerImpl
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
+import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilderImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
@@ -41,7 +56,11 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.*
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
+import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
+import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -77,7 +96,6 @@ import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
-import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import com.simprints.libsimprints.BuildConfig.VERSION_NAME
 import dagger.Module
@@ -96,8 +114,10 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
-        FirebaseManagerImpl(loginInfoManager)
+    open fun provideRemoteDbManager(
+        loginInfoManager: LoginInfoManager,
+        context: Context
+    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
 
     @Provides
     @Singleton

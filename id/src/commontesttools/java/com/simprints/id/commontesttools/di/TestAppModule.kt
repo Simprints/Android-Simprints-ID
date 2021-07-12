@@ -85,13 +85,22 @@ class TestAppModule(
         )
     }
 
-   override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache = SessionDataCacheImpl(app)
+    override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
+        SessionDataCacheImpl(app)
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
-    override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
-        remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
+    override fun provideRemoteDbManager(
+        loginInfoManager: LoginInfoManager,
+        ctx: Context,
+    ): RemoteDbManager =
+        remoteDbManagerRule.resolveDependency {
+            super.provideRemoteDbManager(
+                loginInfoManager,
+                ctx
+            )
+        }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
