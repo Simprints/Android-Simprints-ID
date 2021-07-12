@@ -4,17 +4,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="16dp"
-        android:layout_above="@+id/securityStateLayout">
+        android:layout_above="@+id/securityStateLayout"
+        android:layout_marginBottom="16dp">
 
         <TextView
             android:id="@+id/logs"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"/>
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp" />
 
     </ScrollView>
 
@@ -24,58 +24,82 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/syncLayout"
         android:orientation="horizontal">
+
         <Button
             android:id="@+id/securityStateCompromised"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="COMPROMISED"/>
+            android:layout_weight="1"
+            android:text="Compromised" />
 
         <Button
             android:id="@+id/securityStateProjectEnded"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="PROJECT_ENDED"/>
-
-        <Button
-            android:id="@+id/printRoomDb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PRINT_ROOM_DB"/>
+            android:layout_weight="1"
+            android:text="Project Ended" />
     </LinearLayout>
 
-    <LinearLayout
+    <HorizontalScrollView
         android:id="@+id/syncLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/dbLayout"
+        android:layout_marginVertical="8dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/syncStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sync Events" />
+
+            <Button
+                android:id="@+id/syncConfig"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sync Config" />
+
+            <Button
+                android:id="@+id/syncStop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop Event Sync" />
+
+            <Button
+                android:id="@+id/syncSchedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Schedule Event Sync" />
+
+        </LinearLayout>
+
+
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/dbLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/syncStart"
+            android:id="@+id/printRoomDb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Start Sync" />
-
-        <Button
-            android:id="@+id/syncStop"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Stop Sync" />
-
-        <Button
-            android:id="@+id/syncSchedule"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Schedule Sync" />
+            android:text="Print subjects + events" />
 
         <Button
             android:id="@+id/cleanAll"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Clean" />
+            android:text="Delete subjects + events" />
     </LinearLayout>
 </RelativeLayout>
