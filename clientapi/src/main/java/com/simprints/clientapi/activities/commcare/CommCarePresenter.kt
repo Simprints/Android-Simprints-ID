@@ -118,7 +118,6 @@ class CommCarePresenter(
             val currentSessionId = sessionEventsManager.getCurrentSessionId()
 
             sessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED)
-            sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnConfirmation(
                 RETURN_FOR_FLOW_COMPLETED,
