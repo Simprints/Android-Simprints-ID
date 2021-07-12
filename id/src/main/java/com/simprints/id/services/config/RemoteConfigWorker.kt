@@ -2,11 +2,9 @@ package com.simprints.id.services.config
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.fasterxml.jackson.databind.JsonNode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.logging.Simber
 import kotlinx.coroutines.withContext
@@ -24,9 +22,6 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
     @Inject
     lateinit var projectRepository: ProjectRepository
 
-    @Inject
-    lateinit var remoteConfigWrapper: RemoteConfigWrapper
-
     override suspend fun doWork(): Result {
         getComponent<RemoteConfigWorker> { it.inject(this@RemoteConfigWorker) }
 
@@ -40,8 +35,7 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
                     return@withContext success()
                 }
 
-                val settingsJson = fetchProjectRemoteConfigSettings(projectId)
-                storeProjectRemoteConfigSettings(settingsJson)
+                projectRepository.fetchProjectConfigurationAndSave(projectId)
 
                 success(message = "Successfully updated configs")
             } catch (t: Throwable) {
@@ -50,12 +44,5 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
             }
         }
     }
-
-    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonNode =
-        projectRepository.loadProjectRemoteConfigSettingsJsonString(projectId)
-
-    private fun storeProjectRemoteConfigSettings(settingsJson: JsonNode) {
-        val jsonString = settingsJson.toString()
-        remoteConfigWrapper.projectSettingsJsonString = jsonString
-    }
+    
 }
