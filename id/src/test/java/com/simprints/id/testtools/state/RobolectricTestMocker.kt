@@ -1,16 +1,11 @@
 package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
-import com.fasterxml.jackson.databind.JsonNode
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_SECRET
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import io.mockk.coEvery
@@ -20,27 +15,6 @@ import java.math.BigInteger
 object RobolectricTestMocker {
 
     const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
-
-    suspend fun mockLoadProject(projectRemoteDataSource: ProjectRemoteDataSource,
-                                projectLocalDataSource: ProjectLocalDataSource
-    ): RobolectricTestMocker {
-
-        val project = Project(
-            DEFAULT_PROJECT_ID,
-            "local",
-            "",
-            "",
-            "some_bucket_url"
-        )
-
-        val projectSettings: JsonNode = JsonHelper.jackson.createObjectNode().apply { put("key", "value") }
-
-        coEvery { projectLocalDataSource.load(any()) } returns project
-        coEvery { projectRemoteDataSource.loadProjectFromRemote(any()) } returns project
-        coEvery { projectLocalDataSource.save(any()) } returns Unit
-        coEvery { projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(any()) } returns projectSettings
-        return this
-    }
 
     fun initLogInStateMock(sharedPrefs: SharedPreferences,
                            remoteDbManagerMock: RemoteDbManager

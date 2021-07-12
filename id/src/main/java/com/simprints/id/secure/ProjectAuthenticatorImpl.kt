@@ -1,13 +1,11 @@
 package com.simprints.id.secure
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.models.*
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.catch
@@ -18,9 +16,8 @@ class ProjectAuthenticatorImpl(
     private val projectSecretManager: ProjectSecretManager,
     private val safetyNetClient: SafetyNetClient,
     private val secureDataManager: SecureLocalDbKeyProvider,
-    private val projectRemoteDataSource: ProjectRemoteDataSource,
+    private val projectRepository: ProjectRepository,
     private val signerManager: SignerManager,
-    private val remoteConfigWrapper: RemoteConfigWrapper,
     private val longConsentRepository: LongConsentRepository,
     private val preferencesManager: IdPreferencesManager,
     private val attestationManager: AttestationManager,
@@ -38,9 +35,9 @@ class ProjectAuthenticatorImpl(
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)
 
-        fetchProjectRemoteConfigSettings(nonceScope.projectId)
-            .storeProjectRemoteConfigSettingsUpdateLanguageAndReturnProjectLanguages()
-            .fetchProjectLongConsentTexts()
+        projectRepository.fetchProjectConfigurationAndSave(nonceScope.projectId)
+
+        updateLanguageAndReturnProjectLanguages().fetchProjectLongConsentTexts()
     }
 
     private suspend fun prepareAuthRequestParameters(
@@ -66,7 +63,10 @@ class ProjectAuthenticatorImpl(
     private suspend fun getAuthenticationData(projectId: String, userId: String) =
         authenticationDataManager.requestAuthenticationData(projectId, userId)
 
-    private fun getEncryptedProjectSecret(projectSecret: String, authenticationData: AuthenticationData): String =
+    private fun getEncryptedProjectSecret(
+        projectSecret: String,
+        authenticationData: AuthenticationData
+    ): String =
         projectSecretManager.encryptAndStoreAndReturnProjectSecret(
             projectSecret,
             authenticationData.publicKeyString
@@ -100,13 +100,7 @@ class ProjectAuthenticatorImpl(
         secureDataManager.setLocalDatabaseKey(projectId)
     }
 
-    private suspend fun fetchProjectRemoteConfigSettings(projectId: String): JsonNode =
-        projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
-
-    private fun JsonNode.storeProjectRemoteConfigSettingsUpdateLanguageAndReturnProjectLanguages(): Array<String> {
-        val jsonString = this.toString()
-        remoteConfigWrapper.projectSettingsJsonString = jsonString
-
+    private fun updateLanguageAndReturnProjectLanguages(): Array<String> {
         /*We need to override the language in the helper as the language context is initialised in Application
          in attachBaseContext() which is  called before initialising dagger component.
          Thus we cannot use preferences manager to get the language.*/
@@ -117,6 +111,9 @@ class ProjectAuthenticatorImpl(
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {
         longConsentRepository.deleteLongConsents()
-        forEach { longConsentRepository.getLongConsentResultForLanguage(it).catch { Simber.e(it) }.collect() }
+        forEach {
+            longConsentRepository.getLongConsentResultForLanguage(it).catch { Simber.e(it) }
+                .collect()
+        }
     }
 }

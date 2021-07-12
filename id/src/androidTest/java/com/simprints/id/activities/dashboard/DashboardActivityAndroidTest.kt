@@ -56,7 +56,7 @@ class DashboardActivityAndroidTest {
             .componentBuilder()
             .viewModelModule(buildViewModelModule())
             .build()
-        
+
         mockPreferencesManager = app.component.getIdPreferencesManager()
     }
 

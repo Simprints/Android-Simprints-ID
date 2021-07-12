@@ -7,14 +7,10 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.CoroutineDispatcher
 import org.junit.Before
 import org.junit.Rule
@@ -53,7 +49,6 @@ class RemoteConfigWorkerTest {
         remoteConfigWorker = TestListenableWorkerBuilder<RemoteConfigWorker>(app).build().apply {
             loginInfoManager = loginInfoManagerMock
             projectRepository = projectRepositoryMock
-            remoteConfigWrapper = mockk(relaxed = true)
             dispatcherProvider = testDispatcherProvider
         }
         app.component = mockk(relaxed = true)
@@ -61,8 +56,7 @@ class RemoteConfigWorkerTest {
 
     @Test
     fun `when download settings correctly - should return success`() = testCoroutineRule.runBlockingTest {
-        coEvery { projectRepositoryMock.loadProjectRemoteConfigSettingsJsonString(any()) } returns
-            JsonHelper.fromJson("{}")
+        coEvery { projectRepositoryMock.fetchProjectConfigurationAndSave(any()) } just Runs
 
         val result = remoteConfigWorker.doWork()
 
@@ -76,7 +70,7 @@ class RemoteConfigWorkerTest {
         val result = remoteConfigWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 0) { projectRepositoryMock.loadProjectRemoteConfigSettingsJsonString(any()) }
+        coVerify(exactly = 0) { projectRepositoryMock.fetchProjectConfigurationAndSave(any()) }
     }
 
 }

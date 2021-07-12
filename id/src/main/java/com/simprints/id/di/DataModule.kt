@@ -35,6 +35,7 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import dagger.Module
 import dagger.Provides
@@ -73,10 +74,12 @@ open class DataModule {
     @Provides
     open fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): ProjectRepository = ProjectRepositoryImpl(
         projectLocalDataSource,
-        projectRemoteDataSource
+        projectRemoteDataSource,
+        remoteConfigWrapper
     )
 
     @Provides
