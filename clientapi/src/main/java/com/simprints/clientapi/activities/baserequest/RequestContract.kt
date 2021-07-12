@@ -31,9 +31,10 @@ interface RequestContract {
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
         /**
-         * This is not being used for CommCare because of CoSync.
-         * The method [com.simprints.clientapi.activities.commcare.CommCareContract.View.returnErrorToClient]
-         * is functionally the same as this, but you can pass a nullable eventJson that won't be included in the response
+         * This is not being used for Libsimprints and CommCare because of CoSync.
+         * The methods [com.simprints.clientapi.activities.commcare.CommCareContract.View.returnErrorToClient]
+         * and [com.simprints.clientapi.activities.libsimprints.LibSimprintsContract.View.returnErrorToClient]
+         * are functionally the same as this, but you can pass a nullable eventJson that won't be included in the response
          * if it's null.
          */
         fun returnErrorToClient(
