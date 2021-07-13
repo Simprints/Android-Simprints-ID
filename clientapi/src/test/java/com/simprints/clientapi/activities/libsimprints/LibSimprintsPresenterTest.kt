@@ -35,6 +35,7 @@ class LibSimprintsPresenterTest {
 
     @MockK
     lateinit var view: LibSimprintsActivity
+
     @MockK
     lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
 
@@ -258,6 +259,64 @@ class LibSimprintsPresenterTest {
     private fun verifyCompletionCheckEventWasAdded() {
         coVerify(exactly = 1) {
             clientApiSessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK)
+        }
+    }
+
+    @Test
+    fun shouldNot_closeSession_whenHandling_responseFrom_confirmID_request() {
+        val newSessionId = "session_id_changed"
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        every { view.confirmIdentityExtractor } returns confirmIdentify
+
+        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers  {
+            // return a new sessionId if closeSession is called
+            coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns newSessionId
+        }
+
+
+        LibSimprintsPresenter(
+            view,
+            ConfirmIdentity,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).handleConfirmationResponse(mockk())
+
+
+
+        runBlocking {
+            val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
+            assertThat(sessionId).isNotEqualTo(newSessionId)
+            coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
+        }
+
+    }
+
+    @Test
+    fun shouldNot_closeSession_whenHandling_responseFrom_enrolLastBiometrics_request() {
+        val newSessionId = "session_id_changed"
+        val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
+        every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
+
+        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers {
+            // return a new sessionId if closeSession is called
+            coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns newSessionId
+        }
+
+
+        LibSimprintsPresenter(
+            view,
+            EnrolLastBiometrics,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).handleEnrolResponse(mockk())
+
+
+        runBlocking {
+            val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
+            assertThat(sessionId).isNotEqualTo(newSessionId)
+            coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
         }
     }
 }

@@ -1,15 +1,13 @@
 package com.simprints.clientapi.activities.odk
 
+import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
 import com.simprints.clientapi.domain.responses.entities.MatchResult
@@ -202,6 +200,60 @@ class OdkPresenterTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun shouldNot_closeSession_whenHandling_responseFrom_confirmID_request() {
+        val newSessionId = "session_id_changed"
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        every { view.confirmIdentityExtractor } returns confirmIdentify
+
+        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers  {
+            // return a new sessionId if closeSession is called
+            coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns newSessionId
+        }
+
+
+        OdkPresenter(view, ConfirmIdentity, clientApiSessionEventsManager, mockk(), mockk()).apply {
+            runBlocking {
+              handleConfirmationResponse(mockk())
+            }
+        }
+
+
+        runBlocking {
+            val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
+            assertThat(sessionId).isNotEqualTo(newSessionId)
+            coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
+        }
+    }
+
+    @Test
+    fun shouldNot_closeSession_whenHandling_responseFrom_enrolLastBiometrics_request() {
+        val newSessionId = "session_id_changed"
+        val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
+        every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
+
+        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers  {
+            // return a new sessionId if closeSession is called
+            coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns newSessionId
+        }
+
+
+        OdkPresenter(
+            view,
+            EnrolLastBiometrics,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).apply { runBlocking { handleEnrolResponse(mockk()) } }
+
+        runBlocking {
+            val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
+            assertThat(sessionId).isNotEqualTo(newSessionId)
+            coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
+        }
+
     }
 
     companion object {
