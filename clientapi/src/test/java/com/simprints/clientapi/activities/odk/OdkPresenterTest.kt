@@ -247,7 +247,7 @@ class OdkPresenterTest {
             view,
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
-            mockk(),
+            mockk()
         ).apply { runBlocking { handleEnrolResponse(mockk()) } }
 
         runBlocking {
