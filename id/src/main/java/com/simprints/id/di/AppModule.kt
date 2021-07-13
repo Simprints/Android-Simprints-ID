@@ -2,10 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.lyft.kronos.AndroidClockFactory
-import com.simprints.core.analytics.CoreCrashReportManager
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
@@ -31,9 +28,6 @@ import com.simprints.id.Application
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -108,14 +102,6 @@ open class AppModule {
 
     @Provides
     @Singleton
-    @Suppress("MissingPermission")
-    fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
-        FirebaseAnalytics.getInstance(app).apply {
-            this.setSessionTimeoutDuration(0)
-        }
-
-    @Provides
-    @Singleton
     open fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager =
         RecentEventsPreferencesManagerImpl(prefs)
 
@@ -124,23 +110,6 @@ open class AppModule {
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
-
-    @Provides
-    @Singleton
-    open fun provideAnalyticsManager(
-        loginInfoManager: LoginInfoManager,
-        preferencesManager: PreferencesManager,
-        firebaseAnalytics: FirebaseAnalytics
-    ): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, firebaseAnalytics)
-
-    @Provides
-    @Singleton
-    open fun provideCrashManager(): CrashReportManager = CrashReportManagerImpl()
-
-    @Provides
-    @Singleton
-    open fun provideCoreCrashReportManager(crashReportManager: CrashReportManager): CoreCrashReportManager =
-        crashReportManager
 
     @Provides
     @Singleton
@@ -227,9 +196,8 @@ open class AppModule {
     open fun provideDbEventDatabaseFactory(
         ctx: Context,
         secureDataManager: SecureLocalDbKeyProvider,
-        crashReportManager: CrashReportManager
     ): EventDatabaseFactory =
-        DbEventDatabaseFactoryImpl(ctx, secureDataManager, crashReportManager)
+        DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
     @Provides
     @Singleton
@@ -247,7 +215,6 @@ open class AppModule {
         idPreferencesManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
     ): EventRepository =
@@ -257,7 +224,6 @@ open class AppModule {
             loginInfoManager,
             eventLocalDataSource,
             eventRemoteDataSource,
-            crashReportManager,
             timeHelper,
             validatorFactory,
             VERSION_NAME,
@@ -269,11 +235,9 @@ open class AppModule {
     @Provides
     fun provideModuleRepository(
         preferencesManager: IdPreferencesManager,
-        crashReportManager: CrashReportManager,
         subjectRepository: SubjectRepository
     ): ModuleRepository = ModuleRepositoryImpl(
         preferencesManager,
-        crashReportManager,
         subjectRepository
     )
 
@@ -281,16 +245,12 @@ open class AppModule {
     open fun provideGuidSelectionManager(
         context: Context,
         loginInfoManager: LoginInfoManager,
-        analyticsManager: AnalyticsManager,
-        crashReportManager: CrashReportManager,
         timeHelper: TimeHelper,
         eventRepository: EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
             loginInfoManager,
-            analyticsManager,
-            crashReportManager,
             timeHelper,
             eventRepository
         )
@@ -308,14 +268,12 @@ open class AppModule {
     open fun provideGuidFetchGuidHelper(
         downSyncHelper: EventDownSyncHelper,
         subjectRepository: SubjectRepository,
-        preferencesManager: IdPreferencesManager,
-        crashReportManager: CrashReportManager
+        preferencesManager: IdPreferencesManager
     ): FetchGuidHelper =
         FetchGuidHelperImpl(
             downSyncHelper,
             subjectRepository,
-            preferencesManager,
-            crashReportManager
+            preferencesManager
         )
 
     @Provides
@@ -355,13 +313,10 @@ open class AppModule {
     @ExperimentalCoroutinesApi
     open fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
-        crashReportManager: CrashReportManager
-    ): QrCodeProducer = QrCodeProducerImpl(qrCodeDetector, crashReportManager)
+    ): QrCodeProducer = QrCodeProducerImpl(qrCodeDetector)
 
     @Provides
-    open fun provideQrCodeDetector(
-        crashReportManager: CrashReportManager
-    ): QrCodeDetector = QrCodeDetectorImpl(crashReportManager)
+    open fun provideQrCodeDetector(): QrCodeDetector = QrCodeDetectorImpl()
 
     @Provides
     fun provideHotCache(

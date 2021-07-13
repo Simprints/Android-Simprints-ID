@@ -7,8 +7,8 @@ import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.logging.Simber
 import org.jetbrains.anko.runOnUiThread
-import timber.log.Timber
 
 fun Activity.launchRefusalActivity(requestCode: Int = RequestCode.REFUSAL.value) {
     val intent = Intent(this, RefusalActivity::class.java)
@@ -33,11 +33,11 @@ fun Context.showToast(string: String) =
     }
 
 fun Activity.logActivityCreated() {
-    Timber.d("Fingerprint Activity Log : created ${this::class.simpleName}")
+    Simber.d("Fingerprint Activity Log : created ${this::class.simpleName}")
 }
 
 fun Activity.logActivityDestroyed() {
-    Timber.d("Fingerprint Activity Log : destroyed ${this::class.simpleName}")
+    Simber.d("Fingerprint Activity Log : destroyed ${this::class.simpleName}")
 }
 
 fun Activity.setResultAndFinish(resultCode: ResultCode, data: Intent?) {

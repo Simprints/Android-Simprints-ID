@@ -45,7 +45,6 @@ class EventDownSyncCountWorkerTest {
 
         app.component = mockk(relaxed = true)
         with(countWorker) {
-            crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             eventDownSyncHelper = mockk(relaxed = true)
             jsonHelper = JsonHelper

@@ -9,7 +9,6 @@ import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.mockk
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -51,7 +50,6 @@ class GeneralConsentTextHelperTest {
             PROGRAM_NAME,
             ORGANIZATION_NAME,
             listOf(Modality.FINGER),
-            mockk(),
             JsonHelper
         )
 
@@ -72,7 +70,6 @@ class GeneralConsentTextHelperTest {
             PROGRAM_NAME,
             ORGANIZATION_NAME,
             listOf(Modality.FACE),
-            mockk(),
             JsonHelper
         )
 
@@ -95,7 +92,6 @@ class GeneralConsentTextHelperTest {
             PROGRAM_NAME,
             ORGANIZATION_NAME,
             listOf(Modality.FINGER, Modality.FACE),
-            mockk(),
             JsonHelper
         )
 

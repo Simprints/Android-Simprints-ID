@@ -122,14 +122,12 @@ object Dependencies {
     }
 
     object Firebase {
-        const val analytics = "com.google.firebase:firebase-analytics-ktx:18.0.3"
         const val auth = "com.google.firebase:firebase-auth:19.2.0"
         const val config = "com.google.firebase:firebase-config:19.1.3"
         const val perf = "com.google.firebase:firebase-perf:19.0.5"
         const val storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
         const val mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
         const val mlkit_barcode = "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
-        const val crashlytics = "com.google.firebase:firebase-crashlytics:17.1.1"
     }
 
     object Retrofit {
@@ -143,13 +141,6 @@ object Dependencies {
 
     object Jackson {
         const val core = "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
-    }
-
-    object Timber {
-        const val core = "com.jakewharton.timber:timber:4.5.1"
-        //4.7.1 breaks realm:
-        // https://github.com/realm/realm-java/issues/6153
-        // https://github.com/JakeWharton/timber/issues/295
     }
 
     object RxJava2 {
@@ -185,7 +176,11 @@ object Dependencies {
     // Testing
     object Testing {
         const val junit = "junit:junit:4.13"
-        const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
+
+        object KoTest {
+            const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
+            const val kotlin_assert = "io.kotest:kotest-assertions-core:4.6.0"
+        }
 
         object Robolectric {
             const val core = "org.robolectric:robolectric:$robolectric_version"

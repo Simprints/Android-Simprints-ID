@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
@@ -132,12 +131,10 @@ open class DataModule {
     @Provides
     open fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
-        longConsentRemoteDataSource: LongConsentRemoteDataSource,
-        crashReportManager: CrashReportManager
+        longConsentRemoteDataSource: LongConsentRemoteDataSource
     ): LongConsentRepository = LongConsentRepositoryImpl(
         longConsentLocalDataSource,
-        longConsentRemoteDataSource,
-        crashReportManager
+        longConsentRemoteDataSource
     )
 
     @Provides
@@ -150,7 +147,6 @@ open class DataModule {
         loginInfoManager: LoginInfoManager,
         eventLocal: EventLocalDataSource,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager,
         preferencesManager: IdPreferencesManager,
         subjectLocal: SubjectLocalDataSource,
         encoder: EncodingUtils
@@ -159,7 +155,6 @@ open class DataModule {
             loginInfoManager,
             eventLocal,
             timeHelper,
-            crashReportManager,
             preferencesManager,
             subjectLocal,
             encoder
@@ -178,7 +173,6 @@ open class DataModule {
     @Provides
     open fun provideLicenseRepository(
         licenseLocalDataSource: LicenseLocalDataSource,
-        licenseRemoteDataSource: LicenseRemoteDataSource,
-        crashReportManager: CrashReportManager
+        licenseRemoteDataSource: LicenseRemoteDataSource
     ): LicenseRepository = LicenseRepositoryImpl(licenseLocalDataSource, licenseRemoteDataSource)
 }

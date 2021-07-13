@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.eventsystem.sampledata.*
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import org.junit.Before
 import org.junit.Test
 

@@ -47,8 +47,7 @@ class ConsentActivityTest {
     private val module by lazy {
         TestAppModule(app,
             dbManagerRule = MockkRule,
-            sessionEventsLocalDbManagerRule = MockkRule,
-            crashReportManagerRule = MockkRule)
+            sessionEventsLocalDbManagerRule = MockkRule)
     }
 
     @Before

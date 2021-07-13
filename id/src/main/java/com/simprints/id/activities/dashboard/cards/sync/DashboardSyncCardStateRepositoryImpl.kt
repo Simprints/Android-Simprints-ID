@@ -14,11 +14,11 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.coroutineContext
 
@@ -102,7 +102,7 @@ class DashboardSyncCardStateRepositoryImpl(
 
         var delayBeforeObserve = 0L
         if (shouldForceOneTimeSync()) {
-            Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n Re-launching one time sync")
+            Simber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n Re-launching one time sync")
             eventSyncManager.sync()
             delayBeforeObserve = 6000
         }
@@ -150,7 +150,7 @@ class DashboardSyncCardStateRepositoryImpl(
     }
 
     private fun updateDashboardCardState(newState: DashboardSyncCardState) {
-        Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n New dashboard state: $newState")
+        Simber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n New dashboard state: $newState")
         syncCardStateLiveData.value = newState
     }
 

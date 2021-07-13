@@ -5,7 +5,6 @@ import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
@@ -17,6 +16,8 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,19 +26,16 @@ class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
     private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
+    deviceManager: DeviceManager
 ) : RequestPresenter(
     view,
     sessionEventsManager,
-    deviceManager,
-    crashReportManager
-), LibSimprintsContract.Presenter {
+    deviceManager), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
         if (action !is LibSimprintsActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {

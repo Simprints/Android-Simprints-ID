@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -18,10 +20,6 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
-import com.simprints.core.analytics.CrashReportManager
-import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -30,7 +28,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
-import timber.log.Timber
+import com.simprints.logging.Simber
 import javax.inject.Inject
 
 class LoginActivity : BaseSplitActivity() {
@@ -39,8 +37,6 @@ class LoginActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var viewModelFactory: LoginViewModelFactory
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
     @Inject
     lateinit var loginActivityHelper: LoginActivityHelper
     @Inject
@@ -143,7 +139,7 @@ class LoginActivity : BaseSplitActivity() {
     private fun processQrScanResponse(response: Intent) {
         try {
             val qrCodeResponse = loginActivityHelper.tryParseQrCodeResponse(response)
-            Timber.d("QR code response: $qrCodeResponse")
+            Simber.d("QR code response: $qrCodeResponse")
             val projectId = qrCodeResponse.projectId
             val projectSecret = qrCodeResponse.projectSecret
             baseUrlProvider.setApiBaseUrl(qrCodeResponse.apiBaseUrl)
@@ -170,11 +166,7 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.LOGIN,
-            CrashReportTrigger.UI,
-            message = message
-        )
+        Simber.tag(CrashReportTag.LOGIN.name).i(message)
     }
 
     private fun signIn() {

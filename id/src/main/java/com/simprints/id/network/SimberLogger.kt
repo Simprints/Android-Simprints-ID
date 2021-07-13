@@ -1,11 +1,11 @@
 package com.simprints.id.network
 
+import com.simprints.logging.Simber
 import okhttp3.logging.HttpLoggingInterceptor
-import timber.log.Timber
 
-class TimberLogger: HttpLoggingInterceptor.Logger {
+object SimberLogger: HttpLoggingInterceptor.Logger {
 
     override fun log(message: String) {
-        Timber.d(message)
+        Simber.d(message)
     }
 }
