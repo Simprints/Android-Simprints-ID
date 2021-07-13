@@ -7,11 +7,11 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedExcepti
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -47,7 +47,7 @@ class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
         }.flatMap { device ->
             Single.fromCallable {
                 try {
-                    Timber.d("Attempting connect...")
+                    Simber.d("Attempting connect...")
                     val socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
                     bluetoothAdapter.cancelDiscovery()
                     socket.connect()
@@ -60,7 +60,7 @@ class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
         }
 
     private fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket): Completable {
-        Timber.d("Socket connected. Setting up scanner...")
+        Simber.d("Socket connected. Setting up scanner...")
         return scanner.connect(socket.getInputStream(), socket.getOutputStream())
     }
 

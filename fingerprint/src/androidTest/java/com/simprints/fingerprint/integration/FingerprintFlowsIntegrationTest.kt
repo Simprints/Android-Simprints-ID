@@ -67,7 +67,6 @@ class FingerprintFlowsIntegrationTest : KoinTest {
                 spyk(ScannerFactoryImpl(
                     bluetoothAdapter = simulatedBluetoothAdapter,
                     preferencesManager = mockk(relaxed = true),
-                    crashReportManager = mockk(relaxed = true),
                     scannerUiHelper = mockk(relaxed = true),
                     serialNumberConverter = mockk(relaxed = true),
                     scannerGenerationDeterminer = mockk(relaxed = true),

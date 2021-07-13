@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.camera.core.*
 import androidx.camera.view.PreviewView
-import timber.log.Timber
+import com.simprints.logging.Simber
 import java.util.concurrent.TimeUnit
 
 class CameraFocusManagerImpl : CameraFocusManager {
@@ -29,7 +29,7 @@ class CameraFocusManagerImpl : CameraFocusManager {
                         try {
                             camera.cameraControl.startFocusAndMetering(focusAction)
                         } catch (e: CameraInfoUnavailableException) {
-                            Timber.e(e, "Cannot access camera")
+                            Simber.e(e, "Cannot access camera")
                         }
                         true
                     }
@@ -52,7 +52,7 @@ class CameraFocusManagerImpl : CameraFocusManager {
             try {
                 camera.cameraControl.startFocusAndMetering(focusAction)
             } catch (e: CameraInfoUnavailableException) {
-                Timber.e(e, "Cannot access camera")
+                Simber.e(e, "Cannot access camera")
             }
         }
     }

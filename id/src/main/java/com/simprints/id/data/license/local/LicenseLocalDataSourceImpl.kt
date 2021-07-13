@@ -7,7 +7,7 @@ import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.simprints.id.data.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
 import com.simprints.id.data.license.local.LicenseLocalDataSource.Companion.LICENSE_NAME
-import timber.log.Timber
+import com.simprints.logging.Simber
 import java.io.File
 
 class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource {
@@ -28,7 +28,7 @@ class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource 
         return try {
             getEncryptedFile(file).openFileOutput().use { it.write(license.toByteArray()) }
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
         }
     }
 
@@ -52,7 +52,7 @@ class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource 
         try {
             File(licensePath).delete()
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
         }
     }
 

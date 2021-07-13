@@ -8,7 +8,7 @@ import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.data.images.remote.ImageRemoteDataSource
 import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
 import com.simprints.id.network.BaseUrlProvider
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class ImageRepositoryImpl internal constructor(
     private val localDataSource: ImageLocalDataSource,
@@ -42,7 +42,7 @@ class ImageRepositoryImpl internal constructor(
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Timber.d(t)
+                Simber.d(t)
             }
         }
 

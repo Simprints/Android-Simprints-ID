@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.TabHost
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
@@ -53,7 +52,6 @@ class ConsentActivity : BaseSplitActivity() {
     @Inject lateinit var exitFormHelper: ExitFormHelper
     @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @Inject lateinit var locationManager: LocationManager
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var jsonHelper: JsonHelper
 
     private var startConsentEventTime: Long = 0
@@ -110,7 +108,6 @@ class ConsentActivity : BaseSplitActivity() {
         GeneralConsentTextHelper(
             generalConsentOptionsJson,
             programName, organizationName, modalities,
-            crashReportManager,
             jsonHelper
         ).assembleText(askConsentRequestReceived, this)
 
@@ -122,7 +119,6 @@ class ConsentActivity : BaseSplitActivity() {
         ParentalConsentTextHelper(
             parentalConsentOptionsJson,
             programName, organizationName, modalities,
-            crashReportManager,
             jsonHelper
         ).assembleText(askConsentRequestReceived, this)
 

@@ -2,11 +2,9 @@ package com.simprints.face.orchestrator
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_LICENSE
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
 import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
@@ -17,14 +15,17 @@ import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.error.ErrorType
+import com.simprints.logging.Simber
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import timber.log.Timber
 
-class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportManager) : ViewModel() {
-    val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> = MutableLiveData()
-    val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> = MutableLiveData()
-    val startConfiguration: MutableLiveData<LiveDataEventWithContent<FaceConfigurationRequest>> = MutableLiveData()
+class FaceOrchestratorViewModel : ViewModel() {
+    val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> =
+        MutableLiveData()
+    val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> =
+        MutableLiveData()
+    val startConfiguration: MutableLiveData<LiveDataEventWithContent<FaceConfigurationRequest>> =
+        MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
@@ -64,35 +65,25 @@ class FaceOrchestratorViewModel(private val crashReportManager: FaceCrashReportM
     }
 
     fun missingLicense() {
-        Timber.d("License is missing")
-        crashReportManager.logMessageForCrashReport(
-            FACE_LICENSE,
-            UI,
-            message = "License is missing"
-        )
+        Simber.tag(CrashReportTag.FACE_LICENSE.name).i("License is missing")
         errorEvent.send(ErrorType.LICENSE_MISSING)
     }
 
     fun invalidLicense() {
-        Timber.d("License is invalid")
-        crashReportManager.logMessageForCrashReport(
-            FACE_LICENSE,
-            UI,
-            message = "License is invalid"
-        )
+        Simber.tag(CrashReportTag.FACE_LICENSE.name).i("License is invalid")
         errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
     fun configurationFinished(isSuccess: Boolean, errorCode: String? = null) {
         if (isSuccess) {
-            flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(FaceConfigurationResponse()))
-        } else {
-            Timber.d("Configuration error. Error Code = $errorCode")
-            crashReportManager.logMessageForCrashReport(
-                FACE_LICENSE,
-                UI,
-                message = "Error with configuration download. Error Code = $errorCode"
+            flowFinished.send(
+                DomainToFaceResponse.fromDomainToFaceResponse(
+                    FaceConfigurationResponse()
+                )
             )
+        } else {
+            Simber.tag(CrashReportTag.FACE_LICENSE.name)
+                .i("Error with configuration download. Error Code = $errorCode")
             errorEvent.send(ErrorType.CONFIGURATION_ERROR.apply {
                 this.errorCode = errorCode
             })

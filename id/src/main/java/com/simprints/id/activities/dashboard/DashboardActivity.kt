@@ -31,11 +31,11 @@ import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
 import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.logging.Simber
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 class DashboardActivity : BaseSplitActivity() {
@@ -218,7 +218,7 @@ class DashboardActivity : BaseSplitActivity() {
                 delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
                 initialDelayMillis = 0
             ).also {
-                    Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
+                Simber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
                     viewModel.syncIfRequired()
             }
 

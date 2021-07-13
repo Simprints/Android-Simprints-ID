@@ -6,9 +6,9 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
+import com.simprints.logging.Simber
 import okhttp3.ResponseBody
 import retrofit2.HttpException
-import timber.log.Timber
 
 class LicenseRemoteDataSourceImpl(
     private val simApiClientFactory: SimApiClientFactory,
@@ -28,7 +28,7 @@ class LicenseRemoteDataSourceImpl(
             ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(licenseVendor))
         }
     } catch (t: Throwable) {
-        Timber.e(t)
+        Simber.e(t)
 
         if (t is SyncCloudIntegrationException)
             handleCloudException(t)

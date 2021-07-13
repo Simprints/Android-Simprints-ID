@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -28,7 +27,6 @@ class SetupViewModelTest {
 
     @MockK lateinit var splitInstallManagerMock: SplitInstallManager
     @MockK lateinit var deviceManagerMock: DeviceManager
-    @MockK lateinit var crashReportManagerMock: CrashReportManager
 
     private lateinit var isConnectedUpdates: MutableLiveData<Boolean>
 
@@ -45,7 +43,7 @@ class SetupViewModelTest {
         val modalityList = listOf("fingerprint","face")
         every { splitInstallManagerMock.installedModules } returns emptySet()
 
-        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
+        val viewModel = SetupViewModel(deviceManagerMock)
         viewModel.start(splitInstallManagerMock, modalityList)
 
         verify(exactly = 1) { splitInstallManagerMock.startInstall(any()) }
@@ -56,7 +54,7 @@ class SetupViewModelTest {
         val modalityList = listOf("fingerprint","face")
         every { splitInstallManagerMock.installedModules } returns setOf("fingerprint","face")
 
-        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
+        val viewModel = SetupViewModel(deviceManagerMock)
         viewModel.start(splitInstallManagerMock, modalityList)
 
         assertThat(viewModel.getViewStateLiveData().testObserver().observedValues.last())
@@ -67,7 +65,7 @@ class SetupViewModelTest {
     fun deviceOffline_shouldHaveCorrectViewState() {
         isConnectedUpdates.value = false
 
-        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
+        val viewModel = SetupViewModel(deviceManagerMock)
 
         assertThat(viewModel.getDeviceNetworkLiveData().testObserver().observedValues.last())
             .isEqualTo(DeviceOffline)
@@ -77,7 +75,7 @@ class SetupViewModelTest {
     fun deviceOnline_shouldHaveCorrectViewState() {
         isConnectedUpdates.value = true
 
-        val viewModel = SetupViewModel(deviceManagerMock, crashReportManagerMock)
+        val viewModel = SetupViewModel(deviceManagerMock)
 
         assertThat(viewModel.getDeviceNetworkLiveData().testObserver().observedValues.last())
             .isEqualTo(DeviceOnline)

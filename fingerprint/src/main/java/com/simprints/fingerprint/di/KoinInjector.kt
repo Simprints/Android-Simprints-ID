@@ -19,10 +19,6 @@ import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.activities.refusal.RefusalContract
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -124,9 +120,7 @@ object KoinInjector {
      */
     private fun Module.defineBuildersForFingerprintManagers() {
         single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
-        factory<FingerprintAnalyticsManager> { FingerprintAnalyticsManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
-        factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
@@ -164,7 +158,6 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(),
                 get()
             )
         }
@@ -186,18 +179,17 @@ object KoinInjector {
 
     private fun Module.defineBuildersForPresentersAndViewModels() {
         factory<AlertContract.Presenter> { (view: AlertContract.View, fingerprintAlert: FingerprintAlert) ->
-            AlertPresenter(view, get(), get(), get(), fingerprintAlert)
+            AlertPresenter(view, get(), get(), fingerprintAlert)
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
-            RefusalPresenter(view, get(), get(), get())
+            RefusalPresenter(view, get(), get())
         }
         single<EncodingUtils> { EncodingUtilsImpl }
 
         viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
-                get(),
                 get(),
                 get(),
                 get(),
@@ -208,10 +200,10 @@ object KoinInjector {
                 get()
             )
         }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
-        viewModel { OtaViewModel(get(), get(), get(), get(), get()) }
+        viewModel { OtaViewModel(get(), get(), get(), get()) }
         viewModel { OtaRecoveryViewModel(get()) }
     }
 

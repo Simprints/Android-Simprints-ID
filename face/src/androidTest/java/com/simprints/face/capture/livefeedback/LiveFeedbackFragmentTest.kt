@@ -8,17 +8,15 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.logging.Simber
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
@@ -28,7 +26,6 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class LiveFeedbackFragmentTest : KoinTest {
@@ -78,7 +75,7 @@ class LiveFeedbackFragmentTest : KoinTest {
                 try {
                     allowPermissions.click()
                 } catch (e: UiObjectNotFoundException) {
-                    Timber.e(e, "There is no permissions dialog to interact with.")
+                    Simber.e(e, "There is no permissions dialog to interact with.")
                 }
             }
         }

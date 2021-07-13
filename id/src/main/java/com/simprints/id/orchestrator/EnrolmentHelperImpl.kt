@@ -11,9 +11,9 @@ import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import timber.log.Timber
 import java.util.*
 
 private const val TAG = "ENROLMENT"
@@ -25,17 +25,17 @@ class EnrolmentHelperImpl(
 ) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
-        Timber.tag(TAG).d("Enrolment in progress")
+        Simber.tag(TAG).d("Enrolment in progress")
         registerEvent(subject)
 
-        Timber.tag(TAG).d("Create a subject record")
+        Simber.tag(TAG).d("Create a subject record")
         subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
 
-        Timber.tag(TAG).d("Done!")
+        Simber.tag(TAG).d("Done!")
     }
 
     private suspend fun registerEvent(subject: Subject) {
-        Timber.tag(TAG).d("Register events for enrolments")
+        Simber.tag(TAG).d("Register events for enrolments")
 
         val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
         val personCreationEvent = eventRepository.getEventsFromSession(currentSession)

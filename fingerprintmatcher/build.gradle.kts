@@ -33,6 +33,4 @@ dependencies {
     // Kotlin
     implementation(Dependencies.Kotlin.coroutines_android)
     compileOnly(Dependencies.AndroidX.Annotation.annotation)
-
-    testImplementation(Dependencies.Testing.junit)
 }

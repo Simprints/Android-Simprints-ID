@@ -5,7 +5,7 @@ import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTas
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class RunnableTaskDispatcher(
     private val configurationController: ConfigurationController
@@ -20,7 +20,7 @@ class RunnableTaskDispatcher(
             }
             withResult(result)
         } catch (e: Throwable) {
-            Timber.e(e, "Error running task $runnableTask")
+            Simber.e(e, "Error running task $runnableTask")
             withResult(null)
         }
     }

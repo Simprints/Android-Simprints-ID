@@ -62,9 +62,7 @@ class EventEndSyncReporterWorkerTest {
             .setInputData(inputData)
             .build() as EventEndSyncReporterWorker)
             .apply {
-                crashReportManager = mockk(relaxed = true)
                 resultSetter = mockk(relaxed = true)
                 syncCache = mockk(relaxed = true)
-
             }
 }
