@@ -3,12 +3,10 @@
 package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
@@ -25,13 +23,14 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
-import io.kotlintest.shouldThrow
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.verify
-import io.mockk.coVerify
+import com.simprints.eventsystem.sampledata.createAlertScreenEvent
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -39,7 +38,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.DisplayName
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -55,9 +53,6 @@ class EventRepositoryImplTest {
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
-
-    @MockK
-    lateinit var crashReportManager: CrashReportManager
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -85,7 +80,6 @@ class EventRepositoryImplTest {
             loginInfoManager,
             eventLocalDataSource,
             eventRemoteDataSource,
-            crashReportManager,
             timeHelper,
             sessionEventValidatorsFactory,
             LIB_VERSION_NAME,
@@ -244,7 +238,6 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("The repo should throw if sessions for a not signed project are requested to be uploaded")
     fun upload_shouldNotUploadSessionsForNotSignedProject() {
         runBlocking {
             shouldThrow<TryToUploadEventsForNotSignedProject> {

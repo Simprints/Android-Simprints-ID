@@ -41,6 +41,8 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
 
+    implementation(project(":logging"))
+
     api(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Room.ktx)
     kapt(Dependencies.AndroidX.Room.compiler)
@@ -49,23 +51,17 @@ dependencies {
     implementation(Dependencies.Kotlin.coroutines_android)
     implementation(Dependencies.Kotlin.serialization_json)
     implementation(Dependencies.Jackson.core)
-    implementation(Dependencies.Timber.core)
+
     api(Dependencies.Retrofit.okhttp)
     api(Dependencies.Retrofit.core)
     api(Dependencies.SqlCipher.core)
 
-    testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.AndroidX.ext_junit)
     testImplementation(Dependencies.Testing.coroutines_test)
-    testImplementation(Dependencies.Testing.Robolectric.core)
-    testImplementation(Dependencies.Testing.AndroidX.runner)
+    testImplementation(Dependencies.Testing.Robolectric.annotation)
+    testImplementation(Dependencies.Testing.KoTest.kotlin_assert)
     testImplementation(Dependencies.Testing.AndroidX.room)
-    testImplementation(Dependencies.Testing.Robolectric.multidex)
     testImplementation(project(":testtools"))
-    androidTestImplementation(project(":testtools"))
-    testImplementation(Dependencies.Testing.kotlin)
     testImplementation(Dependencies.Testing.truth)
-    testImplementation(Dependencies.Testing.Mockk.android)
-    testImplementation(Dependencies.Testing.coroutines_test)
-    androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
+    testImplementation(Dependencies.Testing.Mockk.core)
 }

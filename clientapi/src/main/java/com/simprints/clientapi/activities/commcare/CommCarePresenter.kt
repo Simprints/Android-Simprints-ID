@@ -8,7 +8,6 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
 import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
 import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
 import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -24,10 +23,14 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,13 +44,12 @@ class CommCarePresenter(
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager,
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     deviceManager = deviceManager,
-    crashReportManager = crashReportManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ), CommCareContract.Presenter {
@@ -55,7 +57,7 @@ class CommCarePresenter(
     override suspend fun start() {
         if (action !is CommCareActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {

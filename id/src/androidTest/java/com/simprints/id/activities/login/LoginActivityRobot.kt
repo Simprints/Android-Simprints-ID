@@ -23,11 +23,9 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.QrCodeResponse
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every
-import io.mockk.verify
 import org.hamcrest.CoreMatchers.not
 
 const val USER_ID = "user_id"
@@ -50,14 +48,12 @@ fun LoginActivityAndroidTest.loginActivity(
 
     return LoginActivityRobot(
         activityScenario,
-        mockCrashReportManager,
         mockLoginActivityHelper
     ).apply(block)
 }
 
 class LoginActivityRobot(
     private val activityScenario: ActivityScenario<LoginActivity>,
-    private val mockCrashReportManager: CrashReportManager,
     private val mockLoginActivityHelper: LoginActivityHelper
 ) {
 
@@ -143,7 +139,7 @@ class LoginActivityRobot(
     }
 
     infix fun assert(assertion: LoginActivityAssertions.() -> Unit) {
-        LoginActivityAssertions(activityScenario, mockCrashReportManager).apply(assertion)
+        LoginActivityAssertions(activityScenario).apply(assertion)
     }
 
     private fun shouldHaveMandatoryCredentials(result: Boolean) {
@@ -171,8 +167,7 @@ class LoginActivityRobot(
 }
 
 class LoginActivityAssertions(
-    private val activityScenario: ActivityScenario<LoginActivity>,
-    private val mockCrashReportManager: CrashReportManager
+    private val activityScenario: ActivityScenario<LoginActivity>
 ) {
 
     fun userIdFieldHasText(text: String) {
@@ -266,16 +261,6 @@ class LoginActivityAssertions(
             result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
 
         assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
-    }
-
-    fun messageIsLoggedToCrashReport(message: String) {
-        verify {
-            mockCrashReportManager.logMessageForCrashReport(
-                any(),
-                any(),
-                message = message
-            )
-        }
     }
 
     private fun assertToastIsDisplayed(message: String) {

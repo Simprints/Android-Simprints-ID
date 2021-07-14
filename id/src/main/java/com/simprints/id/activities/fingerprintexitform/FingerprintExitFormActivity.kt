@@ -6,22 +6,21 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Action
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Answer
-import com.simprints.core.analytics.CrashReportManager
-import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.analytics.CrashReportTrigger
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.databinding.ActivityFingerprintExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
+import com.simprints.logging.Simber
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
@@ -32,7 +31,6 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     private val binding by viewBinding(ActivityFingerprintExitFormBinding::inflate)
 
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var fingerprintExitFormViewModelFactory: FingerprintExitFormViewModelFactory
 
     private var fingerprintExitFormStartTime: Long = 0
@@ -200,6 +198,6 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
+        Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 }

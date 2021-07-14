@@ -1,7 +1,6 @@
 package com.simprints.core.tools.coroutines
 
 import kotlinx.coroutines.delay
-import timber.log.Timber
 
 suspend fun <T> retryIO(
     times: Int = Int.MAX_VALUE,
@@ -15,9 +14,6 @@ suspend fun <T> retryIO(
         try {
             return runBlock()
         } catch (t: Throwable) {
-            Timber.e("IO failed")
-            Timber.e(t)
-
             if (!retryIf(t)) {
                 throw t
             }

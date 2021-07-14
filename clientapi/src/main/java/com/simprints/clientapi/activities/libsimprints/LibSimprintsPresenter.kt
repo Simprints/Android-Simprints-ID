@@ -9,7 +9,6 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSim
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Verify
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -30,6 +29,8 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +41,6 @@ class LibSimprintsPresenter(
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
     private val timeHelper: ClientApiTimeHelper,
-    crashReportManager: ClientApiCrashReportManager,
     private val subjectRepository: SubjectRepository,
     private val jsonHelper: JsonHelper,
     sharedPreferencesManager: SharedPreferencesManager
@@ -48,7 +48,6 @@ class LibSimprintsPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     deviceManager = deviceManager,
-    crashReportManager = crashReportManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ), LibSimprintsContract.Presenter {
@@ -56,7 +55,7 @@ class LibSimprintsPresenter(
     override suspend fun start() {
         if (action !is LibSimprintsActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {

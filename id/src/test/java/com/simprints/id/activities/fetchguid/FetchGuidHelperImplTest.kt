@@ -1,7 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
@@ -11,7 +10,9 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.LOCAL
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.REMOTE
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
@@ -37,7 +38,6 @@ class FetchGuidHelperImplTest {
     @MockK lateinit var downSyncHelper: EventDownSyncHelper
     @MockK lateinit var subjectRepository: SubjectRepository
     @MockK lateinit var preferencesManager: IdPreferencesManager
-    @MockK lateinit var crashReportManager: CrashReportManager
 
     private lateinit var downloadEventsChannel: Channel<EventDownSyncProgress>
     private val op = projectDownSyncScope.operations.first()
@@ -45,7 +45,7 @@ class FetchGuidHelperImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager, crashReportManager)
+        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager)
         coEvery { preferencesManager.modalities } returns listOf(Modality.FINGER)
         runBlocking {
             mockProgressEmission(emptyList())

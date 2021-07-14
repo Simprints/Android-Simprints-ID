@@ -1,8 +1,11 @@
 package com.simprints.fingerprint.scanner.factory
 
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.scanner.controllers.v2.*
+import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
+import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -12,13 +15,12 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.v2.scanner.create
-import timber.log.Timber
+import com.simprints.logging.Simber
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter,
                          private val preferencesManager: FingerprintPreferencesManager,
-                         private val crashReportManager: FingerprintCrashReportManager,
                          private val scannerUiHelper: ScannerUiHelper,
                          private val serialNumberConverter: SerialNumberConverter,
                          private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
@@ -37,7 +39,7 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
                 serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             )
         }.also {
-            Timber.i("Using scanner generation $it")
+            Simber.i("Using scanner generation $it")
         }
 
         return when (scannerGenerationToUse) {
@@ -60,7 +62,6 @@ class ScannerFactoryImpl(private val bluetoothAdapter: ComponentBluetoothAdapter
             connectionHelper,
             cypressOtaHelper,
             stmOtaHelper,
-            un20OtaHelper,
-            crashReportManager
+            un20OtaHelper
         )
 }

@@ -32,15 +32,19 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.flow.asFlow
-import org.junit.*
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.mockito.stubbing.Answer
-import java.util.*
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -67,7 +71,6 @@ class FingerprintFlowsIntegrationTest : KoinTest {
                 spyk(ScannerFactoryImpl(
                     bluetoothAdapter = simulatedBluetoothAdapter,
                     preferencesManager = mockk(relaxed = true),
-                    crashReportManager = mockk(relaxed = true),
                     scannerUiHelper = mockk(relaxed = true),
                     serialNumberConverter = mockk(relaxed = true),
                     scannerGenerationDeterminer = mockk(relaxed = true),

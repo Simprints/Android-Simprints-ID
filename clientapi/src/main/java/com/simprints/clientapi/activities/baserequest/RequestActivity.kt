@@ -7,18 +7,34 @@ import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.clientapi.clientrequests.extractors.*
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
+import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.moduleapi.app.responses.*
+import com.simprints.logging.Simber
+import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
+import com.simprints.moduleapi.app.responses.IAppEnrolResponse
+import com.simprints.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
+import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
+import com.simprints.moduleapi.app.responses.IAppResponse
+import com.simprints.moduleapi.app.responses.IAppResponseType
+import com.simprints.moduleapi.app.responses.IAppVerifyResponse
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestView {
 
@@ -79,7 +95,7 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Timber.d("RequestActivity: onActivityResult")
+        Simber.d("RequestActivity: onActivityResult")
         val isUnsuccessfulResponse = resultCode != Activity.RESULT_OK || data == null
 
         if (isUnsuccessfulResponse)

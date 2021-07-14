@@ -5,12 +5,20 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
-import com.simprints.fingerprint.activities.collect.state.*
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.DISCONNECTED
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.GOOD_SCAN
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NEVER_RETURNS
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NO_FINGER_DETECTED
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.UNKNOWN_ERROR
+import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
+import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
+import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.commontesttools.time.MockTimer
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -33,7 +41,13 @@ import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.After
@@ -58,8 +72,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
         every { newTimer() } returns mockTimer
     }
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
-    private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
         every { qualityThreshold } returns 60
         every { liveFeedbackOn } returns false
@@ -87,8 +99,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
             factory(override = true) { timeHelper }
             factory { timeHelper }
             factory { sessionEventsManager }
-            factory { fingerprintAnalyticsManager }
-            factory { crashReportManager }
             factory { preferencesManager }
             factory { scannerManager }
             factory { imageManager }
@@ -939,7 +949,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
-    fun unexpectedErrorWhileScanning_launchesAlertAndReportsCrash() {
+    fun unexpectedErrorWhileScanning_launchesAlert() {
         mockScannerSetUiIdle()
         captureFingerprintResponses(UNKNOWN_ERROR)
         noImageTransfer()
@@ -948,7 +958,6 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleScanButtonPressed()
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
 
-        verify { crashReportManager.logExceptionOrSafeException(any()) }
         vm.launchAlert.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
     }
 

@@ -63,8 +63,7 @@ class AlertActivityTest {
     private val module by lazy {
         TestAppModule(
             app,
-            sessionEventsManagerRule = DependencyRule.MockkRule,
-            crashReportManagerRule = DependencyRule.MockkRule)
+            sessionEventsManagerRule = DependencyRule.MockkRule)
     }
 
     @Before

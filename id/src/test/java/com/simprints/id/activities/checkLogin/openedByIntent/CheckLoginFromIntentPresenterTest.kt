@@ -2,7 +2,6 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
@@ -11,7 +10,11 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.callout.*
+import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
@@ -27,12 +30,13 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.secure.models.SecurityState.Status
@@ -40,8 +44,13 @@ import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
@@ -70,9 +79,6 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var remoteConfigFetcherMock: RemoteConfigFetcher
 
     @MockK
-    lateinit var analyticsManagerMock: AnalyticsManager
-
-    @MockK
     lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
 
     @MockK
@@ -80,9 +86,6 @@ class CheckLoginFromIntentPresenterTest {
 
     @MockK
     lateinit var eventRepositoryMock: EventRepository
-
-    @MockK
-    lateinit var crashReportManagerMock: CrashReportManager
 
     @MockK
     lateinit var securityStateRepositoryMock: SecurityStateRepository
@@ -108,7 +111,6 @@ class CheckLoginFromIntentPresenterTest {
             testCoroutineRule.testCoroutineDispatcher
         ).apply {
             remoteConfigFetcher = remoteConfigFetcherMock
-            analyticsManager = analyticsManagerMock
             subjectLocalDataSource = subjectLocalDataSourceMock
             coEvery { subjectLocalDataSource.count(any()) } returns 0
 
@@ -123,7 +125,6 @@ class CheckLoginFromIntentPresenterTest {
             preferencesManager = preferencesManagerMock.apply {
                 every { language } returns "EN"
             }
-            analyticsManager = analyticsManagerMock
             eventRepository = eventRepositoryMock
             timeHelper = timeHelperMock
             coEvery { timeHelper.now() } returns CREATED_AT
@@ -131,7 +132,6 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
             coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
-            crashReportManager = crashReportManagerMock
             securityStateRepository = securityStateRepositoryMock
             val channel = Channel<Status>(capacity = Channel.UNLIMITED)
             coEvery { securityStateRepositoryMock.securityStatusChannel } returns channel
@@ -161,57 +161,6 @@ class CheckLoginFromIntentPresenterTest {
     }
 
     @Test
-    fun presenter_setupIsCalledWithAMainFlow_shouldExtractParamsForAnalyticsManager() {
-        runBlockingTest {
-            val appRequest = AppEnrolRequest(
-                DEFAULT_PROJECT_ID,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                DEFAULT_METADATA
-            )
-            every { view.parseRequest() } returns appRequest
-
-            presenter.setup()
-
-            coVerify(exactly = 1) { analyticsManagerMock.logCallout(appRequest) }
-            coVerify(exactly = 1) {
-                analyticsManagerMock.logUserProperties(
-                    DEFAULT_USER_ID,
-                    DEFAULT_PROJECT_ID,
-                    DEFAULT_MODULE_ID,
-                    DEFAULT_DEVICE_ID
-                )
-            }
-        }
-    }
-
-    @Test
-    fun presenter_setupIsCalledWithAFollowUpRequest_shouldNotExtractParamsForAnalyticsManager() {
-        runBlockingTest {
-            val appRequest = AppEnrolLastBiometricsRequest(
-                DEFAULT_PROJECT_ID,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                DEFAULT_METADATA,
-                GUID1
-            )
-            every { view.parseRequest() } returns appRequest
-
-            presenter.setup()
-
-            coVerify(exactly = 0) { analyticsManagerMock.logCallout(any()) }
-            coVerify(exactly = 0) {
-                analyticsManagerMock.logUserProperties(
-                    any(),
-                    any(),
-                    any(),
-                    any()
-                )
-            }
-        }
-    }
-
-    @Test
     fun presenter_setupIsCalled_shouldSetLastUserId() {
         runBlockingTest {
             val appRequest = AppEnrolRequest(
@@ -225,18 +174,6 @@ class CheckLoginFromIntentPresenterTest {
             presenter.setup()
 
             coVerify { preferencesManagerMock.lastUserUsed = DEFAULT_USER_ID }
-        }
-    }
-
-
-    @Test
-    fun presenter_setupIsCalled_shouldSetSessionIdInCrashlytics() {
-        runBlockingTest {
-            val session = createSessionCaptureEvent()
-            coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
-            presenter.setup()
-
-            coVerify { crashReportManagerMock.setSessionIdCrashlyticsKey(session.id) }
         }
     }
 

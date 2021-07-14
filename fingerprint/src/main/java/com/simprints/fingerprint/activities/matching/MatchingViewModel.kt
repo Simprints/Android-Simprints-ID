@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -21,25 +20,26 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
 import com.simprints.fingerprintmatcher.domain.TemplateFormat
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.util.*
+import java.util.UUID
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
 import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 import com.simprints.fingerprintmatcher.domain.MatchResult as MatcherMatchResult
 
-class MatchingViewModel(private val fingerprintMatcher: FingerprintMatcher,
-                        private val dbManager: FingerprintDbManager,
-                        private val sessionEventsManager: FingerprintSessionEventsManager,
-                        private val crashReportManager: FingerprintCrashReportManager,
-                        private val timeHelper: FingerprintTimeHelper,
-                        private val masterFlowManager: MasterFlowManager) : ViewModel() {
+class MatchingViewModel(
+    private val fingerprintMatcher: FingerprintMatcher,
+    private val dbManager: FingerprintDbManager,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val timeHelper: FingerprintTimeHelper,
+    private val masterFlowManager: MasterFlowManager
+) : ViewModel() {
 
     val result = MutableLiveData<FinishResult>()
     val progress = MutableLiveData(0)
@@ -57,8 +57,13 @@ class MatchingViewModel(private val fingerprintMatcher: FingerprintMatcher,
 
         //Will be deprecated. The matching will have to run irrespective of the action from the calling app.
         when (masterFlowManager.getCurrentAction()) {
-            Action.ENROL, Action.IDENTIFY -> runMatchTask(IdentificationTask(this, matchingRequest, sessionEventsManager, crashReportManager, timeHelper))
-            Action.VERIFY -> runMatchTask(VerificationTask(this, matchingRequest, sessionEventsManager, crashReportManager, timeHelper))
+            Action.ENROL, Action.IDENTIFY -> runMatchTask(IdentificationTask(
+                this,
+                matchingRequest,
+                sessionEventsManager,
+                timeHelper
+            ))
+            Action.VERIFY -> runMatchTask(VerificationTask(this, matchingRequest, sessionEventsManager, timeHelper))
         }
     }
 
@@ -85,8 +90,7 @@ class MatchingViewModel(private val fingerprintMatcher: FingerprintMatcher,
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
-        Timber.e(e)
-        crashReportManager.logExceptionOrSafeException(e)
+        Simber.e(e)
         hasMatchFailed.postValue(true)
         result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))
     }

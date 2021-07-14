@@ -1,22 +1,21 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.core.analytics.CrashReportManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
 
@@ -94,14 +93,12 @@ class TestDataModule(
 
     override fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
-        longConsentRemoteDataSource: LongConsentRemoteDataSource,
-        crashReportManager: CrashReportManager
+        longConsentRemoteDataSource: LongConsentRemoteDataSource
     ): LongConsentRepository =
         longConsentRepositoryRule.resolveDependency {
             super.provideLongConsentRepository(
                 longConsentLocalDataSource,
-                longConsentRemoteDataSource,
-                crashReportManager
+                longConsentRemoteDataSource
             )
         }
 

@@ -19,7 +19,6 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,7 +54,7 @@ class EventMigration2to3Test {
         }
 
         db = helper.runMigrationsAndValidate(
-            TEST_DB, 3, true, EventMigration2to3(mockk())
+            TEST_DB, 3, true, EventMigration2to3()
         )
 
         validateColumnCreation(db, openSessionCaptureEventId)
