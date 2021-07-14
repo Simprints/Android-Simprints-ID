@@ -9,7 +9,6 @@ import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.activities.odk.OdkAction.Verify
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -28,6 +27,8 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,13 +38,11 @@ class OdkPresenter(
     private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager,
     sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     deviceManager = deviceManager,
-    crashReportManager = crashReportManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ), OdkContract.Presenter {
@@ -51,7 +50,7 @@ class OdkPresenter(
     override suspend fun start() {
         if (action !is OdkActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {

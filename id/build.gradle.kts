@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
     kotlin("android")
     kotlin("kapt")
@@ -9,6 +8,7 @@ plugins {
     id("com.github.triplet.play")
     id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 apply {
@@ -134,6 +134,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     api(project(":eventsystem"))
+    implementation(project(":logging"))
     implementation(Dependencies.libsimprints)
 
     implementation(Dependencies.Dagger.core)
@@ -171,16 +172,13 @@ dependencies {
     implementation(Dependencies.Rootbeer.core)
 
     // Firebase
-    api(Dependencies.Firebase.analytics)
     implementation(Dependencies.Firebase.auth)
     implementation(Dependencies.Firebase.config)
     implementation(Dependencies.Firebase.perf)
     implementation(Dependencies.Firebase.storage)
     implementation(Dependencies.Firebase.mlkit)
     implementation(Dependencies.Firebase.mlkit_barcode)
-    implementation(Dependencies.Firebase.crashlytics)
 
-    implementation(Dependencies.Timber.core)
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.multidex)
     implementation(Dependencies.AndroidX.appcompat)
@@ -224,7 +222,7 @@ dependencies {
     testImplementation(Dependencies.Testing.Espresso.intents)
     testImplementation(Dependencies.Testing.Espresso.contrib)
     testImplementation(Dependencies.Testing.truth)
-    testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.KoTest.kotlin)
 
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.koin)
@@ -233,6 +231,7 @@ dependencies {
     testImplementation(Dependencies.Testing.work)
     testImplementation(Dependencies.Testing.coroutines_test)
     kaptTest(Dependencies.Dagger.compiler)
+    testImplementation(project(":logging"))
     testImplementation(project(":testtools")) {
         exclude("org.mockito:mockito-android")
     }

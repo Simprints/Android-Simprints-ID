@@ -55,10 +55,11 @@ import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder
 import com.simprints.id.network.SimApiClientFactoryImpl
-import com.simprints.id.network.TimberLogger
+import com.simprints.id.network.SimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
+import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
@@ -75,7 +76,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
 
 
 @RunWith(AndroidJUnit4::class)
@@ -104,7 +104,7 @@ class EventRemoteDataSourceImplAndroidTest {
                          deviceId: String,
                          versionName: String): OkHttpClient.Builder =
             super.get(authToken, deviceId, versionName).apply {
-                addInterceptor(HttpLoggingInterceptor(TimberLogger()).apply {
+                addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })
                 addNetworkInterceptor {
@@ -142,9 +142,9 @@ class EventRemoteDataSourceImplAndroidTest {
                 events.addEventFor(it)
             }
 
-            Timber.d("UPLOAD ALL EVENTS")
+            Simber.d("UPLOAD ALL EVENTS")
             executeUpload(events)
-            Timber.d("UPLOAD ENROLMENT V1")
+            Simber.d("UPLOAD ENROLMENT V1")
             executeUpload(listOf(createEnrolmentEventV1().apply { labels = eventLabels }))
         }
     }

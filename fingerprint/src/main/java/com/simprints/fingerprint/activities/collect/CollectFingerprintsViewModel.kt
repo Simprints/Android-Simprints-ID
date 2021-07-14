@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.utils.EncodingUtils
@@ -11,9 +12,6 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.*
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
@@ -35,6 +33,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedExce
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -43,7 +42,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
@@ -51,7 +49,6 @@ class CollectFingerprintsViewModel(
     private val scannerManager: ScannerManager,
     private val fingerprintPreferencesManager: FingerprintPreferencesManager,
     private val imageManager: FingerprintImageManager,
-    private val crashReportManager: FingerprintCrashReportManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
@@ -409,8 +406,7 @@ class CollectFingerprintsViewModel(
             is NoFingerDetectedException -> handleNoFingerDetected()
             else -> {
                 updateCaptureState { toNotCollected() }
-                crashReportManager.logExceptionOrSafeException(e)
-                Timber.e(e)
+                Simber.e(e)
                 launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
             }
         }
@@ -519,7 +515,7 @@ class CollectFingerprintsViewModel(
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.deduceFileExtension()
             )
         } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
-            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
+            Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
             null
         } else null
 
@@ -557,24 +553,14 @@ class CollectFingerprintsViewModel(
     }
 
     private fun Completable.doInBackground() =
-        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Timber.e(it) })
+        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Simber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
-        Timber.d(message)
-        crashReportManager.logMessageForCrashReport(
-            FingerprintCrashReportTag.FINGER_CAPTURE,
-            FingerprintCrashReportTrigger.UI,
-            message = message
-        )
+        Simber.tag(CrashReportTag.FINGER_CAPTURE.name).i(message)
     }
 
     private fun logScannerMessageForCrashReport(message: String) {
-        Timber.d(message)
-        crashReportManager.logMessageForCrashReport(
-            FingerprintCrashReportTag.FINGER_CAPTURE,
-            FingerprintCrashReportTrigger.SCANNER_BUTTON,
-            message = message
-        )
+        Simber.tag(CrashReportTag.FINGER_CAPTURE.name).i(message)
     }
 
     private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {

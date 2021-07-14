@@ -32,7 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.*
+import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -48,7 +48,6 @@ class EventDownSyncDownloaderWorkerTest {
         val correctInputData = JsonHelper.toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
         eventDownSyncDownloaderWorker.firebasePerformanceTraceFactory = mockk(relaxed = true)
-        eventDownSyncDownloaderWorker.crashReportManager = mockk(relaxed = true)
     }
 
     @Test
@@ -127,7 +126,6 @@ class EventDownSyncDownloaderWorkerTest {
         (inputData?.let {
             TestListenableWorkerBuilder<EventDownSyncDownloaderWorker>(app, inputData = it).build()
         } ?: TestListenableWorkerBuilder<EventDownSyncDownloaderWorker>(app).build()).apply {
-            crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             eventDownSyncScopeRepository = mockk(relaxed = true)
             coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }

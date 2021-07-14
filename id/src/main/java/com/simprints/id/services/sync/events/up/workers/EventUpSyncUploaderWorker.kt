@@ -5,7 +5,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
@@ -19,10 +18,10 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
 
@@ -31,8 +30,6 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
 
-    @Inject
-    override lateinit var crashReportManager: CrashReportManager
     @Inject
     lateinit var upSyncHelper: EventUpSyncHelper
     @Inject
@@ -44,7 +41,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         try {
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
-            Timber.d("Received $jsonInput")
+            Simber.d("Received $jsonInput")
             parseUpSyncInput(jsonInput)
         } catch (t: Throwable) {
             throw MalformedDownSyncOperationException(t.message ?: "")
@@ -54,7 +51,7 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             getComponent<EventUpSyncUploaderWorker> { it.inject(this@EventUpSyncUploaderWorker) }
-            Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
@@ -63,16 +60,16 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
             upSyncHelper.upSync(this, upSyncScope.operation).collect {
                 count += it.progress
                 eventSyncCache.saveProgress(workerId, count)
-                Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
 
                 reportCount(count)
             }
 
-            Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
             success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
         } catch (t: Throwable) {
-            Timber.d(t)
-            Timber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
+            Simber.d(t)
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
             retryOrFailIfCloudIntegrationError(t)
         }
     }

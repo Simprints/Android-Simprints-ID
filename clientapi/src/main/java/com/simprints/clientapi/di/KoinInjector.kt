@@ -12,8 +12,6 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsPresenter
 import com.simprints.clientapi.activities.odk.OdkAction
 import com.simprints.clientapi.activities.odk.OdkContract
 import com.simprints.clientapi.activities.odk.OdkPresenter
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManagerImpl
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManagerImpl
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -61,7 +59,6 @@ object KoinInjector {
 
     private fun Module.defineBuildersForDomainManagers() {
         factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
-        factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
         factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
         factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext(), get()) }
     }
@@ -71,16 +68,15 @@ object KoinInjector {
             ErrorPresenter(view, get())
         }
         factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: LibSimprintsAction) ->
-            LibSimprintsPresenter(view, action, get(), get(), get(), get(), get(), get(), get())
+            LibSimprintsPresenter(view, action, get(), get(), get(), get(), get(), get())
         }
         factory<OdkContract.Presenter> { (view: OdkContract.View, action: OdkAction) ->
-            OdkPresenter(view, action, get(), get(), get(), get())
+            OdkPresenter(view, action, get(), get(), get())
         }
         factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: CommCareAction) ->
             CommCarePresenter(
                 view,
                 action,
-                get(),
                 get(),
                 get(),
                 get(),

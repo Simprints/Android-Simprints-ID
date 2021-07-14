@@ -37,5 +37,14 @@ dependencyAnalysis {
                 )
             }
         }
+        project(':logging') {
+            onAny {
+                exclude(
+                    // We don't want the logging module the expose Timber via api, even if other
+                    // internal libraries in Simprints use Timber
+                    'com.jakewharton.timber:timber'
+                )
+            }
+        }
     }
 }

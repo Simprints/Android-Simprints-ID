@@ -1,9 +1,9 @@
 package com.simprints.id.testtools.testingapi.remote
 
+import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.network.SimApiClientImpl
-import com.simprints.core.network.SimRemoteInterface
-import com.simprints.id.network.TimberLogger
+import com.simprints.id.network.SimberLogger
 import io.mockk.mockk
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,7 +21,7 @@ class TestingApiClient<T : SimRemoteInterface>(service: KClass<T>, endpoint: Str
             .addConverterFactory(JacksonConverterFactory.create(jsonHelper.jackson))
             .baseUrl(endpoint)
             .client(okHttpClientConfig.addInterceptor(
-                HttpLoggingInterceptor(TimberLogger()).apply {
+                HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 }
             ).build()).build()

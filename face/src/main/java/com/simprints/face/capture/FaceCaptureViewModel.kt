@@ -3,14 +3,12 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.CAPTURE
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTag.FACE_CAPTURE
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportTrigger.UI
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
@@ -18,13 +16,13 @@ import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.models.FaceDetection
+import com.simprints.logging.Simber
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class FaceCaptureViewModel(
     private val shouldSaveFaceImages: Boolean,
-    private val faceImageManager: FaceImageManager,
-    private val crashReportManager: FaceCrashReportManager
+    private val faceImageManager: FaceImageManager
 ) : ViewModel() {
     var faceDetections = listOf<FaceDetection>()
 
@@ -72,11 +70,7 @@ class FaceCaptureViewModel(
     }
 
     fun recapture() {
-        crashReportManager.logMessageForCrashReport(
-            FACE_CAPTURE,
-            UI,
-            message = "Starting face recapture flow"
-        )
+        Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face recapture flow")
         faceDetections = listOf()
         recaptureEvent.send()
     }
@@ -86,20 +80,11 @@ class FaceCaptureViewModel(
     }
 
     private fun startNewAnalyticsSession() {
-        crashReportManager.logMessageForCrashReport(
-            FACE_CAPTURE,
-            UI,
-            message = "Starting face capture flow"
-        )
+        Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face capture flow")
     }
 
     private fun saveFaceDetections() {
-        crashReportManager.logMessageForCrashReport(
-            FACE_CAPTURE,
-            UI,
-            message = "Saving captures to disk"
-        )
-
+        Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Saving captures to disk")
         faceDetections.forEach { saveImage(it, it.id) }
     }
 
@@ -115,7 +100,7 @@ class FaceCaptureViewModel(
     }
 
     fun submitError(throwable: Throwable) {
-        crashReportManager.logException(throwable)
+        Simber.e(throwable)
         unexpectedErrorEvent.send()
     }
 

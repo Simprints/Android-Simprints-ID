@@ -3,12 +3,11 @@ package com.simprints.eventsystem.event.local.migrations
 import android.database.Cursor
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.logging.Simber
 import org.json.JSONObject
-import timber.log.Timber
 
 /**
  * The 2021.1.0 (room v2) introduced:
@@ -21,17 +20,16 @@ import timber.log.Timber
  * 3) Adding a sessionIsClosed field to the SessionCaptureEvent domain class in order to stop using
  * endedAt to mark a sessiona as closed.
  */
-class EventMigration1to2(val crashReportManager: CrashReportManager) : Migration(1, 2) {
+class EventMigration1to2 : Migration(1, 2) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Timber.d("Migrating room db from schema 1 to schema 2.")
+            Simber.d("Migrating room db from schema 1 to schema 2.")
             migrateEnrolments(database)
             migrateSessionClosedInformation(database)
-            Timber.d("Migration from schema 1 to schema 2 done.")
+            Simber.d("Migration from schema 1 to schema 2 done.")
         } catch (t: Throwable) {
-            crashReportManager.logException(t)
-            Timber.d(t)
+            Simber.e(t)
         }
     }
 

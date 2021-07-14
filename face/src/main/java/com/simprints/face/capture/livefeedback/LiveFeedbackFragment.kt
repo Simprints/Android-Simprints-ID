@@ -16,10 +16,10 @@ import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.Size
+import com.simprints.logging.Simber
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 
 class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProcessor {
@@ -80,7 +80,7 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
             )
 
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             mainVm.submitError(t)
         }
     }

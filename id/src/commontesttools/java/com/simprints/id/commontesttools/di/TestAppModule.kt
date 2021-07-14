@@ -4,7 +4,6 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.analytics.CrashReportManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
@@ -50,7 +49,6 @@ class TestAppModule(
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
-    private val crashReportManagerRule: DependencyRule = RealRule,
     private val sessionEventsManagerRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
@@ -73,9 +71,6 @@ class TestAppModule(
     private val qrCodeDetectorRule: DependencyRule = RealRule,
     private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
-
-    override fun provideCrashManager(): CrashReportManager =
-        crashReportManagerRule.resolveDependency { super.provideCrashManager() }
 
     override fun provideLoginInfoManager(
         improvedSharedPreferences: ImprovedSharedPreferences
@@ -136,7 +131,6 @@ class TestAppModule(
         IdPreferencesManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
     ): com.simprints.eventsystem.event.EventRepository = sessionEventsManagerRule.resolveDependency {
@@ -147,7 +141,6 @@ class TestAppModule(
             IdPreferencesManager,
             loginInfoManager,
             timeHelper,
-            crashReportManager,
             validatorFactory,
             sessionDataCache
         )
@@ -219,15 +212,13 @@ class TestAppModule(
     @ExperimentalCoroutinesApi
     override fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
-        crashReportManager: CrashReportManager
     ): QrCodeProducer = qrCodeProducerRule.resolveDependency {
-        super.provideQrCodeProducer(qrCodeDetector, crashReportManager)
+        super.provideQrCodeProducer(qrCodeDetector)
     }
 
     override fun provideQrCodeDetector(
-        crashReportManager: CrashReportManager
     ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
-        super.provideQrCodeDetector(crashReportManager)
+        super.provideQrCodeDetector()
     }
 
     override fun provideBaseUrlProvider(

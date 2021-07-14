@@ -21,7 +21,6 @@ import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsVali
 import com.simprints.clientapi.clientrequests.validators.EnrolValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.BaseRequest
@@ -47,15 +46,14 @@ import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.containsCommcare
 import com.simprints.id.domain.containsSimprints
 import com.simprints.libsimprints.Constants
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
-import timber.log.Timber
 
 abstract class RequestPresenter(
     private val view: RequestContract.RequestView,
     private val eventsManager: ClientApiSessionEventsManager,
     private val deviceManager: DeviceManager,
-    protected val crashReportManager: ClientApiCrashReportManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
     private val sharedPreferencesManager: SharedPreferencesManager,
     private val sessionEventsManager: ClientApiSessionEventsManager
@@ -96,7 +94,7 @@ abstract class RequestPresenter(
         addSuspiciousEventIfRequired(request)
         view.sendSimprintsRequest(request)
     } catch (exception: InvalidRequestException) {
-        Timber.d(exception)
+        Simber.d(exception)
         logInvalidSessionInBackground()
         handleInvalidRequest(exception)
     }
@@ -111,7 +109,7 @@ abstract class RequestPresenter(
     }
 
     private fun handleRootedDevice(exception: RootedDeviceException) {
-        crashReportManager.logExceptionOrSafeException(exception)
+        Simber.e(exception)
         view.handleClientRequestError(ROOTED_DEVICE)
     }
 

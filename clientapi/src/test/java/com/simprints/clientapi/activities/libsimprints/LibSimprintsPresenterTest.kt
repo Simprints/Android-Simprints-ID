@@ -74,7 +74,6 @@ class LibSimprintsPresenterTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         ).apply {
             runBlocking { start() }
@@ -98,7 +97,6 @@ class LibSimprintsPresenterTest {
             view,
             Identify,
             clientApiSessionEventsManager,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -130,7 +128,6 @@ class LibSimprintsPresenterTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
@@ -152,7 +149,6 @@ class LibSimprintsPresenterTest {
             view,
             ConfirmIdentity,
             clientApiSessionEventsManager,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -182,7 +178,6 @@ class LibSimprintsPresenterTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
@@ -201,7 +196,6 @@ class LibSimprintsPresenterTest {
             view,
             Invalid,
             clientApiSessionEventsManager,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -226,7 +220,6 @@ class LibSimprintsPresenterTest {
             view,
             Enrol,
             clientApiSessionEventsManager,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -259,7 +252,6 @@ class LibSimprintsPresenterTest {
             view,
             Identify,
             clientApiSessionEventsManager,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -311,7 +303,6 @@ class LibSimprintsPresenterTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         ).apply {
             handleVerifyResponse(verification)
@@ -352,7 +343,6 @@ class LibSimprintsPresenterTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
 
@@ -385,7 +375,6 @@ class LibSimprintsPresenterTest {
             view,
             ConfirmIdentity,
             clientApiSessionEventsManager,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -423,11 +412,8 @@ class LibSimprintsPresenterTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         ).handleEnrolResponse(mockk())
-
-
         runBlocking {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
             assertThat(sessionId).isNotEqualTo(newSessionId)

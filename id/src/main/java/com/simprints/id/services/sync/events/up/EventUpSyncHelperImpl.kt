@@ -1,13 +1,15 @@
 package com.simprints.id.services.sync.events.up
 
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.FAILED
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import timber.log.Timber
 
 class EventUpSyncHelperImpl(
     private val eventRepository: com.simprints.eventsystem.event.EventRepository,
@@ -24,7 +26,7 @@ class EventUpSyncHelperImpl(
             var count = 0
             try {
                 eventRepository.uploadEvents(operation.projectId).collect {
-                    Timber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
+                    Simber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
                     count = it
                     lastOperation =
                         lastOperation.copy(lastState = RUNNING, lastSyncTime = timerHelper.now())
@@ -37,7 +39,7 @@ class EventUpSyncHelperImpl(
 
 
             } catch (t: Throwable) {
-                Timber.e(t)
+                Simber.e(t)
                 lastOperation =
                     lastOperation.copy(lastState = FAILED, lastSyncTime = timerHelper.now())
                 emitProgress(lastOperation, count)

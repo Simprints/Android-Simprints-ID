@@ -1,9 +1,13 @@
 package com.simprints.id.activities.qrcapture.tools
 
 import androidx.camera.core.ImageProxy
-import com.simprints.core.analytics.CrashReportManager
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import org.junit.Before
@@ -13,7 +17,6 @@ import org.junit.Test
 class QrCodeProducerImplTest {
 
     @MockK lateinit var mockQrCodeDetector: QrCodeDetector
-    @MockK lateinit var mockCrashReportManager: CrashReportManager
     @MockK lateinit var mockImageProxy: ImageProxy
     @MockK lateinit var mockQrCodeChannel: Channel<String>
 
@@ -22,7 +25,7 @@ class QrCodeProducerImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        qrCodeProducer = QrCodeProducerImpl(mockQrCodeDetector, mockCrashReportManager).apply {
+        qrCodeProducer = QrCodeProducerImpl(mockQrCodeDetector).apply {
             qrCodeChannel = mockQrCodeChannel
         }
     }
@@ -43,16 +46,6 @@ class QrCodeProducerImplTest {
         qrCodeProducer.analyze(mockImageProxy)
 
         coVerify { mockQrCodeChannel.send("mock_value") }
-    }
-
-    @Test
-    fun whenDetectorThrowsException_shouldLogToCrashReport() {
-        every { mockImageProxy.image } returns mockk()
-        coEvery { mockQrCodeDetector.detectInImage(any()) } throws Throwable()
-
-        qrCodeProducer.analyze(mockImageProxy)
-
-        coVerify { mockCrashReportManager.logExceptionOrSafeException(any()) }
     }
 
     @Test

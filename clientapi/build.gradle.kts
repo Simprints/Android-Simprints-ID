@@ -48,6 +48,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":id"))
     implementation(project(":moduleapi"))
+    implementation(project(":logging"))
     implementation(Dependencies.libsimprints)
 
     // Service Location
@@ -61,7 +62,6 @@ dependencies {
 
     implementation(Dependencies.Support.material)
     implementation(Dependencies.Kotlin.reflect)
-    implementation(Dependencies.Timber.core)
 
     // Kotlin
     implementation(Dependencies.AndroidX.core)
@@ -85,7 +85,7 @@ dependencies {
     testImplementation(Dependencies.Testing.AndroidX.core)
     testImplementation(Dependencies.Testing.AndroidX.ext_junit)
     testImplementation(Dependencies.Testing.Mockk.core)
-    testImplementation(Dependencies.Testing.kotlin)
+    testImplementation(Dependencies.Testing.KoTest.kotlin)
 
     testImplementation(Dependencies.Testing.Espresso.intents)
     testImplementation(Dependencies.Koin.core_ext)

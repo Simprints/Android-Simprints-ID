@@ -3,6 +3,7 @@ package com.simprints.id
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
+import com.simprints.logging.Simber
 import com.simprints.testtools.android.waitOnSystem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -12,12 +13,13 @@ import io.reactivex.schedulers.Schedulers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class ApplicationTest {
 
-    @get:Rule val loginTestRule = ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)
+    @get:Rule
+    val loginTestRule =
+        ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)
 
     @Test
     fun rxJavaUndeliverableExceptionHappens_shouldBeHandled() {
@@ -39,7 +41,7 @@ class ApplicationTest {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {},
-                onError = { Timber.d(it.message) },
+                onError = { it.message?.let { Simber.d(it) } },
                 onNext = {}
             )
 

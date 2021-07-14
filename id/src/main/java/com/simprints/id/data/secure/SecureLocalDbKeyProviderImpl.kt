@@ -1,13 +1,15 @@
 package com.simprints.id.data.secure
 
 import android.content.SharedPreferences
-import android.util.Base64.*
+import android.util.Base64.DEFAULT
+import android.util.Base64.decode
+import android.util.Base64.encodeToString
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
                                         private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
@@ -55,7 +57,7 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
             encryptedSharedPrefs.edit().putString(getSharedPrefsKeyForRealm(projectId), legacyRealmKey).apply()
             return legacyLocalDbKey
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
         }
 
         return null

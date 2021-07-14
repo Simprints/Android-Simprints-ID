@@ -4,7 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.modality.toMode
-import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -15,10 +17,10 @@ import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class SyncInformationViewModel(
     private val downySyncHelper: EventDownSyncHelper,
@@ -111,7 +113,7 @@ class SyncInformationViewModel(
             DownSyncCounts(creationsToDownload, deletionsToDownload)
 
         } catch (t: Throwable) {
-            Timber.d(t)
+            Simber.d(t)
             null
         }
 

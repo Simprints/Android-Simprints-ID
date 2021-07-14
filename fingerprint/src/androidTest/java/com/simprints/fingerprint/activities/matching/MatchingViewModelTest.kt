@@ -7,7 +7,6 @@ import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -19,7 +18,10 @@ import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchResult
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
@@ -44,7 +46,6 @@ class MatchingViewModelTest : KoinTest {
     val taskExecutorRule = InstantTaskExecutorRule()
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
-    private val crashReportManagerMock: FingerprintCrashReportManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
     private val mockMatcher: FingerprintMatcher = mockk()
 
@@ -67,7 +68,6 @@ class MatchingViewModelTest : KoinTest {
         acquireFingerprintKoinModules()
         loadKoinModules(module(override = true) {
             factory { dbManagerMock }
-            factory { crashReportManagerMock }
             factory { masterFlowManager }
             factory<FingerprintPreferencesManager> { mockk(relaxed = true) }
             factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }
@@ -168,7 +168,7 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun identifyRequest_matchFailsToComplete_showsToastAndLogsError() {
+    fun identifyRequest_matchFailsToComplete_showsToast() {
         mockMatcherError()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
@@ -178,12 +178,11 @@ class MatchingViewModelTest : KoinTest {
         with(viewModel) {
             result.test().awaitValue()
             hasMatchFailed.test().assertValue { it }
-            verify { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 
     @Test
-    fun verifyRequest_matchFailsToComplete_showsToastAndLogsError() {
+    fun verifyRequest_matchFailsToComplete_showsToast() {
         mockMatcherError()
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
@@ -193,7 +192,6 @@ class MatchingViewModelTest : KoinTest {
         with(viewModel) {
             result.test().awaitValue()
             hasMatchFailed.test().assertValue { it }
-            verify { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 

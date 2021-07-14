@@ -6,8 +6,8 @@ import com.simprints.core.CoreApplication
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
-import com.simprints.id.tools.logging.NoLoggingConfigHelper
-import com.simprints.id.tools.logging.TimberDebugLoggingConfigHelper
+import com.simprints.logging.Simber
+import com.simprints.logging.SimberBuilder
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -17,7 +17,6 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import timber.log.Timber
 
 open class Application : CoreApplication() {
 
@@ -63,19 +62,9 @@ open class Application : CoreApplication() {
 
     open fun initApplication() {
         createComponent()
-        setUpLogging()
         handleUndeliverableExceptionInRxJava()
         initKoin()
-    }
-
-    fun setUpLogging() {
-        val loggingConfigHelper = if (BuildConfig.DEBUG_MODE)
-            TimberDebugLoggingConfigHelper()
-        else
-            NoLoggingConfigHelper()
-
-        if (loggingConfigHelper.loggingNeedsSetUp())
-            loggingConfigHelper.setUpLogging()
+        SimberBuilder.initialize(this)
     }
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
@@ -90,10 +79,9 @@ open class Application : CoreApplication() {
             if (e is UndeliverableException) {
                 exceptionToPrint = e.cause
             }
-            Timber.d("Undeliverable exception received", exceptionToPrint)
-
+            Simber.e(e)
+            Simber.d("Undeliverable exception received", exceptionToPrint)
             exceptionToPrint.printStackTrace()
-            component.getCrashReportManager().logException(e)
         }
     }
 
@@ -109,9 +97,7 @@ open class Application : CoreApplication() {
 
     private fun Module.defineBuildersForCoreManagers() {
         factory { component.getPreferencesManager() }
-        factory { component.getAnalyticsManager() }
         factory { component.getSessionEventsManager() }
-        factory { component.getCrashReportManager() }
         factory { component.getTimeHelper() }
         factory { component.getFingerprintRecordLocalDataSource() }
         factory { component.getFaceIdentityLocalDataSource() }
