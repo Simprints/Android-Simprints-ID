@@ -44,7 +44,8 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.containsCommcare
+import com.simprints.id.domain.containsSimprints
 import com.simprints.libsimprints.Constants
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
@@ -147,7 +148,7 @@ abstract class RequestPresenter(
         sessionId: String,
         jsonHelper: JsonHelper
     ): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
+        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare()) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CoSyncEvents(events))
         } else {
@@ -160,7 +161,7 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
+        if (!sharedPreferencesManager.syncDestinationSettings.containsCommcare()) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -184,8 +185,8 @@ abstract class RequestPresenter(
      * Delete the events if returning to CommCare but not Simprints
      */
     override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
+        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare() &&
+            !sharedPreferencesManager.syncDestinationSettings.containsSimprints()
         ) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
