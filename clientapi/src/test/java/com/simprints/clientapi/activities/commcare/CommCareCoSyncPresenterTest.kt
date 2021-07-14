@@ -452,7 +452,6 @@ class CommCareCoSyncPresenterTest {
                 RETURN_FOR_FLOW_COMPLETED_CHECK
             )
         }
-        coVerify(exactly = 1) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
