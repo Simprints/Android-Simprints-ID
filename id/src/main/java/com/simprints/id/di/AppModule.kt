@@ -30,6 +30,7 @@ import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.local.SessionDataCacheImpl
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
@@ -91,7 +92,6 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
-import com.simprints.libsimprints.BuildConfig.VERSION_NAME
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
