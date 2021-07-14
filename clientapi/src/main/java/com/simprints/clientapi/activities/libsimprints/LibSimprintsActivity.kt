@@ -19,12 +19,6 @@ import org.koin.core.parameter.parametersOf
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
-    companion object {
-        /*Ideally, these should be added to the constants class of the LibSimprints library*/
-        private const val SIMPRINTS_EVENTS = "events"
-        private const val SIMPRINTS_SUBJECT_ACTIONS = "subjectActions"
-    }
-
     private val action: LibSimprintsAction
         get() = buildLibSimprintsAction(intent.action)
 
@@ -48,8 +42,13 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         intent.putExtra(Constants.SIMPRINTS_REGISTRATION, registration)
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         intent.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
-        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
-        subjectActions?.let { intent.putExtra(SIMPRINTS_SUBJECT_ACTIONS, subjectActions) }
+        eventsJson?.let { intent.putExtra(Constants.SIMPRINTS_COSYNC_EVENT, eventsJson) }
+        subjectActions?.let {
+            intent.putExtra(
+                Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS,
+                subjectActions
+            )
+        }
         sendOkResult(intent)
     }
 
@@ -63,7 +62,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         intent.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         intent.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
-        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
+        eventsJson?.let { intent.putExtra(Constants.SIMPRINTS_COSYNC_EVENT, eventsJson) }
         sendOkResult(intent)
     }
 
@@ -76,7 +75,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         intent.putExtra(Constants.SIMPRINTS_VERIFICATION, verification)
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         intent.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
-        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
+        eventsJson?.let { intent.putExtra(Constants.SIMPRINTS_COSYNC_EVENT, eventsJson) }
         sendOkResult(intent)
     }
 
@@ -90,7 +89,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         intent.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         intent.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
-        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
+        eventsJson?.let { intent.putExtra(Constants.SIMPRINTS_COSYNC_EVENT, eventsJson) }
         sendOkResult(intent)
     }
 
@@ -101,7 +100,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     ) = Intent().let { intent ->
         intent.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, identificationOutcome)
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
-        eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
+        eventsJson?.let { intent.putExtra(Constants.SIMPRINTS_COSYNC_EVENT, eventsJson) }
         sendOkResult(intent)
     }
 
@@ -127,7 +126,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
             Intent().let { intent ->
                 intent.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
                 intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
-                eventsJson?.let { intent.putExtra(SIMPRINTS_EVENTS, eventsJson) }
+                eventsJson?.let { intent.putExtra(Constants.SIMPRINTS_COSYNC_EVENT, eventsJson) }
             }
         )
         finish()
