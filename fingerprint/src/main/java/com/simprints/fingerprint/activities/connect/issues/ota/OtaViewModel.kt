@@ -13,7 +13,9 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
+import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.HARD_RESET
+import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET
+import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY
 import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.logging.Simber

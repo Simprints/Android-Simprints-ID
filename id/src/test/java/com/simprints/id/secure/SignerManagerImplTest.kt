@@ -15,8 +15,12 @@ import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
@@ -26,22 +30,31 @@ class SignerManagerImplTest {
 
     @MockK
     lateinit var mockProjectRepository: ProjectRepository
+
     @MockK
     lateinit var mockRemoteDbManager: RemoteDbManager
+
     @MockK
     lateinit var mockLoginInfoManager: LoginInfoManager
+
     @MockK
     lateinit var mockPreferencesManager: PreferencesManager
+
     @MockK
     lateinit var mockSyncManager: SyncManager
+
     @MockK
     lateinit var mockEventSyncManager: EventSyncManager
+
     @MockK
     lateinit var mockSecurityStateScheduler: SecurityStateScheduler
+
     @MockK
     lateinit var mockLongConsentRepository: LongConsentRepository
+
     @MockK
     lateinit var mockBaseUrlProvider: BaseUrlProvider
+
     @MockK
     lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
 

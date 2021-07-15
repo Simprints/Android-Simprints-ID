@@ -4,7 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.setup.SetupActivity.ViewState.*
+import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOffline
+import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOnline
+import com.simprints.id.activities.setup.SetupActivity.ViewState.ModalitiesInstalled
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.device.DeviceManager

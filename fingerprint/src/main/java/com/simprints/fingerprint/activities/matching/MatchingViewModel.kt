@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
 import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
