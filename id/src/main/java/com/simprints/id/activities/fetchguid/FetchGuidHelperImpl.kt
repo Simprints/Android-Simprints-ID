@@ -2,7 +2,9 @@ package com.simprints.id.activities.fetchguid
 
 import com.simprints.core.domain.modality.toMode
 import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.LOCAL
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.REMOTE
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager

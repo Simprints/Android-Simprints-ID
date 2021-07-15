@@ -1,10 +1,17 @@
 package com.simprints.fingerprint.activities.alert
 
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.BluetoothSettings
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.Close
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.None
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.PairScanner
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.TryAgain
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.WifiSettings
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.LOW_BATTERY
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
-import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.*
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.BACK
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.CLOSE
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.TRY_AGAIN
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper

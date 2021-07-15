@@ -2,13 +2,26 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.MEDIUM
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.NONE
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
@@ -24,11 +37,14 @@ class OdkPresenter(
     private val view: OdkContract.View,
     private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    deviceManager: DeviceManager
+    deviceManager: DeviceManager,
+    sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
-    view,
-    sessionEventsManager,
-    deviceManager
+    view = view,
+    eventsManager = sessionEventsManager,
+    deviceManager = deviceManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
 ), OdkContract.Presenter {
 
     override suspend fun start() {

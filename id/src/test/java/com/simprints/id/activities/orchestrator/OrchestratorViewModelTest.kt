@@ -4,11 +4,11 @@ import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.simprints.core.domain.modality.Modality.FACE
-import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse

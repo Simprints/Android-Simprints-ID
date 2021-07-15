@@ -8,7 +8,13 @@ import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.OTHER
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_DATA_CONCERNS
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_NOT_PRESENT
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_PERMISSION
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_RELIGION
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_YOUNG
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.SCANNER_NOT_WORKING
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.logging.Simber
 import kotlinx.coroutines.runBlocking

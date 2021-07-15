@@ -1,7 +1,11 @@
 package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
-import com.simprints.eventsystem.sampledata.*
+import com.simprints.eventsystem.sampledata.createEnrolmentEventV2
+import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
+import com.simprints.eventsystem.sampledata.createPersonCreationEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import io.kotest.assertions.throwables.shouldThrow
 import org.junit.Before
 import org.junit.Test

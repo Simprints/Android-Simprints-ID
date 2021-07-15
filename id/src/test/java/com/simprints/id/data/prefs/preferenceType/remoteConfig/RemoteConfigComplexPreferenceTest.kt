@@ -27,7 +27,7 @@ class RemoteConfigComplexPreferenceTest {
     }
 
     @Test
-    fun `return correct value - different from default`() {
+    fun `return correct value of commcare`() {
         every { prefs.getPrimitive(enumClass.name, "SIMPRINTS") } returns "COMMCARE"
         Truth.assertThat(syncLocationSetting).isEqualTo(SyncDestinationSetting.COMMCARE)
     }

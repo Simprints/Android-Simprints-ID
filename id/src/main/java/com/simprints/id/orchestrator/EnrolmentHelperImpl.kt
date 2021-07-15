@@ -14,7 +14,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 private const val TAG = "ENROLMENT"
 

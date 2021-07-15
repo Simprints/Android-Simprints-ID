@@ -17,7 +17,13 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.SecurityModule
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.secure.*
+import com.simprints.id.secure.AttestationManager
+import com.simprints.id.secure.AuthManager
+import com.simprints.id.secure.AuthenticationDataManager
+import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.ProjectSecretManager
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository

@@ -8,7 +8,11 @@ import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwar
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
-import com.simprints.fingerprint.scanner.domain.ota.*
+import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
