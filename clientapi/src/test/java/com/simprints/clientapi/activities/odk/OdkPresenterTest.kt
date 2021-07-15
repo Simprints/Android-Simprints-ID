@@ -1,9 +1,12 @@
 package com.simprints.clientapi.activities.odk
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
@@ -17,15 +20,25 @@ import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
+import com.simprints.clientapi.requestFactories.EnrolRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class OdkPresenterTest {
 
@@ -52,7 +65,7 @@ class OdkPresenterTest {
         val enrolmentExtractor = EnrolRequestFactory.getMockExtractor()
         every { view.enrolExtractor } returns enrolmentExtractor
 
-        OdkPresenter(view, Enrol, clientApiSessionEventsManager, mockk()).apply {
+        OdkPresenter(view, Enrol, clientApiSessionEventsManager, mockk(), mockk()).apply {
             runBlocking { start() }
         }
 
@@ -64,7 +77,13 @@ class OdkPresenterTest {
         val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
         every { view.identifyExtractor } returns identificationExtractor
 
-        OdkPresenter(view, Identify, clientApiSessionEventsManager, mockk()).apply {
+        OdkPresenter(
+            view,
+            Identify,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).apply {
             runBlocking { start() }
         }
 
@@ -76,7 +95,7 @@ class OdkPresenterTest {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         every { view.verifyExtractor } returns verifyExractor
 
-        OdkPresenter(view, Verify, clientApiSessionEventsManager, mockk()).apply {
+        OdkPresenter(view, Verify, clientApiSessionEventsManager, mockk(), mockk()).apply {
             runBlocking { start() }
         }
 
@@ -85,7 +104,13 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, Invalid, clientApiSessionEventsManager, mockk()).apply {
+        OdkPresenter(
+            view,
+            Invalid,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).apply {
             runBlocking {
                 shouldThrow<InvalidIntentActionException> {
                     start()
@@ -101,7 +126,7 @@ class OdkPresenterTest {
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
-        OdkPresenter(view, Enrol, sessionEventsManagerMock, mockk()).apply {
+        OdkPresenter(view, Enrol, sessionEventsManagerMock, mockk(), mockk()).apply {
             handleEnrolResponse(EnrolResponse(registerId))
         }
 
@@ -117,7 +142,7 @@ class OdkPresenterTest {
         val sessionId = UUID.randomUUID().toString()
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
 
-        OdkPresenter(view, Identify, sessionEventsManagerMock, mockk()).apply {
+        OdkPresenter(view, Identify, sessionEventsManagerMock, mockk(), mockk()).apply {
             handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
         }
 
@@ -143,7 +168,7 @@ class OdkPresenterTest {
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
 
-        OdkPresenter(view, Identify, sessionEventsManagerMock, mockk()).apply {
+        OdkPresenter(view, Identify, sessionEventsManagerMock, mockk(), mockk()).apply {
             handleVerifyResponse(verification)
         }
 
@@ -166,7 +191,13 @@ class OdkPresenterTest {
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
 
-        OdkPresenter(view, Invalid, sessionEventsManagerMock, mockk()).handleResponseError(error)
+        OdkPresenter(
+            view,
+            Invalid,
+            sessionEventsManagerMock,
+            mockk(),
+            mockk()
+        ).handleResponseError(error)
 
         verify(exactly = 1) { view.returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
@@ -177,7 +208,13 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
 
-        OdkPresenter(view, ConfirmIdentity, clientApiSessionEventsManager, mockk()).apply {
+        OdkPresenter(
+            view,
+            ConfirmIdentity,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).apply {
             runBlocking { start() }
         }
 
@@ -193,6 +230,7 @@ class OdkPresenterTest {
             view,
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
+            mockk(),
             mockk()
         ).apply { runBlocking { start() } }
 
@@ -211,15 +249,21 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
 
-        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers  {
+        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers {
             // return a new sessionId if closeSession is called
             coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns newSessionId
         }
 
 
-        OdkPresenter(view, ConfirmIdentity, clientApiSessionEventsManager, mockk()).apply {
+        OdkPresenter(
+            view,
+            ConfirmIdentity,
+            clientApiSessionEventsManager,
+            mockk(),
+            mockk()
+        ).apply {
             runBlocking {
-              handleConfirmationResponse(mockk())
+                handleConfirmationResponse(mockk())
             }
         }
 
@@ -237,7 +281,7 @@ class OdkPresenterTest {
         val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
         every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
 
-        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers  {
+        coEvery { clientApiSessionEventsManager.closeCurrentSessionNormally() } answers {
             // return a new sessionId if closeSession is called
             coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns newSessionId
         }
@@ -247,6 +291,7 @@ class OdkPresenterTest {
             view,
             EnrolLastBiometrics,
             clientApiSessionEventsManager,
+            mockk(),
             mockk()
         ).apply { runBlocking { handleEnrolResponse(mockk()) } }
 

@@ -30,8 +30,8 @@ open class FirebaseManagerImpl(
 
     override fun signOut() {
         clearCachedTokenClaims()
-            // On legacy projects they may not have a separate Core Firebase Project, so we try to
-            // log out on both just in case.
+        // On legacy projects they may not have a separate Core Firebase Project, so we try to
+        // log out on both just in case.
         FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
     }
 

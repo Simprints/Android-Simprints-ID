@@ -7,7 +7,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException

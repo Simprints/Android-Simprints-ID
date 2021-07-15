@@ -2,11 +2,10 @@ package com.simprints.fingerprintscanner.v1;
 
 import android.os.Handler;
 import android.os.Looper;
-
+import androidx.annotation.NonNull;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_STATUS;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_TYPE;
 import com.simprints.logging.Simber;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,8 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
 
 class MessageDispatcher extends Thread {
 

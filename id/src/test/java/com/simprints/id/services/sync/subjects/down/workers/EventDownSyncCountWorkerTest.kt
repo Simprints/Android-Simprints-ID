@@ -19,13 +19,17 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.*
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
