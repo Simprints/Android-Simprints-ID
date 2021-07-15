@@ -3,7 +3,9 @@ package com.simprints.id.activities.settings.fingerselection
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_INDEX_FINGER
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.LEFT_THUMB
+import com.simprints.id.data.db.subject.domain.FingerIdentifier.RIGHT_THUMB
 import com.simprints.id.data.prefs.IdPreferencesManager
 import io.mockk.every
 import io.mockk.mockk

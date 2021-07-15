@@ -1,29 +1,31 @@
 package com.simprints.clientapi.activities.commcare
 
-import androidx.annotation.Keep
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.commcare.CommCareAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
+import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
+import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
+import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -31,8 +33,6 @@ import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_I
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class CommCarePresenter(
@@ -47,9 +47,11 @@ class CommCarePresenter(
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
-    view,
-    sessionEventsManager,
-    deviceManager,
+    view = view,
+    eventsManager = sessionEventsManager,
+    deviceManager = deviceManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
 ), CommCareContract.Presenter {
 
     override suspend fun start() {
@@ -81,8 +83,13 @@ class CommCarePresenter(
                 enrol.guid,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getEventsJsonForSession(currentSessionId),
-                getEnrolmentCreationEventForSubject(enrol.guid)
+                getEventsJsonForSession(currentSessionId, jsonHelper),
+                getEnrolmentCreationEventForSubject(
+                    enrol.guid,
+                    subjectRepository = subjectRepository,
+                    timeHelper = timeHelper,
+                    jsonHelper = jsonHelper
+                )
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
@@ -103,7 +110,7 @@ class CommCarePresenter(
             sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(ArrayList(identify.identifications.map {
                 Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
-            }), identify.sessionId, getEventsJsonForSession(identify.sessionId))
+            }), identify.sessionId, getEventsJsonForSession(identify.sessionId, jsonHelper))
         }
     }
 
@@ -117,7 +124,7 @@ class CommCarePresenter(
             view.returnConfirmation(
                 RETURN_FOR_FLOW_COMPLETED,
                 currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
@@ -137,7 +144,7 @@ class CommCarePresenter(
                 verify.matchResult.guidFound,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getEventsJsonForSession(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
@@ -156,7 +163,7 @@ class CommCarePresenter(
                 refusalForm.extra,
                 currentSessionId,
                 RETURN_FOR_FLOW_COMPLETED,
-                getEventsJsonForSession(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
@@ -175,39 +182,10 @@ class CommCarePresenter(
                 errorResponse,
                 flowCompletedCheck,
                 currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
-    }
-
-    /**
-     * Be aware that Android Intents have a cap at around 500KB of data that can be returned.
-     * When changing events, make sure they still fit in.
-     */
-    private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
-            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
-            jsonHelper.toJson(CommCareEvents(events))
-        } else {
-            null
-        }
-
-    private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
-
-        val recordCreationEvent =
-            subjectRepository.load(
-                SubjectQuery(
-                    projectId = getProjectIdFromRequest(),
-                    subjectId = subjectId
-                )
-            )
-                .firstOrNull()
-                ?.fromSubjectToEnrolmentCreationEvent()
-                ?: return null
-
-        return jsonHelper.toJson(CommCareEvents(listOf(recordCreationEvent)))
     }
 
     private suspend fun checkAndProcessSessionId() {
@@ -219,33 +197,4 @@ class CommCarePresenter(
 
         processConfirmIdentityRequest()
     }
-
-    /**
-     * Delete the events if returning to CommCare but not Simprints
-     */
-    private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
-        ) {
-            sessionEventsManager.deleteSessionEvents(sessionId)
-        }
-    }
-
-    private fun getProjectIdFromRequest() =
-        view.extras?.get(Constants.SIMPRINTS_PROJECT_ID) as String
-
-    private fun Subject.fromSubjectToEnrolmentCreationEvent(): EnrolmentRecordCreationEvent {
-        return EnrolmentRecordCreationEvent(
-            timeHelper.now(),
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            sharedPreferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder)
-        )
-    }
-
-    @Keep
-    private data class CommCareEvents(val events: List<Event>)
 }

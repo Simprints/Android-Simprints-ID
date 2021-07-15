@@ -41,7 +41,11 @@ import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.controllers.v2.*
+import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
+import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper
 import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource

@@ -1,6 +1,8 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Failed
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Progress
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Succeed
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector

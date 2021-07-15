@@ -25,8 +25,12 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking

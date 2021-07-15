@@ -3,7 +3,7 @@ package com.simprints.id.data.prefs.preferenceType
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.logging.Simber
-import java.util.*
+import java.util.Date
 import kotlin.reflect.KProperty
 
 class DatePreference(private val prefs: ImprovedSharedPreferences,

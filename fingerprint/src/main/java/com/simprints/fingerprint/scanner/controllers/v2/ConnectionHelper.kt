@@ -13,7 +13,7 @@ import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.io.IOException
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**

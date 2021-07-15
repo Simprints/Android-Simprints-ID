@@ -1,8 +1,13 @@
 package com.simprints.id.activities.qrcapture.tools
 
 import androidx.camera.core.ImageProxy
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import org.junit.Before
