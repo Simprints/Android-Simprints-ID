@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.rxCompletable
 import java.util.concurrent.TimeUnit
 
 class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
@@ -34,7 +35,7 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateUn20FirmwareVersion(firmwareVersion, scanner) thenEmitStep Un20OtaStep.ReconnectingAfterValidating)
-            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
+            .concatWith(rxCompletable { connectionHelper.reconnect(scanner, macAddress) }.addSmallDelay() thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
     private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)

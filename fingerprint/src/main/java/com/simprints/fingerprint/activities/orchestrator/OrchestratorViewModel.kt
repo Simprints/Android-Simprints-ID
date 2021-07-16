@@ -15,12 +15,16 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class OrchestratorViewModel(private val orchestrator: Orchestrator,
-                            private val runnableTaskDispatcher: RunnableTaskDispatcher,
-                            private val scannerManager: ScannerManager,
-                            private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler) : ViewModel() {
+class OrchestratorViewModel(
+    private val orchestrator: Orchestrator,
+    private val runnableTaskDispatcher: RunnableTaskDispatcher,
+    private val scannerManager: ScannerManager,
+    private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
+    private val externalScope: CoroutineScope
+): ViewModel() {
 
     val nextActivityCall = MutableLiveData<ActivityCall>()
     val finishedResult = MutableLiveData<ActivityResult>()
@@ -91,6 +95,10 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
 
     override fun onCleared() {
         super.onCleared()
-        scannerManager.scanner { disconnect() }.onErrorComplete().subscribeOn(Schedulers.io()).subscribe()
+        externalScope.launch {
+            if (scannerManager.isScannerAvailable) {
+                scannerManager.scanner.disconnect()
+            }
+        }
     }
 }

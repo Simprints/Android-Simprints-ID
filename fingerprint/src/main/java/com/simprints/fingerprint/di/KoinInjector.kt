@@ -69,6 +69,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -133,6 +134,7 @@ object KoinInjector {
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FingerprintImageManager> { FingerprintImageManagerImpl(get(), get()) }
         factory<FingerprintApiClientFactory> { FingerprintApiClientFactoryImpl(get()) }
+        factory<DispatcherProvider> { DefaultDispatcherProvider() }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -198,8 +200,16 @@ object KoinInjector {
         }
         single<EncodingUtils> { EncodingUtilsImpl }
 
-        viewModel { OrchestratorViewModel(get(), get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get()) }
+        viewModel {
+            OrchestratorViewModel(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(qualifier = named(Application.APPLICATION_SCOPE))
+            )
+        }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
                 get(),
@@ -209,13 +219,15 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
+                get(),
+                get(qualifier = named(Application.APPLICATION_SCOPE)),
                 get()
             )
         }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get(),get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
-        viewModel { OtaViewModel(get(), get(), get(), get()) }
+        viewModel { OtaViewModel(get(), get(), get(), get(), get()) }
         viewModel { OtaRecoveryViewModel(get()) }
     }
 
