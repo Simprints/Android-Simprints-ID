@@ -173,7 +173,6 @@ dependencies {
 
     // Firebase
     implementation(Dependencies.Firebase.auth)
-    implementation(Dependencies.Firebase.config)
     implementation(Dependencies.Firebase.perf)
     implementation(Dependencies.Firebase.storage)
     implementation(Dependencies.Firebase.mlkit)

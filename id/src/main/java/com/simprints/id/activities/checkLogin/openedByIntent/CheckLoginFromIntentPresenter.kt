@@ -15,7 +15,6 @@ import com.simprints.eventsystem.event.domain.models.callout.VerificationCallout
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
@@ -58,9 +57,6 @@ class CheckLoginFromIntentPresenter(
 ) :
     CheckLoginPresenter(view, component),
     CheckLoginFromIntentContract.Presenter {
-
-    @Inject
-    lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
@@ -264,8 +260,6 @@ class CheckLoginFromIntentPresenter(
         if (appRequest.userId.isNotEmpty()) {
             loginInfoManager.signedInUserId = appRequest.userId
         }
-
-        remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         updateProjectInCurrentSession()
 

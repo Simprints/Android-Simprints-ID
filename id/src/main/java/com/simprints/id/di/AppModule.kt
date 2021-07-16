@@ -76,8 +76,6 @@ import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
 import com.simprints.id.tools.RandomGenerator
@@ -272,12 +270,6 @@ open class AppModule {
             timeHelper,
             eventRepository
         )
-
-    @Provides
-    @Singleton
-    open fun provideImageUpSyncScheduler(
-        context: Context
-    ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()

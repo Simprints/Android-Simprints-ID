@@ -4,9 +4,8 @@ import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.AttestToken
@@ -31,12 +30,11 @@ import java.io.IOException
 @ExperimentalCoroutinesApi
 class ProjectAuthenticatorImplTest {
 
-    @MockK private lateinit var projectRemoteDataSourceMock: ProjectRemoteDataSource
+    @MockK private lateinit var projectRepository: ProjectRepository
     @MockK private lateinit var longConsentRepositoryMock: LongConsentRepository
     @MockK private lateinit var secureDataManager: SecureLocalDbKeyProvider
     @MockK private lateinit var projectSecretManager: ProjectSecretManager
     @MockK private lateinit var signerManager: SignerManager
-    @MockK private lateinit var remoteConfigWrapper: RemoteConfigWrapper
     @MockK private lateinit var preferencesManagerMock: IdPreferencesManager
     @MockK private lateinit var safetyNetClient: SafetyNetClient
     @MockK private lateinit var authenticationDataManagerMock: AuthenticationDataManager
@@ -108,9 +106,8 @@ class ProjectAuthenticatorImplTest {
             projectSecretManager,
             safetyNetClient,
             secureDataManager,
-            projectRemoteDataSourceMock,
+            projectRepository,
             signerManager,
-            remoteConfigWrapper,
             longConsentRepositoryMock,
             preferencesManagerMock,
             attestationManagerMock,
@@ -122,7 +119,7 @@ class ProjectAuthenticatorImplTest {
         coEvery { authenticationDataManagerMock.requestAuthenticationData(any(), any()) } returns AuthenticationData(Nonce(""), PublicKeyString(""))
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
         coEvery { authManagerMock.requestAuthToken(any()) } returns Token("", "", "", "")
-        coEvery { projectRemoteDataSourceMock.loadProjectRemoteConfigSettingsJsonString(any()) } returns mockk()
+        coEvery { projectRepository.fetchProjectConfigurationAndSave(any()) } returns mockk()
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
         every { attestationManagerMock.requestAttestation(any(), any()) } returns AttestToken("google_attestation")
         LanguageHelper.prefs = mockk(relaxed = true)
