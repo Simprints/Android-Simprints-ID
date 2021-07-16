@@ -39,7 +39,7 @@ class RemoteConfigWorkerTest {
     }
 
     private val loginInfoManagerMock: LoginInfoManager = mockk {
-        every { signedInProjectId } returns UUID.randomUUID().toString()
+        every { getSignedInProjectIdOrEmpty() } returns UUID.randomUUID().toString()
     }
 
     private val projectRepositoryMock: ProjectRepository = mockk()
@@ -64,12 +64,12 @@ class RemoteConfigWorkerTest {
     }
 
     @Test
-    fun `when not signed in - should return success`() = testCoroutineRule.runBlockingTest {
-        every { loginInfoManagerMock.signedInProjectId } returns ""
+    fun `when not signed in - should return failure`() = testCoroutineRule.runBlockingTest {
+        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns ""
 
         val result = remoteConfigWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         coVerify(exactly = 0) { projectRepositoryMock.fetchProjectConfigurationAndSave(any()) }
     }
 
