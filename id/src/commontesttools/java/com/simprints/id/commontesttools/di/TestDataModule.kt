@@ -14,6 +14,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.testtools.common.di.DependencyRule
@@ -24,11 +25,8 @@ class TestDataModule(
     private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val eventRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val personRepositoryUpSyncHelperRule: DependencyRule = DependencyRule.RealRule,
-    private val personRepositoryDownSyncHelperRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
@@ -54,11 +52,13 @@ class TestDataModule(
 
     override fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): ProjectRepository = projectRepositoryRule.resolveDependency {
         super.provideProjectRepository(
             projectLocalDataSource,
-            projectRemoteDataSource
+            projectRemoteDataSource,
+            remoteConfigWrapper
         )
     }
 

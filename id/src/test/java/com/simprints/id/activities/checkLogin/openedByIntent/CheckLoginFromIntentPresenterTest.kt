@@ -32,7 +32,6 @@ import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
@@ -76,9 +75,6 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var appComponent: AppComponent
 
     @MockK
-    lateinit var remoteConfigFetcherMock: RemoteConfigFetcher
-
-    @MockK
     lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
 
     @MockK
@@ -110,7 +106,6 @@ class CheckLoginFromIntentPresenterTest {
             appComponent,
             testCoroutineRule.testCoroutineDispatcher
         ).apply {
-            remoteConfigFetcher = remoteConfigFetcherMock
             subjectLocalDataSource = subjectLocalDataSourceMock
             coEvery { subjectLocalDataSource.count(any()) } returns 0
 

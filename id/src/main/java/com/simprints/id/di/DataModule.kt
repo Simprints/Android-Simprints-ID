@@ -10,6 +10,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.consent.longconsent.*
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
@@ -34,6 +35,7 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import dagger.Module
 import dagger.Provides
@@ -72,10 +74,12 @@ open class DataModule {
     @Provides
     open fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): ProjectRepository = ProjectRepositoryImpl(
         projectLocalDataSource,
-        projectRemoteDataSource
+        projectRemoteDataSource,
+        remoteConfigWrapper
     )
 
     @Provides
@@ -139,8 +143,8 @@ open class DataModule {
 
     @Provides
     @Singleton
-    open fun provideEventsSyncStatusDatabase(ctx: Context): com.simprints.eventsystem.events_sync.EventSyncStatusDatabase =
-        com.simprints.eventsystem.events_sync.EventSyncStatusDatabase.getDatabase(ctx)
+    open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
+        EventSyncStatusDatabase.getDatabase(ctx)
 
     @Provides
     open fun provideSubjectToEventMigrationManager(

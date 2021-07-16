@@ -1,6 +1,5 @@
 package com.simprints.id.commontesttools.di
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
@@ -24,9 +23,13 @@ class TestPreferencesModule(
     var settingsPreferencesManagerRule: DependencyRule = RealRule
 ) : PreferencesModule() {
 
-    override fun provideRemoteConfig(): FirebaseRemoteConfig = remoteConfigRule.resolveDependency {
-        super.provideRemoteConfig()
-    }
+    /**
+     * Overriding this method means that we can use a mock or a spy instead of the regular provider from Dagger
+     */
+    override fun provideRemoteConfigWrapper(prefs: ImprovedSharedPreferences): RemoteConfigWrapper =
+        settingsPreferencesManagerRule.resolveDependency {
+            super.provideRemoteConfigWrapper(prefs)
+        }
 
     override fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,
