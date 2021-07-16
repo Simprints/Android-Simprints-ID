@@ -11,9 +11,7 @@ import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A common interface for both Vero 1 and Vero 2. Some features are only available on later versions
@@ -22,27 +20,27 @@ import io.reactivex.Single
  */
 interface ScannerWrapper {
 
-    fun  isImageTransferSupported(): Boolean
+    fun isImageTransferSupported(): Boolean
 
-    fun connect(): Completable
-    fun disconnect(): Completable
+    suspend fun connect()
+    suspend fun disconnect()
 
-    fun setup(): Completable
+    suspend fun setup()
 
-    fun sensorWakeUp(): Completable
-    fun sensorShutDown(): Completable
+    suspend fun sensorWakeUp()
+    suspend fun sensorShutDown()
 
     fun isLiveFeedbackAvailable(): Boolean
     /** @throws UnavailableVero2FeatureException - if UN20 API version is less then 1.1 or if using Vero 1 */
-    fun startLiveFeedback(): Completable
+    suspend fun startLiveFeedback()
     /** @throws UnavailableVero2FeatureException - if UN20 API version is less then 1.1 or if using Vero 1 */
-    fun stopLiveFeedback(): Completable
+    suspend fun stopLiveFeedback()
 
-    fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse>
+    suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): CaptureFingerprintResponse
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): Single<AcquireImageResponse>
+    suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): AcquireImageResponse
 
-    fun setUiIdle(): Completable
+    suspend fun setUiIdle()
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
     fun unregisterTriggerListener(triggerListener: ScannerTriggerListener)
@@ -50,9 +48,9 @@ interface ScannerWrapper {
     fun batteryInformation(): BatteryInfo
 
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performCypressOta(firmwareVersion: String): Observable<CypressOtaStep>
+    suspend fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performStmOta(firmwareVersion: String): Observable<StmOtaStep>
+    suspend fun performStmOta(firmwareVersion: String): Flow<StmOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performUn20Ota(firmwareVersion: String): Observable<Un20OtaStep>
+    suspend fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep>
 }

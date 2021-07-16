@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.rxCompletable
 import java.util.concurrent.TimeUnit
 
 class StmOtaHelper(private val connectionHelper: ConnectionHelper,
@@ -28,14 +29,14 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
     fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Observable<StmOtaStep> =
         Observable.just<StmOtaStep>(StmOtaStep.EnteringOtaModeFirstTime)
             .concatWith(scanner.enterStmOtaMode().onErrorComplete() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
-            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
+            .concatWith(rxCompletable { connectionHelper.reconnect(scanner, macAddress) }.addSmallDelay() thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
             .concatWith(scanner.enterStmOtaMode().addSmallDelay() thenEmitStep StmOtaStep.CommencingTransfer)
             .concatWith(scanner.startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes(firmwareVersion)).map { StmOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(StmOtaStep.ReconnectingAfterTransfer))
-            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.EnteringMainMode)
+            .concatWith(rxCompletable { connectionHelper.reconnect(scanner, macAddress) }.addSmallDelay() thenEmitStep StmOtaStep.EnteringMainMode)
             .concatWith(scanner.enterMainMode().addSmallDelay() thenEmitStep StmOtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateStmFirmwareVersion(firmwareVersion, scanner) thenEmitStep StmOtaStep.ReconnectingAfterValidating)
-            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.UpdatingUnifiedVersionInformation)
+            .concatWith(rxCompletable { connectionHelper.reconnect(scanner, macAddress) }.addSmallDelay() thenEmitStep StmOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
     private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)

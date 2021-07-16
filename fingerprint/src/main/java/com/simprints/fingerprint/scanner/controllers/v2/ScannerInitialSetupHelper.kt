@@ -16,6 +16,7 @@ import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.rxSingle
 import java.util.concurrent.TimeUnit
 
@@ -72,7 +73,7 @@ class ScannerInitialSetupHelper(
         return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
             Completable.complete()
         } else {
-            connectionHelper.reconnect(scanner, macAddress)
+            rxCompletable { connectionHelper.reconnect(scanner, macAddress) }
                 .andThen(Completable.error(OtaAvailableException(availableOtas)))
         }
     }

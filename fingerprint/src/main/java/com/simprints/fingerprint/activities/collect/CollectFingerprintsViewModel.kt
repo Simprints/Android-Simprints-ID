@@ -3,20 +3,16 @@ package com.simprints.fingerprint.activities.collect
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -39,13 +35,10 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedExce
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.concurrent.schedule
@@ -59,7 +52,9 @@ class CollectFingerprintsViewModel(
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
     private val startingStateDeterminer: StartingStateDeterminer,
-    private val encoder: EncodingUtils
+    private val encoder: EncodingUtils,
+    private val externalScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     val state = MutableLiveData<CollectFingerprintsState>()
@@ -96,16 +91,16 @@ class CollectFingerprintsViewModel(
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private val imageRefs: MutableMap<CaptureId, FingerprintImageRef?> = mutableMapOf()
     private var lastCaptureStartedAt: Long = 0
-    private var scanningTask: Disposable? = null
-    private var imageTransferTask: Disposable? = null
-    private var liveFeedbackTask: Disposable? = null
-    private var stopLiveFeedbackTask: Disposable? = null
+    private var scanningTask: Job? = null
+    private var imageTransferTask: Job? = null
+    private var liveFeedbackTask: Job? = null
+    private var stopLiveFeedbackTask: Job? = null
     var liveFeedbackState: LiveFeedbackState? = null
 
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
     private val scannerTriggerListener = ScannerTriggerListener {
-        viewModelScope.launch(context = Dispatchers.Main) {
+        viewModelScope.launch(context = dispatcherProvider.main()) {
             if (state().isShowingConfirmDialog) {
                 logScannerMessageForCrashReport("Scanner trigger clicked for confirm dialog")
                 handleConfirmFingerprintsAndContinue()
@@ -124,8 +119,8 @@ class CollectFingerprintsViewModel(
 
     private fun startObserverForLiveFeedback() {
         state.observeForever {
-            val scanner = scannerManager.scanner
-                ?: return@observeForever launchReconnect.postEvent()
+            if (!scannerManager.isScannerAvailable)
+                return@observeForever launchReconnect.postEvent()
 
             when (it.currentCaptureState()) {
                 CaptureState.NotCollected,
@@ -133,9 +128,8 @@ class CollectFingerprintsViewModel(
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
                     if (it.isShowingConfirmDialog)
-                        stopLiveFeedback(scanner).doInBackground()
-                    else
-                        startLiveFeedback(scanner).doInBackground()
+                        stopLiveFeedback(scannerManager.scanner)
+                    else startLiveFeedback(scannerManager.scanner)
                 }
                 is CaptureState.Scanning,
                 is CaptureState.TransferringImage -> pauseLiveFeedback()
@@ -147,32 +141,33 @@ class CollectFingerprintsViewModel(
         scanner.isLiveFeedbackAvailable() && fingerprintPreferencesManager.liveFeedbackOn
 
 
-    private fun startLiveFeedback(scanner: ScannerWrapper): Completable =
+    private fun startLiveFeedback(scanner: ScannerWrapper) {
         if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback(scanner)) {
             logScannerMessageForCrashReport("startLiveFeedback")
             liveFeedbackState = LiveFeedbackState.START
-            stopLiveFeedbackTask?.dispose()
-            scannerManager.scanner { startLiveFeedback() }.doOnSubscribe { liveFeedbackTask = it }
-        } else {
-            Completable.complete()
+            stopLiveFeedbackTask?.cancel()
+            liveFeedbackTask = viewModelScope.launch(dispatcherProvider.io()) {
+                scannerManager.scanner.startLiveFeedback()
+            }
         }
+    }
 
     private fun pauseLiveFeedback() {
         logScannerMessageForCrashReport("pauseLiveFeedback")
         liveFeedbackState = LiveFeedbackState.PAUSE
-        liveFeedbackTask?.dispose()
+        liveFeedbackTask?.cancel()
     }
 
-    private fun stopLiveFeedback(scanner: ScannerWrapper): Completable =
+    private fun stopLiveFeedback(scanner: ScannerWrapper) {
         if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback(scanner)) {
             logScannerMessageForCrashReport("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
-            liveFeedbackTask?.dispose()
-            scannerManager.scanner { stopLiveFeedback() }
-                .doOnSubscribe { stopLiveFeedbackTask = it }
-        } else {
-            Completable.complete()
+            liveFeedbackTask?.cancel()
+            stopLiveFeedbackTask = viewModelScope.launch(dispatcherProvider.io()) {
+                scannerManager.scanner.stopLiveFeedback()
+            }
         }
+    }
 
     private fun setStartingState() {
         state.value = CollectFingerprintsState(
@@ -185,7 +180,9 @@ class CollectFingerprintsViewModel(
             && scannerManager.scanner?.isImageTransferSupported() ?: false
 
     fun updateSelectedFinger(index: Int) {
-        scannerManager.scanner { setUiIdle() }.doInBackground()
+        viewModelScope.launch(dispatcherProvider.io()) {
+            scannerManager.scanner.setUiIdle()
+        }
         updateState {
             isAskingRescan = false
             isShowingSplashScreen = false
@@ -236,28 +233,29 @@ class CollectFingerprintsViewModel(
 
     private fun cancelScanning() {
         updateCaptureState { toNotCollected() }
-        scanningTask?.dispose()
-        imageTransferTask?.dispose()
+        scanningTask?.cancel()
+        imageTransferTask?.cancel()
     }
 
     private fun startScanning() {
         updateCaptureState { toScanning() }
         lastCaptureStartedAt = timeHelper.now()
-        scanningTask?.dispose()
-        scanningTask = scannerManager.scanner { setUiIdle() }
-            .andThen(scannerManager.scanner<CaptureFingerprintResponse> {
-                captureFingerprint(
+        scanningTask?.cancel()
+
+        scanningTask = viewModelScope.launch(dispatcherProvider.io()) {
+            try {
+                scannerManager.scanner.setUiIdle()
+                val capturedFingerprint = scannerManager.scanner.captureFingerprint(
                     fingerprintPreferencesManager.captureFingerprintStrategy,
                     scanningTimeoutMs.toInt(),
                     fingerprintPreferencesManager.qualityThreshold
                 )
-            })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = ::handleCaptureSuccess,
-                onError = ::handleScannerCommunicationsError
-            )
+
+                handleCaptureSuccess(capturedFingerprint)
+            } catch (ex: Throwable) {
+                handleScannerCommunicationsError(ex)
+            }
+        }
     }
 
     private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
@@ -284,19 +282,20 @@ class CollectFingerprintsViewModel(
                 fingerprintPreferencesManager.saveFingerprintImagesStrategy.isEager())
 
     private fun proceedToImageTransfer() {
-        imageTransferTask?.dispose()
-        imageTransferTask =
-            scannerManager.scanner<AcquireImageResponse> {
+        imageTransferTask?.cancel()
+
+        imageTransferTask = viewModelScope.launch(dispatcherProvider.io()) {
+            try {
+                val acquiredImage = scannerManager.scanner.
                 acquireImage(
                     fingerprintPreferencesManager.saveFingerprintImagesStrategy
+
                 )
+                handleImageTransferSuccess(acquiredImage)
+            } catch (ex: Throwable) {
+                handleScannerCommunicationsError(ex)
             }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = ::handleImageTransferSuccess,
-                    onError = ::handleScannerCommunicationsError
-                )
+        }
     }
 
     private fun handleImageTransferSuccess(acquireImageResponse: AcquireImageResponse) {
@@ -379,7 +378,9 @@ class CollectFingerprintsViewModel(
             if (currentCaptureIndex < captures.size - 1) {
                 timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
                     updateFingerState { currentCaptureIndex += 1 }
-                    scannerManager.scanner { setUiIdle() }.doInBackground()
+                    viewModelScope.launch(dispatcherProvider.io()) {
+                        scannerManager.scanner.setUiIdle()
+                    }
                 }
             }
         }
@@ -576,9 +577,13 @@ class CollectFingerprintsViewModel(
     fun handleOnPause() {
         // Don't try to reconnect scanner in onPause, if scanner is null,
         // reconnection of null scanner will be handled in onResume
-        scannerManager.scanner?.let { scanner ->
-            stopLiveFeedback(scanner).doInBackground()
-            scanner.unregisterTriggerListener(scannerTriggerListener)
+        if (scannerManager.isScannerAvailable) {
+            scannerManager.scanner.let { scanner ->
+                viewModelScope.launch {
+                    stopLiveFeedback(scanner)
+                }
+                scanner.unregisterTriggerListener(scannerTriggerListener)
+            }
         }
     }
 
@@ -591,11 +596,10 @@ class CollectFingerprintsViewModel(
     override fun onCleared() {
         super.onCleared()
         cancelScanning()
-        scannerManager.scanner { disconnect() }.doInBackground()
+        externalScope.launch {
+            scannerManager.scanner.disconnect()
+        }
     }
-
-    private fun Completable.doInBackground() =
-        subscribeOn(Schedulers.single()).subscribeBy(onComplete = {}, onError = { Simber.e(it) })
 
     fun logUiMessageForCrashReport(message: String) {
         Simber.tag(CrashReportTag.FINGER_CAPTURE.name).i(message)
@@ -606,7 +610,9 @@ class CollectFingerprintsViewModel(
     }
 
     private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {
-        scannerManager.scanner?.block() ?: launchReconnect.postEvent()
+        if (scannerManager.isScannerAvailable)
+            scannerManager.scanner.block()
+        else launchReconnect.postEvent()
     }
 
     companion object {

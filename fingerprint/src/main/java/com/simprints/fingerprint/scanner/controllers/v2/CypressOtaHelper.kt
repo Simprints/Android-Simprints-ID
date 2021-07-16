@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.rxCompletable
 import java.util.concurrent.TimeUnit
 
 class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
@@ -30,7 +31,7 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
             .concatWith(scanner.enterCypressOtaMode().addSmallDelay() thenEmitStep CypressOtaStep.CommencingTransfer)
             .concatWith(scanner.startCypressOta(firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)).map { CypressOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
-            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
+            .concatWith( rxCompletable { connectionHelper.reconnect(scanner, macAddress) }.addSmallDelay() thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
             .concatWith(validateCypressFirmwareVersion(firmwareVersion, scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 

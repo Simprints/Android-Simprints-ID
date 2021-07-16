@@ -4,9 +4,10 @@ import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
@@ -27,18 +28,18 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIss
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
-import io.reactivex.Completable
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ConnectScannerViewModel(
     private val scannerManager: ScannerManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val preferencesManager: FingerprintPreferencesManager,
-    private val nfcManager: NfcManager
+    private val nfcManager: NfcManager,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
@@ -56,109 +57,109 @@ class ConnectScannerViewModel(
 
     val showScannerErrorDialogWithScannerId = MutableLiveData<LiveDataEventWithContent<String>>()
 
-    private var setupFlow: Disposable? = null
 
     fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
-    }
-
-    fun start() {
-        startSetup()
+        runBlocking { startSetup() }
     }
 
     @SuppressLint("CheckResult")
-    private fun startSetup() {
+    private suspend fun startSetup() {
         stopConnectingAndResetState()
-        setupFlow = disconnectVero()
-            .andThen(checkIfBluetoothIsEnabled())
-            .andThen(initVero())
-            .andThen(connectToVero())
-            .andThen(setupVero())
-            .andThen(resetVeroUI())
-            .andThen(wakeUpVero())
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { manageVeroErrors(it) }, onComplete = {
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            try {
+                disconnectVero()
+                checkIfBluetoothIsEnabled()
+                initVero()
+                connectToVero()
+                setupVero()
+                resetVeroUI()
+                wakeUpVero()
                 handleSetupFinished()
-            })
+            } catch (ex : Exception) {
+                manageVeroErrors(ex)
+            }
+        }
     }
 
     fun stopConnectingAndResetState() {
-        progress.postValue(0)
-        message.postValue(R.string.connect_scanner_bt_connect)
-        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
-        setupFlow?.dispose()
+        progress.value = 0
+        message.value = R.string.connect_scanner_bt_connect
+        backButtonBehaviour.value = BackButtonBehaviour.EXIT_FORM
     }
 
-    private fun disconnectVero() =
-        veroTask(computeProgress(1),
-            R.string.connect_scanner_bt_connect,
-            "ScannerManager: disconnect",
-            scannerManager.scanner { disconnect() }.onErrorComplete()
-        )
+    private suspend fun disconnectVero() {
+        if (scannerManager.isScannerAvailable) {
+            postProgressAndMessage(step = 1, messageRes = R.string.connect_scanner_bt_connect)
+            scannerManager.scanner.disconnect()
+            logMessageForCrashReport("ScannerManager: disconnect")
+        }
+    }
 
-    private fun checkIfBluetoothIsEnabled() =
-        veroTask(
-            computeProgress(2),
-            R.string.connect_scanner_bt_connect,
-            "ScannerManager: bluetooth is enabled",
-            scannerManager.checkBluetoothStatus()
-        )
+    private suspend fun checkIfBluetoothIsEnabled() {
+        postProgressAndMessage(step = 2, messageRes = R.string.connect_scanner_bt_connect)
+        scannerManager.checkBluetoothStatus()
+        logMessageForCrashReport("ScannerManager: bluetooth is enabled")
+    }
 
-    private fun initVero() =
-        veroTask(
-            computeProgress(3), R.string.connect_scanner_bt_connect, "ScannerManager: init vero",
-            scannerManager.initScanner()
-        )
+    private suspend fun initVero() {
+        postProgressAndMessage(step = 3, messageRes = R.string.connect_scanner_bt_connect)
+        scannerManager.initScanner()
+        logMessageForCrashReport("ScannerManager: init vero")
+    }
 
-    private fun connectToVero() = veroTask(computeProgress(4),
-        R.string.connect_scanner_bt_connect,
-        "ScannerManager: connectToVero",
-        scannerManager.scanner { connect() }) {
+    private suspend fun connectToVero() {
+        postProgressAndMessage(step = 4,
+       messageRes = R.string.connect_scanner_bt_connect)
+
+        scannerManager.scanner .connect()
+
             addBluetoothConnectivityEvent()
-        }
+       logMessageForCrashReport("ScannerManager: connectToVero")
+    }
 
-    private fun setupVero() = veroTask(
-        computeProgress(5),
-        R.string.connect_scanner_setup,
-        "ScannerManager: setupVero",
-        scannerManager.scanner { setup() }) {
-            setLastConnectedScannerInfo()
-            addInfoSnapshotEventIfNecessary()
-        }
+    private suspend fun setupVero() {
+        postProgressAndMessage(step = 5, messageRes = R.string.connect_scanner_setup)
+        scannerManager.scanner.setup()
+        setLastConnectedScannerInfo()
+        addInfoSnapshotEventIfNecessary()
+        logMessageForCrashReport("ScannerManager: setupVero")
+    }
 
-    private fun resetVeroUI() =
-        veroTask(computeProgress(6), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
-            scannerManager.scanner { setUiIdle() })
+    private suspend fun resetVeroUI() {
+        postProgressAndMessage(step = 6, messageRes = R.string.connect_scanner_setup)
+        scannerManager.scanner.setUiIdle()
+        logMessageForCrashReport("ScannerManager: resetVeroUI")
+    }
 
-    private fun wakeUpVero() =
-        veroTask(computeProgress(7),
-            R.string.connect_scanner_wake_un20,
-            "ScannerManager: wakeUpVero",
-            scannerManager.scanner { sensorWakeUp() }) { updateBluetoothConnectivityEventWithVeroInfoIfNecessary() }
+    private suspend fun wakeUpVero() {
+        postProgressAndMessage(step = 7, messageRes = R.string.connect_scanner_wake_un20)
+        scannerManager.scanner.sensorWakeUp()
+        updateBluetoothConnectivityEventWithVeroInfoIfNecessary()
+        logMessageForCrashReport("ScannerManager: wakeUpVero")
+    }
 
     private fun updateBluetoothConnectivityEventWithVeroInfoIfNecessary() {
-        scannerManager.scanner?.run {
+        if (!scannerManager.isScannerAvailable)
+            return retryConnect()
+
+
+        with(scannerManager.scanner) {
             if (versionInformation().generation == ScannerGeneration.VERO_1) {
                 sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
                     versionInformation().firmware.stm
                 )
             }
-        } ?: retryConnect()
+        }
     }
 
-    private fun veroTask(
-        progress: Int, @StringRes messageRes: Int, crashReportMessage: String,
-        task: Completable, callback: (() -> Unit)? = null
-    ): Completable =
-        Completable.fromAction {
-            this.progress.postValue(progress)
-            this.message.postValue(messageRes)
-        }
-            .andThen(task)
-            .andThen(Completable.fromAction { callback?.invoke() })
-            .doOnComplete {
-                logMessageForCrashReport(crashReportMessage)
-            }
+    private fun postProgressAndMessage(step: Int,  @StringRes messageRes: Int) {
+        val progress = computeProgress(step)
+        this.progress.postValue(progress)
+        this.message.postValue(messageRes)
+    }
+
 
     private fun manageVeroErrors(e: Throwable) {
         Simber.d(e)
@@ -177,9 +178,7 @@ class ConnectScannerViewModel(
                 connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
             is ScannerDisconnectedException, is UnknownScannerIssueException ->
                 scannerManager.currentScannerId?.let {
-                    showScannerErrorDialogWithScannerId.postEvent(
-                        it
-                    )
+                    showScannerErrorDialogWithScannerId.postEvent(it)
                 }
             is OtaAvailableException -> {
                 setLastConnectedScannerInfo()
@@ -225,7 +224,7 @@ class ConnectScannerViewModel(
         scannerConnected.postEvent(true)
     }
 
-    fun retryConnect() {
+    fun retryConnect() = runBlocking {
         startSetup()
     }
 
@@ -254,7 +253,11 @@ class ConnectScannerViewModel(
     }
 
     private fun addBluetoothConnectivityEvent() {
-        scannerManager.scanner?.run {
+        if (!scannerManager.isScannerAvailable)
+            return retryConnect()
+
+
+        with(scannerManager.scanner) {
             sessionEventsManager.addEventInBackground(
                 ScannerConnectionEvent(
                     timeHelper.now(),
@@ -266,11 +269,15 @@ class ConnectScannerViewModel(
                     )
                 )
             )
-        } ?: retryConnect()
+        }
     }
 
     private fun addInfoSnapshotEventIfNecessary() {
-        scannerManager.scanner?.run {
+        if (!scannerManager.isScannerAvailable)
+            return retryConnect()
+
+
+        with(scannerManager.scanner) {
             if (versionInformation().generation == ScannerGeneration.VERO_2) {
                 sessionEventsManager.addEventInBackground(
                     Vero2InfoSnapshotEvent(
@@ -280,7 +287,7 @@ class ConnectScannerViewModel(
                     )
                 )
             }
-        } ?: retryConnect()
+        }
     }
 
     private fun logMessageForCrashReport(message: String) {
@@ -291,10 +298,6 @@ class ConnectScannerViewModel(
         Simber.tag(CrashReportTag.ALERT.name).i("Scanner error confirm dialog shown")
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        setupFlow?.dispose()
-    }
 
     enum class BackButtonBehaviour {
         DISABLED,

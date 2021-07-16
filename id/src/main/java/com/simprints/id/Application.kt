@@ -9,18 +9,22 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 open class Application : CoreApplication() {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
+    lateinit var applicationScope: CoroutineScope
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -56,8 +60,13 @@ open class Application : CoreApplication() {
     open fun initApplication() {
         createComponent()
         handleUndeliverableExceptionInRxJava()
+        createApplicationScope()
         initKoin()
         SimberBuilder.initialize(this)
+    }
+
+    open fun createApplicationScope() {
+        applicationScope = CoroutineScope(SupervisorJob())
     }
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
@@ -84,6 +93,7 @@ open class Application : CoreApplication() {
             androidContext(this@Application)
             loadKoinModules(listOf(module(override = true) {
                 this.defineBuildersForCoreManagers()
+                single(qualifier = named(APPLICATION_SCOPE)) { applicationScope }
             }))
         }
     }
@@ -110,4 +120,7 @@ open class Application : CoreApplication() {
         stopKoin()
     }
 
+    companion object {
+        const val APPLICATION_SCOPE = "application_scope"
+    }
 }
