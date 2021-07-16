@@ -32,7 +32,7 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
 
                 // if the user is not signed in, we shouldn't try again
                 if (projectId.isEmpty()) {
-                    return@withContext success()
+                    return@withContext Result.failure()
                 }
 
                 projectRepository.fetchProjectConfigurationAndSave(projectId)
