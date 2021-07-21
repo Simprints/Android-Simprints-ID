@@ -79,9 +79,17 @@ open class FirebaseManagerImpl(
         .setApiKey(token.apiKey)
         .build()
 
-    private fun initializeCoreProject(token: Token) =
-        Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
-
+    private fun initializeCoreProject(token: Token) {
+        try {
+            Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
+        } catch (ex: IllegalStateException) {
+            // IllegalStateException = FirebaseApp name coreBackendFirebaseProject already exists!
+            // We re-initialize because they might be signing into a different project.
+            getCoreApp().delete()
+            Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
+        }
+    }
+    
     private fun clearCachedTokenClaims() {
         loginInfoManager.clearCachedTokenClaims()
     }
