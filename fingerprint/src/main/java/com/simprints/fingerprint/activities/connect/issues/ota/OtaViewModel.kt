@@ -86,9 +86,12 @@ class OtaViewModel(
     private suspend fun AvailableOta.toScannerObservable(): Flow<OtaStep> {
         val otaStartedTime = timeHelper.now()
         return when (this) {
-            AvailableOta.CYPRESS -> scannerManager.scanner.performCypressOta(AvailableOta.CYPRESS)
-            AvailableOta.STM -> scannerManager.scanner.performStmOta(AvailableOta.STM)
-            AvailableOta.UN20 -> scannerManager.scanner.performUn20Ota(AvailableOta.UN20)
+            AvailableOta.CYPRESS ->
+                scannerManager.scanner.performCypressOta(targetVersions(AvailableOta.CYPRESS))
+            AvailableOta.STM ->
+                scannerManager.scanner.performStmOta(targetVersions(AvailableOta.STM))
+            AvailableOta.UN20 ->
+                scannerManager.scanner.performUn20Ota(targetVersions(AvailableOta.UN20))
         }.onSuccess {
             saveOtaEventInSession(this@toScannerObservable, otaStartedTime)
         }.onError {

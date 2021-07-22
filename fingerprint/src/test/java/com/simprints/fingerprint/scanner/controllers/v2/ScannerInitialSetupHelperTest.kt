@@ -20,9 +20,10 @@ import com.simprints.fingerprintscanner.v2.domain.root.models.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
@@ -49,12 +50,12 @@ class ScannerInitialSetupHelperTest {
     fun setup() {
         every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns LOCAL_SCANNER_VERSION
         every { scannerMock.enterMainMode() } returns Completable.complete()
-        every {
+        coEvery {
             connectionHelperMock.reconnect(
                 eq(scannerMock),
                 any()
             )
-        } returns Completable.complete()
+        } answers {}
     }
 
     private fun setupScannerWithBatteryInfo(batteryInfo: BatteryInfo) {
@@ -77,7 +78,7 @@ class ScannerInitialSetupHelperTest {
         testScheduler.advanceTime()
 
         testSubscriber.awaitAndAssertSuccess()
-        verify(exactly = 0) { connectionHelperMock.reconnect(any(), any()) }
+        coVerify(exactly = 0) { connectionHelperMock.reconnect(any(), any()) }
     }
 
     @Test
@@ -172,7 +173,7 @@ class ScannerInitialSetupHelperTest {
                 )
             )
         }
-        verify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
+        coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
     }
 
     @Test
@@ -257,7 +258,7 @@ class ScannerInitialSetupHelperTest {
                 )
             )
         }
-        verify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
+        coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
 
         assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
         assertThat(batteryInfo).isEqualTo(HIGH_BATTERY_INFO)

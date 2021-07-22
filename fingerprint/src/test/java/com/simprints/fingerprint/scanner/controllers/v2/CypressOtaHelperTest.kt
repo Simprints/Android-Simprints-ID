@@ -10,10 +10,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.models.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import io.mockk.CapturingSlot
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -33,7 +30,8 @@ class CypressOtaHelperTest {
 
     @Before
     fun setup() {
-        every { connectionHelperMock.reconnect(any(), any()) } returns Completable.complete()
+        coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
+
 
         every { scannerMock.enterCypressOtaMode() } returns Completable.complete()
         every { scannerMock.startCypressOta(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
@@ -102,7 +100,7 @@ class CypressOtaHelperTest {
             listOf(CypressOtaStep.ReconnectingAfterTransfer)
         val error = IOException("oops!")
 
-        every { connectionHelperMock.reconnect(any(), any()) } returns Completable.error(error)
+        coEvery { connectionHelperMock.reconnect(any(), any()) } throws  error
 
         val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).test()
         testScheduler.advanceTime()

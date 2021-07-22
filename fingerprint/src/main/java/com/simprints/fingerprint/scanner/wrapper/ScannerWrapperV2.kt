@@ -105,7 +105,7 @@ class ScannerWrapperV2(
 
     override fun isLiveFeedbackAvailable(): Boolean = true
 
-    override suspendfun startLiveFeedback() =
+    override suspend fun startLiveFeedback() =
         (if (isLiveFeedbackAvailable()) {
             scannerV2.setScannerLedStateOn()
                 .andThen(getImageQualityWhileSettingLEDState())
@@ -119,7 +119,7 @@ class ScannerWrapperV2(
             scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
         }.repeat()
 
-    override suspendfun stopLiveFeedback()=
+    override suspend fun stopLiveFeedback()=
         suspendCoroutine<Unit> {
             if (isLiveFeedbackAvailable()) {
                 scannerV2.setSmileLedState(scannerUiHelper.idleLedState())

@@ -2,26 +2,27 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
-import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.*
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.*
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.CapturingSlot
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import io.reactivex.Observable
+import com.simprints.testtools.common.mock.MockTimer
+import io.mockk.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,14 +35,24 @@ class OtaViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val firmwareLocalDataSource: FirmwareLocalDataSource = mockk()
     private val sessionEventsManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val mockTimer = MockTimer()
     private val timeHelperMock: FingerprintTimeHelper = mockk(relaxed = true) {
         every { newTimer() } returns mockTimer
     }
     private val scannerMock: ScannerWrapper = mockk()
-    private val scannerManager = ScannerManagerImpl(mockk(), mockk(), mockk(), mockk()).also {
-        it.scanner = scannerMock
+    private val scannerManager: ScannerManager = mockk {
+        every { scanner } returns scannerMock
+    }
+
+    private val mockDispatcher = mockk<DispatcherProvider> {
+        every { main() } returns testCoroutineRule.testCoroutineDispatcher
+        every { default() } returns testCoroutineRule.testCoroutineDispatcher
+        every { io() } returns testCoroutineRule.testCoroutineDispatcher
     }
 
     private val fingerprintManager: FingerprintPreferencesManager = mockk(relaxed = true) {
@@ -53,18 +64,17 @@ class OtaViewModelTest {
         scannerManager,
         sessionEventsManagerMock,
         timeHelperMock,
-        fingerprintManager
+        mockDispatcher,
+       fingerprintManager
     )
 
     @Before
     fun setup() {
-
-        every { scannerMock.performCypressOta(any()) } returns Observable.fromIterable(
-            CYPRESS_OTA_STEPS
-        )
-        every { scannerMock.performStmOta(any()) } returns Observable.fromIterable(STM_OTA_STEPS)
-        every { scannerMock.performUn20Ota(any()) } returns Observable.fromIterable(UN20_OTA_STEPS)
-    }
+        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns
+            ScannerFirmwareVersions(cypress = NEW_CYPRESS_VERSION, stm = NEW_STM_VERSION, un20 = NEW_UN20_VERSION)
+        coEvery { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
+        coEvery { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
+        coEvery { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()    }
 
     @Test
     fun oneOta_updatesStateCorrectlyAndSavesEvent() {
@@ -114,10 +124,10 @@ class OtaViewModelTest {
     fun otaFailsFirstAttempt_otaException_correctlyUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performStmOta(any()) } returns Observable.concat(
-            Observable.just(STM_OTA_STEPS[0]),
-            Observable.error(OtaFailedException("oops"))
-        )
+        coEvery { scannerMock.performStmOta(any()) } returns flow {
+            emit(STM_OTA_STEPS[0])
+            throw OtaFailedException("oops")
+        }
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
@@ -136,10 +146,10 @@ class OtaViewModelTest {
     fun otaFailsLastAttempt_otaException_correctlyUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performStmOta(any()) } returns Observable.concat(
-            Observable.just(STM_OTA_STEPS[0]),
-            Observable.error(OtaFailedException("oops"))
-        )
+        coEvery { scannerMock.performStmOta(any()) } returns flow {
+            emit(STM_OTA_STEPS[0])
+            throw OtaFailedException("oops")
+        }
 
         otaViewModel.startOta(
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
@@ -158,10 +168,10 @@ class OtaViewModelTest {
     fun otaFailsLastAttempt_backendMaintenanceException_correctlyUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performStmOta(any()) } returns Observable.concat(
-            Observable.just(STM_OTA_STEPS[0]),
-            Observable.error(BackendMaintenanceException(estimatedOutage = null))
-        )
+        coEvery { scannerMock.performStmOta(any()) } returns flow {
+            emit(STM_OTA_STEPS[0])
+            throw createBackendMaintenanceException()
+        }
 
         otaViewModel.startOta(
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
@@ -180,10 +190,10 @@ class OtaViewModelTest {
     fun otaFailsFirstAttempt_otaExceptionRequiringDelay_correctlyDelaysThenUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performUn20Ota(any()) } returns Observable.concat(
-            Observable.just(Un20OtaStep.AwaitingCacheCommit),
-            Observable.error(OtaFailedException("oops"))
-        )
+        coEvery { scannerMock.performUn20Ota(any()) } returns flow {
+            emit(Un20OtaStep.AwaitingCacheCommit)
+            throw OtaFailedException("oops")
+        }
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
@@ -200,6 +210,14 @@ class OtaViewModelTest {
             assertThat(it.recoveryStrategy).isEqualTo(OtaRecoveryStrategy.SOFT_RESET)
             assertThat(it.remainingOtas).isEqualTo(listOf(AvailableOta.UN20))
         }
+    }
+
+    private fun createBackendMaintenanceException(): HttpException {
+        val errorResponse =
+            "{\"error\":\"002\"}"
+        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<ApiLicense>(503, errorResponseBody)
+        return HttpException(mockResponse)
     }
 
     private fun Iterable<Float?>.assertAlmostContainsExactlyElementsIn(

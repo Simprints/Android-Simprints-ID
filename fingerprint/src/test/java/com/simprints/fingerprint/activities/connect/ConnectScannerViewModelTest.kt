@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
@@ -25,11 +26,12 @@ import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +48,9 @@ class ConnectScannerViewModelTest : KoinTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
@@ -54,6 +59,12 @@ class ConnectScannerViewModelTest : KoinTest {
     private val scannerFactory: ScannerFactory = mockk()
 
     private lateinit var viewModel: ConnectScannerViewModel
+
+    private val mockDispatcher = mockk<DispatcherProvider> {
+        every { main() } returns testCoroutineRule.testCoroutineDispatcher
+        every { default() } returns testCoroutineRule.testCoroutineDispatcher
+        every { io() } returns testCoroutineRule.testCoroutineDispatcher
+    }
 
     @Before
     fun setUp() {
@@ -65,6 +76,7 @@ class ConnectScannerViewModelTest : KoinTest {
             factory { pairingManager }
             factory { nfcManager }
             factory { scannerFactory }
+            factory { mockDispatcher }
         }
         loadKoinModules(mockModule)
 
@@ -73,13 +85,14 @@ class ConnectScannerViewModelTest : KoinTest {
 
     private fun mockScannerWrapper(scannerGeneration: ScannerGeneration, connectFailException: Throwable? = null) =
         mockk<ScannerWrapper> {
-            every { disconnect() } returns Completable.complete()
-            every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(
-                connectFailException
-            )
-            every { setup() } returns Completable.complete()
-            every { sensorWakeUp() } returns Completable.complete()
-            every { setUiIdle() } returns Completable.complete()
+            coEvery { disconnect() } answers {}
+            coEvery { connect() } answers {
+                if (connectFailException != null)
+                    throw connectFailException
+            }
+            coEvery { setup() } answers {}
+            coEvery { sensorWakeUp() } answers {}
+            coEvery { setUiIdle() } answers {}
             every { versionInformation() } returns when (scannerGeneration) {
                 VERO_1 -> VERO_1_VERSION
                 VERO_2 -> VERO_2_VERSION

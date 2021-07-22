@@ -11,10 +11,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import io.mockk.CapturingSlot
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -34,7 +31,7 @@ class Un20OtaHelperTest {
 
     @Before
     fun setup() {
-        every { connectionHelperMock.reconnect(any(), any()) } returns Completable.complete()
+        coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
         every { scannerMock.enterMainMode() } returns Completable.complete()
         every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()

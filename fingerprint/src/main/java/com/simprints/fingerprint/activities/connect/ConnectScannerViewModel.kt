@@ -60,9 +60,12 @@ class ConnectScannerViewModel(
 
     fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
-        runBlocking { startSetup() }
+        start()
     }
 
+    fun start(){
+        runBlocking { startSetup() }
+     }
     @SuppressLint("CheckResult")
     private suspend fun startSetup() {
         stopConnectingAndResetState()

@@ -2,22 +2,12 @@ package com.simprints.fingerprint.activities.collect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.DISCONNECTED
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.GOOD_SCAN
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NEVER_RETURNS
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NO_FINGER_DETECTED
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.UNKNOWN_ERROR
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.testtools.common.mock.MockTimer
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
+import com.simprints.fingerprint.activities.collect.state.*
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -26,7 +16,6 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
@@ -36,24 +25,26 @@ import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.*
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.id.Application
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
-import io.mockk.verify
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.mockk.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.context.loadKoinModules
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class CollectFingerprintsViewModelTest : KoinTest {
 
@@ -62,6 +53,9 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     private val mockTimer = MockTimer()
     private val timeHelper: FingerprintTimeHelper = mockk(relaxed = true) {
@@ -76,8 +70,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
         every { isLiveFeedbackAvailable() } returns false
         every { isImageTransferSupported() } returns true
     }
-    private val scannerManager: ScannerManager =
-        ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())
+    private lateinit var scannerManager: ScannerManager
+
     private val imageManager: FingerprintImageManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
     private val pairingManager: ScannerPairingManager = mockk()
@@ -86,13 +80,22 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
     private lateinit var vm: CollectFingerprintsViewModel
 
+    private val mockDispatcher = mockk<DispatcherProvider> {
+        every { main() } returns testCoroutineRule.testCoroutineDispatcher
+        every { default() } returns testCoroutineRule.testCoroutineDispatcher
+        every { io() } returns testCoroutineRule.testCoroutineDispatcher
+    }
+
     @Before
     fun setUp() {
         mockBase64EncodingForSavingTemplateInSession()
 
-        scannerManager.scanner = scanner
+        scannerManager = mockk(relaxed = true) {
+            every { scanner } returns this@CollectFingerprintsViewModelTest.scanner
+            every { isScannerAvailable } returns true
+        }
 
-        val mockModule = module {
+        val mockModule = module(override = true) {
             factory { timeHelper }
             factory { sessionEventsManager }
             factory { preferencesManager }
@@ -102,7 +105,11 @@ class CollectFingerprintsViewModelTest : KoinTest {
             factory { pairingManager }
             factory { nfcManager }
             factory { scannerFactory }
+            factory { mockDispatcher }
             single<EncodingUtils> { EncodingUtilsImplForTests }
+            single<CoroutineScope>(named(Application.APPLICATION_SCOPE)) {
+                testCoroutineRule.testCoroutineScope
+            }
         }
         loadKoinModules(mockModule)
 
@@ -135,9 +142,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_noImageTransfer_updatesStateToScanningDuringScan() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(NEVER_RETURNS)
+        setupCaptureFingerprintResponses(NEVER_RETURNS)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -162,9 +170,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_withImageTransfer_updatesStateToTransferringImageAfterScan() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
         withImageTransfer()
 
@@ -184,9 +193,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_noImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -211,9 +221,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_withImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(OK)
         withImageTransfer()
 
@@ -238,9 +249,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_noImageTransfer_badScan_updatesStatesCorrectlyAndCreatesEvent() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(BAD_SCAN)
+        setupCaptureFingerprintResponses(BAD_SCAN)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -261,9 +273,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_withImageTransfer_badScan_doesNotTransferImage_updatesStatesCorrectlyAndCreatesEvent() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(BAD_SCAN)
+        setupCaptureFingerprintResponses(BAD_SCAN)
         withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -284,9 +297,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_noFingerDetected_updatesStatesCorrectlyAndCreatesEvent() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(NO_FINGER_DETECTED)
+        setupCaptureFingerprintResponses(NO_FINGER_DETECTED)
         withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -300,7 +314,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     @Test
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(DISCONNECTED)
+        coEvery { scanner.captureFingerprint(any(), any(), any()) } throws ScannerDisconnectedException()
         withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -311,9 +325,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun scanPressed_scannerDisconnectedDuringTransfer_updatesStateCorrectlyAndReconnects() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.DISCONNECTED)
         withImageTransfer()
 
@@ -325,9 +340,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
-    fun badScanLastAttempt_withImageTransfer_transfersImageAndUpdatesStatesCorrectly() {
+    @ExperimentalTime
+    fun badScanLastAttempt_withImageTransfer_transfersImageAndUpdatesStatesCorrectly() = runBlockingTest {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(BAD_SCAN)
+        setupCaptureFingerprintResponses(BAD_SCAN)
         acquireImageResponses(OK)
         withImageTransfer()
 
@@ -373,14 +389,15 @@ class CollectFingerprintsViewModelTest : KoinTest {
         assertThat(vm.state().isShowingSplashScreen).isFalse()
         assertThat(vm.state().currentFingerIndex).isEqualTo(1)
 
-        verify(exactly = 1) { scanner.acquireImage(any()) }
+        coVerify(exactly = 1) { scanner.acquireImage(any()) }
         coVerify(exactly = 3) { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
+    @ExperimentalTime
     fun receivesOnlyBadScansThenConfirm_performsImageTransferEventually_resultsInCorrectStateAndSavesFingersCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(BAD_SCAN)
+        setupCaptureFingerprintResponses(BAD_SCAN)
         acquireImageResponses(OK)
         withImageTransfer()
 
@@ -427,9 +444,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun receivesOnlyGoodScansThenConfirm_withImageTransfer_resultsInCorrectStateAndSavesFingersCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(OK)
         withImageTransfer()
 
@@ -480,9 +498,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun receivesOnlyGoodScansThenConfirm_noImageTransfer_resultsInCorrectStateAndReturnsFingersCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -523,9 +542,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun goodScan_swipeBackThenRescan_updatesStateCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN, DIFFERENT_GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN, DIFFERENT_GOOD_SCAN)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -618,9 +638,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun receivesMixOfScanResults_withImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(
+        setupCaptureFingerprintResponses(
             BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
             BAD_SCAN, NO_FINGER_DETECTED, NO_FINGER_DETECTED, // skipped
             NO_FINGER_DETECTED, BAD_SCAN, BAD_SCAN, BAD_SCAN,
@@ -714,9 +735,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun receivesMixOfScanResults_withEagerImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(
+        setupCaptureFingerprintResponses(
             BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
             BAD_SCAN, NO_FINGER_DETECTED, NO_FINGER_DETECTED, // skipped
             NO_FINGER_DETECTED, BAD_SCAN, BAD_SCAN, BAD_SCAN,
@@ -812,9 +834,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun pressingCancel_duringScan_cancelsProperly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(NEVER_RETURNS)
+        setupCaptureFingerprintResponses(NEVER_RETURNS)
         withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -825,9 +848,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun pressingCancel_duringImageTransfer_doesNothing() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
         withImageTransfer()
 
@@ -857,9 +881,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun restartAfterScans_resetsStateCorrectly() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(OK)
         withImageTransfer()
 
@@ -892,9 +917,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun backPressed_whileScanning_cancelsScanning() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(NEVER_RETURNS)
+        setupCaptureFingerprintResponses(NEVER_RETURNS)
         withImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -905,8 +931,8 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
-    fun shouldLaunch_reconnectActivity_whenScanner_IsNull() {
-        scannerManager.scanner = null
+    fun shouldLaunch_reconnectActivity_whenScanner_isNotAvailable() {
+        every { scannerManager.isScannerAvailable } returns false
 
         vm.start(TWO_FINGERS_IDS)
 
@@ -916,9 +942,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
 
     @Test
+    @ExperimentalTime
     fun backPressed_whileTransferringImage_cancelsTransfer() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
         withImageTransfer()
 
@@ -939,9 +966,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun backPressed_whileIdle_doesNothing() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -960,9 +988,10 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun unexpectedErrorWhileScanning_launchesAlert() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(UNKNOWN_ERROR)
+        setupCaptureFingerprintResponses(UNKNOWN_ERROR)
         noImageTransfer()
 
         vm.start(TWO_FINGERS_IDS)
@@ -994,7 +1023,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         vm.start(TWO_FINGERS_IDS)
 
-        verify { scanner.startLiveFeedback() }
+        coVerify { scanner.startLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
     }
 
@@ -1002,13 +1031,14 @@ class CollectFingerprintsViewModelTest : KoinTest {
     fun whenStart_AndLiveFeedbackIsNotEnabled_liveFeedbackIsNotStarted() {
         vm.start(TWO_FINGERS_IDS)
 
-        verify(exactly = 0) { scanner.startLiveFeedback() }
+        coVerify(exactly = 0) { scanner.startLiveFeedback() }
     }
 
     @Test
+    @ExperimentalTime
     fun whenScanButtonPressed_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(NEVER_RETURNS)
+        setupCaptureFingerprintResponses(NEVER_RETURNS)
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
@@ -1018,35 +1048,38 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun whenGoodScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        verify { scanner.startLiveFeedback() }
+        coVerify { scanner.startLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
     }
 
     @Test
+    @ExperimentalTime
     fun whenBadScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(BAD_SCAN)
+        setupCaptureFingerprintResponses(BAD_SCAN)
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        verify { scanner.startLiveFeedback() }
+        coVerify { scanner.startLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
     }
 
     @Test
+    @ExperimentalTime
     fun whenSecondScan_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
         mockScannerSetUiIdle()
-        captureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
+        setupCaptureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
@@ -1058,13 +1091,14 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     @Test
+    @ExperimentalTime
     fun whenEndOfWorkflow_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
         mockScannerSetUiIdle()
         setupLiveFeedbackOn()
 
         getToEndOfWorkflow()
 
-        verify { scanner.stopLiveFeedback() }
+        coVerify { scanner.stopLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
     }
 
@@ -1076,7 +1110,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleRestart()
 
-        verify { scanner.startLiveFeedback() }
+        coVerify { scanner.startLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
     }
 
@@ -1087,7 +1121,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleOnPause()
 
-        verify { scanner.stopLiveFeedback() }
+        coVerify { scanner.stopLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
     }
 
@@ -1099,11 +1133,12 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleOnPause()
         vm.handleOnResume()
 
-        verify { scanner.startLiveFeedback() }
+        coVerify { scanner.startLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
     }
 
     @Test
+    @ExperimentalTime
     fun whenResume_AndLiveFeedbackWasStopped_liveFeedbackIsStopped() {
         mockScannerSetUiIdle()
         setupLiveFeedbackOn()
@@ -1112,12 +1147,13 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleOnPause()
         vm.handleOnResume()
 
-        verify { scanner.stopLiveFeedback() }
+        coVerify { scanner.stopLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
     }
 
+    @ExperimentalTime
     private fun getToEndOfWorkflow() {
-        captureFingerprintResponses(GOOD_SCAN)
+        setupCaptureFingerprintResponses(GOOD_SCAN)
         vm.start(TWO_FINGERS_IDS)
         repeat(2) {
             vm.handleScanButtonPressed()
@@ -1136,35 +1172,50 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     private fun mockScannerSetUiIdle() {
-        every { scanner.setUiIdle() } returns Completable.complete()
+        coEvery { scanner.setUiIdle() } returns Unit
     }
 
-    private fun captureFingerprintResponses(vararg responses: MockCaptureFingerprintResponse) {
-        every { scanner.captureFingerprint(any(), any(), any()) } returnsMany responses.map {
-            when (it) {
-                GOOD_SCAN -> Single.just(CaptureFingerprintResponse(TEMPLATE, GOOD_QUALITY))
-                DIFFERENT_GOOD_SCAN -> Single.just(
-                    CaptureFingerprintResponse(
-                        DIFFERENT_TEMPLATE,
-                        DIFFERENT_GOOD_QUALITY
-                    )
-                )
-                BAD_SCAN -> Single.just(CaptureFingerprintResponse(TEMPLATE, BAD_QUALITY))
-                NO_FINGER_DETECTED -> Single.error(NoFingerDetectedException())
-                DISCONNECTED -> Single.error(ScannerDisconnectedException())
-                UNKNOWN_ERROR -> Single.error(Error("Oops!"))
-                NEVER_RETURNS -> Single.never()
+    @ExperimentalTime
+    private fun setupCaptureFingerprintResponses(vararg mockResponses: MockCaptureFingerprintResponse) {
+        val initialMock = coEvery { scanner.captureFingerprint(any(), any(), any()) }
+        val fingerprintResponses = mockResponses.map { it.toCaptureFingerprintResponse() }
+
+        // capture the first response in the list
+        val firstResponse = fingerprintResponses.first()
+        val subsequentMock = when {
+            mockResponses[0] == NEVER_RETURNS -> initialMock.coAnswers { neverReturnResponse() }
+            firstResponse is Throwable -> initialMock.throws(firstResponse)
+            else -> initialMock.returns(firstResponse as CaptureFingerprintResponse)
+        }
+
+        // capture subsequent responses except the first.
+        fingerprintResponses.forEachIndexed { index, response ->
+            // skip the first response
+            if (index != 0) {
+                when {
+                    mockResponses[index] == NEVER_RETURNS -> subsequentMock.coAndThen { neverReturnResponse() }
+                    response is Throwable -> subsequentMock.andThenThrows(response)
+                    else -> subsequentMock.andThen(response as CaptureFingerprintResponse)
+                }
             }
         }
     }
 
-    private fun acquireImageResponses(vararg responses: MockAcquireImageResult) {
-        every { scanner.acquireImage(any()) } returnsMany responses.map {
-            when (it) {
-                OK -> Single.just(AcquireImageResponse(IMAGE))
-                MockAcquireImageResult.DISCONNECTED -> Single.error(ScannerDisconnectedException())
-                MockAcquireImageResult.NEVER_RETURNS -> Single.never()
-            }
+    @ExperimentalTime
+    private fun acquireImageResponses(response: MockAcquireImageResult) {
+        val mock = coEvery { scanner.acquireImage(any()) }
+        when (response) {
+            OK -> mock.returns(AcquireImageResponse(IMAGE))
+            MockAcquireImageResult.DISCONNECTED -> mock.throws(ScannerDisconnectedException())
+            MockAcquireImageResult.NEVER_RETURNS -> mock.coAnswers { neverReturnResponse() }
+        }
+    }
+
+    @ExperimentalTime
+    private suspend inline fun <reified T : Any> neverReturnResponse(): T {
+        withContext(testCoroutineRule.testCoroutineDispatcher) {
+            delay(Duration.INFINITE)
+            throw Error("Should Never Return")
         }
     }
 
@@ -1174,7 +1225,24 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
 
     private enum class MockCaptureFingerprintResponse {
-        GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, UNKNOWN_ERROR, NEVER_RETURNS
+        GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, UNKNOWN_ERROR, NEVER_RETURNS;
+
+
+        fun toCaptureFingerprintResponse(): Any = when (this) {
+            GOOD_SCAN -> CaptureFingerprintResponse(TEMPLATE, GOOD_QUALITY)
+            DIFFERENT_GOOD_SCAN -> CaptureFingerprintResponse(
+                DIFFERENT_TEMPLATE,
+                DIFFERENT_GOOD_QUALITY
+            )
+            BAD_SCAN -> CaptureFingerprintResponse(TEMPLATE, BAD_QUALITY)
+            NO_FINGER_DETECTED -> NoFingerDetectedException()
+            DISCONNECTED -> ScannerDisconnectedException()
+            UNKNOWN_ERROR -> Error("Oops!")
+            NEVER_RETURNS -> {
+                // runBlocking { delay(Duration.INFINITE) }
+                Error("Nothing to return!")
+            }
+        }
     }
 
     private enum class MockAcquireImageResult {
