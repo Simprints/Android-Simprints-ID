@@ -33,6 +33,7 @@ open class FirebaseManagerImpl(
         // On legacy projects they may not have a separate Core Firebase Project, so we try to
         // log out on both just in case.
         FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
+        tryToDeleteCoreApp()
     }
 
     override fun isSignedIn(projectId: String, userId: String): Boolean {
@@ -59,8 +60,7 @@ open class FirebaseManagerImpl(
                 it
             } ?: throw RemoteDbNotSignedInException()
         }
-
-
+    
     private fun cacheTokenClaims(token: String) {
         extractTokenPayloadAsJson(token)?.let {
             if (it.has(TOKEN_PROJECT_ID_CLAIM)) {
@@ -79,8 +79,24 @@ open class FirebaseManagerImpl(
         .setApiKey(token.apiKey)
         .build()
 
-    private fun initializeCoreProject(token: Token) =
-        Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
+    private fun initializeCoreProject(token: Token) {
+        try {
+            Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
+        } catch (ex: IllegalStateException) {
+            // IllegalStateException = FirebaseApp name coreBackendFirebaseProject already exists!
+            // We re-initialize because they might be signing into a different project.
+            tryToDeleteCoreApp()
+            Firebase.initialize(context, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
+        }
+    }
+
+    private fun tryToDeleteCoreApp() {
+        try {
+            getCoreApp().delete()
+        } catch (ex: IllegalStateException) {
+            Simber.d(ex)
+        }
+    }
 
     private fun clearCachedTokenClaims() {
         loginInfoManager.clearCachedTokenClaims()
