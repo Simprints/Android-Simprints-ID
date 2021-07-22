@@ -15,7 +15,7 @@ class FirmwareRepository(private val firmwareRemoteDataSource: FirmwareRemoteDat
         Simber.d("Saved firmware versions: $savedVersions")
 
         val downloadableFirmwares = firmwareRemoteDataSource.getDownloadableFirmwares(savedVersions)
-        Simber.d("Firmwares available for download: $downloadableFirmwares")
+        Simber.d("Firmwares available for download: ${downloadableFirmwares.joinToString()}")
 
         val cypressToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.CYPRESS, savedVersions.cypress)
         val stmToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.STM, savedVersions.stm)
