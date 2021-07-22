@@ -65,7 +65,7 @@ import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluet
 import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
@@ -224,7 +224,7 @@ object KoinInjector {
                 get()
             )
         }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get(),get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get(),get(),get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
         viewModel { OtaViewModel(get(), get(), get(), get(), get()) }

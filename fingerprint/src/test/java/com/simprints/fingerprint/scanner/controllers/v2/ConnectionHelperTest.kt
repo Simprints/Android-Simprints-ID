@@ -8,14 +8,10 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAd
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import com.simprints.testtools.common.reactive.advanceTime
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import io.mockk.Ordering
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.schedulers.TestScheduler
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import java.io.IOException
 
@@ -42,97 +38,74 @@ class ConnectionHelperTest {
     private val connectionHelper = ConnectionHelper(mockAdapter, testScheduler)
 
     @Test
-    fun connect_successful_connectsScannerAndSocket() {
+    fun connect_successful_connectsScannerAndSocket() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
         every { mockSocket.connect() } returns Unit
 
-        val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitAndAssertSuccess()
+        connectionHelper.connectScanner(mockScanner, "mac address")
 
         verify { mockSocket.connect() }
         verify { mockScanner.connect(any(), any()) }
     }
 
-    @Test
-    fun connect_adapterIsNull_throwsBluetoothNotSupportedException() {
+    @Test(expected = BluetoothNotSupportedException::class)
+    fun connect_adapterIsNull_throwsBluetoothNotSupportedException() = runBlockingTest {
         every { mockAdapter.isNull() } returns true
 
-        val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError(BluetoothNotSupportedException::class.java)
+        connectionHelper.connectScanner(mockScanner, "mac address")
     }
 
-    @Test
-    fun connect_adapterIsOff_throwsBluetoothNotEnabledException() {
+    @Test(expected = BluetoothNotEnabledException::class)
+    fun connect_adapterIsOff_throwsBluetoothNotEnabledException() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns false
 
-        val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError(BluetoothNotEnabledException::class.java)
+         connectionHelper.connectScanner(mockScanner, "mac address")
     }
 
-    @Test
-    fun connect_deviceNotPaired_throwsScannerNotPairedException() {
+    @Test(expected = ScannerNotPairedException::class)
+    fun connect_deviceNotPaired_throwsScannerNotPairedException() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns false
 
-        val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError(ScannerNotPairedException::class.java)
+        connectionHelper.connectScanner(mockScanner, "mac address")
     }
 
-    @Test
-    fun connect_socketFailsToConnect_throwsScannerDisconnectedException() {
+    @Test(expected = ScannerDisconnectedException::class)
+    fun connect_socketFailsToConnect_throwsScannerDisconnectedException() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
         every { mockSocket.connect() } throws IOException("Oops")
 
-        val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError(ScannerDisconnectedException::class.java)
+        connectionHelper.connectScanner(mockScanner, "mac address")
     }
 
     @Test
-    fun connect_socketFailsFirstTimeThenConnects_completesSuccessfullyDueToRetry() {
+    fun connect_socketFailsFirstTimeThenConnects_completesSuccessfullyDueToRetry() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
         every { mockSocket.connect() } throws IOException("Oops") andThen Unit
 
-        val testSubscriber = connectionHelper.connectScanner(mockScanner, "mac address").test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitAndAssertSuccess()
+        connectionHelper.connectScanner(mockScanner, "mac address")
 
         verify(exactly = 2) { mockSocket.connect() }
-        verify { mockScanner.connect(any(), any()) }
+        coVerify { mockScanner.connect(any(), any()) }
     }
 
     @Test
-    fun disconnect_disconnectsScanner() {
+    fun disconnect_disconnectsScanner() = runBlockingTest {
         connectionHelper.disconnectScanner(mockScanner)
-            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
 
         verify { mockScanner.disconnect() }
     }
 
     @Test
-    fun connectThenDisconnect_disconnectsScannerAndSocket() {
+    fun connectThenDisconnect_disconnectsScannerAndSocket() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
@@ -140,16 +113,15 @@ class ConnectionHelperTest {
         every { mockSocket.close() } returns Unit
 
         connectionHelper.connectScanner(mockScanner, "mac address")
-            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
         connectionHelper.disconnectScanner(mockScanner)
-            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
+
 
         verify { mockScanner.disconnect() }
         verify { mockSocket.close() }
     }
 
     @Test
-    fun connectThenReconnect_reconnectsSocketAndScanner() {
+    fun connectThenReconnect_reconnectsSocketAndScanner() = runBlockingTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
@@ -157,9 +129,7 @@ class ConnectionHelperTest {
         every { mockSocket.close() } returns Unit
 
         connectionHelper.connectScanner(mockScanner, "mac address")
-            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
         connectionHelper.reconnect(mockScanner, "mac address")
-            .test().also { testScheduler.advanceTime() }.awaitAndAssertSuccess()
 
         verify(Ordering.SEQUENCE) {
             mockScanner.connect(any(), any())

@@ -2,23 +2,18 @@ package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.*
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
+import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion
+import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
+import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import io.mockk.CapturingSlot
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -26,6 +21,7 @@ import io.reactivex.schedulers.TestScheduler
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 
 class StmOtaHelperTest {
 
@@ -37,7 +33,7 @@ class StmOtaHelperTest {
 
     @Before
     fun setup() {
-        every { connectionHelperMock.reconnect(any(), any()) } returns Completable.complete()
+        coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
         every { scannerMock.enterStmOtaMode() } returns Completable.complete()
         every { scannerMock.startStmOta(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
@@ -103,8 +99,7 @@ class StmOtaHelperTest {
             listOf(StmOtaStep.ReconnectingAfterTransfer)
         val error = IOException("oops!")
 
-        every { connectionHelperMock.reconnect(any(), any()) } returnsMany
-            listOf(Completable.complete(), Completable.error(error))
+        coEvery { connectionHelperMock.reconnect(any(), any()) } answers {} andThenThrows error
 
         val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
         testScheduler.advanceTime()
