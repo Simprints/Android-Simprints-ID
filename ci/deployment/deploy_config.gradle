@@ -1,12 +1,8 @@
-def deployPropertiesFile = rootProject.file("ci/deployment/deploy.properties")
-def deployProperties = new Properties()
-deployProperties.load(new FileInputStream(deployPropertiesFile))
-
 apply plugin: 'com.google.firebase.appdistribution'
 
 play {
     serviceAccountCredentials = file("${rootDir}/google_api_key.json")
-    artifactDir = file("build/outputs/bundle/${deployProperties['BUNDLE_FOLDER']}")
+    artifactDir = file("build/outputs/bundle/release")
 }
 
 android {
