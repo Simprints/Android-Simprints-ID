@@ -305,6 +305,6 @@ pipelines:
         develop: *development_flow
         release/*: *release_flow
     custom:
-        default-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
+        develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
         release-pipeline: *release_flow # Pipeline to create a release manually
         ci-test-pipeline: *ci-test # For CI testing purposes only
