@@ -291,7 +291,7 @@ flows:
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
-    -   flow: &ci-test # For testing purposes only
+    -   flow: &ci-test # For CI testing purposes only
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
@@ -304,7 +304,7 @@ pipelines:
         main: *release_flow
         develop: *development_flow
         release/*: *release_flow
-        ci/*: *ci-test
     custom:
         default-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
-        release-pipeline: *release_flow # Pipeline to create a separate build and release to alpha
+        release-pipeline: *release_flow # Pipeline to create a release manually
+        ci-test-pipeline: *ci-test # For CI testing purposes only
