@@ -205,7 +205,7 @@ definitions:
                 deployment: Staging
                 max-time: 30
                 size: 2x
-                trigger: manual
+                #trigger: manual
                 caches:
                     - gradle
                     - gradlewrapper
