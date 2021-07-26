@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.extentions.onError
-import com.simprints.core.tools.extentions.onSuccess
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -50,12 +48,16 @@ class OtaViewModel(
             try {
                 availableOtas.asFlow()
                     .flatMapConcat {
-            it.toScannerObservable().onSuccess {
+            it.toFlowOfSteps().onCompletion { error ->
+                            if (error == null) {
                                 remainingOtas.remove(it)
         }}
-                    .onSuccess {
-                        progress.postValue(1f)
-                        otaComplete.postEvent()
+                    }
+                    .onCompletion { error ->
+                        if (error == null) {
+                            progress.postValue(1f)
+                            otaComplete.postEvent()
+                        }
                     }
             .collect { otaStep ->
                 Simber.d(otaStep.toString())
@@ -83,7 +85,7 @@ class OtaViewModel(
         }
     }
 
-    private suspend fun AvailableOta.toScannerObservable(): Flow<OtaStep> {
+    private suspend fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
         val otaStartedTime = timeHelper.now()
         return when (this) {
             AvailableOta.CYPRESS ->
@@ -92,11 +94,13 @@ class OtaViewModel(
                 scannerManager.scanner.performStmOta(targetVersions(AvailableOta.STM))
             AvailableOta.UN20 ->
                 scannerManager.scanner.performUn20Ota(targetVersions(AvailableOta.UN20))
-        }.onSuccess {
-            saveOtaEventInSession(this@toScannerObservable, otaStartedTime)
-        }.onError {
-            saveOtaEventInSession(this@toScannerObservable, otaStartedTime, it)
-            throw it
+        }.onCompletion { error ->
+            if (error == null) {
+                saveOtaEventInSession(this@toFlowOfSteps, otaStartedTime)
+            } else {
+                saveOtaEventInSession(this@toFlowOfSteps, otaStartedTime, error)
+                throw error
+            }
         }
     }
 
