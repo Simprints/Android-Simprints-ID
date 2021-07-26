@@ -236,7 +236,6 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/deployment/release_setup
-                    - echo "BUNDLE_FOLDER=release" >>ci/deployment/deploy.properties
                     - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
