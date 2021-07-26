@@ -305,8 +305,9 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
     -   flow: &ci-test
-            -   step: *build-and-sign-universal-apk
-            -   step: *run-all-android-tests
+            -   step: *sign-and-deploy-to-staging
+            -   step: *sign-and-deploy-to-internal
+            -   step: *promote-internal-to-alpha
 
 ######################################################################
 # Define the triggers that launch the pipeline.
