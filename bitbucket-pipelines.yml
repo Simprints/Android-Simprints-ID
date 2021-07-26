@@ -257,6 +257,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - bash ./ci/deployment/release_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
 ######################################################################

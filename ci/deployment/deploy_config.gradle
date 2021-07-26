@@ -1,7 +1,7 @@
 apply plugin: 'com.google.firebase.appdistribution'
 
 play {
-    serviceAccountCredentials = file("${rootDir}/google_api_key.json")
+    serviceAccountCredentials = file("$rootDir/google_api_key.json")
     artifactDir = file("build/outputs/bundle/release")
 }
 
