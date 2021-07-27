@@ -6,7 +6,6 @@ import timber.log.Timber
  * A very lightweight wrapper around Timber in case we ever decide to use a different logging
  * library.
  * @see <a href="URL#https://github.com/JakeWharton/timber">Timber</a>
- * @see <a href="URL#https://simprints.atlassian.net/l/c/jwGUtYwe">Further Documentation</a>
  */
 object Simber {
 
