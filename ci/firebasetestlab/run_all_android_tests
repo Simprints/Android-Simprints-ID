@@ -20,7 +20,7 @@ clear
 ######################################################################
         
 single_runner="run_firebase_test_lab"
-device="walleye,version=28,locale=en,orientation=portrait"
+device="blueline,version=28,locale=en,orientation=portrait"
 n_attemps_per_module="1"
 root_path="test-reports"
 template_module_log_file="$root_path/@/logs/firebase_logs"
