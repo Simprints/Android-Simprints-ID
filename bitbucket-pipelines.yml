@@ -236,7 +236,6 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/deployment/release_setup
-                    - echo "BUNDLE_FOLDER=release" >>ci/deployment/deploy.properties
                     - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
@@ -258,6 +257,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - bash ./ci/deployment/release_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
 ######################################################################
@@ -276,7 +276,7 @@ flows:
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
-    -   flow: &release_branch_flow
+    -   flow: &release_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
@@ -291,33 +291,20 @@ flows:
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
-    -   flow: &production_flow
-            -   parallel:
-                    -   step: *run-clientapi-unit-tests
-                    -   step: *run-id-unit-tests
-                    -   step: *run-face-unit-tests
-                    -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *dependency-health-check
-                    -   step: *build-and-sign-universal-apk
-            -   parallel:
-                    -   step: *upload-sonar-scan-and-check-quality-gate
-                    -   step: *run-all-android-tests
+    -   flow: &ci-test # For CI testing purposes only
+            -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
-    -   flow: &ci-test
-            -   step: *build-and-sign-universal-apk
-            -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
 pipelines:
     branches:
-        main: *production_flow
+        main: *release_flow
         develop: *development_flow
-        release/*: *release_branch_flow
-        ci/*: *ci-test
+        release/*: *release_flow
     custom:
-        default-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
-        release-pipeline: *production_flow # Pipeline to create a separate build and release to alpha
+        develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
+        release-pipeline: *release_flow # Pipeline to create a release manually
+        ci-test-pipeline: *ci-test # For CI testing purposes only
