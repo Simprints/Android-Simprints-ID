@@ -160,11 +160,13 @@ open class EventRepositoryImpl(
             }
         }
 
-        Simber.tag("SYNC").d("[EVENT_REPO] Uploading abandoned events")
-        eventLocalDataSource.loadAbandonedEvents(projectId).let {
-            Simber.tag(CrashReportTag.SYNC.name).i("Abandoned Events: ${it.size}")
-            attemptEventUpload(it, projectId)
-            this.emit(it.size)
+        Simber.tag("SYNC").d("[EVENT_REPO] Uploading old SubjectCreation events")
+        eventLocalDataSource.loadOldSubjectCreationEvents(projectId).let {
+            Simber.tag(CrashReportTag.SYNC.name).i("Old SubjectCreation: ${it.size}")
+            if (it.isNotEmpty()) {
+                attemptEventUpload(it, projectId)
+                this.emit(it.size)
+            }
         }
     }
 
