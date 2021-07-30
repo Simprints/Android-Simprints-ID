@@ -63,9 +63,9 @@ open class EventLocalDataSourceImpl(
         eventDao.insertOrUpdate(event.fromDomainToDb())
     }
 
-    override suspend fun loadAbandonedEvents(projectId: String): List<Event> =
+    override suspend fun loadOldSubjectCreationEvents(projectId: String): List<Event> =
         withContext(writingContext) {
-            eventDao.loadAbandonedEvents(projectId).map { it.fromDbToDomain() }
+            eventDao.loadOldSubjectCreationEvents(projectId).map { it.fromDbToDomain() }
         }
 
     override suspend fun delete(ids: List<String>) = withContext(writingContext) {
