@@ -53,12 +53,12 @@ class SecurityStateWorkerTest {
     }
 
     @Test
-    fun whenAnExceptionIsThrown_shouldStillSucceed() = runBlocking {
+    fun whenAnExceptionIsThrown_shouldFail() = runBlocking {
         mockException()
 
         val result = worker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
     private fun mockSuccess() {
