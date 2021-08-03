@@ -120,7 +120,7 @@ fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
 
     coEvery {
-        eventLocalDataSource.loadAbandonedEvents(any())
+        eventLocalDataSource.loadOldSubjectCreationEvents(any())
     } returns (group1 + group2).filter { it.labels.sessionId.isNullOrBlank() }
 
     return (group1 + group2)
@@ -143,7 +143,7 @@ suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecord
     } returns events.asFlow()
 
     coEvery {
-        eventLocalDataSource.loadAbandonedEvents(any())
+        eventLocalDataSource.loadOldSubjectCreationEvents(any())
     } returns events.filter { it.labels.sessionId.isNullOrBlank() }
 
     return events.toList()
