@@ -122,7 +122,7 @@ class EventRoomDaoTest {
             )
 
             addIntoDb(event, closedEvent)
-            verifyEvents(listOf(closedEvent), eventDao.loadAbandonedEvents(DEFAULT_PROJECT_ID))
+            verifyEvents(listOf(closedEvent), eventDao.loadOldSubjectCreationEvents(DEFAULT_PROJECT_ID))
         }
     }
 
