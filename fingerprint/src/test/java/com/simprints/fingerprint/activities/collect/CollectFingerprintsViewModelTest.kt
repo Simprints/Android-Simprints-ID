@@ -107,7 +107,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             factory { scannerFactory }
             factory { mockDispatcher }
             single<EncodingUtils> { EncodingUtilsImplForTests }
-            single<CoroutineScope>(named(Application.APPLICATION_SCOPE)) {
+            single<CoroutineScope>(named(Application.APPLICATION_COROUTINE_SCOPE)) {
                 testCoroutineRule.testCoroutineScope
             }
         }
