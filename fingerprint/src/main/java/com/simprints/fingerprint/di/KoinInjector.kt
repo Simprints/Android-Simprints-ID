@@ -206,7 +206,7 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(qualifier = named(Application.APPLICATION_SCOPE))
+                get(qualifier = named(Application.APPLICATION_COROUTINE_SCOPE))
             )
         }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
@@ -220,7 +220,7 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(qualifier = named(Application.APPLICATION_SCOPE)),
+                get(qualifier = named(Application.APPLICATION_COROUTINE_SCOPE)),
                 get()
             )
         }
