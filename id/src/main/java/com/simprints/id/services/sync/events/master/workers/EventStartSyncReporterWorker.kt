@@ -27,7 +27,6 @@ class EventStartSyncReporterWorker(appContext: Context,
                 crashlyticsLog("Start - Params: $syncId")
                 success(inputData)
             } catch (t: Throwable) {
-                t.printStackTrace()
                 fail(t)
             }
         }

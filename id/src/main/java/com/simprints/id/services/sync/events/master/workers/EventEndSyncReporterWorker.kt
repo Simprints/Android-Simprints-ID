@@ -34,7 +34,6 @@ class EventEndSyncReporterWorker(appContext: Context,
                     throw IllegalArgumentException("SyncId missed")
                 }
             } catch (t: Throwable) {
-                t.printStackTrace()
                 fail(t)
             }
         }
