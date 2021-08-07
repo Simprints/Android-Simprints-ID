@@ -24,16 +24,14 @@ class ImageUpSyncWorker(
             (applicationContext as Application).component.inject(this@ImageUpSyncWorker)
             crashlyticsLog("Start")
 
-            val success = try {
-                imageRepository.uploadStoredImagesAndDelete()
+            try {
+                if (imageRepository.uploadStoredImagesAndDelete()) {
+                    success()
+                } else {
+                    retry()
+                }
             } catch (ex: Exception) {
-                false
+                retry(t = ex)
             }
-
-            if (success)
-                success()
-            else
-                retry()
         }
-
 }
