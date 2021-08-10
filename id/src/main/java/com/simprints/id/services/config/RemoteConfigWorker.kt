@@ -6,7 +6,6 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import com.simprints.logging.Simber
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -39,7 +38,6 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
 
                 success(message = "Successfully updated configs")
             } catch (t: Throwable) {
-                Simber.e(t)
                 retry(message = "Failed to update configs")
             }
         }
