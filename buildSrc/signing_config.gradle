@@ -8,6 +8,12 @@ android {
             storeFile file(store_file)
             storePassword store_password
         }
+        stagingConfig {
+            keyAlias staging_key_alias
+            keyPassword key_password
+            storeFile file(store_file)
+            storePassword store_password
+        }
     }
 
     buildTypes {
@@ -15,7 +21,7 @@ android {
             signingConfig signingConfigs.config
         }
         staging {
-            signingConfig signingConfigs.config
+            signingConfig signingConfigs.stagingConfig
         }
         debug {
             signingConfig signingConfigs.config
