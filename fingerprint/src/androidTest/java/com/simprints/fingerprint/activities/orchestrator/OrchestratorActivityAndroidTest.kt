@@ -44,7 +44,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
     private val firmwareFileUpdateSchedulerMock = mockk<FirmwareFileUpdateScheduler>(relaxed = true)
     private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
-    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, mockk(), scannerManagerMock, firmwareFileUpdateSchedulerMock))
+    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, mockk(relaxed = true), scannerManagerMock, firmwareFileUpdateSchedulerMock, mockk(relaxed = true)))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
