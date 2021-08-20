@@ -14,6 +14,13 @@ interface LoginInfoManager {
     var signedInProjectId: String
     var signedInUserId: String
     var prefs: ImprovedSharedPreferences
+
+    // Core Firebase Project details. We store them to initialize the core Firebase project.
+    var coreFirebaseProjectId: String
+    var coreFirebaseApplicationId: String
+    var coreFirebaseApiKey: String
+
+
     fun getEncryptedProjectSecretOrEmpty(): String
 
     fun getSignedInProjectIdOrEmpty(): String
@@ -23,4 +30,5 @@ interface LoginInfoManager {
     fun cleanCredentials()
     fun clearCachedTokenClaims()
     fun storeCredentials(projectId: String, userId: String)
+
 }
