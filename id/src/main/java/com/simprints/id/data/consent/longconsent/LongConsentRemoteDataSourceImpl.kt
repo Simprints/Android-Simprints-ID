@@ -4,10 +4,13 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StreamDownloadTask
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.common.FirebaseManagerImpl.Companion.getLegacyAppFallback
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.tools.extensions.awaitTask
 
-class LongConsentRemoteDataSourceImpl(private val loginInfoManager: LoginInfoManager) :
+class LongConsentRemoteDataSourceImpl(
+    private val loginInfoManager: LoginInfoManager,
+    private val remoteDbManager: RemoteDbManager
+) :
     LongConsentRemoteDataSource {
 
     companion object {
@@ -26,7 +29,7 @@ class LongConsentRemoteDataSourceImpl(private val loginInfoManager: LoginInfoMan
             .stream
 
     private fun getFirebaseStorage() =
-        FirebaseStorage.getInstance(getLegacyAppFallback(), BuildConfig.LONG_CONSENT_BUCKET).apply {
+        FirebaseStorage.getInstance(remoteDbManager.getLegacyAppFallback(), BuildConfig.LONG_CONSENT_BUCKET).apply {
             maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
         }
 
