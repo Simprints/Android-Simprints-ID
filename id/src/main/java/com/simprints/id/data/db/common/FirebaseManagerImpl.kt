@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
@@ -110,15 +111,17 @@ open class FirebaseManagerImpl(
     }
 
     override fun getCoreApp() = try {
-        FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
+        getCoreFirebaseApp()
     } catch (ex: IllegalStateException) {
         getCoreAppOrAttemptInit()
     }
 
+    private fun getCoreFirebaseApp() = FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
+
     @Synchronized
     private fun getCoreAppOrAttemptInit() = try {
         // We try to return the core app right away in case there are follow on synchronized requests
-        FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
+        getCoreFirebaseApp()
     } catch (ex: IllegalStateException) {
         val token = Token(
             "",
@@ -131,7 +134,7 @@ open class FirebaseManagerImpl(
             throw IllegalStateException("Core Firebase App options are not stored")
 
         initializeCoreProject(token, context)
-        FirebaseApp.getInstance(CORE_BACKEND_PROJECT)
+        getCoreFirebaseApp()
     }
 
     override fun getLegacyAppFallback() = try {
