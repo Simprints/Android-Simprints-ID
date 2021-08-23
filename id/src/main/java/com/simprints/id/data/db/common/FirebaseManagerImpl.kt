@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
@@ -87,14 +88,12 @@ open class FirebaseManagerImpl(
 
     private fun initializeCoreProject(token: Token, context: Context) {
         try {
-            FirebaseApp.initializeApp(
-                context.applicationContext,
-                getFirebaseOptions(token),
-                CORE_BACKEND_PROJECT
-            )
+            Firebase.initialize(context.applicationContext, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
         } catch (ex: IllegalStateException) {
             // IllegalStateException = FirebaseApp name coreBackendFirebaseProject already exists!
-            Simber.d(ex)
+            // We re-initialize because they might be signing into a different project.
+            tryToDeleteCoreApp()
+            Firebase.initialize(context.applicationContext, getFirebaseOptions(token), CORE_BACKEND_PROJECT)
         }
     }
 
