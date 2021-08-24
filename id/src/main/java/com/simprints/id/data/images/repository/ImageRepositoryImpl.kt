@@ -1,6 +1,9 @@
 package com.simprints.id.data.images.repository
 
 import android.content.Context
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.id.data.db.common.FirebaseManagerImpl
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.images.local.ImageLocalDataSource
 import com.simprints.id.data.images.local.ImageLocalDataSourceImpl
 import com.simprints.id.data.images.model.Path
@@ -15,9 +18,13 @@ class ImageRepositoryImpl internal constructor(
     private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
-    constructor(context: Context, baseUrlProvider: BaseUrlProvider) : this(
+    constructor(
+        context: Context,
+        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager
+    ) : this(
         ImageLocalDataSourceImpl(context),
-        ImageRemoteDataSourceImpl(baseUrlProvider)
+        ImageRemoteDataSourceImpl(baseUrlProvider, remoteDbManager)
     )
 
     override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {

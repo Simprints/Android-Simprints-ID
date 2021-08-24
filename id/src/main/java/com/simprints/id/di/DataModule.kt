@@ -12,6 +12,7 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.consent.longconsent.*
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -116,8 +117,9 @@ open class DataModule {
     @Provides
     open fun provideImageRepository(
         context: Context,
-        baseUrlProvider: BaseUrlProvider
-    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider)
+        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager
+    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider, remoteDbManager)
 
     @Provides
     open fun provideLongConsentLocalDataSource(
@@ -128,9 +130,10 @@ open class DataModule {
 
     @Provides
     open fun provideLongConsentRemoteDataSource(
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        remoteDbManager: RemoteDbManager
     ): LongConsentRemoteDataSource =
-        LongConsentRemoteDataSourceImpl(loginInfoManager)
+        LongConsentRemoteDataSourceImpl(loginInfoManager, remoteDbManager)
 
     @Provides
     open fun provideLongConsentRepository(

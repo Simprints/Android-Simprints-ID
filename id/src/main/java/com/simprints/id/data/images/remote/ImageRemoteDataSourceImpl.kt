@@ -1,7 +1,7 @@
 package com.simprints.id.data.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.data.db.common.FirebaseManagerImpl.Companion.getLegacyAppFallback
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.logging.Simber
@@ -9,7 +9,8 @@ import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 
 internal class ImageRemoteDataSourceImpl(
-    private val baseUrlProvider: BaseUrlProvider
+    private val baseUrlProvider: BaseUrlProvider,
+    private val remoteDbManager: RemoteDbManager
 ) : ImageRemoteDataSource {
 
     override suspend fun uploadImage(
@@ -17,13 +18,16 @@ internal class ImageRemoteDataSourceImpl(
         imageRef: SecuredImageRef
     ): UploadResult {
 
-        val firebaseProjectName = getLegacyAppFallback().options.projectId
+        val firebaseProjectName = remoteDbManager.getLegacyAppFallback().options.projectId
 
         return if (firebaseProjectName != null) {
             val bucketUrl = baseUrlProvider.getImageStorageBucketUrl()
                 ?: return UploadResult(imageRef, UploadResult.Status.FAILED)
 
-            val rootRef = FirebaseStorage.getInstance(getLegacyAppFallback(), bucketUrl).reference
+            val rootRef = FirebaseStorage.getInstance(
+                remoteDbManager.getLegacyAppFallback(),
+                bucketUrl
+            ).reference
 
             var fileRef = rootRef
             imageRef.relativePath.parts.forEach { pathPart ->
