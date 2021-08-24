@@ -8,6 +8,7 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -75,9 +76,10 @@ class TestDataModule(
 
     override fun provideImageRepository(
         context: Context,
-        baseUrlProvider: BaseUrlProvider
+        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager
     ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, baseUrlProvider)
+        super.provideImageRepository(context, baseUrlProvider, remoteDbManager)
     }
 
     override fun provideLongConsentLocalDataSource(

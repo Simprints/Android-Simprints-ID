@@ -11,8 +11,11 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
         const val PROJECT_ID: String = "PROJECT_ID"
         const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"
         const val USER_ID_CLAIM: String = "USER_ID_CLAIM"
-
         const val USER_ID: String = "USER_ID"
+        const val CORE_FIREBASE_PROJECT_ID = "CORE_FIREBASE_PROJECT_ID"
+        const val CORE_FIREBASE_APPLICATION_ID = "CORE_FIREBASE_APPLICATION_ID"
+        const val CORE_FIREBASE_API_KEY = "CORE_FIREBASE_API_KEY"
+
         private const val DEFAULT_VALUE: String = ""
     }
 
@@ -53,6 +56,27 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
         set(value) {
             field = value
             prefs.edit().putPrimitive(USER_ID, field).commit()
+        }
+
+    override var coreFirebaseProjectId: String = DEFAULT_VALUE
+        get() = prefs.getPrimitive(CORE_FIREBASE_PROJECT_ID, DEFAULT_VALUE)
+        set(value) {
+            field = value
+            prefs.edit().putPrimitive(CORE_FIREBASE_PROJECT_ID, field).commit()
+        }
+
+    override var coreFirebaseApplicationId: String = DEFAULT_VALUE
+        get() = prefs.getPrimitive(CORE_FIREBASE_APPLICATION_ID, DEFAULT_VALUE)
+        set(value) {
+            field = value
+            prefs.edit().putPrimitive(CORE_FIREBASE_APPLICATION_ID, field).commit()
+        }
+
+    override var coreFirebaseApiKey: String = DEFAULT_VALUE
+        get() = prefs.getPrimitive(CORE_FIREBASE_API_KEY, DEFAULT_VALUE)
+        set(value) {
+            field = value
+            prefs.edit().putPrimitive(CORE_FIREBASE_API_KEY, field).commit()
         }
 
     override fun getEncryptedProjectSecretOrEmpty(): String =
@@ -106,6 +130,9 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
     override fun clearCachedTokenClaims() {
         projectIdTokenClaim = ""
         userIdTokenClaim = ""
+        coreFirebaseProjectId = ""
+        coreFirebaseApplicationId = ""
+        coreFirebaseApiKey = ""
     }
 
     override fun storeCredentials(projectId: String, userId: String) {
