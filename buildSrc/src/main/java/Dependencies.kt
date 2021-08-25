@@ -258,7 +258,7 @@ object Dependencies {
         const val kronos = "com.lyft.kronos:kronos-android:$kronos_version"
     }
 
-    const val libsimprints = "com.simprints:libsimprints:2021.2.0"
+    const val libsimprints = "com.simprints:libsimprints:2021.3.0"
 
 }
 
