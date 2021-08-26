@@ -211,7 +211,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/deployment/release_setup
+                    - bash ./ci/deployment/build_properties_setup
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
                     - ./gradlew packageStagingUniversalApk
                     - ./gradlew id:appDistributionUploadStaging
@@ -235,7 +235,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/deployment/release_setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
                     - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
@@ -257,7 +258,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/deployment/release_setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
 ######################################################################
