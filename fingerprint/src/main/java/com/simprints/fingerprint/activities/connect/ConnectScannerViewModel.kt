@@ -80,7 +80,7 @@ class ConnectScannerViewModel(
                 resetVeroUI()
                 wakeUpVero()
                 handleSetupFinished()
-            } catch (ex : Exception) {
+            } catch (ex : Throwable) {
                 manageVeroErrors(ex)
             }
         }
