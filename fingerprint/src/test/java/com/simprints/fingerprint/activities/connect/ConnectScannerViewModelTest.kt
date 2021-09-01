@@ -141,7 +141,7 @@ class ConnectScannerViewModelTest : KoinTest {
         viewModel.start()
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
-        assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
+        assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 1) // 1 at the start
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
@@ -160,7 +160,7 @@ class ConnectScannerViewModelTest : KoinTest {
         viewModel.start()
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
-        assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
+        assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 1) // 1 at the start
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
