@@ -25,8 +25,22 @@ import kotlin.coroutines.suspendCoroutine
 import com.simprints.fingerprintscanner.v1.ButtonListener as ScannerTriggerListenerV1
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
+
+/**
+ * This class is a wrapper over the Vero 1 Scanner, that stands as a middle man between higher
+ * dependencies and the vero 1 scanner object. It translates the high-level requests of high-level
+ * dependencies, into low-level commands of the scanner.
+ *
+ * @param scannerV1  the vero 1 scanner object
+ *
+ */
 class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
 
+
+    /**
+     * This function retrieves the unified versions of STM & un20 and Unknown for th cypress because,
+     * the vero 1 doesn't run custom cypress firmware.
+     */
     override fun versionInformation(): ScannerVersion =
         ScannerVersion(
             hardwareVersion = "",
@@ -141,10 +155,10 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
 
     private fun handleFingerprintCaptureError(error: SCANNER_ERROR?, cont: Continuation<CaptureFingerprintResponse>) {
         when (error) {
-            UN20_SDK_ERROR -> emitter.tryOnError(NoFingerDetectedException()) // If no finger is detected on the sensor
-            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO, IO_ERROR -> emitter.tryOnError(ScannerDisconnectedException())
-            BUSY, INTERRUPTED, TIMEOUT -> emitter.tryOnError(ScannerOperationInterruptedException())
-            else -> emitter.tryOnError(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
+            UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException()) // If no finger is detected on the sensor
+            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO, IO_ERROR -> cont.resumeWithException(ScannerDisconnectedException())
+            BUSY, INTERRUPTED, TIMEOUT -> cont.resumeWithException(ScannerOperationInterruptedException())
+            else -> cont.resumeWithException(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
         }
     }
 
