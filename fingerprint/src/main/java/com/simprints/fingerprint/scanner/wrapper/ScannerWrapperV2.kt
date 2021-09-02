@@ -29,7 +29,6 @@ import io.reactivex.observers.DisposableObserver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
 import java.io.IOException
 import kotlin.coroutines.resume
@@ -251,20 +250,17 @@ class ScannerWrapperV2(
         }
     }
 
-    override suspend fun performCypressOta(firmwareVersion: String) =
+    override suspend fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep> =
             cypressOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
-                .wrapErrorsFromScanner()
-            .asFlow()
+                .mapPotentialErrorFromScanner()
 
     override suspend fun performStmOta(firmwareVersion: String): Flow<StmOtaStep> =
             stmOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
-                .wrapErrorsFromScanner()
-            .asFlow()
+                .mapPotentialErrorFromScanner()
 
     override suspend fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep> =
              un20OtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
-                .wrapErrorsFromScanner()
-            .asFlow()
+                .mapPotentialErrorFromScanner()
 
 
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
