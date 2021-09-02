@@ -11,13 +11,14 @@ import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFir
 import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import com.simprints.testtools.common.reactive.advanceTime
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.schedulers.TestScheduler
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -28,8 +29,7 @@ class StmOtaHelperTest {
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
-    private val testScheduler = TestScheduler()
-    private val stmOtaHelper = StmOtaHelper(connectionHelperMock, firmwareFileManagerMock, testScheduler)
+    private val stmOtaHelper = StmOtaHelper(connectionHelperMock, firmwareFileManagerMock)
 
     @Before
     fun setup() {
@@ -46,20 +46,17 @@ class StmOtaHelperTest {
     }
 
     @Test
-    fun performStmOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() {
+    fun performStmOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runBlocking {
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
             listOf(StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion,
                 StmOtaStep.ReconnectingAfterValidating, StmOtaStep.UpdatingUnifiedVersionInformation)
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val actualSteps = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).toList()
 
-        testObserver.awaitAndAssertSuccess()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
 
@@ -68,8 +65,8 @@ class StmOtaHelperTest {
         assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions()).isEqualTo(NEW_SCANNER_VERSION.toScannerFirmwareVersions())
     }
 
-    @Test
-    fun stmOtaFailsDuringTransfer_propagatesError() {
+    @Test(expected = ScannerV2OtaFailedException::class)
+    fun stmOtaFailsDuringTransfer_propagatesError() = runBlocking<Unit> {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
@@ -79,20 +76,20 @@ class StmOtaHelperTest {
         every { scannerMock.startStmOta(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val otaFlow = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING)
+        val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-        testObserver.assertError(error)
+
+        // throw ota exception
+        otaFlow.last()
     }
 
-    @Test
-    fun stmOtaFailsDuringConnectSecondTime_propagatesError() {
+    @Test(expected = IOException::class)
+    fun stmOtaFailsDuringConnectSecondTime_propagatesError() = runBlocking<Unit> {
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
@@ -101,20 +98,20 @@ class StmOtaHelperTest {
 
         coEvery { connectionHelperMock.reconnect(any(), any()) } answers {} andThenThrows error
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val otaFlow = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING)
+        val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-        testObserver.assertError(error)
+
+        // throws ioException
+        otaFlow.last()
     }
 
-    @Test
-    fun stmOtaFailsToValidate_throwsOtaError() {
+    @Test(expected = OtaFailedException::class)
+    fun stmOtaFailsToValidate_throwsOtaError() = runBlocking<Unit> {
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
@@ -122,16 +119,17 @@ class StmOtaHelperTest {
 
         every { scannerMock.getStmFirmwareVersion() } returns Single.just(OLD_STM_VERSION)
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val otaFlow = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING)
+        val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
-        testObserver.awaitTerminalEvent()
 
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-        testObserver.assertError(OtaFailedException::class.java)
+
+        // throws ota exception
+        otaFlow.last()
     }
 
     companion object {

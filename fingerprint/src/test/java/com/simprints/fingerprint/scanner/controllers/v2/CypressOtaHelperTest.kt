@@ -8,13 +8,14 @@ import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprintscanner.v2.domain.root.models.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import com.simprints.testtools.common.reactive.advanceTime
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.schedulers.TestScheduler
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -25,8 +26,7 @@ class CypressOtaHelperTest {
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
-    private val testScheduler = TestScheduler()
-    private val cypressOtaHelper = CypressOtaHelper(connectionHelperMock, firmwareFileManagerMock, testScheduler)
+    private val cypressOtaHelper = CypressOtaHelper(connectionHelperMock, firmwareFileManagerMock)
 
     @Before
     fun setup() {
@@ -49,18 +49,16 @@ class CypressOtaHelperTest {
     }
 
     @Test
-    fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() {
+    fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runBlocking {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
             listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion, CypressOtaStep.UpdatingUnifiedVersionInformation)
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val actualItems = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).toList()
 
-        testObserver.awaitAndAssertSuccess()
 
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualItems).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualItems.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
 
@@ -70,9 +68,9 @@ class CypressOtaHelperTest {
             .isEqualTo(NEW_SCANNER_VERSION.firmwareVersions.toScannerFirmwareVersions())
     }
 
-    @Test
+    @Test(expected = ScannerV2OtaFailedException::class)
     fun
-        cypressOtaFailsDuringTransfer_propagatesError() {
+        cypressOtaFailsDuringTransfer_propagatesError() = runBlocking<Unit> {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             progressValues.map { CypressOtaStep.TransferInProgress(it) }
@@ -81,41 +79,43 @@ class CypressOtaHelperTest {
         every { scannerMock.startCypressOta(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val otaFlow = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING)
+        val actualItems = otaFlow
+            .take(expectedSteps.size)
+            .toList()
 
-        testObserver.awaitTerminalEvent()
 
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualItems).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualItems.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-        testObserver.assertError(error)
+
+        // should throw exception
+        otaFlow.last()
     }
 
-    @Test
-    fun cypressOtaFailsDuringConnect_propagatesError() {
+    @Test(expected = IOException::class)
+    fun cypressOtaFailsDuringConnect_propagatesError() = runBlocking<Unit> {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
             listOf(CypressOtaStep.ReconnectingAfterTransfer)
         val error = IOException("oops!")
 
         coEvery { connectionHelperMock.reconnect(any(), any()) } throws  error
+        val otaFlow =  cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING)
+        val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).test()
-        testScheduler.advanceTime()
-
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-        testObserver.assertError(error)
+
+        // throw ioException
+        otaFlow.last()
     }
 
-    @Test
-    fun cypressOtaFailsToValidate_throwsOtaError() {
+    @Test(expected = OtaFailedException::class)
+    fun cypressOtaFailsToValidate_throwsOtaError() = runBlocking<Unit> {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
             listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion)
@@ -124,16 +124,16 @@ class CypressOtaHelperTest {
             CypressExtendedFirmwareVersion(versionAsString = "")
         )
 
-        val testObserver = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).test()
-        testScheduler.advanceTime()
+        val otaFlow = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING)
+        val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedSteps).inOrder()
-        assertThat(testObserver.values().map { it.totalProgress })
+        assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
+        assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-        testObserver.assertError(OtaFailedException::class.java)
+
+        // throws Ota exception
+        otaFlow.last()
     }
 
     companion object {
