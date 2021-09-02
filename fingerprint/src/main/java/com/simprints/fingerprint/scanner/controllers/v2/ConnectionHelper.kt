@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
@@ -9,37 +10,35 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDe
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.infra.logging.Simber
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 /**
- * Helper class for connecting to a Vero 2 with retries.
- * Holds a reference to the [ComponentBluetoothSocket] so that it can be disconnected later.
+ * This is a helper class used to establish bluetooth socket connection, between the android
+ * device and the Vero 2 scanner. It also handles retries and reconnections to the scanner.
+ *
+ * @param bluetoothAdapter  a reference to the [ComponentBluetoothSocket] for
+ *        connection/disconnection from the bluetooth socket.
  */
-class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
-                       private val timeScheduler: Scheduler = Schedulers.io()) {
+class ConnectionHelper(
+    private val bluetoothAdapter: ComponentBluetoothAdapter,
+    private val dispatcher: DispatcherProvider) {
 
     private var socket: ComponentBluetoothSocket? = null
 
     /**
+     * Note: we use a flow to handle retries
+     *
      * @throws ScannerDisconnectedException if could not connect with the scanner
      * @throws ScannerNotPairedException if attempted to connect to a scanner that is not paired
      * @throws BluetoothNotEnabledException if bluetooth is not turned on
      * @throws BluetoothNotSupportedException if bluetooth is not supported on this device (e.g. an emulator)
      */
-    suspend fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES) =
+    suspend fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<Unit> =
         establishConnectedSocket(macAddress, maxRetries).map { socket ->
             connectScannerObjectWithSocket(scanner, socket)
         }
@@ -63,9 +62,11 @@ class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
     private suspend fun initiateAndReturnSocketConnection(device: ComponentBluetoothDevice): ComponentBluetoothSocket {
         try {
             Simber.d("Attempting connect...")
-            val socket = withContext(Dispatchers.IO) { device.createRfcommSocketToServiceRecord(DEFAULT_UUID) }
+            val socket = withContext(dispatcher.io()) {
+                device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
+            }
             bluetoothAdapter.cancelDiscovery()
-            withContext(Dispatchers.IO) { socket.connect() }
+            withContext(dispatcher.io()) { socket.connect() }
             this.socket = socket
             return socket
         } catch (e: IOException) {
@@ -74,28 +75,23 @@ class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
     }
 
 
-    private suspend fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket) =
-        suspendCoroutine<Unit> {cont ->
-            Simber.d("Socket connected. Setting up scanner...")
+    private suspend fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket) {
 
-            // TODO update [Scanner] class to use Coroutines
-            scanner.connect(socket.getInputStream(), socket.getOutputStream())
-                .doOnError { exception -> cont.resumeWithException(exception) }
-                .subscribe { cont.resume(Unit) }
-        }
+        Simber.d("Socket connected. Setting up scanner...")
 
-    suspend fun disconnectScanner(scanner: Scanner) =
-        suspendCoroutine<Unit> { cont ->
-            scanner.disconnect()
-                .doOnComplete { socket?.close() }
-                .doOnError { error -> cont.resumeWithException(error) }
-                .subscribe { cont.resume(Unit) }
-        }
+        // TODO update [Scanner] class to use Coroutines
+        scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
+    }
+
+    suspend fun disconnectScanner(scanner: Scanner) {
+        scanner.disconnect().await()
+        socket?.close()
+    }
 
     suspend fun reconnect(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES) {
         disconnectScanner(scanner)
         delay(RECONNECT_DELAY_MS)
-        connectScanner(scanner, macAddress, maxRetries)
+        connectScanner(scanner, macAddress, maxRetries).collect()
     }
 
     companion object {
