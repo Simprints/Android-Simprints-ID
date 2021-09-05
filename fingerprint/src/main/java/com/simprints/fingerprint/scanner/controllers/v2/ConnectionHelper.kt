@@ -21,8 +21,9 @@ import java.util.*
  * This is a helper class used to establish bluetooth socket connection, between the android
  * device and the Vero 2 scanner. It also handles retries and reconnections to the scanner.
  *
- * @param bluetoothAdapter  a reference to the [ComponentBluetoothSocket] for
- *        connection/disconnection from the bluetooth socket.
+ * @param bluetoothAdapter  a reference to the [ComponentBluetoothSocket] for connecting and
+ *         disconnecting from the bluetooth socket.
+ * @param dispatcher  a [DispatcherProvider] for specifying which context a coroutine should run
  */
 class ConnectionHelper(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
@@ -31,7 +32,14 @@ class ConnectionHelper(
     private var socket: ComponentBluetoothSocket? = null
 
     /**
-     * Note: we use a flow to handle retries
+     * This method establishes socket connection to the given scanner object, using the provided
+     * scanner's mac address and the bluetooth socket [ComponentBluetoothSocket].
+     *
+     * @param scanner   the scanner object that will be connected to via bluetooth socket
+     * @param macAddress  the string value representing the scanner's mac address
+     *
+     * @return  a flow [Flow] representing the connection process that could occur multiple times
+     *                 with retries, hence a flow is primarily used to handle connection retries
      *
      * @throws ScannerDisconnectedException if could not connect with the scanner
      * @throws ScannerNotPairedException if attempted to connect to a scanner that is not paired
