@@ -19,6 +19,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFi
 import com.simprints.fingerprintscanner.v2.domain.root.models.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -27,6 +28,7 @@ import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -66,23 +68,21 @@ class ScannerInitialSetupHelperTest {
     }
 
     @Test
-    fun ifNoAvailableVersions_completesNormally() {
+    fun ifNoAvailableVersions_completesNormally() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions()
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
-        val testSubscriber =
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitAndAssertSuccess()
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
+
+
         coVerify(exactly = 0) { connectionHelperMock.reconnect(any(), any()) }
     }
 
     @Test
-    fun ifVersionsContainsUnknowns_throwsCorrectOtaAvailableException() {
+    fun ifVersionsContainsUnknowns_throwsCorrectOtaAvailableException() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(
@@ -96,19 +96,16 @@ class ScannerInitialSetupHelperTest {
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
-        val testSubscriber =
+        val exception = assertThrows<OtaAvailableException> {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError { e ->
-            e is OtaAvailableException && e.availableOtas.containsAll(listOf(AvailableOta.CYPRESS))
         }
+
+        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS))
     }
 
     @Test
-    fun setupScannerWithOtaCheck_savesVersionAndBatteryInfo() {
+    fun setupScannerWithOtaCheck_savesVersionAndBatteryInfo() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, ScannerFirmwareVersions.UNKNOWN)
@@ -119,21 +116,18 @@ class ScannerInitialSetupHelperTest {
         var version: ScannerVersion? = null
         var batteryInfo: BatteryInfo? = null
 
-        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(
             scannerMock,
             MAC_ADDRESS,
             { version = it },
-            { batteryInfo = it }).test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitAndAssertSuccess()
+            { batteryInfo = it })
 
         assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
         assertThat(batteryInfo).isEqualTo(HIGH_BATTERY_INFO)
     }
 
     @Test
-    fun ifAvailableVersionMatchesExistingVersion_completesNormally() {
+    fun ifAvailableVersionMatchesExistingVersion_completesNormally() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, SCANNER_VERSION_LOW.toScannerVersion().firmware)
@@ -141,16 +135,13 @@ class ScannerInitialSetupHelperTest {
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
-        val testSubscriber =
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitAndAssertSuccess()
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
+
     }
 
     @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableExceptionAndReconnects() {
+    fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableExceptionAndReconnects() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, SCANNER_VERSION_HIGH.toScannerVersion().firmware)
@@ -159,20 +150,12 @@ class ScannerInitialSetupHelperTest {
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
-        val testSubscriber =
+        val exception = assertThrows<OtaAvailableException> {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError { e ->
-            e is OtaAvailableException && e.availableOtas.containsAll(
-                listOf(
-                    AvailableOta.CYPRESS,
-                    AvailableOta.UN20
-                )
-            )
         }
+
+        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
         coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
     }
 
@@ -197,7 +180,7 @@ class ScannerInitialSetupHelperTest {
 
     }
     @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() {
+    fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, SCANNER_VERSION_HIGH.toScannerVersion().firmware)
@@ -205,16 +188,13 @@ class ScannerInitialSetupHelperTest {
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(LOW_BATTERY_INFO)
 
-        val testSubscriber =
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitAndAssertSuccess()
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
+
     }
 
     @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_lowPhoneBattery_completesNormally() {
+    fun ifAvailableVersionGreaterThanExistingVersion_lowPhoneBattery_completesNormally() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, SCANNER_VERSION_HIGH.toScannerVersion().firmware)
@@ -222,16 +202,13 @@ class ScannerInitialSetupHelperTest {
         every { batteryLevelChecker.isLowBattery() } returns true
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
-        val testSubscriber =
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitAndAssertSuccess()
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
+
     }
 
     @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_stillSavesVersionAndBatteryInfo() {
+    fun ifAvailableVersionGreaterThanExistingVersion_stillSavesVersionAndBatteryInfo() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, SCANNER_VERSION_HIGH.toScannerVersion().firmware)
@@ -242,22 +219,12 @@ class ScannerInitialSetupHelperTest {
         var version: ScannerVersion? = null
         var batteryInfo: BatteryInfo? = null
 
-        val testSubscriber = scannerInitialSetupHelper.setupScannerWithOtaCheck(
-            scannerMock,
-            MAC_ADDRESS,
-            { version = it },
-            { batteryInfo = it }).test()
-        testScheduler.advanceTime()
 
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertError { e ->
-            e is OtaAvailableException && e.availableOtas.containsAll(
-                listOf(
-                    AvailableOta.CYPRESS,
-                    AvailableOta.UN20
-                )
-            )
+        val exception = assertThrows<OtaAvailableException> {
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, { version = it }, { batteryInfo = it })
         }
+
+        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
         coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
 
         assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
