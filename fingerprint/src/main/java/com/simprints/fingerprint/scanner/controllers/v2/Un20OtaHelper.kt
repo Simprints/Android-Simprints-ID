@@ -40,7 +40,7 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
      * If completes successfully, will finish with a connected scanner in root mode
      *
      * @param scanner the connected scanner expected to be in root mode
-     * @param macAddress the scanner's macAddress
+     * @param macAddress the scanner's mac address
      */
     fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<Un20OtaStep> = flow {
         enterMainMode(scanner)
