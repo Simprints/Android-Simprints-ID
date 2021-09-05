@@ -23,10 +23,10 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
+import io.mockk.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -42,9 +42,10 @@ import org.koin.test.KoinTest
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
+    private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private val firmwareFileUpdateSchedulerMock = mockk<FirmwareFileUpdateScheduler>(relaxed = true)
     private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
-    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, mockk(relaxed = true), scannerManagerMock, firmwareFileUpdateSchedulerMock, mockk(relaxed = true)))
+    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, mockk(relaxed = true), scannerManagerMock, firmwareFileUpdateSchedulerMock, mockCoroutineScope))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
