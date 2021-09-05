@@ -39,8 +39,9 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
      * If completes successfully, will finish with a connected scanner in root mode
      *
      * @param scanner the connected scanner expected to be in root mode
-     * @param macAddress the scanner's macAddress
+     * @param macAddress the scanner's mac address
      *
+     * @return  a flow of [CypressOtaStep] which represents the sequence of update steps being taken
      */
     fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<CypressOtaStep> = flow {
         enterCypressOtaMode(scanner)
