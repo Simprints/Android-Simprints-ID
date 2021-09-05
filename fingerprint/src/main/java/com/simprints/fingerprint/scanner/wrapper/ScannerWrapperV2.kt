@@ -32,8 +32,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.rx2.await
 import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -69,18 +67,18 @@ class ScannerWrapperV2(
             .collect()
 
 
-    override suspend fun setup() =
-        suspendCoroutine<Unit> { cont ->
+    override suspend fun setup() {
+        try {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(
                 scannerV2,
                 macAddress,
                 { scannerVersion = it },
                 { batteryInfo = it }
             )
-                .wrapErrorsFromScanner()
-                .doOnError { ex -> cont.resumeWithException(ex) }
-                .subscribe { cont.resume(Unit) }
+        } catch (ex: Throwable) {
+            throw wrapErrorFromScanner(ex)
         }
+    }
 
     override suspend fun disconnect() {
         try {
