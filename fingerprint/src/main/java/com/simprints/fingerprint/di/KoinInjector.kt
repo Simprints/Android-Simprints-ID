@@ -147,7 +147,6 @@ object KoinInjector {
 
         factory { get<Application>().component }
         factory { get<AppComponent>().getLoginManager() }
-        factory<DispatcherProvider> { DefaultDispatcherProvider() }
         factory { FingerprintFileDownloader(get(), get(), get()) }
         factory { FirmwareRemoteDataSource(get(), get()) }
         factory { FirmwareRepository(get(), get(), get()) }
