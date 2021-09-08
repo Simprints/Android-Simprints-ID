@@ -24,6 +24,7 @@ object Dependencies {
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
     private const val fragment_version = "1.3.3"
+    private const val chuck_version = "1.1.0"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -136,6 +137,11 @@ object Dependencies {
         const val converterScalars = "com.squareup.retrofit2:converter-scalars:$retrofit_version"
         const val logging = "com.squareup.okhttp3:logging-interceptor:$okttp_version"
         const val okhttp = "com.squareup.okhttp3:okhttp:$okttp_version"
+    }
+
+    object Chuck {
+        const val debug = "com.readystatesoftware.chuck:library:$chuck_version"
+        const val release = "com.readystatesoftware.chuck:library-no-op:$chuck_version"
     }
 
     object Jackson {
