@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -14,18 +15,21 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class EventDownSyncHelperImplTest {
@@ -43,6 +47,20 @@ class EventDownSyncHelperImplTest {
     @MockK private lateinit var preferencesManager: IdPreferencesManager
     private val subjectFactory = SubjectFactoryImpl(EncodingUtilsImplForTests)
 
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -53,7 +71,8 @@ class EventDownSyncHelperImplTest {
             eventDownSyncScopeRepository,
             subjectFactory,
             preferencesManager,
-            timeHelper
+            timeHelper,
+            testDispatcherProvider
         )
 
         runBlockingTest {
