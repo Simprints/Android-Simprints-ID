@@ -18,7 +18,7 @@ open class DefaultOkHttpClientBuilder {
         authToken: String? = null,
         deviceId: String,
         versionName: String,
-        chuckInterceptor: Interceptor
+        chuckInterceptor: Interceptor =HttpLoggingInterceptor()
     ): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
