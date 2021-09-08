@@ -69,6 +69,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
@@ -100,10 +101,13 @@ class EventRemoteDataSourceImplAndroidTest {
     var remoteDbManager = mockk<RemoteDbManager>()
 
     private val okHttpClientBuilder = object : DefaultOkHttpClientBuilder() {
-        override fun get(authToken: String?,
-                         deviceId: String,
-                         versionName: String): OkHttpClient.Builder =
-            super.get(authToken, deviceId, versionName).apply {
+        override fun get(
+            authToken: String?,
+            deviceId: String,
+            versionName: String,
+            chuckInterceptor: Interceptor
+        ): OkHttpClient.Builder =
+            super.get(authToken, deviceId, versionName, chuckInterceptor).apply {
                 addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })
@@ -127,7 +131,7 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, okHttpClientBuilder),
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper,mockk(), okHttpClientBuilder),
             JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100

@@ -10,6 +10,7 @@ import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import com.simprints.core.tools.extentions.isClientAndCloudIntegrationIssue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -17,14 +18,17 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import kotlin.reflect.KClass
 
-open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<T>,
-                                                    private val url: String,
-                                                    private val deviceId: String,
-                                                    private val versionName: String,
-                                                    private val authToken: String? = null,
-                                                    private val performanceTracer: FirebasePerformanceTraceFactory,
-                                                    private val jsonHelper: JsonHelper,
-                                                    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()) :
+open class SimApiClientImpl<T : SimRemoteInterface>(
+    private val service: KClass<T>,
+    private val url: String,
+    private val deviceId: String,
+    private val versionName: String,
+    private val authToken: String? = null,
+    private val performanceTracer: FirebasePerformanceTraceFactory,
+    private val jsonHelper: JsonHelper,
+    private val chuckInterceptor: Interceptor,
+    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
+) :
     SimApiClient<T> {
 
     override val api: T by lazy {
@@ -41,7 +45,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        okHttpClientBuilder.get(authToken, deviceId, versionName)
+        okHttpClientBuilder.get(authToken, deviceId, versionName,chuckInterceptor)
     }
 
     override suspend fun <V> executeCall(traceName: String?,

@@ -1,6 +1,7 @@
 package com.simprints.id.network
 
 import com.google.common.truth.Truth.assertThat
+import io.mockk.mockk
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
@@ -33,7 +34,7 @@ class HttpInterceptorTest {
         // create okHttp client using default builder
         val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get("", "", versionName)
+            .get("", "", versionName, mockk())
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -56,7 +57,7 @@ class HttpInterceptorTest {
 
         val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get("", deviceId, "")
+            .get("", deviceId, "", mockk())
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -77,7 +78,7 @@ class HttpInterceptorTest {
         val okHttpBuilder = DefaultOkHttpClientBuilder()
 
         okHttpClient = okHttpBuilder
-            .get(null, "", "")
+            .get(null, "", "", mockk())
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -99,7 +100,7 @@ class HttpInterceptorTest {
 
         val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(authToken, "", "")
+            .get(authToken, "", "", mockk())
             .build()
 
         val mockHttpRequest = Request.Builder()
