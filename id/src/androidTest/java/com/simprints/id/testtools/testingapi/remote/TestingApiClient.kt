@@ -22,7 +22,7 @@ class TestingApiClient<T : SimRemoteInterface>(
     "",
     mockk(),
     jsonHelper,
-    mockk()
+    HttpLoggingInterceptor()
 ) {
 
     override val retrofit: Retrofit by lazy {
