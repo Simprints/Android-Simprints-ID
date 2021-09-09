@@ -26,7 +26,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(
     private val authToken: String? = null,
     private val performanceTracer: FirebasePerformanceTraceFactory,
     private val jsonHelper: JsonHelper,
-    private val chuckInterceptor: Interceptor,
+    private val interceptor: Interceptor,
     private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
 ) :
     SimApiClient<T> {
@@ -45,7 +45,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        okHttpClientBuilder.get(authToken, deviceId, versionName,chuckInterceptor)
+        okHttpClientBuilder.get(authToken, deviceId, versionName,interceptor)
     }
 
     override suspend fun <V> executeCall(traceName: String?,
