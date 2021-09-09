@@ -24,7 +24,7 @@ object Dependencies {
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
     private const val fragment_version = "1.3.3"
-    private const val chuck_version = "1.1.0"
+    private const val chuck_version = "3.5.2"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -104,7 +104,7 @@ object Dependencies {
     }
 
     object Support {
-        const val material = "com.google.android.material:material:1.1.0-alpha03"
+        const val material = "com.google.android.material:material:1.4.0"
     }
 
     object WorkManager {
@@ -140,8 +140,8 @@ object Dependencies {
     }
 
     object Chuck {
-        const val debug = "com.readystatesoftware.chuck:library:$chuck_version"
-        const val release = "com.readystatesoftware.chuck:library-no-op:$chuck_version"
+        const val debug = "com.github.chuckerteam.chucker:library:$chuck_version"
+        const val release = "com.github.chuckerteam.chucker:library-no-op:$chuck_version"
     }
 
     object Jackson {
