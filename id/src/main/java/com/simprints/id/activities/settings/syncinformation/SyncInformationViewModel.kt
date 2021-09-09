@@ -4,9 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.modality.toMode
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.subject.SubjectRepository
@@ -96,7 +94,7 @@ class SyncInformationViewModel(
         try {
             val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope(
                 preferencesManager.modalities.map { it.toMode() },
-                preferencesManager.moduleIdOptions.toList(),
+                preferencesManager.selectedModules.toList(),
                 preferencesManager.syncGroup
             )
             var creationsToDownload = 0
