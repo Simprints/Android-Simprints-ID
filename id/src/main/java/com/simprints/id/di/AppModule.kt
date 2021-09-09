@@ -2,8 +2,8 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.lyft.kronos.AndroidClockFactory
-import com.readystatesoftware.chuck.ChuckInterceptor
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
@@ -185,7 +185,7 @@ open class AppModule {
         baseUrlProvider: BaseUrlProvider,
         performanceTracer: FirebasePerformanceTraceFactory,
         jsonHelper: JsonHelper,
-        chuckInterceptor: Interceptor
+        interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
@@ -193,7 +193,7 @@ open class AppModule {
         remoteDbManager,
         performanceTracer,
         jsonHelper,
-        chuckInterceptor
+        interceptor
     )
 
     @Provides
@@ -214,7 +214,8 @@ open class AppModule {
         SessionEventValidatorsFactoryImpl()
 
     @Provides
-    open fun provideChuckInterceptor(ctx: Context): Interceptor = ChuckInterceptor(ctx)
+    open fun provideChuckerInterceptor(ctx: Context): Interceptor =
+        ChuckerInterceptor.Builder(ctx).build()
 
     @Provides
     open fun provideDbEventDatabaseFactory(
