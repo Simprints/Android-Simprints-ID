@@ -77,6 +77,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.logging.Level
 
 
 @RunWith(AndroidJUnit4::class)
@@ -101,13 +102,12 @@ class EventRemoteDataSourceImplAndroidTest {
     var remoteDbManager = mockk<RemoteDbManager>()
 
     private val okHttpClientBuilder = object : DefaultOkHttpClientBuilder() {
-        override fun get(
-            authToken: String?,
-            deviceId: String,
-            versionName: String,
-            chuckInterceptor: Interceptor
+        override fun get(authToken: String?,
+                         deviceId: String,
+                         versionName: String,
+                         interceptor: Interceptor
         ): OkHttpClient.Builder =
-            super.get(authToken, deviceId, versionName, chuckInterceptor).apply {
+            super.get(authToken, deviceId, versionName,interceptor).apply {
                 addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })

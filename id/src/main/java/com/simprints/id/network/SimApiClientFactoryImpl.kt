@@ -16,7 +16,7 @@ class SimApiClientFactoryImpl(
     private val remoteDbManager: RemoteDbManager,
     private val performanceTracer: FirebasePerformanceTraceFactory,
     private val jsonHelper: JsonHelper,
-    private val chuckInterceptor: Interceptor,
+    private val interceptor: Interceptor,
     private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
 ): SimApiClientFactory {
 
@@ -32,7 +32,7 @@ class SimApiClientFactoryImpl(
             remoteDbManager.getCurrentToken(),
             performanceTracer,
             jsonHelper,
-            chuckInterceptor,
+            interceptor,
             okHttpClientBuilder
         )
     }
@@ -46,7 +46,7 @@ class SimApiClientFactoryImpl(
             null,
             performanceTracer,
             jsonHelper,
-            chuckInterceptor,
+            interceptor,
             okHttpClientBuilder
         )
     }
