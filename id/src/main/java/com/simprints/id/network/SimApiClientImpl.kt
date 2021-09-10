@@ -1,13 +1,13 @@
 package com.simprints.id.network
 
+import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.network.NetworkConstants
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.coroutines.retryIO
+import com.simprints.core.tools.extentions.isCloudRecoverableIssue
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.exceptions.SyncCloudIntegrationException
-import com.simprints.core.network.NetworkConstants
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
-import com.simprints.core.tools.extentions.isClientAndCloudIntegrationIssue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -62,7 +62,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(private val service: KClass<
                         networkBlock(api)
                     }.also { trace?.stop() }
                 } catch (throwable: Throwable) {
-                    throw if (throwable.isClientAndCloudIntegrationIssue()) {
+                    throw if (!throwable.isCloudRecoverableIssue()) {
                         SyncCloudIntegrationException("Http status code not worth to retry", throwable)
                     } else {
                         throwable
