@@ -197,6 +197,12 @@ class SyncInformationViewModelTest {
 
     @Test
     fun syncing_ShouldOnlyRequestCountForSelectedModules(){
+        coEvery { eventRepository.localCount(any()) } returns 0
+        coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns 0
+        coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
+        coEvery { subjectRepository.count(any()) } returns 0
+        every { imageRepository.getNumberOfImagesToUpload() } returns 0
+
         viewModel.fetchSyncInformation()
         verify(exactly = 1) { preferencesManager.selectedModules }
         verify(exactly = 0) { preferencesManager.moduleIdOptions }
