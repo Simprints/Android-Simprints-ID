@@ -22,6 +22,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,7 +62,8 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         coEvery { mockRemoteDbManager.getCurrentToken() } returns "token"
         runBlocking {
-            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(), JsonHelper).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
+            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(), JsonHelper,
+                HttpLoggingInterceptor()).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
         }
     }
 
@@ -94,5 +96,4 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
 
         return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)
     }
-
 }
