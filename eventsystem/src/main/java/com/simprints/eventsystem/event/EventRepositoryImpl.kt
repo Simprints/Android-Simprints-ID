@@ -5,7 +5,6 @@ import android.os.Build.VERSION
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.tools.extentions.isClientAndCloudIntegrationIssue
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.*
@@ -26,6 +25,7 @@ import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
+import retrofit2.HttpException
 import java.util.*
 
 open class EventRepositoryImpl(
@@ -183,10 +183,9 @@ open class EventRepositoryImpl(
             deleteEventsFromDb(events.map { it.id })
         } catch (t: Throwable) {
             Simber.w(t)
-            if (t.isClientAndCloudIntegrationIssue()) {
+            // We don't need to report http exceptions as cloud logs all of them.
+            if (t !is HttpException) {
                 Simber.e(t)
-                // We do not delete subject events (pokedex) since they are important.
-                deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
             }
         }
     }
