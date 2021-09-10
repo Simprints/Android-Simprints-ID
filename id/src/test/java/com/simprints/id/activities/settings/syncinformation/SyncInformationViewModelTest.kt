@@ -3,8 +3,10 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
@@ -28,6 +30,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
@@ -43,7 +46,7 @@ class SyncInformationViewModelTest {
     lateinit var downySyncHelper: EventDownSyncHelper
 
     @MockK
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    lateinit var eventRepository: EventRepository
 
     @MockK
     lateinit var subjectRepository: SubjectRepository
@@ -52,7 +55,7 @@ class SyncInformationViewModelTest {
     lateinit var preferencesManager: IdPreferencesManager
 
     @MockK
-    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @MockK
     lateinit var imageRepository: ImageRepository
@@ -190,6 +193,13 @@ class SyncInformationViewModelTest {
         assertThat(vo.recordsToDeleteObserver).isEqualTo(0)
         assertThat(vo.recordsToDownSyncObserver).isEqualTo(0)
         assertThat(vo.moduleCountsObserver).isEqualTo(moduleCount)
+    }
+
+    @Test
+    fun syncing_ShouldOnlyRequestCountForSelectedModules(){
+        viewModel.fetchSyncInformation()
+        verify(exactly = 1) { preferencesManager.selectedModules }
+        verify(exactly = 0) { preferencesManager.moduleIdOptions }
     }
 
     private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =
