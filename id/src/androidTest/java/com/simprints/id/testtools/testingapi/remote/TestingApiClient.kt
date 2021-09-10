@@ -11,9 +11,19 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
 import kotlin.reflect.KClass
 
-class TestingApiClient<T : SimRemoteInterface>(service: KClass<T>, endpoint: String,
-                                               private val jsonHelper: JsonHelper)
-    : SimApiClientImpl<T>(service, endpoint, "", "", "", mockk(), jsonHelper) {
+class TestingApiClient<T : SimRemoteInterface>(
+    service: KClass<T>, endpoint: String,
+    private val jsonHelper: JsonHelper
+) : SimApiClientImpl<T>(
+    service,
+    endpoint,
+    "",
+    "",
+    "",
+    mockk(),
+    jsonHelper,
+    HttpLoggingInterceptor()
+) {
 
     override val retrofit: Retrofit by lazy {
         Retrofit.Builder()

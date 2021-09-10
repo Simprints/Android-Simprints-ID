@@ -15,6 +15,7 @@ import com.simprints.id.secure.models.SecurityState
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
+import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -50,7 +51,8 @@ class SecurityStateRemoteDataSourceImplTest {
             VERSION_NAME,
             randomUUID(),
             mockk(),
-            JsonHelper
+            JsonHelper,
+            HttpLoggingInterceptor()
         )
 
         every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
