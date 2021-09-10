@@ -185,7 +185,7 @@ open class AppModule {
         baseUrlProvider: BaseUrlProvider,
         performanceTracer: FirebasePerformanceTraceFactory,
         jsonHelper: JsonHelper,
-        interceptor: Interceptor
+        @Named("ChuckerInterceptor") interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
@@ -214,6 +214,7 @@ open class AppModule {
         SessionEventValidatorsFactoryImpl()
 
     @Provides
+    @Named("ChuckerInterceptor")
     open fun provideChuckerInterceptor(ctx: Context): Interceptor =
         ChuckerInterceptor.Builder(ctx).build()
 
