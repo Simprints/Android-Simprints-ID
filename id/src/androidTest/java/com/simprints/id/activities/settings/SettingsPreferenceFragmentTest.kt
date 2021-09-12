@@ -1,24 +1,18 @@
 package com.simprints.id.activities.settings
 
-import androidx.fragment.app.testing.launchFragment
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.testtools.AndroidTestConfig
-import io.mockk.MockKAnnotations
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -34,8 +28,6 @@ class SettingsPreferenceFragmentTest {
     @Before
     fun setUp() {
         Intents.init()
-//        MockKAnnotations.init(this, relaxed = true)
-//        AndroidTestConfig(this, appModule).initAndInjectComponent()
     }
 
     @Test
