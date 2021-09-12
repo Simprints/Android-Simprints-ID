@@ -143,6 +143,21 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
     @Test
     @ExperimentalTime
+    fun shouldNot_launchAlertScreen_whenOngoingFingerScan_isCancelled() {
+        mockScannerSetUiIdle()
+        setupCaptureFingerprintResponses(NEVER_RETURNS)
+
+        vm.start(TWO_FINGERS_IDS)
+
+        // start and cancel finger scan
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+
+        vm.launchAlert.assertEventWithContentNeverReceived()
+    }
+
+    @Test
+    @ExperimentalTime
     fun scanPressed_noImageTransfer_updatesStateToScanningDuringScan() {
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)

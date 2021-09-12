@@ -37,10 +37,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
@@ -252,6 +249,9 @@ class CollectFingerprintsViewModel(
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
+            } catch (ex: CancellationException) {
+                // ignore cancellation exception, but log behaviour
+                Simber.d("Fingerprint scanning was cancelled")
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
