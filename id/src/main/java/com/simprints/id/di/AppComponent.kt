@@ -35,6 +35,7 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
+import com.simprints.id.activities.setup.SetupActivityHelper
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
@@ -137,6 +138,7 @@ interface AppComponent {
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(preferencesManager: IdPreferencesManager)
     fun inject(remoteConfigWorker: RemoteConfigWorker)
+    fun inject(setupActivityHelper: SetupActivityHelper)
 
     fun getSessionEventsManager(): EventRepository
     fun getTimeHelper(): TimeHelper
