@@ -43,7 +43,9 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew core:jacocoTestReport
                     - ./gradlew id:jacocoTestReport
+                    - ./gradlew eventsystem:jacocoTestReport
                 artifacts:
                     - id/build/reports/**
                     - core/build/reports/**
@@ -61,7 +63,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew face:jacocoTestReport
                 artifacts:
                     - face/build/reports/**
 
@@ -78,7 +81,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprint:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew fingerprint:jacocoTestReport
                 artifacts:
                     - fingerprint/build/reports/**
 
@@ -95,7 +99,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew fingerprintscanner:jacocoTestReport
                 artifacts:
                     - fingerprintscanner/build/reports/**
 
