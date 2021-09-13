@@ -16,11 +16,10 @@ import javax.inject.Inject
 
 class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params) {
-    override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
 
+    override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
     @Inject
     lateinit var eventRepository: EventRepository
-
     @Inject
     lateinit var locationManager: LocationManager
 

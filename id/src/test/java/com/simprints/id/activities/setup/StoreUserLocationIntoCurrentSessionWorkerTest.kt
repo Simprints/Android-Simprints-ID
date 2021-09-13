@@ -31,29 +31,19 @@ import java.util.concurrent.Executors
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 @ExperimentalCoroutinesApi
 internal class StoreUserLocationIntoCurrentSessionWorkerTest {
-
-
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
-
     private lateinit var worker: StoreUserLocationIntoCurrentSessionWorker
-
     @RelaxedMockK
     lateinit var mockEventRepository: com.simprints.eventsystem.event.EventRepository
-
     @RelaxedMockK
     lateinit var mockLocationManager: LocationManager
-
-    private lateinit var executor: Executor
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(Dispatchers.Unconfined)
         UnitTestConfig(this).setupWorkManager()
-        executor = Executors.newSingleThreadExecutor()
         worker = TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(app).build()
-
         app.component = mockk(relaxed = true)
         mockDependencies()
     }
@@ -72,7 +62,6 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
             listOf(
                 buildFakeLocation()
             )
-
         )
         worker.doWork()
         coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent() }
