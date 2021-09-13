@@ -1,5 +1,6 @@
 package com.simprints.id.commontesttools.di
 
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.activities.dashboard.DashboardViewModelFactory
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.dashboard.cards.project.repository.DashboardProjectDetailsRepository
@@ -24,9 +25,9 @@ class TestViewModelModule(
         }
     }
 
-    override fun provideLoginViewModelFactory(authenticationHelper: AuthenticationHelper): LoginViewModelFactory {
+    override fun provideLoginViewModelFactory(authenticationHelper: AuthenticationHelper, dispatcher: DispatcherProvider): LoginViewModelFactory {
         return loginViewModelFactoryRule.resolveDependency {
-            super.provideLoginViewModelFactory(authenticationHelper)
+            super.provideLoginViewModelFactory(authenticationHelper, dispatcher)
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
@@ -18,14 +19,17 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -40,6 +44,19 @@ class EventDownSyncCountWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var countWorker: EventDownSyncCountWorker
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
+
     @Before
     fun setUp() {
         countWorker = TestListenableWorkerBuilder<EventDownSyncCountWorker>(app)
@@ -53,6 +70,7 @@ class EventDownSyncCountWorkerTest {
             eventDownSyncHelper = mockk(relaxed = true)
             jsonHelper = JsonHelper
             eventDownSyncScopeRepository = mockk(relaxed = true)
+            dispatcher = testDispatcherProvider
         }
 
         coEvery { countWorker.eventDownSyncScopeRepository.refreshState(any()) } coAnswers { args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }

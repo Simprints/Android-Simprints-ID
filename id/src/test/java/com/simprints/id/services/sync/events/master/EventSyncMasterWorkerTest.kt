@@ -13,6 +13,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
@@ -51,14 +52,17 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -72,6 +76,19 @@ class EventSyncMasterWorkerTest {
     }
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
@@ -104,6 +121,7 @@ class EventSyncMasterWorkerTest {
             eventSyncSubMasterWorkersBuilder = mockk(relaxed = true)
             timeHelper = TestTimeHelperImpl()
             preferenceManager = preferencesManager
+            dispatcher = testDispatcherProvider
         }
     }
 
