@@ -23,8 +23,6 @@ import org.junit.Test
 
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 
 @RunWith(AndroidJUnit4::class)
@@ -42,7 +40,6 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     fun setup() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(Dispatchers.Unconfined)
-        UnitTestConfig(this).setupWorkManager()
         worker = TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(app).build()
         app.component = mockk(relaxed = true)
         mockDependencies()
