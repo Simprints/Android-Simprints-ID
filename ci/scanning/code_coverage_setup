@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cat << EOF >> buildSrc/build_config.gradle
+ext {
+    apply from: "\${rootDir}\${File.separator}ci\${File.separator}scanning\${File.separator}jacoco.gradle"
+}
+EOF
