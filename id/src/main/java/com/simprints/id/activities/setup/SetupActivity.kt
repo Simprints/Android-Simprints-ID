@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
@@ -15,7 +17,6 @@ import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -32,11 +33,9 @@ import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.*
@@ -140,8 +139,8 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun collectLocationInBackground() {
-        val component = (application as Application).component
-        SetupActivityHelper.getInstance(component).storeUserLocationIntoCurrentSession()
+        val request = OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java).build()
+        WorkManager.getInstance(applicationContext).enqueue(request)
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
