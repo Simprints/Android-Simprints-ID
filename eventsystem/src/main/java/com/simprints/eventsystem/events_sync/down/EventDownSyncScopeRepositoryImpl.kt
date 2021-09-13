@@ -23,8 +23,9 @@ class EventDownSyncScopeRepositoryImpl(
 
     override suspend fun getDownSyncScope(
         modes: List<Modes>,
-        possibleModuleIds: List<String>,
-        syncGroup: GROUP): EventDownSyncScope {
+        selectedModuleIDs: List<String>,
+        syncGroup: GROUP
+    ): EventDownSyncScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 
         val possibleUserId: String? = loginInfoManager.getSignedInUserIdOrEmpty()
@@ -43,7 +44,7 @@ class EventDownSyncScopeRepositoryImpl(
             GROUP.USER ->
                 SubjectUserScope(projectId, possibleUserId, modes)
             GROUP.MODULE ->
-                SubjectModuleScope(projectId, possibleModuleIds, modes)
+                SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
         syncScope.operations = syncScope.operations.map { op ->

@@ -1,6 +1,8 @@
 package com.simprints.eventsystem.sampledata
 
 import com.simprints.core.domain.modality.Modes
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope.ProjectScope
 import java.util.*
 
 object SampleDefaults {
@@ -29,22 +31,22 @@ object SampleDefaults {
 
     val DEFAULT_MODES = listOf(Modes.FINGERPRINT)
 
-    val projectUpSyncScope = com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope.ProjectScope(
+    val projectUpSyncScope = ProjectScope(
         DEFAULT_PROJECT_ID
     )
 
-    val projectDownSyncScope = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectProjectScope(
+    val projectDownSyncScope = SubjectProjectScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_MODES
     )
 
-    val userDownSyncScope = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectUserScope(
+    val userDownSyncScope = SubjectUserScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_USER_ID,
         DEFAULT_MODES
     )
 
-    val modulesDownSyncScope = com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope(
+    val modulesDownSyncScope = SubjectModuleScope(
         DEFAULT_PROJECT_ID,
         listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
         DEFAULT_MODES
