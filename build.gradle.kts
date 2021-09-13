@@ -1,6 +1,5 @@
 apply {
     from("ci${File.separator}scanning${File.separator}sonarqube.gradle")
-    from("ci${File.separator}scanning${File.separator}jacoco.gradle")
     from("ci${File.separator}scanning${File.separator}dependency_health.gradle")
 }
 
@@ -20,7 +19,9 @@ buildscript {
 
         // CI Scanning & Retry
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1")
-        classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
+
+        classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
+
         classpath("org.ow2.asm:asm:9.0")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.74.0")
         classpath("org.gradle:test-retry-gradle-plugin:1.2.0")
