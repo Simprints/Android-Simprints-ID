@@ -4,7 +4,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 
     reports {
         xml.enabled = true
-        html.enabled = true
+        xml.destination = file("${buildDir}${File.separator}jacocoXml")
     }
 
     def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
@@ -13,10 +13,10 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 
     sourceDirectories.setFrom(files([mainSrc]))
     classDirectories.setFrom(files([debugTree]))
-//    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
-//        "jacoco/testDebugUnitTest.exec",
-//        "outputs/code-coverage/connected/*coverage.ec"
-//    ]))
+    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+        "jacoco/testDebugUnitTest.exec",
+        "outputs/code-coverage/connected/*coverage.ec"
+    ]))
 }
 
 android {
