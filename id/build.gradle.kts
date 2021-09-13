@@ -15,6 +15,8 @@ apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
     from("${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle")
     from("${rootDir}${File.separator}ci${File.separator}deployment${File.separator}deploy_config.gradle")
+
+    from("${rootDir}${File.separator}ci${File.separator}scanning${File.separator}jacoco.gradle")
 }
 
 val RELEASE_SAFETYNET_KEY: String by extra
