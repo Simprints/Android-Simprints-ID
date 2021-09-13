@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -21,11 +22,13 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.D
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
+class EventDownSyncCountWorker(
+    val context: Context,
+    params: WorkerParameters,
+) : SimCoroutineWorker(context, params) {
 
     companion object {
         const val INPUT_COUNT_WORKER_DOWN = "INPUT_COUNT_WORKER_DOWN"
@@ -41,6 +44,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
     @Inject lateinit var eventDownSyncHelper: EventDownSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
     @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    @Inject lateinit var dispatcher: DispatcherProvider
 
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
@@ -49,19 +53,19 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
         jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope>(jsonInput)
     }
 
-    override suspend fun doWork(): Result =
-        withContext(Dispatchers.IO) {
+    override suspend fun doWork(): Result {
+        getComponent<EventDownSyncCountWorker> { it.inject(this@EventDownSyncCountWorker) }
+
+        return withContext(dispatcher.io()) {
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
             try {
-                getComponent<EventDownSyncCountWorker> { it.inject(this@EventDownSyncCountWorker) }
-
                 crashlyticsLog("Start - Params: $downSyncScope")
-
                 execute(downSyncScope)
             } catch (t: Throwable) {
                 fail(t)
             }
         }
+    }
 
     private suspend fun execute(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope): Result {
         return try {
