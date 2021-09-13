@@ -41,9 +41,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew core:jacocoTestReportDebug
-                    - ./gradlew id:jacocoTestReportDebug
-                    - ./gradlew eventsystem:jacocoTestReportDebug
+                    - ./gradlew id:jacocoTestReport
                 artifacts:
                     - id/build/reports/**
                     - core/build/reports/**
@@ -294,9 +292,7 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
     -   flow: &ci-test # For CI testing purposes only
-            -   step: *sign-and-deploy-to-staging
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-internal-to-alpha
+            -   step: *run-id-unit-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
