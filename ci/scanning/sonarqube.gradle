@@ -10,6 +10,7 @@ sonarqube {
         property "sonar.c.file.suffixes", "-"
         property "sonar.java.coveragePlugin", "jacoco"
     }
+    androidVariant "debug"
 }
 
 subprojects {
