@@ -1,6 +1,7 @@
 package com.simprints.id.testtools.testingapi.remote
 
 import com.simprints.core.network.SimRemoteInterface
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.network.SimberLogger
@@ -12,16 +13,17 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import kotlin.reflect.KClass
 
 class TestingApiClient<T : SimRemoteInterface>(
-    service: KClass<T>, endpoint: String,
+    service: KClass<T>,
+    endpoint: String,
+    dispatcher: DispatcherProvider,
     private val jsonHelper: JsonHelper
-) : SimApiClientImpl<T>(
+): SimApiClientImpl<T>(
     service,
     endpoint,
-    "",
-    "",
-    "",
+    "", "", "",
     mockk(),
     jsonHelper,
+    dispatcher,
     HttpLoggingInterceptor()
 ) {
 
