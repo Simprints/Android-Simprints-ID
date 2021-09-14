@@ -306,9 +306,8 @@ pipelines:
         develop: *development_flow
         release/*: *release_flow
     pull-requests:
-        main: *release_flow
-        develop: *development_flow
-        release/*: *release_flow
+        '**':
+            -   step: *upload-sonar-scan-and-check-quality-gate
     custom:
         develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
         release-pipeline: *release_flow # Pipeline to create a release manually
