@@ -1,12 +1,12 @@
-package com.simprints.id.activities.setup
+package com.simprints.id.services.location
 
 import android.location.Location
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.LocationManager
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
@@ -62,7 +62,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
         )
         worker.doWork()
         coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent() }
-        coVerify(exactly = 1) { mockEventRepository.addOrUpdateEvent(any()) }
+        coVerify(exactly = 1) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 
     @Test

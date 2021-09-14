@@ -1,4 +1,4 @@
-package com.simprints.id.activities.setup
+package com.simprints.id.services.location
 
 import android.content.Context
 import androidx.work.WorkerParameters
@@ -9,11 +9,15 @@ import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.tools.LocationManager
 import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Worker that collects user's last known location and save it into current session
+ */
 class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params) {
 
@@ -26,10 +30,7 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
     override suspend fun doWork(): Result = withContext(Dispatchers.Main) {
         getComponent<StoreUserLocationIntoCurrentSessionWorker> { it.inject(this@StoreUserLocationIntoCurrentSessionWorker) }
         try {
-            val locationRequest = LocationRequest().apply {
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            }
-            val locationsFlow = locationManager.requestLocation(locationRequest).take(1)
+            val locationsFlow = createLocationFlow()
             locationsFlow.collect { locations ->
                 saveUserLocation(locations.last())
             }
@@ -38,6 +39,13 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
             fail(t)
         }
         success()
+    }
+
+    private suspend fun createLocationFlow(): Flow<List<android.location.Location>> {
+        val locationRequest = LocationRequest().apply {
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        return locationManager.requestLocation(locationRequest).take(1)
     }
 
     private suspend fun saveUserLocation(lastLocation: android.location.Location) {
