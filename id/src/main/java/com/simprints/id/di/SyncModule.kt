@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.WorkManager
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -77,14 +78,16 @@ open class SyncModule {
         eventSyncStateProcessor: EventSyncStateProcessor,
         downSyncScopeRepository: EventDownSyncScopeRepository,
         upSyncScopeRepo: EventUpSyncScopeRepository,
-        eventSyncCache: EventSyncCache
+        eventSyncCache: EventSyncCache,
+        dispatcher: DispatcherProvider
     ): EventSyncManager =
         EventSyncManagerImpl(
             ctx,
             eventSyncStateProcessor,
             downSyncScopeRepository,
             upSyncScopeRepo,
-            eventSyncCache
+            eventSyncCache,
+            dispatcher
         )
 
     @Provides
@@ -155,7 +158,8 @@ open class SyncModule {
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         subjectFactory: SubjectFactory,
         preferencesManager: IdPreferencesManager,
-        timeHelper: TimeHelper
+        timeHelper: TimeHelper,
+        dispatcher: DispatcherProvider
     ): EventDownSyncHelper =
         EventDownSyncHelperImpl(
             subjectRepository,
@@ -163,7 +167,8 @@ open class SyncModule {
             eventDownSyncScopeRepository,
             subjectFactory,
             preferencesManager,
-            timeHelper
+            timeHelper,
+            dispatcher
         )
 
     @Provides

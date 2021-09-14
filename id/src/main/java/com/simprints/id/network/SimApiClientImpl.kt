@@ -7,6 +7,7 @@ import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.extentions.isCloudRecoverableIssue
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,10 +27,10 @@ open class SimApiClientImpl<T : SimRemoteInterface>(
     private val authToken: String? = null,
     private val performanceTracer: FirebasePerformanceTraceFactory,
     private val jsonHelper: JsonHelper,
+    private val dispatcher: DispatcherProvider,
     private val interceptor: Interceptor,
     private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
-) :
-    SimApiClient<T> {
+) : SimApiClient<T> {
 
     override val api: T by lazy {
         retrofit.create(service.java)
@@ -62,7 +63,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(
             runBlock = {
                 return@retryIO try {
 
-                    withContext(Dispatchers.IO) {
+                    withContext(dispatcher.io()) {
                         networkBlock(api)
                     }.also { trace?.stop() }
                 } catch (throwable: Throwable) {

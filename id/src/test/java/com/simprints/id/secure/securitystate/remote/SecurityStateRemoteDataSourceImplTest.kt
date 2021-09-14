@@ -9,19 +9,19 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import retrofit2.HttpException
 
@@ -33,6 +33,19 @@ class SecurityStateRemoteDataSourceImplTest {
     private lateinit var remoteDataSource: SecurityStateRemoteDataSourceImpl
 
     private val mockWebServer = MockWebServer()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
 
     @Before
     fun setUp() {
@@ -52,6 +65,7 @@ class SecurityStateRemoteDataSourceImplTest {
             randomUUID(),
             mockk(),
             JsonHelper,
+            testDispatcherProvider,
             HttpLoggingInterceptor()
         )
 
