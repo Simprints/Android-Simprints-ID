@@ -301,11 +301,23 @@ flows:
 # Define the triggers that launch the pipeline.
 ######################################################################
 pipelines:
-    default: *development_flow
     branches:
         main: *release_flow
         develop: *development_flow
         release/*: *release_flow
+    pull-requests:
+        '**':
+            - step:
+                name: sonar
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - bash ./ci/tools/install_java_11
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
     custom:
         develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
         release-pipeline: *release_flow # Pipeline to create a release manually
