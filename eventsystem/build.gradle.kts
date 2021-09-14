@@ -8,6 +8,7 @@ plugins {
 apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
 }
+
 android {
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")

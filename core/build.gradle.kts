@@ -72,6 +72,6 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.AndroidX.runner)
     androidTestImplementation(Dependencies.Testing.AndroidX.rules)
     androidTestImplementation(Dependencies.Testing.truth)
-    androidTestUtil(Dependencies.Testing.AndroidX.orchestrator)
+    androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
     androidTestImplementation(Dependencies.Testing.live_data)
 }
