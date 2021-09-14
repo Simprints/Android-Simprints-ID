@@ -1,5 +1,6 @@
 package com.simprints.id.testtools.testingapi.remote
 
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
@@ -12,7 +13,7 @@ import io.reactivex.schedulers.Schedulers
 /**
  * This class wraps [RemoteTestingApi] and makes all the calls to the cloud blocking.
  */
-class RemoteTestingManagerImpl : RemoteTestingManager {
+class RemoteTestingManagerImpl(private val dispatcher: DispatcherProvider) : RemoteTestingManager {
 
     companion object {
         private const val RETRY_ATTEMPTS = 3L
@@ -21,6 +22,7 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
     private val remoteTestingApi = TestingApiClient(
         RemoteTestingApi::class,
         RemoteTestingApi.baseUrl,
+        dispatcher,
         JsonHelper).api
 
     override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
