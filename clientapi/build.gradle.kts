@@ -97,7 +97,7 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
     androidTestImplementation(Dependencies.Testing.AndroidX.runner)
     androidTestImplementation(Dependencies.Testing.Mockk.android)
-    androidTestUtil(Dependencies.Testing.AndroidX.orchestrator)
+    androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
 
     androidTestImplementation(Dependencies.Testing.AndroidX.rules)
     androidTestImplementation(Dependencies.Testing.Espresso.core)
