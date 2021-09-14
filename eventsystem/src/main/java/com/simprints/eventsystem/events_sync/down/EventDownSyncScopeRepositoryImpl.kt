@@ -4,6 +4,7 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
@@ -11,13 +12,13 @@ import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
 import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class EventDownSyncScopeRepositoryImpl(
     val loginInfoManager: LoginInfoManager,
     val preferencesManager: PreferencesManager,
-    private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
+    private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
+    private val dispatcher: DispatcherProvider
 ) : EventDownSyncScopeRepository {
 
 
@@ -53,7 +54,7 @@ class EventDownSyncScopeRepositoryImpl(
     }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher.io()) {
             downSyncOperationOperationDao.insertOrUpdate(
                 buildFromEventsDownSyncOperationState(
                     syncScopeOperation
@@ -78,7 +79,7 @@ class EventDownSyncScopeRepositoryImpl(
     }
 
     override suspend fun deleteAll() {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher.io()) {
             downSyncOperationOperationDao.deleteAll()
         }
     }
