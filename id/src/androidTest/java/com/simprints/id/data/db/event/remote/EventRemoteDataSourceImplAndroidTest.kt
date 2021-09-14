@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -61,12 +62,14 @@ import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
@@ -87,12 +90,29 @@ class EventRemoteDataSourceImplAndroidTest {
         const val DEFAULT_TIME = 1000L
     }
 
-    private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
+    private val remoteTestingManager: RemoteTestingManager by lazy {
+        RemoteTestingManager.create(testDispatcherProvider)
+    }
+
     @MockK lateinit var timeHelper: TimeHelper
 
-    @get:Rule
-    val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
+
+    @get:Rule
+    val testProjectRule = TestProjectRule(testDispatcherProvider)
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private lateinit var eventLabels: EventLabels
@@ -104,8 +124,7 @@ class EventRemoteDataSourceImplAndroidTest {
         override fun get(authToken: String?,
                          deviceId: String,
                          versionName: String,
-                         interceptor: Interceptor
-        ): OkHttpClient.Builder =
+                         interceptor: Interceptor): OkHttpClient.Builder =
             super.get(authToken, deviceId, versionName,interceptor).apply {
                 addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
@@ -130,7 +149,7 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper,HttpLoggingInterceptor(), okHttpClientBuilder),
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, testDispatcherProvider, HttpLoggingInterceptor(), okHttpClientBuilder),
             JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100

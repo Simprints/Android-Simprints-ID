@@ -110,8 +110,9 @@ open class AppModule {
     @Singleton
     open fun provideRemoteDbManager(
         loginInfoManager: LoginInfoManager,
-        context: Context
-    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
+        context: Context,
+        dispatcher: DispatcherProvider
+    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context, dispatcher)
 
     @Provides
     @Singleton
@@ -185,6 +186,7 @@ open class AppModule {
         baseUrlProvider: BaseUrlProvider,
         performanceTracer: FirebasePerformanceTraceFactory,
         jsonHelper: JsonHelper,
+        dispatcher: DispatcherProvider,
         @Named("ChuckerInterceptor") interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
@@ -193,6 +195,7 @@ open class AppModule {
         remoteDbManager,
         performanceTracer,
         jsonHelper,
+        dispatcher,
         interceptor
     )
 

@@ -11,6 +11,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -21,14 +22,17 @@ import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgres
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -41,6 +45,19 @@ class EventDownSyncDownloaderWorkerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
 
     @Before
     fun setUp() {
@@ -133,6 +150,7 @@ class EventDownSyncDownloaderWorkerTest {
             jsonHelper = JsonHelper
             eventDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncHelper = mockk(relaxed = true)
+            dispatcher = testDispatcherProvider
         }
 }
 

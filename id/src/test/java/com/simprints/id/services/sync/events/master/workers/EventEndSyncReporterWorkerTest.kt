@@ -5,15 +5,19 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.Data
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -25,6 +29,19 @@ class EventEndSyncReporterWorkerTest {
 
     private val syncId = UUID.randomUUID().toString()
     private val tagForMasterSyncId = "$TAG_MASTER_SYNC_ID$syncId"
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
@@ -64,5 +81,6 @@ class EventEndSyncReporterWorkerTest {
             .apply {
                 resultSetter = mockk(relaxed = true)
                 syncCache = mockk(relaxed = true)
+                dispatcher = testDispatcherProvider
             }
 }

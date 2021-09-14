@@ -9,6 +9,7 @@ import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
@@ -89,11 +90,13 @@ class TestAppModule(
     override fun provideRemoteDbManager(
         loginInfoManager: LoginInfoManager,
         ctx: Context,
+        dispatcher: DispatcherProvider
     ): RemoteDbManager =
         remoteDbManagerRule.resolveDependency {
             super.provideRemoteDbManager(
                 loginInfoManager,
-                ctx
+                ctx,
+                dispatcher
             )
         }
 

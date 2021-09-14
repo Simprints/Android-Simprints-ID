@@ -2,6 +2,7 @@ package com.simprints.id.activities.fetchguid
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
@@ -12,12 +13,14 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -35,15 +38,23 @@ class FetchGuidViewModelTest {
     @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @MockK private lateinit var timeHelper: TimeHelper
 
-    companion object {
-        private const val PROJECT_ID = "project_id"
-        private const val VERIFY_GUID = "verify_guid"
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
     }
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = FetchGuidViewModel(fetchGuidHelper, deviceManager, eventRepository, timeHelper)
+        viewModel = FetchGuidViewModel(fetchGuidHelper, deviceManager, eventRepository, timeHelper, testDispatcherProvider)
 
         configureMocks()
     }
@@ -143,5 +154,11 @@ class FetchGuidViewModelTest {
                     LocalResult.NOT_FOUND,
                     RemoteResult.NOT_FOUND))
         }
+    }
+
+
+    companion object {
+        private const val PROJECT_ID = "project_id"
+        private const val VERIFY_GUID = "verify_guid"
     }
 }

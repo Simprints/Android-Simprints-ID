@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -19,14 +20,15 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
 
-class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
-    SimCoroutineWorker(context, params), WorkerProgressCountReporter {
+class EventUpSyncUploaderWorker(
+    context: Context,
+    params: WorkerParameters,
+) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
 
@@ -36,6 +38,8 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
     lateinit var eventSyncCache: EventSyncCache
     @Inject
     lateinit var jsonHelper: JsonHelper
+    @Inject
+    lateinit var dispatcher: DispatcherProvider
 
     private val upSyncScope by lazy {
         try {
@@ -48,29 +52,32 @@ class EventUpSyncUploaderWorker(context: Context, params: WorkerParameters) :
         }
     }
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        try {
-            getComponent<EventUpSyncUploaderWorker> { it.inject(this@EventUpSyncUploaderWorker) }
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
+    override suspend fun doWork(): Result {
+        getComponent<EventUpSyncUploaderWorker> { it.inject(this@EventUpSyncUploaderWorker) }
 
-            val workerId = this@EventUpSyncUploaderWorker.id.toString()
-            var count = eventSyncCache.readProgress(workerId)
+        return withContext(dispatcher.io()) {
+            try {
+                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
-            crashlyticsLog("Start")
-            upSyncHelper.upSync(this, upSyncScope.operation).collect {
-                count += it.progress
-                eventSyncCache.saveProgress(workerId, count)
-                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+                val workerId = this@EventUpSyncUploaderWorker.id.toString()
+                var count = eventSyncCache.readProgress(workerId)
 
-                reportCount(count)
+                crashlyticsLog("Start")
+                upSyncHelper.upSync(this, upSyncScope.operation).collect {
+                    count += it.progress
+                    eventSyncCache.saveProgress(workerId, count)
+                    Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+
+                    reportCount(count)
+                }
+
+                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
+                success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
+            } catch (t: Throwable) {
+                Simber.d(t)
+                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
+                retryOrFailIfCloudIntegrationError(t)
             }
-
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
-            success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
-        } catch (t: Throwable) {
-            Simber.d(t)
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
-            retryOrFailIfCloudIntegrationError(t)
         }
     }
 
