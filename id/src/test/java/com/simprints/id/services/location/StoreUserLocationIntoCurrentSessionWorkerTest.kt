@@ -31,8 +31,10 @@ import org.robolectric.annotation.Config
 internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var worker: StoreUserLocationIntoCurrentSessionWorker
+
     @RelaxedMockK
     lateinit var mockEventRepository: com.simprints.eventsystem.event.EventRepository
+
     @RelaxedMockK
     lateinit var mockLocationManager: LocationManager
 
@@ -70,7 +72,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
         coEvery { mockLocationManager.requestLocation(any()) } throws Exception("Location collect exception")
         worker.doWork()
         coVerify(exactly = 0) { mockEventRepository.getCurrentCaptureSessionEvent() }
-        coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any()) }
+        coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 
 
