@@ -65,11 +65,13 @@ open class SyncModule {
     @Provides
     open fun provideEventUpSyncScopeRepo(
         loginInfoManager: LoginInfoManager,
-        dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao
+        dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao,
+        dispatcher: DispatcherProvider
     ): EventUpSyncScopeRepository =
         EventUpSyncScopeRepositoryImpl(
             loginInfoManager,
-            dbEventUpSyncOperationStateDao
+            dbEventUpSyncOperationStateDao,
+            dispatcher
         )
 
     @Provides
@@ -105,12 +107,14 @@ open class SyncModule {
     open fun provideEventDownSyncScopeRepo(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        downSyncOperationStateDao: DbEventDownSyncOperationStateDao
+        downSyncOperationStateDao: DbEventDownSyncOperationStateDao,
+        dispatcher: DispatcherProvider
     ): EventDownSyncScopeRepository =
         EventDownSyncScopeRepositoryImpl(
             loginInfoManager,
             preferencesManager,
-            downSyncOperationStateDao
+            downSyncOperationStateDao,
+            dispatcher
         )
 
     @Provides

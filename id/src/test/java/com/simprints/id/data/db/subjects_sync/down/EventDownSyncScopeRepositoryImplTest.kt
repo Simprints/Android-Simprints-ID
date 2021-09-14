@@ -5,6 +5,7 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
@@ -24,16 +25,19 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -54,6 +58,20 @@ class EventDownSyncScopeRepositoryImplTest {
 
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
+
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -61,7 +79,8 @@ class EventDownSyncScopeRepositoryImplTest {
             EventDownSyncScopeRepositoryImpl(
                 loginInfoManager,
                 preferencesManager,
-                downSyncOperationOperationDao
+                downSyncOperationOperationDao,
+                testDispatcherProvider
             )
 
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
