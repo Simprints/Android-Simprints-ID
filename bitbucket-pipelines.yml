@@ -302,7 +302,7 @@ flows:
 ######################################################################
 pipelines:
     pull-requests:
-        '**':*development_flow
+        '**': *development_flow
         main: *release_flow
         release/*: *release_flow
     custom:
