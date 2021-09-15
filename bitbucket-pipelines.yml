@@ -25,7 +25,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew clientapi:jacocoTestReport
                 artifacts:
                     - clientapi/build/reports/**
 
@@ -41,9 +42,10 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew core:jacocoTestReportDebug
-                    - ./gradlew id:jacocoTestReportDebug
-                    - ./gradlew eventsystem:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew core:jacocoTestReport
+                    - ./gradlew id:jacocoTestReport
+                    - ./gradlew eventsystem:jacocoTestReport
                 artifacts:
                     - id/build/reports/**
                     - core/build/reports/**
@@ -61,7 +63,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew face:jacocoTestReport
                 artifacts:
                     - face/build/reports/**
 
@@ -78,7 +81,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprint:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew fingerprint:jacocoTestReport
                 artifacts:
                     - fingerprint/build/reports/**
 
@@ -95,7 +99,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew fingerprintscanner:jacocoTestReport
                 artifacts:
                     - fingerprintscanner/build/reports/**
 
@@ -293,9 +298,9 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
     -   flow: &ci-test # For CI testing purposes only
-            -   step: *sign-and-deploy-to-staging
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-internal-to-alpha
+            -   parallel:
+                    -   step: *run-id-unit-tests
+                    -   step: *run-clientapi-unit-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
