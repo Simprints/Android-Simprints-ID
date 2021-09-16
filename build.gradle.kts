@@ -46,7 +46,7 @@ buildscript {
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
 
         // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.4.0-agp4.2")
+        classpath("com.github.triplet.gradle:play-publisher:3.6.0-agp4.2")
         classpath("com.google.firebase:firebase-appdistribution-gradle:2.2.0")
     }
 
