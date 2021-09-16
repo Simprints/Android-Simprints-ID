@@ -18,7 +18,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
 
         // CI Scanning & Retry
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
