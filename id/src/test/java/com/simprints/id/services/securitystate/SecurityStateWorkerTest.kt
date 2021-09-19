@@ -5,14 +5,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -30,16 +29,8 @@ class SecurityStateWorkerTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
 
     @Before
     fun setUp() {
