@@ -2,14 +2,10 @@ package com.simprints.face.match
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.face.FixtureGenerator
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
-import com.simprints.face.controllers.core.events.model.Event
-import com.simprints.face.controllers.core.events.model.MatchEntry
+import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.Matcher
-import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
-import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
@@ -20,17 +16,9 @@ import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.tools.utils.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.CapturingSlot
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.spyk
-import io.mockk.verify
-import kotlinx.coroutines.CoroutineDispatcher
+import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
 import org.junit.Rule
 import org.junit.Test
@@ -39,15 +27,7 @@ import java.io.Serializable
 class FaceMatchViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
