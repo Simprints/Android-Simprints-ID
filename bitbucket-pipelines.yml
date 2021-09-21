@@ -266,6 +266,17 @@ definitions:
                     - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
+
+        ######################################################################
+        # Run dependabot tool which scans all gradle files and open automatic PRs
+        ######################################################################
+        -   step: &update-dependencies
+                name: "Update project dependencies"
+                image: ruby:2.6.6
+                max-time: 30
+                script:
+                    - bash ./ci/dependabot/run_dependabot
+
 ######################################################################
 # Define the different pipelines flows as anchors.
 ######################################################################
@@ -301,6 +312,9 @@ flows:
             -   parallel:
                     -   step: *run-id-unit-tests
                     -   step: *run-clientapi-unit-tests
+    -   flow: &update-dependencies-flow
+            -   step: *update-dependencies
+
 
 ######################################################################
 # Define the triggers that launch the pipeline.
@@ -314,3 +328,4 @@ pipelines:
         develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
         release-pipeline: *release_flow # Pipeline to create a release manually
         ci-test-pipeline: *ci-test # For CI testing purposes only
+        dependabot: *update-dependencies-flow
