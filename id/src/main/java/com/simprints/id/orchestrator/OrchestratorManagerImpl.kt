@@ -2,10 +2,8 @@ package com.simprints.id.orchestrator
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.FACE
-import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
@@ -54,10 +52,10 @@ open class OrchestratorManagerImpl(
         modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)
 
         val fingerprintCaptureCompleted =
-            !modalities.contains(FINGER) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }.all { it.getResult() is FingerprintCaptureResponse }
+            !modalities.contains(Modality.FINGER) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }.all { it.getResult() is FingerprintCaptureResponse }
 
         val faceCaptureCompleted =
-            !modalities.contains(FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }.all { it.getResult() is FaceCaptureResponse }
+            !modalities.contains(Modality.FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }.all { it.getResult() is FaceCaptureResponse }
 
 
         if (fingerprintCaptureCompleted && faceCaptureCompleted) {

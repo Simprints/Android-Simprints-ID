@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.responses.entities
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MatchResult(val guidFound: String,

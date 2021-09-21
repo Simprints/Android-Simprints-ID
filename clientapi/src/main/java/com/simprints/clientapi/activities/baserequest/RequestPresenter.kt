@@ -1,20 +1,63 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.simprints.clientapi.activities.errors.ClientApiAlert.*
-import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.*
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
+import androidx.annotation.Keep
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_METADATA
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_MODULE_ID
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_PROJECT_ID
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_SELECTED_ID
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_SESSION_ID
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_USER_ID
+import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_VERIFY_ID
+import com.simprints.clientapi.activities.errors.ClientApiAlert.ROOTED_DEVICE
+import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
+import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrolBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrolLastBiometricsBuilder
+import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
+import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
+import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsValidator
+import com.simprints.clientapi.clientrequests.validators.EnrolValidator
+import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
+import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.exceptions.*
+import com.simprints.clientapi.exceptions.InvalidMetadataException
+import com.simprints.clientapi.exceptions.InvalidModuleIdException
+import com.simprints.clientapi.exceptions.InvalidProjectIdException
+import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.exceptions.InvalidSelectedIdException
+import com.simprints.clientapi.exceptions.InvalidSessionIdException
+import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
+import com.simprints.clientapi.exceptions.InvalidUserIdException
+import com.simprints.clientapi.exceptions.InvalidVerifyIdException
+import com.simprints.clientapi.exceptions.RootedDeviceException
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
-import timber.log.Timber
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
+import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.id.domain.containsCommcare
+import com.simprints.id.domain.containsSimprints
+import com.simprints.libsimprints.Constants
+import com.simprints.logging.Simber
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 
-abstract class RequestPresenter(private val view: RequestContract.RequestView,
-                                private val eventsManager: ClientApiSessionEventsManager,
-                                private val deviceManager: DeviceManager,
-                                protected val crashReportManager: ClientApiCrashReportManager)
-    : RequestContract.Presenter {
+abstract class RequestPresenter(
+    private val view: RequestContract.RequestView,
+    private val eventsManager: ClientApiSessionEventsManager,
+    private val deviceManager: DeviceManager,
+    private val encoder: EncodingUtils = EncodingUtilsImpl,
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val sessionEventsManager: ClientApiSessionEventsManager
+) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
         EnrolBuilder(view.enrolExtractor, EnrolValidator(view.enrolExtractor))
@@ -38,7 +81,11 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     override suspend fun processEnrolLastBiometrics() = validateAndSendRequest(
         EnrolLastBiometricsBuilder(
             view.enrolLastBiometricsExtractor,
-            EnrolLastBiometricsValidator(view.enrolLastBiometricsExtractor, eventsManager.getCurrentSessionId(), eventsManager.isCurrentSessionAnIdentificationOrEnrolment())
+            EnrolLastBiometricsValidator(
+                view.enrolLastBiometricsExtractor,
+                eventsManager.getCurrentSessionId(),
+                eventsManager.isCurrentSessionAnIdentificationOrEnrolment()
+            )
         )
     )
 
@@ -47,7 +94,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         addSuspiciousEventIfRequired(request)
         view.sendSimprintsRequest(request)
     } catch (exception: InvalidRequestException) {
-        Timber.d(exception)
+        Simber.d(exception)
         logInvalidSessionInBackground()
         handleInvalidRequest(exception)
     }
@@ -62,7 +109,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     private fun handleRootedDevice(exception: RootedDeviceException) {
-        crashReportManager.logExceptionOrSafeException(exception)
+        Simber.e(exception)
         view.handleClientRequestError(ROOTED_DEVICE)
     }
 
@@ -91,4 +138,61 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         eventsManager.addInvalidIntentEvent(view.intentAction ?: "", view.extras ?: emptyMap())
     }
 
+    /**
+     * Be aware that Android Intents have a cap at around 500KB of data that can be returned.
+     * When changing events, make sure they still fit in.
+     */
+    override suspend fun getEventsJsonForSession(
+        sessionId: String,
+        jsonHelper: JsonHelper
+    ): String? =
+        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare()) {
+            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
+            jsonHelper.toJson(CoSyncEvents(events))
+        } else {
+            null
+        }
+
+    override suspend fun getEnrolmentCreationEventForSubject(
+        subjectId: String,
+        subjectRepository: SubjectRepository,
+        timeHelper: ClientApiTimeHelper,
+        jsonHelper: JsonHelper
+    ): String? {
+        if (!sharedPreferencesManager.syncDestinationSettings.containsCommcare()) return null
+
+        val recordCreationEvent =
+            subjectRepository.load(
+                SubjectQuery(
+                    projectId = getProjectIdFromRequest(),
+                    subjectId = subjectId
+                )
+            )
+                .firstOrNull()
+                ?.fromSubjectToEnrolmentCreationEvent(
+                    now = timeHelper.now(),
+                    modalities = sharedPreferencesManager.modalities,
+                    encoder = encoder
+                )
+                ?: return null
+
+        return jsonHelper.toJson(CoSyncEvents(listOf(recordCreationEvent)))
+    }
+
+    /**
+     * Delete the events if returning to CommCare but not Simprints
+     */
+    override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
+        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare() &&
+            !sharedPreferencesManager.syncDestinationSettings.containsSimprints()
+        ) {
+            sessionEventsManager.deleteSessionEvents(sessionId)
+        }
+    }
+
+    override fun getProjectIdFromRequest() =
+        view.extras?.get(Constants.SIMPRINTS_PROJECT_ID) as String
+
+    @Keep
+    private data class CoSyncEvents(val events: List<Event>)
 }

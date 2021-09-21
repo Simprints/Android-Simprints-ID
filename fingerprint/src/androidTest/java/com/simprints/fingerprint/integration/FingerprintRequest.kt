@@ -13,7 +13,7 @@ import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 fun createFingerprintCaptureRequestIntent(

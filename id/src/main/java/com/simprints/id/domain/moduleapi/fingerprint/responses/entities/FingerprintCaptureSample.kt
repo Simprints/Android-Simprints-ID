@@ -1,8 +1,8 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import android.os.Parcelable
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.fromModuleApiToDomain
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.fromModuleApiToDomain
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.data.db.subject.domain.fromModuleApiToDomain
@@ -13,8 +13,8 @@ import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize

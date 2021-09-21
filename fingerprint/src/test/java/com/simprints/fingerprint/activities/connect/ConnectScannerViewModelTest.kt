@@ -5,17 +5,24 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration.*
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration.VERO_1
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration.VERO_2
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.versions.*
-import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.domain.versions.ChipApiVersion
+import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
@@ -33,9 +40,10 @@ import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.declareModule
 
 class ConnectScannerViewModelTest : KoinTest {
 
@@ -46,8 +54,6 @@ class ConnectScannerViewModelTest : KoinTest {
     val rule = InstantTaskExecutorRule()
 
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val fingerprintAnalyticsManager: FingerprintAnalyticsManager = mockk(relaxed = true)
-    private val crashReportManager: FingerprintCrashReportManager = mockk(relaxed = true)
     private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
     private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
     private val pairingManager: ScannerPairingManager = mockk()
@@ -58,32 +64,35 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Before
     fun setUp() {
-        declareModule {
+        val mockModule = module(override = true) {
             factory { mockk<FingerprintTimeHelper>(relaxed = true) }
             factory { sessionEventsManager }
-            factory { fingerprintAnalyticsManager }
-            factory { crashReportManager }
             factory { preferencesManager }
             factory { bluetoothAdapter }
             factory { pairingManager }
             factory { nfcManager }
             factory { scannerFactory }
         }
+        loadKoinModules(mockModule)
+
         viewModel = get()
     }
 
-    private fun mockScannerWrapper(scannerGeneration: ScannerGeneration, connectFailException: Throwable? = null) = mockk<ScannerWrapper> {
-        every { disconnect() } returns Completable.complete()
-        every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(connectFailException)
-        every { setup() } returns Completable.complete()
-        every { sensorWakeUp() } returns Completable.complete()
-        every { setUiIdle() } returns Completable.complete()
-        every { versionInformation() } returns when (scannerGeneration) {
-            VERO_1 -> VERO_1_VERSION
-            VERO_2 -> VERO_2_VERSION
+    private fun mockScannerWrapper(scannerGeneration: ScannerGeneration, connectFailException: Throwable? = null) =
+        mockk<ScannerWrapper> {
+            every { disconnect() } returns Completable.complete()
+            every { connect() } returns if (connectFailException == null) Completable.complete() else Completable.error(
+                connectFailException
+            )
+            every { setup() } returns Completable.complete()
+            every { sensorWakeUp() } returns Completable.complete()
+            every { setUiIdle() } returns Completable.complete()
+            every { versionInformation() } returns when (scannerGeneration) {
+                VERO_1 -> VERO_1_VERSION
+                VERO_2 -> VERO_2_VERSION
+            }
+            every { batteryInformation() } returns mockk(relaxed = true)
         }
-        every { batteryInformation() } returns mockk(relaxed = true)
-    }
 
     @Test
     fun start_bluetoothOff_sendsBluetoothOffIssueEvent() {
@@ -100,7 +109,10 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun start_bluetoothNotSupported_sendsBluetoothNotSupportedAlert() {
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, connectFailException = BluetoothNotSupportedException())
+        every { scannerFactory.create(any()) } returns mockScannerWrapper(
+            VERO_2,
+            connectFailException = BluetoothNotSupportedException()
+        )
 
         val launchAlertObserver = viewModel.launchAlert.testObserver()
 
@@ -121,7 +133,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
         assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
-        verify { fingerprintAnalyticsManager.logScannerProperties(any(), any()) }
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
@@ -140,7 +151,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
         assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 2) // 2 at the start
-        verify { fingerprintAnalyticsManager.logScannerProperties(any(), any()) }
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
@@ -238,7 +248,7 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEventAndLogsCrashlytics() {
+    fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEvent() {
         val error = Error("Oops")
         setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, error)
@@ -250,7 +260,6 @@ class ConnectScannerViewModelTest : KoinTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(false)
         launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
-        verify { crashReportManager.logExceptionOrSafeException(eq(error)) }
     }
 
     @Test
@@ -263,7 +272,8 @@ class ConnectScannerViewModelTest : KoinTest {
 
         viewModel.connectScannerIssue.assertEventReceivedWithContentAssertions {
             assertThat(it).isInstanceOf(ConnectScannerIssue.Ota::class.java)
-            assertThat((it as ConnectScannerIssue.Ota).otaFragmentRequest.availableOtas).containsExactlyElementsIn(e.availableOtas).inOrder()
+            assertThat((it as ConnectScannerIssue.Ota).otaFragmentRequest.availableOtas).containsExactlyElementsIn(e.availableOtas)
+                .inOrder()
         }
     }
 

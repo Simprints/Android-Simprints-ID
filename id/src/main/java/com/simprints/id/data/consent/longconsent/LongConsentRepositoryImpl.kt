@@ -1,16 +1,16 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Failed
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Progress
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Succeed
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
-import timber.log.Timber
 
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
-    private val longConsentRemoteDataSource: LongConsentRemoteDataSource,
-    private val crashReportManager: CrashReportManager
+    private val longConsentRemoteDataSource: LongConsentRemoteDataSource
 ) : LongConsentRepository {
 
     companion object {
@@ -26,8 +26,7 @@ class LongConsentRepositoryImpl(
                 downloadLongConsentFromFirebaseStorage(this, language)
             }
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
-            Timber.d(t)
+            Simber.e(t)
             emit(Failed(language, t))
         }
     }
@@ -59,8 +58,7 @@ class LongConsentRepositoryImpl(
             flowCollector.emit(Succeed(language, file.readText()))
 
         } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
-            Timber.d(t)
+            Simber.e(t)
             flowCollector.emit(Failed(language, t))
         }
     }

@@ -1,7 +1,8 @@
 package com.simprints.id.testtools.testingapi
 
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.models.TestProjectCreationParameters
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -15,6 +16,7 @@ import org.junit.runner.Description
  * @build:Rule val testProjectRule = TestProjectRule()
  */
 class TestProjectRule(
+    val dispatcher: DispatcherProvider,
     val testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()
 ) : TestWatcher() {
 
@@ -23,7 +25,7 @@ class TestProjectRule(
 
     override fun starting(description: Description?) {
 
-        testProject = RemoteTestingManager.create().createTestProject(testProjectCreationParameters)
+        testProject = RemoteTestingManager.create(dispatcher).createTestProject(testProjectCreationParameters)
 
         localDbKey = LocalDbKey(
             testProject.id,
@@ -31,6 +33,6 @@ class TestProjectRule(
     }
 
     override fun finished(description: Description?) {
-        RemoteTestingManager.create().deleteTestProject(testProject.id)
+        RemoteTestingManager.create(dispatcher).deleteTestProject(testProject.id)
     }
 }

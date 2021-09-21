@@ -1,41 +1,39 @@
 package com.simprints.clientapi.activities.commcare
 
-import androidx.annotation.Keep
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.commcare.CommCareAction.*
+import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
+import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
+import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
+import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
+import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.exceptions.CouldntSaveEventException
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.models.Event
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.toMode
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
-
-private const val RETURN_TIMEOUT = 3_000L
 
 class CommCarePresenter(
     private val view: CommCareContract.View,
@@ -46,18 +44,20 @@ class CommCarePresenter(
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
-    view,
-    sessionEventsManager,
-    deviceManager,
-    crashReportManager
+    view = view,
+    eventsManager = sessionEventsManager,
+    deviceManager = deviceManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
 ), CommCareContract.Presenter {
 
     override suspend fun start() {
         if (action !is CommCareActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {
@@ -72,20 +72,24 @@ class CommCarePresenter(
     }
 
     override fun handleEnrolResponse(enrol: EnrolResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutineScope.launch {
             // need to get sessionId before it is closed and null
             val currentSessionId = sessionEventsManager.getCurrentSessionId()
 
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED)
             sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnRegistration(
                 enrol.guid,
                 currentSessionId,
-                flowCompletedCheck,
-                getEventsJsonForSession(currentSessionId),
-                getEnrolmentCreationEventForSubject(enrol.guid)
+                RETURN_FOR_FLOW_COMPLETED,
+                getEventsJsonForSession(currentSessionId, jsonHelper),
+                getEnrolmentCreationEventForSubject(
+                    enrol.guid,
+                    subjectRepository = subjectRepository,
+                    timeHelper = timeHelper,
+                    jsonHelper = jsonHelper
+                )
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
@@ -101,40 +105,37 @@ class CommCarePresenter(
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutineScope.launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(ArrayList(identify.identifications.map {
                 Identification(it.guidFound, it.confidenceScore, Tier.valueOf(it.tier.name))
-            }), identify.sessionId, getEventsJsonForSession(identify.sessionId))
+            }), identify.sessionId, getEventsJsonForSession(identify.sessionId, jsonHelper))
         }
     }
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutineScope.launch {
             // need to get sessionId before it is closed and null
             val currentSessionId = sessionEventsManager.getCurrentSessionId()
 
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
+            sessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED)
 
             view.returnConfirmation(
-                flowCompletedCheck,
+                RETURN_FOR_FLOW_COMPLETED,
                 currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutineScope.launch {
             // need to get sessionId before it is closed and null
             val currentSessionId = sessionEventsManager.getCurrentSessionId()
 
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED)
             sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnVerification(
@@ -142,90 +143,48 @@ class CommCarePresenter(
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
                 currentSessionId,
-                flowCompletedCheck,
-                getEventsJsonForSession(currentSessionId)
+                RETURN_FOR_FLOW_COMPLETED,
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutineScope.launch {
             // need to get sessionId before it is closed and null
             val currentSessionId = sessionEventsManager.getCurrentSessionId()
 
-            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
-            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED)
             sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnExitForms(
                 refusalForm.reason,
                 refusalForm.extra,
                 currentSessionId,
-                flowCompletedCheck,
-                getEventsJsonForSession(currentSessionId)
+                RETURN_FOR_FLOW_COMPLETED,
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
         }
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutineScope.launch {
             // need to get sessionId before it is closed and null
             val currentSessionId = sessionEventsManager.getCurrentSessionId()
 
             val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
-            addCompletionCheckEvent(flowCompletedCheck)
+            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
             sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnErrorToClient(
                 errorResponse,
                 flowCompletedCheck,
                 currentSessionId,
-                getEventsJsonForSession(currentSessionId)
+                getEventsJsonForSession(currentSessionId, jsonHelper)
             )
             deleteSessionEventsIfNeeded(currentSessionId)
-        }
-    }
-
-    /**
-     * Be aware that Android Intents have a cap at around 500KB of data that can be returned.
-     * When changing events, make sure they still fit in.
-     */
-    private suspend fun getEventsJsonForSession(sessionId: String): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) {
-            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
-            jsonHelper.toJson(CommCareEvents(events))
-        } else {
-            null
-        }
-
-    private suspend fun getEnrolmentCreationEventForSubject(subjectId: String): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE)) return null
-
-        val recordCreationEvent =
-            subjectRepository.load(SubjectQuery(projectId = getProjectIdFromRequest(), subjectId = subjectId))
-                .firstOrNull()
-                ?.fromSubjectToEnrolmentCreationEvent()
-                ?: return null
-
-        return jsonHelper.toJson(CommCareEvents(listOf(recordCreationEvent)))
-    }
-
-    /**
-     * This method will wait [RETURN_TIMEOUT] for the completion event to finish.
-     * If it doesn't finish, it will log an error and continue the flow.
-     *
-     * We should not cause problems to the calling app if an event can't be saved at the end of the flow.
-     */
-    private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) {
-        val job = withTimeoutOrNull(RETURN_TIMEOUT) {
-            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
-        }
-
-        if (job == null) {
-            Timber.e(CouldntSaveEventException("Event: FlowCompletedEvent"))
-            crashReportManager.logExceptionOrSafeException(CouldntSaveEventException("Event: FlowCompletedEvent"))
         }
     }
 
@@ -238,32 +197,4 @@ class CommCarePresenter(
 
         processConfirmIdentityRequest()
     }
-
-    /**
-     * Delete the events if returning to CommCare but not Simprints
-     */
-    private suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.COMMCARE) &&
-            !sharedPreferencesManager.syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
-        ) {
-            sessionEventsManager.deleteSessionEvents(sessionId)
-        }
-    }
-
-    private fun getProjectIdFromRequest() = view.extras?.get(Constants.SIMPRINTS_PROJECT_ID) as String
-
-    private fun Subject.fromSubjectToEnrolmentCreationEvent(): EnrolmentRecordCreationEvent {
-        return EnrolmentRecordCreationEvent(
-            timeHelper.now(),
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            sharedPreferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples)
-        )
-    }
-
-    @Keep
-    private data class CommCareEvents(val events: List<Event>)
 }

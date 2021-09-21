@@ -30,7 +30,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/dashboard_sync_card_try_again_sync_button"
-            style="@style/SimprintsButton"
+            style="@style/SimprintsOrangeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"

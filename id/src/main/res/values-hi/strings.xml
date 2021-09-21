@@ -38,15 +38,15 @@
     <string name="dashboard_card_activity">गतिविधि: %1$s</string>
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">पंजीकरण</item>
-        <item quantity="other"></item>
+        <item quantity="other">पंजीकरण</item>
     </plurals>
     <plurals name="dashboard_card_identifications">
         <item quantity="one">विभिन्न पहचान</item>
-        <item quantity="other"></item>
+        <item quantity="other">विभिन्न पहचान</item>
     </plurals>
     <plurals name="dashboard_card_verifications">
         <item quantity="one">विभिन्न सत्यापन</item>
-        <item quantity="other"></item>
+        <item quantity="other">विभिन्न सत्यापन</item>
     </plurals>
     <string name="exit_form_capture_face">चेहरे की फ़ोटो लें</string>
     <string name="fetch_guid_checking_person_in_database">व्यक्ति को डाटाबेस में खोजा जा रहा है</string>

@@ -13,7 +13,7 @@ android {
 
     buildTypes {
         release {
-            debuggable = DEBUGGABLE
+            debuggable = false
             lintOptions.fatal 'StopShip'
             versionNameSuffix "+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "false")
@@ -31,6 +31,14 @@ android {
             versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "true")
             buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        kotlinOptions {
+            jvmTarget = "1.8"
         }
     }
 }

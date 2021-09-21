@@ -6,7 +6,7 @@ import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.f
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromModuleApiToDomain
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ErrorResponse(val reason: Reason) : Parcelable {

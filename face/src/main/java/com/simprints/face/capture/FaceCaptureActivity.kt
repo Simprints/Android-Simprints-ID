@@ -39,10 +39,6 @@ class FaceCaptureActivity : FaceActivity() {
             finish()
         })
 
-        vm.retryFlowEvent.observe(this, LiveDataEventObserver {
-            findNavController(R.id.capture_host_fragment).navigate(R.id.action_retryFragment_to_liveFeedbackFragment)
-        })
-
         vm.recaptureEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.capture_host_fragment).navigate(R.id.action_confirmationFragment_to_liveFeedbackFragment)
         })
@@ -72,12 +68,11 @@ class FaceCaptureActivity : FaceActivity() {
     }
 
     enum class BackButtonContext {
-        CAPTURE, RETRY;
+        CAPTURE;
 
         companion object {
             fun fromFragmentId(fragmentId: Int?): BackButtonContext? = when (fragmentId) {
                 R.id.preparationFragment, R.id.liveFeedbackFragment -> CAPTURE
-                R.id.retryFragment -> RETRY
                 else -> null
             }
         }

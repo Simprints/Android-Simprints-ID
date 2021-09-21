@@ -8,10 +8,10 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality.FACE
+import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.FACE
-import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse

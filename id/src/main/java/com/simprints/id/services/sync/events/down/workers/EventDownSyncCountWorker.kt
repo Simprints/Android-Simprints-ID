@@ -8,12 +8,10 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
+import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
@@ -23,12 +21,14 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.C
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
-import kotlinx.coroutines.Dispatchers
+import com.simprints.logging.Simber
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
-class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
+class EventDownSyncCountWorker(
+    val context: Context,
+    params: WorkerParameters,
+) : SimCoroutineWorker(context, params) {
 
     companion object {
         const val INPUT_COUNT_WORKER_DOWN = "INPUT_COUNT_WORKER_DOWN"
@@ -41,43 +41,43 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
         WorkManager.getInstance(context)
     }
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var eventDownSyncHelper: EventDownSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
-    @Inject lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    @Inject lateinit var dispatcher: DispatcherProvider
 
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
             ?: throw IllegalArgumentException("input required")
-        Timber.d("Received $jsonInput")
-        jsonHelper.fromJson<EventDownSyncScope>(jsonInput)
+        Simber.d("Received $jsonInput")
+        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope>(jsonInput)
     }
 
-    override suspend fun doWork(): Result =
-        withContext(Dispatchers.IO) {
-            Timber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
+    override suspend fun doWork(): Result {
+        getComponent<EventDownSyncCountWorker> { it.inject(this@EventDownSyncCountWorker) }
+
+        return withContext(dispatcher.io()) {
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
             try {
-                getComponent<EventDownSyncCountWorker> { it.inject(this@EventDownSyncCountWorker) }
-
                 crashlyticsLog("Start - Params: $downSyncScope")
-
                 execute(downSyncScope)
             } catch (t: Throwable) {
                 fail(t)
             }
         }
+    }
 
-    private suspend fun execute(downSyncScope: EventDownSyncScope): Result {
+    private suspend fun execute(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope): Result {
         return try {
 
             val downCount = getDownCount(downSyncScope)
             val output = jsonHelper.toJson(downCount)
 
-            Timber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
             success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
 
         } catch (t: Throwable) {
-            Timber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Failed. ${t.message}")
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Failed. ${t.message}")
 
             when {
                 t is SyncCloudIntegrationException -> {
@@ -87,7 +87,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
                     retry(t)
                 }
                 else -> {
-                    Timber.d(t)
+                    Simber.d(t)
                     t.printStackTrace()
                     success(message = "Succeed because count is not required any more.")
                 }
@@ -110,7 +110,7 @@ class EventDownSyncCountWorker(val context: Context, params: WorkerParameters) :
         } ?: false
     }
 
-    private suspend fun getDownCount(downSyncScope: EventDownSyncScope) =
+    private suspend fun getDownCount(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) =
         downSyncScope.operations.map {
             val opWithLastState = eventDownSyncScopeRepository.refreshState(it)
             eventDownSyncHelper.countForDownSync(opWithLastState)

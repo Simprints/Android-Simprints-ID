@@ -1,7 +1,7 @@
 ext {
 
     MIN_SDK_VERSION = 23
-    TARGET_SDK_VERSION = 29
+    TARGET_SDK_VERSION = 30
 
     /**
      * Debug Version code. The version code for staging and production builds are taken from the CI.
@@ -15,7 +15,7 @@ ext {
      * on, and the version of the BFSID API being used. Read more about our versioning here:
      * https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+Simprints+ID
      */
-    VERSION_NAME = "2021.1.2"
+    VERSION_NAME = "2021.3.0"
 
     /**
      * Build type. The version code describes which build type was used for the build.
@@ -36,7 +36,6 @@ ext {
      * ones here so we can test none production builds locally. The release one is added by the CD.
      */
     RELEASE_SAFETYNET_KEY = ""
-    STAGING_SAFETYNET_KEY = "AIzaSyCSmwYkm2iHlKi-cBjohMH-FS6jQuCqPTE"
+    STAGING_SAFETYNET_KEY = "AIzaSyBBu-O2HOB21688mu9mB38K475wFxrqm7A"
     DEV_SAFETYNET_KEY = "AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I"
-
 }

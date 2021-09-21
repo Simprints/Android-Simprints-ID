@@ -6,21 +6,21 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Action
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Answer
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FingerprintExitFormReason
+import com.simprints.id.databinding.ActivityFingerprintExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
-import kotlinx.android.synthetic.main.activity_fingerprint_exit_form.*
+import com.simprints.logging.Simber
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
@@ -28,9 +28,9 @@ import javax.inject.Inject
 class FingerprintExitFormActivity : BaseSplitActivity() {
 
     private lateinit var viewModel: FingerprintExitFormViewModel
+    private val binding by viewBinding(ActivityFingerprintExitFormBinding::inflate)
 
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var fingerprintExitFormViewModelFactory: FingerprintExitFormViewModelFactory
 
     private var fingerprintExitFormStartTime: Long = 0
@@ -42,7 +42,7 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fingerprint_exit_form)
+        setContentView(binding.root)
 
         injectDependencies()
 
@@ -62,22 +62,24 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     }
 
     private fun setTextInLayout() {
-        whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
-        fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-        fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
-        fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-        fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-        fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-        fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
-        fingerprintRbOther.text = getString(R.string.refusal_other)
-        fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
-        fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
-        fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
+        binding.apply {
+            whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
+            fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
+            fingerprintRbOther.text = getString(R.string.refusal_other)
+            fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
+            fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
+            fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
+        }
     }
 
     private fun setRadioGroupListener() {
-        fingerprintExitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            fingerprintExitFormText.removeTextChangedListener(textWatcher)
+        binding.fingerprintExitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
+            binding.fingerprintExitFormText.removeTextChangedListener(textWatcher)
             enableSubmitButton()
             enableFingerprintExitFormText()
             handleRadioOptionIdentifierClick(optionIdentifier)
@@ -86,11 +88,8 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        with (fingerprintExitFormScrollView) {
-            onLayoutChange { _, _, _, _,
-                             _, _, _, _, _ ->
-                fullScroll(View.FOCUS_DOWN)
-            }
+        binding.fingerprintExitFormScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
+            binding.fingerprintExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
@@ -103,15 +102,15 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     }
 
     private fun enableSubmitButton() {
-        fingerprintBtSubmitExitForm.isEnabled = true
+        binding.fingerprintBtSubmitExitForm.isEnabled = true
     }
 
     private fun disableSubmitButton() {
-        fingerprintBtSubmitExitForm.isEnabled = false
+        binding.fingerprintBtSubmitExitForm.isEnabled = false
     }
 
     private fun enableFingerprintExitFormText() {
-        fingerprintExitFormText.isEnabled = true
+        binding.fingerprintExitFormText.isEnabled = true
     }
 
     private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
@@ -149,17 +148,17 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
         }
     }
 
-    private fun getExitFormText() = fingerprintExitFormText.text.toString()
+    private fun getExitFormText() = binding.fingerprintExitFormText.text.toString()
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
-        fingerprintBtSubmitExitForm.isEnabled = false
-        fingerprintExitFormText.requestFocus()
+        binding.fingerprintBtSubmitExitForm.isEnabled = false
+        binding.fingerprintExitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(fingerprintExitFormText, InputMethodManager.SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(binding.fingerprintExitFormText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setTextChangeListenerOnExitText() {
-        fingerprintExitFormText.addTextChangedListener(textWatcher)
+        binding.fingerprintExitFormText.addTextChangedListener(textWatcher)
     }
 
 
@@ -187,7 +186,7 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
 
     override fun onBackPressed() {
-        if (fingerprintBtSubmitExitForm.isEnabled) {
+        if (binding.fingerprintBtSubmitExitForm.isEnabled) {
             showToast(R.string.refusal_toast_submit)
         } else {
             showToast(R.string.refusal_toast_select_option_submit)
@@ -199,6 +198,6 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
+        Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 }

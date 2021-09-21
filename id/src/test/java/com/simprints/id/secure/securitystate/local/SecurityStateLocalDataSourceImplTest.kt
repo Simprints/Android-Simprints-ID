@@ -1,7 +1,7 @@
 package com.simprints.id.secure.securitystate.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.secure.models.SecurityState
 import io.mockk.MockKAnnotations
 import io.mockk.every

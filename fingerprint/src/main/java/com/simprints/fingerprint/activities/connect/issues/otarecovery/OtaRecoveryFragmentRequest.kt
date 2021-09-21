@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Keep

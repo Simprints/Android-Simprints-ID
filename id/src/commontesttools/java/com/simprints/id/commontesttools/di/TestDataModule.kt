@@ -1,22 +1,24 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.event.remote.EventRemoteDataSource
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.testtools.common.di.DependencyRule
 import kotlinx.coroutines.FlowPreview
 
@@ -25,11 +27,8 @@ class TestDataModule(
     private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val eventRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val personRepositoryUpSyncHelperRule: DependencyRule = DependencyRule.RealRule,
-    private val personRepositoryDownSyncHelperRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
@@ -38,13 +37,15 @@ class TestDataModule(
     override fun provideProjectLocalDataSource(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        dispatcher: DispatcherProvider
     ): ProjectLocalDataSource =
         projectLocalDataSourceRule.resolveDependency {
             super.provideProjectLocalDataSource(
                 ctx,
                 secureLocalDbKeyProvider,
-                loginInfoManager
+                loginInfoManager,
+                dispatcher
             )
         }
 
@@ -55,11 +56,13 @@ class TestDataModule(
 
     override fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): ProjectRepository = projectRepositoryRule.resolveDependency {
         super.provideProjectRepository(
             projectLocalDataSource,
-            projectRemoteDataSource
+            projectRemoteDataSource,
+            remoteConfigWrapper
         )
     }
 
@@ -76,9 +79,10 @@ class TestDataModule(
 
     override fun provideImageRepository(
         context: Context,
-        baseUrlProvider: BaseUrlProvider
+        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager
     ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, baseUrlProvider)
+        super.provideImageRepository(context, baseUrlProvider, remoteDbManager)
     }
 
     override fun provideLongConsentLocalDataSource(
@@ -94,14 +98,12 @@ class TestDataModule(
 
     override fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
-        longConsentRemoteDataSource: LongConsentRemoteDataSource,
-        crashReportManager: CrashReportManager
+        longConsentRemoteDataSource: LongConsentRemoteDataSource
     ): LongConsentRepository =
         longConsentRepositoryRule.resolveDependency {
             super.provideLongConsentRepository(
                 longConsentLocalDataSource,
-                longConsentRemoteDataSource,
-                crashReportManager
+                longConsentRemoteDataSource
             )
         }
 
@@ -109,13 +111,15 @@ class TestDataModule(
     override fun providePersonLocalDataSource(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        dispatcher: DispatcherProvider,
     ): SubjectLocalDataSource =
         personLocalDataSourceRule.resolveDependency {
             super.providePersonLocalDataSource(
                 ctx,
                 secureLocalDbKeyProvider,
-                loginInfoManager
+                loginInfoManager,
+                dispatcher
             )
         }
 

@@ -2,9 +2,9 @@ package com.simprints.id.activities.coreexitform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.eventsystem.event.EventRepository
 
-class CoreExitFormViewModelFactory(private val eventRepository: EventRepository) : ViewModelProvider.Factory {
+class CoreExitFormViewModelFactory(private val eventRepository: com.simprints.eventsystem.event.EventRepository) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

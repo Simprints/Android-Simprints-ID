@@ -1,10 +1,17 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
-import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.domain.*
+import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
+import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper
+import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
+import com.simprints.fingerprint.scanner.domain.BatteryInfo
+import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
@@ -23,25 +30,26 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
-import timber.log.Timber
 import java.io.IOException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerWrapperV2(private val scannerV2: ScannerV2,
-                       private val scannerUiHelper: ScannerUiHelper,
-                       private val macAddress: String,
-                       private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
-                       private val connectionHelper: ConnectionHelper,
-                       private val cypressOtaHelper: CypressOtaHelper,
-                       private val stmOtaHelper: StmOtaHelper,
-                       private val un20OtaHelper: Un20OtaHelper,
-                       private val crashReportManager: FingerprintCrashReportManager) : ScannerWrapper {
+class ScannerWrapperV2(
+    private val scannerV2: com.simprints.fingerprintscanner.v2.scanner.Scanner,
+    private val scannerUiHelper: ScannerUiHelper,
+    private val macAddress: String,
+    private val scannerInitialSetupHelper: ScannerInitialSetupHelper,
+    private val connectionHelper: ConnectionHelper,
+    private val cypressOtaHelper: CypressOtaHelper,
+    private val stmOtaHelper: StmOtaHelper,
+    private val un20OtaHelper: Un20OtaHelper
+) : ScannerWrapper {
 
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
@@ -246,13 +254,12 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     private fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
         is IOException -> { // Disconnected or timed-out communications with Scanner
-            Timber.d(e, "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException")
+            Simber.d(e, "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException")
             ScannerDisconnectedException()
         }
         is IllegalStateException, // We're calling scanner methods out of order somehow
         is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
-            Timber.e(e)
-            crashReportManager.logExceptionOrSafeException(e)
+            Simber.e(e)
             UnexpectedScannerException(e)
         }
         is ScannerV2OtaFailedException -> { // Wrap the OTA failed exception to fingerprint domain exception

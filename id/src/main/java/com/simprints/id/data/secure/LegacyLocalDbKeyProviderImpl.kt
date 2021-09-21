@@ -1,19 +1,22 @@
 package com.simprints.id.data.secure
 
 import android.util.Base64
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 
 @Deprecated("Use SecureLocalDbKeyProviderImpl")
-open class LegacyLocalDbKeyProviderImpl(private val keystoreManager: KeystoreManager,
-                                        private val prefsManager: PreferencesManager)
-    : LegacyLocalDbKeyProvider {
+open class LegacyLocalDbKeyProviderImpl(
+    private val keystoreManager: KeystoreManager,
+    private val prefsManager: PreferencesManager
+) : LegacyLocalDbKeyProvider {
 
     companion object {
         private const val PROJECT_ID_ENC_DATA = "ProjectIdEncData"
         private const val SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER = "realmKey"
-        const val SHARED_PREFS_KEY_FOR_REALM_KEY = "${PROJECT_ID_ENC_DATA}_${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_"
+        const val SHARED_PREFS_KEY_FOR_REALM_KEY =
+            "${PROJECT_ID_ENC_DATA}_${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_"
     }
 
     override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {

@@ -1,13 +1,19 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.consent.longconsent.*
-import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.remote.EventRemoteDataSource
-import com.simprints.id.data.db.event.remote.EventRemoteDataSourceImpl
-import com.simprints.id.data.db.events_sync.EventSyncStatusDatabase
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -30,12 +36,9 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
-import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
@@ -55,11 +58,13 @@ open class DataModule {
     open fun provideProjectLocalDataSource(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        dispatcher: DispatcherProvider
     ): ProjectLocalDataSource = ProjectLocalDataSourceImpl(
         ctx,
         secureLocalDbKeyProvider,
-        loginInfoManager
+        loginInfoManager,
+        dispatcher
     )
 
     @Provides
@@ -73,10 +78,12 @@ open class DataModule {
     @Provides
     open fun provideProjectRepository(
         projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource
+        projectRemoteDataSource: ProjectRemoteDataSource,
+        remoteConfigWrapper: RemoteConfigWrapper
     ): ProjectRepository = ProjectRepositoryImpl(
         projectLocalDataSource,
-        projectRemoteDataSource
+        projectRemoteDataSource,
+        remoteConfigWrapper
     )
 
     @Provides
@@ -93,11 +100,13 @@ open class DataModule {
     open fun providePersonLocalDataSource(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        dispatcher: DispatcherProvider
     ): SubjectLocalDataSource = SubjectLocalDataSourceImpl(
         ctx,
         secureLocalDbKeyProvider,
-        loginInfoManager
+        loginInfoManager,
+        dispatcher
     )
 
     @Provides
@@ -113,8 +122,9 @@ open class DataModule {
     @Provides
     open fun provideImageRepository(
         context: Context,
-        baseUrlProvider: BaseUrlProvider
-    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider)
+        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager
+    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider, remoteDbManager)
 
     @Provides
     open fun provideLongConsentLocalDataSource(
@@ -125,19 +135,18 @@ open class DataModule {
 
     @Provides
     open fun provideLongConsentRemoteDataSource(
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        remoteDbManager: RemoteDbManager
     ): LongConsentRemoteDataSource =
-        LongConsentRemoteDataSourceImpl(loginInfoManager)
+        LongConsentRemoteDataSourceImpl(loginInfoManager, remoteDbManager)
 
     @Provides
     open fun provideLongConsentRepository(
         longConsentLocalDataSource: LongConsentLocalDataSource,
-        longConsentRemoteDataSource: LongConsentRemoteDataSource,
-        crashReportManager: CrashReportManager
+        longConsentRemoteDataSource: LongConsentRemoteDataSource
     ): LongConsentRepository = LongConsentRepositoryImpl(
         longConsentLocalDataSource,
-        longConsentRemoteDataSource,
-        crashReportManager
+        longConsentRemoteDataSource
     )
 
     @Provides
@@ -150,17 +159,17 @@ open class DataModule {
         loginInfoManager: LoginInfoManager,
         eventLocal: EventLocalDataSource,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager,
-        preferencesManager: PreferencesManager,
-        subjectLocal: SubjectLocalDataSource
+        preferencesManager: IdPreferencesManager,
+        subjectLocal: SubjectLocalDataSource,
+        encoder: EncodingUtils
     ): SubjectToEventMigrationManager =
         SubjectToEventDbMigrationManagerImpl(
             loginInfoManager,
             eventLocal,
             timeHelper,
-            crashReportManager,
             preferencesManager,
-            subjectLocal
+            subjectLocal,
+            encoder
         )
 
     @Provides
@@ -176,7 +185,6 @@ open class DataModule {
     @Provides
     open fun provideLicenseRepository(
         licenseLocalDataSource: LicenseLocalDataSource,
-        licenseRemoteDataSource: LicenseRemoteDataSource,
-        crashReportManager: CrashReportManager
+        licenseRemoteDataSource: LicenseRemoteDataSource
     ): LicenseRepository = LicenseRepositoryImpl(licenseLocalDataSource, licenseRemoteDataSource)
 }

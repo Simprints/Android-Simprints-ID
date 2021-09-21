@@ -1,6 +1,6 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.data
 
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 
 class DailyActivityLocalDataSourceImpl(
     private val preferencesManager: RecentEventsPreferencesManager

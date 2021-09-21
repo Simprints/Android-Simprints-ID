@@ -1,22 +1,19 @@
 package com.simprints.id.data.prefs.preferenceType.remoteConfig
 
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.tools.serializers.Serializer
 import java.security.InvalidParameterException
 import kotlin.reflect.KProperty
 
-open class RemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferences,
-                                                  private val remoteConfigWrapper: RemoteConfigWrapper,
-                                                  private val key: String,
-                                                  private val defValue: T,
-                                                  serializer: Serializer<T>)
-    : ComplexPreference<T>(prefs, key, defValue, serializer) {
-
-    init {
-        remoteConfigWrapper.prepareDefaultValue(key, serializedDefValue)
-    }
+open class RemoteConfigComplexPreference<T : Any>(
+    prefs: ImprovedSharedPreferences,
+    private val remoteConfigWrapper: RemoteConfigWrapper,
+    private val key: String,
+    private val defValue: T,
+    serializer: Serializer<T>
+) : ComplexPreference<T>(prefs, key, defValue, serializer) {
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         setSerializedPrefValueToRemoteConfigValue()
@@ -24,7 +21,7 @@ open class RemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferenc
     }
 
     private fun setSerializedPrefValueToRemoteConfigValue() {
-        serializedValue = remoteConfigWrapper.getString(key)?: serializedDefValue
+        serializedValue = remoteConfigWrapper.getString(key) ?: serializedDefValue
     }
 
     protected fun getAndDeserializePrefValue(thisRef: Any?, property: KProperty<*>): T =

@@ -14,8 +14,8 @@ import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchResult
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 object DomainToFingerprintResponse {
 

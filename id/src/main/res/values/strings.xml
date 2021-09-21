@@ -89,8 +89,10 @@
     <!-- Screen Text -->
     <!-- Loading text -->
     <string name="test_loaded_candidates_quantity_key" translatable="false">test_loaded_candidates</string>
-    <string name="test_loaded_candidates_one">Loaded %d candidate.</string>
-    <string name="test_loaded_candidates_other">Loaded %d candidates.</string>
+    <plurals name="test_loaded_candidates">
+        <item quantity="one">Loaded %d candidate.</item>
+        <item quantity="other">Loaded %d candidates.</item>
+    </plurals>
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->

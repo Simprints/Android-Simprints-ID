@@ -11,27 +11,28 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.extentions.getStringPlural
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
+import com.simprints.face.databinding.ActivityFaceMatchBinding
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchViewModel.MatchState.*
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import kotlinx.android.synthetic.main.activity_face_match.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 class FaceMatchActivity : FaceActivity() {
     private val vm: FaceMatchViewModel by viewModel()
+    private val binding by viewBinding(ActivityFaceMatchBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_face_match)
+        setContentView(binding.root)
+
         setTextInLayout()
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val faceRequest: FaceMatchRequest =
             this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
@@ -42,7 +43,7 @@ class FaceMatchActivity : FaceActivity() {
     }
 
     private fun setTextInLayout() {
-        face_match_please_wait.text =
+        binding.faceMatchPleaseWait.text =
             getString(R.string.face_match_please_wait)
     }
 
@@ -50,9 +51,9 @@ class FaceMatchActivity : FaceActivity() {
         runOnUiThread {
             ObjectAnimator
                 .ofInt(
-                    face_match_progress,
+                    binding.faceMatchProgress,
                     "progress",
-                    face_match_progress.progress,
+                    binding.faceMatchProgress.progress,
                     progress
                 )
                 .setDuration((progress * 10).toLong())
@@ -78,66 +79,71 @@ class FaceMatchActivity : FaceActivity() {
     }
 
     private fun renderNotStarted() {
-        face_match_tv_matchingProgressStatus1.isGone = true
-        face_match_tv_matchingProgressStatus2.isGone = true
-        face_match_progress.isGone = true
-        face_match_tv_matchingResultStatus1.isGone = true
-        face_match_tv_matchingResultStatus2.isGone = true
-        face_match_tv_matchingResultStatus3.isGone = true
+        binding.apply {
+            faceMatchTvMatchingProgressStatus1.isGone = true
+            faceMatchTvMatchingProgressStatus2.isGone = true
+            faceMatchProgress.isGone = true
+            faceMatchTvMatchingResultStatus1.isGone = true
+            faceMatchTvMatchingResultStatus2.isGone = true
+            faceMatchTvMatchingResultStatus3.isGone = true
+        }
     }
 
     private fun renderLoadingCandidates() {
-        face_match_tv_matchingProgressStatus1.isVisible = true
-        face_match_tv_matchingProgressStatus1.text =
-            getString(R.string.face_match_loading_candidates)
+        binding.apply {
+            faceMatchTvMatchingProgressStatus1.isVisible = true
+            faceMatchTvMatchingProgressStatus1.text =
+                getString(R.string.face_match_loading_candidates)
 
-        face_match_progress.isVisible = true
+            faceMatchProgress.isVisible = true
+        }
+
         setIdentificationProgress(25)
     }
 
     private fun renderMatching() {
-        face_match_tv_matchingProgressStatus1.text =
+        binding.faceMatchTvMatchingProgressStatus1.text =
             getString(R.string.face_match_matching_candidates)
 
         setIdentificationProgress(50)
     }
 
     private fun renderFinished(matchState: Finished) {
-        face_match_tv_matchingProgressStatus1.text = getStringPlural(
-            R.string.face_match_matched_candidates_quantity_key,
+        binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
+            R.plurals.face_match_matched_candidates,
             matchState.candidatesMatched,
-            arrayOf(matchState.candidatesMatched)
+            matchState.candidatesMatched
         )
 
-        face_match_tv_matchingProgressStatus2.isVisible = true
-        face_match_tv_matchingProgressStatus2.text = getStringPlural(
-            R.string.face_match_returned_results_quantity_key,
+        binding.faceMatchTvMatchingProgressStatus2.isVisible = true
+        binding.faceMatchTvMatchingProgressStatus2.text = resources.getQuantityString(
+            R.plurals.face_match_returned_results,
             matchState.returnSize,
-            arrayOf(matchState.returnSize)
+            matchState.returnSize
         )
 
         if (matchState.veryGoodMatches > 0) {
-            face_match_tv_matchingResultStatus1.isVisible = true
-            face_match_tv_matchingResultStatus1.text = getStringPlural(
-                R.string.face_match_tier1or2_matches_quantity_key,
+            binding.faceMatchTvMatchingResultStatus1.isVisible = true
+            binding.faceMatchTvMatchingResultStatus1.text = resources.getQuantityString(
+                R.plurals.face_match_tier1or2_matches,
                 matchState.veryGoodMatches,
-                arrayOf(matchState.veryGoodMatches)
+                matchState.veryGoodMatches
             )
         }
         if (matchState.goodMatches > 0) {
-            face_match_tv_matchingResultStatus2.isVisible = true
-            face_match_tv_matchingResultStatus2.text = getStringPlural(
-                R.string.face_match_tier3_matches_quantity_key,
+            binding.faceMatchTvMatchingResultStatus2.isVisible = true
+            binding.faceMatchTvMatchingResultStatus2.text = resources.getQuantityString(
+                R.plurals.face_match_tier3_matches,
                 matchState.goodMatches,
-                arrayOf(matchState.goodMatches)
+                matchState.goodMatches
             )
         }
         if (matchState.veryGoodMatches < 1 && matchState.goodMatches < 1 || matchState.fairMatches > 1) {
-            face_match_tv_matchingResultStatus3.isVisible = true
-            face_match_tv_matchingResultStatus3.text = getStringPlural(
-                R.string.face_match_tier4_matches_quantity_key,
+            binding.faceMatchTvMatchingResultStatus3.isVisible = true
+            binding.faceMatchTvMatchingResultStatus3.text = resources.getQuantityString(
+                R.plurals.face_match_tier4_matches,
                 matchState.fairMatches,
-                arrayOf(matchState.fairMatches)
+                matchState.fairMatches
             )
         }
 

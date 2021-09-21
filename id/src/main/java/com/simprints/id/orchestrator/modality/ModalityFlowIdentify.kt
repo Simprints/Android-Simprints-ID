@@ -1,10 +1,10 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -20,14 +20,13 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.tools.time.TimeHelper
 
 class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                                private val faceStepProcessor: FaceStepProcessor,
                                private val coreStepProcessor: CoreStepProcessor,
                                private val matchGroup: GROUP,
                                timeHelper: TimeHelper,
-                               eventRepository: EventRepository,
+                               eventRepository: com.simprints.eventsystem.event.EventRepository,
                                consentRequired: Boolean,
                                locationRequired: Boolean,
                                private val modalities: List<Modality>,

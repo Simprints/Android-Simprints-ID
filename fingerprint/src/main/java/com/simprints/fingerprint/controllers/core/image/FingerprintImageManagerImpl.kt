@@ -1,25 +1,25 @@
 package com.simprints.fingerprint.controllers.core.image
 
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.id.data.images.repository.ImageRepository
-import timber.log.Timber
+import com.simprints.logging.Simber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
-                                  private val coreEventRepository: EventRepository) : FingerprintImageManager {
+                                  private val coreEventRepository: com.simprints.eventsystem.event.EventRepository
+) : FingerprintImageManager {
 
     override suspend fun save(imageBytes: ByteArray, captureEventId: String, fileExtension: String): FingerprintImageRef? =
         determinePath(captureEventId, fileExtension)?.let { path ->
-            Timber.d("Saving fingerprint image ${path.compose()}")
+            Simber.d("Saving fingerprint image ${path.compose()}")
             val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
 
             return if (securedImageRef != null) {
                 FingerprintImageRef(securedImageRef.relativePath.toDomain())
             } else {
-                Timber.e("Saving image failed for captureId $captureEventId")
+                Simber.e("Saving image failed for captureId $captureEventId")
                 null
             }
         }
@@ -34,7 +34,7 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
                 PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"
             ))
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             null
         }
 

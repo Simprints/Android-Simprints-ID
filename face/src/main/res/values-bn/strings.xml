@@ -30,20 +30,40 @@
     <string name="matching_x_records">%s রেকর্ড এর সাথে মিলানো হচ্ছে</string>
     <string name="face_match_please_wait">"আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন  "</string>
     <string name="face_match_loading_candidates">"অংশগ্রহণকারীদের তথ্য লোড হচ্ছে "</string>
+
+
+
     <string name="face_match_matching_candidates">অংশগ্রহণকারীদের তথ্য মিলানো হচ্ছে</string>
-    <string name="face_match_matched_candidates_one">%d অংশগ্রহণকারীর সাথে মিলানো হয়েছে</string>
-    <string name="face_match_matched_candidates_other">%d অংশগ্রহণকারীর সাথে মিলানো হয়েছে</string>
-    <string name="face_match_returned_results_one">%d রেজাল্ট ফেরত</string>
-    <string name="face_match_returned_results_other">%d রেজাল্ট ফেরত</string>
-    <string name="face_match_tier1or2_matches_zero">খুব ভালো মিল পাওয়া যায়নি</string>
-    <string name="face_match_tier1or2_matches_one">%d খুব ভালো মিল</string>
-    <string name="face_match_tier1or2_matches_other">%d খুব ভালো মিল</string>
-    <string name="face_match_tier3_matches_zero">ভালো মিল পাওয়া যায়নি</string>
-    <string name="face_match_tier3_matches_one">%d ভালো মিল</string>
-    <string name="face_match_tier3_matches_other">%d ভালো মিল</string>
-    <string name="face_match_tier4_matches_zero">কোন মিল পাওয়া যায়নি</string>
-    <string name="face_match_tier4_matches_one">%d মিল</string>
-    <string name="face_match_tier4_matches_other">%d মিল</string>
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">%d অংশগ্রহণকারীর সাথে মিলানো হয়েছে</item>
+        <item quantity="other">%d অংশগ্রহণকারীর সাথে মিলানো হয়েছে</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">%d রেজাল্ট ফেরত</item>
+        <item quantity="other">%d রেজাল্ট ফেরত</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">খুব ভালো মিল পাওয়া যায়নি</item>
+        <item quantity="one">%d খুব ভালো মিল</item>
+        <item quantity="other">%d খুব ভালো মিল</item>
+    </plurals>
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">ভালো মিল পাওয়া যায়নি</item>
+        <item quantity="one">%d ভালো মিল</item>
+        <item quantity="other">%d ভালো মিল</item>
+    </plurals>
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">কোন মিল পাওয়া যায়নি</item>
+        <item quantity="one">%d মিল</item>
+        <item quantity="other">%d মিল</item>
+    </plurals>
+
+
+
     <string name="error_licence_invalid_title">অবৈধ লাইসেন্স</string>
     <string name="error_licence_invalid_message">মুুখের লাইসেন্স অবৈধ, আপনার সুপেরভাইসার এর সাথে যোগাযোগ করুন</string>
     <string name="error_licence_invalid_button">বন্ধ করুন</string>

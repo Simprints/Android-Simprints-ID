@@ -1,5 +1,6 @@
 package com.simprints.id.tools.extensions
 
+import com.simprints.core.tools.extentions.fromLowerCamelToLowerUnderscore
 import org.junit.Assert
 import org.junit.Test
 

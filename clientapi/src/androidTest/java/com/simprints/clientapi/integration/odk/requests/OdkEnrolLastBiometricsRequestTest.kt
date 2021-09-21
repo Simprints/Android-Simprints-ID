@@ -20,7 +20,8 @@ import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.mock.declareModule
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class OdkEnrolLastBiometricsRequestTest : BaseOdkClientApiTest() {
@@ -37,9 +38,9 @@ class OdkEnrolLastBiometricsRequestTest : BaseOdkClientApiTest() {
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns sessionIdField.value()
 
-        declareModule {
+        loadKoinModules(module(override = true) {
             factory { clientApiSessionEventsManager }
-        }
+        })
     }
 
     @Test

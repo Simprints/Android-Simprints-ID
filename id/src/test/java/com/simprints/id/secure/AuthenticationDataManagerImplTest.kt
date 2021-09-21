@@ -2,12 +2,12 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.models.AuthenticationData
@@ -15,6 +15,8 @@ import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -22,7 +24,9 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
@@ -33,12 +37,6 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
 
-    companion object {
-        private const val PROJECT_ID = "projectId"
-        private const val USER_ID = "userId"
-        private const val DEVICE_ID = "deviceId"
-    }
-
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
@@ -48,9 +46,14 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
     @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
     @MockK lateinit var mockRemoteDbManager: RemoteDbManager
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
     private val validateUrl: (url: String) -> Unit = {
         assertThat(it).isEqualTo(expectedUrl)
     }
+
 
     private lateinit var apiClient: SimApiClientImpl<SecureApiInterface>
 
@@ -61,7 +64,8 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         coEvery { mockRemoteDbManager.getCurrentToken() } returns "token"
         runBlocking {
-            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(), JsonHelper).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
+            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(), JsonHelper,
+                testDispatcherProvider, HttpLoggingInterceptor()).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
         }
     }
 
@@ -95,4 +99,10 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
         return authenticationDataManagerSpy.requestAuthenticationData(PROJECT_ID, USER_ID)
     }
 
+
+    companion object {
+        private const val PROJECT_ID = "projectId"
+        private const val USER_ID = "userId"
+        private const val DEVICE_ID = "deviceId"
+    }
 }

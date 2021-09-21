@@ -3,13 +3,12 @@ package com.simprints.id.activities.consent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.mockk
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -51,7 +50,6 @@ class GeneralConsentTextHelperTest {
             PROGRAM_NAME,
             ORGANIZATION_NAME,
             listOf(Modality.FINGER),
-            mockk(),
             JsonHelper
         )
 
@@ -72,7 +70,6 @@ class GeneralConsentTextHelperTest {
             PROGRAM_NAME,
             ORGANIZATION_NAME,
             listOf(Modality.FACE),
-            mockk(),
             JsonHelper
         )
 
@@ -95,7 +92,6 @@ class GeneralConsentTextHelperTest {
             PROGRAM_NAME,
             ORGANIZATION_NAME,
             listOf(Modality.FINGER, Modality.FACE),
-            mockk(),
             JsonHelper
         )
 

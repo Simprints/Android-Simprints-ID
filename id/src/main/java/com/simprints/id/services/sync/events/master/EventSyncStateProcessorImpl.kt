@@ -22,7 +22,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.C
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class EventSyncStateProcessorImpl(val ctx: Context,
                                   private val eventSyncCache: EventSyncCache,
@@ -41,7 +41,7 @@ class EventSyncStateProcessorImpl(val ctx: Context,
 
                         val syncState = EventSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
-                        Timber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
+                        Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
                     }
                 }
             }
@@ -50,7 +50,7 @@ class EventSyncStateProcessorImpl(val ctx: Context,
 
     private fun observerForLastSyncId(): LiveData<String> {
         return syncWorkersLiveDataProvider.getStartSyncReportersLiveData().switchMap { startSyncReporters ->
-            Timber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received updated from Master Scheduler")
+            Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received updated from Master Scheduler")
 
             val completedSyncMaster = startSyncReporters.completedWorkers()
             val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
@@ -59,7 +59,7 @@ class EventSyncStateProcessorImpl(val ctx: Context,
                 if (mostRecentSyncMaster != null) {
                     val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
                     if (!lastSyncId.isNullOrBlank()) {
-                        Timber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received sync id: $lastSyncId")
+                        Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received sync id: $lastSyncId")
                         this.postValue(lastSyncId)
                     }
                 }

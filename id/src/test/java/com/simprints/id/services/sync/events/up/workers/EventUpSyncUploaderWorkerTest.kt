@@ -1,8 +1,8 @@
 package com.simprints.id.services.sync.events.up.workers
 
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope
 import com.google.common.truth.Truth.assertThat
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import org.junit.Test
 
 class EventUpSyncUploaderWorkerTest {

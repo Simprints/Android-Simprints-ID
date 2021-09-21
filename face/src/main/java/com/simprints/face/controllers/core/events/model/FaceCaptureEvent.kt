@@ -1,13 +1,13 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.models.FaceDetection
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
 import com.simprints.face.detection.Face as DetectionFace
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
 
 @Keep
 class FaceCaptureEvent(
@@ -48,7 +48,7 @@ class FaceCaptureEvent(
                         it.yaw,
                         it.roll,
                         it.quality,
-                        EncodingUtils.byteArrayToBase64(it.template),
+                        EncodingUtilsImpl.byteArrayToBase64(it.template),
                         it.format.fromDomainToCore()
                     )
                 }

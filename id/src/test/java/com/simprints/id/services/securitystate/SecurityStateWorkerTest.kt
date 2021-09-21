@@ -7,12 +7,14 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -25,12 +27,17 @@ class SecurityStateWorkerTest {
 
     private lateinit var worker: SecurityStateWorker
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
+
     @Before
     fun setUp() {
         worker = TestListenableWorkerBuilder<SecurityStateWorker>(app).build().apply {
             repository = mockk()
             securityStateProcessor = mockk()
-            crashReportManager = mockk(relaxed = true)
+            dispatcher = testDispatcherProvider
         }
         app.component = mockk(relaxed = true)
     }
@@ -55,21 +62,12 @@ class SecurityStateWorkerTest {
     }
 
     @Test
-    fun whenAnExceptionIsThrown_shouldStillSucceed() = runBlocking {
+    fun whenAnExceptionIsThrown_shouldFail() = runBlocking {
         mockException()
 
         val result = worker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.success())
-    }
-
-    @Test
-    fun whenAnExceptionIsThrown_shouldLogToCrashReport() = runBlocking {
-        mockException()
-
-        worker.doWork()
-
-        verify { worker.crashReportManager.logExceptionOrSafeException(any()) }
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
     private fun mockSuccess() {

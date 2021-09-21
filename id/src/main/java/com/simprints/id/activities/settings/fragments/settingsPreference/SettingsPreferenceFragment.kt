@@ -7,13 +7,12 @@ import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.simprints.core.tools.extentions.getStringArray
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.Modality
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
@@ -22,7 +21,7 @@ import javax.inject.Inject
  class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
      @Inject
-     lateinit var preferencesManager: PreferencesManager
+     lateinit var preferencesManager: IdPreferencesManager
 
      @Inject
      lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
@@ -115,8 +114,8 @@ import javax.inject.Inject
     }
 
     private fun getLanguageCodeAndNamePairs(): Map<String, String> {
-        val languageCodes = requireActivity().getStringArray(R.array.language_values)
-        val languageNames = requireActivity().getStringArray(R.array.language_array)
+        val languageCodes = requireActivity().resources.getStringArray(R.array.language_values)
+        val languageNames = requireActivity().resources.getStringArray(R.array.language_array)
         return languageCodes.zip(languageNames).toMap()
     }
 

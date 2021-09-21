@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.databinding.ActivityFingerSelectionBinding
@@ -28,28 +29,34 @@ class FingerSelectionActivity : BaseSplitActivity() {
     @Inject
     lateinit var viewModelFactory: FingerSelectionViewModelFactory
     private lateinit var viewModel: FingerSelectionViewModel
-    private lateinit var binding: ActivityFingerSelectionBinding
+    private val binding by viewBinding(ActivityFingerSelectionBinding::inflate)
 
     private lateinit var fingerSelectionAdapter: FingerSelectionItemAdapter
 
     private val itemTouchHelper = ItemTouchHelper(
         object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
 
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?,
-                                           actionState: Int) {
+            override fun onSelectedChanged(
+                viewHolder: RecyclerView.ViewHolder?,
+                actionState: Int
+            ) {
                 super.onSelectedChanged(viewHolder, actionState)
                 if (actionState == ACTION_STATE_DRAG) viewHolder?.itemView?.alpha = 0.5f
             }
 
-            override fun clearView(recyclerView: RecyclerView,
-                                   viewHolder: RecyclerView.ViewHolder) {
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
                 super.clearView(recyclerView, viewHolder)
                 viewHolder.itemView.alpha = 1.0f
             }
 
-            override fun onMove(recyclerView: RecyclerView,
-                                viewHolder: RecyclerView.ViewHolder,
-                                target: RecyclerView.ViewHolder): Boolean {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
                 viewModel.moveItem(from, to)
@@ -62,15 +69,26 @@ class FingerSelectionActivity : BaseSplitActivity() {
         }
     )
 
+    private val settingsSaveConfirmationDialog =
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
+            .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
+                viewModel.savePreference()
+                super.onBackPressed()
+            }
+            .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
+            .setCancelable(false)
+            .create()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
-        binding = ActivityFingerSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         configureToolbar()
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(FingerSelectionViewModel::class.java)
+        viewModel =
+            ViewModelProvider(this, viewModelFactory).get(FingerSelectionViewModel::class.java)
 
         initTextInLayout()
         initRecyclerView()
@@ -121,7 +139,8 @@ class FingerSelectionActivity : BaseSplitActivity() {
             fingerSelectionAdapter.notifyDataSetChanged()
             if (it.size >= MAXIMUM_NUMBER_OF_ITEMS) {
                 binding.addFingerButton.isEnabled = false
-                binding.addFingerButton.background.colorFilter = PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
+                binding.addFingerButton.background.colorFilter =
+                    PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.LIGHTEN)
             } else {
                 binding.addFingerButton.isEnabled = true
                 binding.addFingerButton.background.colorFilter = null
@@ -140,7 +159,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
     override fun onBackPressed() {
         if (viewModel.haveSettingsChanged()) {
             if (viewModel.canSavePreference()) {
-                createAndShowConfirmationDialog()
+                settingsSaveConfirmationDialog.show()
             } else {
                 showToast(R.string.finger_selection_invalid)
             }
@@ -149,20 +168,14 @@ class FingerSelectionActivity : BaseSplitActivity() {
         }
     }
 
-    private fun createAndShowConfirmationDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
-            .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
-                viewModel.savePreference()
-                super.onBackPressed()
-            }
-            .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
-            .setCancelable(false)
-            .create()
-            .show()
-    }
-
     companion object {
         private const val MAXIMUM_NUMBER_OF_ITEMS = 10
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (settingsSaveConfirmationDialog.isShowing) {
+            settingsSaveConfirmationDialog.dismiss()
+        }
     }
 }

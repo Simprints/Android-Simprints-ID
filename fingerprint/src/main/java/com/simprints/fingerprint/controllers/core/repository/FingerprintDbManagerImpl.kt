@@ -1,9 +1,10 @@
 package com.simprints.fingerprint.controllers.core.repository
 
+import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.id.data.db.subject.domain.FingerprintSample
+import com.simprints.fingerprint.data.domain.fingerprint.fromModuleApiToDomain
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,7 +22,7 @@ class FingerprintDbManagerImpl(private val coreFingerprintIdentityLocalDataSourc
 }
 
 fun FingerprintSample.fromCoreToDomain() =
-    Fingerprint(fingerIdentifier.fromCoreToDomain(), template)
+    Fingerprint(fingerIdentifier.fromModuleApiToDomain(), template)
 
 fun FingerIdentifierCore.fromCoreToDomain(): FingerIdentifier =
     when (this) {

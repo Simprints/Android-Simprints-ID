@@ -9,7 +9,7 @@
     android:orientation="vertical"
     tools:context="com.simprints.fingerprint.activities.connect.ConnectScannerActivity">
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
@@ -20,6 +20,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/connect_scanner_nav_graph"
-        tools:ignore="FragmentTagUsage" />
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
