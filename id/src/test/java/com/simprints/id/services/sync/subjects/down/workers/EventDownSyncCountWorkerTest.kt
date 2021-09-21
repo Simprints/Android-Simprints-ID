@@ -20,6 +20,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -46,16 +47,7 @@ class EventDownSyncCountWorkerTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setUp() {
