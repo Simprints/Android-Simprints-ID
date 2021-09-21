@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.requests
 
 import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 
 data class ConfirmIdentityRequest(

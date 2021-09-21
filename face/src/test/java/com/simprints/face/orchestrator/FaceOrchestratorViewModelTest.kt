@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator.generateFaceMatchResults
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
@@ -13,7 +12,11 @@ import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
-import com.simprints.moduleapi.face.responses.*
+import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
+import com.simprints.moduleapi.face.responses.IFaceConfigurationResponse
+import com.simprints.moduleapi.face.responses.IFaceErrorReason
+import com.simprints.moduleapi.face.responses.IFaceErrorResponse
+import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
@@ -21,11 +24,10 @@ import io.mockk.mockk
 import io.mockk.spyk
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class FaceOrchestratorViewModelTest {
-    private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
-    private val viewModel = spyk(FaceOrchestratorViewModel(faceCrashReportManager))
+    private val viewModel = spyk(FaceOrchestratorViewModel())
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

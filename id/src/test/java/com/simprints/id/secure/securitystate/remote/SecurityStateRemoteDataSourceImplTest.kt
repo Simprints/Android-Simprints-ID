@@ -4,23 +4,23 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
+import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import retrofit2.HttpException
 
@@ -32,6 +32,10 @@ class SecurityStateRemoteDataSourceImplTest {
     private lateinit var remoteDataSource: SecurityStateRemoteDataSourceImpl
 
     private val mockWebServer = MockWebServer()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setUp() {
@@ -50,7 +54,9 @@ class SecurityStateRemoteDataSourceImplTest {
             VERSION_NAME,
             randomUUID(),
             mockk(),
-            JsonHelper
+            JsonHelper,
+            testDispatcherProvider,
+            HttpLoggingInterceptor()
         )
 
         every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID

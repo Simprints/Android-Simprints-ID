@@ -44,7 +44,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.simprints.uicomponents.widgets.DashedCircularProgress
+    <com.simprints.face.widgets.DashedCircularProgress
         android:id="@+id/capture_progress"
         android:layout_width="242dp"
         android:layout_height="242dp"
@@ -84,6 +84,7 @@
         android:textAllCaps="true"
         android:textColor="@color/feedback_chip_text"
         android:textSize="16sp"
+        android:fontFamily="@font/muli_semibold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/capture_guide_frame" />

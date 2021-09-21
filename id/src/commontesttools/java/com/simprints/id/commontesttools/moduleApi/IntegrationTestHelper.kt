@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools.moduleApi
 
 import com.simprints.moduleapi.app.requests.*
 import com.simprints.moduleapi.app.responses.*
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 internal data class AppConfirmationResponse(

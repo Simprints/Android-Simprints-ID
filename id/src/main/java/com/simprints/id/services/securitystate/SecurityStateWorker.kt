@@ -2,38 +2,38 @@ package com.simprints.id.services.securitystate
 
 import android.content.Context
 import androidx.work.WorkerParameters
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 class SecurityStateWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : SimCoroutineWorker(context, workerParams) {
 
     override val tag: String = SecurityStateWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var repository: SecurityStateRepository
     @Inject lateinit var securityStateProcessor: SecurityStateProcessor
+    @Inject lateinit var dispatcher: DispatcherProvider
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+    override suspend fun doWork(): Result {
         (applicationContext as Application).component.inject(this@SecurityStateWorker)
-        crashlyticsLog("Fetching security state")
 
-        try {
-            val securityState = repository.getSecurityState()
-            securityStateProcessor.processSecurityState(securityState)
-            success()
-        } catch (t: Throwable) {
-            crashReportManager.logExceptionOrSafeException(t)
-            success()
+        return withContext(dispatcher.io()) {
+            crashlyticsLog("Fetching security state")
+
+            try {
+                val securityState = repository.getSecurityState()
+                securityStateProcessor.processSecurityState(securityState)
+                success()
+            } catch (t: Throwable) {
+                fail(t)
+            }
         }
     }
 

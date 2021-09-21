@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.core.requests
 
-import com.simprints.id.domain.modality.Modality
-import kotlinx.android.parcel.Parcelize
+import com.simprints.core.domain.modality.Modality
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class SetupRequest(val modalitiesRequired: List<Modality>,

@@ -14,7 +14,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.mock.declareModule
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class CommCareActivityTest : BaseClientApiTest() {
@@ -26,9 +27,9 @@ class CommCareActivityTest : BaseClientApiTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        declareModule {
+        loadKoinModules(module(override = true) {
             factory { (context: Context) -> mockk<CommCareGuidSelectionNotifier>(relaxed = true) }
-        }
+        })
         rule.launchActivity(buildIntent())
     }
 

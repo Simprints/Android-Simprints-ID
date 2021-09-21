@@ -1,7 +1,7 @@
 package com.simprints.id.exitformhandler
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 open class ExitFormResult(val type: ExitFormType): Parcelable {

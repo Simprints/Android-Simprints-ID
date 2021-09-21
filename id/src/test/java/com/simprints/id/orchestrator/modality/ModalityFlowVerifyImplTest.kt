@@ -1,10 +1,11 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.FACE
-import com.simprints.id.domain.modality.Modality.FINGER
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality.FACE
+import com.simprints.core.domain.modality.Modality.FINGER
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
@@ -13,8 +14,6 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.verifyAppRequest
-import com.simprints.id.tools.time.TimeHelper
-import com.simprints.id.commontesttools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -39,7 +38,7 @@ class ModalityFlowVerifyImplTest {
     @MockK private lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @MockK lateinit var faceStepProcessor: FaceStepProcessor
     @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var eventRepository: EventRepository
+    @MockK lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
     @MockK lateinit var fingerprintStepMock: Step
     @MockK lateinit var faceStepMock: Step
     @MockK lateinit var verifyCoreStepMock: Step

@@ -2,19 +2,33 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.MEDIUM
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.NONE
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,18 +38,19 @@ class OdkPresenter(
     private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
+    sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
-    view,
-    sessionEventsManager,
-    deviceManager,
-    crashReportManager
+    view = view,
+    eventsManager = sessionEventsManager,
+    deviceManager = deviceManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
 ), OdkContract.Presenter {
 
     override suspend fun start() {
         if (action !is OdkActionFollowUpAction) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+            Simber.tag(SESSION_ID, true).i(sessionId)
         }
 
         runIfDeviceIsNotRooted {
@@ -57,7 +72,13 @@ class OdkPresenter(
 
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
+
+            // There is a bug that creates a malformed session on multiple callouts
+            // of EnrolLastBiometrics, this tries to fix that, here is a ticket detailing the issue:
+            // https://simprints.atlassian.net/browse/CORE-612
+            if (action != EnrolLastBiometrics) {
+                sessionEventsManager.closeCurrentSessionNormally()
+            }
 
             view.returnRegistration(enrol.guid, currentSessionId, flowCompletedCheck)
         }
@@ -86,7 +107,6 @@ class OdkPresenter(
 
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnConfirmation(flowCompletedCheck, currentSessionId)
         }

@@ -1,11 +1,13 @@
 package com.simprints.id.data.db.subject.domain
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.subject.*
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.subject.*
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.core.tools.utils.EncodingUtils
 
 interface SubjectFactory {
 
@@ -48,10 +50,10 @@ class SubjectFactoryImpl(private val encodingUtils: EncodingUtils) : SubjectFact
         format: FingerprintTemplateFormat
     ): FingerprintSample {
         return FingerprintSample(
-            template.finger.fromEventToPerson(),
+            template.finger,
             encodingUtils.base64ToBytes(template.template),
             template.quality,
-            format
+            format.fromDomainToModuleApi()
         )
     }
 
@@ -62,5 +64,5 @@ class SubjectFactoryImpl(private val encodingUtils: EncodingUtils) : SubjectFact
             ?: emptyList()
 
     private fun buildFaceSample(template: FaceTemplate, format: FaceTemplateFormat) =
-        FaceSample(encodingUtils.base64ToBytes(template.template), format)
+        FaceSample(encodingUtils.base64ToBytes(template.template), format.fromDomainToModuleApi())
 }

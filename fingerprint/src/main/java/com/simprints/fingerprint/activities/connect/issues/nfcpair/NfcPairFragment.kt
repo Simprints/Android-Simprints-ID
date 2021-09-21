@@ -11,6 +11,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -20,13 +21,13 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.databinding.FragmentNfcPairBinding
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
-import kotlinx.android.synthetic.main.fragment_nfc_pair.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -38,6 +39,7 @@ class NfcPairFragment : FingerprintFragment() {
 
     private val viewModel: NfcPairViewModel by viewModel()
     private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    private val binding by viewBinding(FragmentNfcPairBinding::bind)
 
     private val nfcManager: NfcManager by inject()
     private val scannerPairingManager: ScannerPairingManager by inject()
@@ -68,30 +70,30 @@ class NfcPairFragment : FingerprintFragment() {
 
         setupScannerPhoneTappingAnimation()
 
-        couldNotPairTextView.paintFlags = couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
+        binding.couldNotPairTextView.paintFlags = binding.couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        binding.couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
 
         viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(getString(it)) }
         viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith { handleAwaitingPair(it) }
     }
 
     private fun setTextInLayout() {
-        couldNotPairTextView.text = getString(R.string.cannot_connect_devices)
-        tryAgainButton.text = getString(R.string.try_again_label)
-        nfcPairInstructionsTextView.text = getString(R.string.nfc_pair_instructions)
-        nfcPairTitleTextView.text = getString(R.string.nfc_pair_title)
+        binding.couldNotPairTextView.text = getString(R.string.cannot_connect_devices)
+        binding.tryAgainButton.text = getString(R.string.try_again_label)
+        binding.nfcPairInstructionsTextView.text = getString(R.string.nfc_pair_instructions)
+        binding.nfcPairTitleTextView.text = getString(R.string.nfc_pair_title)
     }
 
     private fun setupScannerPhoneTappingAnimation() {
         AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_scanner).also { scannerAnimation ->
             scannerAnimation.repeatMode = Animation.REVERSE
             scannerAnimation.repeatCount = Animation.INFINITE
-            nfcPairScannerImageView.startAnimation(scannerAnimation)
+            binding.nfcPairScannerImageView.startAnimation(scannerAnimation)
         }
         AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_phone).also { phoneAnimation ->
             phoneAnimation.repeatMode = Animation.REVERSE
             phoneAnimation.repeatCount = Animation.INFINITE
-            nfcPairPhoneImageView.startAnimation(phoneAnimation)
+            binding.nfcPairPhoneImageView.startAnimation(phoneAnimation)
         }
     }
 
@@ -130,11 +132,14 @@ class NfcPairFragment : FingerprintFragment() {
     }
 
     private fun handleAwaitingPair(macAddress: String) {
-        tryAgainButton.visibility = View.INVISIBLE
-        couldNotPairTextView.visibility = View.GONE
-        nfcPairingProgressBar.visibility = View.VISIBLE
-        nfcPairInstructionsTextView.text = String.format(getString(R.string.nfc_pairing_in_progress),
-            serialNumberConverter.convertMacAddressToSerialNumber(macAddress))
+        binding.apply {
+            tryAgainButton.visibility = View.INVISIBLE
+            couldNotPairTextView.visibility = View.GONE
+            nfcPairingProgressBar.visibility = View.VISIBLE
+            nfcPairInstructionsTextView.text = String.format(getString(R.string.nfc_pairing_in_progress),
+                serialNumberConverter.convertMacAddressToSerialNumber(macAddress))
+        }
+
         handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
     }
 
@@ -151,12 +156,15 @@ class NfcPairFragment : FingerprintFragment() {
     private fun handlePairingAttemptFailed() {
         handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
-            couldNotPairTextView.visibility = View.GONE
-            nfcPairingProgressBar.visibility = View.INVISIBLE
-            tryAgainButton.visibility = View.VISIBLE
-            nfcPairInstructionsTextView.text = String.format(requireActivity().getString(R.string.nfc_pairing_try_again_instruction),
-                arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
-            tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
+
+            binding.apply {
+                couldNotPairTextView.visibility = View.GONE
+                nfcPairingProgressBar.visibility = View.INVISIBLE
+                tryAgainButton.visibility = View.VISIBLE
+                nfcPairInstructionsTextView.text = String.format(requireActivity().getString(R.string.nfc_pairing_try_again_instruction),
+                    arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())))
+                tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent.longconsent
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

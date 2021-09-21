@@ -3,13 +3,16 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.commontesttools.time.MockTimer
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
-import com.simprints.fingerprint.scanner.domain.ota.*
+import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
@@ -38,7 +41,6 @@ class OtaViewModelTest {
 
     private val firmwareLocalDataSource: FirmwareLocalDataSource = mockk()
     private val sessionEventsManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val crashReportManagerMock: FingerprintCrashReportManager = mockk(relaxed = true)
     private val mockTimer = MockTimer()
     private val timeHelperMock: FingerprintTimeHelper = mockk(relaxed = true) {
         every { newTimer() } returns mockTimer
@@ -48,7 +50,12 @@ class OtaViewModelTest {
         it.scanner = scannerMock
     }
 
-    private val otaViewModel = OtaViewModel(scannerManager, firmwareLocalDataSource, sessionEventsManagerMock, crashReportManagerMock, timeHelperMock)
+    private val otaViewModel = OtaViewModel(
+        scannerManager,
+        firmwareLocalDataSource,
+        sessionEventsManagerMock,
+        timeHelperMock
+    )
 
     @Before
     fun setup() {
@@ -116,8 +123,6 @@ class OtaViewModelTest {
         assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
         assertThat(capturedEvents[1].failureReason).isNotEmpty()
 
-        verify { crashReportManagerMock.logExceptionOrSafeException(ofType<OtaFailedException>()) }
-
         otaViewModel.otaRecovery.assertEventReceivedWithContentAssertions {
             assertThat(it.recoveryStrategy).isEqualTo(OtaRecoveryStrategy.HARD_RESET)
             assertThat(it.remainingOtas).isEqualTo(listOf(AvailableOta.STM, AvailableOta.UN20))
@@ -137,8 +142,6 @@ class OtaViewModelTest {
         assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
         assertThat(capturedEvents[1].failureReason).isNotEmpty()
 
-        verify { crashReportManagerMock.logExceptionOrSafeException(ofType<OtaFailedException>()) }
-
         otaViewModel.otaFailed.assertEventReceived()
     }
 
@@ -154,8 +157,6 @@ class OtaViewModelTest {
         assertThat(capturedEvents[2].chip).isEqualTo("un20")
         assertThat(capturedEvents[2].targetAppVersion).isEqualTo(NEW_UN20_STRING)
         assertThat(capturedEvents[2].failureReason).isNotEmpty()
-
-        verify { crashReportManagerMock.logExceptionOrSafeException(ofType<OtaFailedException>()) }
 
         otaViewModel.otaRecovery.assertEventWithContentNeverReceived()
 

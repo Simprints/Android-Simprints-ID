@@ -2,9 +2,7 @@ package com.simprints.face.match
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.face.FixtureGenerator
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.Matcher
@@ -18,9 +16,9 @@ import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.tools.utils.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.asFlow
 import org.junit.Rule
 import org.junit.Test
@@ -29,15 +27,7 @@ import java.io.Serializable
 class FaceMatchViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -51,7 +41,6 @@ class FaceMatchViewModelTest {
     private val masterFlowManager: MasterFlowManager = mockk()
     private val faceDbManager: FaceDbManager = mockk()
     private val faceMatcher: FaceMatcher = spyk()
-    private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
@@ -223,7 +212,6 @@ class FaceMatchViewModelTest {
             masterFlowManager,
             faceDbManager,
             faceMatcher,
-            faceCrashReportManager,
             faceSessionEventsManager,
             faceTimeHelper,
             testDispatcherProvider

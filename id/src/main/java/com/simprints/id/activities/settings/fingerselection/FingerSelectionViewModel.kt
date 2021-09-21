@@ -2,14 +2,13 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import timber.log.Timber
+import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
+import com.simprints.logging.Simber
 
-class FingerSelectionViewModel(private val preferencesManager: PreferencesManager,
-                               private val crashReportManager: CrashReportManager) : ViewModel() {
+class FingerSelectionViewModel(private val preferencesManager: IdPreferencesManager) : ViewModel() {
 
     val items = MutableLiveData<List<FingerSelectionItem>>()
 
@@ -56,25 +55,27 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
     fun resetFingerItems() {
         postUpdatedItems {
             clear()
-            addAll(preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems().apply {
-                forEach { it.removable = false }
-            })
+            addAll(
+                preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()
+                    .apply {
+                        forEach { it.removable = false }
+                    })
         }
     }
 
     fun haveSettingsChanged() = determineFingerSelectionItemsFromPrefs() != _items.toList()
 
     fun canSavePreference(): Boolean {
-        val highestNumberOfFingersInItems = _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.max()
-            ?: 1
-        val maxAllowedFingers = QUANTITY_OPTIONS.max() ?: 1
+        val highestNumberOfFingersInItems =
+            _items.toFingerIdentifiers().groupingBy { it }.eachCount().values.maxOrNull() ?: 1
+        val maxAllowedFingers = QUANTITY_OPTIONS.maxOrNull() ?: 1
         return highestNumberOfFingersInItems <= maxAllowedFingers
     }
 
     fun savePreference() {
         val fingerprintsToCollect = _items.toFingerIdentifiers()
         preferencesManager.fingerprintsToCollect = fingerprintsToCollect
-        crashReportManager.setFingersSelectedCrashlyticsKey(fingerprintsToCollect)
+        Simber.tag(FINGERS_SELECTED, true).i(fingerprintsToCollect.map { it.name }.toString())
     }
 
     private fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =
@@ -86,7 +87,7 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
                         savedPref.firstOrNull { it.finger == finger }?.removable = false
                     }
             } catch (e: NoSuchPreferenceError) {
-                Timber.e(e)
+                Simber.e(e)
             }
         }
 
@@ -108,7 +109,11 @@ class FingerSelectionViewModel(private val preferencesManager: PreferencesManage
         }
 }
 
-data class FingerSelectionItem(var finger: FingerIdentifier, var quantity: Int, var removable: Boolean)
+data class FingerSelectionItem(
+    var finger: FingerIdentifier,
+    var quantity: Int,
+    var removable: Boolean
+)
 
 val ORDERED_FINGERS = listOf(
     FingerIdentifier.LEFT_THUMB,

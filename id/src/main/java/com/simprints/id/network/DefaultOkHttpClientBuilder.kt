@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.test.core.BuildConfig
+import com.simprints.core.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,9 +14,12 @@ open class DefaultOkHttpClientBuilder {
         const val USER_AGENT_HEADER = "User-Agent"
     }
 
-    open fun get(authToken: String? = null,
-                 deviceId: String,
-                 versionName: String): OkHttpClient.Builder =
+    open fun get(
+        authToken: String? = null,
+        deviceId: String,
+        versionName: String,
+        interceptor: Interceptor =HttpLoggingInterceptor()
+    ): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)
@@ -29,7 +32,8 @@ open class DefaultOkHttpClientBuilder {
             }
             .apply {
                 if (BuildConfig.DEBUG_MODE) {
-                    addInterceptor(buildLoggingInterceptor())
+                    addInterceptor(buildSimperLoggingInterceptor())
+                    addInterceptor(interceptor)
                 }
             }
             .addInterceptor(buildDeviceIdInterceptor(deviceId))
@@ -51,8 +55,8 @@ open class DefaultOkHttpClientBuilder {
             return@Interceptor chain.proceed(newRequest)
         }
 
-    private fun buildLoggingInterceptor(): Interceptor {
-        val logger = TimberLogger()
+    private fun buildSimperLoggingInterceptor(): Interceptor {
+        val logger = SimberLogger
         return HttpLoggingInterceptor(logger).apply {
             level = HttpLoggingInterceptor.Level.HEADERS
         }

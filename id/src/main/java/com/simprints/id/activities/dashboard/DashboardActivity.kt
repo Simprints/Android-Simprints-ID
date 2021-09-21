@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
@@ -30,11 +31,11 @@ import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
 import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.logging.Simber
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 class DashboardActivity : BaseSplitActivity() {
@@ -60,9 +61,10 @@ class DashboardActivity : BaseSplitActivity() {
     lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private lateinit var viewModel: DashboardViewModel
-    private lateinit var binding: ActivityDashboardBinding
-    private lateinit var projectDetailsBinding: ActivityDashboardCardProjectDetailsBinding
-    private lateinit var dailyActivityBinding: ActivityDashboardCardDailyActivityBinding
+    private val binding by viewBinding(ActivityDashboardBinding::inflate)
+    // set bindings for included layouts
+    private val projectDetailsBinding: ActivityDashboardCardProjectDetailsBinding by lazy { binding.dashboardProjectDetails }
+    private val dailyActivityBinding: ActivityDashboardCardDailyActivityBinding by lazy { binding.dashboardDailyActivity }
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -76,14 +78,8 @@ class DashboardActivity : BaseSplitActivity() {
         val component = (application as Application).component
         component.inject(this)
 
-        binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         title = getString(R.string.dashboard_label)
-        // set bindings for included layouts
-        dailyActivityBinding = binding.dashboardDailyActivity
-        projectDetailsBinding = binding.dashboardProjectDetails
-
 
         setupActionBar()
         viewModel = ViewModelProvider(this, viewModelFactory).get(
@@ -222,7 +218,7 @@ class DashboardActivity : BaseSplitActivity() {
                 delayMillis = TIME_FOR_CHECK_IF_SYNC_REQUIRED,
                 initialDelayMillis = 0
             ).also {
-                    Timber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
+                Simber.tag(SYNC_LOG_TAG).d("[ACTIVITY] Launch sync if required")
                     viewModel.syncIfRequired()
             }
 

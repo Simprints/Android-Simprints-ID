@@ -44,9 +44,9 @@ class OrchestratorActivity : FingerprintActivity() {
         viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(resultCode, data))
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState?.getParcelable<OrchestratorState>(RESTORE_STATE_KEY)?.let {
+        savedInstanceState.getParcelable<OrchestratorState>(RESTORE_STATE_KEY)?.let {
             viewModel.restoreState(it)
         }
     }

@@ -4,8 +4,8 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintErrorReason
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintErrorResponse
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class FingerprintErrorResponse(

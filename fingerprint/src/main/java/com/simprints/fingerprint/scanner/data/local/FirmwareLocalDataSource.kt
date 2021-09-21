@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.data.local
 import android.content.Context
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import timber.log.Timber
+import com.simprints.logging.Simber
 import java.io.File
 
 /**
@@ -14,9 +14,9 @@ class FirmwareLocalDataSource(private val context: Context) {
 
     fun getAvailableScannerFirmwareVersions(): ScannerFirmwareVersions =
         ScannerFirmwareVersions(
-            cypress = getFirmwareVersionsInDir(CYPRESS_DIR).max() ?: ChipFirmwareVersion.UNKNOWN,
-            stm = getFirmwareVersionsInDir(STM_DIR).max() ?: ChipFirmwareVersion.UNKNOWN,
-            un20 = getFirmwareVersionsInDir(UN20_DIR).max() ?: ChipFirmwareVersion.UNKNOWN
+            cypress = getFirmwareVersionsInDir(CYPRESS_DIR).maxOrNull() ?: ChipFirmwareVersion.UNKNOWN,
+            stm = getFirmwareVersionsInDir(STM_DIR).maxOrNull() ?: ChipFirmwareVersion.UNKNOWN,
+            un20 = getFirmwareVersionsInDir(UN20_DIR).maxOrNull() ?: ChipFirmwareVersion.UNKNOWN
         )
 
     fun loadCypressFirmwareBytes() = loadFirmwareBytes(CYPRESS_DIR)
@@ -26,7 +26,7 @@ class FirmwareLocalDataSource(private val context: Context) {
     fun loadUn20FirmwareBytes() = loadFirmwareBytes(UN20_DIR)
 
     private fun loadFirmwareBytes(chipDirName: String): ByteArray {
-        val version = getFirmwareVersionsInDir(chipDirName).max()
+        val version = getFirmwareVersionsInDir(chipDirName).maxOrNull()
             ?: throw IllegalStateException("No available firmware file in $FIRMWARE_DIR/$chipDirName/")
         return getFile(chipDirName, version).readBytes()
     }
@@ -41,7 +41,7 @@ class FirmwareLocalDataSource(private val context: Context) {
         saveFirmwareBytes(UN20_DIR, version, bytes)
 
     private fun saveFirmwareBytes(chipDirName: String, version: ChipFirmwareVersion, bytes: ByteArray) {
-        Timber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/${version.toString().replace(".", "-")}.$BIN_FILE_EXTENSION")
+        Simber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/${version.toString().replace(".", "-")}.$BIN_FILE_EXTENSION")
         val existingVersions = getFirmwareVersionsInDir(chipDirName)
         getFile(chipDirName, version).writeBytes(bytes)
         existingVersions.filter { it != version }.forEach { getFile(chipDirName, it).delete() }
@@ -55,7 +55,7 @@ class FirmwareLocalDataSource(private val context: Context) {
                 val majorMinor = it.name.split('.')[0].split('-')
                 ChipFirmwareVersion(majorMinor[0].toInt(), majorMinor[1].toInt())
             } catch (e: Exception) {
-                Timber.e(e, "Error encountered when parsing firmware file name")
+                Simber.e(e, "Error encountered when parsing firmware file name")
                 null
             }
         } ?: emptyList()

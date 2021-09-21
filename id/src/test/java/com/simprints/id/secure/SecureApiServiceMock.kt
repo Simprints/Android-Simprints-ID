@@ -48,7 +48,10 @@ class SecureApiServiceMock(
 
     private fun <T> buildSuccessResponseWith(body: T?) = Calls.response(Response.success(body))
 
-    private fun getApiToken() = ApiToken("legacy_token")
+    private fun getApiToken() = ApiToken(
+        "legacy_token",
+        ApiToken.FirebaseOptions("project_id", "api_key", "app_id", null, null, null)
+    )
 
     private fun getSecurityState() = SecurityState(
         "mock-device-id", SecurityState.Status.RUNNING

@@ -2,5 +2,6 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/muli</item>
+        <item>@font/muli_semibold</item>
     </array>
 </resources>

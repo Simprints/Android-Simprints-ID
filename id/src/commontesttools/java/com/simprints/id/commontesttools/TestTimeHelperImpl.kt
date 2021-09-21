@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools
 
 import android.text.format.DateUtils.*
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.core.tools.time.TimeHelper
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit

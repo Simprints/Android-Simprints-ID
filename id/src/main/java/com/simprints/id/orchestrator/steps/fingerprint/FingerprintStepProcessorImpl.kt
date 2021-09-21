@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
@@ -17,7 +17,8 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY as RESPONSE_BUNDLE_KEY
 
 class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: FingerprintRequestFactory,
-                                   private val prefs: PreferencesManager) : FingerprintStepProcessor {
+                                   private val prefs: IdPreferencesManager
+) : FingerprintStepProcessor {
 
     companion object {
         const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"

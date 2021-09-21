@@ -6,12 +6,10 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
-import com.simprints.core.tools.extentions.getQuantityString
 import com.simprints.core.tools.extentions.nand
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
-import com.simprints.id.tools.time.TimeHelper
-import kotlinx.android.synthetic.main.activity_dashboard_card_daily_activity.view.*
+import com.simprints.core.tools.time.TimeHelper
 
 class DashboardDailyActivityCardDisplayerImpl(
     private val timeHelper: TimeHelper
@@ -47,7 +45,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_enrolments_count
             ).text = "$enrolmentsCount"
 
-            val labelText = context.getQuantityString(
+            val labelText = context.resources.getQuantityString(
                 R.plurals.dashboard_card_enrolments,
                 enrolmentsCount
             )
@@ -67,7 +65,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_identifications_count
             ).text = "$identificationsCount"
 
-            val labelText = context.getQuantityString(
+            val labelText = context.resources.getQuantityString(
                 R.plurals.dashboard_card_identifications,
                 identificationsCount
             )
@@ -88,7 +86,7 @@ class DashboardDailyActivityCardDisplayerImpl(
                 R.id.dashboard_daily_activity_card_verifications_count
             ).text = "$verificationsCount"
 
-            val labelText = context.getQuantityString(
+            val labelText = context.resources.getQuantityString(
                 R.plurals.dashboard_card_verifications,
                 verificationsCount
             )
@@ -108,8 +106,8 @@ class DashboardDailyActivityCardDisplayerImpl(
         val shouldHideDividers = dailyActivityState.shouldHideDividers()
 
         if (shouldHideDividers) {
-            divider_enrolments.visibility = GONE
-            divider_identifications.visibility = GONE
+            enrolmentsDivider.visibility = GONE
+            identificationsDivider.visibility = GONE
         } else {
             setEnrolmentsDividerVisibility(enrolmentsDivider, dailyActivityState)
             setIdentificationsDividerVisibility(identificationsDivider, dailyActivityState)

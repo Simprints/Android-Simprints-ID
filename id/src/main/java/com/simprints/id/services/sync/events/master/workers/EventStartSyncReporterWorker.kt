@@ -2,9 +2,8 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -16,25 +15,28 @@ import javax.inject.Inject
  * When it's in ENQUEUED the outputData is erased, so we can't extract the uniqueId observing
  * PeopleStartSyncReporterWorker.
  */
-class EventStartSyncReporterWorker(appContext: Context,
-                                   params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
+class EventStartSyncReporterWorker(
+    appContext: Context,
+    params: WorkerParameters
+) : SimCoroutineWorker(appContext, params) {
+
+    @Inject lateinit var dispatcher: DispatcherProvider
 
     override val tag: String = EventStartSyncReporterWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
+    override suspend fun doWork(): Result {
+        getComponent<EventSyncMasterWorker> { it.inject(this@EventStartSyncReporterWorker) }
 
-    override suspend fun doWork(): Result =
-        withContext(Dispatchers.IO) {
+        return withContext(dispatcher.io()) {
             try {
-                getComponent<EventSyncMasterWorker> { it.inject(this@EventStartSyncReporterWorker) }
                 val syncId = inputData.getString(SYNC_ID_STARTED)
                 crashlyticsLog("Start - Params: $syncId")
                 success(inputData)
             } catch (t: Throwable) {
-                t.printStackTrace()
                 fail(t)
             }
         }
+    }
 
     companion object {
         const val SYNC_ID_STARTED = "SYNC_ID_STARTED"

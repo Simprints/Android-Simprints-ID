@@ -1,9 +1,9 @@
 package com.simprints.id.data.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.spyk

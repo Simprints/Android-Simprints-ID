@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -15,7 +15,7 @@ import com.simprints.moduleapi.face.responses.IFaceResponse
 
 class FaceStepProcessorImpl(
     private val faceRequestFactory: FaceRequestFactory,
-    private val prefs: PreferencesManager
+    private val prefs: IdPreferencesManager
 ) : FaceStepProcessor {
 
     companion object {

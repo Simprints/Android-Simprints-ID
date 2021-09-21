@@ -1,35 +1,40 @@
 package com.simprints.id.data.images.remote
 
-import com.google.firebase.FirebaseApp
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.network.BaseUrlProvider
+import com.simprints.logging.Simber
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
 import java.io.FileInputStream
 
 internal class ImageRemoteDataSourceImpl(
-    private val baseUrlProvider: BaseUrlProvider
+    private val baseUrlProvider: BaseUrlProvider,
+    private val remoteDbManager: RemoteDbManager
 ) : ImageRemoteDataSource {
-
-    private val firebaseProjectName = FirebaseApp.getInstance().options.projectId
 
     override suspend fun uploadImage(
         imageStream: FileInputStream,
         imageRef: SecuredImageRef
     ): UploadResult {
+
+        val firebaseProjectName = remoteDbManager.getLegacyAppFallback().options.projectId
+
         return if (firebaseProjectName != null) {
             val bucketUrl = baseUrlProvider.getImageStorageBucketUrl()
                 ?: return UploadResult(imageRef, UploadResult.Status.FAILED)
 
-            val rootRef = FirebaseStorage.getInstance(bucketUrl).reference
+            val rootRef = FirebaseStorage.getInstance(
+                remoteDbManager.getLegacyAppFallback(),
+                bucketUrl
+            ).reference
 
             var fileRef = rootRef
             imageRef.relativePath.parts.forEach { pathPart ->
                 fileRef = fileRef.child(pathPart)
             }
 
-            Timber.d("Uploading ${fileRef.path}")
+            Simber.d("Uploading ${fileRef.path}")
 
             val uploadTask = fileRef.putStream(imageStream).await()
 
@@ -40,10 +45,10 @@ internal class ImageRemoteDataSourceImpl(
             }
 
             UploadResult(imageRef, status)
-
         } else {
             UploadResult(imageRef, UploadResult.Status.FAILED)
         }
     }
+
 
 }

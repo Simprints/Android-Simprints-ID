@@ -1,43 +1,46 @@
 package com.simprints.id.data.db.subjects_sync.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODES
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULES
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.TIME1
-import com.simprints.id.sampledata.SampleDefaults.modulesDownSyncScope
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation.DownSyncState
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncScope.*
-import com.simprints.id.data.db.events_sync.down.domain.getUniqueKey
-import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.id.data.db.events_sync.down.local.DbEventsDownSyncOperationState
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modes
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
+import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
+import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULES
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
+import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class EventDownSyncScopeRepositoryImplTest {
 
     companion object {
@@ -46,16 +49,39 @@ class EventDownSyncScopeRepositoryImplTest {
         private val LAST_STATE = DownSyncState.COMPLETE
     }
 
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
+    @MockK
+    lateinit var loginInfoManager: LoginInfoManager
+    @MockK
+    lateinit var preferencesManager: IdPreferencesManager
+    @MockK
+    lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
 
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+
+        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
+
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        eventDownSyncScopeRepository = EventDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationOperationDao)
+        eventDownSyncScopeRepository =
+            EventDownSyncScopeRepositoryImpl(
+                loginInfoManager,
+                preferencesManager,
+                downSyncOperationOperationDao,
+                testDispatcherProvider
+            )
 
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { loginInfoManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
@@ -66,9 +92,11 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun buildProjectDownSyncScope() {
         runBlockingTest {
-            mockGlobalSyncGroup()
-
-            val syncScope = eventDownSyncScopeRepository.getDownSyncScope()
+            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+                listOf(Modes.FINGERPRINT),
+                DEFAULT_MODULES.toList(),
+                GROUP.GLOBAL
+            )
 
             assertProjectSyncScope(syncScope)
         }
@@ -77,9 +105,12 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun buildUserDownSyncScope() {
         runBlockingTest {
-            mockUserSyncGroup()
 
-            val syncScope = eventDownSyncScopeRepository.getDownSyncScope()
+            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+                listOf(Modes.FINGERPRINT),
+                DEFAULT_MODULES.toList(),
+                GROUP.USER
+            )
 
             assertUserSyncScope(syncScope)
         }
@@ -88,9 +119,11 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun buildModuleDownSyncScope() {
         runBlockingTest {
-            mockModuleSyncGroup()
-
-            val syncScope = eventDownSyncScopeRepository.getDownSyncScope()
+            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+                listOf(Modes.FINGERPRINT),
+                DEFAULT_MODULES.toList(),
+                GROUP.MODULE
+            )
 
             assertModuleSyncScope(syncScope)
         }
@@ -100,11 +133,14 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun throwWhenProjectIsMissing() {
         runBlockingTest {
-            mockGlobalSyncGroup()
             every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
-                eventDownSyncScopeRepository.getDownSyncScope()
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    listOf(Modes.FINGERPRINT),
+                    DEFAULT_MODULES.toList(),
+                    GROUP.GLOBAL
+                )
             }
         }
     }
@@ -112,11 +148,14 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun throwWhenUserIsMissing() {
         runBlockingTest {
-            mockGlobalSyncGroup()
             every { loginInfoManager.getSignedInUserIdOrEmpty() } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
-                eventDownSyncScopeRepository.getDownSyncScope()
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    listOf(Modes.FINGERPRINT),
+                    DEFAULT_MODULES.toList(),
+                    GROUP.GLOBAL
+                )
             }
         }
     }
@@ -125,7 +164,8 @@ class EventDownSyncScopeRepositoryImplTest {
     fun downSyncOp_refresh_shouldReturnARefreshedOp() {
         runBlockingTest {
 
-            val refreshedSyncOp = eventDownSyncScopeRepository.refreshState(projectDownSyncScope.operations.first())
+            val refreshedSyncOp =
+                eventDownSyncScopeRepository.refreshState(projectDownSyncScope.operations.first())
 
             assertThat(refreshedSyncOp).isNotNull()
             refreshedSyncOp.assertProjectSyncOpIsRefreshed()
@@ -152,25 +192,33 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     private fun getSyncOperationsWithLastResult() =
-        projectDownSyncScope.operations.map { DbEventsDownSyncOperationState(it.getUniqueKey(), LAST_STATE, LAST_EVENT_ID, LAST_SYNC_TIME) } +
-            userDownSyncScope.operations.map { DbEventsDownSyncOperationState(it.getUniqueKey(), LAST_STATE, LAST_EVENT_ID, LAST_SYNC_TIME) } +
-            modulesDownSyncScope.operations.map { DbEventsDownSyncOperationState(it.getUniqueKey(), LAST_STATE, LAST_EVENT_ID, LAST_SYNC_TIME) }
+        projectDownSyncScope.operations.map {
+            com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState(
+                it.getUniqueKey(),
+                LAST_STATE,
+                LAST_EVENT_ID,
+                LAST_SYNC_TIME
+            )
+        } +
+            userDownSyncScope.operations.map {
+                com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState(
+                    it.getUniqueKey(),
+                    LAST_STATE,
+                    LAST_EVENT_ID,
+                    LAST_SYNC_TIME
+                )
+            } +
+            modulesDownSyncScope.operations.map {
+                com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState(
+                    it.getUniqueKey(),
+                    LAST_STATE,
+                    LAST_EVENT_ID,
+                    LAST_SYNC_TIME
+                )
+            }
 
 
-    private fun mockGlobalSyncGroup() {
-        every { preferencesManager.syncGroup } returns GROUP.GLOBAL
-    }
-
-    private fun mockUserSyncGroup() {
-        every { preferencesManager.syncGroup } returns GROUP.USER
-    }
-
-    private fun mockModuleSyncGroup() {
-        every { preferencesManager.syncGroup } returns GROUP.MODULE
-        every { preferencesManager.selectedModules } returns DEFAULT_MODULES.toSet()
-    }
-
-    private fun assertProjectSyncScope(syncScope: EventDownSyncScope) {
+    private fun assertProjectSyncScope(syncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectProjectScope::class.java)
         with((syncScope as SubjectProjectScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -178,7 +226,7 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun assertUserSyncScope(syncScope: EventDownSyncScope) {
+    private fun assertUserSyncScope(syncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectUserScope::class.java)
         with((syncScope as SubjectUserScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -187,7 +235,7 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun assertModuleSyncScope(syncScope: EventDownSyncScope) {
+    private fun assertModuleSyncScope(syncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectModuleScope::class.java)
         with((syncScope as SubjectModuleScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -196,7 +244,7 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-    private fun EventDownSyncOperation.assertProjectSyncOpIsRefreshed() {
+    private fun com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.assertProjectSyncOpIsRefreshed() {
         assertThat(lastEventId).isEqualTo(LAST_EVENT_ID)
         assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         assertThat(state).isEqualTo(LAST_STATE)

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
+
+cat << EOF >> buildSrc/signing_properties.gradle
+ext {
+  store_file = "\$rootDir/android-signing-keystore.jks"
+  store_password="${SIGNING_KEYSTORE_PASSWORD}" as String
+  key_alias="${SIGNING_KEY_ALIAS}" as String
+  key_password="${SIGNING_KEY_PASSWORD}" as String
+}
+EOF

@@ -10,10 +10,9 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.data.db.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.id.exceptions.unexpected.SyncCloudIntegrationException
+import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -22,6 +21,8 @@ import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgres
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
@@ -30,6 +31,7 @@ import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -43,13 +45,16 @@ class EventDownSyncDownloaderWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
     @Before
     fun setUp() {
         app.component = mockk(relaxed = true)
         val correctInputData = JsonHelper.toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
         eventDownSyncDownloaderWorker.firebasePerformanceTraceFactory = mockk(relaxed = true)
-        eventDownSyncDownloaderWorker.crashReportManager = mockk(relaxed = true)
     }
 
     @Test
@@ -128,14 +133,14 @@ class EventDownSyncDownloaderWorkerTest {
         (inputData?.let {
             TestListenableWorkerBuilder<EventDownSyncDownloaderWorker>(app, inputData = it).build()
         } ?: TestListenableWorkerBuilder<EventDownSyncDownloaderWorker>(app).build()).apply {
-            crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             eventDownSyncScopeRepository = mockk(relaxed = true)
-            coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as EventDownSyncOperation }
+            coEvery { eventDownSyncScopeRepository.refreshState(any()) } answers { this.args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }
             syncCache = mockk(relaxed = true)
             jsonHelper = JsonHelper
             eventDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncHelper = mockk(relaxed = true)
+            dispatcher = testDispatcherProvider
         }
 }
 

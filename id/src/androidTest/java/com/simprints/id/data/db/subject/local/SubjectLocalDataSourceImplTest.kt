@@ -2,17 +2,18 @@ package com.simprints.id.data.db.subject.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
+import com.simprints.eventsystem.RealmTestsBase
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
-import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
@@ -35,14 +36,24 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     private val loginInfoManagerMock = mockk<LoginInfoManager>()
     private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
 
+    private val testDispatcherProvider = DefaultDispatcherProvider()
+
     @Before
     @FlowPreview
     fun setup() {
         realm = Realm.getInstance(config)
         every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(newDatabaseName, newDatabaseKey)
+        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
+            newDatabaseName,
+            newDatabaseKey
+        )
 
-        subjectLocalDataSource = SubjectLocalDataSourceImpl(testContext, secureLocalDbKeyProviderMock, loginInfoManagerMock)
+        subjectLocalDataSource = SubjectLocalDataSourceImpl(
+            testContext,
+            secureLocalDbKeyProviderMock,
+            loginInfoManagerMock,
+            testDispatcherProvider
+        )
     }
 
     @Test
@@ -55,8 +66,16 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
         val differentSecureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
-        every { differentSecureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(differentNewDatabaseName, differentDatabaseKey)
-        val differentLocalDataSource = SubjectLocalDataSourceImpl(testContext, differentSecureLocalDbKeyProviderMock, loginInfoManagerMock)
+        every { differentSecureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
+            differentNewDatabaseName,
+            differentDatabaseKey
+        )
+        val differentLocalDataSource = SubjectLocalDataSourceImpl(
+            testContext,
+            differentSecureLocalDbKeyProviderMock,
+            loginInfoManagerMock,
+            testDispatcherProvider
+        )
 
         val count = runBlocking { differentLocalDataSource.count() }
         assertThat(count).isEqualTo(0)
@@ -120,7 +139,9 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
         realm.executeTransaction {
             assertThat(realm.where(DbSubject::class.java).count()).isEqualTo(1)
-            assertThat(realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)).isTrue()
+            assertThat(
+                realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)
+            ).isTrue()
         }
     }
 
@@ -132,7 +153,9 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
         realm.executeTransaction {
             assertThat(realm.where(DbSubject::class.java).count()).isEqualTo(1)
-            assertThat(realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)).isTrue()
+            assertThat(
+                realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)
+            ).isTrue()
         }
     }
 
@@ -143,12 +166,15 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         subjectLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
         subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
 
-        val fingerprintIdentityLocalDataSource = (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
-        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(SubjectQuery()).toList()
+        val fingerprintIdentityLocalDataSource =
+            (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
+        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(
+            SubjectQuery()
+        ).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
-                verifyIdentity(fakePerson1, get(0))
-                verifyIdentity(fakePerson2, get(1))
+                verifyIdentity(fakePerson1, find { it.patientId == fakePerson1.subjectId }!!)
+                verifyIdentity(fakePerson2, find { it.patientId == fakePerson2.subjectId }!!)
             }
         }
     }
@@ -164,8 +190,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectQuery()).toList()
         realm.executeTransaction {
             with(faceRecords) {
-                verifyIdentity(fakePerson1, get(0))
-                verifyIdentity(fakePerson2, get(1))
+                verifyIdentity(fakePerson1, find { it.personId == fakePerson1.subjectId }!!)
+                verifyIdentity(fakePerson2, find { it.personId == fakePerson2.subjectId }!!)
             }
         }
     }
@@ -174,7 +200,9 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
             assertThrows<InvalidQueryToLoadRecordsException> {
-                (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mockk())
+                (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(
+                    mockk()
+                )
             }
         }
     }
@@ -187,7 +215,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
         val people = subjectLocalDataSource.load().toList()
 
-        listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
+        listOf(fakePerson).zip(people)
+            .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
     @Test
@@ -195,8 +224,10 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = subjectLocalDataSource.load(SubjectQuery(attendantId = fakePerson.attendantId)).toList()
-        listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
+        val people =
+            subjectLocalDataSource.load(SubjectQuery(attendantId = fakePerson.attendantId)).toList()
+        listOf(fakePerson).zip(people)
+            .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
     @Test
@@ -204,8 +235,10 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = subjectLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
-        listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
+        val people =
+            subjectLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
+        listOf(fakePerson).zip(people)
+            .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
     @Test

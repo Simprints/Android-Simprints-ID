@@ -1,0 +1,18 @@
+apply plugin: 'com.google.firebase.appdistribution'
+
+play {
+    serviceAccountCredentials = file("$rootDir/google_api_key.json")
+    artifactDir = file("build/outputs/bundle/release")
+}
+
+android {
+    buildTypes {
+        staging {
+            firebaseAppDistribution {
+                apkPath = "id/build/outputs/universal_apk/staging/id-staging-universal.apk"
+                serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
+                groups = "pre-release-testers"
+            }
+        }
+    }
+}
