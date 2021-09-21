@@ -306,9 +306,9 @@ flows:
 # Define the triggers that launch the pipeline.
 ######################################################################
 pipelines:
-    branches:
+    pull-requests:
+        '**': *development_flow
         main: *release_flow
-        develop: *development_flow
         release/*: *release_flow
     custom:
         develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
