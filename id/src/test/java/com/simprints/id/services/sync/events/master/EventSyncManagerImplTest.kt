@@ -7,7 +7,6 @@ import androidx.work.*
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
@@ -19,12 +18,12 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -44,16 +43,7 @@ class EventSyncManagerImplTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val ctx: Context = ApplicationProvider.getApplicationContext()
     private val wm: WorkManager
