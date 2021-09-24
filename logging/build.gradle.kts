@@ -25,7 +25,9 @@ dependencies {
     //4.7.1 breaks realm:
     // https://github.com/realm/realm-java/issues/6153
     // https://github.com/JakeWharton/timber/issues/295
-    implementation("com.jakewharton.timber:timber:4.5.1")
+    implementation(Dependencies.Timber.timber) {
+        exclude("org.jetbrains", "annotations")
+    }
 
     // Unit Tests
     testImplementation(Dependencies.Testing.junit)

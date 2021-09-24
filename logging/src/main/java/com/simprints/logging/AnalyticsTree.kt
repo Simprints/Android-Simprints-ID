@@ -14,7 +14,7 @@ internal class AnalyticsTree(private val analytics: FirebaseAnalytics) : Timber.
         private const val defaultTag = "DEFAULT"
     }
 
-    override fun log(priority: Int, tag: String?, message: String?, t: Throwable?) {
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (priority == Log.VERBOSE || priority == Log.DEBUG) return
 
         if (tag != null && tag.contains(Simber.USER_PROPERTY_TAG)) {
@@ -27,13 +27,9 @@ internal class AnalyticsTree(private val analytics: FirebaseAnalytics) : Timber.
         }
 
         if (priority == Log.INFO) {
-            message?.let {
-                val params = Bundle()
-                params.putString(tag ?: defaultTag, it)
-                analytics.logEvent(tag ?: defaultTag, params)
-            }
-
+            val params = Bundle()
+            params.putString(tag ?: defaultTag, message)
+            analytics.logEvent(tag ?: defaultTag, params)
         }
-
     }
 }
