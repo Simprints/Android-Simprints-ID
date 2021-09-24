@@ -24,7 +24,7 @@ buildscript {
 
         classpath("org.ow2.asm:asm:9.0")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.74.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.2.0")
+        classpath("org.gradle:test-retry-gradle-plugin:1.3.1")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.8")
