@@ -28,7 +28,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
 
-        ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
     }
 
     lintOptions.warning("InvalidPackage")
@@ -41,7 +41,7 @@ android {
 
     buildTypes {
         getByName("release") {
-            minifyEnabled(true)
+            isMinifyEnabled = true
             extra.set("enableCrashlytics", true)
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             manifestPlaceholders["firebase_performance_logcat_enabled"] = false
@@ -56,7 +56,7 @@ android {
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
         getByName("staging") {
-            minifyEnabled(true)
+            isMinifyEnabled = true
             extra.set("enableCrashlytics", true)
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             manifestPlaceholders["firebase_performance_logcat_enabled"] = false
@@ -71,7 +71,7 @@ android {
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
         getByName("debug") {
-            minifyEnabled(false)
+            isMinifyEnabled = false
             extra.set("enableCrashlytics", false)
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             manifestPlaceholders["firebase_performance_logcat_enabled"] = false
@@ -115,7 +115,7 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures = mutableSetOf(":fingerprint", ":face", ":clientapi")
+    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":face", ":clientapi"))
 }
 
 repositories {
