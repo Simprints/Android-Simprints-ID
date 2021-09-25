@@ -135,6 +135,9 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    #dependency-analysis plugin v0.78.0 needs java11+
+                    - bash ./ci/tools/install_java_11
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
                     - ./gradlew :clientapi:projectHealth
