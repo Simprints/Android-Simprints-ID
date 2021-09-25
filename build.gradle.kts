@@ -34,7 +34,7 @@ buildscript {
         // Dependency Publishing
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.24.4")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.24.18")
 
         // Realm Database
         classpath("io.realm:realm-gradle-plugin:10.4.0")
