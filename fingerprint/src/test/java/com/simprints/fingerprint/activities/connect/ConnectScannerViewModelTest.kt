@@ -90,6 +90,7 @@ class ConnectScannerViewModelTest : KoinTest {
                 if (connectFailException != null)
                     throw connectFailException
             }
+            coEvery { setScannerInfoAndCheckAvailableOta() } answers {}
             coEvery { setup() } answers {}
             coEvery { sensorWakeUp() } answers {}
             coEvery { setUiIdle() } answers {}

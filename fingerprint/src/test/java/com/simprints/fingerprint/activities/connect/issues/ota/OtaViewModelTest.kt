@@ -15,6 +15,7 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevision
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.*
+import com.simprints.id.data.license.remote.ApiLicense
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.common.mock.MockTimer
@@ -26,6 +27,8 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 
 class OtaViewModelTest {
 
@@ -38,7 +41,6 @@ class OtaViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val firmwareLocalDataSource: FirmwareLocalDataSource = mockk()
     private val sessionEventsManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val mockTimer = MockTimer()
     private val timeHelperMock: FingerprintTimeHelper = mockk(relaxed = true) {
@@ -70,8 +72,7 @@ class OtaViewModelTest {
 
     @Before
     fun setup() {
-        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns
-            ScannerFirmwareVersions(cypress = NEW_CYPRESS_VERSION, stm = NEW_STM_VERSION, un20 = NEW_UN20_VERSION)
+
         coEvery { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
         coEvery { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
         coEvery { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()    }

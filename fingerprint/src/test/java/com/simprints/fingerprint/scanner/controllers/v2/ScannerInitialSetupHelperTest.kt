@@ -18,16 +18,13 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmEx
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.*
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.schedulers.TestScheduler
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -39,13 +36,11 @@ class ScannerInitialSetupHelperTest {
     private val batteryLevelChecker = mockk<BatteryLevelChecker>()
     private val fingerprintPreferenceManager= mockk<FingerprintPreferencesManager>()
     private val firmwareLocalDataSource= mockk<FirmwareLocalDataSource>()
-    private val testScheduler = TestScheduler()
     private val scannerInitialSetupHelper = ScannerInitialSetupHelper(
         connectionHelperMock,
         batteryLevelChecker,
         fingerprintPreferenceManager,
         firmwareLocalDataSource,
-        testScheduler
     )
 
     @Before
@@ -159,26 +154,6 @@ class ScannerInitialSetupHelperTest {
         coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
     }
 
-    @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_noLocalDownloadedFirmwares_completesNormally() {
-        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns mapOf()
-
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-        every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
-            put(HARDWARE_VERSION, SCANNER_VERSION_HIGH.toScannerVersion().firmware)
-        }
-
-        every { batteryLevelChecker.isLowBattery() } returns false
-        setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
-
-        val testSubscriber =
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-                .test()
-        testScheduler.advanceTime()
-
-        testSubscriber.awaitAndAssertSuccess()
-
-    }
     @Test
     fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() = runBlocking {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
