@@ -124,7 +124,7 @@ class ConnectScannerViewModel(
 
     private suspend fun setupVero() {
         postProgressAndMessage(step = 5, messageRes = R.string.connect_scanner_setup)
-        scannerManager.scanner.setup()
+        scannerManager.scanner.setScannerInfoAndCheckAvailableOta()
         setLastConnectedScannerInfo()
         addInfoSnapshotEventIfNecessary()
         logMessageForCrashReport("ScannerManager: setupVero")

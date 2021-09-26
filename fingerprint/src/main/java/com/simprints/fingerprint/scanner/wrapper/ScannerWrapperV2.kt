@@ -20,6 +20,7 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.infra.logging.Simber
 import io.reactivex.Completable
@@ -56,7 +57,12 @@ class ScannerWrapperV2(
             generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN,
         )
-
+    /**
+     * This function returns the already set battery info, or returns a default value of UNKNOWN,
+     * if the battery info hasn't been set.
+     *
+     * @see setScannerInfoAndCheckAvailableOta
+     */
     override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
 
     override fun isImageTransferSupported(): Boolean= true
@@ -67,7 +73,15 @@ class ScannerWrapperV2(
             .collect()
 
 
-    override suspend fun setup() {
+    /**
+     * This function runs check of available firmware updates, and in turn reads and sets the
+     * scanner's firmware versions and battery information.
+     *
+     * @throws ScannerDisconnectedException
+     * @throws UnexpectedScannerException
+     * @throws OtaFailedException
+     */
+    override suspend fun setScannerInfoAndCheckAvailableOta() {
         try {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(
                 scannerV2,
@@ -88,18 +102,41 @@ class ScannerWrapperV2(
         }
     }
 
-    override suspend fun sensorWakeUp() =
-        scannerV2
-            .ensureUn20State(true)
-            .wrapErrorsFromScanner()
-            .await()
+    /**
+     * This function turns on the Un20 sensor (fingerprint sensor), by specifying what state it
+     * expects the sensor to be in, represented as a boolean value (true | false -> on | off)
+     *
+     * @see ensureUn20State
+     *
+     * @throws ScannerDisconnectedException
+     * @throws UnexpectedScannerException
+     */
+    override suspend fun sensorWakeUp()  {
+        try {
+            scannerV2.ensureUn20State(true)
+        } catch (ex: Throwable) {
+            throw wrapErrorFromScanner(ex)
+        }
+    }
 
 
-    override suspend fun sensorShutDown() =
-        scannerV2
-            .ensureUn20State(false)
-            .wrapErrorsFromScanner()
-            .await()
+    /**
+     * This function turns off the Un20 sensor (fingerprint sensor), by specifying what state it
+     * expects the sensor to be in, represented as a boolean value (true | false -> on | off)
+     *
+     * @see ensureUn20State
+     *
+     * @throws ScannerDisconnectedException
+     * @throws UnexpectedScannerException
+     * @throws NotConnectedException
+     */
+    override suspend fun sensorShutDown() {
+        try {
+            scannerV2.ensureUn20State(false)
+        } catch (ex: Throwable) {
+            throw wrapErrorFromScanner(ex)
+        }
+    }
 
     override fun isLiveFeedbackAvailable(): Boolean = true
 

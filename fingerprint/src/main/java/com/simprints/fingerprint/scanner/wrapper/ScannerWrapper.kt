@@ -25,7 +25,12 @@ interface ScannerWrapper {
     suspend fun connect()
     suspend fun disconnect()
 
-    suspend fun setup()
+    /**
+     * This method checks for available firmware updates
+     *
+     * @throws OtaAvailableException
+     */
+    suspend fun setScannerInfoAndCheckAvailableOta()
 
     suspend fun sensorWakeUp()
     suspend fun sensorShutDown()

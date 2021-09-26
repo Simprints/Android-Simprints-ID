@@ -78,7 +78,13 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
         ))
     }
 
-    override suspend fun setup() {}
+    /**
+     * This function does nothing because vero 1 scanner doesn't support firmware updates
+     */
+    override suspend fun setScannerInfoAndCheckAvailableOta() {
+        //Not implemented
+    }
+
 
     override suspend fun disconnect() = suspendCoroutine<Unit> { cont ->
         scannerV1.disconnect(ScannerCallbackWrapper(
