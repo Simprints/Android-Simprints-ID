@@ -56,7 +56,7 @@ class EventMigration3to4 : Migration(3, 4) {
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
     }
-    
+
     companion object {
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
