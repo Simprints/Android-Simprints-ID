@@ -3,6 +3,7 @@ package com.simprints.eventsystem.event.local.migrations
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase.CONFLICT_NONE
 import androidx.room.testing.MigrationTestHelper
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -19,6 +20,8 @@ import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.eventsystem.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.spyk
+import io.mockk.verify
 import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
@@ -39,15 +42,10 @@ class EventMigration3to4Test {
 
     @Test
     @Throws(IOException::class)
-    fun migrate3To4() {
+    fun `validate end to end migration is successful`() {
         val eventId = randomUUID()
 
-        helper.createDatabase(TEST_DB, 3).apply {
-            val event = createEvent(eventId)
-
-            this.insert("DbEvent", CONFLICT_NONE, event)
-            close()
-        }
+        setupV3DbWithEvent(eventId)
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 4, true, EventMigration3to4())
 
@@ -59,6 +57,43 @@ class EventMigration3to4Test {
         Truth.assertThat(event).isInstanceOf(ConnectivitySnapshotEvent::class.java)
         assert(event.payload.eventVersion == 2)
         assert(!jsonObject.has("networkType"))
+
+    }
+
+    @Test
+    fun `validate migration is called`() {
+        val dbSky = spyk(EventMigration3to4())
+
+        setupV3DbWithEvent(randomUUID())
+        helper.runMigrationsAndValidate(TEST_DB, 4, true, dbSky)
+
+        verify(exactly = 1) { dbSky.migrate(any()) }
+        verify(exactly = 1) { dbSky.migrateConnectivityEvents(any()) }
+    }
+
+    @Test
+    fun `validate all events are migrated`() {
+        val dbSky = spyk(EventMigration3to4())
+        val eventId1 = randomUUID()
+        val eventId2 = randomUUID()
+
+        setupV3DbWithEvent(eventId1, eventId2)
+        helper.runMigrationsAndValidate(TEST_DB, 4, true, dbSky)
+
+        verify(exactly = 1) {
+            dbSky.migrateEnrolmentEventPayloadType(
+                any(),
+                any(),
+                eventId1
+            )
+        }
+        verify(exactly = 1) {
+            dbSky.migrateEnrolmentEventPayloadType(
+                any(),
+                any(),
+                eventId2
+            )
+        }
     }
 
     private fun createEvent(id: String) = ContentValues().apply {
@@ -83,6 +118,16 @@ class EventMigration3to4Test {
         this.put("endedAt", 0)
         this.put("sessionIsClosed", 0)
     }
+
+    private fun setupV3DbWithEvent(vararg eventId: String): SupportSQLiteDatabase =
+        helper.createDatabase(TEST_DB, 3).apply {
+            eventId.forEach {
+                val event = createEvent(it)
+                this.insert("DbEvent", CONFLICT_NONE, event)
+            }
+            close()
+        }
+
 
     companion object {
         private const val TEST_DB = "test"
