@@ -12,6 +12,9 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentPreparationBinding
 import org.koin.android.ext.android.inject
 
+/**
+ * This class represents the screen the user is presented to prepare them on how to capture the face
+ */
 class PreparationFragment: Fragment(R.layout.fragment_preparation) {
     private val binding by viewBinding(FragmentPreparationBinding::bind)
 
