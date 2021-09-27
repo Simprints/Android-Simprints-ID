@@ -21,7 +21,12 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-
+/**
+ * This is the class presented as the user is capturing theface, they are presented with this fragment, which displays
+ * live information about distance and whether the face is ready to be captured or not.
+ * It also displays the capture process of the face and then sends this result to
+ * [com.simprints.face.capture.confirmation.ConfirmationFragment]
+ */
 class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProcessor {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: LiveFeedbackFragmentViewModel by viewModel { parametersOf(mainVm) }
