@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase.CONFLICT_NONE
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -62,38 +63,48 @@ class EventMigration3to4Test {
 
     @Test
     fun `validate migration is called`() {
-        val dbSky = spyk(EventMigration3to4())
+        val migrationSpy = spyk(EventMigration3to4())
 
         setupV3DbWithEvent(randomUUID())
-        helper.runMigrationsAndValidate(TEST_DB, 4, true, dbSky)
+        helper.runMigrationsAndValidate(TEST_DB, 4, true, migrationSpy)
 
-        verify(exactly = 1) { dbSky.migrate(any()) }
-        verify(exactly = 1) { dbSky.migrateConnectivityEvents(any()) }
+        verify(exactly = 1) { migrationSpy.migrate(any()) }
+        verify(exactly = 1) { migrationSpy.migrateConnectivityEvents(any()) }
     }
 
     @Test
     fun `validate all events are migrated`() {
-        val dbSky = spyk(EventMigration3to4())
+        val migrationSpy = spyk(EventMigration3to4())
         val eventId1 = randomUUID()
         val eventId2 = randomUUID()
 
         setupV3DbWithEvent(eventId1, eventId2)
-        helper.runMigrationsAndValidate(TEST_DB, 4, true, dbSky)
+        helper.runMigrationsAndValidate(TEST_DB, 4, true, migrationSpy)
 
         verify(exactly = 1) {
-            dbSky.migrateEnrolmentEventPayloadType(
+            migrationSpy.migrateEnrolmentEventPayloadType(
                 any(),
                 any(),
                 eventId1
             )
         }
         verify(exactly = 1) {
-            dbSky.migrateEnrolmentEventPayloadType(
+            migrationSpy.migrateEnrolmentEventPayloadType(
                 any(),
                 any(),
                 eventId2
             )
         }
+    }
+
+    @Test
+    fun `validate migration query is called`() {
+        val migrationSpy = spyk(EventMigration3to4())
+
+        val db = spyk(setupV3DbWithEvent(randomUUID(), close = false))
+        migrationSpy.migrateConnectivityEvents(db)
+
+        verify(exactly = 1) { db.query(any<SupportSQLiteQuery>()) }
     }
 
     private fun createEvent(id: String) = ContentValues().apply {
@@ -119,13 +130,17 @@ class EventMigration3to4Test {
         this.put("sessionIsClosed", 0)
     }
 
-    private fun setupV3DbWithEvent(vararg eventId: String): SupportSQLiteDatabase =
+    private fun setupV3DbWithEvent(
+        vararg eventId: String,
+        close: Boolean = true
+    ): SupportSQLiteDatabase =
         helper.createDatabase(TEST_DB, 3).apply {
             eventId.forEach {
                 val event = createEvent(it)
                 this.insert("DbEvent", CONFLICT_NONE, event)
             }
-            close()
+            if (close)
+                close()
         }
 
 
