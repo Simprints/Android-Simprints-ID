@@ -202,7 +202,6 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             ConnectivitySnapshotEvent(
                 DEFAULT_TIME,
-                "Unknown",
                 listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED)), eventLabels
             )
         )
