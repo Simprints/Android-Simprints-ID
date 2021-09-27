@@ -10,6 +10,7 @@ import com.simprints.eventsystem.BuildConfig
 import com.simprints.eventsystem.common.Converters
 import com.simprints.eventsystem.event.local.migrations.EventMigration1to2
 import com.simprints.eventsystem.event.local.migrations.EventMigration2to3
+import com.simprints.eventsystem.event.local.migrations.EventMigration3to4
 import com.simprints.eventsystem.event.local.models.DbEvent
 import net.sqlcipher.database.SupportFactory
 
@@ -32,6 +33,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations()
                 .addMigrations(EventMigration1to2())
                 .addMigrations(EventMigration2to3())
+                .addMigrations(EventMigration3to4())
 
             if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)
