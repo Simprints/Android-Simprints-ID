@@ -51,13 +51,6 @@ class ScannerWrapperV2(
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
 
-
-    // TODO remove this before PR
-    fun setVersion(scannerVersion: ScannerVersion? = null, batteryInfo: BatteryInfo? = null) {
-        this.scannerVersion = scannerVersion
-        this.batteryInfo = batteryInfo
-    }
-
     /**
      * This function returns the already set scanner version info, or returns a default of UNKNOWN
      * values if the version info hasn't been set.
