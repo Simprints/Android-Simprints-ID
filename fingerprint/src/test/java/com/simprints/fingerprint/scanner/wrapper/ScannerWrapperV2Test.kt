@@ -7,7 +7,11 @@ import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrateg
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
+import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
@@ -26,6 +30,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
@@ -57,6 +62,69 @@ class ScannerWrapperV2Test {
             un20OtaHelper
         ),
         recordPrivateCalls = true)
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should throw the correct corresponding errors when scanner disconnection fails`() = runBlockingTest {
+        coEvery { connectionHelper.disconnectScanner(any()) } answers {
+            throw ScannerDisconnectedException()
+        } andThenThrows(UnexpectedScannerException("Scanner cannot disconnect"))
+
+        assertThrows<ScannerDisconnectedException> { scannerWrapperV2.disconnect() }
+        assertThrows<UnexpectedScannerException> { scannerWrapperV2.disconnect() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should throw the correct corresponding errors when scanner connection fails`() = runBlockingTest {
+        coEvery { connectionHelper.connectScanner(any(), any()) } answers {
+            throw ScannerDisconnectedException()
+        } andThen {
+            throw ScannerNotPairedException()
+        } andThen {
+            throw BluetoothNotEnabledException()
+        } andThenThrows(BluetoothNotSupportedException())
+
+        assertThrows<ScannerDisconnectedException> { scannerWrapperV2.connect() }
+        assertThrows<ScannerNotPairedException> { scannerWrapperV2.connect() }
+        assertThrows<BluetoothNotEnabledException> { scannerWrapperV2.connect() }
+        assertThrows<BluetoothNotSupportedException> { scannerWrapperV2.connect() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should return the correct scanner info when scanner info hasn been set`() = runBlockingTest {
+        val expectedVersion = ScannerVersion(
+            ScannerGeneration.VERO_2,
+            ScannerFirmwareVersions.UNKNOWN,
+            ScannerApiVersions.UNKNOWN
+        )
+
+        coEvery { scannerInitialSetupHelper.checkScannerInfoAndAvailableOta(any(), any(), any(), any()) } answers {
+            val scannerInfoCallback = args[2] as ((ScannerVersion) -> Unit)
+            scannerInfoCallback.invoke(expectedVersion)
+        }
+
+        scannerWrapperV2.setScannerInfoAndCheckAvailableOta()
+
+        val actualVersion = scannerWrapperV2.versionInformation()
+
+        assertThat(actualVersion).isEqualTo(expectedVersion)
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should return the unknown scanner info when scanner info hasn't been set`() = runBlockingTest {
+        val expectedVersion = ScannerVersion(
+            ScannerGeneration.VERO_2,
+            ScannerFirmwareVersions.UNKNOWN,
+            ScannerApiVersions.UNKNOWN
+        )
+
+        val actualVersion = scannerWrapperV2.versionInformation()
+
+        assertThat(actualVersion).isEqualTo(expectedVersion)
     }
 
     @Test
@@ -252,6 +320,70 @@ class ScannerWrapperV2Test {
         assertThrows<UnavailableVero2FeatureException> {
             scannerWrapperV2.startLiveFeedback()
         }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should not turn off(on) the Un20 sensor when sensorShutdown(sensorWakeup) is called and the sensor's current state is off(on)`() = runBlockingTest {
+        every { scannerV2.getUn20Status() } returns Single.just(false) andThen Single.just(true)
+        every { scannerV2.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
+        every { scannerV2.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
+
+        scannerWrapperV2.sensorShutDown()
+        scannerWrapperV2.sensorWakeUp()
+
+        verify(exactly = 0) {
+            scannerV2.turnUn20OffAndAwaitStateChangeEvent()
+            scannerV2.turnUn20OnAndAwaitStateChangeEvent()
+        }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should turn on the Un20 sensor when sensorWakeup is called and the sensor's current state is off`() = runBlockingTest {
+        every { scannerV2.getUn20Status() } returns Single.just(false)
+        every { scannerV2.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
+
+        scannerWrapperV2.sensorWakeUp()
+
+        verify(exactly = 1) { scannerV2.turnUn20OnAndAwaitStateChangeEvent() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should turn off the Un20 sensor when sensorShutdown is called and the sensor's current state is on`() = runBlockingTest {
+        every { scannerV2.getUn20Status() } returns Single.just(true)
+        every { scannerV2.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
+
+        scannerWrapperV2.sensorShutDown()
+
+        verify(exactly = 1) { scannerV2.turnUn20OffAndAwaitStateChangeEvent() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should complete execution successfully when setting scanner UI to default, when startLiveFeedback is called`() = runBlockingTest {
+        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns true
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+        every { scannerV2.getImageQualityPreview() } returns Maybe.just(50)
+
+        // get the job of the continuous feedback
+        val job = launch {
+            scannerWrapperV2.startLiveFeedback()
+        }
+
+        // force-stop the continuous live feedback
+        job.cancel()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() = runBlockingTest {
+        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns true
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+        every { scannerV2.setScannerLedStateDefault() } returns Completable.complete()
+
+        scannerWrapperV2.stopLiveFeedback()
     }
 
     @Test

@@ -6,6 +6,8 @@ import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrat
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
+import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
@@ -16,6 +18,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -31,6 +34,66 @@ class ScannerWrapperV1Test {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         scannerWrapperV1 = ScannerWrapperV1(scannerV1)
+    }
+
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should return the correct vero 1 scanner info`() = runBlockingTest {
+        val ucVersion = 3
+        val unVersion = 4
+        val expectedVersion = ScannerVersion(
+            ScannerGeneration.VERO_1,
+            ScannerFirmwareVersions(
+                cypress = ChipFirmwareVersion.UNKNOWN,
+                stm = ChipFirmwareVersion(ucVersion, 0),
+                un20 = ChipFirmwareVersion(unVersion, 0)
+            ),
+            ScannerApiVersions.UNKNOWN
+        )
+        every { scannerV1.ucVersion } returns ucVersion.toShort()
+        every { scannerV1.unVersion } returns unVersion.toShort()
+
+
+        val actualVersion = scannerWrapperV1.versionInformation()
+
+        assertThat(actualVersion).isEqualTo(expectedVersion)
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should continue successfully when setting scanner LED to idle completes successfully or fails`() = runBlockingTest {
+        // trigger the button click listener callback when it is registered
+        every { scannerV1.disconnect(any()) } answers {
+            val scannerCallback = args.last() as ScannerCallback
+            scannerCallback.onSuccess()
+        } andThen {
+            val scannerCallback = args.last() as ScannerCallback
+            scannerCallback.onFailure(SCANNER_ERROR.IO_ERROR)
+        }
+
+        // disconnecting successfully, should continue without issues
+        scannerWrapperV1.disconnect()
+        // disconnecting when error occurs, should continue without issues
+        scannerWrapperV1.disconnect()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should continue successfully if scanner disconnection fails or succeeds`() = runBlockingTest {
+        // trigger the button click listener callback when it is registered
+        every { scannerV1.disconnect(any()) } answers {
+            val scannerCallback = args.last() as ScannerCallback
+            scannerCallback.onSuccess()
+        } andThen {
+            val scannerCallback = args.last() as ScannerCallback
+            scannerCallback.onFailure(SCANNER_ERROR.IO_ERROR)
+        }
+
+        // disconnecting successfully, should continue without issues
+        scannerWrapperV1.disconnect()
+        // disconnecting when error occurs, should continue without issues
+        scannerWrapperV1.disconnect()
     }
 
     @Test
@@ -112,8 +175,29 @@ class ScannerWrapperV1Test {
         assertThat(actualResponse.template).isEqualTo(expectedResponse.template)
     }
 
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should trigger scanner's stopContinuousCapture when captureFingerprint coroutine is cancelled`() = runBlockingTest {
+        val expectedResponse = CaptureFingerprintResponse(byteArrayOf(), 64)
+        every { scannerV1.template } returns expectedResponse.template
+        every { scannerV1.imageQuality } returns expectedResponse.imageQualityScore
 
+        every { scannerV1.stopContinuousCapture() } returns true
 
+        val captureJob = launch {
+            scannerWrapperV1.captureFingerprint(
+                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
+                1000,
+                50
+            )
+        }
+
+        // cancel capture
+        captureJob.cancel()
+
+        // ensure that scanner's continuous capture is stopped
+        verify(exactly = 1) { scannerV1.stopContinuousCapture() }
+    }
 
     @Test
     fun shouldRead_scannerVersion_correctlyFormatted_withNewApiFormat() {
@@ -162,6 +246,17 @@ class ScannerWrapperV1Test {
         }
 
         assertThrows<ScannerLowBatteryException> { scannerWrapperV1.sensorWakeUp() }
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun `should throw UnknownScannerIssueException when other scanner error occurs during sensor wakeup`() = runBlockingTest {
+        every { scannerV1.un20Wakeup(any()) } answers {
+            val scannerCallback = args.first() as ScannerCallback
+            scannerCallback.onFailure(SCANNER_ERROR.IO_ERROR)
+        }
+
+        assertThrows<UnknownScannerIssueException> { scannerWrapperV1.sensorWakeUp() }
     }
 
     @Test
