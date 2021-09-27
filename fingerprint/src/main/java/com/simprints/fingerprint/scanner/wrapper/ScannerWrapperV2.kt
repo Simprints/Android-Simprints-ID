@@ -51,18 +51,18 @@ class ScannerWrapperV2(
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
 
+    /**
+     * This function returns the already set scanner version info, or returns a default of UNKNOWN
+     * values if the version info hasn't been set.
+     *
+     * @see setScannerInfoAndCheckAvailableOta
+     */
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
             hardwareVersion = ScannerExtendedInfoReaderHelper.UNKNOWN_HARDWARE_VERSION,
             generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN,
         )
-    /**
-     * This function returns the already set battery info, or returns a default value of UNKNOWN,
-     * if the battery info hasn't been set.
-     *
-     * @see setScannerInfoAndCheckAvailableOta
-     */
     override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
 
     override fun isImageTransferSupported(): Boolean= true
