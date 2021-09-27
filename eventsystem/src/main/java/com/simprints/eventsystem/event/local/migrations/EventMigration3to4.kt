@@ -49,8 +49,8 @@ class EventMigration3to4 : Migration(3, 4) {
             val originalJson = JSONObject(jsonData)
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
 
-            newPayload.remove("networkType")
-            newPayload.put("eventVersion", 2)
+            newPayload.remove(PAYLOAD_TYPE_NAME)
+            newPayload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
@@ -61,6 +61,9 @@ class EventMigration3to4 : Migration(3, 4) {
     companion object {
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
+        private const val PAYLOAD_TYPE_NAME = "networkType"
+        private const val VERSION_PAYLOAD_NAME = "eventVersion"
+        private const val NEW_EVENT_VERSION_VALUE = 2
     }
 
 }
