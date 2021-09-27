@@ -24,7 +24,7 @@ class EventMigration3to4 : Migration(3, 4) {
         }
     }
 
-    private fun migrateConnectivityEvents(database: SupportSQLiteDatabase) {
+    fun migrateConnectivityEvents(database: SupportSQLiteDatabase) {
         val enrolmentEventsQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ?", arrayOf("CONNECTIVITY_SNAPSHOT")
         )
@@ -39,7 +39,7 @@ class EventMigration3to4 : Migration(3, 4) {
     /**
      * Remove the network type line, and update the version to 2.
      */
-    private fun migrateEnrolmentEventPayloadType(
+    fun migrateEnrolmentEventPayloadType(
         it: Cursor,
         database: SupportSQLiteDatabase,
         id: String?
@@ -56,8 +56,7 @@ class EventMigration3to4 : Migration(3, 4) {
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
     }
-
-
+    
     companion object {
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
