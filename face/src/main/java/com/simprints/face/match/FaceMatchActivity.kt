@@ -150,8 +150,6 @@ class FaceMatchActivity : FaceActivity() {
         setIdentificationProgress(100)
     }
 
-    override fun onBackPressed() {}
-
     companion object {
         fun getStartingIntent(context: Context, faceMatchRequest: FaceMatchRequest): Intent =
             Intent(context, FaceMatchActivity::class.java).apply {
