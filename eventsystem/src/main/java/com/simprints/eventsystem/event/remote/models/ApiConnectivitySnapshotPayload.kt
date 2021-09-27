@@ -9,7 +9,6 @@ import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.C
 data class ApiConnectivitySnapshotPayload(
     override val startTime: Long,
     override val version: Int,
-    val networkType: String,
     val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, startTime) {
 
     @Keep
@@ -21,6 +20,5 @@ data class ApiConnectivitySnapshotPayload(
     constructor(domainPayload: ConnectivitySnapshotPayload) :
         this(domainPayload.createdAt,
             domainPayload.eventVersion,
-            domainPayload.networkType,
             domainPayload.connections.map { ApiConnection(it) })
 }

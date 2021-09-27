@@ -291,7 +291,7 @@ fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventL
 fun createConnectivitySnapshotEvent() =
     ConnectivitySnapshotEvent(
         CREATED_AT,
-        "wifi",
+
         listOf(Connection("GPRS", CONNECTED)),
         eventLabels
     )
