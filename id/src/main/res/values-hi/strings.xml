@@ -152,4 +152,6 @@
     <string name="refusal_other">अन्य</string>
     <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली\?</string>
     <string name="dashboard_sync_card_try_again_button">पुनः प्रयास करें</string>
+    <string name="confirmation_sent">पुष्टिकरण भेजा गया</string>
+    <string name="redirecting_you_back">आपको वापस रीडायरेक्ट कर रहा है</string>
 </resources>

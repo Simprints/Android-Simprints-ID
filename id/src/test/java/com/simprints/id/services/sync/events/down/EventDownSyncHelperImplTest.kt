@@ -1,7 +1,6 @@
 package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -16,13 +15,13 @@ import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
@@ -50,16 +49,7 @@ class EventDownSyncHelperImplTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setup() {

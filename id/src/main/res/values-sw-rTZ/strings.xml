@@ -154,5 +154,7 @@
     <string name="modality_starting_download">Anza kupakua</string>
     <string name="modality_downloading">Inapakua… %1$s</string>
     <string name="modality_installing">Inaingiza...</string>
+    <string name="confirmation_sent">Uthibitishaji umetumwa</string>
+    <string name="redirecting_you_back">Inakuelekeza tena</string>
 
 </resources>

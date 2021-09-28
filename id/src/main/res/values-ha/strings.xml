@@ -17,6 +17,7 @@
 
     <string name="launch_consent_decline_button">Ban amince ba</string>
     <string name="launch_consent_accept_button">Na amince</string>
+    <string name="confirmation_sent">" "</string>
 
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">Enrolment</item>
