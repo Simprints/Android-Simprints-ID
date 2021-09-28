@@ -153,6 +153,8 @@
     </plurals>
     <string name="confirm_module_selection_title">Módulos selecionados</string>
     <string name="scan_qr">Scannear QR</string>
+    <string name="confirmation_sent">Confirmação enviada</string>
+    <string name="redirecting_you_back">Redirecionando você de volta</string>
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">Inscrição</item>
         <item quantity="other">Inscrições</item>
