@@ -78,6 +78,7 @@ class CheckLoginFromIntentPresenter(
     override suspend fun setup() {
         try {
             parseAppRequest()
+            showConfirmationTextIfPossible()
             addCalloutAndConnectivityEventsInSession(appRequest)
 
             extractSessionParametersForAnalyticsManager()
@@ -87,6 +88,12 @@ class CheckLoginFromIntentPresenter(
             Simber.e(t)
             view.openAlertActivityForError(AlertType.UNEXPECTED_ERROR)
             setupFailed = true
+        }
+    }
+
+    private fun showConfirmationTextIfPossible() {
+        if (appRequest is AppConfirmIdentityRequest){
+            view.showConfirmationText()
         }
     }
 

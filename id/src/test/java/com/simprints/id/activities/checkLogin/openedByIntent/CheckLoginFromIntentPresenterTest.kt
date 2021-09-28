@@ -236,7 +236,34 @@ class CheckLoginFromIntentPresenterTest {
             coVerify { eventRepositoryMock.addOrUpdateEvent(any<IdentificationCalloutEvent>()) }
         }
     }
+    @Test
+    fun presenter_setup_shouldShowConfirmationTextForAppConfirmIdentityRequest() =runBlockingTest{
+            val appRequest = AppConfirmIdentityRequest(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_USER_ID,
+                GUID1,
+                GUID2)
+            every { view.parseRequest() } returns appRequest
 
+            presenter.setup()
+
+            // showConfirmationText should be called for AppConfirmIdentityRequest type
+            coVerify {view.showConfirmationText()  }
+    }
+    @Test
+    fun presenter_setup_shouldNotShowConfirmationTextForAppIdentifyRequest()=runBlockingTest {
+        val appRequest = AppIdentifyRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
+            DEFAULT_METADATA
+        )
+        every { view.parseRequest() } returns appRequest
+        presenter.setup()
+        // showConfirmationText shouldn't be called for AppIdentifyRequest type
+        coVerify (exactly = 0){view.showConfirmationText()  }
+
+    }
     @Test
     fun presenter_setup_shouldAddVerificationCallout() {
         runBlockingTest {

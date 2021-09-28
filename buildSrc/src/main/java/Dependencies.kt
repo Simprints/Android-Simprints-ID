@@ -1,6 +1,6 @@
 object Dependencies {
 
-    const val kotlin_version = "1.5.10"
+    const val kotlin_version = "1.5.30"
     const val androidx_navigation_version = "2.3.0-alpha04"
 
     private const val kotlin_coroutine_version = "1.3.1"
@@ -25,6 +25,7 @@ object Dependencies {
     private const val kronos_version = "0.0.1-alpha09"
     private const val fragment_version = "1.3.3"
     private const val chuck_version = "3.5.2"
+    private const val timber_version = "5.0.1"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -262,6 +263,10 @@ object Dependencies {
     // For NTP time
     object Kronos {
         const val kronos = "com.lyft.kronos:kronos-android:$kronos_version"
+    }
+
+    object Timber {
+        const val timber = "com.jakewharton.timber:timber:$timber_version"
     }
 
     const val libsimprints = "com.simprints:libsimprints:2021.3.0"

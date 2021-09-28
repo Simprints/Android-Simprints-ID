@@ -2,6 +2,7 @@ package com.simprints.id.testtools.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenterTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
@@ -63,6 +64,7 @@ interface AppComponentForTests : AppComponent {
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(subjectsDownSyncCountWorkerTest: EventDownSyncCountWorkerTest)
     fun inject(checkLoginFromIntentPresenterTest: CheckLoginFromIntentPresenterTest)
+    fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
 
     @ExperimentalCoroutinesApi
     fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
