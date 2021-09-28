@@ -217,4 +217,6 @@
     <string name="face_feature_alert">ছবি তোলার ফিচার</string>
     <string name="sync_info_images_to_upload">আপলোড এর জন্য প্রস্তুত ছবি</string>
     <string name="why_did_you_skip_biometrics">বায়োমেট্রিক তথ্য এড়িয়ে গেলেন কেন\?</string>
+    <string name="confirmation_sent">প্রয়োজনীয় ফাইল ডাউনলোড করা হচ্ছে</string>
+    <string name="redirecting_you_back">আপনাকে ফিরিয়ে আনছে</string>
 </resources>

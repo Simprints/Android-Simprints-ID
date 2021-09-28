@@ -308,5 +308,7 @@
     <string name="modality_downloading">Downloading… %1$s</string>
     <string name="modality_installing">Installing…</string>
     <string name="modality_download_taking_longer">Download taking longer than expected…</string>
+    <string name="confirmation_sent">Confirmation sent</string>
+    <string name="redirecting_you_back">Redirecting you back</string>
 
 </resources>
