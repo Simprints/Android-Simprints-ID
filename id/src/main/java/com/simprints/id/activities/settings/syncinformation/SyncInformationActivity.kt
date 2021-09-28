@@ -6,11 +6,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.TabHost
 import android.widget.TextView
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -22,6 +22,7 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
+import com.simprints.id.databinding.FragmentModuleSyncInformationBinding
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -37,12 +38,13 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
+
     private val binding by viewBinding(ActivitySyncInformationBinding::inflate)
+    private val tabBinding by viewBinding(FragmentModuleSyncInformationBinding::inflate)
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
     private lateinit var viewModel: SyncInformationViewModel
-    private lateinit var selectedModulesTabSpec: TabHost.TabSpec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,11 +66,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         setupRecordsCountCards()
 
         viewModel.fetchSyncInformation()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setFocusOnDefaultModulesTab()
     }
 
     private fun setTextInLayout() {
@@ -105,10 +102,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setFocusOnDefaultModulesTab() {
-        binding.modulesTabHost.setCurrentTabByTag(SELECTED_MODULES_TAB_TAG)
-    }
-
     private fun enableModuleSelectionButtonAndTabsIfNecessary() {
         if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
@@ -120,7 +113,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun setupAdapters() {
-        with(binding.selectedModulesView) {
+        with(tabBinding.selectedModulesView) {
             adapter = moduleCountAdapterForSelected
             layoutManager = LinearLayoutManager(applicationContext)
         }
@@ -135,13 +128,33 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun setupModulesTabs() {
-        binding.modulesTabHost.setup()
+        val syncInfoTab = binding.modulesTabHost.newTab()
+        val selectModulesTab = binding.modulesTabHost.newTab()
+        syncInfoTab.customView = tabBinding.selectedModulesView
 
-        selectedModulesTabSpec = binding.modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
-            .setIndicator(getString(R.string.sync_info_selected_modules))
-            .setContent(R.id.selectedModulesView)
+        binding.modulesTabHost.addTab(syncInfoTab, true)
 
-        binding.modulesTabHost.addTab(selectedModulesTabSpec)
+        binding.modulesTabHost.addOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                // called when tab selected
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                // called when tab unselected
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                // called when a tab is reselected
+            }
+        })
+
+//        binding.modulesTabHost.setup()
+//
+//        selectedModulesTabSpec = binding.modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
+//            .setIndicator(getString(R.string.sync_info_selected_modules))
+//            .setContent(R.id.selectedModulesView)
+//
+//        binding.modulesTabHost.addTab(selectedModulesTabSpec)
     }
 
     private fun setupClickListeners() {
@@ -151,32 +164,32 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.recordsInLocal.observe(this, Observer {
+        viewModel.recordsInLocal.observe(this, {
             binding.totalRecordsCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
         })
 
-        viewModel.recordsToUpSync.observe(this, Observer {
+        viewModel.recordsToUpSync.observe(this, {
             binding.recordsToUploadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToUploadCount, binding.recordsToUploadProgress)
         })
 
-        viewModel.imagesToUpload.observe(this, Observer {
+        viewModel.imagesToUpload.observe(this, {
             binding.imagesToUploadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.imagesToUploadCount, binding.imagesToUploadProgress)
         })
 
-        viewModel.recordsToDownSync.observe(this, Observer {
+        viewModel.recordsToDownSync.observe(this, {
             binding.recordsToDownloadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         })
 
-        viewModel.recordsToDelete.observe(this, Observer {
+        viewModel.recordsToDelete.observe(this, {
             binding.recordsToDeleteCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
         })
 
-        viewModel.moduleCounts.observe(this, Observer {
+        viewModel.moduleCounts.observe(this, {
             it?.let {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
@@ -203,7 +216,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
         val totalRecordsEntry =
             ModuleCount(getString(R.string.sync_info_total_records),
-                moduleCounts.sumBy { it.count })
+                moduleCounts.sumOf { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
         moduleCountAdapter.submitList(moduleCountsArray)
@@ -228,7 +241,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     companion object {
-        private const val SELECTED_MODULES_TAB_TAG = "SelectedModules"
         private const val TOTAL_RECORDS_INDEX = 0
     }
 }

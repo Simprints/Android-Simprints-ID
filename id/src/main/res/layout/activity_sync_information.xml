@@ -71,8 +71,8 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTintMode="src_atop"
-                android:indeterminateTint="@color/colorPrimary"/>
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
@@ -124,8 +124,8 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTintMode="src_atop"
-                android:indeterminateTint="@color/colorPrimary"/>
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
@@ -177,8 +177,8 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTintMode="src_atop"
-                android:indeterminateTint="@color/colorPrimary"/>
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
@@ -223,7 +223,6 @@
                 android:textSize="16sp"
                 tools:text="0" />
 
-
             <ProgressBar
                 android:id="@+id/recordsToUploadProgress"
                 android:layout_width="0dp"
@@ -232,8 +231,8 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTintMode="src_atop"
-                android:indeterminateTint="@color/colorPrimary"/>
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
@@ -285,15 +284,14 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTintMode="src_atop"
-                android:indeterminateTint="@color/colorPrimary"/>
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
-
-    <TabHost
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/modulesTabHost"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -301,40 +299,11 @@
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/simprints_white" />
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/selectedModulesView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:fadeScrollbars="false"
-                    android:padding="10dp"
-                    android:scrollbars="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/bottomDivider"
-                    tools:itemCount="100"
-                    tools:listitem="@layout/item_module_count" />
-            </FrameLayout>
-        </LinearLayout>
-    </TabHost>
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
+        app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <Button
         android:id="@+id/moduleSelectionButton"
@@ -352,7 +321,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintTop_toBottomOf="@+id/modulesTabHost" />
+        app:layout_constraintTop_toBottomOf="@+id/modulesTabHost"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/recordsCardsBarrier"
