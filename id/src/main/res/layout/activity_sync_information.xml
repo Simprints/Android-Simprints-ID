@@ -275,7 +275,6 @@
                 android:textSize="16sp"
                 tools:text="0" />
 
-
             <ProgressBar
                 android:id="@+id/imagesToUploadProgress"
                 android:layout_width="0dp"
@@ -291,19 +290,44 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.tabs.TabLayout
+    <LinearLayout
         android:id="@+id/modulesTabHost"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
-        app:tabGravity="fill"
-        app:tabMaxWidth="0dp"
-        app:tabMode="fixed"
-        tools:ignore="SpeakableTextPresentCheck" />
+        android:background="@color/cardview_light_background"
+        tools:ignore="SpeakableTextPresentCheck">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_info_selected_modules"
+            android:textAlignment="center"
+            android:padding="5dp"
+            android:textSize="16sp"/>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/selectedModulesView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="false"
+            android:padding="10dp"
+            android:scrollbars="vertical"
+            tools:itemCount="100"
+            tools:listitem="@layout/item_module_count" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/moduleSelectionButton"

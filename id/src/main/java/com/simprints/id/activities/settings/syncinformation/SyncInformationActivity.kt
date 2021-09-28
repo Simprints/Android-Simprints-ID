@@ -9,8 +9,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -22,7 +20,6 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
-import com.simprints.id.databinding.FragmentModuleSyncInformationBinding
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -40,7 +37,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     lateinit var eventSyncManager: EventSyncManager
 
     private val binding by viewBinding(ActivitySyncInformationBinding::inflate)
-    private val tabBinding by viewBinding(FragmentModuleSyncInformationBinding::inflate)
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
@@ -60,7 +56,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         enableModuleSelectionButtonAndTabsIfNecessary()
         setupAdapters()
         setupToolbar()
-        setupModulesTabs()
         setupClickListeners()
         observeUi()
         setupRecordsCountCards()
@@ -113,7 +108,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun setupAdapters() {
-        with(tabBinding.selectedModulesView) {
+        with(binding.selectedModulesView) {
             adapter = moduleCountAdapterForSelected
             layoutManager = LinearLayoutManager(applicationContext)
         }
@@ -125,36 +120,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun setupToolbar() {
         setSupportActionBar(binding.syncInfoToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun setupModulesTabs() {
-        val syncInfoTab = binding.modulesTabHost.newTab()
-        val selectModulesTab = binding.modulesTabHost.newTab()
-        syncInfoTab.customView = tabBinding.selectedModulesView
-
-        binding.modulesTabHost.addTab(syncInfoTab, true)
-
-        binding.modulesTabHost.addOnTabSelectedListener(object : OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                // called when tab selected
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                // called when tab unselected
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab) {
-                // called when a tab is reselected
-            }
-        })
-
-//        binding.modulesTabHost.setup()
-//
-//        selectedModulesTabSpec = binding.modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
-//            .setIndicator(getString(R.string.sync_info_selected_modules))
-//            .setContent(R.id.selectedModulesView)
-//
-//        binding.modulesTabHost.addTab(selectedModulesTabSpec)
     }
 
     private fun setupClickListeners() {
