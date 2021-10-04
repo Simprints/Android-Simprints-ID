@@ -61,7 +61,10 @@ android {
 
     buildTypes {
         debug {
-            testCoverageEnabled = true
+            // There appears to be an issues with test coverage in APG 7.0 and Kotlin 1.5. Test
+            // coverage should be re-enabled once it's fixed. 
+            // https://github.com/NeoTech-Software/Android-Root-Coverage-Plugin/issues/36#issuecomment-905299443
+            // testCoverageEnabled = true
         }
     }
 }

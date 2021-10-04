@@ -20,7 +20,6 @@ object ConnectivitySnapshotEventSample : SampleEvent() {
         )
         return ConnectivitySnapshotEvent(
             CREATED_AT,
-            "WIFI",
             connectionState,
             labels
         )

@@ -10,11 +10,12 @@ import com.simprints.eventsystem.BuildConfig
 import com.simprints.eventsystem.common.Converters
 import com.simprints.eventsystem.event.local.migrations.EventMigration1to2
 import com.simprints.eventsystem.event.local.migrations.EventMigration2to3
+import com.simprints.eventsystem.event.local.migrations.EventMigration3to4
 import com.simprints.eventsystem.event.local.models.DbEvent
 import net.sqlcipher.database.SupportFactory
 
 
-@Database(entities = [DbEvent::class], version = 3, exportSchema = true)
+@Database(entities = [DbEvent::class], version = 4, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
@@ -29,9 +30,9 @@ abstract class EventRoomDatabase : RoomDatabase() {
             dbName: String
         ): EventRoomDatabase {
             val builder = Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
-                .addMigrations()
                 .addMigrations(EventMigration1to2())
                 .addMigrations(EventMigration2to3())
+                .addMigrations(EventMigration3to4())
 
             if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)
