@@ -65,63 +65,102 @@
         app:layout_constraintStart_toEndOf="@+id/consentDeclineButton"
         app:layout_constraintTop_toTopOf="@+id/consentDeclineButton" />
 
-    <TabHost
+<!--    <TabHost-->
+<!--        android:id="@+id/tabHost"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/guideline"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine"-->
+<!--        app:layout_goneMarginTop="40dp">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TabWidget-->
+<!--                android:id="@android:id/tabs"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@color/simprints_white" />-->
+
+<!--            <FrameLayout-->
+<!--                android:id="@android:id/tabcontent"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent">-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/generalConsentTextView"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:paddingLeft="10dp"-->
+<!--                    android:paddingTop="10dp"-->
+<!--                    android:paddingRight="10dp"-->
+<!--                    android:scrollbars="vertical"-->
+<!--                    android:textColor="@color/simprints_white"-->
+<!--                    android:textSize="20sp"-->
+<!--                    app:autoSizeMaxTextSize="25sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/parentalConsentTextView"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:paddingLeft="10dp"-->
+<!--                    android:paddingTop="10dp"-->
+<!--                    android:paddingRight="10dp"-->
+<!--                    android:scrollbars="vertical"-->
+<!--                    android:text=""-->
+<!--                    android:textColor="@color/simprints_white"-->
+<!--                    android:textSize="20sp"-->
+<!--                    app:autoSizeMaxTextSize="25sp" />-->
+
+<!--            </FrameLayout>-->
+<!--        </LinearLayout>-->
+<!--    </TabHost>-->
+
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabHost"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/consentTextHolderView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Tab 1"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Tab 2"/>
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <TextView
+        android:id="@+id/consentTextHolderView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:scrollbars="vertical"
+        android:text=""
+        android:textColor="@color/simprints_white"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine"
-        app:layout_goneMarginTop="40dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/simprints_white" />
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/generalConsentTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingRight="10dp"
-                    android:scrollbars="vertical"
-                    android:textColor="@color/simprints_white"
-                    android:textSize="20sp"
-                    app:autoSizeMaxTextSize="25sp" />
-
-                <TextView
-                    android:id="@+id/parentalConsentTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingRight="10dp"
-                    android:scrollbars="vertical"
-                    android:text=""
-                    android:textColor="@color/simprints_white"
-                    android:textSize="20sp"
-                    app:autoSizeMaxTextSize="25sp" />
-
-            </FrameLayout>
-        </LinearLayout>
-    </TabHost>
+        app:layout_constraintTop_toBottomOf="@+id/tabHost" />
 
     <TextView
         android:id="@+id/privacyNoticeText"
