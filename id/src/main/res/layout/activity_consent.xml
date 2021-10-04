@@ -69,20 +69,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@color/simprints_white"
         app:layout_constraintBottom_toTopOf="@+id/consentTextHolderView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine">
 
         <com.google.android.material.tabs.TabItem
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/consent_general_title"/>
+            android:layout_height="wrap_content"
+            android:text="@string/consent_general_title" />
 
         <com.google.android.material.tabs.TabItem
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/consent_parental_title"/>
+            android:layout_height="wrap_content"
+            android:text="@string/consent_parental_title" />
 
     </com.google.android.material.tabs.TabLayout>
 
