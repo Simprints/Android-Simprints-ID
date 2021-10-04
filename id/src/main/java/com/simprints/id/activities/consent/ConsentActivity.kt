@@ -6,9 +6,9 @@ import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
-import android.widget.TabHost
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.tabs.TabLayout
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
@@ -42,17 +42,28 @@ class ConsentActivity : BaseSplitActivity() {
     private lateinit var viewModel: ConsentViewModel
     private val binding by viewBinding(ActivityConsentBinding::inflate)
 
-    private lateinit var generalConsentTab: TabHost.TabSpec
-    private lateinit var parentalConsentTab: TabHost.TabSpec
     private lateinit var askConsentRequestReceived: AskConsentRequest
 
-    @Inject lateinit var viewModelFactory: ConsentViewModelFactory
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var preferencesManager: IdPreferencesManager
-    @Inject lateinit var exitFormHelper: ExitFormHelper
-    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-    @Inject lateinit var locationManager: LocationManager
-    @Inject lateinit var jsonHelper: JsonHelper
+    @Inject
+    lateinit var viewModelFactory: ConsentViewModelFactory
+
+    @Inject
+    lateinit var timeHelper: TimeHelper
+
+    @Inject
+    lateinit var preferencesManager: IdPreferencesManager
+
+    @Inject
+    lateinit var exitFormHelper: ExitFormHelper
+
+    @Inject
+    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+
+    @Inject
+    lateinit var locationManager: LocationManager
+
+    @Inject
+    lateinit var jsonHelper: JsonHelper
 
     private var startConsentEventTime: Long = 0
 
@@ -91,31 +102,47 @@ class ConsentActivity : BaseSplitActivity() {
             privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or UNDERLINE_TEXT_FLAG
         }
 
-        with(preferencesManager) {
-            binding.generalConsentTextView.text =
-                buildGeneralConsentText(generalConsentOptionsJson, programName, organizationName, modalities, jsonHelper)
-            binding.parentalConsentTextView.text =
-                buildParentalConsentText(parentalConsentOptionsJson, programName, organizationName, modalities, jsonHelper)
-        }
+//        with(preferencesManager) {
+//            binding.generalConsentTextView.text =
+//                buildGeneralConsentText(
+//                    generalConsentOptionsJson,
+//                    programName,
+//                    organizationName,
+//                    modalities,
+//                    jsonHelper
+//                )
+//            binding.parentalConsentTextView.text =
+//                buildParentalConsentText(
+//                    parentalConsentOptionsJson,
+//                    programName,
+//                    organizationName,
+//                    modalities,
+//                    jsonHelper
+//                )
+//        }
 
     }
 
-    private fun buildGeneralConsentText(generalConsentOptionsJson: String,
-                                        programName: String,
-                                        organizationName: String,
-                                        modalities: List<Modality>,
-                                        jsonHelper: JsonHelper) =
+    private fun buildGeneralConsentText(
+        generalConsentOptionsJson: String,
+        programName: String,
+        organizationName: String,
+        modalities: List<Modality>,
+        jsonHelper: JsonHelper
+    ) =
         GeneralConsentTextHelper(
             generalConsentOptionsJson,
             programName, organizationName, modalities,
             jsonHelper
         ).assembleText(askConsentRequestReceived, this)
 
-    private fun buildParentalConsentText(parentalConsentOptionsJson: String,
-                                         programName: String,
-                                         organizationName: String,
-                                         modalities: List<Modality>,
-                                         jsonHelper: JsonHelper) =
+    private fun buildParentalConsentText(
+        parentalConsentOptionsJson: String,
+        programName: String,
+        organizationName: String,
+        modalities: List<Modality>,
+        jsonHelper: JsonHelper
+    ) =
         ParentalConsentTextHelper(
             parentalConsentOptionsJson,
             programName, organizationName, modalities,
@@ -123,23 +150,46 @@ class ConsentActivity : BaseSplitActivity() {
         ).assembleText(askConsentRequestReceived, this)
 
     private fun setupTabs() {
-        binding.tabHost.setup()
+        val generalConsentText = buildGeneralConsentText(
+            preferencesManager.generalConsentOptionsJson,
+            preferencesManager.programName,
+            preferencesManager.organizationName,
+            preferencesManager.modalities,
+            jsonHelper
+        )
 
-        generalConsentTab = binding.tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG)
-            .setIndicator(getString(R.string.consent_general_title))
-            .setContent(R.id.generalConsentTextView)
+        binding.consentTextHolderView.text = generalConsentText
 
-        parentalConsentTab = binding.tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG)
-            .setIndicator(getString(R.string.consent_parental_title))
-            .setContent(R.id.parentalConsentTextView)
-
-        binding.tabHost.addTab(generalConsentTab)
-        if (preferencesManager.parentalConsentExists) {
-            binding.tabHost.addTab(parentalConsentTab)
+        if (!preferencesManager.parentalConsentExists) {
+            binding.tabHost.removeTabAt(1)
         }
 
-        binding.generalConsentTextView.movementMethod = ScrollingMovementMethod()
-        binding.parentalConsentTextView.movementMethod = ScrollingMovementMethod()
+        binding.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                // called when tab selected
+                if (tab.position == GENERAL_CONSENT_TAB_TAG)
+                    binding.consentTextHolderView.text = generalConsentText
+                else if (tab.position == PARENTAL_CONSENT_TAB_TAG)
+                    binding.consentTextHolderView.text = buildParentalConsentText(
+                        preferencesManager.parentalConsentOptionsJson,
+                        preferencesManager.programName,
+                        preferencesManager.organizationName,
+                        preferencesManager.modalities,
+                        jsonHelper
+                    )
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                // called when tab unselected
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                // called when a tab is reselected
+            }
+
+        })
+
+        binding.consentTextHolderView.movementMethod = ScrollingMovementMethod()
     }
 
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -163,7 +213,7 @@ class ConsentActivity : BaseSplitActivity() {
     private fun buildConsentEventForResult(consentResult: ConsentPayload.Result) =
         ConsentEvent(startConsentEventTime, timeHelper.now(), getCurrentConsentTab(), consentResult)
 
-    private fun getCurrentConsentTab() = when (binding.tabHost.currentTabTag) {
+    private fun getCurrentConsentTab() = when (binding.tabHost.selectedTabPosition) {
         GENERAL_CONSENT_TAB_TAG -> Type.INDIVIDUAL
         PARENTAL_CONSENT_TAB_TAG -> Type.PARENTAL
         else -> throw IllegalStateException("Invalid consent tab selected")
@@ -215,7 +265,7 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     companion object {
-        const val GENERAL_CONSENT_TAB_TAG = "General"
-        const val PARENTAL_CONSENT_TAB_TAG = "Parental"
+        const val GENERAL_CONSENT_TAB_TAG = 0
+        const val PARENTAL_CONSENT_TAB_TAG = 1
     }
 }
