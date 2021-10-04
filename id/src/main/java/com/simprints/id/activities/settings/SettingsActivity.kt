@@ -58,6 +58,7 @@ class SettingsActivity : BaseSplitActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             setResult(LOGOUT_RESULT_CODE)
             finish()
