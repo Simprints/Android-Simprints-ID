@@ -25,6 +25,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew clientapi:jacocoTestReport
                 artifacts:
@@ -42,6 +43,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew id:jacocoTestReport
@@ -63,6 +65,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew face:jacocoTestReport
                 artifacts:
@@ -81,6 +84,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprint:jacocoTestReport
                 artifacts:
@@ -99,6 +103,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprintscanner:jacocoTestReport
                 artifacts:
@@ -118,6 +123,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
@@ -134,7 +140,6 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     #dependency-analysis plugin v0.78.0 needs java11+
-                    - bash ./ci/tools/install_java_11
                     - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
@@ -161,6 +166,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     # Build ID Android Test APK
                     - ./gradlew id:assembleDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
