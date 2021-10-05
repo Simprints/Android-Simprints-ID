@@ -25,8 +25,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/tools/install_java_11
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew clientapi:jacocoTestReport
                 artifacts:
@@ -120,8 +118,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/tools/install_java_11
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
