@@ -27,7 +27,8 @@ class FaceCaptureEvent(
         qualityThreshold,
         result.fromDomainToCore(),
         isFallback,
-        eventFace?.fromDomainToCore()
+        eventFace?.fromDomainToCore(),
+        id =id
     )
 
     @Keep
