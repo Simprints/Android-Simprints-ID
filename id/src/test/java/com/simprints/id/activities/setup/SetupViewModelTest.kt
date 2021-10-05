@@ -2,7 +2,9 @@ package com.simprints.id.activities.setup
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOffline
 import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOnline
@@ -12,11 +14,10 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -81,5 +82,38 @@ class SetupViewModelTest {
 
         assertThat(viewModel.getDeviceNetworkLiveData().testObserver().observedValues.last())
             .isEqualTo(DeviceOnline)
+    }
+
+    @Test
+    fun `reStartDownloadIfNecessary shouldn't call cancelInstall when requestSessionStates is empty`() {
+        // Given
+        val modalityList = listOf("fingerprint", "face")
+        mockRequestSessionStates(emptyList())
+        // When
+        val viewModel = SetupViewModel(deviceManagerMock)
+        viewModel.reStartDownloadIfNecessary(splitInstallManagerMock, modalityList)
+        // Then
+        verify(exactly = 0) { splitInstallManagerMock.cancelInstall(any()) }
+    }
+
+    @Test
+    fun `reStartDownloadIfNecessary should call cancelInstall when requestSessionStates isn't empty`() {     /* Given */
+        // Given
+        val viewModel = SetupViewModel(deviceManagerMock)
+        val modalityList = listOf("fingerprint", "face")
+        mockRequestSessionStates(listOf(mockk()))
+        every { splitInstallManagerMock.cancelInstall(any()) } returns mockk()
+        every { viewModel.start(splitInstallManagerMock, modalityList) } just Runs
+        // When
+        viewModel.reStartDownloadIfNecessary(splitInstallManagerMock, modalityList)
+        // Then
+        verify(exactly = 1) { splitInstallManagerMock.cancelInstall(any()) }
+    }
+
+    private fun mockRequestSessionStates(result: List<SplitInstallSessionState>) {
+        //To mock module-wide extension functions we need to call mockkStatic(...)
+        //with the module’s class name as an argument.
+        mockkStatic("com.google.android.play.core.ktx.SplitInstallManagerKtxKt")
+        coEvery { splitInstallManagerMock.requestSessionStates() } returns result
     }
 }
