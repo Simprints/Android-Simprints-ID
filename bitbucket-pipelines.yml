@@ -24,8 +24,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew clientapi:jacocoTestReport
                 artifacts:
@@ -42,8 +41,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew id:jacocoTestReport
