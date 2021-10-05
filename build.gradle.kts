@@ -37,7 +37,7 @@ buildscript {
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.24.18")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.4.0")
+        classpath("io.realm:realm-gradle-plugin:10.8.0")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
