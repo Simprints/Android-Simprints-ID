@@ -62,8 +62,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew face:jacocoTestReport
                 artifacts:
@@ -81,8 +80,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprint:jacocoTestReport
                 artifacts:
@@ -100,8 +98,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprintscanner:jacocoTestReport
                 artifacts:
@@ -120,8 +117,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
@@ -136,9 +132,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    #dependency-analysis plugin v0.78.0 needs java11+
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
                     - ./gradlew :clientapi:projectHealth
@@ -163,8 +157,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     # Build ID Android Test APK
                     - ./gradlew id:assembleDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
@@ -219,7 +212,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
                     - ./gradlew packageStagingUniversalApk
@@ -243,7 +236,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - bash ./ci/deployment/signing_properties_setup
                     - mkdir -p id/src/release
@@ -266,7 +259,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
