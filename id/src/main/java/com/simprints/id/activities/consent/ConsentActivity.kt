@@ -101,26 +101,6 @@ class ConsentActivity : BaseSplitActivity() {
             privacyNoticeText.text = getString(R.string.privacy_notice_text)
             privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or UNDERLINE_TEXT_FLAG
         }
-
-//        with(preferencesManager) {
-//            binding.generalConsentTextView.text =
-//                buildGeneralConsentText(
-//                    generalConsentOptionsJson,
-//                    programName,
-//                    organizationName,
-//                    modalities,
-//                    jsonHelper
-//                )
-//            binding.parentalConsentTextView.text =
-//                buildParentalConsentText(
-//                    parentalConsentOptionsJson,
-//                    programName,
-//                    organizationName,
-//                    modalities,
-//                    jsonHelper
-//                )
-//        }
-
     }
 
     private fun buildGeneralConsentText(
@@ -166,7 +146,6 @@ class ConsentActivity : BaseSplitActivity() {
 
         binding.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                // called when tab selected
                 if (tab.position == GENERAL_CONSENT_TAB_TAG)
                     binding.consentTextHolderView.text = generalConsentText
                 else if (tab.position == PARENTAL_CONSENT_TAB_TAG)
@@ -179,14 +158,8 @@ class ConsentActivity : BaseSplitActivity() {
                     )
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                // called when tab unselected
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab) {
-                // called when a tab is reselected
-            }
-
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
         binding.consentTextHolderView.movementMethod = ScrollingMovementMethod()
