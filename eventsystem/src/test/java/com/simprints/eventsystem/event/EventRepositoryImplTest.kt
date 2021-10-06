@@ -25,12 +25,8 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -309,7 +305,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
+    fun upload_fails_shouldNotDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
                 Response.error<String>(
@@ -323,7 +319,7 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            coVerify {
+            coVerify(exactly = 0) {
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
                     .map { it.id })
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }

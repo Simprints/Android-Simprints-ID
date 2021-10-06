@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
@@ -24,7 +25,6 @@ import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,6 +53,9 @@ class DebugActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var subjectRepository: SubjectRepository
+
+    @Inject
+    lateinit var dispatcher: DispatcherProvider
 
     private val binding by viewBinding(ActivityDebugBinding::inflate)
 
@@ -92,7 +95,7 @@ class DebugActivity : BaseSplitActivity() {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
+                withContext(dispatcher.io()) {
                     eventSyncManager.cancelScheduledSync()
                     eventSyncManager.stop()
                     eventLocalDataSource.deleteAll()
@@ -114,7 +117,7 @@ class DebugActivity : BaseSplitActivity() {
         binding.printRoomDb.setOnClickListener {
             binding.logs.text = ""
             lifecycleScope.launch {
-                withContext(Dispatchers.Main) {
+                withContext(dispatcher.main()) {
                     val logStringBuilder = StringBuilder()
                     logStringBuilder.append("\nSubjects ${subjectRepository.count()}")
 

@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync.events.down
 
 import androidx.annotation.VisibleForTesting
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
@@ -20,18 +21,19 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
-                              val eventRepository: com.simprints.eventsystem.event.EventRepository,
-                              private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-                              private val subjectFactory: SubjectFactory,
-                              private val preferencesManager: IdPreferencesManager,
-                              val timeHelper: TimeHelper
+class EventDownSyncHelperImpl(
+    val subjectRepository: SubjectRepository,
+    val eventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+    private val subjectFactory: SubjectFactory,
+    private val preferencesManager: IdPreferencesManager,
+    private val timeHelper: TimeHelper,
+    private val dispatcher: DispatcherProvider
 ) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation): List<EventCount> =
@@ -117,7 +119,7 @@ class EventDownSyncHelperImpl(val subjectRepository: SubjectRepository,
         Simber.d("[DOWN_SYNC_HELPER] Emit progress")
 
         if (!this.isClosedForSend) {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher.io()) {
                 eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
             }
             this.send(EventDownSyncProgress(lastOperation, count))

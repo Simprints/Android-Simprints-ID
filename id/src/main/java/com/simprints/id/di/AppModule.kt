@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
@@ -93,6 +94,7 @@ import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import okhttp3.Interceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -108,8 +110,9 @@ open class AppModule {
     @Singleton
     open fun provideRemoteDbManager(
         loginInfoManager: LoginInfoManager,
-        context: Context
-    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
+        context: Context,
+        dispatcher: DispatcherProvider
+    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context, dispatcher)
 
     @Provides
     @Singleton
@@ -122,7 +125,8 @@ open class AppModule {
         RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
-    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache = SessionDataCacheImpl(app)
+    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
+        SessionDataCacheImpl(app)
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
@@ -181,14 +185,18 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
         performanceTracer: FirebasePerformanceTraceFactory,
-        jsonHelper: JsonHelper
+        jsonHelper: JsonHelper,
+        dispatcher: DispatcherProvider,
+        @Named("ChuckerInterceptor") interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         ctx.packageVersionName,
         remoteDbManager,
         performanceTracer,
-        jsonHelper
+        jsonHelper,
+        dispatcher,
+        interceptor
     )
 
     @Provides
@@ -207,6 +215,11 @@ open class AppModule {
     @Provides
     open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
         SessionEventValidatorsFactoryImpl()
+
+    @Provides
+    @Named("ChuckerInterceptor")
+    open fun provideChuckerInterceptor(ctx: Context): Interceptor =
+        ChuckerInterceptor.Builder(ctx).build()
 
     @Provides
     open fun provideDbEventDatabaseFactory(

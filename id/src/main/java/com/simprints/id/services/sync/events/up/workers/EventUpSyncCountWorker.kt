@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -25,6 +25,7 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
 
     @Inject lateinit var eventUpSyncHelper: EventUpSyncHelper
     @Inject lateinit var jsonHelper: JsonHelper
+    @Inject lateinit var dispatcher: DispatcherProvider
 
     private val upSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_UP)
@@ -33,18 +34,21 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
         jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
     }
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        try {
-            getComponent<EventUpSyncCountWorker> { it.inject(this@EventUpSyncCountWorker) }
-            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
+    override suspend fun doWork(): Result {
+        getComponent<EventUpSyncCountWorker> { it.inject(this@EventUpSyncCountWorker) }
 
-            crashlyticsLog("Start - $upSyncScope")
+        return withContext(dispatcher.io()) {
+            try {
+                Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
 
-            execute(upSyncScope)
-        } catch (t: Throwable) {
-            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Failed ${t.message}")
+                crashlyticsLog("Start - $upSyncScope")
 
-            fail(t)
+                execute(upSyncScope)
+            } catch (t: Throwable) {
+                Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Failed ${t.message}")
+
+                fail(t)
+            }
         }
     }
 

@@ -17,6 +17,8 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -24,6 +26,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -37,6 +40,10 @@ class EventSyncManagerImplTest {
     @MockK lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
     @MockK lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
     @MockK lateinit var eventSyncCache: EventSyncCache
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val ctx: Context = ApplicationProvider.getApplicationContext()
     private val wm: WorkManager
@@ -52,7 +59,7 @@ class EventSyncManagerImplTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this, relaxed = true)
-        subjectsSyncManager = EventSyncManagerImpl(ctx, eventSyncStateProcessor, eventDownSyncScopeRepository, eventUpSyncScopeRepository, eventSyncCache)
+        subjectsSyncManager = EventSyncManagerImpl(ctx, eventSyncStateProcessor, eventDownSyncScopeRepository, eventUpSyncScopeRepository, eventSyncCache, testDispatcherProvider)
     }
 
     @Test

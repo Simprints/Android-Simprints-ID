@@ -198,6 +198,9 @@ dependencies {
     implementation(Dependencies.AndroidX.sqlite)
     implementation(Dependencies.SqlCipher.core)
 
+    debugImplementation(Dependencies.Chuck.debug)
+    releaseImplementation(Dependencies.Chuck.release)
+
     // ######################################################
     //                      Unit test
     // ######################################################

@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.RealmTestsBase
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
@@ -35,6 +36,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     private val loginInfoManagerMock = mockk<LoginInfoManager>()
     private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
 
+    private val testDispatcherProvider = DefaultDispatcherProvider()
+
     @Before
     @FlowPreview
     fun setup() {
@@ -48,7 +51,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         subjectLocalDataSource = SubjectLocalDataSourceImpl(
             testContext,
             secureLocalDbKeyProviderMock,
-            loginInfoManagerMock
+            loginInfoManagerMock,
+            testDispatcherProvider
         )
     }
 
@@ -69,7 +73,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val differentLocalDataSource = SubjectLocalDataSourceImpl(
             testContext,
             differentSecureLocalDbKeyProviderMock,
-            loginInfoManagerMock
+            loginInfoManagerMock,
+            testDispatcherProvider
         )
 
         val count = runBlocking { differentLocalDataSource.count() }
