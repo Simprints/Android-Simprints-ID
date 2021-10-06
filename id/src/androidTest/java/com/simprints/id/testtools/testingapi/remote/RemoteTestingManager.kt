@@ -1,12 +1,13 @@
 package com.simprints.id.testtools.testingapi.remote
 
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.testtools.testingapi.models.*
 
 interface RemoteTestingManager {
 
     companion object {
-        fun create() = RemoteTestingManagerImpl()
+        fun create(dispatcher: DispatcherProvider) = RemoteTestingManagerImpl(dispatcher)
     }
 
     fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()): TestProject

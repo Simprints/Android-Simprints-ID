@@ -116,10 +116,15 @@ class SetupViewModel(
     private fun logMessageForCrashReport(message: String) {
         Simber.tag(ID_SETUP.name).i(message)
     }
-
+    /**
+     * This Method cancels and restart the last installation session if this session is not active
+     *
+     * @param splitInstallManager
+     * @param modalitiesRequired
+     */
     fun reStartDownloadIfNecessary(splitInstallManager: SplitInstallManager, modalitiesRequired: List<String>) {
         viewModelScope.launch {
-            if (!isModalityInstallOnGoing(splitInstallManager)) {
+            if (isModalityInstallOnGoing(splitInstallManager) == false) {
                 logMessageForCrashReport("Restarting modalities download")
                 splitInstallManager.cancelInstall(splitInstallManager.requestSessionStates().last().sessionId())
                 start(splitInstallManager, modalitiesRequired)
@@ -127,8 +132,17 @@ class SetupViewModel(
         }
     }
 
+    /**
+     * This method check if the last installation session is active.
+     *
+     * @param splitInstallManager
+     *
+     * @return True if the last session has no errors and  is already installed, installing, downloading or downloaded.
+     * False otherwise.
+     * Null if there is no installation session.
+     */
     private suspend fun isModalityInstallOnGoing(splitInstallManager: SplitInstallManager) =
-        splitInstallManager.requestSessionStates().last().let {
+        splitInstallManager.requestSessionStates().lastOrNull()?.let {
             (it.status == INSTALLED || it.status == INSTALLING || it.status == DOWNLOADING || it.status == DOWNLOADED) && it.errorCode() == NO_ERROR
         }
 }

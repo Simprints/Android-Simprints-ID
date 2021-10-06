@@ -9,6 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.BuildConfig
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.addTagForBackgroundSyncMasterWorker
@@ -24,15 +25,17 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-class EventSyncManagerImpl(private val ctx: Context,
-                           private val eventSyncStateProcessor: EventSyncStateProcessor,
-                           private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-                           private val upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-                           private val eventSyncCache: EventSyncCache) : EventSyncManager {
+class EventSyncManagerImpl(
+    private val ctx: Context,
+    private val eventSyncStateProcessor: EventSyncStateProcessor,
+    private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+    private val upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+    private val eventSyncCache: EventSyncCache,
+    private val dispatcher: DispatcherProvider
+) : EventSyncManager {
 
     companion object {
         private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
@@ -102,7 +105,7 @@ class EventSyncManagerImpl(private val ctx: Context,
             .build()
 
     override suspend fun deleteSyncInfo() {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher.io()) {
             downSyncScopeRepository.deleteAll()
             upSyncScopeRepo.deleteAll()
             eventSyncCache.clearProgresses()

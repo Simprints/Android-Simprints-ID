@@ -10,11 +10,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
@@ -33,9 +29,7 @@ import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.secure.models.SecurityState.Status
@@ -43,13 +37,8 @@ import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
@@ -111,7 +100,6 @@ class CheckLoginFromIntentPresenterTest {
 
             simNetworkUtils = simNetworkUtilsMock
             every { simNetworkUtils.connectionsStates } returns emptyList()
-            every { simNetworkUtils.mobileNetworkType } returns ""
 
             loginInfoManager = loginInfoManagerMock.apply {
                 every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
@@ -236,7 +224,34 @@ class CheckLoginFromIntentPresenterTest {
             coVerify { eventRepositoryMock.addOrUpdateEvent(any<IdentificationCalloutEvent>()) }
         }
     }
+    @Test
+    fun presenter_setup_shouldShowConfirmationTextForAppConfirmIdentityRequest() =runBlockingTest{
+            val appRequest = AppConfirmIdentityRequest(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_USER_ID,
+                GUID1,
+                GUID2)
+            every { view.parseRequest() } returns appRequest
 
+            presenter.setup()
+
+            // showConfirmationText should be called for AppConfirmIdentityRequest type
+            coVerify {view.showConfirmationText()  }
+    }
+    @Test
+    fun presenter_setup_shouldNotShowConfirmationTextForAppIdentifyRequest()=runBlockingTest {
+        val appRequest = AppIdentifyRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
+            DEFAULT_METADATA
+        )
+        every { view.parseRequest() } returns appRequest
+        presenter.setup()
+        // showConfirmationText shouldn't be called for AppIdentifyRequest type
+        coVerify (exactly = 0){view.showConfirmationText()  }
+
+    }
     @Test
     fun presenter_setup_shouldAddVerificationCallout() {
         runBlockingTest {

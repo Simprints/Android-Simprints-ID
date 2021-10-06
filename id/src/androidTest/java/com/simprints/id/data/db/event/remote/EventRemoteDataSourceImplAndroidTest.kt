@@ -61,6 +61,8 @@ import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -69,6 +71,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
@@ -86,12 +89,20 @@ class EventRemoteDataSourceImplAndroidTest {
         const val DEFAULT_TIME = 1000L
     }
 
-    private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
+    private val remoteTestingManager: RemoteTestingManager by lazy {
+        RemoteTestingManager.create(testDispatcherProvider)
+    }
+
     @MockK lateinit var timeHelper: TimeHelper
 
-    @get:Rule
-    val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
+    @get:Rule
+    val testProjectRule = TestProjectRule(testDispatcherProvider)
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private lateinit var eventLabels: EventLabels
@@ -102,8 +113,9 @@ class EventRemoteDataSourceImplAndroidTest {
     private val okHttpClientBuilder = object : DefaultOkHttpClientBuilder() {
         override fun get(authToken: String?,
                          deviceId: String,
-                         versionName: String): OkHttpClient.Builder =
-            super.get(authToken, deviceId, versionName).apply {
+                         versionName: String,
+                         interceptor: Interceptor): OkHttpClient.Builder =
+            super.get(authToken, deviceId, versionName,interceptor).apply {
                 addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })
@@ -127,7 +139,7 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, okHttpClientBuilder),
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, testDispatcherProvider, HttpLoggingInterceptor(), okHttpClientBuilder),
             JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100
@@ -190,7 +202,6 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             ConnectivitySnapshotEvent(
                 DEFAULT_TIME,
-                "Unknown",
                 listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED)), eventLabels
             )
         )

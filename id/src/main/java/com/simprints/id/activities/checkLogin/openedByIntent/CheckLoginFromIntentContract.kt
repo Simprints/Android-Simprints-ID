@@ -17,6 +17,7 @@ interface CheckLoginFromIntentContract {
         fun parseRequest(): AppRequest
         fun finishCheckLoginFromIntentActivity()
         fun setResultErrorAndFinish(appResponse: IAppErrorResponse)
+        fun showConfirmationText()
     }
 
     interface Presenter {

@@ -21,6 +21,8 @@ import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgres
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
 import io.mockk.every
@@ -29,10 +31,11 @@ import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.UUID
+import java.util.*
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -41,6 +44,10 @@ class EventDownSyncDownloaderWorkerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setUp() {
@@ -133,6 +140,7 @@ class EventDownSyncDownloaderWorkerTest {
             jsonHelper = JsonHelper
             eventDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncHelper = mockk(relaxed = true)
+            dispatcher = testDispatcherProvider
         }
 }
 

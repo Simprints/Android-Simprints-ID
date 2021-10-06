@@ -1,6 +1,6 @@
 object Dependencies {
 
-    const val kotlin_version = "1.5.10"
+    const val kotlin_version = "1.5.30"
     const val androidx_navigation_version = "2.3.0-alpha04"
 
     private const val kotlin_coroutine_version = "1.3.1"
@@ -24,6 +24,8 @@ object Dependencies {
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
     private const val fragment_version = "1.3.3"
+    private const val chuck_version = "3.5.2"
+    private const val timber_version = "5.0.1"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -103,7 +105,7 @@ object Dependencies {
     }
 
     object Support {
-        const val material = "com.google.android.material:material:1.1.0-alpha03"
+        const val material = "com.google.android.material:material:1.4.0"
     }
 
     object WorkManager {
@@ -136,6 +138,11 @@ object Dependencies {
         const val converterScalars = "com.squareup.retrofit2:converter-scalars:$retrofit_version"
         const val logging = "com.squareup.okhttp3:logging-interceptor:$okttp_version"
         const val okhttp = "com.squareup.okhttp3:okhttp:$okttp_version"
+    }
+
+    object Chuck {
+        const val debug = "com.github.chuckerteam.chucker:library:$chuck_version"
+        const val release = "com.github.chuckerteam.chucker:library-no-op:$chuck_version"
     }
 
     object Jackson {
@@ -256,6 +263,10 @@ object Dependencies {
     // For NTP time
     object Kronos {
         const val kronos = "com.lyft.kronos:kronos-android:$kronos_version"
+    }
+
+    object Timber {
+        const val timber = "com.jakewharton.timber:timber:$timber_version"
     }
 
     const val libsimprints = "com.simprints:libsimprints:2021.3.0"

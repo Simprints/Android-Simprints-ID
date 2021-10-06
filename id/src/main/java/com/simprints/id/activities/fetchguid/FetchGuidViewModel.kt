@@ -3,16 +3,15 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.tools.extentions.inBackground
-import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
+import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.id.data.db.SubjectFetchResult
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.tools.device.DeviceManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -20,7 +19,8 @@ class FetchGuidViewModel(
     private val fetchGuidHelper: FetchGuidHelper,
     private val deviceManager: DeviceManager,
     private val eventRepository: EventRepository,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    private val dispatcher: DispatcherProvider
 ) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()
@@ -35,7 +35,7 @@ class FetchGuidViewModel(
     }
 
     private suspend fun getSubjectFetchResult(projectId: String, verifyGuid: String) =
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher.io()) {
             val fetchResult = fetchGuidHelper.loadFromRemoteIfNeeded(this, projectId, verifyGuid)
             if (fetchResult.subjectSource == SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
                 getSubjectFetchResultForError()
@@ -91,4 +91,5 @@ class FetchGuidViewModel(
             SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE -> RemoteResult.NOT_FOUND
             SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> null
         }
+
 }

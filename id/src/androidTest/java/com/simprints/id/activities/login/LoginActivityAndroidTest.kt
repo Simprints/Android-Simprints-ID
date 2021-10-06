@@ -2,14 +2,9 @@ package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.id.Application
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -35,6 +30,7 @@ class LoginActivityAndroidTest {
     @MockK
     lateinit var mockLoginActivityHelper: LoginActivityHelper
 
+    private val testDispatcherProvider = DefaultDispatcherProvider()
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     private val appModule by lazy {
@@ -53,7 +49,7 @@ class LoginActivityAndroidTest {
     private val viewModelModule by lazy {
         TestViewModelModule(
             loginViewModelFactoryRule = DependencyRule.ReplaceRule {
-                LoginViewModelFactory(mockAuthenticationHelper)
+                LoginViewModelFactory(mockAuthenticationHelper, testDispatcherProvider)
             }
         )
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -57,11 +58,13 @@ open class DataModule {
     open fun provideProjectLocalDataSource(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        dispatcher: DispatcherProvider
     ): ProjectLocalDataSource = ProjectLocalDataSourceImpl(
         ctx,
         secureLocalDbKeyProvider,
-        loginInfoManager
+        loginInfoManager,
+        dispatcher
     )
 
     @Provides
@@ -97,11 +100,13 @@ open class DataModule {
     open fun providePersonLocalDataSource(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager
+        loginInfoManager: LoginInfoManager,
+        dispatcher: DispatcherProvider
     ): SubjectLocalDataSource = SubjectLocalDataSourceImpl(
         ctx,
         secureLocalDbKeyProvider,
-        loginInfoManager
+        loginInfoManager,
+        dispatcher
     )
 
     @Provides

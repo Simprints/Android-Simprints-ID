@@ -9,15 +9,18 @@ import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.UUID
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -25,6 +28,10 @@ class EventEndSyncReporterWorkerTest {
 
     private val syncId = UUID.randomUUID().toString()
     private val tagForMasterSyncId = "$TAG_MASTER_SYNC_ID$syncId"
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
@@ -64,5 +71,6 @@ class EventEndSyncReporterWorkerTest {
             .apply {
                 resultSetter = mockk(relaxed = true)
                 syncCache = mockk(relaxed = true)
+                dispatcher = testDispatcherProvider
             }
 }
