@@ -21,11 +21,11 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
-import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Test
@@ -97,6 +97,31 @@ class ConsentActivityTest {
     }
 
     @Test
+    fun `declining on parental tab should still exit correctly`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+        activity.consentDeclineButton.performClick()
+
+        assertActivityStarted(FaceExitFormActivity::class.java, activity)
+    }
+
+    @Test
+    fun `declining on un-known tab should throw error`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.addTab(activity.tabHost.newTab(), 2, true)
+
+        assertThrows<IllegalStateException> { activity.consentDeclineButton.performClick() }
+    }
+
+    @Test
     fun `general consent text should show first`() {
         every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
         val controller = createRoboConsentActivity(getIntentForConsentAct())
@@ -113,8 +138,7 @@ class ConsentActivityTest {
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
-        val tab: TabLayout.Tab = activity.tabHost.getTabAt(1)!!
-        tab.select()
+        activity.tabHost.getTabAt(1)!!.select()
 
         activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -154,8 +178,23 @@ class ConsentActivityTest {
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
-        val tab: TabLayout.Tab = activity.tabHost.getTabAt(1)!!
-        tab.select()
+        activity.tabHost.getTabAt(1)!!.select()
+
+        assert(activity.tabHost.selectedTabPosition == 1)
+        assert(
+            activity.consentTextHolderView.text.contains(PARENTAL_CONSENT_HINT)
+        )
+    }
+
+    @Test
+    fun `re-selecting a tab shouldn't change the text`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+        activity.tabHost.getTabAt(1)!!.select()
 
         assert(activity.tabHost.selectedTabPosition == 1)
         assert(
@@ -195,7 +234,7 @@ class ConsentActivityTest {
         get() = findViewById<Button>(R.id.consentDeclineButton)
 
     private val ConsentActivity.tabHost
-        get() = spyk(findViewById<TabLayout>(R.id.tabHost))
+        get() = findViewById<TabLayout>(R.id.tabHost)
 
     private val ConsentActivity.consentTextHolderView
         get() = findViewById<TextView>(R.id.consentTextHolderView)
