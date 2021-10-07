@@ -152,8 +152,12 @@ class ConsentActivity : BaseSplitActivity() {
                     )
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                // We do not need to change the text when a tab is unselected
+            }
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                // We do not need to refresh the text when a tab is reselected
+            }
         })
 
         binding.consentTextHolderView.movementMethod = ScrollingMovementMethod()
