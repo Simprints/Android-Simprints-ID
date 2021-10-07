@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.core.domain.common.GROUP
@@ -129,32 +130,32 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.recordsInLocal.observe(this, {
+        viewModel.recordsInLocal.observe(this, Observer {
             binding.totalRecordsCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
         })
 
-        viewModel.recordsToUpSync.observe(this, {
+        viewModel.recordsToUpSync.observe(this, Observer {
             binding.recordsToUploadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToUploadCount, binding.recordsToUploadProgress)
         })
 
-        viewModel.imagesToUpload.observe(this, {
+        viewModel.imagesToUpload.observe(this, Observer {
             binding.imagesToUploadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.imagesToUploadCount, binding.imagesToUploadProgress)
         })
 
-        viewModel.recordsToDownSync.observe(this, {
+        viewModel.recordsToDownSync.observe(this, Observer {
             binding.recordsToDownloadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         })
 
-        viewModel.recordsToDelete.observe(this, {
+        viewModel.recordsToDelete.observe(this, Observer {
             binding.recordsToDeleteCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
         })
 
-        viewModel.moduleCounts.observe(this, {
+        viewModel.moduleCounts.observe(this, Observer {
             it?.let {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
