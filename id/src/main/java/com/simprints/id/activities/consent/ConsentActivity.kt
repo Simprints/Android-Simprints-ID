@@ -15,6 +15,7 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
@@ -44,26 +45,19 @@ class ConsentActivity : BaseSplitActivity() {
 
     private lateinit var askConsentRequestReceived: AskConsentRequest
 
-    @Inject
-    lateinit var viewModelFactory: ConsentViewModelFactory
+    @Inject lateinit var viewModelFactory: ConsentViewModelFactory
 
-    @Inject
-    lateinit var timeHelper: TimeHelper
+    @Inject lateinit var timeHelper: TimeHelper
 
-    @Inject
-    lateinit var preferencesManager: IdPreferencesManager
+    @Inject lateinit var preferencesManager: IdPreferencesManager
 
-    @Inject
-    lateinit var exitFormHelper: ExitFormHelper
+    @Inject lateinit var exitFormHelper: ExitFormHelper
 
-    @Inject
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    @Inject lateinit var eventRepository: EventRepository
 
-    @Inject
-    lateinit var locationManager: LocationManager
+    @Inject lateinit var locationManager: LocationManager
 
-    @Inject
-    lateinit var jsonHelper: JsonHelper
+    @Inject lateinit var jsonHelper: JsonHelper
 
     private var startConsentEventTime: Long = 0
 
