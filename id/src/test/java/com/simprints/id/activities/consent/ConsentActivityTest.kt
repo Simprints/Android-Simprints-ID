@@ -111,7 +111,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `on tab selected listener should send correct tabs`() {
+    fun `parental tab click should select correct tab`() {
         every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
         every { preferencesManagerSpy.parentalConsentExists } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
@@ -125,6 +125,26 @@ class ConsentActivityTest {
                 assert(tab.position == ConsentActivity.PARENTAL_CONSENT_TAB_TAG)
             }
            
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+    }
+
+    @Test
+    fun `general tab click should select correct tab`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        val tab: TabLayout.Tab = activity.tabHost.getTabAt(0)!!
+        tab.select()
+
+        activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                assert(tab.position == ConsentActivity.GENERAL_CONSENT_TAB_TAG)
+            }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
