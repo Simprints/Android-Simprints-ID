@@ -44,7 +44,7 @@ buildscript {
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.4.0-agp4.2")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:2.1.2")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:2.2.0")
     }
 
 }
