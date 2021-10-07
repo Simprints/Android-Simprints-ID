@@ -103,11 +103,7 @@ class ConsentActivityTest {
         val activity = controller.get()
 
         assert(activity.tabHost.selectedTabPosition == 0)
-        assert(
-            activity.consentTextHolderView.text.contains(
-                "I'd like to take photographs of your face to enrol you in this program and identify you"
-            )
-        )
+        assert(activity.consentTextHolderView.text.contains(GEN_CONSENT_HINT))
     }
 
     @Test
@@ -124,7 +120,7 @@ class ConsentActivityTest {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 assert(tab.position == ConsentActivity.PARENTAL_CONSENT_TAB_TAG)
             }
-           
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
@@ -137,12 +133,13 @@ class ConsentActivityTest {
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
-        val tab: TabLayout.Tab = activity.tabHost.getTabAt(0)!!
-        tab.select()
+        activity.tabHost.getTabAt(1)!!.select()
+        activity.tabHost.getTabAt(0)!!.select()
 
         activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 assert(tab.position == ConsentActivity.GENERAL_CONSENT_TAB_TAG)
+                assert(activity.consentTextHolderView.text.contains(GEN_CONSENT_HINT))
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -162,9 +159,7 @@ class ConsentActivityTest {
 
         assert(activity.tabHost.selectedTabPosition == 1)
         assert(
-            activity.consentTextHolderView.text.contains(
-                "I'd like to take photographs of your child's face to enrol them"
-            )
+            activity.consentTextHolderView.text.contains(PARENTAL_CONSENT_HINT)
         )
     }
 
@@ -204,4 +199,12 @@ class ConsentActivityTest {
 
     private val ConsentActivity.consentTextHolderView
         get() = findViewById<TextView>(R.id.consentTextHolderView)
+
+    companion object {
+        private const val GEN_CONSENT_HINT =
+            "I'd like to take photographs of your face to enrol you in this program and identify you"
+
+        private const val PARENTAL_CONSENT_HINT =
+            "I'd like to take photographs of your child's face to enrol them"
+    }
 }

@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings
 
+import android.app.Activity
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -50,9 +51,22 @@ class SettingsActivityTest {
         shadowOf(activity).receiveResult(intent, 1, Intent())
 
         assert(activity.isFinishing)
+        assert(shadowOf(activity).resultCode == 1)
+    }
 
-        //verify { activitySpy.finish() }
-        //verify { activitySpy.setResult(1) }
+    @Test
+    fun `check activity doesn't finish when result is cancelled`() {
+
+        val controller = createRoboActivity()
+        val activity = controller.get()
+
+        activity.openSettingAboutActivity()
+
+        val intent = shadowOf(activity).nextStartedActivity
+
+        shadowOf(activity).receiveResult(intent, Activity.RESULT_CANCELED, Intent())
+
+        assert(!activity.isFinishing)
     }
 
     private fun createRoboActivity() = createActivity<SettingsActivity>()
