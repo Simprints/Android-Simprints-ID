@@ -111,6 +111,26 @@ class ConsentActivityTest {
     }
 
     @Test
+    fun `on tab selected listener should send correct tabs`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        val tab: TabLayout.Tab = activity.tabHost.getTabAt(1)!!
+        tab.select()
+
+        activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                assert(tab.position == ConsentActivity.PARENTAL_CONSENT_TAB_TAG)
+            }
+           
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+    }
+
+    @Test
     fun `selecting parental consent should set correct text`() {
         every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
         every { preferencesManagerSpy.parentalConsentExists } returns true
