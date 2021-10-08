@@ -5,16 +5,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.firebase.perf.metrics.Trace
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
 import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CancellationException
-import timber.log.Timber
 import java.io.IOException
 
 const val SYNC_LOG_TAG = "SYNC"
@@ -23,8 +21,6 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     abstract val tag: String
     var resultSetter: WorkerResultSetter = WorkerResultSetterImpl()
     var firebasePerformanceTraceFactory: FirebasePerformanceTraceFactory = FirebasePerformanceTraceFactoryImpl()
-
-    abstract var crashReportManager: CrashReportManager
 
     private var workerTrace: Trace? = null
 
@@ -41,9 +37,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
     }
 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
-        val finalMessage = "$tag - Retry] $message"
-        crashlyticsLog(finalMessage)
-        Timber.d(finalMessage)
+        crashlyticsLog("$tag - Retry] $message")
 
         logExceptionIfRequired(t)
         workerTrace?.stop()
@@ -54,9 +48,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
                        message: String? = t.message ?: "",
                        outputData: Data? = null): Result {
 
-        val finalMessage = "$tag - Failed] $message"
-        crashlyticsLog(finalMessage)
-        Timber.d(finalMessage)
+        crashlyticsLog("$tag - Failed] $message")
 
         logExceptionIfRequired(t)
         workerTrace?.stop()
@@ -65,28 +57,22 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
     protected fun success(outputData: Data? = null,
                           message: String = ""): Result {
-
-        val finalMessage = "$tag - Success] $message"
-        crashlyticsLog(finalMessage)
-        Timber.d(finalMessage)
+        crashlyticsLog("$tag - Success] $message")
 
         workerTrace?.stop()
         return resultSetter.success(outputData)
     }
 
     protected fun crashlyticsLog(message: String) {
-        Timber.d("$tag - $message")
-
-        crashReportManager.logMessageForCrashReport(
-            CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "$tag - $message")
+        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message")
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {
         t?.let {
-            Timber.d(t)
+            Simber.d(t)
             // IOExceptions are about network issues, so they are not worth to report
             if (it !is IOException || it !is CancellationException) {
-                crashReportManager.logExceptionOrSafeException(it)
+                Simber.e(t)
             }
         }
     }

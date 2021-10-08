@@ -7,7 +7,6 @@ import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -19,7 +18,10 @@ import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchResult
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
@@ -30,9 +32,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.declareModule
 import java.io.Serializable
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
@@ -43,7 +46,6 @@ class MatchingViewModelTest : KoinTest {
     val taskExecutorRule = InstantTaskExecutorRule()
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
-    private val crashReportManagerMock: FingerprintCrashReportManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
     private val mockMatcher: FingerprintMatcher = mockk()
 
@@ -64,15 +66,13 @@ class MatchingViewModelTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        declareModule {
+        loadKoinModules(module(override = true) {
             factory { dbManagerMock }
-            factory { crashReportManagerMock }
             factory { masterFlowManager }
             factory<FingerprintPreferencesManager> { mockk(relaxed = true) }
             factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }
             factory { mockMatcher }
-        }
-
+        })
     }
 
     @Test
@@ -89,7 +89,7 @@ class MatchingViewModelTest : KoinTest {
         assertNotNull(result)
         result?.let { matchingResult ->
             assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, matchingResult.results.size)
-            val highestScoreCandidate = matchingResult.results.maxBy { it.confidence }?.guid
+            val highestScoreCandidate = matchingResult.results.maxByOrNull { it.confidence }?.guid
             assertThat(highestScoreCandidate).isEqualTo(probeFingerprintRecord.personId)
         }
         coVerify { dbManagerMock.loadPeople(query) }
@@ -168,7 +168,7 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun identifyRequest_matchFailsToComplete_showsToastAndLogsError() {
+    fun identifyRequest_matchFailsToComplete_showsToast() {
         mockMatcherError()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
@@ -178,12 +178,11 @@ class MatchingViewModelTest : KoinTest {
         with(viewModel) {
             result.test().awaitValue()
             hasMatchFailed.test().assertValue { it }
-            verify { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 
     @Test
-    fun verifyRequest_matchFailsToComplete_showsToastAndLogsError() {
+    fun verifyRequest_matchFailsToComplete_showsToast() {
         mockMatcherError()
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
@@ -193,7 +192,6 @@ class MatchingViewModelTest : KoinTest {
         with(viewModel) {
             result.test().awaitValue()
             hasMatchFailed.test().assertValue { it }
-            verify { crashReportManagerMock.logExceptionOrSafeException(any()) }
         }
     }
 

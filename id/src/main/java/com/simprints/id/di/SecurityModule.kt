@@ -3,24 +3,24 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.EventRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.secure.AttestationManager
 import com.simprints.id.secure.AttestationManagerImpl
 import com.simprints.id.secure.AuthManager
@@ -47,7 +47,6 @@ import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -67,7 +66,7 @@ open class SecurityModule {
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
-        eventRepository: EventRepository,
+        eventRepository: com.simprints.eventsystem.event.EventRepository,
         baseUrlProvider: BaseUrlProvider,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
@@ -79,7 +78,6 @@ open class SecurityModule {
         syncManager,
         securityStateScheduler,
         longConsentRepository,
-        eventRepository,
         baseUrlProvider,
         remoteConfigWrapper
     )
@@ -117,11 +115,11 @@ open class SecurityModule {
         baseUrlProvider: BaseUrlProvider,
         safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
+        projectRepository: ProjectRepository,
         projectRemoteDataSource: ProjectRemoteDataSource,
         signerManager: SignerManager,
-        remoteConfigWrapper: RemoteConfigWrapper,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         attestationManager: AttestationManager,
         authenticationDataManager: AuthenticationDataManager
     ): ProjectAuthenticator = ProjectAuthenticatorImpl(
@@ -129,9 +127,8 @@ open class SecurityModule {
         projectSecretManager,
         safetyNetClient,
         secureDataManager,
-        projectRemoteDataSource,
+        projectRepository,
         signerManager,
-        remoteConfigWrapper,
         longConsentRepository,
         preferencesManager,
         attestationManager,
@@ -140,14 +137,12 @@ open class SecurityModule {
 
     @Provides
     open fun provideAuthenticationHelper(
-        crashReportManager: CrashReportManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        eventRepository: EventRepository
+        eventRepository: com.simprints.eventsystem.event.EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
-            crashReportManager,
             loginInfoManager,
             timeHelper,
             projectAuthenticator,

@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.requests
 
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintConfigurationRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FingerprintConfigurationRequest(

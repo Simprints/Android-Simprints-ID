@@ -1,7 +1,7 @@
 package com.simprints.id.exitformhandler
 
 import android.content.Intent
-import com.simprints.id.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 
 interface ExitFormHelper {

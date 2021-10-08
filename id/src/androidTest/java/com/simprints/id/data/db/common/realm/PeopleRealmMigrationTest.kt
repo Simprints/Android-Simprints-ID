@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.common.realm
+package com.simprints.eventsystem.common.realm
 
 /*
  * FIXME: These tests are failing due to all Realm objects being always at the latest version

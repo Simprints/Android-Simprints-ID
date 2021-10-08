@@ -5,11 +5,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.fingerprint.di.KoinInjector
 import com.simprints.fingerprint.scanner.data.FirmwareRepository
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.inject
-import timber.log.Timber
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * Downloads the latest firmware binaries, ensuring that the latest versions are always on the phone.
@@ -19,17 +19,17 @@ class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            Timber.d("FirmwareFileUpdateWorker started")
+            Simber.d("FirmwareFileUpdateWorker started")
             KoinInjector.acquireFingerprintKoinModules()
 
             val firmwareRepository: FirmwareRepository by inject()
 
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
-            Timber.d("FirmwareFileUpdateWorker succeeded")
+            Simber.d("FirmwareFileUpdateWorker succeeded")
             Result.success()
         } catch (e: Throwable) {
-            Timber.e(e, "FirmwareFileUpdateWorker failed")
+            Simber.e(e, "FirmwareFileUpdateWorker failed")
             Result.retry()
         } finally {
             KoinInjector.releaseFingerprintKoinModules()

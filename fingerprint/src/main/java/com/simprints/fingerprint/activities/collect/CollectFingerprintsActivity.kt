@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -24,6 +25,8 @@ import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRe
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.databinding.ActivityCollectFingerprintsBinding
+import com.simprints.fingerprint.databinding.ContentMainBinding
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -31,8 +34,6 @@ import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
-import kotlinx.android.synthetic.main.content_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -41,6 +42,8 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private val masterFlowManager: MasterFlowManager by inject()
 
     private val vm: CollectFingerprintsViewModel by viewModel()
+    private val binding by viewBinding(ActivityCollectFingerprintsBinding::inflate)
+    private lateinit var mainContentBinding: ContentMainBinding
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: AlertDialog? = null
@@ -48,11 +51,14 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_collect_fingerprints)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setContentView(binding.root)
+        mainContentBinding = binding.mainContent
 
-        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(CollectFingerprintsTaskRequest.BUNDLE_KEY)
-            ?: throw InvalidRequestForCollectFingerprintsActivityException()
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        val fingerprintRequest = this.intent.extras?.getParcelable<CollectFingerprintsTaskRequest>(
+            CollectFingerprintsTaskRequest.BUNDLE_KEY
+        ) ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
         vm.start(fingerprintRequest.fingerprintsToCapture)
 
@@ -68,7 +74,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.show()
         supportActionBar?.title = when (masterFlowManager.getCurrentAction()) {
             Action.ENROL -> getString(R.string.register_title)
@@ -81,24 +87,24 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         fingerViewPagerManager = FingerViewPagerManager(
             vm.state().fingerStates.map { it.id }.toMutableList(),
             this,
-            view_pager,
-            indicator_layout,
+            mainContentBinding.viewPager,
+            mainContentBinding.indicatorLayout,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
             isAbleToSelectNewFinger = { !vm.state().currentCaptureState().isCommunicating() }
         )
     }
 
     private fun initMissingFingerButton() {
-        missingFingerText.text = getString(R.string.missing_finger)
-        missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        missingFingerText.setOnClickListener {
+        mainContentBinding.missingFingerText.text = getString(R.string.missing_finger)
+        mainContentBinding.missingFingerText.paintFlags = mainContentBinding.missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        mainContentBinding.missingFingerText.setOnClickListener {
             vm.logUiMessageForCrashReport("Missing finger text clicked")
             vm.handleMissingFingerButtonPressed()
         }
     }
 
     private fun initScanButton() {
-        scan_button.setOnClickListener {
+        mainContentBinding.scanButton.setOnClickListener {
             vm.logUiMessageForCrashReport("Scan button clicked")
             vm.handleScanButtonPressed()
         }
@@ -125,9 +131,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun CollectFingerprintsState.updateScanButton() {
         with(currentCaptureState()) {
-            scan_button.text = getString(buttonTextId(isAskingRescan))
-            scan_button.setTextColor(resources.getColor(buttonTextColour(), null))
-            scan_button.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
+            mainContentBinding.scanButton.text = getString(buttonTextId(isAskingRescan))
+            mainContentBinding.scanButton.setTextColor(resources.getColor(buttonTextColour(), null))
+            mainContentBinding.scanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
         }
     }
 
@@ -209,5 +215,10 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         if (!vm.state().currentCaptureState().isCommunicating()) {
             launchRefusalActivity()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        confirmDialog?.dismiss()
     }
 }

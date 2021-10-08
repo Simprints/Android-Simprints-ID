@@ -3,9 +3,9 @@ package com.simprints.face.initializers
 import android.app.Activity
 import android.content.Context
 import com.google.android.play.core.splitinstall.SplitInstallHelper
+import com.simprints.logging.Simber
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
-import timber.log.Timber
 
 class RankOneInitializer : SdkInitializer {
     /**
@@ -20,7 +20,7 @@ class RankOneInitializer : SdkInitializer {
         try {
             loadNdkLibraries(activity)
         } catch (t: Throwable) {
-            Timber.e(t)
+            Simber.e(t)
             return false
         }
         roc.roc_preinitialize_android(activity)

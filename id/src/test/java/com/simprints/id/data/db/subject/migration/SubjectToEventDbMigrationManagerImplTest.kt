@@ -1,21 +1,25 @@
 package com.simprints.id.data.db.subject.migration
 
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.defaultSubject
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.core.domain.modality.toMode
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.toMode
-import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
+import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
-import com.simprints.id.tools.time.TimeHelper
-import io.mockk.*
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
@@ -23,14 +27,19 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class SubjectToEventDbMigrationManagerImplTest {
 
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var eventLocal: EventLocalDataSource
-    @MockK lateinit var timeHelper: TimeHelper
-    @MockK lateinit var crashReportManager: CrashReportManager
-    @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var subjectLocal: SubjectLocalDataSource
+    @MockK
+    lateinit var loginInfoManager: LoginInfoManager
+    @MockK
+    lateinit var eventLocal: EventLocalDataSource
+    @MockK
+    lateinit var timeHelper: TimeHelper
+    @MockK
+    lateinit var preferencesManager: IdPreferencesManager
+    @MockK
+    lateinit var subjectLocal: SubjectLocalDataSource
 
     private lateinit var migrationManager: SubjectToEventMigrationManager
 
@@ -42,9 +51,10 @@ class SubjectToEventDbMigrationManagerImplTest {
             loginInfoManager,
             eventLocal,
             timeHelper,
-            crashReportManager,
             preferencesManager,
-            subjectLocal)
+            subjectLocal,
+            EncodingUtilsImplForTests
+        )
 
         mockUUID()
     }
@@ -99,7 +109,11 @@ class SubjectToEventDbMigrationManagerImplTest {
                 subjectIntoDb.moduleId,
                 subjectIntoDb.attendantId,
                 preferencesManager.modalities.map { it.toMode() },
-                EnrolmentRecordCreationEvent.buildBiometricReferences(subjectIntoDb.fingerprintSamples, subjectIntoDb.faceSamples)
+                EnrolmentRecordCreationEvent.buildBiometricReferences(
+                    subjectIntoDb.fingerprintSamples,
+                    subjectIntoDb.faceSamples,
+                    EncodingUtilsImplForTests
+                )
             )
 
             coVerify(exactly = 1) {
@@ -113,7 +127,10 @@ class SubjectToEventDbMigrationManagerImplTest {
         runBlockingTest {
             mockUserIsSignedIn()
             val subjectIntoDb = defaultSubject.copy(toSync = true)
-            coEvery { subjectLocal.load(any()) } returnsMany listOf(flowOf(subjectIntoDb), emptyFlow())
+            coEvery { subjectLocal.load(any()) } returnsMany listOf(
+                flowOf(subjectIntoDb),
+                emptyFlow()
+            )
 
             migrationManager.migrateSubjectToSyncToEventsDb()
             migrationManager.migrateSubjectToSyncToEventsDb()
@@ -138,18 +155,6 @@ class SubjectToEventDbMigrationManagerImplTest {
             coVerify(exactly = 1) {
                 subjectLocal.performActions(listOf(Creation(subjectIntoDb.copy(toSync = false))))
             }
-        }
-    }
-
-    @Test
-    fun migrationFails_shouldReportTheIssue() {
-        runBlockingTest {
-            mockUserIsSignedIn()
-            coEvery { loginInfoManager.getSignedInProjectIdOrEmpty() } throws Throwable("test")
-
-            migrationManager.migrateSubjectToSyncToEventsDb()
-
-            verify(exactly = 1) { crashReportManager.logException(any<MigrationToNewEventArchitectureException>()) }
         }
     }
 

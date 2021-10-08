@@ -2,21 +2,20 @@ package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.id.Application
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestSecurityModule
 import com.simprints.id.commontesttools.di.TestViewModelModule
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
@@ -31,9 +30,6 @@ import javax.inject.Inject
 class LoginActivityAndroidTest {
 
     @Inject
-    lateinit var mockCrashReportManager: CrashReportManager
-
-    @Inject
     lateinit var mockAuthenticationHelper: AuthenticationHelper
 
     @MockK
@@ -42,7 +38,7 @@ class LoginActivityAndroidTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     private val appModule by lazy {
-        TestAppModule(app, crashReportManagerRule = DependencyRule.MockkRule)
+        TestAppModule(app)
     }
 
     private val securityModule by lazy {
@@ -247,40 +243,6 @@ class LoginActivityAndroidTest {
         loginActivity {
         } pressBack {
             loginNotCompleteIntentIsReturned()
-        }
-    }
-
-    @Test
-    fun clickScanQrButton_shouldLogToCrashReport() {
-        loginActivity {
-        } clickScanQr {
-            messageIsLoggedToCrashReport("Scan QR button clicked")
-        }
-    }
-
-    @Test
-    fun clickSignInButton_shouldLogToCrashReport() {
-        loginActivity {
-        } clickSignIn {
-            messageIsLoggedToCrashReport("Login button clicked")
-        }
-    }
-
-    @Test
-    fun receiveValidQrCodeResponse_shouldLogToCrashReport() {
-        loginActivity {
-            receiveValidQrCodeResponse()
-        } clickScanQr {
-            messageIsLoggedToCrashReport("QR scanning successful")
-        }
-    }
-
-    @Test
-    fun receiveInvalidQrCodeResponse_shouldLogToCrashReport() {
-        loginActivity {
-            receiveInvalidQrCodeResponse()
-        } clickScanQr {
-            messageIsLoggedToCrashReport("QR scanning unsuccessful")
         }
     }
 

@@ -3,8 +3,8 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
+import com.simprints.core.domain.common.GROUP
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
@@ -30,7 +30,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
-    private lateinit var preferencesManagerMock: PreferencesManager
+    private lateinit var preferencesManagerMock: IdPreferencesManager
 
     private val fingerprintRequestFactory: FingerprintRequestFactory = FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor

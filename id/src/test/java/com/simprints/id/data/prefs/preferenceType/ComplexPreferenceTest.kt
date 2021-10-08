@@ -1,8 +1,8 @@
 package com.simprints.id.data.prefs.preferenceType
 
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.domain.GROUP
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer

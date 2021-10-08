@@ -2,7 +2,6 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,6 @@ class EventEndSyncReporterWorker(appContext: Context,
 
     override val tag: String = EventEndSyncReporterWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var syncCache: EventSyncCache
 
     override suspend fun doWork(): Result =
@@ -36,7 +34,6 @@ class EventEndSyncReporterWorker(appContext: Context,
                     throw IllegalArgumentException("SyncId missed")
                 }
             } catch (t: Throwable) {
-                t.printStackTrace()
                 fail(t)
             }
         }

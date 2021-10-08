@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.preferenceType.remoteConfig
 
 import com.google.common.truth.Truth
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.tools.serializers.EnumSerializer
 import io.mockk.every
@@ -27,7 +27,7 @@ class RemoteConfigComplexPreferenceTest {
     }
 
     @Test
-    fun `return correct value - different from default`() {
+    fun `return correct value of commcare`() {
         every { prefs.getPrimitive(enumClass.name, "SIMPRINTS") } returns "COMMCARE"
         Truth.assertThat(syncLocationSetting).isEqualTo(SyncDestinationSetting.COMMCARE)
     }

@@ -1,19 +1,19 @@
 package com.simprints.id.exitformhandler
 
 import android.content.Intent
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
-import com.simprints.id.domain.modality.Modality
+import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.exitformhandler.ExitFormResult.ExitFormType.*
 import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
-import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.id.exitformhandler.ExitFormResult.ExitFormType.*
 
 class ExitFormHelperImpl : ExitFormHelper {
 

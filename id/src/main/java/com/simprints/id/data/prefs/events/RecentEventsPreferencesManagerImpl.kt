@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.events
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 
 class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)

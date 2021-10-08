@@ -1,6 +1,6 @@
 package com.simprints.core.tools.json
 
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import org.junit.Test
 
 class JsonHelperTest {

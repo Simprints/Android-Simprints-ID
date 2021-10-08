@@ -4,39 +4,38 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.eventsystem.EventSystemApplication
+import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.eventsystem.event.local.EventDatabaseFactory
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.event.local.SessionDataCache
+import com.simprints.eventsystem.event.local.SessionDataCacheImpl
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.validators.SessionEventValidatorsFactory
-import com.simprints.id.data.db.event.local.EventDatabaseFactory
-import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.event.local.SessionDataCache
-import com.simprints.id.data.db.event.local.SessionDataCacheImpl
-import com.simprints.id.data.db.event.remote.EventRemoteDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
-import dagger.Provides
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,7 +49,6 @@ class TestAppModule(
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
-    private val crashReportManagerRule: DependencyRule = RealRule,
     private val sessionEventsManagerRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
@@ -74,9 +72,6 @@ class TestAppModule(
     private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
-    override fun provideCrashManager(): CrashReportManager =
-        crashReportManagerRule.resolveDependency { super.provideCrashManager() }
-
     override fun provideLoginInfoManager(
         improvedSharedPreferences: ImprovedSharedPreferences
     ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
@@ -85,13 +80,22 @@ class TestAppModule(
         )
     }
 
-   override fun provideSessionDataCache(app: Application): SessionDataCache = SessionDataCacheImpl(app)
+    override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
+        SessionDataCacheImpl(app)
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
-    override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
-        remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
+    override fun provideRemoteDbManager(
+        loginInfoManager: LoginInfoManager,
+        ctx: Context,
+    ): RemoteDbManager =
+        remoteDbManagerRule.resolveDependency {
+            super.provideRemoteDbManager(
+                loginInfoManager,
+                ctx
+            )
+        }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
@@ -124,21 +128,19 @@ class TestAppModule(
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        preferencesManager: PreferencesManager,
+        IdPreferencesManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
-        crashReportManager: CrashReportManager,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): EventRepository = sessionEventsManagerRule.resolveDependency {
+    ): com.simprints.eventsystem.event.EventRepository = sessionEventsManagerRule.resolveDependency {
         super.provideEventRepository(
             ctx,
             eventLocalDataSource,
             eventRemoteDataSource,
-            preferencesManager,
+            IdPreferencesManager,
             loginInfoManager,
             timeHelper,
-            crashReportManager,
             validatorFactory,
             sessionDataCache
         )
@@ -210,15 +212,13 @@ class TestAppModule(
     @ExperimentalCoroutinesApi
     override fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
-        crashReportManager: CrashReportManager
     ): QrCodeProducer = qrCodeProducerRule.resolveDependency {
-        super.provideQrCodeProducer(qrCodeDetector, crashReportManager)
+        super.provideQrCodeProducer(qrCodeDetector)
     }
 
     override fun provideQrCodeDetector(
-        crashReportManager: CrashReportManager
     ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
-        super.provideQrCodeDetector(crashReportManager)
+        super.provideQrCodeDetector()
     }
 
     override fun provideBaseUrlProvider(

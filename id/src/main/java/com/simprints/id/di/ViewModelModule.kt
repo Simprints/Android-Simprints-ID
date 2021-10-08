@@ -1,6 +1,10 @@
 package com.simprints.id.di
 
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.dashboard.DashboardViewModelFactory
@@ -22,14 +26,10 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -39,7 +39,6 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.time.TimeHelper
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,7 +70,8 @@ open class ViewModelModule {
     open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
                                               deviceManager: DeviceManager,
                                               eventRepository: EventRepository,
-                                              timeHelper: TimeHelper) =
+                                              timeHelper: TimeHelper
+    ) =
         FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
 
     @Provides
@@ -79,12 +79,12 @@ open class ViewModelModule {
         downySyncHelper: EventDownSyncHelper,
         eventRepository: EventRepository,
         subjectRepository: SubjectRepository,
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
         eventSyncManager: EventSyncManager
-    ) =
+    ): SyncInformationViewModelFactory =
         SyncInformationViewModelFactory(
             downySyncHelper,
             eventRepository,
@@ -97,14 +97,13 @@ open class ViewModelModule {
 
     @Provides
     open fun provideFingerSelectionViewModelFactory(
-        preferencesManager: PreferencesManager,
-        crashReportManager: CrashReportManager
-    ) = FingerSelectionViewModelFactory(preferencesManager, crashReportManager)
+        preferencesManager: IdPreferencesManager
+    ) = FingerSelectionViewModelFactory(preferencesManager)
 
     @Provides
     open fun providePrivacyNoticeViewModelFactory(
         longConsentRepository: LongConsentRepository,
-        preferencesManager: PreferencesManager,
+        preferencesManager: IdPreferencesManager,
         dispatcherProvider: DispatcherProvider
     ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager, dispatcherProvider)
 
@@ -112,21 +111,18 @@ open class ViewModelModule {
     open fun provideEnrolLastBiometricsViewModel(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper,
-        preferencesManager: PreferencesManager
+        preferencesManager: IdPreferencesManager
     ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, preferencesManager)
 
     @ExperimentalCoroutinesApi
     @Provides
     open fun provideSetupViewModelFactory(
-        deviceManager: DeviceManager,
-        crashReportManager: CrashReportManager
-    ) = SetupViewModelFactory(deviceManager, crashReportManager)
+        deviceManager: DeviceManager
+    ) = SetupViewModelFactory(deviceManager)
 
     @Provides
-    open fun provideSettingsPreferenceViewModelFactory(
-        crashReportManager: CrashReportManager
-    ): SettingsPreferenceViewModelFactory {
-        return SettingsPreferenceViewModelFactory(crashReportManager)
+    open fun provideSettingsPreferenceViewModelFactory(): SettingsPreferenceViewModelFactory {
+        return SettingsPreferenceViewModelFactory()
     }
 
     @Provides
@@ -147,17 +143,15 @@ open class ViewModelModule {
     fun provideOrchestratorViewModelFactory(
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
-        preferenceManager: PreferencesManager,
-        eventRepository: EventRepository,
-        crashReportManager: CrashReportManager
+        preferenceManager: IdPreferencesManager,
+        eventRepository: EventRepository
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
             preferenceManager.modalities,
             eventRepository,
-            DomainToModuleApiAppResponse,
-            crashReportManager
+            DomainToModuleApiAppResponse
         )
     }
 

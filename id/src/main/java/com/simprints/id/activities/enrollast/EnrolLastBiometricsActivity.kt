@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
@@ -18,8 +19,7 @@ import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequ
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.id.tools.time.TimeHelper
-import timber.log.Timber
+import com.simprints.logging.Simber
 import javax.inject.Inject
 
 class EnrolLastBiometricsActivity : BaseSplitActivity() {
@@ -43,7 +43,7 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
         injectDependencies()
-        Timber.d("EnrolLastBiometrics started")
+        Simber.d("EnrolLastBiometrics started")
 
         enrolLastBiometricsRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
             ?: throw InvalidAppRequest()
@@ -82,7 +82,7 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
 
 
     private fun sendOkResult(newSubjectId: String?) {
-        Timber.d("EnrolLastBiometrics done")
+        Simber.d("EnrolLastBiometrics done")
         val response = EnrolLastBiometricsResponse(newSubjectId)
         setResultAndFinish(response)
     }

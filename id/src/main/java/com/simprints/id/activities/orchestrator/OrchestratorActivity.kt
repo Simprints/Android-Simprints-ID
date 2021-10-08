@@ -6,10 +6,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -18,7 +19,6 @@ import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -38,7 +38,7 @@ class OrchestratorActivity : BaseSplitActivity() {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var preferencesManager: PreferencesManager
+    lateinit var preferencesManager: IdPreferencesManager
 
     @Inject
     lateinit var timeHelper: TimeHelper

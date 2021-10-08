@@ -7,7 +7,7 @@ import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.simprints.id.data.images.model.Path
 import com.simprints.id.data.images.model.SecuredImageRef
-import timber.log.Timber
+import com.simprints.logging.Simber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -30,7 +30,7 @@ internal class ImageLocalDataSourceImpl(
         createDirectoryIfNonExistent(fullPath)
 
         val file = File(fullPath)
-        Timber.d(file.absoluteFile.toString())
+        Simber.d(file.absoluteFile.toString())
 
         return try {
             if (relativePath.compose().isEmpty())
@@ -55,7 +55,7 @@ internal class ImageLocalDataSourceImpl(
         return try {
             encryptedFile.openFileInput()
         } catch (t: Throwable) {
-            Timber.d(t)
+            Simber.d(t)
             null
         }
     }

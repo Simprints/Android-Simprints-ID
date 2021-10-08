@@ -2,11 +2,9 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
  * It's executed at the beginning of a sync and it sets in the output the unique sync id.
@@ -21,8 +19,6 @@ class EventStartSyncReporterWorker(appContext: Context,
 
     override val tag: String = EventStartSyncReporterWorker::class.java.simpleName
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
-
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
             try {
@@ -31,7 +27,6 @@ class EventStartSyncReporterWorker(appContext: Context,
                 crashlyticsLog("Start - Params: $syncId")
                 success(inputData)
             } catch (t: Throwable) {
-                t.printStackTrace()
                 fail(t)
             }
         }

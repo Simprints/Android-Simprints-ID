@@ -3,7 +3,8 @@ package com.simprints.id.data.db
 import com.simprints.id.data.db.subject.domain.Subject
 
 data class SubjectFetchResult(val subject: Subject? = null,
-                              val subjectSource: SubjectSource) {
+                              val subjectSource: SubjectSource
+) {
 
     enum class SubjectSource {
         LOCAL,

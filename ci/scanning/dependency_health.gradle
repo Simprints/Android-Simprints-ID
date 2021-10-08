@@ -1,0 +1,50 @@
+apply plugin: "com.autonomousapps.dependency-analysis"
+
+dependencyAnalysis {
+    issues {
+        all {
+            onUsedTransitiveDependencies { severity("ignore") }
+            onUnusedDependencies { severity("fail") }
+            onIncorrectConfiguration { severity("fail") }
+            ignoreKtx(true)
+        }
+        project(':id') {
+            onAny {
+                exclude(
+                    // We exclude these APIs in ID because because multiple modules need
+                    // them, and DFMs can't implement the same lib but autonomousapps does not
+                    // recognize this transitive property
+                    'org.jetbrains.kotlin:kotlin-stdlib',
+                    'org.koin:koin-android-viewmodel',
+                    'androidx.navigation:navigation-dynamic-features-fragment',
+                    'org.jetbrains.anko:anko',
+                    'io.realm:realm-android-kotlin-extensions',
+                    'io.realm:realm-annotations',
+                    'io.realm:realm-android-library',
+                    'com.google.firebase:firebase-analytics-ktx',
+                    ':moduleapi',
+                    ':core',
+                    'androidx.fragment:fragment-testing'
+                )
+            }
+        }
+        project(':fingerprintscanner') {
+            onAny {
+                exclude(
+                    // We exclude reflection in the fingerprint scanner because the dependency
+                    // scanner cannot detect reflective global extensions (we should remove these)
+                    'org.jetbrains.kotlin:kotlin-reflect'
+                )
+            }
+        }
+        project(':logging') {
+            onAny {
+                exclude(
+                    // We don't want the logging module the expose Timber via api, even if other
+                    // internal libraries in Simprints use Timber
+                    'com.jakewharton.timber:timber'
+                )
+            }
+        }
+    }
+}

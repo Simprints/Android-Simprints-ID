@@ -10,16 +10,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.modality.Modality
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.packageVersionName
@@ -30,12 +30,26 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private lateinit var packageVersionName: String
     private lateinit var deviceId: String
+    private val confirmationDialogForLogout: AlertDialog by lazy {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.confirmation_logout_title))
+            .setMessage(getString(R.string.confirmation_logout_message))
+            .setPositiveButton(
+                getString(R.string.logout)
+            ) { _, _ ->
+                settingsAboutViewModel.logout()
+                finishSettings()
+            }
+            .setNegativeButton(
+                getString(R.string.confirmation_logout_cancel), null
+            ).create()
+    }
 
     @Inject
     lateinit var recentEventsManager: RecentEventsPreferencesManager
 
     @Inject
-    lateinit var preferencesManager: PreferencesManager
+    lateinit var preferencesManager: IdPreferencesManager
 
     @Inject
     lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
@@ -52,7 +66,10 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         val component = (requireActivity().application as Application).component
         component.inject(this)
 
-        settingsAboutViewModel = ViewModelProvider(this, settingsAboutViewModelFactory).get(SettingsAboutViewModel::class.java)
+        settingsAboutViewModel = ViewModelProvider(
+            this,
+            settingsAboutViewModelFactory
+        ).get(SettingsAboutViewModel::class.java)
         setTextInLayout()
         setPreferenceListeners()
 
@@ -90,7 +107,8 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         getAppVersionPreference()?.title = getString(R.string.preference_app_version_title)
         getDeviceIdPreference()?.title = getString(R.string.preference_device_id_title)
         getScannerVersionPreference()?.title = getString(R.string.preference_scanner_version_title)
-        getSyncAndSearchConfigurationPreference()?.title = getString(R.string.preference_sync_and_search_title)
+        getSyncAndSearchConfigurationPreference()?.title =
+            getString(R.string.preference_sync_and_search_title)
         getLogoutPreference()?.title = getString(R.string.preference_logout_title)
     }
 
@@ -135,7 +153,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
 
     private fun showConfirmationDialogForLogout() {
         activity?.runOnUiThreadIfStillRunning {
-            buildConfirmationDialogForLogout().show()
+            confirmationDialogForLogout.show()
         }
     }
 
@@ -198,23 +216,16 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         preference.summary = deviceId
     }
 
-    internal fun buildConfirmationDialogForLogout(): AlertDialog =
-        AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.confirmation_logout_title))
-            .setMessage(getString(R.string.confirmation_logout_message))
-            .setPositiveButton(
-                getString(R.string.logout)
-            ) { _, _ ->
-                settingsAboutViewModel.logout()
-                finishSettings()
-            }
-            .setNegativeButton(
-                getString(R.string.confirmation_logout_cancel), null
-            ).create()
-
     private fun finishSettings() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsAboutActivity).finishActivityBecauseLogout()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (confirmationDialogForLogout.isShowing) {
+            confirmationDialogForLogout.dismiss()
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.events_sync.up.domain.old
 
 import androidx.annotation.Keep
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState
 import java.util.*
 
 @Keep

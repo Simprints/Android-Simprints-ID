@@ -1,7 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.data
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

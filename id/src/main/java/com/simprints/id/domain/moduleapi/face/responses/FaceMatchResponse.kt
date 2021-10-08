@@ -3,8 +3,8 @@ package com.simprints.id.domain.moduleapi.face.responses
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.fromModuleApiToDomain
 import com.simprints.moduleapi.face.responses.IFaceMatchResponse
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceMatchResponse(val result: List<FaceMatchResult>) : FaceResponse {

@@ -1,10 +1,10 @@
 package com.simprints.id.data.prefs.preferenceType
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
-import timber.log.Timber
+import com.simprints.logging.Simber
 import kotlin.reflect.KProperty
 
 /**
@@ -50,7 +50,7 @@ open class ComplexPreference<T : Any>(val prefs: ImprovedSharedPreferences,
     }
 
     open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        Timber.d("ComplexPreference.setValue key=$key , value=$serializedValue")
+        Simber.d("ComplexPreference.setValue key=$key , value=$serializedValue")
         serializedValue = serializer.serialize(value)
     }
 }

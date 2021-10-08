@@ -19,7 +19,10 @@ import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
@@ -39,9 +42,7 @@ class DashboardActivityAndroidTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     private val preferencesModule by lazy {
-        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.ReplaceRule {
-            mockPreferencesManager
-        })
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpykRule)
     }
 
     @Before
@@ -55,6 +56,8 @@ class DashboardActivityAndroidTest {
             .componentBuilder()
             .viewModelModule(buildViewModelModule())
             .build()
+
+        mockPreferencesManager = app.component.getIdPreferencesManager()
     }
 
     @Test

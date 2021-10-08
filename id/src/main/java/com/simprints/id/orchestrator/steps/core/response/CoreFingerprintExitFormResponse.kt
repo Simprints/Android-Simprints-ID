@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.steps.core.response
 
 import android.os.Parcelable
 import com.simprints.id.data.exitform.FingerprintExitFormReason
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CoreFingerprintExitFormResponse(val reason: FingerprintExitFormReason = FingerprintExitFormReason.OTHER,

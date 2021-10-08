@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.subject.migration
 
-import com.simprints.id.data.db.event.domain.models.face.FaceTemplateFormat
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.subject.local.models.DbFaceSample
 import com.simprints.id.data.db.subject.local.models.DbFingerprintSample
@@ -127,7 +127,8 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateProjectInfoTo2(schema: RealmSchema) {
         schema.create(PROJECT_TABLE)
-            .addField(PROJECT_ID, String::class.java, FieldAttribute.PRIMARY_KEY).setRequired(PROJECT_ID, true)
+            .addField(PROJECT_ID, String::class.java, FieldAttribute.PRIMARY_KEY).setRequired(
+                PROJECT_ID, true)
             .addStringAndMakeRequired(PROJECT_LEGACY_ID)
             .addStringAndMakeRequired(PROJECT_NAME)
             .addStringAndMakeRequired(PROJECT_DESCRIPTION)

@@ -3,7 +3,7 @@ package com.simprints.id.activities.coreexitform.result
 import android.os.Parcelable
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CoreExitFormActivityResult(val action: Action, val answer: Answer) :

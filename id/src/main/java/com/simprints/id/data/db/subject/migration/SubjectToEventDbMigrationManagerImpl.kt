@@ -1,19 +1,19 @@
 package com.simprints.id.data.db.subject.migration
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.id.data.db.event.local.EventLocalDataSource
+import com.simprints.core.domain.modality.toMode
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.toMode
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.MigrationToNewEventArchitectureException
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.toList
-import timber.log.Timber
 
 @Deprecated("To be removed once 2020.3.2 is not supported anymore.")
 /**
@@ -26,9 +26,10 @@ class SubjectToEventDbMigrationManagerImpl(
     val loginInfoManager: LoginInfoManager,
     private val eventLocal: EventLocalDataSource,
     val timeHelper: TimeHelper,
-    val crashReportManager: CrashReportManager,
-    val preferencesManager: PreferencesManager,
-    private val subjectLocal: SubjectLocalDataSource) : SubjectToEventMigrationManager {
+    val preferencesManager: IdPreferencesManager,
+    private val subjectLocal: SubjectLocalDataSource,
+    private val encoder: EncodingUtils
+) : SubjectToEventMigrationManager {
 
     override suspend fun migrateSubjectToSyncToEventsDb() {
         try {
@@ -50,8 +51,7 @@ class SubjectToEventDbMigrationManagerImpl(
                 }
             }
         } catch (t: Throwable) {
-            Timber.e(t)
-            crashReportManager.logException(MigrationToNewEventArchitectureException(cause = t))
+            Simber.e(MigrationToNewEventArchitectureException(cause = t))
         }
     }
 
@@ -63,7 +63,7 @@ class SubjectToEventDbMigrationManagerImpl(
             subject.moduleId,
             subject.attendantId,
             preferencesManager.modalities.map { it.toMode() },
-            EnrolmentRecordCreationEvent.buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples)
+            EnrolmentRecordCreationEvent.buildBiometricReferences(subject.fingerprintSamples, subject.faceSamples, encoder)
         )
     }
 
