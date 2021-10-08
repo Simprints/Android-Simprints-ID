@@ -4,6 +4,8 @@ import androidx.work.*
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
@@ -24,7 +26,7 @@ class EventDownSyncWorkersBuilderImpl(
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             preferencesManager.modalities.map { it.toMode() },
-            preferencesManager.moduleIdOptions.toList(),
+            preferencesManager.selectedModules.toList(),
             preferencesManager.syncGroup
         )
         val uniqueDownSyncId = UUID.randomUUID().toString()
@@ -36,7 +38,7 @@ class EventDownSyncWorkersBuilderImpl(
     private fun buildDownSyncWorkers(
         uniqueSyncID: String?,
         uniqueDownSyncID: String,
-        downSyncOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+        downSyncOperation: EventDownSyncOperation
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventDownSyncDownloaderWorker::class.java)
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation)))
@@ -47,7 +49,7 @@ class EventDownSyncWorkersBuilderImpl(
     private fun buildCountWorker(
         uniqueSyncID: String?,
         uniqueDownSyncID: String,
-        eventDownSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
+        eventDownSyncScope: EventDownSyncScope
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventDownSyncCountWorker::class.java)
             .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to jsonHelper.toJson(eventDownSyncScope)))

@@ -69,7 +69,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
         }
     )
 
-    private val settingsSaveConfirmationDialog =
+    private val settingsSaveConfirmationDialog by lazy {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
             .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
@@ -79,6 +79,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
             .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
             .setCancelable(false)
             .create()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

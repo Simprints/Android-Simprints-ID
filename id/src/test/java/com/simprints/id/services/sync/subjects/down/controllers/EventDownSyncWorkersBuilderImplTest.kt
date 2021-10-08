@@ -3,8 +3,10 @@ package com.simprints.id.services.sync.subjects.down.controllers
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
@@ -22,10 +24,14 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.D
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class EventDownSyncWorkersBuilderImplTest {
 
     private lateinit var eventDownSyncWorkersFactory: EventDownSyncWorkersBuilder
@@ -34,11 +40,15 @@ class EventDownSyncWorkersBuilderImplTest {
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @MockK
+    lateinit var mockLoginInfoManager: LoginInfoManager
+
+    @MockK
     lateinit var mockPreferencesManager: IdPreferencesManager
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+
         eventDownSyncWorkersFactory = EventDownSyncWorkersBuilderImpl(
             eventDownSyncScopeRepository,
             JsonHelper,
@@ -99,6 +109,21 @@ class EventDownSyncWorkersBuilderImplTest {
         chain.assertDownSyncDownloaderWorkerInput(modulesDownSyncScope)
         chain.assertDownSyncCountWorkerInput(modulesDownSyncScope)
         assertThat(chain.size).isEqualTo(3)
+    }
+
+    @Test
+    fun builder_forModuleDownSync_shouldOnlySyncSelectedModules() = runBlockingTest {
+        coEvery {
+            eventDownSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns modulesDownSyncScope
+
+        eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
+        verify(exactly = 1) { mockPreferencesManager.selectedModules }
+        verify(exactly = 0) { mockPreferencesManager.moduleIdOptions }
     }
 
     @Test
@@ -206,7 +231,7 @@ private fun List<WorkRequest>.assertSubjectsDownSyncCountWorkerTagsForPeriodic(c
         count
     )
 
-private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
+private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope: EventDownSyncScope) {
     val downloaders =
         filter { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
     val jsonHelper = JsonHelper
@@ -219,7 +244,7 @@ private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope:
     assertThat(downloaders).hasSize(ops.size)
 }
 
-private fun List<WorkRequest>.assertDownSyncCountWorkerInput(downSyncScope: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope) {
+private fun List<WorkRequest>.assertDownSyncCountWorkerInput(downSyncScope: EventDownSyncScope) {
     val counter = first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
     val jsonHelper = JsonHelper
     assertThat(
