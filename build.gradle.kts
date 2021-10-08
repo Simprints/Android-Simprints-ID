@@ -7,14 +7,14 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven(url = "http://storage.googleapis.com/r8-releases/raw/master")
+        maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://plugins.gradle.org/m2/")
     }
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:4.2.1")
+        classpath("com.android.tools.build:gradle:7.0.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
 
         // CI Scanning & Retry
