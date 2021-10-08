@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.TabHost
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -37,12 +36,12 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
+
     private val binding by viewBinding(ActivitySyncInformationBinding::inflate)
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
     private lateinit var viewModel: SyncInformationViewModel
-    private lateinit var selectedModulesTabSpec: TabHost.TabSpec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,17 +57,11 @@ class SyncInformationActivity : BaseSplitActivity() {
         enableModuleSelectionButtonAndTabsIfNecessary()
         setupAdapters()
         setupToolbar()
-        setupModulesTabs()
         setupClickListeners()
         observeUi()
         setupRecordsCountCards()
 
         viewModel.fetchSyncInformation()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setFocusOnDefaultModulesTab()
     }
 
     private fun setTextInLayout() {
@@ -105,10 +98,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setFocusOnDefaultModulesTab() {
-        binding.modulesTabHost.setCurrentTabByTag(SELECTED_MODULES_TAB_TAG)
-    }
-
     private fun enableModuleSelectionButtonAndTabsIfNecessary() {
         if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
@@ -132,16 +121,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     private fun setupToolbar() {
         setSupportActionBar(binding.syncInfoToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun setupModulesTabs() {
-        binding.modulesTabHost.setup()
-
-        selectedModulesTabSpec = binding.modulesTabHost.newTabSpec(SELECTED_MODULES_TAB_TAG)
-            .setIndicator(getString(R.string.sync_info_selected_modules))
-            .setContent(R.id.selectedModulesView)
-
-        binding.modulesTabHost.addTab(selectedModulesTabSpec)
     }
 
     private fun setupClickListeners() {
@@ -203,7 +182,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
         val totalRecordsEntry =
             ModuleCount(getString(R.string.sync_info_total_records),
-                moduleCounts.sumBy { it.count })
+                moduleCounts.sumOf { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
         moduleCountAdapter.submitList(moduleCountsArray)
@@ -228,7 +207,6 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     companion object {
-        private const val SELECTED_MODULES_TAB_TAG = "SelectedModules"
         private const val TOTAL_RECORDS_INDEX = 0
     }
 }

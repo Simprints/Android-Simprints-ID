@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
-        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     testOptions {
