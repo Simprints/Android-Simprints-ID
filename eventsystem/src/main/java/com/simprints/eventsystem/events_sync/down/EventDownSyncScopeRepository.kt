@@ -9,7 +9,7 @@ interface EventDownSyncScopeRepository {
 
     suspend fun getDownSyncScope(
         modes: List<Modes>,
-        possibleModuleIds: List<String>,
+        selectedModuleIDs: List<String>,
         syncGroup: GROUP
     ): EventDownSyncScope
 
