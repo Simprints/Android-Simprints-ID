@@ -2,6 +2,7 @@ package com.simprints.id.tools.device
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 
@@ -12,14 +13,22 @@ class ConnectivityHelperImpl(private val ctx: Context) : ConnectivityHelper {
         ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
+    /**
+     * This method checks the active network connection status
+     *
+     * @return
+     * True: if theres an active network &&
+     *  has an active internet connection &&
+     *  connectivity on this network was successfully validated
+     * False: otherwise.
+     */
     override fun isNetworkAvailable(): Boolean {
-        val networkInfo = connectivityManager.activeNetworkInfo
-        var isAvailable = false
-        if (networkInfo != null && networkInfo.isConnected) {
-            // Network is present and connected
-            isAvailable = true
-        }
-        return isAvailable
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network);
+
+        return capabilities != null
+            && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
     }
 
     override fun registerNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {

@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.domain.models
 
-import android.net.NetworkInfo.DetailedState
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
@@ -16,7 +16,9 @@ class ConnectivitySnapshotEventTest {
     @Test
     fun create_ConnectivitySnapshotEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val connectionState = listOf(Connection("GPRS", DetailedState.CONNECTED))
+        val connectionState = listOf(Connection(
+            SimNetworkUtils.ConnectionType.MOBILE,
+            SimNetworkUtils.ConnectionState.CONNECTED))
         val event = ConnectivitySnapshotEventSample.getEvent(labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
