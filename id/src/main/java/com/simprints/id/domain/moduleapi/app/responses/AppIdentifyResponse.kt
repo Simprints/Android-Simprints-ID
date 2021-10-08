@@ -1,8 +1,8 @@
 package com.simprints.id.domain.moduleapi.app.responses
 
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class AppIdentifyResponse(val identifications: List<MatchResult>,

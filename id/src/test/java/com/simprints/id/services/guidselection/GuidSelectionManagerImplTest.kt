@@ -1,17 +1,14 @@
 package com.simprints.id.services.guidselection
 
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.GuidSelectionEvent
-import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
-import com.simprints.id.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -28,15 +25,13 @@ class GuidSelectionManagerImplTest {
     private val guidSelectionRequest = GuidSelectionRequest(DEFAULT_PROJECT_ID, GUID1, GUID2)
 
     @MockK private lateinit var loginInfoManager: LoginInfoManager
-    @MockK private lateinit var analyticsManager: AnalyticsManager
-    @MockK private lateinit var crashReportManager: CrashReportManager
     @MockK private lateinit var timerHelper: TimeHelper
-    @MockK private lateinit var eventRepository: EventRepository
+    @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        guidSelectionManager = GuidSelectionManagerImpl(DEFAULT_DEVICE_ID, loginInfoManager, analyticsManager, crashReportManager, timerHelper, eventRepository)
+        guidSelectionManager = GuidSelectionManagerImpl(DEFAULT_DEVICE_ID, loginInfoManager, timerHelper, eventRepository)
         every { timerHelper.now() } returns CREATED_AT
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
@@ -61,34 +56,4 @@ class GuidSelectionManagerImplTest {
         }
     }
 
-    @Test
-    fun handleConfirmIdentityRequest_shouldReportToAnalytics() {
-        runBlocking {
-            every { loginInfoManager.isProjectIdSignedIn(any()) } returns true
-
-            guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
-
-            coVerify(exactly = 1) { analyticsManager.logGuidSelectionWorker(DEFAULT_PROJECT_ID, GUID1, DEFAULT_DEVICE_ID, GUID2, true) }
-        }
-    }
-
-    @Test
-    fun handleConfirmIdentityRequest_somethingWrongHappens_shouldReportToAnalytics() {
-        runBlocking {
-            guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
-
-            coVerify(exactly = 1) { analyticsManager.logGuidSelectionWorker(DEFAULT_PROJECT_ID, GUID1, DEFAULT_DEVICE_ID, GUID2, false) }
-        }
-    }
-
-    @Test
-    fun handleConfirmIdentityRequest_somethingWrongHappens_shouldLogException() {
-        runBlocking {
-            every { loginInfoManager.isProjectIdSignedIn(any()) } throws Throwable("Error")
-
-            guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
-
-            coVerify(exactly = 1) { crashReportManager.logExceptionOrSafeException(any()) }
-        }
-    }
 }

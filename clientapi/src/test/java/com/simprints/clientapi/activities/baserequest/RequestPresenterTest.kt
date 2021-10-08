@@ -2,17 +2,14 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.RootedDeviceException
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
@@ -42,10 +39,22 @@ class RequestPresenterTest {
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>(relaxed = true).apply {
-                every { this@apply.build() } returns EnrolRequest(projectIdField, userIdField, moduleIdField, metadataField, extraField)
+                every { this@apply.build() } returns EnrolRequest(
+                    projectIdField,
+                    userIdField,
+                    moduleIdField,
+                    metadataField,
+                    extraField
+                )
             }
 
-            val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))
+            val presenter = ImplRequestPresenter(
+                mockk(relaxed = true),
+                clientApiSessionEventsManagerMock,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true)
+            )
             presenter.validateAndSendRequest(requestBuilder)
 
             coVerify(exactly = 1) {
@@ -58,10 +67,22 @@ class RequestPresenterTest {
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
         runBlockingTest {
             val requestBuilder = mockk<ClientRequestBuilder>().apply {
-                every { this@apply.build() } returns EnrolRequest(projectIdField, userIdField, moduleIdField, metadataField, emptyMap())
+                every { this@apply.build() } returns EnrolRequest(
+                    projectIdField,
+                    userIdField,
+                    moduleIdField,
+                    metadataField,
+                    emptyMap()
+                )
             }
 
-            val presenter = ImplRequestPresenter(mockk(relaxed = true), clientApiSessionEventsManagerMock, mockk(relaxed = true), mockk(relaxed = true))
+            val presenter = ImplRequestPresenter(
+                mockk(relaxed = true),
+                clientApiSessionEventsManagerMock,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true)
+            )
             presenter.validateAndSendRequest(requestBuilder)
 
             coVerify(exactly = 0) {
@@ -71,31 +92,17 @@ class RequestPresenterTest {
     }
 
     @Test
-    fun withRootedDevice_shouldLogException() = runBlockingTest {
-        val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
-        val exception = RootedDeviceException()
-        every { mockDeviceManager.checkIfDeviceIsRooted() } throws exception
-        val mockCrashReportManager = mockk<ClientApiCrashReportManager>(relaxed = true)
-        val presenter = ImplRequestPresenter(
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockDeviceManager,
-            mockCrashReportManager
-        )
-
-        presenter.start()
-
-        verify(exactly = 1) {
-            mockCrashReportManager.logExceptionOrSafeException(exception)
-        }
-    }
-
-    @Test
     fun withRootedDevice_shouldShowAlertScreen() = runBlockingTest {
         val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
-        val presenter = ImplRequestPresenter(mockView, mockk(relaxed = true), mockDeviceManager, mockk(relaxed = true))
+        val presenter = ImplRequestPresenter(
+            mockView,
+            mockk(relaxed = true),
+            mockDeviceManager,
+            mockk(relaxed = true),
+            mockk(relaxed = true)
+        )
 
         presenter.start()
 
@@ -108,8 +115,15 @@ class ImplRequestPresenter(
     view: RequestContract.RequestView,
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
     deviceManager: DeviceManager,
-    crashReportManager: ClientApiCrashReportManager
-) : RequestPresenter(view, clientApiSessionEventsManager, deviceManager, crashReportManager) {
+    sharedPreferencesManager: SharedPreferencesManager,
+    sessionEventsManager: ClientApiSessionEventsManager
+) : RequestPresenter(
+    view = view,
+    eventsManager = clientApiSessionEventsManager,
+    deviceManager = deviceManager,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sessionEventsManager = sessionEventsManager
+) {
 
     override suspend fun start() {
         runIfDeviceIsNotRooted {}

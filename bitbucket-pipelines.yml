@@ -33,7 +33,7 @@ definitions:
         # Run the ID unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-id-unit-tests
-                name: "Run Id & Core unit tests"
+                name: "Run Id, Core & Event System unit tests"
                 size: 2x
                 max-time: 30
                 caches:
@@ -43,15 +43,18 @@ definitions:
                     - bash ./ci/pipeline/setup
                     - ./gradlew core:jacocoTestReportDebug
                     - ./gradlew id:jacocoTestReportDebug
+                    - ./gradlew eventsystem:jacocoTestReportDebug
                 artifacts:
                     - id/build/reports/**
                     - core/build/reports/**
+                    - eventsystem/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-face-unit-tests
                 name: "Run Face unit tests"
+                size: 2x
                 max-time: 30
                 caches:
                     - gradle
@@ -111,9 +114,33 @@ definitions:
                 script:
                     - bash ./ci/pipeline/setup
                     - ./gradlew assembleDebug
-                    - bash ./ci/pipeline/install_java_11
+                    - bash ./ci/tools/install_java_11
                     - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
+
+        ######################################################################
+        # Scan all of the projects dependencies and report back if there are
+        # un-used, incorrectly declared, or incorrect transitive dependencies
+        ######################################################################
+        -   step: &dependency-health-check
+                max-time: 30
+                size: 2x
+                name: "Dependency health check"
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - bash ./ci/pipeline/setup
+                    - ./gradlew :eventsystem:projectHealth
+                    - ./gradlew :core:projectHealth
+                    - ./gradlew :clientapi:projectHealth
+                    - ./gradlew :face:projectHealth
+                    - ./gradlew :fingerprint:projectHealth
+                    - ./gradlew :fingerprintscanner:projectHealth
+                    - ./gradlew :fingerprintmatcher:projectHealth
+                    - ./gradlew :fingerprintscannermock:projectHealth
+                    - ./gradlew :moduleapi:projectHealth
+                    - ./gradlew :logging:projectHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
@@ -139,8 +166,8 @@ definitions:
                     - ./gradlew fingerprint:assembleDebugAndroidTest
                     - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk
                     # Build Face Android Test APK
-                    # - ./gradlew face:assembleDebugAndroidTest
-                    # - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
+                    - ./gradlew face:assembleDebugAndroidTest
+                    - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     # Build Universal APK
                     - ./gradlew packageDebugUniversalApk --stacktrace
                     - mv id/build/outputs/universal_apk/debug/id-debug-universal.apk universal.apk
@@ -160,9 +187,9 @@ definitions:
                 image: google/cloud-sdk:slim
                 script:
                     - bash ./ci/pipeline/setup_gcloud
-                    - mv ./*.apk ./ci/pipeline/
-                    - cd ./ci/pipeline/
-                    - ./run_all_android_tests.sh universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk
+                    - mv ./*.apk ./ci/firebasetestlab/
+                    - cd ./ci/firebasetestlab/
+                    - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk face:face-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
@@ -184,7 +211,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup.sh
+                    - bash ./ci/deployment/build_properties_setup
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
                     - ./gradlew packageStagingUniversalApk
                     - ./gradlew id:appDistributionUploadStaging
@@ -208,8 +235,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
-                    - bash ./ci/pipeline/release_setup.sh
-                    - echo "BUNDLE_FOLDER=release" >>ci/deploy.properties
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
                     - mkdir -p id/src/release
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
@@ -231,6 +258,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - bash ./ci/pipeline/setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
 ######################################################################
@@ -244,17 +273,19 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
                     -   step: *run-all-android-tests
-    -   flow: &release_branch_flow
+    -   flow: &release_flow
             -   parallel:
                     -   step: *run-clientapi-unit-tests
                     -   step: *run-id-unit-tests
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -262,32 +293,20 @@ flows:
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
-    -   flow: &production_flow
-            -   parallel:
-                    -   step: *run-clientapi-unit-tests
-                    -   step: *run-id-unit-tests
-                    -   step: *run-face-unit-tests
-                    -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *build-and-sign-universal-apk
-            -   parallel:
-                    -   step: *upload-sonar-scan-and-check-quality-gate
-                    -   step: *run-all-android-tests
+    -   flow: &ci-test # For CI testing purposes only
+            -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
-    -   flow: &ci-test
-            -   step: *build-and-sign-universal-apk
-            -   step: *run-all-android-tests
 
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
 pipelines:
     branches:
-        main: *production_flow
+        main: *release_flow
         develop: *development_flow
-        release/*: *release_branch_flow
-        ci/*: *ci-test
+        release/*: *release_flow
     custom:
-        default-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
-        release-pipeline: *production_flow # Pipeline to create a separate build and release to alpha
+        develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
+        release-pipeline: *release_flow # Pipeline to create a release manually
+        ci-test-pipeline: *ci-test # For CI testing purposes only

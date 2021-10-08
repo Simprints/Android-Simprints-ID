@@ -4,10 +4,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.face.FixtureGenerator
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
-import com.simprints.face.controllers.core.events.model.*
+import com.simprints.face.controllers.core.events.model.Event
+import com.simprints.face.controllers.core.events.model.MatchEntry
 import com.simprints.face.controllers.core.events.model.Matcher
+import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
+import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
@@ -19,7 +21,15 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.tools.utils.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.asFlow
 import org.junit.Rule
@@ -51,7 +61,6 @@ class FaceMatchViewModelTest {
     private val masterFlowManager: MasterFlowManager = mockk()
     private val faceDbManager: FaceDbManager = mockk()
     private val faceMatcher: FaceMatcher = spyk()
-    private val faceCrashReportManager: FaceCrashReportManager = mockk(relaxUnitFun = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
@@ -223,7 +232,6 @@ class FaceMatchViewModelTest {
             masterFlowManager,
             faceDbManager,
             faceMatcher,
-            faceCrashReportManager,
             faceSessionEventsManager,
             faceTimeHelper,
             testDispatcherProvider

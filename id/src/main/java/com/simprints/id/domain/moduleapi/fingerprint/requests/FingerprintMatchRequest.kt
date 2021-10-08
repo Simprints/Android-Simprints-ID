@@ -5,7 +5,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.fromDoma
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize

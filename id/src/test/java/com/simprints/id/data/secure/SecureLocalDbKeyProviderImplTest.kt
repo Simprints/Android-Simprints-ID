@@ -7,9 +7,11 @@ import android.util.Base64.encodeToString
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex

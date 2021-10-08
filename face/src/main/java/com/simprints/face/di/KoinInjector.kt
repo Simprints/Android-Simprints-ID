@@ -6,8 +6,6 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.configuration.ConfigurationViewModel
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManager
-import com.simprints.face.controllers.core.crashreport.FaceCrashReportManagerImpl
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
 import com.simprints.face.controllers.core.flow.MasterFlowManager
@@ -95,7 +93,6 @@ object KoinInjector {
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
-        factory<FaceCrashReportManager> { FaceCrashReportManagerImpl(get()) }
         factory<FaceTimeHelper> { FaceTimeHelperImpl(get()) }
         factory<FaceSessionEventsManager> { FaceSessionEventsManagerImpl(get()) }
         factory<DispatcherProvider> { DefaultDispatcherProvider() }
@@ -110,11 +107,15 @@ object KoinInjector {
     }
 
     private fun Module.defineBuildersForViewModels() {
-        viewModel { FaceOrchestratorViewModel(get()) }
-        viewModel { FaceCaptureViewModel(get<FacePreferencesManager>().maxRetries, get(), get()) }
+        viewModel { FaceOrchestratorViewModel() }
+        viewModel {
+            FaceCaptureViewModel(
+                get<FacePreferencesManager>().shouldSaveFaceImages,
+                get()
+            )
+        }
         viewModel {
             FaceMatchViewModel(
-                get(),
                 get(),
                 get(),
                 get(),
@@ -134,7 +135,7 @@ object KoinInjector {
                 get()
             )
         }
-        viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get()) }
+        viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
 
         viewModel { ConfigurationViewModel(get(), get()) }
     }

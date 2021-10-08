@@ -3,12 +3,12 @@ package com.simprints.id.activities.dashboard.cards.sync
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
-import com.simprints.id.sampledata.SampleDefaults
 import com.simprints.id.commontesttools.TestTimeHelperImpl
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -19,7 +19,6 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.D
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.time.TimeHelper
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
@@ -44,8 +43,8 @@ class DashboardSyncCardStateRepositoryImplTest {
 
     @MockK lateinit var eventSyncManager: EventSyncManager
     @MockK lateinit var deviceManager: DeviceManager
-    @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var downSyncScopeRepository: EventDownSyncScopeRepository
+    @MockK lateinit var preferencesManager: IdPreferencesManager
+    @MockK lateinit var downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
     @MockK lateinit var cacheSync: EventSyncCache
     @MockK lateinit var timeHelper: TimeHelper
 
@@ -62,7 +61,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
         every { eventSyncManager.getLastSyncState() } returns syncStateLiveData
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.projectDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.projectDownSyncScope
         every { preferencesManager.selectedModules } returns emptySet()
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
         every { eventSyncManager.hasSyncEverRunBefore() } returns true
@@ -94,7 +93,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.ON
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -106,7 +105,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -118,7 +117,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.OFF
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -130,7 +129,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun modulesSelectedWithSyncByModule_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns setOf(SampleDefaults.DEFAULT_MODULE_ID)
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.modulesDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()
@@ -141,7 +140,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     @Test
     fun noModulesSelectedWithSyncByProject_syncStateShouldBeConnecting() = runBlockingTest {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope() } returns SampleDefaults.projectDownSyncScope
+        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.projectDownSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.testObserver()

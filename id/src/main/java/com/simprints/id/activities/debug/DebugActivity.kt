@@ -6,23 +6,24 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.Application
-import com.simprints.id.R
-import com.simprints.id.data.db.event.local.EventLocalDataSource
-import com.simprints.id.data.db.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
+import com.simprints.id.services.config.RemoteConfigScheduler
+import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
-import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -32,12 +33,28 @@ import javax.inject.Inject
 
 class DebugActivity : BaseSplitActivity() {
 
-    @Inject lateinit var eventSyncManager: EventSyncManager
-    @Inject lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
-    @Inject lateinit var securityStateRepository: SecurityStateRepository
-    @Inject lateinit var securityStateProcessor: SecurityStateProcessor
-    @Inject lateinit var eventLocalDataSource: EventLocalDataSource
-    @Inject lateinit var subjectRepository: SubjectRepository
+    @Inject
+    lateinit var eventSyncManager: EventSyncManager
+
+    @Inject
+    lateinit var remoteConfigScheduler: RemoteConfigScheduler
+
+    @Inject
+    lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
+
+    @Inject
+    lateinit var securityStateRepository: SecurityStateRepository
+
+    @Inject
+    lateinit var securityStateProcessor: SecurityStateProcessor
+
+    @Inject
+    lateinit var eventLocalDataSource: EventLocalDataSource
+
+    @Inject
+    lateinit var subjectRepository: SubjectRepository
+
+    private val binding by viewBinding(ActivityDebugBinding::inflate)
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -47,34 +64,33 @@ class DebugActivity : BaseSplitActivity() {
         val component = (application as Application).component
         component.inject(this)
 
-        setContentView(R.layout.activity_debug)
+        setContentView(binding.root)
 
         eventSyncManager.getLastSyncState().observe(this, Observer {
             val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
-                "${it.syncId.takeLast(3)} - " +
+                "${it.syncId.takeLast(5)} - " +
                     "${states.toDebugActivitySyncState().name} - " +
                     "${it.progress}/${it.total}"
 
-            val ssb = SpannableStringBuilder(logs.text)
-            ssb.append(coloredText(message + "\n", Color.parseColor(getRandomColor(it.syncId))))
+            val ssb = SpannableStringBuilder(coloredText("\n$message", Color.parseColor(getRandomColor())))
 
-            logs.setText(ssb, TextView.BufferType.SPANNABLE)
+            binding.logs.append(ssb)
         })
 
-        syncSchedule.setOnClickListener {
+        binding.syncSchedule.setOnClickListener {
             eventSyncManager.scheduleSync()
         }
 
-        syncStart.setOnClickListener {
+        binding.syncStart.setOnClickListener {
             eventSyncManager.sync()
         }
 
-        syncStop.setOnClickListener {
+        binding.syncStop.setOnClickListener {
             eventSyncManager.stop()
         }
 
-        cleanAll.setOnClickListener {
+        binding.cleanAll.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     eventSyncManager.cancelScheduledSync()
@@ -87,40 +103,55 @@ class DebugActivity : BaseSplitActivity() {
             }
         }
 
-        securityStateCompromised.setOnClickListener {
+        binding.securityStateCompromised.setOnClickListener {
             setSecurityStatus(SecurityState.Status.COMPROMISED)
         }
 
-        securityStateProjectEnded.setOnClickListener {
+        binding.securityStateProjectEnded.setOnClickListener {
             setSecurityStatus(SecurityState.Status.PROJECT_ENDED)
         }
 
-        printRoomDb.setOnClickListener {
-            logs.text = ""
+        binding.printRoomDb.setOnClickListener {
+            binding.logs.text = ""
             lifecycleScope.launch {
                 withContext(Dispatchers.Main) {
-                    logs.text = "${logs.text} Subjects ${subjectRepository.count()} \n"
+                    val logStringBuilder = StringBuilder()
+                    logStringBuilder.append("\nSubjects ${subjectRepository.count()}")
 
                     val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
-                        logs.text = "${logs.text} ${it.key} ${it.value.size} \n"
+                        logStringBuilder.append("\n${it.key} ${it.value.size}")
                     }
+
+                    binding.logs.text = logStringBuilder.toString()
                 }
             }
         }
 
+        binding.syncConfig.setOnClickListener {
+            remoteConfigScheduler.syncNow()
+            binding.logs.append("\nGetting Configs from BFSID")
+        }
+
+        wm.getWorkInfosForUniqueWorkLiveData(RemoteConfigSchedulerImpl.WORK_NAME_ONE_TIME)
+            .observe(this, Observer { workInfos ->
+                binding.logs.append(
+                    workInfos.joinToString("", "\n") { workInfo ->
+                        "${workInfo.id.toString().take(5)} - ${workInfo.state}"
+                    }
+                )
+            })
     }
 
-    private fun getRandomColor(seed: String): String {
-        val rnd = seed.toCharArray().sumBy { it.toInt() } % 4
-        return arrayOf("red", "yellow", "green", "blue")[rnd]
-    }
+    private fun getRandomColor(): String = arrayOf("red", "black", "purple", "green", "blue").random()
 
-    private fun coloredText(text: String, color: Int): SpannableString? {
+    private fun coloredText(text: String, color: Int): SpannableString {
         val spannableString = SpannableString(text)
         try {
-            spannableString.setSpan(ForegroundColorSpan(color), 0,
-                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(
+                ForegroundColorSpan(color), 0,
+                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         } catch (e: Exception) {
         }
         return spannableString

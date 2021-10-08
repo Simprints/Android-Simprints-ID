@@ -9,32 +9,35 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.extentions.getStringPlural
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.databinding.ActivityMatchingBinding
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
-import kotlinx.android.synthetic.main.activity_matching.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MatchingActivity : FingerprintActivity() {
 
     private val viewModel: MatchingViewModel by viewModel()
+    private val binding by viewBinding(ActivityMatchingBinding::inflate)
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
-        setContentView(R.layout.activity_matching)
+        setContentView(binding.root)
+
         setTextInLayout()
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         observeResult()
         observeProgress()
@@ -43,7 +46,7 @@ class MatchingActivity : FingerprintActivity() {
     }
 
     private fun setTextInLayout() {
-        matching_please_wait.text = getString(R.string.please_wait)
+        binding.matchingPleaseWait.text = getString(R.string.please_wait)
     }
 
     override fun onResume() {
@@ -66,28 +69,28 @@ class MatchingActivity : FingerprintActivity() {
 
     private fun observeTextViewUpdates() {
         viewModel.hasLoadingBegun.observe(this, Observer {
-            if (it) tv_matchingProgressStatus1.setText(R.string.loading_candidates)
+            if (it) binding.tvMatchingProgressStatus1.setText(R.string.loading_candidates)
         })
 
         viewModel.matchBeginningSummary.observe(this, Observer {
-            tv_matchingProgressStatus1.text = getStringPlural(R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
-            tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
+            binding.tvMatchingProgressStatus1.text = resources.getQuantityString(R.plurals.loaded_candidates_result, it.matchSize, it.matchSize)
+            binding.tvMatchingProgressStatus2.setText(R.string.matching_fingerprints)
         })
 
         viewModel.matchFinishedSummary.observe(this, Observer {
-            tv_matchingProgressStatus2.text = getStringPlural(R.string.returned_results_quantity_key, it.returnSize, arrayOf(it.returnSize))
+            binding.tvMatchingProgressStatus2.text = resources.getQuantityString(R.plurals.returned_results, it.returnSize, it.returnSize)
 
             if (it.veryGoodMatches > 0) {
-                tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = getStringPlural(R.string.tier1or2_matches_quantity_key, it.veryGoodMatches, arrayOf(it.veryGoodMatches))
+                binding.tvMatchingResultStatus1.visibility = View.VISIBLE
+                binding.tvMatchingResultStatus1.text = resources.getQuantityString(R.plurals.tier1or2_matches, it.veryGoodMatches, it.veryGoodMatches)
             }
             if (it.goodMatches > 0) {
-                tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = getStringPlural(R.string.tier3_matches_quantity_key, it.goodMatches, arrayOf(it.goodMatches))
+                binding.tvMatchingResultStatus2.visibility = View.VISIBLE
+                binding.tvMatchingResultStatus2.text = resources.getQuantityString(R.plurals.tier3_matches, it.goodMatches, it.goodMatches)
             }
             if (it.veryGoodMatches < 1 && it.goodMatches < 1 || it.fairMatches > 1) {
-                tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = getStringPlural(R.string.tier4_matches_quantity_key, it.fairMatches, arrayOf(it.fairMatches))
+                binding.tvMatchingResultStatus3.visibility = View.VISIBLE
+                binding.tvMatchingResultStatus3.text = resources.getQuantityString(R.plurals.tier4_matches, it.fairMatches, it.fairMatches)
             }
             setIdentificationProgress(100)
         })
@@ -106,7 +109,7 @@ class MatchingActivity : FingerprintActivity() {
     @SuppressLint("ObjectAnimatorBinding")
     private fun setIdentificationProgress(progress: Int) =
         runOnUiThread {
-            ObjectAnimator.ofInt(pb_identification, "progress", pb_identification.progress, progress)
+            ObjectAnimator.ofInt(binding.pbIdentification, "progress", binding.pbIdentification.progress, progress)
                 .setDuration((progress * 10).toLong())
                 .start()
         }

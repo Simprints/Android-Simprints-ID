@@ -6,16 +6,18 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
-import com.simprints.id.data.db.subject.domain.FaceSample as CoreFaceSample
 
-class FaceDbManagerImpl(private val coreFaceIdentityLocalDataSource: FaceIdentityLocalDataSource) : FaceDbManager {
+
+class FaceDbManagerImpl(private val coreFaceIdentityLocalDataSource: FaceIdentityLocalDataSource) :
+    FaceDbManager {
 
     override suspend fun loadPeople(query: Serializable): Flow<FaceIdentity> =
         coreFaceIdentityLocalDataSource
             .loadFaceIdentities(query)
             .map {
-                FaceIdentity(it.personId, it.faces.map { face -> face.fromCoreToDomain() })
+                FaceIdentity(
+                    it.personId,
+                    it.faces.map { face -> FaceSample(face.id, face.template) })
             }
 }
 
-fun CoreFaceSample.fromCoreToDomain() = FaceSample(id, template)

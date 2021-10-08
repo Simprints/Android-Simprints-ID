@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.app.requests
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class AppRequest(open val projectId: String,
                         open val userId: String) : Parcelable {

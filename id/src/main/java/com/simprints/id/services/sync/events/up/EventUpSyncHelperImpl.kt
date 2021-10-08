@@ -1,33 +1,32 @@
 package com.simprints.id.services.sync.events.up
 
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation
-import com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.FAILED
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.tools.time.TimeHelper
+import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import timber.log.Timber
 
 class EventUpSyncHelperImpl(
-    private val eventRepository: EventRepository,
-    private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
+    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
     private val timerHelper: TimeHelper
 ) : EventUpSyncHelper {
 
-    override suspend fun countForUpSync(operation: EventUpSyncOperation): Int =
+    override suspend fun countForUpSync(operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation): Int =
         eventRepository.localCount(operation.projectId)
 
-    override suspend fun upSync(scope: CoroutineScope, operation: EventUpSyncOperation) =
+    override suspend fun upSync(scope: CoroutineScope, operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation) =
         flow<EventUpSyncProgress> {
             var lastOperation = operation.copy()
             var count = 0
             try {
                 eventRepository.uploadEvents(operation.projectId).collect {
-                    Timber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
+                    Simber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
                     count = it
                     lastOperation =
                         lastOperation.copy(lastState = RUNNING, lastSyncTime = timerHelper.now())
@@ -40,7 +39,7 @@ class EventUpSyncHelperImpl(
 
 
             } catch (t: Throwable) {
-                Timber.e(t)
+                Simber.e(t)
                 lastOperation =
                     lastOperation.copy(lastState = FAILED, lastSyncTime = timerHelper.now())
                 emitProgress(lastOperation, count)
@@ -48,7 +47,7 @@ class EventUpSyncHelperImpl(
         }
 
     private suspend fun FlowCollector<EventUpSyncProgress>.emitProgress(
-        lastOperation: EventUpSyncOperation,
+        lastOperation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation,
         count: Int
     ) {
         eventUpSyncScopeRepo.insertOrUpdate(lastOperation)

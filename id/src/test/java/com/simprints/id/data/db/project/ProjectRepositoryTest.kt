@@ -3,10 +3,11 @@ package com.simprints.id.data.db.project
 import android.accounts.NetworkErrorException
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -43,11 +44,13 @@ class ProjectRepositoryTest {
 
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
+    private val remoteConfigWrapper: RemoteConfigWrapper = mockk(relaxUnitFun = true)
     private val firebasePerformanceMock: FirebasePerformance = mockk()
 
     private val projectRepository = ProjectRepositoryImpl(
         projectLocalDataSourceMock,
         projectRemoteDataSourceMock,
+        remoteConfigWrapper,
         firebasePerformanceMock
     )
 
@@ -104,6 +107,15 @@ class ProjectRepositoryTest {
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
         coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+    }
+
+    @Test
+    fun `fetch a new project config correctly`() = runBlocking {
+        coEvery { projectRemoteDataSourceMock.loadProjectRemoteConfigSettingsJsonString(DEFAULT_PROJECT_ID) } returns mockk()
+
+        projectRepository.fetchProjectConfigurationAndSave(DEFAULT_PROJECT_ID)
+
+        coVerify { projectRemoteDataSourceMock.loadProjectRemoteConfigSettingsJsonString(DEFAULT_PROJECT_ID) }
     }
 
 }

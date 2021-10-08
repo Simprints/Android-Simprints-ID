@@ -1,6 +1,9 @@
 package com.simprints.id.data.images.repository
 
 import android.content.Context
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.id.data.db.common.FirebaseManagerImpl
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.images.local.ImageLocalDataSource
 import com.simprints.id.data.images.local.ImageLocalDataSourceImpl
 import com.simprints.id.data.images.model.Path
@@ -8,16 +11,20 @@ import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.data.images.remote.ImageRemoteDataSource
 import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
 import com.simprints.id.network.BaseUrlProvider
-import timber.log.Timber
+import com.simprints.logging.Simber
 
 class ImageRepositoryImpl internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
-    constructor(context: Context, baseUrlProvider: BaseUrlProvider) : this(
+    constructor(
+        context: Context,
+        baseUrlProvider: BaseUrlProvider,
+        remoteDbManager: RemoteDbManager
+    ) : this(
         ImageLocalDataSourceImpl(context),
-        ImageRemoteDataSourceImpl(baseUrlProvider)
+        ImageRemoteDataSourceImpl(baseUrlProvider, remoteDbManager)
     )
 
     override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
@@ -42,7 +49,7 @@ class ImageRepositoryImpl internal constructor(
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Timber.d(t)
+                Simber.d(t)
             }
         }
 

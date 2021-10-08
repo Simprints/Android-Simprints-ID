@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect.resources
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.simprints.core.R as CR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.activities.collect.state.FingerState
@@ -44,7 +45,7 @@ fun FingerState.indicatorDeselectedDrawableId(): Int =
 @Suppress("unused")
 @ColorRes
 fun FingerState.nameTextColour(): Int =
-    R.color.simprints_blue
+    CR.color.simprints_blue
 
 @Suppress("unused")
 @StringRes
@@ -69,4 +70,4 @@ fun FingerState.directionTextId(isLastFinger: Boolean): Int =
 @Suppress("unused")
 @ColorRes
 fun FingerState.directionTextColour(): Int =
-    R.color.simprints_grey
+    CR.color.simprints_grey

@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.connect.request
 
 import android.os.Parcelable
 import com.simprints.fingerprint.orchestrator.task.TaskRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ConnectScannerTaskRequest(val connectMode: ConnectMode) : TaskRequest, Parcelable {

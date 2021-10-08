@@ -46,31 +46,15 @@
 
 -keepclassmembers enum * { *; }
 
-# For Realm
--keepnames public class * extends io.realm.RealmObject
--keep @io.realm.annotations.RealmModule class *
--keepattributes Annotation
--dontwarn javax.**
--dontwarn io.realm.**
--keep class io.realm.annotations.RealmModule
--keep @interface io.realm.annotations.RealmModule { *; }
--keep class io.realm.annotations.RealmModule { *; }
-
-
 # These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
--keep class com.simprints.fingerprintmatcher.** { *; }
--keep class com.simprints.id.data.db.event.remote.models.** { *; }
--keep class com.simprints.id.data.db.event.domain.models.** { *; }
--keep class com.simprints.id.data.db.event.local.** { *; }
-
--dontwarn com.simprints.fingerprintmatcher.**
-
+-keep class com.simprints.eventsystem.event.remote.models.** { *; }
+-keep class com.simprints.eventsystem.event.domain.models.** { *; }
+-keep class com.simprints.eventsystem.event.local.** { *; }
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
--keepattributes *Annotation*
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,*Annotation*
 -keep public class * extends java.lang.Exception
 -keep public class * extends java.lang.RuntimeException
 -keep public class * extends java.lang.Throwable
@@ -101,12 +85,12 @@
 }
 # https://github.com/Kotlin/kotlinx.coroutines/issues/1270
 -dontwarn kotlinx.coroutines.flow.**
--dontwarn com.simprints.id.data.db.person.local.**
+-dontwarn com.simprints.eventsystem.person.local.**
 -dontwarn com.simprints.id.services.scheduledSync.people.up.workers.**
 -dontwarn com.simprints.id.tools.extensions.**
 -dontwarn com.simprints.id.activities.settings.syncinformation.**
 -dontwarn com.simprints.id.activities.consent.**
--dontwarn com.simprints.id.data.db.session.**
+-dontwarn com.simprints.eventsystem.session.**
 
 # https://github.com/Kotlin/kotlinx.coroutines/issues/2046
 -dontwarn java.lang.instrument.ClassFileTransformer

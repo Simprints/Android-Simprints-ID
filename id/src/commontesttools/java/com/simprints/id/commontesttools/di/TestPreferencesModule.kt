@@ -1,17 +1,16 @@
 package com.simprints.id.commontesttools.di
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.di.PreferencesModule
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -24,9 +23,13 @@ class TestPreferencesModule(
     var settingsPreferencesManagerRule: DependencyRule = RealRule
 ) : PreferencesModule() {
 
-    override fun provideRemoteConfig(): FirebaseRemoteConfig = remoteConfigRule.resolveDependency {
-        super.provideRemoteConfig()
-    }
+    /**
+     * Overriding this method means that we can use a mock or a spy instead of the regular provider from Dagger
+     */
+    override fun provideRemoteConfigWrapper(prefs: ImprovedSharedPreferences): RemoteConfigWrapper =
+        settingsPreferencesManagerRule.resolveDependency {
+            super.provideRemoteConfigWrapper(prefs)
+        }
 
     override fun provideSettingsPreferencesManager(
         prefs: ImprovedSharedPreferences,

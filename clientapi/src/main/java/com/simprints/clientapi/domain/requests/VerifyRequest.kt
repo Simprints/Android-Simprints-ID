@@ -2,7 +2,7 @@ package com.simprints.clientapi.domain.requests
 
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.moduleapi.app.requests.IAppVerifyRequest
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 
 data class VerifyRequest(

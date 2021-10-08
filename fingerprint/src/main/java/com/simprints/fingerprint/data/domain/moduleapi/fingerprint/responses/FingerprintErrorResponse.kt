@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FingerprintErrorResponse(val reason: FingerprintErrorReason) : FingerprintResponse {

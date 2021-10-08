@@ -1,64 +1,67 @@
-package com.simprints.id.data.db.event.remote
+package com.simprints.eventsystem.event.remote
 
 import android.net.NetworkInfo
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.domain.modality.Modes.FACE
+import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.id.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.sampledata.SampleDefaults.GUID1
-import com.simprints.id.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.event.domain.models.*
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload
+import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
+import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+import com.simprints.eventsystem.event.domain.models.callback.*
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
+import com.simprints.eventsystem.event.domain.models.callout.*
+import com.simprints.eventsystem.event.domain.models.face.*
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
+import com.simprints.eventsystem.event.domain.models.session.Device
+import com.simprints.eventsystem.event.domain.models.session.Location
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.eventsystem.sampledata.buildFakeBiometricReferences
+import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.id.commontesttools.events.buildFakeBiometricReferences
-import com.simprints.id.commontesttools.events.createEnrolmentEventV1
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.event.domain.models.*
-import com.simprints.id.data.db.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.id.data.db.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.id.data.db.event.domain.models.AuthorizationEvent.AuthorizationPayload
-import com.simprints.id.data.db.event.domain.models.CandidateReadEvent.CandidateReadPayload
-import com.simprints.id.data.db.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.id.data.db.event.domain.models.EventType.*
-import com.simprints.id.data.db.event.domain.models.IntentParsingEvent.IntentParsingPayload
-import com.simprints.id.data.db.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
-import com.simprints.id.data.db.event.domain.models.RefusalEvent.RefusalPayload
-import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
-import com.simprints.id.data.db.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
-import com.simprints.id.data.db.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
-import com.simprints.id.data.db.event.domain.models.callback.*
-import com.simprints.id.data.db.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.id.data.db.event.domain.models.callout.*
-import com.simprints.id.data.db.event.domain.models.face.*
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.id.data.db.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.id.data.db.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.event.domain.models.session.DatabaseInfo
-import com.simprints.id.data.db.event.domain.models.session.Device
-import com.simprints.id.data.db.event.domain.models.session.Location
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.domain.modality.Modes.FACE
-import com.simprints.id.domain.modality.Modes.FINGERPRINT
-import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.DefaultOkHttpClientBuilder
-import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.network.SimApiClientFactoryImpl
-import com.simprints.id.network.TimberLogger
+import com.simprints.id.network.SimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-import com.simprints.id.tools.time.TimeHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.logging.Simber
+import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -73,7 +76,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
 
 
 @RunWith(AndroidJUnit4::class)
@@ -102,7 +104,7 @@ class EventRemoteDataSourceImplAndroidTest {
                          deviceId: String,
                          versionName: String): OkHttpClient.Builder =
             super.get(authToken, deviceId, versionName).apply {
-                addInterceptor(HttpLoggingInterceptor(TimberLogger()).apply {
+                addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })
                 addNetworkInterceptor {
@@ -140,9 +142,9 @@ class EventRemoteDataSourceImplAndroidTest {
                 events.addEventFor(it)
             }
 
-            Timber.d("UPLOAD ALL EVENTS")
+            Simber.d("UPLOAD ALL EVENTS")
             executeUpload(events)
-            Timber.d("UPLOAD ENROLMENT V1")
+            Simber.d("UPLOAD ENROLMENT V1")
             executeUpload(listOf(createEnrolmentEventV1().apply { labels = eventLabels }))
         }
     }
@@ -209,12 +211,12 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addFingerprintCaptureEvent() {
         FingerprintCapturePayload.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
-                val fakeTemplate = EncodingUtils.byteArrayToBase64(
+                val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
                     SubjectsGeneratorUtils.getRandomFingerprintSample().template
                 )
 
                 val fingerprint = FingerprintCapturePayload.Fingerprint(
-                    fingerIdentifier,
+                    fingerIdentifier.fromDomainToModuleApi(),
                     0,
                     fakeTemplate,
                     FingerprintTemplateFormat.ISO_19794_2
@@ -223,7 +225,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 val event = FingerprintCaptureEvent(
                     DEFAULT_TIME,
                     DEFAULT_TIME,
-                    fingerIdentifier,
+                    fingerIdentifier.fromDomainToModuleApi(),
                     0,
                     result,
                     fingerprint,
@@ -238,7 +240,7 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addFaceCaptureEvent() {
         FaceCapturePayload.Result.values().forEachIndexed { index, result ->
-            val template = EncodingUtils.byteArrayToBase64(
+            val template = EncodingUtilsImpl.byteArrayToBase64(
                 SubjectsGeneratorUtils.getRandomFaceSample().template
             )
 
@@ -270,11 +272,6 @@ class EventRemoteDataSourceImplAndroidTest {
 
             add(event)
         }
-    }
-
-    private fun MutableList<Event>.addFaceCaptureRetryEvent() {
-        val event = FaceCaptureRetryEvent(DEFAULT_TIME, DEFAULT_TIME + 100, eventLabels)
-        add(event)
     }
 
     private fun MutableList<Event>.addFaceFallbackCaptureEvent() {
@@ -404,7 +401,6 @@ class EventRemoteDataSourceImplAndroidTest {
         )
 
         event.payload.location = Location(0.0, 0.0)
-        event.payload.analyticsId = "analyticsId"
         event.payload.uploadedAt = 1
         event.payload.endedAt = 1
 
@@ -413,7 +409,7 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(EnrolmentRecordCreationEvent(
-            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(),
+            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(EncodingUtilsImplForTests),
             EventLabels(subjectId = GUID1, projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
         )
     }
@@ -433,13 +429,13 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addCallbackVerificationEvent() {
-        Tier.values().forEach {
+        IAppResponseTier.values().forEach {
             add(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(randomUUID(), 0, it), eventLabels))
         }
     }
 
     private fun MutableList<Event>.addCallbackIdentificationEvent() {
-        Tier.values().forEach {
+        IAppResponseTier.values().forEach {
             add(IdentificationCallbackEvent(DEFAULT_TIME, randomUUID(), listOf(CallbackComparisonScore(randomUUID(), 0, it)), eventLabels))
         }
     }
@@ -510,7 +506,6 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
             FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
-            FACE_CAPTURE_RETRY -> addFaceCaptureRetryEvent()
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
             ENROLMENT_V1 -> { }

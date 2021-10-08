@@ -1,11 +1,14 @@
 package com.simprints.id.data.prefs.settings
 
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.network.NetworkConstants
+import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
@@ -15,11 +18,8 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.Overr
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import com.simprints.id.network.NetworkConstants
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -150,7 +150,7 @@ open class SettingsPreferencesManagerImpl(
 
     /**
      * Whether the parental consent should be shown
-      */
+     */
     override var parentalConsentExists: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -172,7 +172,7 @@ open class SettingsPreferencesManagerImpl(
 
     /**
      * The options of the parental consent as a JSON string of booleans
-      */
+     */
     override var parentalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -314,14 +314,6 @@ open class SettingsPreferencesManagerImpl(
     override var apiBaseUrl: String
         by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
-    override var faceMaxRetries: Int
-        by RemoteConfigPrimitivePreference(
-            prefs,
-            remoteConfigWrapper,
-            FACE_MAX_RETRIES,
-            FACE_MAX_RETRIES_DEFAULT
-        )
-
     override var faceQualityThreshold: Float
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -336,6 +328,14 @@ open class SettingsPreferencesManagerImpl(
             remoteConfigWrapper,
             FACE_NB_OF_FRAMES_CAPTURED,
             FACE_NB_OF_FRAMES_CAPTURED_DEFAULT
+        )
+
+    override var shouldSaveFaceImages: Boolean
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            SHOULD_SAVE_FACE_IMAGES_KEY,
+            SHOULD_SAVE_FACE_IMAGES_DEFAULT
         )
 
     override var fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>
@@ -356,10 +356,6 @@ open class SettingsPreferencesManagerImpl(
             faceConfidenceThresholdsSerializer
         )
 
-    init {
-        remoteConfigWrapper.registerAllPreparedDefaultValues()
-    }
-
     override fun getRemoteConfigStringPreference(key: String) = remoteConfigWrapper.getString(key)
         ?: throw NoSuchPreferenceError.forKey(key)
 
@@ -369,7 +365,10 @@ open class SettingsPreferencesManagerImpl(
     ): T = serializer.deserialize(getRemoteConfigStringPreference(key))
 
     override fun getRemoteConfigFingerprintsToCollect() =
-        getRemoteConfigComplexPreference(FINGERPRINTS_TO_COLLECT_KEY, fingerprintsToCollectSerializer)
+        getRemoteConfigComplexPreference(
+            FINGERPRINTS_TO_COLLECT_KEY,
+            fingerprintsToCollectSerializer
+        )
 
     companion object {
         const val NB_IDS_KEY = "NbOfIdsInt"
@@ -430,7 +429,8 @@ open class SettingsPreferencesManagerImpl(
         const val MODALITY_KEY = "Modality"
 
         const val FINGERPRINTS_TO_COLLECT_KEY = "FingerprintsToCollect"
-        val FINGERPRINTS_TO_COLLECT_DEFAULT = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+        val FINGERPRINTS_TO_COLLECT_DEFAULT =
+            listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
 
         const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
         const val FINGER_IMAGES_EXIST_DEFAULT = true
@@ -447,12 +447,14 @@ open class SettingsPreferencesManagerImpl(
         const val FINGERPRINT_LIVE_FEEDBACK_ON_DEFAULT = false
         const val FINGERPRINT_LIVE_FEEDBACK_ON_KEY = "FingerprintLiveFeedbackOn"
 
+        const val SHOULD_SAVE_FACE_IMAGES_DEFAULT = true
+        const val SHOULD_SAVE_FACE_IMAGES_KEY = "SaveFaceImages"
+
         const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60
         const val FINGERPRINT_QUALITY_THRESHOLD_KEY = "FingerprintQualityThreshold"
 
         const val API_BASE_URL_KEY = "ApiBaseUrl"
 
-        const val FACE_MAX_RETRIES = "FaceMaxRetries"
         const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f

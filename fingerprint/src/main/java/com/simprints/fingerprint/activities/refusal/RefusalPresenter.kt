@@ -1,24 +1,29 @@
 package com.simprints.fingerprint.activities.refusal
 
 import android.annotation.SuppressLint
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.OTHER
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_DATA_CONCERNS
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_NOT_PRESENT
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_PERMISSION
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_RELIGION
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_YOUNG
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.SCANNER_NOT_WORKING
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.logging.Simber
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
-class RefusalPresenter(private val view: RefusalContract.View,
-                       private val crashReportManager: FingerprintCrashReportManager,
-                       private val sessionEventsManager: FingerprintSessionEventsManager,
-                       private val timeHelper: FingerprintTimeHelper) : RefusalContract.Presenter {
+class RefusalPresenter(
+    private val view: RefusalContract.View,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val timeHelper: FingerprintTimeHelper
+) : RefusalContract.Presenter {
 
     private var reason: RefusalFormReason = OTHER
     private var refusalStartTime: Long = 0
@@ -95,8 +100,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                     RefusalAnswer.fromRefusalFormReason(refusalReason),
                     refusalText))
             } catch (t: Throwable) {
-                Timber.d(t)
-                crashReportManager.logExceptionOrSafeException(t)
+                Simber.e(t)
             }
         }
     }
@@ -112,7 +116,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     private fun logAsMalfunctionInCrashReportIfAppNotWorking(refusalText: String) {
         if (reason == SCANNER_NOT_WORKING) {
-            crashReportManager.logMalfunction(refusalText)
+            Simber.w(refusalText)
         }
     }
 
@@ -148,6 +152,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(REFUSAL, UI, message = message)
+        Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 }

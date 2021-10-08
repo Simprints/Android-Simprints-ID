@@ -2,25 +2,45 @@ package com.simprints.id.services.sync.events.master
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.BLOCKED
 import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.WorkManager
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
 import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS
-import com.simprints.id.services.sync.events.common.*
+import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
+import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_UP_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.common.addCommonTagForAllSyncWorkers
+import com.simprints.id.services.sync.events.common.addTagForEndSyncReporter
+import com.simprints.id.services.sync.events.common.addTagForMasterSyncId
+import com.simprints.id.services.sync.events.common.addTagForScheduledAtNow
+import com.simprints.id.services.sync.events.common.addTagForStartSyncReporter
+import com.simprints.id.services.sync.events.common.filterByTags
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.END_SYNC_REPORTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.START_SYNC_REPORTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
@@ -32,7 +52,11 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -53,7 +77,7 @@ class EventSyncMasterWorkerTest {
         get() = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
 
     private lateinit var masterWorker: EventSyncMasterWorker
-    private val preferencesManager = mockk<PreferencesManager>(relaxed = true) {
+    private val preferencesManager = mockk<IdPreferencesManager>(relaxed = true) {
         every { eventDownSyncSetting } returns ON
         every { syncDestinationSettings } returns listOf(SIMPRINTS)
     }
@@ -73,7 +97,6 @@ class EventSyncMasterWorkerTest {
 
     private fun mockDependencies() {
         with(masterWorker) {
-            crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             downSyncWorkerBuilder = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)
@@ -235,24 +258,23 @@ class EventSyncMasterWorkerTest {
         )
         coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns buildStartSyncReporterWorker(
             uniqueSyncId
-        )
+        ).build()
         coEvery { masterWorker.eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns buildEndSyncReporterWorker(
             uniqueSyncId
-        )
+        ).build()
 
     }
 
-    private fun buildEndSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(EventEndSyncReporterWorker::class.java)
+    private fun buildEndSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest.Builder =
+        OneTimeWorkRequestBuilder<EventEndSyncReporterWorker>()
             .addTagForMasterSyncId(uniqueSyncId)
             .addTagForScheduledAtNow()
             .addCommonTagForAllSyncWorkers()
             .addTagForEndSyncReporter()
             .setInputData(workDataOf(EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncId))
             .setConstraints(constraintsForWorkers())
-            .build() as OneTimeWorkRequest
 
-    private fun buildStartSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest =
+    private fun buildStartSyncReporterWorker(uniqueSyncId: String): OneTimeWorkRequest.Builder =
         OneTimeWorkRequest.Builder(EventStartSyncReporterWorker::class.java)
             .addTagForMasterSyncId(uniqueSyncId)
             .addTagForScheduledAtNow()
@@ -260,7 +282,6 @@ class EventSyncMasterWorkerTest {
             .addTagForStartSyncReporter()
             .setInputData(workDataOf(EventStartSyncReporterWorker.SYNC_ID_STARTED to uniqueSyncId))
             .setConstraints(constraintsForWorkers())
-            .build() as OneTimeWorkRequest
 
     private fun buildDownSyncWorkers(uniqueSyncId: String): List<OneTimeWorkRequest> =
         listOf(

@@ -2,19 +2,17 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 
 class SyncInformationViewModelFactory(private val downySyncHelper: EventDownSyncHelper,
-                                      private val eventRepository: EventRepository,
+                                      private val eventRepository: com.simprints.eventsystem.event.EventRepository,
                                       private val subjectRepository: SubjectRepository,
-                                      private val preferencesManager: PreferencesManager,
+                                      private val preferencesManager: IdPreferencesManager,
                                       private val projectId: String,
-                                      private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+                                      private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
                                       private val imageRepository: ImageRepository) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

@@ -9,8 +9,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.simprints.clientapi.di.KoinInjector
-import com.simprints.id.data.db.event.EventRepository
-import com.simprints.id.data.db.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.moduleapi.app.responses.IAppResponse
 import io.mockk.coEvery
 import io.mockk.every
@@ -19,8 +19,9 @@ import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.mock.declareModule
 
 open class BaseClientApiTest : KoinTest {
 
@@ -55,9 +56,9 @@ open class BaseClientApiTest : KoinTest {
         Intents.init()
 
         KoinInjector.loadClientApiKoinModules()
-        declareModule {
+        loadKoinModules(module(override = true) {
             factory { buildDummySessionEventsManagerMock() }
-        }
+        })
     }
 
     private fun buildDummySessionEventsManagerMock(): EventRepository {

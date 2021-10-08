@@ -2,12 +2,12 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.NetworkConstants.Companion.DEFAULT_BASE_URL
-import com.simprints.id.network.SimApiClientFactory
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.models.AuthenticationData

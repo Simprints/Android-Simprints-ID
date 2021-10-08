@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.project.remote
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.network.SimApiClient
 
 
 interface ProjectRemoteDataSource {

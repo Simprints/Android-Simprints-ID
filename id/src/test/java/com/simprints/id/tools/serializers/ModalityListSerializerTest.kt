@@ -1,8 +1,8 @@
 package com.simprints.id.tools.serializers
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.modality.Modality
 import org.junit.Test
 
 class ModalityListSerializerTest {

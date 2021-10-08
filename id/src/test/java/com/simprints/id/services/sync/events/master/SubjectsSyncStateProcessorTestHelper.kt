@@ -6,8 +6,8 @@ import androidx.work.WorkInfo.State.*
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.domain.EventCount
-import com.simprints.id.data.db.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.event.domain.EventCount
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC

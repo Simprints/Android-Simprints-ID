@@ -1,8 +1,8 @@
 package com.simprints.id.testtools.testingapi.remote
 
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType
-import com.simprints.id.data.db.event.remote.models.ApiEventPayloadType.*
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
 import com.simprints.id.testtools.testingapi.models.*
 import io.reactivex.Single
@@ -67,7 +67,7 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
             OneToManyMatch, PersonCreation, AlertScreen, GuidSelection, ConnectivitySnapshot, Refusal, CandidateRead,
             ScannerConnection, Vero2InfoSnapshot, ScannerFirmwareUpdate, InvalidIntent, SuspiciousIntent, IntentParsing,
             CompletionCheck, SessionCapture, FaceOnboardingComplete, FaceFallbackCapture, FaceCapture,
-            FaceCaptureConfirmation, FaceCaptureRetry,
+            FaceCaptureConfirmation,
             null -> {
                 // ADD TEST FOR NEW EVENT IN THIS CLASS
             }

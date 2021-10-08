@@ -4,7 +4,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.face.responses.entities.fromDomainToModuleApi
 import com.simprints.moduleapi.face.requests.IFaceMatchRequest
 import com.simprints.moduleapi.face.responses.entities.IFaceSample
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize

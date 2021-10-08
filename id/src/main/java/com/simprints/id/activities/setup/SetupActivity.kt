@@ -13,8 +13,10 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
+import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
@@ -24,10 +26,8 @@ import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.event.EventRepository
+import com.simprints.id.databinding.ActivitySetupBinding
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
@@ -36,11 +36,10 @@ import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
-import kotlinx.android.synthetic.main.activity_setup.*
+import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
@@ -50,22 +49,23 @@ import kotlin.math.min
 class SetupActivity : BaseSplitActivity() {
 
     @Inject lateinit var locationManager: LocationManager
-    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
-    @Inject lateinit var eventRepository: EventRepository
+    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
     private val viewModel: SetupViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(SetupViewModel::class.java)
     }
+    private val binding by viewBinding(ActivitySetupBinding::inflate)
 
     private var slowDownloadTimer: TimerTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setup)
+        setContentView(binding.root)
+
         setupRequest = intent.extras?.getParcelable(CoreResponse.CORE_STEP_BUNDLE)
             ?: throw InvalidAppRequest()
         splitInstallManager = SplitInstallManagerFactory.create(this)
@@ -105,7 +105,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun observeNetworkState() {
         viewModel.getDeviceNetworkLiveData().observe(this, Observer {
-            Timber.d("Setup - Observing network $it")
+            Simber.d("Setup - Observing network $it")
             if (it == DeviceOffline && viewModel.getViewStateLiveData().value != ModalitiesInstalled) {
                 launchAlertIfNecessary()
             }
@@ -136,9 +136,9 @@ class SetupActivity : BaseSplitActivity() {
     private fun collectLocationInBackground() {
         inBackground(Dispatchers.Main) {
             try {
-                storeUserLocationIntoCurrentSession(locationManager, eventRepository, crashReportManager)
+                storeUserLocationIntoCurrentSession(locationManager, eventRepository)
             } catch (t: Throwable) {
-                Timber.d(t)
+                Simber.d(t)
             }
         }
     }
@@ -147,7 +147,7 @@ class SetupActivity : BaseSplitActivity() {
         val permissions = extractPermissionsFromRequest(setupRequest)
 
         if (permissions.all { hasPermission(it) }) {
-            Timber.d("All permissions are granted")
+            Simber.d("All permissions are granted")
             performPermissionActionsAndFinish()
         } else {
             requestPermissionsIfRequired(permissions, PERMISSIONS_REQUEST_CODE)
@@ -156,7 +156,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun performPermissionActionsAndFinish() {
         lifecycleScope.launch {
-            Timber.d("Adding location to session")
+            Simber.d("Adding location to session")
             collectLocationInBackground()
             setResultAndFinish(SETUP_COMPLETE_FLAG)
         }
@@ -172,16 +172,16 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun updateUiForDownloadStarting() {
-        with(modalityDownloadText) {
+        with(binding.modalityDownloadText) {
             text = getString(R.string.modality_starting_download)
             isVisible = true
         }
-        with(modalityDownloadProgressBar) {
+        with(binding.modalityDownloadProgressBar) {
             isIndeterminate = true
             isVisible = true
 
         }
-        setupLogo.isVisible = false
+        binding.setupLogo.isVisible = false
     }
 
     private fun requestUserConfirmationDoDownloadModalities(state: SplitInstallSessionState) {
@@ -190,16 +190,16 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun updateUiForDownloadProgress(bytesDownloaded: Long, totalBytesToDownload: Long) {
         val downloadProgress = calculatePercentage(bytesDownloaded, totalBytesToDownload)
-        with(modalityDownloadProgressBar) {
+        with(binding.modalityDownloadProgressBar) {
             isVisible = true
             isIndeterminate = false
             progress = downloadProgress
         }
-        with(modalityDownloadText) {
+        with(binding.modalityDownloadText) {
             isVisible = true
             text = getString(R.string.modality_downloading).format("$downloadProgress%")
         }
-        setupLogo.isVisible = false
+        binding.setupLogo.isVisible = false
     }
 
     private fun rescheduleTimerForSlowDownloadUI() {
@@ -210,15 +210,15 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun updateUiForDownloadTakingLonger() {
-        with(modalityDownloadText) {
+        with(binding.modalityDownloadText) {
             text = getString(R.string.modality_download_taking_longer)
             isVisible = true
         }
-        with(modalityDownloadProgressBar) {
+        with(binding.modalityDownloadProgressBar) {
             isIndeterminate = true
             isVisible = true
         }
-        setupLogo.isVisible = false
+        binding.setupLogo.isVisible = false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -248,21 +248,21 @@ class SetupActivity : BaseSplitActivity() {
         min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
 
     private fun updateUiForModalitiesInstalling() {
-        with(modalityDownloadText) {
+        with(binding.modalityDownloadText) {
             text = getString(R.string.modality_installing)
             isVisible = true
         }
-        with(modalityDownloadProgressBar) {
+        with(binding.modalityDownloadProgressBar) {
             isIndeterminate = true
             isVisible = true
         }
-        setupLogo.isVisible = false
+        binding.setupLogo.isVisible = false
     }
 
     private fun updateUiForModalitiesInstalledAndAskPermissions() {
-        modalityDownloadText.isVisible = false
-        modalityDownloadProgressBar.isVisible = false
-        setupLogo.isVisible = true
+        binding.modalityDownloadText.isVisible = false
+        binding.modalityDownloadProgressBar.isVisible = false
+        binding.setupLogo.isVisible = true
         askPermissionsOrPerformSpecificActions()
     }
 
