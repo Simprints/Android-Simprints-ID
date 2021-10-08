@@ -1,6 +1,5 @@
 package com.simprints.eventsystem.sampledata
 
-import android.net.NetworkInfo
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
@@ -14,8 +13,8 @@ object ConnectivitySnapshotEventSample : SampleEvent() {
     ): ConnectivitySnapshotEvent {
         val connectionState = listOf(
             SimNetworkUtils.Connection(
-                "GPRS",
-                NetworkInfo.DetailedState.CONNECTED
+                SimNetworkUtils.ConnectionType.MOBILE,
+                SimNetworkUtils.ConnectionState.CONNECTED
             )
         )
         return ConnectivitySnapshotEvent(
