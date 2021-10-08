@@ -14,7 +14,7 @@ data class ApiConnectivitySnapshotPayload(
     @Keep
     class ApiConnection(val type: String, val state: String) {
         constructor(connection: SimNetworkUtils.Connection)
-            : this(connection.type, connection.state.toString())
+            : this(connection.type.toString(), connection.state.toString())
     }
 
     constructor(domainPayload: ConnectivitySnapshotPayload) :
