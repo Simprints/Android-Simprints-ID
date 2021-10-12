@@ -26,6 +26,7 @@ object Dependencies {
     private const val fragment_version = "1.3.3"
     private const val chuck_version = "3.5.2"
     private const val timber_version = "5.0.1"
+    private const val simmatcher_version ="1.0.0"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -270,6 +271,7 @@ object Dependencies {
     }
 
     const val libsimprints = "com.simprints:libsimprints:2021.3.0"
+    const val simmatcher ="com.simprints:libsimmatcher:$simmatcher_version"
 
 }
 

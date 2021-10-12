@@ -2,9 +2,19 @@
 
 ## Cloning
 
-There are submodules in this repository [LibSimprints](https://github.com/Simprints/LibSimprints) and [SimMatcher](https://bitbucket.org/simprints/fingerprint-simmatcher.git), so recursive cloning is necessary:
+`git clone  git@bitbucket.org:simprints/android-simprints-id.git`
 
-`git clone --recursive git@bitbucket.org:simprints/android-simprints-id.git`
+Simprints ID  project uses [Simmatcher](https://github.com/Simprints/Fingerprint-SimMatcher) library which is hosted as a github package.
+
+You will need to use your personal access token (PAT) to authenticate to GitHub Packages. You can add your github username and token to local.properties file:
+
+`
+GITHUB_USERNAME=username
+
+GITHUB_TOKEN=personal access token
+`
+
+or set the GITHUB_USERNAME and GITHUB_TOKEN environment variables.
 
 ### Full CI Workflow
 The aim of the `ci` workflow is to run all tests in all modules, assemble production and debug builds of the APK, and report to the main CI Slack channel.
@@ -55,6 +65,7 @@ To use Mockito in DF modules for android tests, a different dexer is required: c
 More about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
 
 ## Build types
+
 Simprints ID has 3 different build types: `debug`, `staging` and `release`.
 
 - `debug`: to be used only in development. Uses the development environment of the backend

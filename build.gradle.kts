@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 apply {
     from("ci${File.separator}scanning${File.separator}sonarqube.gradle")
     from("ci${File.separator}scanning${File.separator}dependency_health.gradle")
@@ -7,6 +9,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenCentral()
         maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://plugins.gradle.org/m2/")
@@ -54,6 +57,16 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        maven {
+            name = "SimMatcherGitHubPackages"
+            url = uri("https://maven.pkg.github.com/simprints/lib-android-simmatcher")
+            credentials {
+                username = gradleLocalProperties(rootDir).getProperty("GITHUB_USERNAME")
+                    ?: System.getenv("GITHUB_USERNAME")
+                password = gradleLocalProperties(rootDir).getProperty("GITHUB_TOKEN")
+                    ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).forEach {
