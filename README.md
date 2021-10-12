@@ -4,17 +4,15 @@
 
 `git clone  git@bitbucket.org:simprints/android-simprints-id.git`
 
-Simprints ID  project uses [Simmatcher](https://github.com/Simprints/Fingerprint-SimMatcher) library which is hosted as a github package.
+Simprints ID  project uses [Simmatcher](https://github.com/simprints/Lib-android-simmatcher) library which is hosted as a private github package.
 
-You will need to use your personal access token (PAT) to authenticate to GitHub Packages. You can add your github username and token to local.properties file:
+Use your personal access token (PAT) to authenticate to GitHub Packages(see "[creating a PAT docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)").
+By adding it to local.properties file:
 
-`
-GITHUB_USERNAME=username
+    GITHUB_USERNAME=username
+    GITHUB_TOKEN=personal access token
 
-GITHUB_TOKEN=personal access token
-`
-
-or set the GITHUB_USERNAME and GITHUB_TOKEN environment variables.
+or set the `GITHUB_USERNAME` and `GITHUB_TOKEN` as environment variables.
 
 ### Full CI Workflow
 The aim of the `ci` workflow is to run all tests in all modules, assemble production and debug builds of the APK, and report to the main CI Slack channel.
