@@ -188,7 +188,6 @@ fun createEnrolmentRecordCreationEvent(encoder: EncodingUtils) =
         listOf(FINGERPRINT, FACE),
         buildFakeBiometricReferences(encoder),
         EventLabels(
-            subjectId = GUID1,
             projectId = DEFAULT_PROJECT_ID,
             moduleIds = listOf(GUID2),
             attendantId = DEFAULT_USER_ID,
@@ -200,7 +199,6 @@ fun createEnrolmentRecordDeletionEvent() =
     EnrolmentRecordDeletionEvent(
         CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
         EventLabels(
-            subjectId = GUID1,
             projectId = DEFAULT_PROJECT_ID,
             moduleIds = listOf(GUID2),
             attendantId = DEFAULT_USER_ID,
@@ -225,7 +223,6 @@ fun createEnrolmentRecordMoveEvent(encoder: EncodingUtils) =
             DEFAULT_USER_ID
         ),
         EventLabels(
-            subjectId = GUID1,
             projectId = DEFAULT_PROJECT_ID,
             moduleIds = listOf(GUID2),
             attendantId = DEFAULT_USER_ID,
