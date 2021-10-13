@@ -36,7 +36,6 @@ data class EnrolmentRecordCreationEvent(
     ) : this(
         UUID.randomUUID().toString(),
         extraLabels.copy(
-            subjectId = subjectId,
             projectId = projectId,
             moduleIds = listOf(moduleId),
             attendantId = attendantId,
