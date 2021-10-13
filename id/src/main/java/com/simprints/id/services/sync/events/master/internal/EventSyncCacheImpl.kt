@@ -2,6 +2,7 @@ package com.simprints.id.services.sync.events.master.internal
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import com.simprints.logging.Simber
 import java.util.*
 
 @SuppressLint("ApplySharedPref")
@@ -26,7 +27,15 @@ class EventSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
     }
 
     override fun clearProgresses() {
-        sharedForProgresses.edit().clear().commit()
+        // calling commit after clear sometimes throw SecurityException
+        // it is a reported bug in Jetpack Security and not yet resolved.
+        // https://issuetracker.google.com/issues/138314232#comment23
+        // and https://issuetracker.google.com/issues/169904974
+        try {
+            sharedForProgresses.edit().clear().commit()
+        } catch (ex: SecurityException) {
+            Simber.e(ex)
+        }
     }
 
 
