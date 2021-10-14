@@ -73,7 +73,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun count_shouldMakeANetworkRequest() {
         runBlocking {
-            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any(), any()) } returns listOf(ApiEventCount(EnrolmentRecordCreation, 1))
+            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any()) } returns listOf(ApiEventCount(EnrolmentRecordCreation, 1))
 
             val count = eventRemoteDataSource.count(query)
 
@@ -84,8 +84,7 @@ class EventRemoteDataSourceImplTest {
                     listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
                     DEFAULT_USER_ID, GUID1,
                     listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
-                    GUID2,
-                    listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove)
+                    GUID2
                 )
             }
         }
@@ -94,7 +93,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun errorForCountRequestFails_shouldThrowAnException() {
         runBlocking {
-            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
+            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
 
             shouldThrow<Throwable> {
                 eventRemoteDataSource.count(query)
@@ -137,7 +136,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun getEvents_shouldThrowAnException() {
         runBlocking {
-            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
+            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
 
             shouldThrow<Throwable> {
                 eventRemoteDataSource.getEvents(query, this)
@@ -155,7 +154,7 @@ class EventRemoteDataSourceImplTest {
             with(query) {
                 coVerify {
                     eventRemoteInterface.downloadEvents(
-                        projectId, moduleIds, userId, subjectId, modes, lastEventId, types.map { it.name }
+                        projectId, moduleIds, userId, subjectId, modes, lastEventId
                     )
                 }
             }
