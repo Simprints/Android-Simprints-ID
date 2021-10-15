@@ -209,7 +209,7 @@ fun validateAuthorizationEventApiModel(json: JSONObject) {
             assertThat(length()).isEqualTo(2)
         }
         assertThat(getString("result")).isAnyOf("AUTHORIZED", "NOT_AUTHORIZED")
-        assertThat(length()).isEqualTo(4)
+        assertThat(length()).isEqualTo(5)
     }
 }
 
