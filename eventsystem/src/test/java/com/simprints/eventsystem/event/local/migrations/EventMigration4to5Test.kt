@@ -39,7 +39,7 @@ class EventMigration4to5Test {
 
     @Test
     @Throws(IOException::class)
-    fun migrate1To2() {
+    fun migrate4To5() {
         val version4Event = createEvent()
         // create db with schema version 4.
         helper.createDatabase(TEST_DB, 4).apply {

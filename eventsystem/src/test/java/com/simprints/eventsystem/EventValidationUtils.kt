@@ -209,7 +209,7 @@ fun validateAuthorizationEventApiModel(json: JSONObject) {
             assertThat(length()).isEqualTo(2)
         }
         assertThat(getString("result")).isAnyOf("AUTHORIZED", "NOT_AUTHORIZED")
-        assertThat(length()).isEqualTo(5)
+        assertThat(length()).isEqualTo(4)
     }
 }
 
@@ -302,12 +302,11 @@ fun validateEnrolmentEventV2ApiModel(json: JSONObject) {
 fun validateEnrolmentRecordCreationEventApiModel(json: JSONObject) {
     assertThat(json.getString("id")).isNotNull()
     with(json.getJSONObject("labels")) {
-        assertThat(this.getJSONArray("subjectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("mode").length()).isEqualTo(2)
-        assertThat(this.length()).isEqualTo(5)
+        assertThat(this.length()).isEqualTo(4)
     }
     with(json.getJSONObject("payload")) {
         assertThat(getString("type")).isEqualTo("EnrolmentRecordCreation")
@@ -316,7 +315,6 @@ fun validateEnrolmentRecordCreationEventApiModel(json: JSONObject) {
 
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(3)
-        assertThat(getString("subjectId")).isNotEmpty()
         assertThat(getString("projectId")).isNotEmpty()
         assertThat(getString("moduleId")).isNotEmpty()
         assertThat(getString("attendantId")).isNotEmpty()
@@ -332,12 +330,11 @@ fun validateEnrolmentRecordCreationEventApiModel(json: JSONObject) {
 fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
     assertThat(json.getString("id")).isNotNull()
     with(json.getJSONObject("labels")) {
-        assertThat(this.getJSONArray("subjectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("mode").length()).isEqualTo(2)
-        assertThat(this.length()).isEqualTo(5)
+        assertThat(this.length()).isEqualTo(4)
     }
     with(json.getJSONObject("payload")) {
         assertThat(getString("type")).isEqualTo("EnrolmentRecordDeletion")
@@ -346,7 +343,6 @@ fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
 
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(0)
-        assertThat(getString("subjectId")).isNotEmpty()
         assertThat(getString("projectId")).isNotEmpty()
         assertThat(getString("moduleId")).isNotEmpty()
         assertThat(getString("attendantId")).isNotEmpty()
@@ -358,12 +354,11 @@ fun validateEnrolmentRecordDeletionEventApiModel(json: JSONObject) {
 fun validateEnrolmentRecordMoveEventApiModel(json: JSONObject) {
     assertThat(json.getString("id")).isNotNull()
     with(json.getJSONObject("labels")) {
-        assertThat(this.getJSONArray("subjectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("moduleId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("attendantId").length()).isEqualTo(1)
         assertThat(this.getJSONArray("mode").length()).isEqualTo(2)
-        assertThat(this.length()).isEqualTo(5)
+        assertThat(this.length()).isEqualTo(4)
     }
     with(json.getJSONObject("payload")) {
         assertThat(getString("type")).isEqualTo("EnrolmentRecordMove")
@@ -374,7 +369,6 @@ fun validateEnrolmentRecordMoveEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(1)
         val creation = getJSONObject("enrolmentRecordCreation")
         with(creation) {
-            assertThat(getString("subjectId")).isNotEmpty()
             assertThat(getString("projectId")).isNotEmpty()
             assertThat(getString("moduleId")).isNotEmpty()
             assertThat(getString("attendantId")).isNotEmpty()
@@ -383,7 +377,6 @@ fun validateEnrolmentRecordMoveEventApiModel(json: JSONObject) {
 
         val deletion = getJSONObject("enrolmentRecordDeletion")
         with(deletion) {
-            assertThat(getString("subjectId")).isNotEmpty()
             assertThat(getString("projectId")).isNotEmpty()
             assertThat(getString("moduleId")).isNotEmpty()
             assertThat(getString("attendantId")).isNotEmpty()
