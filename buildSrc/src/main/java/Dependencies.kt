@@ -70,7 +70,7 @@ object Dependencies {
             const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
         }
 
-        const val security = "androidx.security:security-crypto:1.0.0-rc04"
+        const val security = "androidx.security:security-crypto:1.0.0"
 
         object CameraX {
             const val core = "androidx.camera:camera-core:$androidx_camerax_version"
