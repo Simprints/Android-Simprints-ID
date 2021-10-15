@@ -32,7 +32,7 @@ class EventMigration4to5Test {
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventSystemApplication::class.java.canonicalName,
+        EventRoomDatabase::class.java.canonicalName,
         FrameworkSQLiteOpenHelperFactory()
     )
 
