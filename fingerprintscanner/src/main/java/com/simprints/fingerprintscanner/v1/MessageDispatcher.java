@@ -39,6 +39,7 @@ class MessageDispatcher extends Thread {
         this.buttonListeners = new HashSet<>();
     }
 
+    @Override
     public void run() {
         Message msg;
         while (!Thread.interrupted()) {
