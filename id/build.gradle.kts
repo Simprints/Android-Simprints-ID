@@ -112,6 +112,15 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
     }
+    packagingOptions {
+        // The below files are duplicated from kotlinx-coroutines-debug.
+        // We should exclude them in the packaging options as per kotlinx.coroutines/kotlinx-coroutines-debug documentation
+        // https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-debug#build-failures-due-to-duplicate-resource-files
+        resources.excludes.add ("**/attach_hotspot_windows.dll")
+        resources.excludes.add ("META-INF/AL2.0")
+        resources.excludes.add ( "META-INF/LGPL2.1")
+        resources.excludes.add ("META-INF/licenses/ASM")
+    }
 
     buildFeatures.viewBinding = true
 
