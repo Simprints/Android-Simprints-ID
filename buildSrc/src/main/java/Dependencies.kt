@@ -3,7 +3,7 @@ object Dependencies {
     const val kotlin_version = "1.5.30"
     const val androidx_navigation_version = "2.3.0-alpha04"
 
-    private const val kotlin_coroutine_version = "1.3.1"
+    private const val kotlin_coroutine_version = "1.5.2"
     private const val app_compat_version = "1.2.0"
     private const val androidx_version = "1.3.0-beta01"
     private const val espresso_version = "3.2.0-alpha04"

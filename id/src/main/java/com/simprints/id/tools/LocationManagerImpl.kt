@@ -19,7 +19,10 @@ class LocationManagerImpl(val ctx: Context) : LocationManager {
     override suspend fun requestLocation(request: LocationRequest): Flow<List<Location>> = channelFlow {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                offer(result.locations)
+                // The offer  method was deprecated in the favour of [trySend].
+                // Calling offer in a closed channel throws "AbortFlowException: Flow was aborted, no more elements needed"
+                // this could be a race condition where the channel is just closed before canceling this callback.
+                trySend(result.locations)
             }
         }
 
