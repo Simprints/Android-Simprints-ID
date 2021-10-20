@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.BaseUrlProvider
@@ -64,7 +63,7 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         coEvery { mockRemoteDbManager.getCurrentToken() } returns "token"
         runBlocking {
-            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(), JsonHelper,
+            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(),
                 testDispatcherProvider, HttpLoggingInterceptor()).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
         }
     }

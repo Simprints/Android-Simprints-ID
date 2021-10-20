@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClientImpl
@@ -54,7 +53,6 @@ class SecurityStateRemoteDataSourceImplTest {
             VERSION_NAME,
             randomUUID(),
             mockk(),
-            JsonHelper,
             testDispatcherProvider,
             HttpLoggingInterceptor()
         )
