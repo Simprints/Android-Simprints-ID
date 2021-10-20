@@ -1,5 +1,7 @@
 package com.simprints.logging
 
+import com.simprints.logging.trees.PerformanceMonitoringTree.getTrace
+import com.simprints.logging.trees.Trace
 import timber.log.Timber
 
 /**
@@ -74,20 +76,14 @@ object Simber {
     fun e(message: String, args: Any? = null) = Timber.e(message, args)
     fun e(t: Throwable, message: String, args: Any? = null) = Timber.e(t, message, args)
 
-//    /**
-//     * Used to track the performance of something inside of the code. Call [pStart] to start
-//     * tracking performance, and [pStop] to stop a trace with the same name as the one that started.
-//     * IMPORTANT: [traceName] must be unique
-//     * DEBUG: Is sent to Log.i
-//     * STAGING: Is sent to Log.i & sent to Firebase Performance Monitoring
-//     * RELEASE: Is sent to Firebase Performance Monitoring
-//     */
-//    fun pStart(traceName: String) {
-//        Timber.tag(PERFORMANCE_FLAG + PerformanceMonitoringTree.START_FLAG).i(traceName)
-//    }
-//
-//    fun pStop(traceName: String) =
-//        Timber.tag(PERFORMANCE_FLAG + PerformanceMonitoringTree.STOP_FLAG).i(traceName)
+    /**
+     * Used to track the performance of something inside of the code. Call [trace] to get a [Trace]
+     * instance. Call [Trace.start] to begin the trace and [Trace.stop] to end it.
+     * DEBUG: Is sent to Log.i
+     * STAGING: Is sent to Log.i & sent to Firebase Performance Monitoring
+     * RELEASE: Is sent to Firebase Performance Monitoring
+     */
+    fun trace(traceName: String): Trace = getTrace(traceName)
 
     /**
      * Adds a custom tag to the log.

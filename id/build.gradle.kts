@@ -42,10 +42,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
-            extra.set("enableCrashlytics", true)
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
-            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$RELEASE_SAFETYNET_KEY\"")
             buildConfigField(
                 "String",
@@ -57,10 +54,7 @@ android {
         }
         getByName("staging") {
             isMinifyEnabled = true
-            extra.set("enableCrashlytics", true)
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
-            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$STAGING_SAFETYNET_KEY\"")
             buildConfigField(
                 "String",
@@ -72,10 +66,7 @@ android {
         }
         getByName("debug") {
             isMinifyEnabled = false
-            extra.set("enableCrashlytics", false)
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
-            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
             withGroovyBuilder {
                 "FirebasePerformance" {
                     invokeMethod("setInstrumentationEnabled", false)

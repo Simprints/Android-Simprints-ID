@@ -1,33 +1,17 @@
 package com.simprints.id.activities.setup
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.android.play.core.ktx.requestProgressFlow
 import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.ktx.status
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.DOWNLOADED
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.DOWNLOADING
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.INSTALLED
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.INSTALLING
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.PENDING
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
 import com.simprints.core.analytics.CrashReportTag.ID_SETUP
-import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOffline
-import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOnline
-import com.simprints.id.activities.setup.SetupActivity.ViewState.Downloading
-import com.simprints.id.activities.setup.SetupActivity.ViewState.ModalitiesInstalled
-import com.simprints.id.activities.setup.SetupActivity.ViewState.ModalitiesInstalling
-import com.simprints.id.activities.setup.SetupActivity.ViewState.RequiresUserConfirmationToDownload
-import com.simprints.id.activities.setup.SetupActivity.ViewState.StartingDownload
+import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.extensions.trace
 import com.simprints.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -39,7 +23,7 @@ class SetupViewModel(
 ) : ViewModel() {
 
     internal val scope by lazy { viewModelScope }
-    private val modalityDownloadTrace by lazy { trace("modalityDownload") }
+    private val modalityDownloadTrace by lazy { Simber.trace("modalityDownload") }
 
     fun getViewStateLiveData(): LiveData<SetupActivity.ViewState> = viewStateLiveData
     fun getDeviceNetworkLiveData(): LiveData<SetupActivity.ViewState> =

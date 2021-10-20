@@ -4,6 +4,9 @@ import android.app.Application
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
+import com.simprints.logging.trees.AnalyticsTree
+import com.simprints.logging.trees.CrashReportingTree
+import com.simprints.logging.trees.PerformanceMonitoringTree.performanceMonitor
 import timber.log.Timber
 
 object SimberBuilder {
@@ -24,5 +27,6 @@ object SimberBuilder {
             performanceMonitor = FirebasePerformance.getInstance()
         }
     }
+
 
 }
