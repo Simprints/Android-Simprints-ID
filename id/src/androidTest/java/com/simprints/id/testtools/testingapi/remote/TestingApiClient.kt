@@ -5,7 +5,6 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.network.SimberLogger
-import io.mockk.mockk
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -21,7 +20,7 @@ class TestingApiClient<T : SimRemoteInterface>(
     service,
     endpoint,
     "", "", "",
-    mockk(),
+    JsonHelper,
     dispatcher,
     HttpLoggingInterceptor()
 ) {
