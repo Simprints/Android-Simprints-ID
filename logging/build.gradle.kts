@@ -36,11 +36,12 @@ android {
 }
 
 dependencies {
-    // We specifically don't include Crashlytics, Analytics and Timber in the central buildSrc
-    // module because we do not want or expect these dependencies to be used in multiple modules
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.1")
-    implementation("com.google.firebase:firebase-analytics-ktx:19.0.1")
-    implementation("com.google.firebase:firebase-perf:19.0.5")
+    // We specifically don't include Crashlytics, Analytics, Performance monitoring and Timber in
+    // the central buildSrc module because we do not want or expect these dependencies to be used in
+    // multiple modules
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.3")
+    implementation("com.google.firebase:firebase-analytics-ktx:19.0.2")
+    api("com.google.firebase:firebase-perf:20.0.3")
 
     //4.7.1 breaks realm:
     // https://github.com/realm/realm-java/issues/6153
