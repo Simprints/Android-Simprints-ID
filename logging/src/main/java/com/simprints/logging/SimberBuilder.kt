@@ -3,6 +3,7 @@ package com.simprints.logging
 import android.app.Application
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 
 object SimberBuilder {
@@ -12,7 +13,7 @@ object SimberBuilder {
      * times without issue. Re-initializing Simber uproots and replants all trees.
      * @param context Application Context
      */
-    fun initialize(context: Application){
+    fun initialize(context: Application) {
         Timber.uprootAll()
 
         if (BuildConfig.DEBUG) {
@@ -20,6 +21,7 @@ object SimberBuilder {
         } else {
             Timber.plant(CrashReportingTree(FirebaseCrashlytics.getInstance()))
             Timber.plant(AnalyticsTree(FirebaseAnalytics.getInstance(context)))
+            performanceMonitor = FirebasePerformance.getInstance()
         }
     }
 

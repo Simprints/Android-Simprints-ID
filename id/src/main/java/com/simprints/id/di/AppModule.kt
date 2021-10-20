@@ -85,8 +85,6 @@ import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
-import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
-import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
@@ -176,15 +174,10 @@ open class AppModule {
     )
 
     @Provides
-    open fun provideFirebasePerformanceTraceFactory(): FirebasePerformanceTraceFactory =
-        FirebasePerformanceTraceFactoryImpl()
-
-    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
-        performanceTracer: FirebasePerformanceTraceFactory,
         jsonHelper: JsonHelper,
         dispatcher: DispatcherProvider,
         @Named("ChuckerInterceptor") interceptor: Interceptor
@@ -193,7 +186,6 @@ open class AppModule {
         ctx.deviceId,
         ctx.packageVersionName,
         remoteDbManager,
-        performanceTracer,
         jsonHelper,
         dispatcher,
         interceptor

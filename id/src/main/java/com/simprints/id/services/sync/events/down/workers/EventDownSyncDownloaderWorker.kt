@@ -57,7 +57,6 @@ class EventDownSyncDownloaderWorker(
 
         return withContext(dispatcher.io()) {
             try {
-                traceWorkerPerformance()
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
                 crashlyticsLog("Start - Params: $downSyncOperationInput")
