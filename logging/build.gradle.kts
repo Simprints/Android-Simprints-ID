@@ -9,6 +9,25 @@ apply {
 
 android {
 
+    buildTypes {
+        getByName("release") {
+            extra.set("enableCrashlytics", true)
+            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
+            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
+        }
+        getByName("staging") {
+            extra.set("enableCrashlytics", true)
+            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
+            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
+        }
+        getByName("debug") {
+            extra.set("enableCrashlytics", false)
+            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
+            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
+        }
+
+    }
+
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

@@ -1,4 +1,4 @@
-package com.simprints.logging
+package com.simprints.logging.trees
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
