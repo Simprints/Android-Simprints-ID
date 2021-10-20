@@ -10,6 +10,7 @@ import timber.log.Timber
 object Simber {
 
     internal const val USER_PROPERTY_TAG = "zzUserPropertyTag"
+    internal const val PERFORMANCE_FLAG = "zzPerformanceFlag"
 
     /**
      * Use this when you want to go absolutely nuts with your logging. If for some reason you've
@@ -72,6 +73,21 @@ object Simber {
     fun e(t: Throwable) = Timber.e(t)
     fun e(message: String, args: Any? = null) = Timber.e(message, args)
     fun e(t: Throwable, message: String, args: Any? = null) = Timber.e(t, message, args)
+
+//    /**
+//     * Used to track the performance of something inside of the code. Call [pStart] to start
+//     * tracking performance, and [pStop] to stop a trace with the same name as the one that started.
+//     * IMPORTANT: [traceName] must be unique
+//     * DEBUG: Is sent to Log.i
+//     * STAGING: Is sent to Log.i & sent to Firebase Performance Monitoring
+//     * RELEASE: Is sent to Firebase Performance Monitoring
+//     */
+//    fun pStart(traceName: String) {
+//        Timber.tag(PERFORMANCE_FLAG + PerformanceMonitoringTree.START_FLAG).i(traceName)
+//    }
+//
+//    fun pStop(traceName: String) =
+//        Timber.tag(PERFORMANCE_FLAG + PerformanceMonitoringTree.STOP_FLAG).i(traceName)
 
     /**
      * Adds a custom tag to the log.
