@@ -22,7 +22,6 @@ class TestingApiClient<T : SimRemoteInterface>(
     endpoint,
     "", "", "",
     mockk(),
-    jsonHelper,
     dispatcher,
     HttpLoggingInterceptor()
 ) {
