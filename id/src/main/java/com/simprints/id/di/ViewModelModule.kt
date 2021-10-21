@@ -90,7 +90,8 @@ open class ViewModelModule {
         loginInfoManager: LoginInfoManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        eventSyncManager: EventSyncManager
+        eventSyncManager: EventSyncManager,
+        dispatcher: DispatcherProvider
     ): SyncInformationViewModelFactory =
         SyncInformationViewModelFactory(
             downySyncHelper,
@@ -99,7 +100,8 @@ open class ViewModelModule {
             preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             eventDownSyncScopeRepository,
-            imageRepository
+            imageRepository,
+            dispatcher
         )
 
     @Provides
