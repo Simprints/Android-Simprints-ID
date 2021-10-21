@@ -33,6 +33,12 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
 }
 
 dependencies {
@@ -52,4 +58,10 @@ dependencies {
 
     // Unit Tests
     testImplementation(Dependencies.Testing.junit)
+    testImplementation(Dependencies.Testing.Mockk.core)
+    testImplementation(Dependencies.Testing.AndroidX.monitor)
+    testImplementation(Dependencies.Testing.Robolectric.core)
+    testImplementation(Dependencies.Testing.AndroidX.ext_junit)
+    testImplementation(project(":testtools"))
+
 }

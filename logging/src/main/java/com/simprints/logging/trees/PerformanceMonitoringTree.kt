@@ -9,17 +9,18 @@ internal object PerformanceMonitoringTree {
 
     var performanceMonitor: FirebasePerformance? = null
 
-    fun getTrace(name: String) = Trace(name, performanceMonitor)
+    fun getTrace(name: String, simber: Simber) = Trace(name, performanceMonitor, simber)
 
 }
 
 
-class Trace(val name: String, performanceMonitor: FirebasePerformance?) {
+class Trace(val name: String, performanceMonitor: FirebasePerformance?, val simber: Simber) {
 
-    private val startTime = System.currentTimeMillis()
+    private var startTime: Long? = null
     private val newTrace = performanceMonitor?.newTrace(name)
 
     fun start() {
+        startTime = System.currentTimeMillis()
         newTrace?.start()
     }
 
@@ -27,7 +28,9 @@ class Trace(val name: String, performanceMonitor: FirebasePerformance?) {
         newTrace?.stop()
 
         if (BuildConfig.DEBUG)
-            Simber.i("Trace time for $name = ${System.currentTimeMillis() - startTime}")
+            startTime?.let {
+                simber.i("Trace time for $name = ${System.currentTimeMillis() - it} ms")
+            }
     }
 
 }

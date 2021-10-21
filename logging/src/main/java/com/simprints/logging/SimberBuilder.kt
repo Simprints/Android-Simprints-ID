@@ -1,6 +1,6 @@
 package com.simprints.logging
 
-import android.app.Application
+import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
@@ -16,7 +16,7 @@ object SimberBuilder {
      * times without issue. Re-initializing Simber uproots and replants all trees.
      * @param context Application Context
      */
-    fun initialize(context: Application) {
+    fun initialize(context: Context) {
         Timber.uprootAll()
 
         if (BuildConfig.DEBUG) {
