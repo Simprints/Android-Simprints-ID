@@ -59,7 +59,6 @@ dependencies {
     // Unit Tests
     testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.Mockk.core)
-    testImplementation(Dependencies.Testing.AndroidX.monitor)
     testImplementation(Dependencies.Testing.Robolectric.core)
     testImplementation(Dependencies.Testing.AndroidX.ext_junit)
     testImplementation(project(":testtools"))
