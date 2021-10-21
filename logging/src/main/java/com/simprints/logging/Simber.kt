@@ -83,7 +83,7 @@ object Simber {
      * STAGING: Is sent to Log.i & sent to Firebase Performance Monitoring
      * RELEASE: Is sent to Firebase Performance Monitoring
      */
-    fun trace(traceName: String): Trace = getTrace(traceName)
+    fun trace(traceName: String): Trace = getTrace(traceName, this)
 
     /**
      * Adds a custom tag to the log.
