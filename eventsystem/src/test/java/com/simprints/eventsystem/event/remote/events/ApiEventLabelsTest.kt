@@ -19,7 +19,6 @@ class ApiEventLabelsTest {
     fun create_ApiEventLabels() {
         val apiEventLabels = ApiEventLabels().apply {
             this["projectId"] = listOf(DEFAULT_PROJECT_ID)
-            this["subjectId"] = listOf(GUID1)
             this["attendantId"] = listOf(DEFAULT_USER_ID)
             this["sessionId"] = listOf(GUID1)
             this["moduleId"] = listOf(DEFAULT_MODULE_ID)

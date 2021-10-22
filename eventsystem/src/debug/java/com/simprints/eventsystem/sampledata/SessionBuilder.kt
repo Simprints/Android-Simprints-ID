@@ -10,7 +10,6 @@ object SessionBuilder {
         labels: EventLabels = EventLabels(
             sessionId = UUID.randomUUID().toString(),
             projectId = SampleDefaults.DEFAULT_PROJECT_ID,
-            subjectId = UUID.randomUUID().toString(),
             deviceId = SampleDefaults.DEFAULT_DEVICE_ID
         ),
         isClosed: Boolean = false
