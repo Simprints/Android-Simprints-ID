@@ -317,6 +317,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-module-unit-tests
                     -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
