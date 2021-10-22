@@ -1,51 +1,40 @@
 package com.simprints.logging.trees
 
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.logging.BuildConfig
+import com.simprints.logging.LoggingTestUtils.setDebugBuildConfig
 import com.simprints.logging.Simber
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Test
-import org.robolectric.util.ReflectionHelpers
 
-class PerformanceMonitoringTreeTest {
+class PerformanceMonitoringTraceTest {
 
     @Test
-    fun `calling trace start should try to create a new FPM trace`() {
+    fun `calling trace should try to create a new FPM trace`() {
+        val simber = Simber
         val fpmMock: FirebasePerformance = mockk(relaxed = true)
-        PerformanceMonitoringTree.performanceMonitor = fpmMock
 
-        Simber.trace(TRACE_NAME)
+        PerformanceMonitoringTrace(TRACE_NAME, fpmMock, simber)
 
         verify { fpmMock.newTrace(TRACE_NAME) }
     }
 
     @Test
-    fun `calling trace should get new trace`() {
-        PerformanceMonitoringTree.performanceMonitor = mockk(relaxed = true)
-
-        Simber.trace(TRACE_NAME)
-
-        verify { PerformanceMonitoringTree.getTrace(TRACE_NAME, Simber) }
-    }
-
-    @Test
-    fun `if FPM isn't set trace should not be created`() {
+    fun `if DEBUG is true FPM trace should not be created`() {
         val fpmMock: FirebasePerformance = mockk(relaxed = true)
 
         Simber.trace(TRACE_NAME)
 
         verify(exactly = 0) { fpmMock.newTrace(TRACE_NAME) }
-        assert(PerformanceMonitoringTree.performanceMonitor == null)
     }
 
     @Test
     fun `if FPM is set trace start should start FPM trace`() {
         val fpmMock: FirebasePerformance = mockk(relaxed = true)
-        PerformanceMonitoringTree.performanceMonitor = fpmMock
+        val trace = spyk(PerformanceMonitoringTrace(TRACE_NAME, fpmMock, Simber))
 
-        Simber.trace(TRACE_NAME).start()
+        trace.start()
 
         verify { fpmMock.newTrace(TRACE_NAME).start() }
     }
@@ -53,34 +42,37 @@ class PerformanceMonitoringTreeTest {
     @Test
     fun `if FPM is set trace stop should stop FPM trace`() {
         val fpmMock: FirebasePerformance = mockk(relaxed = true)
-        PerformanceMonitoringTree.performanceMonitor = fpmMock
+        val trace = spyk(PerformanceMonitoringTrace(TRACE_NAME, fpmMock, Simber))
 
-        Simber.trace(TRACE_NAME).stop()
+        trace.stop()
 
         verify { fpmMock.newTrace(TRACE_NAME).stop() }
     }
 
     @Test
     fun `if FPM isn't set trace start should not start FPM trace`() {
-        val fpmMock: FirebasePerformance = mockk(relaxed = true)
+        val trace = spyk(PerformanceMonitoringTrace(TRACE_NAME, null, Simber))
 
-        Simber.trace(TRACE_NAME).start()
+        trace.start()
 
-        verify(exactly = 0) { fpmMock.newTrace(TRACE_NAME).start() }
+        assert(trace.newTrace == null)
+        assert(trace.newTrace?.start() == null)
     }
 
     @Test
     fun `if FPM isn't set trace stop should not stop FPM trace`() {
-        val fpmMock: FirebasePerformance = mockk(relaxed = true)
+        val trace = spyk(PerformanceMonitoringTrace(TRACE_NAME, null, Simber))
 
-        Simber.trace(TRACE_NAME).stop()
+        trace.stop()
 
-        verify(exactly = 0) { fpmMock.newTrace(TRACE_NAME).stop() }
+        assert(trace.newTrace == null)
+        assert(trace.newTrace?.stop() == null)
     }
 
     @Test
     fun `if debug mode stopping trace should print time`() {
-        ReflectionHelpers.setStaticField(BuildConfig::class.java, "DEBUG", true)
+        setDebugBuildConfig(true)
+
         val simberSpy = spyk<Simber>()
 
         val trace = simberSpy.trace(TRACE_NAME)
@@ -96,10 +88,10 @@ class PerformanceMonitoringTreeTest {
 
     @Test
     fun `if not debug mode stopping trace should not print time`() {
-        ReflectionHelpers.setStaticField(BuildConfig::class.java, "DEBUG", false)
+        setDebugBuildConfig(false)
         val simberSpy = spyk<Simber>()
+        val trace = spyk(PerformanceMonitoringTrace(TRACE_NAME, mockk(relaxed = true), simberSpy))
 
-        val trace = simberSpy.trace(TRACE_NAME)
         trace.start()
         trace.stop()
 

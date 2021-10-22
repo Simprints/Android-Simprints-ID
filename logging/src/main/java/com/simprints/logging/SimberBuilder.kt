@@ -6,7 +6,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
 import com.simprints.logging.trees.AnalyticsTree
 import com.simprints.logging.trees.CrashReportingTree
-import com.simprints.logging.trees.PerformanceMonitoringTree.performanceMonitor
+import com.simprints.logging.trees.PerformanceMonitoringTrace
 import timber.log.Timber
 
 object SimberBuilder {
@@ -24,9 +24,14 @@ object SimberBuilder {
         } else {
             Timber.plant(CrashReportingTree(FirebaseCrashlytics.getInstance()))
             Timber.plant(AnalyticsTree(FirebaseAnalytics.getInstance(context)))
-            performanceMonitor = FirebasePerformance.getInstance()
         }
     }
 
+    internal fun getTrace(name: String, simber: Simber): PerformanceMonitoringTrace {
+        return if (BuildConfig.DEBUG)
+            PerformanceMonitoringTrace(name, null, simber)
+        else
+            PerformanceMonitoringTrace(name, FirebasePerformance.getInstance(), simber)
+    }
 
 }

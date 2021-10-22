@@ -4,13 +4,12 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.firebase.FirebaseApp
-import com.simprints.logging.trees.PerformanceMonitoringTree
+import com.simprints.logging.LoggingTestUtils.setDebugBuildConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import org.robolectric.util.ReflectionHelpers
 import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
@@ -26,7 +25,7 @@ class SimberBuilderTest {
 
     @Test
     fun `initialize in debug mode should only create debug tree`() {
-        ReflectionHelpers.setStaticField(BuildConfig::class.java, "DEBUG", true)
+        setDebugBuildConfig(true)
 
         SimberBuilder.initialize(context)
 
@@ -35,16 +34,16 @@ class SimberBuilderTest {
 
     @Test
     fun `initialize in debug mode should not create performance monitor`() {
-        ReflectionHelpers.setStaticField(BuildConfig::class.java, "DEBUG", true)
+        setDebugBuildConfig(true)
 
-        SimberBuilder.initialize(context)
+        val trace = SimberBuilder.getTrace("Test Name", Simber)
 
-        assert(PerformanceMonitoringTree.performanceMonitor == null)
+        assert(trace.newTrace == null)
     }
 
     @Test
     fun `initialize in release mode should create 2 trees`() {
-        ReflectionHelpers.setStaticField(BuildConfig::class.java, "DEBUG", false)
+        setDebugBuildConfig(false)
 
         try {
             SimberBuilder.initialize(context)
