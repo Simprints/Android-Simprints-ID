@@ -37,6 +37,7 @@ class PerformanceMonitoringTreeTest {
         Simber.trace(TRACE_NAME)
 
         verify(exactly = 0) { fpmMock.newTrace(TRACE_NAME) }
+        assert(PerformanceMonitoringTree.performanceMonitor == null)
     }
 
     @Test
@@ -94,7 +95,7 @@ class PerformanceMonitoringTreeTest {
     }
 
     @Test
-    fun `if not debug mode stopping trace should print time`() {
+    fun `if not debug mode stopping trace should not print time`() {
         ReflectionHelpers.setStaticField(BuildConfig::class.java, "DEBUG", false)
         val simberSpy = spyk<Simber>()
 
