@@ -422,7 +422,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(EnrolmentRecordCreationEvent(
             CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(EncodingUtilsImplForTests),
-            EventLabels(subjectId = GUID1, projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+            EventLabels(projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
         )
     }
 

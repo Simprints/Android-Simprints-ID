@@ -16,7 +16,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-//@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ApiEventTest {
 
     private val jackson = JsonHelper.jackson

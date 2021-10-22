@@ -29,7 +29,6 @@ class ApiEventLabels : HashMap<String, List<String>>() {
 fun ApiEventLabels.fromApiToDomain() =
     EventLabels(
         projectId = this[PROJECT_ID_LABEL_KEY]?.firstOrNull(),
-        subjectId = this[SUBJECT_ID_LABEL_KEY]?.firstOrNull(),
         attendantId = this[ATTENDANT_ID_LABEL_KEY]?.firstOrNull(),
         moduleIds = this[MODULE_ID_LABEL_KEY],
         mode = (this[MODE_LABEL_KEY])?.map { Modes.valueOf(it) },
@@ -40,7 +39,6 @@ fun ApiEventLabels.fromApiToDomain() =
 fun EventLabels.fromDomainToApi(): ApiEventLabels {
     val api = ApiEventLabels()
     projectId?.let { api.put(PROJECT_ID_LABEL_KEY, listOf(it)) }
-    subjectId?.let { api.put(SUBJECT_ID_LABEL_KEY, listOf(it)) }
     attendantId?.let { api.put(ATTENDANT_ID_LABEL_KEY, listOf(it)) }
     moduleIds?.let { api.put(MODULE_ID_LABEL_KEY, it) }
     mode?.let { api.put(MODE_LABEL_KEY, it.map { it.name }) }
