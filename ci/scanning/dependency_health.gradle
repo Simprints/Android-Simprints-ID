@@ -40,9 +40,12 @@ dependencyAnalysis {
         project(':logging') {
             onAny {
                 exclude(
-                    // We don't want the logging module the expose Timber via api, even if other
+                    // We don't want the logging module the expose these via api, even if other
                     // internal libraries in Simprints use Timber
-                    'com.jakewharton.timber:timber'
+                    'com.jakewharton.timber:timber',
+                    'com.google.firebase:firebase-perf',
+                    // False positive
+                    'org.robolectric:robolectric'
                 )
             }
         }
