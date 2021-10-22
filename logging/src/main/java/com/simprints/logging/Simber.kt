@@ -1,7 +1,7 @@
 package com.simprints.logging
 
-import com.simprints.logging.trees.PerformanceMonitoringTree.getTrace
-import com.simprints.logging.trees.Trace
+import com.simprints.logging.SimberBuilder.getTrace
+import com.simprints.logging.trees.PerformanceMonitoringTrace
 import timber.log.Timber
 
 /**
@@ -12,7 +12,6 @@ import timber.log.Timber
 object Simber {
 
     internal const val USER_PROPERTY_TAG = "zzUserPropertyTag"
-    internal const val PERFORMANCE_FLAG = "zzPerformanceFlag"
 
     /**
      * Use this when you want to go absolutely nuts with your logging. If for some reason you've
@@ -77,13 +76,15 @@ object Simber {
     fun e(t: Throwable, message: String, args: Any? = null) = Timber.e(t, message, args)
 
     /**
-     * Used to track the performance of something inside of the code. Call [trace] to get a [Trace]
-     * instance. Call [Trace.start] to begin the trace and [Trace.stop] to end it.
+     * Used to track the performance of something inside of the code. Call
+     * [PerformanceMonitoringTrace] to get a [PerformanceMonitoringTrace] instance. Call
+     * [PerformanceMonitoringTrace.start] to begin the trace and [PerformanceMonitoringTrace.stop]
+     * to end it.
      * DEBUG: Is sent to Log.i
      * STAGING: Is sent to Log.i & sent to Firebase Performance Monitoring
      * RELEASE: Is sent to Firebase Performance Monitoring
      */
-    fun trace(traceName: String): Trace = getTrace(traceName, this)
+    fun trace(traceName: String): PerformanceMonitoringTrace = getTrace(traceName, this)
 
     /**
      * Adds a custom tag to the log.

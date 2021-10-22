@@ -5,25 +5,27 @@ import com.simprints.logging.BuildConfig
 import com.simprints.logging.Simber
 
 
-internal object PerformanceMonitoringTree {
-
-    var performanceMonitor: FirebasePerformance? = null
-
-    fun getTrace(name: String, simber: Simber) = Trace(name, performanceMonitor, simber)
-
-}
-
-
-class Trace(val name: String, performanceMonitor: FirebasePerformance?, val simber: Simber) {
+class PerformanceMonitoringTrace(
+    val name: String,
+    performanceMonitor: FirebasePerformance?,
+    val simber: Simber
+) {
 
     private var startTime: Long? = null
-    private val newTrace = performanceMonitor?.newTrace(name)
+    internal val newTrace = performanceMonitor?.newTrace(name)
 
+    /**
+     * Call [start] to begin a new trace. If you call start again before calling [stop] to timer
+     * will be reset to 0.
+     */
     fun start() {
         startTime = System.currentTimeMillis()
         newTrace?.start()
     }
 
+    /**
+     * Call [stop] to end and report the current trace. Will be printed to [Simber.i] in debug mode.
+     */
     fun stop() {
         newTrace?.stop()
 
