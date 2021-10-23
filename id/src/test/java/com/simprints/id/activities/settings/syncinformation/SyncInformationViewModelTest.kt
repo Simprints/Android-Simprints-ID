@@ -25,6 +25,8 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Succeeded
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -41,6 +43,10 @@ class SyncInformationViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @MockK
     lateinit var downySyncHelper: EventDownSyncHelper
@@ -78,7 +84,8 @@ class SyncInformationViewModelTest {
             preferencesManager,
             projectId,
             eventDownSyncScopeRepository,
-            imageRepository
+            imageRepository,
+            testDispatcherProvider
         )
     }
 

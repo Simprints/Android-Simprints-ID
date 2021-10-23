@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.modality.toMode
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
@@ -16,7 +17,6 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,8 @@ class SyncInformationViewModel(
     private val preferencesManager: IdPreferencesManager,
     private val projectId: String,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     val recordsInLocal = MutableLiveData<Int?>(null)
@@ -47,7 +48,7 @@ class SyncInformationViewModel(
             }
         }
         // Move walking the file system to the IO thread
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
         }
         viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
