@@ -4,7 +4,7 @@ import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.logging.Simber
+import com.simprints.logging.PerformanceMonitor
 
 class ProjectRepositoryImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,
@@ -13,7 +13,7 @@ class ProjectRepositoryImpl(
 ) : ProjectRepository {
 
     override suspend fun loadFromRemoteAndRefreshCache(projectId: String): Project? {
-        val trace = Simber.trace("refreshProjectInfoWithServer").apply { start() }
+        val trace = PerformanceMonitor.trace("refreshProjectInfoWithServer").apply { start() }
         val projectInLocal = projectLocalDataSource.load(projectId)
         return projectInLocal?.also {
             fetchAndUpdateCache(it.id)

@@ -12,6 +12,7 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.simprints.core.analytics.CrashReportTag.ID_SETUP
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.logging.PerformanceMonitor
 import com.simprints.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -23,7 +24,7 @@ class SetupViewModel(
 ) : ViewModel() {
 
     internal val scope by lazy { viewModelScope }
-    private val modalityDownloadTrace by lazy { Simber.trace("modalityDownload") }
+    private val modalityDownloadTrace by lazy { PerformanceMonitor.trace("modalityDownload") }
 
     fun getViewStateLiveData(): LiveData<SetupActivity.ViewState> = viewStateLiveData
     fun getDeviceNetworkLiveData(): LiveData<SetupActivity.ViewState> =

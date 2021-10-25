@@ -1,7 +1,8 @@
-package com.simprints.logging.trees
+package com.simprints.logging.performancemonitoring
 
 import com.google.firebase.perf.FirebasePerformance
 import com.simprints.logging.LoggingTestUtils.setDebugBuildConfig
+import com.simprints.logging.PerformanceMonitor
 import com.simprints.logging.Simber
 import io.mockk.mockk
 import io.mockk.spyk
@@ -24,7 +25,7 @@ class PerformanceMonitoringTraceTest {
     fun `if DEBUG is true FPM trace should not be created`() {
         val fpmMock: FirebasePerformance = mockk(relaxed = true)
 
-        Simber.trace(TRACE_NAME)
+        PerformanceMonitor.trace(TRACE_NAME)
 
         verify(exactly = 0) { fpmMock.newTrace(TRACE_NAME) }
     }
@@ -75,7 +76,7 @@ class PerformanceMonitoringTraceTest {
 
         val simberSpy = spyk<Simber>()
 
-        val trace = simberSpy.trace(TRACE_NAME)
+        val trace = PerformanceMonitor.trace(TRACE_NAME, simberSpy)
         trace.start()
         trace.stop()
 
