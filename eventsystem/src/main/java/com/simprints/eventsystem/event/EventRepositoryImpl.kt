@@ -89,8 +89,9 @@ open class EventRepositoryImpl(
         reportException {
             val session = getCurrentCaptureSessionEvent()
 
+            val currentEvents = sessionDataCache.eventCache.values.toList()
             validators.forEach {
-                it.validate(sessionDataCache.eventCache.values.toList(), event)
+                it.validate(currentEvents, event)
             }
 
             sessionDataCache.eventCache[event.id] = event
