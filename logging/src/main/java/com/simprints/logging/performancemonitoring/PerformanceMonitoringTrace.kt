@@ -1,4 +1,4 @@
-package com.simprints.logging.trees
+package com.simprints.logging.performancemonitoring
 
 import com.google.firebase.perf.FirebasePerformance
 import com.simprints.logging.BuildConfig

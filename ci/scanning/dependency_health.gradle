@@ -44,8 +44,6 @@ dependencyAnalysis {
                     // internal libraries in Simprints use Timber
                     'com.jakewharton.timber:timber',
                     'com.google.firebase:firebase-perf',
-                    // False positive
-                    'org.robolectric:robolectric'
                 )
             }
         }
