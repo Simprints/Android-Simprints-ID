@@ -11,10 +11,10 @@ import com.simprints.testtools.common.di.DependencyRule.SpykRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /*
-* A base class to be used in all activity tests.
+* A base class to be used in all unit tests.
  */
 @ExperimentalCoroutinesApi
-open class BaseActivityTest {
+open class BaseUnitTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private val preferencesModule by lazy {
