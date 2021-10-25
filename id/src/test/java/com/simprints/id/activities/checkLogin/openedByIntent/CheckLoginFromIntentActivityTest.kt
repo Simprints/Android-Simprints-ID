@@ -15,7 +15,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.R
 import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
-import com.simprints.id.activities.BaseActivityTest
+import com.simprints.id.activities.BaseUnitTest
 import com.simprints.id.commontesttools.moduleApi.AppEnrolRequestModuleApi
 import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.app.requests.IAppRequest
@@ -31,7 +31,7 @@ import org.robolectric.annotation.Config
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromIntentActivityTest : BaseActivityTest() {
+class CheckLoginFromIntentActivityTest : BaseUnitTest() {
 
     @Before
     override fun setUp() {

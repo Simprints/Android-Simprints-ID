@@ -6,7 +6,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
-import com.simprints.id.activities.BaseActivityTest
+import com.simprints.id.activities.BaseUnitTest
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -27,7 +27,7 @@ import org.robolectric.annotation.Config
     application = TestApplication::class,
     shadows = [ShadowAndroidXMultiDex::class]
 )
-class ModuleSelectionFragmentTest : BaseActivityTest() {
+class ModuleSelectionFragmentTest : BaseUnitTest() {
 
     @Before
     override fun setUp() {
