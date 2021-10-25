@@ -64,7 +64,7 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         coEvery { mockRemoteDbManager.getCurrentToken() } returns "token"
         runBlocking {
-            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, mockk(), JsonHelper,
+            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, JsonHelper,
                 testDispatcherProvider, HttpLoggingInterceptor()).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
         }
     }

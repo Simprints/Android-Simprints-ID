@@ -9,26 +9,56 @@ apply {
 
 android {
 
+    buildTypes {
+        getByName("release") {
+            extra.set("enableCrashlytics", true)
+            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
+            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
+        }
+        getByName("staging") {
+            extra.set("enableCrashlytics", true)
+            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
+            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
+        }
+        getByName("debug") {
+            extra.set("enableCrashlytics", false)
+            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
+            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
+        }
+
+    }
+
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
 }
 
 dependencies {
-    // We specifically don't include Crashlytics, Analytics and Timber in the central buildSrc
-    // module because we do not want or expect these dependencies to be used in multiple modules
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.1")
-    implementation("com.google.firebase:firebase-analytics-ktx:19.0.1")
+    // We specifically don't include Crashlytics, Analytics, Performance monitoring and Timber in
+    // the central buildSrc module because we do not want or expect these dependencies to be used in
+    // multiple modules
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.3")
+    implementation("com.google.firebase:firebase-analytics-ktx:19.0.2")
+    implementation("com.google.firebase:firebase-perf:20.0.3")
 
     //4.7.1 breaks realm:
     // https://github.com/realm/realm-java/issues/6153
     // https://github.com/JakeWharton/timber/issues/295
-    implementation(Dependencies.Timber.timber) {
+    implementation("com.jakewharton.timber:timber:5.0.1") {
         exclude("org.jetbrains", "annotations")
     }
 
     // Unit Tests
     testImplementation(Dependencies.Testing.junit)
+    testImplementation(Dependencies.Testing.Mockk.core)
+    testImplementation(Dependencies.Testing.Robolectric.core)
+
 }

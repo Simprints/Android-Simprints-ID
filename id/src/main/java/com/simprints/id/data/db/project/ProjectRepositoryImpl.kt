@@ -1,20 +1,19 @@
 package com.simprints.id.data.db.project
 
-import com.google.firebase.perf.FirebasePerformance
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.logging.PerformanceMonitor
 
 class ProjectRepositoryImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,
     private val projectRemoteDataSource: ProjectRemoteDataSource,
     private val remoteConfigWrapper: RemoteConfigWrapper,
-    private val performanceTracker: FirebasePerformance = FirebasePerformance.getInstance()
 ) : ProjectRepository {
 
     override suspend fun loadFromRemoteAndRefreshCache(projectId: String): Project? {
-        val trace = performanceTracker.newTrace("refreshProjectInfoWithServer").apply { start() }
+        val trace = PerformanceMonitor.trace("refreshProjectInfoWithServer").apply { start() }
         val projectInLocal = projectLocalDataSource.load(projectId)
         return projectInLocal?.also {
             fetchAndUpdateCache(it.id)

@@ -53,7 +53,6 @@ class SecurityStateRemoteDataSourceImplTest {
             DEVICE_ID,
             VERSION_NAME,
             randomUUID(),
-            mockk(),
             JsonHelper,
             testDispatcherProvider,
             HttpLoggingInterceptor()
