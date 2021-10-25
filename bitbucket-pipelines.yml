@@ -43,13 +43,31 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
-                    - ./gradlew core:jacocoTestReport
                     - ./gradlew id:jacocoTestReport
-                    - ./gradlew eventsystem:jacocoTestReport
                 artifacts:
                     - id/build/reports/**
+
+        ######################################################################
+        # Run the Core, Event system and Logging unit tests with coverage and
+        # upload report to artifacts.
+        ######################################################################
+        -   step: &run-module-unit-tests
+                name: "Run the Core, Event system and Logging unit tests"
+                size: 2x
+                max-time: 30
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew core:jacocoTestReport
+                    - ./gradlew eventsystem:jacocoTestReport
+                    - ./gradlew logging:jacocoTestReport
+                artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
+                    - logging/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -286,6 +304,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-module-unit-tests
                     -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
@@ -298,6 +317,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-module-unit-tests
                     -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:

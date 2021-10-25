@@ -25,7 +25,6 @@ object Dependencies {
     private const val kronos_version = "0.0.1-alpha09"
     private const val fragment_version = "1.3.3"
     private const val chuck_version = "3.5.2"
-    private const val timber_version = "5.0.1"
     private const val simmatcher_version ="1.0.0"
 
     object Kotlin {
@@ -126,7 +125,6 @@ object Dependencies {
 
     object Firebase {
         const val auth = "com.google.firebase:firebase-auth:19.2.0"
-        const val perf = "com.google.firebase:firebase-perf:19.0.5"
         const val storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
         const val mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
         const val mlkit_barcode = "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
@@ -264,10 +262,6 @@ object Dependencies {
     // For NTP time
     object Kronos {
         const val kronos = "com.lyft.kronos:kronos-android:$kronos_version"
-    }
-
-    object Timber {
-        const val timber = "com.jakewharton.timber:timber:$timber_version"
     }
 
     const val libsimprints = "com.simprints:libsimprints:2021.3.0"

@@ -1,9 +1,10 @@
-package com.simprints.logging
+package com.simprints.logging.trees
 
 import android.os.Bundle
 import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
+import com.simprints.logging.Simber
 import timber.log.Timber
 
 
@@ -11,7 +12,7 @@ internal class AnalyticsTree(private val analytics: FirebaseAnalytics) : Timber.
 
     companion object {
         // If for some reason there is no tag for the event
-        private const val defaultTag = "DEFAULT"
+        internal const val defaultTag = "DEFAULT"
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {

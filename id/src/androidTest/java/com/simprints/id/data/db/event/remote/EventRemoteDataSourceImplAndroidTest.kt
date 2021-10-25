@@ -138,7 +138,7 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, testDispatcherProvider, HttpLoggingInterceptor(), okHttpClientBuilder),
+            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, JsonHelper, testDispatcherProvider, HttpLoggingInterceptor(), okHttpClientBuilder),
             JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100

@@ -54,7 +54,6 @@ class EventDownSyncDownloaderWorkerTest {
         app.component = mockk(relaxed = true)
         val correctInputData = JsonHelper.toJson(projectDownSyncScope.operations.first())
         eventDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
-        eventDownSyncDownloaderWorker.firebasePerformanceTraceFactory = mockk(relaxed = true)
     }
 
     @Test
