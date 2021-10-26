@@ -219,3 +219,11 @@ dependencies {
     // This is to solve multiple imports of guava https://stackoverflow.com/a/60492942/4072335
     androidTestImplementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 }
+
+configurations {
+    androidTestImplementation {
+        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
+        // the issue is reported here https://github.com/mockk/mockk/issues/722
+        exclude("io.mockk", "mockk-agent-jvm")
+    }
+}

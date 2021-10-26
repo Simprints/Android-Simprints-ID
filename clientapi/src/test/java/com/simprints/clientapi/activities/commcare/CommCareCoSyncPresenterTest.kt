@@ -54,8 +54,12 @@ class CommCareCoSyncPresenterTest {
     }
 
     private val view = mockk<CommCareActivity> {
-        every { extras } returns mapOf()
-        every { extras?.get(Constants.SIMPRINTS_PROJECT_ID) } returns UUID.randomUUID().toString()
+        every { extras } returns mapOf(
+            Pair(
+                Constants.SIMPRINTS_PROJECT_ID,
+                UUID.randomUUID().toString()
+            )
+        )
     }
     private val jsonHelper = JsonHelper
 

@@ -11,6 +11,7 @@ import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -31,8 +32,8 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
         getComponent<StoreUserLocationIntoCurrentSessionWorker> { it.inject(this@StoreUserLocationIntoCurrentSessionWorker) }
         try {
             val locationsFlow = createLocationFlow()
-            locationsFlow.collect { locations ->
-                saveUserLocation(locations.last())
+            locationsFlow.filterNotNull().collect{ location ->
+                saveUserLocation(location)
             }
         } catch (t: Throwable) {
             Simber.e(t)
@@ -41,8 +42,8 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
         success()
     }
 
-    private suspend fun createLocationFlow(): Flow<List<android.location.Location>> {
-        val locationRequest = LocationRequest().apply {
+    private fun createLocationFlow(): Flow<android.location.Location?> {
+        val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         return locationManager.requestLocation(locationRequest).take(1)

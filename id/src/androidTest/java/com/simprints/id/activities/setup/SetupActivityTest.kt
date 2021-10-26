@@ -19,6 +19,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
@@ -57,7 +58,7 @@ class SetupActivityTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { mockLocationManager.requestLocation(any()) } returns flowOf(listOf(buildFakeLocation()))
+        every { mockLocationManager.requestLocation(any()) } returns flowOf(buildFakeLocation())
 
         app.component = AndroidTestConfig(this, appModule = appModule)
             .componentBuilder()
