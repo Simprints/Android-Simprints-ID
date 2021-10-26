@@ -196,8 +196,8 @@ dependencies {
     implementation(Dependencies.AndroidX.sqlite)
     implementation(Dependencies.SqlCipher.core)
 
+    implementation(Dependencies.Chuck.release)
     debugImplementation(Dependencies.Chuck.debug)
-    releaseImplementation(Dependencies.Chuck.release)
 
     // ######################################################
     //                      Unit test
@@ -293,6 +293,11 @@ dependencies {
     }
 }
 configurations {
+    debugImplementation{
+        // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
+        // And a full feature version that should be added in debug build types
+        exclude("com.github.chuckerteam.chucker","library-no-op")
+    }
     androidTestImplementation {
         // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
         // the issue is reported here https://github.com/mockk/mockk/issues/722
