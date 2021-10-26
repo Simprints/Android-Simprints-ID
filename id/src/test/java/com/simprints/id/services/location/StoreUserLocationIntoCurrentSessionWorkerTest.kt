@@ -1,12 +1,12 @@
 package com.simprints.id.services.location
 
-import android.location.Location
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.TestData
 import com.simprints.id.tools.LocationManager
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
@@ -57,11 +57,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
 
     @Test
     fun storeUserLocationIntoCurrentSession() = runBlocking {
-        coEvery { mockLocationManager.requestLocation(any()) } returns flowOf(
-            listOf(
-                buildFakeLocation()
-            )
-        )
+        every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
         worker.doWork()
         coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent() }
         coVerify(exactly = 1) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
@@ -69,24 +65,10 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
 
     @Test
     fun `storeUserLocationIntoCurrentSession requestLocation throw exception`() = runBlocking {
-        coEvery { mockLocationManager.requestLocation(any()) } throws Exception("Location collect exception")
+        every { mockLocationManager.requestLocation(any()) } throws Exception("Location collect exception")
         worker.doWork()
         coVerify(exactly = 0) { mockEventRepository.getCurrentCaptureSessionEvent() }
         coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
-    }
-
-
-    companion object {
-        private const val PROVIDER = "flp"
-        private const val LAT = 37.377166
-        private const val LNG = -122.086966
-        private const val ACCURACY = 3.0f
-    }
-
-    private fun buildFakeLocation() = Location(PROVIDER).apply {
-        longitude = LNG
-        latitude = LAT
-        accuracy = ACCURACY
     }
 
     @After

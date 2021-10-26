@@ -5,6 +5,6 @@ import com.google.android.gms.location.LocationRequest
 import kotlinx.coroutines.flow.Flow
 
 interface LocationManager {
-    suspend fun requestLocation(request: LocationRequest): Flow<List<Location>>
+    fun requestLocation(request: LocationRequest): Flow<Location?>
 
 }

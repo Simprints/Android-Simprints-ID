@@ -1,5 +1,6 @@
 package com.simprints.id.testtools
 
+import android.location.Location
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.eventsystem.sampledata.SampleDefaults
@@ -23,5 +24,17 @@ object TestData {
         listOf(FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23)),
         false
     )
+    private const val PROVIDER = "flp"
+    private const val LAT = 37.377166
+    private const val LNG = -122.086966
+    private const val ACCURACY = 3.0f
+
+
+    fun buildFakeLocation() = Location(PROVIDER).apply {
+        longitude = LNG
+        latitude = LAT
+        accuracy = ACCURACY
+    }
+
 
 }

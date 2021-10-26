@@ -34,7 +34,6 @@ android {
 
     buildFeatures.viewBinding = true
 }
-
 repositories {
     maven(url = "https://jitpack.io")
     maven(url = "https://maven.google.com")
@@ -87,10 +86,13 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.AndroidX.rules)
     androidTestUtil(Dependencies.Testing.AndroidX.orchestrator)
 
+    androidTestImplementation(Dependencies.Testing.Mockk.core)
     androidTestImplementation(Dependencies.Testing.Mockk.android)
+    androidTestImplementation(Dependencies.Testing.Objenesis.core)
     androidTestImplementation(Dependencies.Testing.truth)
 
     // Espresso
+    androidTestImplementation(Dependencies.Testing.AndroidX.uiAutomator)
     androidTestImplementation(Dependencies.Testing.Espresso.core)
     androidTestImplementation(Dependencies.Testing.Espresso.intents)
     androidTestImplementation(Dependencies.Testing.Espresso.barista) {
@@ -125,10 +127,20 @@ dependencies {
 
     // Navigation
     androidTestImplementation(Dependencies.Testing.navigation_testing)
-    debugImplementation(Dependencies.Testing.fragment_testing)
+    debugImplementation(Dependencies.Testing.fragment_testing){
+        exclude( "androidx.test",  "core")
+    }
 
     // Mockk
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.truth)
     testImplementation(Dependencies.Testing.Robolectric.core)
+}
+
+configurations {
+    androidTestImplementation {
+        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
+        // the issue is reported here https://github.com/mockk/mockk/issues/722
+        exclude("io.mockk", "mockk-agent-jvm")
+    }
 }

@@ -28,11 +28,8 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
@@ -77,6 +74,7 @@ class SyncInformationViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         UnitTestConfig(this).coroutinesMainThread()
+        mockkStatic("com.simprints.id.data.prefs.settings.SettingsPreferencesManagerKt")
         viewModel = SyncInformationViewModel(
             downySyncHelper,
             eventRepository,

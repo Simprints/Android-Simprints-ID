@@ -96,6 +96,7 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.AndroidX.core)
     androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
     androidTestImplementation(Dependencies.Testing.AndroidX.runner)
+    androidTestImplementation(Dependencies.Testing.Mockk.core)
     androidTestImplementation(Dependencies.Testing.Mockk.android)
     androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
 
@@ -106,7 +107,17 @@ dependencies {
     androidTestImplementation(Dependencies.Koin.core_ext)
     androidTestImplementation(Dependencies.Testing.koin)
     androidTestImplementation(Dependencies.Testing.truth)
+    androidTestImplementation(Dependencies.Testing.Objenesis.core)
 
 }
 
-configurations.forEach { it.exclude("com.google.guava", "listenablefuture") }
+configurations {
+    androidTestImplementation {
+        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
+        // the issue is reported here https://github.com/mockk/mockk/issues/722
+        exclude("io.mockk", "mockk-agent-jvm")
+    }
+    forEach {
+        it.exclude("com.google.guava", "listenablefuture")
+    }
+}

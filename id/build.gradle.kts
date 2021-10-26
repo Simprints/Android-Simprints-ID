@@ -152,7 +152,6 @@ dependencies {
     implementation(Dependencies.Support.material)
     implementation(Dependencies.WorkManager.work)
     implementation(Dependencies.PlayServices.location)
-    implementation(Dependencies.PlayServices.places)
     implementation(Dependencies.PlayServices.safetynet)
     implementation(Dependencies.Retrofit.core)
     implementation(Dependencies.Retrofit.adapter)
@@ -264,6 +263,7 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.rx2_idler)
     androidTestImplementation(Dependencies.Testing.Mockk.core)
     androidTestImplementation(Dependencies.Testing.Mockk.android)
+
     androidTestImplementation(Dependencies.Testing.mockwebserver)
     androidTestImplementation(Dependencies.Testing.coroutines_test)
     androidTestImplementation(Dependencies.Testing.AndroidX.room)
@@ -288,9 +288,17 @@ dependencies {
     }
     androidTestImplementation(Dependencies.Testing.kappuccino)
 
-    debugImplementation(Dependencies.Testing.fragment_testing)
+    debugImplementation(Dependencies.Testing.fragment_testing){
+        exclude( "androidx.test",  "core")
+    }
 }
-
+configurations {
+    androidTestImplementation {
+        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
+        // the issue is reported here https://github.com/mockk/mockk/issues/722
+        exclude("io.mockk", "mockk-agent-jvm")
+    }
+}
 kapt {
     useBuildCache = true
     arguments {

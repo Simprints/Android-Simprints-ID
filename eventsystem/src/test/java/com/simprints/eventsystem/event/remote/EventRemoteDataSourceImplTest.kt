@@ -23,15 +23,12 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.coVerifySequence
-import io.mockk.excludeRecords
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -147,9 +144,10 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun getEvents_shouldMakeTheRightRequest() {
         runBlocking {
-            shouldThrow<Throwable> {
-                eventRemoteDataSource.getEvents(query, this)
-            }
+            val mockedScope: CoroutineScope = mockk()
+            mockkStatic("kotlinx.coroutines.channels.ProduceKt")
+            every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
+            eventRemoteDataSource.getEvents(query, mockedScope)
 
             with(query) {
                 coVerify {
