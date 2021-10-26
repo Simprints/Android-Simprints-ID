@@ -68,7 +68,7 @@ class ConnectScannerViewModelTest : KoinTest {
 
     @Before
     fun setUp() {
-        val mockModule = module(override = true) {
+        val mockModule = module {
             factory { mockk<FingerprintTimeHelper>(relaxed = true) }
             factory { sessionEventsManager }
             factory { preferencesManager }
@@ -91,7 +91,6 @@ class ConnectScannerViewModelTest : KoinTest {
                     throw connectFailException
             }
             coEvery { setScannerInfoAndCheckAvailableOta() } answers {}
-            coEvery { setup() } answers {}
             coEvery { sensorWakeUp() } answers {}
             coEvery { setUiIdle() } answers {}
             every { versionInformation() } returns when (scannerGeneration) {

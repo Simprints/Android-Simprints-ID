@@ -8,7 +8,6 @@ import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
@@ -20,18 +19,15 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Captu
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageData
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.spyk
-import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -45,13 +41,13 @@ class ScannerWrapperV2Test {
     @MockK lateinit var stmOtaHelper: StmOtaHelper
     @MockK lateinit var un20OtaHelper: Un20OtaHelper
 
-    private lateinit var scannerWrapperV2: ScannerWrapperV2
+    private lateinit var scannerWrapper: ScannerWrapperV2
 
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        scannerWrapperV2 = spyk(ScannerWrapperV2(
+        scannerWrapper = spyk(ScannerWrapperV2(
             scannerV2,
             scannerUiHelper,
             "Mock mac address",
@@ -65,77 +61,73 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw the correct corresponding errors when scanner disconnection fails`() = runBlockingTest {
+    fun `should throw the correct corresponding errors when scanner disconnection fails`() = runTest {
         coEvery { connectionHelper.disconnectScanner(any()) } answers {
             throw ScannerDisconnectedException()
         } andThenThrows(UnexpectedScannerException("Scanner cannot disconnect"))
 
-        assertThrows<ScannerDisconnectedException> { scannerWrapperV2.disconnect() }
-        assertThrows<UnexpectedScannerException> { scannerWrapperV2.disconnect() }
+        assertThrows<ScannerDisconnectedException> { scannerWrapper.disconnect() }
+        assertThrows<UnexpectedScannerException> { scannerWrapper.disconnect() }
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw the correct corresponding errors when scanner connection fails`() = runBlockingTest {
+    fun `should throw the correct corresponding errors when scanner connection fails`() = runTest {
         coEvery { connectionHelper.connectScanner(any(), any()) } answers {
             throw ScannerDisconnectedException()
-        } andThen {
+        } andThenAnswer  {
             throw ScannerNotPairedException()
-        } andThen {
+        } andThenAnswer  {
             throw BluetoothNotEnabledException()
         } andThenThrows(BluetoothNotSupportedException())
 
-        assertThrows<ScannerDisconnectedException> { scannerWrapperV2.connect() }
-        assertThrows<ScannerNotPairedException> { scannerWrapperV2.connect() }
-        assertThrows<BluetoothNotEnabledException> { scannerWrapperV2.connect() }
-        assertThrows<BluetoothNotSupportedException> { scannerWrapperV2.connect() }
+        assertThrows<ScannerDisconnectedException> { scannerWrapper.connect() }
+        assertThrows<ScannerNotPairedException> { scannerWrapper.connect() }
+        assertThrows<BluetoothNotEnabledException> { scannerWrapper.connect() }
+        assertThrows<BluetoothNotSupportedException> { scannerWrapper.connect() }
     }
 
+    @Suppress("UNCHECKED_CAST")
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should return the correct scanner info when scanner info hasn been set`() = runBlockingTest {
+    fun `should return the correct scanner info when scanner info hasn been set`() = runTest {
         val expectedVersion = ScannerVersion(
+            ScannerExtendedInfoReaderHelper.UNKNOWN_HARDWARE_VERSION,
             ScannerGeneration.VERO_2,
             ScannerFirmwareVersions.UNKNOWN,
-            ScannerApiVersions.UNKNOWN
         )
 
-        coEvery { scannerInitialSetupHelper.checkScannerInfoAndAvailableOta(any(), any(), any(), any()) } answers {
+        coEvery { scannerInitialSetupHelper.setupScannerWithOtaCheck(any(), any(), any(), any()) } answers {
             val scannerInfoCallback = args[2] as ((ScannerVersion) -> Unit)
             scannerInfoCallback.invoke(expectedVersion)
         }
 
-        scannerWrapperV2.setScannerInfoAndCheckAvailableOta()
+        scannerWrapper.setScannerInfoAndCheckAvailableOta()
 
-        val actualVersion = scannerWrapperV2.versionInformation()
+        val actualVersion = scannerWrapper.versionInformation()
 
         assertThat(actualVersion).isEqualTo(expectedVersion)
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should return the unknown scanner info when scanner info hasn't been set`() = runBlockingTest {
+    fun `should return the unknown scanner info when scanner info hasn't been set`() = runTest {
         val expectedVersion = ScannerVersion(
+            ScannerExtendedInfoReaderHelper.UNKNOWN_HARDWARE_VERSION,
             ScannerGeneration.VERO_2,
             ScannerFirmwareVersions.UNKNOWN,
-            ScannerApiVersions.UNKNOWN
         )
 
-        val actualVersion = scannerWrapperV2.versionInformation()
+        val actualVersion = scannerWrapper.versionInformation()
 
         assertThat(actualVersion).isEqualTo(expectedVersion)
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should return actual image data in ImageResponse when appropriate image-save strategy is provided and image data is returned from scanner`() = runBlockingTest {
+    fun `should return actual image data in ImageResponse when appropriate image-save strategy is provided and image data is returned from scanner`() = runTest {
         val expectedImageResponse = AcquireImageResponse(imageBytes = byteArrayOf())
         every { scannerV2.acquireImage(any()) } returns Maybe.just(
             ImageData(expectedImageResponse.imageBytes, 128)
         )
 
-        val actualImageResponse = scannerWrapperV2.acquireImage(
+        val actualImageResponse = scannerWrapper.acquireImage(
             SaveFingerprintImagesStrategy.WSQ_15
         )
 
@@ -143,30 +135,27 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw NoFingerDetectedException when trying to acquire fingerprint image and scanner returns a null ImageData`() = runBlockingTest {
+    fun `should throw NoFingerDetectedException when trying to acquire fingerprint image and scanner returns a null ImageData`() = runTest {
         every { scannerV2.acquireImage(any()) } returns Maybe.empty()
 
         assertThrows<NoFingerDetectedException> {
-            scannerWrapperV2.acquireImage(
+            scannerWrapper.acquireImage(
                 SaveFingerprintImagesStrategy.WSQ_15
             )
         }
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw UnexpectedScannerException when trying to acquire fingerprint image and save fingerprint strategy is NEVER`() = runBlockingTest {
-        assertThrows<UnexpectedScannerException> {
-            scannerWrapperV2.acquireImage(
+    fun `should throw UnexpectedScannerException when trying to acquire fingerprint image and save fingerprint strategy is NEVER`() = runTest {
+        assertThrows<IllegalArgumentException> {
+            scannerWrapper.acquireImage(
                 SaveFingerprintImagesStrategy.NEVER
             )
         }
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should return correct capture response when capture result and image quality are OK`() = runBlockingTest {
+    fun `should return correct capture response when capture result and image quality are OK`() = runTest {
         val qualityThreshold = 50
         val expectedCaptureResponse = CaptureFingerprintResponse(
             template = byteArrayOf(),
@@ -181,7 +170,7 @@ class ScannerWrapperV2Test {
 
 
 
-        val actualResponse = scannerWrapperV2.captureFingerprint(
+        val actualResponse = scannerWrapper.captureFingerprint(
             CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
             1000,
             qualityThreshold
@@ -192,8 +181,7 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw NoFingerDetectedException when no fingerprint template is returned after fingerprint is captured`() = runBlockingTest {
+    fun `should throw NoFingerDetectedException when no fingerprint template is returned after fingerprint is captured`() = runTest {
         val qualityThreshold = 50
         every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold)
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
@@ -204,7 +192,7 @@ class ScannerWrapperV2Test {
 
 
         assertThrows<NoFingerDetectedException> {
-            scannerWrapperV2.captureFingerprint(
+            scannerWrapper.captureFingerprint(
                 CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
                 1000,
                 qualityThreshold
@@ -213,8 +201,7 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should trigger bad_scan LED when captured fingerprint's image quality score is less than specified image quality_threshold`() = runBlockingTest {
+    fun `should trigger bad_scan LED when captured fingerprint's image quality score is less than specified image quality_threshold`() = runTest {
         val qualityThreshold = 50
         every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold - 10)
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
@@ -223,7 +210,7 @@ class ScannerWrapperV2Test {
         }
         every { scannerV2.acquireTemplate(any()) } returns Maybe.just(TemplateData(byteArrayOf()))
 
-        scannerWrapperV2.captureFingerprint(
+        scannerWrapper.captureFingerprint(
             CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
             1000,
             qualityThreshold
@@ -233,8 +220,7 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should trigger good_scan LED when captured fingerprint's image quality score is greater or equal to specified image quality_threshold`() = runBlockingTest {
+    fun `should trigger good_scan LED when captured fingerprint's image quality score is greater or equal to specified image quality_threshold`() = runTest {
         val qualityThreshold = 50
         every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold + 10)
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
@@ -243,7 +229,7 @@ class ScannerWrapperV2Test {
         }
         every { scannerV2.acquireTemplate(any()) } returns Maybe.just(TemplateData(byteArrayOf()))
 
-        scannerWrapperV2.captureFingerprint(
+        scannerWrapper.captureFingerprint(
             CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
             1000,
             qualityThreshold
@@ -253,8 +239,7 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw NoFingerDetectedException when captured fingerprint's image quality score is less than no_image quality_threshold`() = runBlockingTest {
+    fun `should throw NoFingerDetectedException when captured fingerprint's image quality score is less than no_image quality_threshold`() = runTest {
         every { scannerV2.getImageQualityScore() } returns Maybe.empty()
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
         every { scannerV2.captureFingerprint(any()) } answers {
@@ -262,7 +247,7 @@ class ScannerWrapperV2Test {
         }
 
         assertThrows<NoFingerDetectedException> {
-            scannerWrapperV2.captureFingerprint(
+            scannerWrapper.captureFingerprint(
                 CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
                 1000,
                 50
@@ -271,23 +256,22 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw corresponding errors when capture fingerprint result is not OK`() = runBlockingTest {
+    fun `should throw corresponding errors when capture fingerprint result is not OK`() = runTest {
         every { scannerV2.captureFingerprint(any()) } answers {
             (Single.just(CaptureFingerprintResult.FINGERPRINT_NOT_FOUND))
-        } andThen {
+        } andThenAnswer  {
             Single.just(CaptureFingerprintResult.DPI_UNSUPPORTED)
-        } andThen {
+        } andThenAnswer  {
             Single.just(CaptureFingerprintResult.UNKNOWN_ERROR)
         }
 
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns true
+        every { scannerWrapper["isLiveFeedbackAvailable"]() } returns true
 
 
         // first throws NoFingerDetectedException
         assertThrows<NoFingerDetectedException> {
-            scannerWrapperV2.captureFingerprint(
+            scannerWrapper.captureFingerprint(
                 CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
                 1000,
                 50
@@ -295,7 +279,7 @@ class ScannerWrapperV2Test {
         }
         // and then throws UnexpectedScannerException
         assertThrows<UnexpectedScannerException> {
-            scannerWrapperV2.captureFingerprint(
+            scannerWrapper.captureFingerprint(
                 CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
                 1000,
                 50
@@ -303,7 +287,7 @@ class ScannerWrapperV2Test {
         }
         // and then throws UnknownScannerIssueException
         assertThrows<UnknownScannerIssueException> {
-            scannerWrapperV2.captureFingerprint(
+            scannerWrapper.captureFingerprint(
                 CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
                 1000,
                 50
@@ -313,24 +297,22 @@ class ScannerWrapperV2Test {
 
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw UnavailableVero2FeatureException when startLiveFeedback is called and live feedback is not available`() = runBlockingTest {
-        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns false
+    fun `should throw UnavailableVero2FeatureException when startLiveFeedback is called and live feedback is not available`() = runTest {
+        every { scannerWrapper["isLiveFeedbackAvailable"]() } returns false
 
         assertThrows<UnavailableVero2FeatureException> {
-            scannerWrapperV2.startLiveFeedback()
+            scannerWrapper.startLiveFeedback()
         }
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should not turn off(on) the Un20 sensor when sensorShutdown(sensorWakeup) is called and the sensor's current state is off(on)`() = runBlockingTest {
+    fun `should not turn off(on) the Un20 sensor when sensorShutdown(sensorWakeup) is called and the sensor's current state is off(on)`() = runTest {
         every { scannerV2.getUn20Status() } returns Single.just(false) andThen Single.just(true)
         every { scannerV2.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
         every { scannerV2.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
 
-        scannerWrapperV2.sensorShutDown()
-        scannerWrapperV2.sensorWakeUp()
+        scannerWrapper.sensorShutDown()
+        scannerWrapper.sensorWakeUp()
 
         verify(exactly = 0) {
             scannerV2.turnUn20OffAndAwaitStateChangeEvent()
@@ -339,37 +321,34 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should turn on the Un20 sensor when sensorWakeup is called and the sensor's current state is off`() = runBlockingTest {
+    fun `should turn on the Un20 sensor when sensorWakeup is called and the sensor's current state is off`() = runTest {
         every { scannerV2.getUn20Status() } returns Single.just(false)
         every { scannerV2.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
 
-        scannerWrapperV2.sensorWakeUp()
+        scannerWrapper.sensorWakeUp()
 
         verify(exactly = 1) { scannerV2.turnUn20OnAndAwaitStateChangeEvent() }
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should turn off the Un20 sensor when sensorShutdown is called and the sensor's current state is on`() = runBlockingTest {
+    fun `should turn off the Un20 sensor when sensorShutdown is called and the sensor's current state is on`() = runTest {
         every { scannerV2.getUn20Status() } returns Single.just(true)
         every { scannerV2.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
 
-        scannerWrapperV2.sensorShutDown()
+        scannerWrapper.sensorShutDown()
 
         verify(exactly = 1) { scannerV2.turnUn20OffAndAwaitStateChangeEvent() }
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should complete execution successfully when setting scanner UI to default, when startLiveFeedback is called`() = runBlockingTest {
-        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns true
+    fun `should complete execution successfully when setting scanner UI to default, when startLiveFeedback is called`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns true
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
         every { scannerV2.getImageQualityPreview() } returns Maybe.just(50)
 
         // get the job of the continuous feedback
         val job = launch {
-            scannerWrapperV2.startLiveFeedback()
+            scannerWrapper.startLiveFeedback()
         }
 
         // force-stop the continuous live feedback
@@ -377,24 +356,24 @@ class ScannerWrapperV2Test {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() = runBlockingTest {
-        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns true
+    fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns true
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
         every { scannerV2.setScannerLedStateDefault() } returns Completable.complete()
 
-        scannerWrapperV2.stopLiveFeedback()
+        scannerWrapper.stopLiveFeedback()
     }
 
     @Test
-    @ExperimentalCoroutinesApi
-    fun `should throw UnavailableVero2FeatureException when stopLiveFeedback is called and live feedback is not available`() = runBlockingTest {
-        every { scannerWrapperV2["isLiveFeedbackAvailable"]() } returns false
+    fun `should throw UnavailableVero2FeatureException when stopLiveFeedback is called and live feedback is not available`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns false
 
         assertThrows<UnavailableVero2FeatureException> {
-            scannerWrapperV2.stopLiveFeedback()
+            scannerWrapper.stopLiveFeedback()
         }
     }
-
-
+    @Test
+    fun `test imageTransfer should be supported in v2 scanners`() {
+        assertThat(scannerWrapper.isImageTransferSupported()).isTrue()
+    }
 }

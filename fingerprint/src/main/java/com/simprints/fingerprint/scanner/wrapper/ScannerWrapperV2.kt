@@ -24,7 +24,6 @@ import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedExceptio
 import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.infra.logging.Simber
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
@@ -33,7 +32,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.rx2.await
 import java.io.IOException
-import kotlin.coroutines.suspendCoroutine
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
@@ -154,25 +152,24 @@ class ScannerWrapperV2(
             scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
         }.repeat()
 
-    override suspend fun stopLiveFeedback()=
-        suspendCoroutine<Unit> {
-            if (isLiveFeedbackAvailable()) {
-                scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-                    .andThen(scannerV2.setScannerLedStateDefault())
-            } else {
-                Completable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK))
-            }
+    override suspend fun stopLiveFeedback() {
+        if (isLiveFeedbackAvailable()) {
+            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
+            scannerV2.setScannerLedStateDefault()
+        } else {
+            throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
         }
+    }
 
 
-    private fun ScannerV2.ensureUn20State(desiredState: Boolean): Completable =
+    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) =
         getUn20Status().flatMapCompletable { actualState ->
             when {
                 desiredState && !actualState -> turnUn20OnAndAwaitStateChangeEvent()
                 !desiredState && actualState -> turnUn20OffAndAwaitStateChangeEvent()
                 else -> Completable.complete()
             }
-        }
+        }.await()
 
     override suspend fun captureFingerprint(
         captureFingerprintStrategy: CaptureFingerprintStrategy,
@@ -319,9 +316,6 @@ class ScannerWrapperV2(
 
     private fun <T> Single<T>.wrapErrorsFromScanner() =
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
-
-    private fun <T> Observable<T>.wrapErrorsFromScanner() =
-        onErrorResumeNext { e: Throwable -> Observable.error(wrapErrorFromScanner(e)) }
 
 
     private fun <T> Flow<T>.mapPotentialErrorFromScanner() =

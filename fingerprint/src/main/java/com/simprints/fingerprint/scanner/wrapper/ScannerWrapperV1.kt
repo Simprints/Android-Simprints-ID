@@ -57,7 +57,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     //Vero 1 scanners doesn't support image transfer
     override fun isImageTransferSupported(): Boolean = false
 
-    override suspend fun connect() = suspendCoroutine<Unit> { cont ->
+    override suspend fun connect() = suspendCoroutine { cont ->
         scannerV1.connect(ScannerCallbackWrapper(
             success = {
                 cont.resume(Unit)
@@ -86,14 +86,14 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     }
 
 
-    override suspend fun disconnect() = suspendCoroutine<Unit> { cont ->
+    override suspend fun disconnect() = suspendCoroutine { cont ->
         scannerV1.disconnect(ScannerCallbackWrapper(
             success = { cont.resume(Unit) },
             failure = { cont.resume(Unit) }
         ))
     }
 
-    override suspend fun sensorWakeUp() = suspendCoroutine<Unit> { cont ->
+    override suspend fun sensorWakeUp() = suspendCoroutine { cont ->
         scannerV1.un20Wakeup(ScannerCallbackWrapper(
             success = {
                 cont.resume(Unit)
@@ -128,7 +128,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     override fun isLiveFeedbackAvailable(): Boolean = false
 
     override suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int) =
-        suspendCancellableCoroutine<CaptureFingerprintResponse> { cont ->
+        suspendCancellableCoroutine { cont ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, cont))
 
             cont.invokeOnCancellation {

@@ -15,20 +15,16 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevision
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.*
-import com.simprints.id.data.license.remote.ApiLicense
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.common.mock.MockTimer
 import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import retrofit2.HttpException
-import retrofit2.Response
 
 class OtaViewModelTest {
 
@@ -171,7 +167,7 @@ class OtaViewModelTest {
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
         coEvery { scannerMock.performStmOta(any()) } returns flow {
             emit(STM_OTA_STEPS[0])
-            throw createBackendMaintenanceException()
+            throw BackendMaintenanceException(estimatedOutage = null)
         }
 
         otaViewModel.startOta(
@@ -211,14 +207,6 @@ class OtaViewModelTest {
             assertThat(it.recoveryStrategy).isEqualTo(OtaRecoveryStrategy.SOFT_RESET)
             assertThat(it.remainingOtas).isEqualTo(listOf(AvailableOta.UN20))
         }
-    }
-
-    private fun createBackendMaintenanceException(): HttpException {
-        val errorResponse =
-            "{\"error\":\"002\"}"
-        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
-        val mockResponse = Response.error<ApiLicense>(503, errorResponseBody)
-        return HttpException(mockResponse)
     }
 
     private fun Iterable<Float?>.assertAlmostContainsExactlyElementsIn(

@@ -174,7 +174,7 @@ class CollectFingerprintsViewModel(
 
     fun isImageTransferRequired(): Boolean =
         fingerprintPreferencesManager.saveFingerprintImagesStrategy.isImageTransferRequired()
-            && scannerManager.scanner?.isImageTransferSupported() ?: false
+            && scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
         viewModelScope.launch(dispatcherProvider.io()) {

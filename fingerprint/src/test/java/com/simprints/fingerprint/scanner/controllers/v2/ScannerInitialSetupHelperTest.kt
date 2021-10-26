@@ -150,7 +150,7 @@ class ScannerInitialSetupHelperTest {
 
         }
 
-        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
+        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS,AvailableOta.STM, AvailableOta.UN20))
         coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
     }
 
@@ -199,7 +199,7 @@ class ScannerInitialSetupHelperTest {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, { version = it }, { batteryInfo = it })
         }
 
-        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
+        assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS,AvailableOta.STM, AvailableOta.UN20))
         coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
 
         assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
