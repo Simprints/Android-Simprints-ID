@@ -21,7 +21,10 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlin.concurrent.schedule
 
@@ -48,10 +51,11 @@ class OtaViewModel(
             try {
                 availableOtas.asFlow()
                     .flatMapConcat {
-            it.toFlowOfSteps().onCompletion { error ->
+                        it.toFlowOfSteps().onCompletion { error ->
                             if (error == null) {
                                 remainingOtas.remove(it)
-        }}
+                            }
+                        }
                     }
                     .onCompletion { error ->
                         if (error == null) {
