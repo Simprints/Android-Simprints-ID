@@ -10,9 +10,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.LOCAL
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.REMOTE
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager

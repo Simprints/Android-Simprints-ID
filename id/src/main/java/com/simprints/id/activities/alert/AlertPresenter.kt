@@ -10,9 +10,7 @@ import com.simprints.id.R
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
-import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
-import com.simprints.id.domain.alert.AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED
-import com.simprints.id.domain.alert.AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED
+import com.simprints.id.domain.alert.AlertActivityViewModel.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.exitformhandler.ExitFormHelper

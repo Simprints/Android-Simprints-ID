@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.repository
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
@@ -9,7 +10,6 @@ import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
-import com.simprints.core.tools.time.TimeHelper
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

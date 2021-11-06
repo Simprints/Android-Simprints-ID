@@ -1,11 +1,11 @@
 package com.simprints.id.activities.requestLogin
 
 import android.os.Bundle
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.databinding.ActivityFrontBinding
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName

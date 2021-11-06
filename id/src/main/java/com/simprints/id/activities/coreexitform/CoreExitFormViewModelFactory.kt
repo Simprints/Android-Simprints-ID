@@ -2,7 +2,6 @@ package com.simprints.id.activities.coreexitform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.eventsystem.event.EventRepository
 
 class CoreExitFormViewModelFactory(private val eventRepository: com.simprints.eventsystem.event.EventRepository) : ViewModelProvider.Factory {
 

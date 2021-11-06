@@ -1,9 +1,7 @@
 package com.simprints.id.services.sync.events.up
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.FAILED
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope

@@ -7,11 +7,7 @@ import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
@@ -20,9 +16,7 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -38,13 +32,8 @@ import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_I
 import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
 import com.simprints.logging.Simber
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent

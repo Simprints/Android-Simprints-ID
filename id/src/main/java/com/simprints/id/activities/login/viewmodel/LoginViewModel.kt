@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.secure.AuthenticationHelper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

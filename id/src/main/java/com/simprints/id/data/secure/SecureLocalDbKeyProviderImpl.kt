@@ -1,9 +1,7 @@
 package com.simprints.id.data.secure
 
 import android.content.SharedPreferences
-import android.util.Base64.DEFAULT
-import android.util.Base64.decode
-import android.util.Base64.encodeToString
+import android.util.Base64.*
 import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider

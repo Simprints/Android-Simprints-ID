@@ -35,7 +35,6 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
-import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
@@ -46,6 +45,7 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.config.RemoteConfigWorker
+import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker

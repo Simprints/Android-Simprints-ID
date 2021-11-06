@@ -13,12 +13,8 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf

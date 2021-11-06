@@ -6,9 +6,7 @@ import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOffline
-import com.simprints.id.activities.setup.SetupActivity.ViewState.DeviceOnline
-import com.simprints.id.activities.setup.SetupActivity.ViewState.ModalitiesInstalled
+import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.device.DeviceManager
@@ -17,7 +15,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

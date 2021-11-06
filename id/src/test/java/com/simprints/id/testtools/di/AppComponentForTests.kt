@@ -6,9 +6,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenterTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
-import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivityTest
-import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragmentTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest

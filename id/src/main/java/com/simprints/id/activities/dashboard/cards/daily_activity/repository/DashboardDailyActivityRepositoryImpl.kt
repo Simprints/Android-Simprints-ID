@@ -1,10 +1,10 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.repository
 
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
-import com.simprints.core.tools.time.TimeHelper
 
 class DashboardDailyActivityRepositoryImpl(
     private val localDataSource: DailyActivityLocalDataSource,

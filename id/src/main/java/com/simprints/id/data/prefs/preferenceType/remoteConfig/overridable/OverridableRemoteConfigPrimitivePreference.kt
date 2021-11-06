@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable
 
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPreference.Companion.IS_OVERRIDDEN_DEFAULT_VALUE

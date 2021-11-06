@@ -1,12 +1,12 @@
 package com.simprints.id.network
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.core.network.NetworkConstants.Companion.BASE_URL_SUFFIX
 import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
