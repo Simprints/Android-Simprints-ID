@@ -1,10 +1,10 @@
 package com.simprints.face.models
 
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import java.util.*
 

@@ -7,13 +7,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.APP_NOT_WORKING
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.OTHER
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.REFUSED_DATA_CONCERNS
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.REFUSED_NOT_PRESENT
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.REFUSED_PERMISSION
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.REFUSED_RELIGION
-import com.simprints.face.controllers.core.events.model.RefusalAnswer.REFUSED_YOUNG
+import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 import com.simprints.logging.Simber
 
 class ExitFormViewModel(

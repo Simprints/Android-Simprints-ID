@@ -2,7 +2,6 @@ package com.simprints.id.activities.faceexitform
 
 import androidx.lifecycle.ViewModel
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.data.exitform.toRefusalEventAnswer

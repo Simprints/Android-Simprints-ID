@@ -6,15 +6,7 @@ import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImplTest
-import com.simprints.id.di.AppComponent
-import com.simprints.id.di.AppModule
-import com.simprints.id.di.DashboardActivityModule
-import com.simprints.id.di.DataModule
-import com.simprints.id.di.PreferencesModule
-import com.simprints.id.di.SecurityModule
-import com.simprints.id.di.SerializerModule
-import com.simprints.id.di.SyncModule
-import com.simprints.id.di.ViewModelModule
+import com.simprints.id.di.*
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

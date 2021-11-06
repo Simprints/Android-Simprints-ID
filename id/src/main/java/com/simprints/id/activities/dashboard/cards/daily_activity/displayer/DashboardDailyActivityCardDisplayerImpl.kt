@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import com.simprints.core.tools.extentions.nand
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
-import com.simprints.core.tools.time.TimeHelper
 
 class DashboardDailyActivityCardDisplayerImpl(
     private val timeHelper: TimeHelper

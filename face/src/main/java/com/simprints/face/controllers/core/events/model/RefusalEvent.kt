@@ -1,9 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.moduleapi.face.responses.IFaceExitReason
 import com.simprints.eventsystem.event.domain.models.RefusalEvent as CoreRefusalEvent
-import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer as CoreRefusalAnswer
 
 @Keep
 class RefusalEvent(

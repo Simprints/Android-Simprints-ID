@@ -7,7 +7,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.CornerTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module

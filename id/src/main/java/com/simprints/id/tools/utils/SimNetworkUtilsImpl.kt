@@ -2,10 +2,10 @@ package com.simprints.id.tools.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionType
-import android.net.NetworkCapabilities
 
 
 open class SimNetworkUtilsImpl(val ctx: Context) : SimNetworkUtils {

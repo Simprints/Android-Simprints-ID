@@ -16,11 +16,11 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
-import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.face.models.PreviewFrame
 import com.simprints.face.models.Size
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.livedata.testObserver
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
 import org.junit.Rule
 import org.junit.Test

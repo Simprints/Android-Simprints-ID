@@ -14,8 +14,8 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.R
-import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
 import com.simprints.id.activities.BaseUnitTest
+import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
 import com.simprints.id.commontesttools.moduleApi.AppEnrolRequestModuleApi
 import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.app.requests.IAppRequest
