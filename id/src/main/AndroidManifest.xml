@@ -37,7 +37,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
-            android:launchMode="standard"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,12 +47,11 @@
         </activity>
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
-            android:launchMode="standard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Launcher" />
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
-            android:launchMode="standard"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.clientapp.REGISTER_LAST_BIOMETRICS" />
