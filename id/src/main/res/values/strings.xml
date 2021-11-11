@@ -30,7 +30,7 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- First argument in consent text should always be program name, second is modality specific access/use case text -->
-    <string name="consent_enrol_only">I\'d like to %1$s to enrol you in %2$s.&#160;</string>
+    <string name="consent_enrol_only">I\'d like to %2$s to enrol you in %1$s.&#160;</string>
     <string name="consent_enrol">I\'d like to %2$s to enrol you in %1$s and identify you in the future.&#160;</string>
     <string name="consent_id_verify">I\'d like to %2$s to find your records for %1$s.&#160;</string>
     <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your %1$s and current location.&#160;</string>
