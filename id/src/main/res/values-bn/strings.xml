@@ -198,7 +198,7 @@
     <string name="modality_downloading">"ডাউনলোড হচ্ছে "</string>
     <string name="modality_installing">ইন্সটল হচ্ছে</string>
     <string name="biometrics_access_fingerprint_face">আঙ্গুলের ছাপের তথ্য, ছবি</string>
-    <string name="consent_enrol_only">আমি আপনাকে %1$s এ নিবন্ধন করতে চাই %2$s </string>
+    <string name="consent_enrol_only">আমি আপনাকে %2$s এ নিবন্ধন করতে চাই %1$s </string>
     <string name="consent_share_data_no">সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %1$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে। </string>
     <string name="consent_parental_id_verify">"আমি  %2$s তাঁকে খুঁজে বের করতে চাই %1$s "</string>
     <string name="consent_parental_share_data_no">সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক প্রতিষ্ঠানের কাছে তাঁর %1$s এবং বর্তমান ঠিকানা সংরক্ষিত আছে। </string>
