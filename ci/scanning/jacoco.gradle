@@ -4,7 +4,11 @@ jacoco {
     toolVersion = "${Plugins.jacoco}"
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+task jacocoTestReport(type: JacocoReport) {
+    // Run all debug unit test gradle tasks before generating jacoco reports
+    dependsOn tasks.withType(Test).matching {
+        it.name.toLowerCase().contains("debug")
+    }
 
     reports {
         xml.enabled = true
