@@ -45,8 +45,6 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     lateinit var appRequest: AppRequest
 
-    private var newActivity = true
-
     private val observerForNextStep = Observer<Step?> {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
@@ -108,7 +106,6 @@ class OrchestratorActivity : BaseSplitActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         vm.restoreState()
-        newActivity = false
     }
 
     override fun onResume() {
@@ -117,10 +114,6 @@ class OrchestratorActivity : BaseSplitActivity() {
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 
-        if (newActivity) {
-            vm.clearState()
-        }
-        newActivity = false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

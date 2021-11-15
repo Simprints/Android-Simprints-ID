@@ -57,6 +57,7 @@ dependencies {
 
     // Support
     implementation(Dependencies.AndroidX.appcompat)
+    implementation(Dependencies.AndroidX.security)
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.Lifecycle.scope)
 

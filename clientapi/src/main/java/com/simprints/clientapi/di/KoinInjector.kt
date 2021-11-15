@@ -1,6 +1,7 @@
 package com.simprints.clientapi.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
@@ -23,6 +24,11 @@ import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.clientapi.tools.DeviceManagerImpl
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.id.orchestrator.cache.HotCacheImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -58,9 +64,18 @@ object KoinInjector {
         }
 
     private fun Module.defineBuildersForDomainManagers() {
-        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
         factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
         factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext(), get()) }
+        buildClientApiSessionEventsManager()
+    }
+
+    private fun Module.buildClientApiSessionEventsManager() {
+        factory<StepEncoder> { StepEncoderImpl() }
+        factory<SharedPreferences> {
+            EncryptedSharedPreferencesBuilderImpl(androidContext()).buildEncryptedSharedPreferences()
+        }
+        factory<HotCache> { HotCacheImpl(get() , get()) }
+        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get(),get()) }
     }
 
     private fun Module.defineBuildersForPresenters() {
