@@ -71,12 +71,8 @@ open class OrchestratorManagerImpl(
         proceedToNextStepOrAppResponse()
     }
 
-    override fun clearState() {
-        hotCache.clearSteps()
-    }
 
     override fun saveState() {
-        hotCache.clearSteps()
         modalitiesFlow.steps.forEach {
             hotCache.save(it)
         }

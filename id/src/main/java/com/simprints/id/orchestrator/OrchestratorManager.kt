@@ -20,6 +20,5 @@ interface OrchestratorManager {
     suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?)
 
     suspend fun restoreState()
-    fun clearState()
     fun saveState()
 }

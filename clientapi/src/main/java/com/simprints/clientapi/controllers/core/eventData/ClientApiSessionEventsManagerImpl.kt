@@ -9,6 +9,7 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.id.orchestrator.cache.HotCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,10 +19,13 @@ import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScree
 class ClientApiSessionEventsManagerImpl(
     private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
+    private val hotCache: HotCache,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
+        // Clear cached steps before creating a new session
+        hotCache.clearSteps()
         coreEventRepository.createSession()
 
         inBackground(dispatcher) {

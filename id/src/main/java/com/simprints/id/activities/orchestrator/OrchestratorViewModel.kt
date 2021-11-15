@@ -52,9 +52,6 @@ class OrchestratorViewModel(
         }
     }
 
-    fun clearState() {
-        orchestratorManager.clearState()
-    }
 
     fun saveState() {
         orchestratorManager.saveState()
