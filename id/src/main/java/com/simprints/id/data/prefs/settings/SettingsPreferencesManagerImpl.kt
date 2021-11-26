@@ -423,7 +423,7 @@ open class SettingsPreferencesManagerImpl(
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
         const val SYNC_DESTINATION_SETTINGS_KEY = "SyncDestination"
-        val SYNC_DESTINATION_SETTINGS_DEFAULT = listOf(SyncDestinationSetting.SIMPRINTS)
+        val SYNC_DESTINATION_SETTINGS_DEFAULT = emptyList<SyncDestinationSetting>()
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
