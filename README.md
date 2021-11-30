@@ -92,6 +92,10 @@ To create an universal apk that can be shared you need to:
 
 To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).
 
+## Deploying to a connected device
+After creating the universal apk from app bundle, run command to install apk on connected device.
+`bundletool install-apks --apks=/MyApp/my_app.apks`
+
 ## Deploying to the Google Play Store
 For a full guide go [here](https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+a+new+version) to get the complete breakdown. 
 
