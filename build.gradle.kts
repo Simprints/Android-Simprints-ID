@@ -11,7 +11,6 @@ buildscript {
         jcenter()
         mavenCentral()
         maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
-        maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://plugins.gradle.org/m2/")
     }
 

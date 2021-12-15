@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.simprints.core.login.LoginInfoManager
@@ -53,10 +54,15 @@ open class FirebaseManagerImpl(
         withContext(dispatcher.io()) {
             // Projects that were signed in and then updated to 2021.2.0 need to check the
             // previous Firebase project until they login again.
-            val result =
-                FirebaseAuth.getInstance(getLegacyAppFallback()).getAccessToken(false).await()
+            val result = try {
+                FirebaseAuth.getInstance(getLegacyAppFallback())
+                    .getAccessToken(false).await()
+            } catch (ex: FirebaseNoSignedInUserException) {
+                Simber.d(ex)
+                null
+            }
 
-            result.token?.let {
+            result?.token?.let {
                 cacheTokenClaims(it)
                 it
             } ?: throw RemoteDbNotSignedInException()

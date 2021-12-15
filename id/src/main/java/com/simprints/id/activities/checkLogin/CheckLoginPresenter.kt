@@ -40,8 +40,6 @@ abstract class CheckLoginPresenter(
             checkSignedInOrThrow()
             handleSignedInUser()
         } catch (t: Throwable) {
-            Simber.e(t)
-
             when (t) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
