@@ -1,5 +1,6 @@
 package com.simprints.eventsystem.event.domain.validators
 
+import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.eventsystem.exceptions.validator.GuidSelectEventValidatorException
 import com.simprints.eventsystem.sampledata.createGuidSelectionEvent
 import com.simprints.eventsystem.sampledata.createIdentificationCallbackEvent
@@ -25,7 +26,7 @@ class GuidSelectionEventValidatorTest {
 
     @Test
     fun validate_shouldThrowIfGuidEventIsAlreadyPresent() {
-        shouldThrow<GuidSelectEventValidatorException> {
+        shouldThrow<DuplicateGuidSelectEventValidatorException> {
             val currentEvents = listOf(createSessionCaptureEvent(), createGuidSelectionEvent())
             validator.validate(currentEvents, createGuidSelectionEvent())
         }
