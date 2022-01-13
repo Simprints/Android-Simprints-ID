@@ -6,8 +6,8 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
-import com.simprints.id.data.consent.longconsent.LongConsentLocalDataSource
-import com.simprints.id.data.consent.longconsent.LongConsentRemoteDataSource
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository

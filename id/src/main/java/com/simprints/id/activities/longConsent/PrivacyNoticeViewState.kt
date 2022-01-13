@@ -7,6 +7,5 @@ sealed class PrivacyNoticeViewState {
 
     data class ConsentNotAvailable(val language: String) : PrivacyNoticeViewState()
 
-    data class DownloadInProgress(val language: String,
-                                  val progress: Int) : PrivacyNoticeViewState()
+    data class DownloadInProgress(val language: String) : PrivacyNoticeViewState()
 }

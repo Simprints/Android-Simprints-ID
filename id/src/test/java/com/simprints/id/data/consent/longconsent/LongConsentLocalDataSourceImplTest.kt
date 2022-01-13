@@ -2,6 +2,7 @@ package com.simprints.id.data.consent.longconsent
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -39,7 +40,7 @@ class LongConsentLocalDataSourceImplTest {
 
     @Test
     fun createLocalFilePath_shouldHaveTheRightPath() {
-        val actualFilePathForProject = longConsentLocalDataSource.filePathForProject.toString()
+        val actualFilePathForProject = longConsentLocalDataSource.projectFilePath.toString()
 
         assertThat(actualFilePathForProject).contains("${longConsentsPath}${File.separator}${PROJECT_ID_TEST}")
     }
