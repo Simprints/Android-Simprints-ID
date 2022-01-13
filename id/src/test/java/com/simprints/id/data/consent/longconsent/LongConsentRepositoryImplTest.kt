@@ -93,8 +93,9 @@ class LongConsentRepositoryImplTest {
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
-            assertThat(size).isEqualTo(1)
-            assertThat(get(0)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
+            assertThat(get(1)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
         }
     }
 }
