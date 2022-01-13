@@ -1,4 +1,4 @@
-package com.simprints.id.data.consent.longconsent
+package com.simprints.id.data.consent.longconsent.local
 
 import java.io.File
 

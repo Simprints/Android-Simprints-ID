@@ -1,16 +1,17 @@
-package com.simprints.id.data.consent.longconsent
+package com.simprints.id.data.consent.longconsent.local
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.login.LoginInfoManager
 import java.io.BufferedReader
 import java.io.File
 
-class LongConsentLocalDataSourceImpl(absolutePath: String,
-                                     private val loginInfoManager: LoginInfoManager
+class LongConsentLocalDataSourceImpl(
+    absolutePath: String,
+    private val loginInfoManager: LoginInfoManager
 ) : LongConsentLocalDataSource {
 
     companion object {
-        const val FILE_PATH = "long-consents"
+        const val FOLDER = "long-consents"
         const val FILE_TYPE = "txt"
     }
 
@@ -20,45 +21,40 @@ class LongConsentLocalDataSourceImpl(absolutePath: String,
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val filePathForProject: File by lazy {
+    internal val projectFilePath: File by lazy {
         createLocalFilePath(baseFilePath.absolutePath)
     }
 
     override fun isLongConsentPresentInLocal(language: String): Boolean {
         val fileName = "$language.${FILE_TYPE}"
-        return File(filePathForProject, fileName).exists()
+        return File(projectFilePath, fileName).exists()
     }
 
     override fun createFileForLanguage(language: String) =
-        File(filePathForProject, "$language.$FILE_TYPE")
+        File(projectFilePath, "$language.$FILE_TYPE")
 
-    private fun createBaseFilePath(absolutePath: String) = File(absolutePath +
-        File.separator +
-        FILE_PATH)
+    private fun createBaseFilePath(absolutePath: String) =
+        File(absolutePath + File.separator + FOLDER)
 
     private fun createLocalFilePath(absolutePath: String): File {
-        val filePath = File(absolutePath +
-            File.separator +
-            loginInfoManager.getSignedInProjectIdOrEmpty())
+        val pathName = absolutePath + File.separator + loginInfoManager.getSignedInProjectIdOrEmpty()
+        val file = File(pathName)
 
-        if (!filePath.exists()) {
-            filePath.mkdirs()
+        if (!file.exists()) {
+            file.mkdirs()
         }
 
-        return filePath
+        return file
     }
 
     override fun deleteLongConsents() {
-        getAllLongConsentFiles()?.forEach { baseFile ->
+        baseFilePath.listFiles()?.forEach { baseFile ->
             if (baseFile.isDirectory) {
                 deleteFilesInDirectory(baseFile)
             }
             baseFile.delete()
         }
     }
-
-    private fun getAllLongConsentFiles() =
-        baseFilePath.listFiles()
 
     private fun deleteFilesInDirectory(baseFile: File) {
         baseFile.listFiles().forEach { it.delete() }

@@ -13,6 +13,10 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.consent.longconsent.*
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
@@ -136,9 +140,9 @@ open class DataModule {
     @Provides
     open fun provideLongConsentRemoteDataSource(
         loginInfoManager: LoginInfoManager,
-        remoteDbManager: RemoteDbManager
+        simApiClientFactory: SimApiClientFactory
     ): LongConsentRemoteDataSource =
-        LongConsentRemoteDataSourceImpl(loginInfoManager, remoteDbManager)
+        LongConsentRemoteDataSourceImpl(loginInfoManager, simApiClientFactory)
 
     @Provides
     open fun provideLongConsentRepository(
