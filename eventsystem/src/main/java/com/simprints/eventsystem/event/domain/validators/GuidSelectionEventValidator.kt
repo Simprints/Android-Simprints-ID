@@ -3,6 +3,7 @@ package com.simprints.eventsystem.event.domain.validators
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
+import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.eventsystem.exceptions.validator.GuidSelectEventValidatorException
 
 class GuidSelectionEventValidator : EventValidator {
@@ -17,7 +18,7 @@ class GuidSelectionEventValidator : EventValidator {
 
             currentEvents.filter { it.payload.type == GUID_SELECTION }.forEach {
                 if (it.id != eventToAdd.id) {
-                    throw GuidSelectEventValidatorException("GuidSelectionEvent already exist in session ${currentSession?.id}")
+                    throw DuplicateGuidSelectEventValidatorException("GuidSelectionEvent already exist in session ${currentSession?.id}")
                 }
             }
 

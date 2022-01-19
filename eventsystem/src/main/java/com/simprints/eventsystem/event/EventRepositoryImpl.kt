@@ -21,6 +21,7 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
+import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -266,7 +267,10 @@ open class EventRepositoryImpl(
         try {
             block()
         } catch (t: Throwable) {
-            Simber.e(t)
+            // prevent crashlytics logging of duplicate guid-selection
+            if (t is DuplicateGuidSelectEventValidatorException) Simber.d(t)
+            else Simber.e(t)
+
             throw t
         }
 
