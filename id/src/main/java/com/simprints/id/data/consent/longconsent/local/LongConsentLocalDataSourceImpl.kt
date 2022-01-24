@@ -53,7 +53,7 @@ class LongConsentLocalDataSourceImpl(
     }
 
     override fun deleteLongConsents() {
-        baseFilePath.listFiles()?.forEach { baseFile ->
+        getLongConsentFiles()?.forEach { baseFile ->
             if (baseFile.isDirectory) {
                 deleteFilesInDirectory(baseFile)
             }
@@ -61,8 +61,10 @@ class LongConsentLocalDataSourceImpl(
         }
     }
 
+    private fun getLongConsentFiles() = baseFilePath.listFiles()
+
     private fun deleteFilesInDirectory(baseFile: File) {
-        baseFile.listFiles().forEach { it.delete() }
+        baseFile.listFiles()?.forEach { it.delete() }
     }
 
     override fun getLongConsentText(language: String) =
