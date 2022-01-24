@@ -1,14 +1,13 @@
-package com.simprints.id.data.consent.longconsent
+package com.simprints.id.data.consent.longconsent.local
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
 import org.junit.Test
 import java.io.File
+
 
 class LongConsentLocalDataSourceImplTest {
 
@@ -50,5 +49,41 @@ class LongConsentLocalDataSourceImplTest {
         val actualFile = longConsentLocalDataSource.createFileForLanguage(DEFAULT_LANGUAGE).toString()
 
         assertThat(actualFile).contains("${longConsentsPath}${File.separator}${PROJECT_ID_TEST}${File.separator}${DEFAULT_LANGUAGE}.txt")
+    }
+
+    @Test
+    fun deleteConsentFolders_shouldRemove_allRelatedFiles_andFolders() {
+        longConsentLocalDataSource = spyk(LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock))
+
+        val file: File = mockk(relaxed = true) {
+            every { delete() } returns true
+        }
+
+        val directory: File = mockk(relaxed = true) {
+            every { isDirectory } returns true
+            every { delete() } returns true
+            every { listFiles() } returns arrayOf(file)
+        }
+
+        every { longConsentLocalDataSource.baseFilePath } returns mockk {
+            every { listFiles() } returns arrayOf(directory)
+        }
+
+
+        longConsentLocalDataSource.deleteLongConsents()
+
+        verify(exactly = 1) { file.delete() }
+        verify(exactly = 1) { directory.delete() }
+    }
+
+    @Test
+    fun getLongConsent_shouldReturn_anEmptyString_whenLongConsent_isNotAvailable() {
+        longConsentLocalDataSource = spyk(LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock)) {
+            every { isLongConsentPresentInLocal(DEFAULT_LANGUAGE) } returns false
+        }
+
+        val longConsent = longConsentLocalDataSource.getLongConsentText(DEFAULT_LANGUAGE)
+
+        assertThat(longConsent.isEmpty()).isTrue()
     }
 }
