@@ -4,11 +4,11 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.logging.Simber
-import java.net.URL
 
 class LongConsentRemoteDataSourceImpl(
     private val loginInfoManager: LoginInfoManager,
-    private val simApiClientFactory: SimApiClientFactory
+    private val simApiClientFactory: SimApiClientFactory,
+    private val consentDownloader: (FileUrl) -> ByteArray
 ) : LongConsentRemoteDataSource {
 
     private val projectId by lazy {
@@ -20,7 +20,7 @@ class LongConsentRemoteDataSourceImpl(
         val longConsentRemoteApi = getLongConsentRemoteApi().api
         val fileUrl = longConsentRemoteApi.getLongConsentDownloadUrl(projectId, fileId)
         Simber.d("Downloading long consent file at %s", fileUrl.url)
-        val fileBytes = URL(fileUrl.url).readBytes()
+        val fileBytes = consentDownloader(fileUrl)
         return LongConsentRemoteDataSource.File(fileBytes)
     }
 

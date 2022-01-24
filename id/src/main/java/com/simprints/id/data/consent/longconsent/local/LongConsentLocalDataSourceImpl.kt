@@ -7,7 +7,7 @@ import java.io.File
 
 class LongConsentLocalDataSourceImpl(
     absolutePath: String,
-    private val loginInfoManager: LoginInfoManager
+    private val loginInfoManager: LoginInfoManager,
 ) : LongConsentLocalDataSource {
 
     companion object {
