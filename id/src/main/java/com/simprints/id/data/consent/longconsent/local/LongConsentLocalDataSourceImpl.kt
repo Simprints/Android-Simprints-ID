@@ -2,6 +2,7 @@ package com.simprints.id.data.consent.longconsent.local
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.id.tools.utils.FileUtil
 import java.io.BufferedReader
 import java.io.File
 
@@ -27,18 +28,22 @@ class LongConsentLocalDataSourceImpl(
 
     override fun isLongConsentPresentInLocal(language: String): Boolean {
         val fileName = "$language.${FILE_TYPE}"
-        return File(projectFilePath, fileName).exists()
+        return FileUtil.exists(projectFilePath.path, fileName)
     }
 
-    override fun createFileForLanguage(language: String) =
-        File(projectFilePath, "$language.$FILE_TYPE")
+    override fun createFileForLanguage(language: String): File {
+        val fileName = "$language.${FILE_TYPE}"
+        return FileUtil.createFile(projectFilePath.path, fileName)
+    }
 
-    private fun createBaseFilePath(absolutePath: String) =
-        File(absolutePath + File.separator + FOLDER)
+    private fun createBaseFilePath(absolutePath: String): File {
+        val filePath = absolutePath + File.separator + FOLDER
+        return FileUtil.createDirectory(filePath)
+    }
 
     private fun createLocalFilePath(absolutePath: String): File {
-        val pathName = absolutePath + File.separator + loginInfoManager.getSignedInProjectIdOrEmpty()
-        val file = File(pathName)
+        val filePath = absolutePath + File.separator + loginInfoManager.getSignedInProjectIdOrEmpty()
+        val file = FileUtil.createDirectory(filePath)
 
         if (!file.exists()) {
             file.mkdirs()
@@ -62,7 +67,8 @@ class LongConsentLocalDataSourceImpl(
 
     override fun getLongConsentText(language: String) =
         if (isLongConsentPresentInLocal(language)) {
-            val br: BufferedReader = createFileForLanguage(language).bufferedReader()
+            val file = createFileForLanguage(language)
+            val br: BufferedReader = FileUtil.readFile(file)
             val fileContent = StringBuffer("")
 
             br.forEachLine {
