@@ -12,7 +12,12 @@ import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
-import com.simprints.id.data.consent.longconsent.*
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
+import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
@@ -42,6 +47,7 @@ import com.simprints.id.network.BaseUrlProvider
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.FlowPreview
+import java.net.URL
 import javax.inject.Singleton
 
 @Module
@@ -136,9 +142,13 @@ open class DataModule {
     @Provides
     open fun provideLongConsentRemoteDataSource(
         loginInfoManager: LoginInfoManager,
-        remoteDbManager: RemoteDbManager
+        simApiClientFactory: SimApiClientFactory
     ): LongConsentRemoteDataSource =
-        LongConsentRemoteDataSourceImpl(loginInfoManager, remoteDbManager)
+        LongConsentRemoteDataSourceImpl(
+            loginInfoManager,
+            simApiClientFactory,
+            consentDownloader = { fileUrl -> URL(fileUrl.url).readBytes() }
+        )
 
     @Provides
     open fun provideLongConsentRepository(
