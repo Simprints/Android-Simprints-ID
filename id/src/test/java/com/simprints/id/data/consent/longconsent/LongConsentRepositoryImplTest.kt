@@ -2,6 +2,8 @@ package com.simprints.id.data.consent.longconsent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -65,23 +67,20 @@ class LongConsentRepositoryImplTest {
         val bytesSize = 2048
         val consentBytes = Random.nextBytes(bytesSize)
         val consentText = consentBytes.toString(Charset.defaultCharset())
-        val byteArrayInputStream = ByteArrayInputStream(consentBytes)
 
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
         every { longConsentLocalDataSourceMock.createFileForLanguage(any()) } returns File.createTempFile("test", null)
-        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } returns LongConsentRemoteDataSource.Stream(
-            byteArrayInputStream,
-            bytesSize.toLong()
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } returns LongConsentRemoteDataSource.File(
+            consentBytes
         )
 
         val states = mutableListOf<LongConsentFetchResult>()
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
-            assertThat(size).isEqualTo(3)
-            assertThat(get(0)).isEqualTo(LongConsentFetchResult.Progress(DEFAULT_LANGUAGE, 0.5f))
-            assertThat(get(1)).isEqualTo(LongConsentFetchResult.Progress(DEFAULT_LANGUAGE, 1f))
-            assertThat(get(2)).isEqualTo(LongConsentFetchResult.Succeed(DEFAULT_LANGUAGE, consentText))
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
+            assertThat(get(1)).isEqualTo(LongConsentFetchResult.Succeed(DEFAULT_LANGUAGE, consentText))
         }
     }
 
@@ -94,8 +93,9 @@ class LongConsentRepositoryImplTest {
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
-            assertThat(size).isEqualTo(1)
-            assertThat(get(0)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
+            assertThat(get(1)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
         }
     }
 }

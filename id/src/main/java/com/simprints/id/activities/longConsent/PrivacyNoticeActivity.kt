@@ -72,7 +72,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             when (it) {
                 is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
                 is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
-                is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress(it)
+                is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress()
             }
         })
     }
@@ -89,10 +89,6 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     private fun setConsentNotAvailable() {
         setNoPrivacyNoticeFound()
         showDownloadErrorToast()
-    }
-
-    private fun setDownloadProgress(downloadInProgressState: PrivacyNoticeViewState.DownloadInProgress) {
-        setDownloadProgress(downloadInProgressState.progress)
     }
 
     private fun setLongConsentText(text: String) {
@@ -116,7 +112,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         }
     }
 
-    private fun setDownloadProgress(progress: Int) {
+    private fun setDownloadProgress() {
         binding.apply {
             longConsentDownloadButton.isVisible = false
             longConsentTextView.isVisible = false
@@ -125,7 +121,6 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             longConsentHeader.text = getString(R.string.long_consent_downloading)
 
             longConsentDownloadProgressBar.isVisible = true
-            longConsentDownloadProgressBar.progress = progress
         }
     }
 
