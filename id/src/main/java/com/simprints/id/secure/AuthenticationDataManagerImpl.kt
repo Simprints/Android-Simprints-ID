@@ -7,6 +7,7 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.toDomainAuthData
+import com.simprints.id.tools.extensions.checkForMaintenanceAndThrow
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -28,7 +29,7 @@ class AuthenticationDataManagerImpl(
     private fun handleResponseError(response: Response<ApiAuthenticationData>): Nothing =
         when (response.code()) {
             401, 404 -> throw AuthRequestInvalidCredentialsException()
-            in 500..599 -> throw SimprintsInternalServerException()
+            in 500..599 -> response.checkForMaintenanceAndThrow()
             else -> throw HttpException(response)
         }
 
