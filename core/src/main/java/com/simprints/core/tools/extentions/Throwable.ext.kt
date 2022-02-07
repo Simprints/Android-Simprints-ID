@@ -19,3 +19,13 @@ fun Throwable.isBackendMaitenanceException(): Boolean {
     }
     return false
 }
+
+fun Throwable.getEstimatedOutage(): Long? {
+    return if (this.isBackendMaitenanceException()) {
+        val exception = this as HttpException
+        val headers = exception.response()?.headers()
+        headers?.get("Retry-After")?.toLong()
+    } else {
+        null
+    }
+}
