@@ -1,6 +1,9 @@
 package com.simprints.id.data.consent.longconsent
 
-import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.*
+import com.simprints.core.tools.extentions.isBackendMaitenanceException
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Failed
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.InProgress
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Succeed
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.logging.Simber
@@ -23,7 +26,11 @@ class LongConsentRepositoryImpl(
             }
         } catch (t: Throwable) {
             Simber.e(t)
-            emit(Failed(language, t))
+            if (t.isBackendMaitenanceException()) {
+                emit(Failed(language, t, true))
+            } else {
+                emit(Failed(language, t))
+            }
         }
     }
 
@@ -44,7 +51,13 @@ class LongConsentRepositoryImpl(
             flowCollector.emit(Succeed(language, file.readText()))
         } catch (t: Throwable) {
             Simber.e(t)
-            flowCollector.emit(Failed(language, t))
+            flowCollector.emit(
+                if (t.isBackendMaitenanceException()) {
+                    Failed(language, t, true)
+                } else {
+                    Failed(language, t)
+                }
+            )
         }
     }
 
