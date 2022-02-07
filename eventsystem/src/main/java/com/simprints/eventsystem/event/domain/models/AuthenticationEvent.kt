@@ -47,6 +47,7 @@ data class AuthenticationEvent(
             BAD_CREDENTIALS,
             OFFLINE,
             TECHNICAL_FAILURE,
+            BACKEND_MAINTENANCE,
             SAFETYNET_UNAVAILABLE,
             SAFETYNET_INVALID_CLAIM,
             UNKNOWN

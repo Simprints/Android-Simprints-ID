@@ -6,12 +6,22 @@ import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.exceptions.safe.BackendMaintenanceException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
-import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.AttestToken
+import com.simprints.id.secure.models.AuthenticationData
+import com.simprints.id.secure.models.Nonce
+import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.secure.models.PublicKeyString
+import com.simprints.id.secure.models.Token
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
@@ -21,19 +31,29 @@ import java.io.IOException
 @ExperimentalCoroutinesApi
 class ProjectAuthenticatorImplTest {
 
-    @MockK private lateinit var projectRepository: ProjectRepository
-    @MockK private lateinit var longConsentRepositoryMock: LongConsentRepository
-    @MockK private lateinit var secureDataManager: SecureLocalDbKeyProvider
-    @MockK private lateinit var projectSecretManager: ProjectSecretManager
-    @MockK private lateinit var signerManager: SignerManager
-    @MockK private lateinit var preferencesManagerMock: IdPreferencesManager
-    @MockK private lateinit var safetyNetClient: SafetyNetClient
-    @MockK private lateinit var authenticationDataManagerMock: AuthenticationDataManager
-    @MockK private lateinit var attestationManagerMock: AttestationManager
-    @MockK private lateinit var authManagerMock: AuthManager
+    @MockK
+    private lateinit var projectRepository: ProjectRepository
+    @MockK
+    private lateinit var longConsentRepositoryMock: LongConsentRepository
+    @MockK
+    private lateinit var secureDataManager: SecureLocalDbKeyProvider
+    @MockK
+    private lateinit var projectSecretManager: ProjectSecretManager
+    @MockK
+    private lateinit var signerManager: SignerManager
+    @MockK
+    private lateinit var preferencesManagerMock: IdPreferencesManager
+    @MockK
+    private lateinit var safetyNetClient: SafetyNetClient
+    @MockK
+    private lateinit var authenticationDataManagerMock: AuthenticationDataManager
+    @MockK
+    private lateinit var attestationManagerMock: AttestationManager
+    @MockK
+    private lateinit var authManagerMock: AuthManager
 
     private lateinit var authenticator: ProjectAuthenticator
-    
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -53,6 +73,15 @@ class ProjectAuthenticatorImplTest {
         coEvery { authManagerMock.requestAuthToken(any()) } throws IOException()
 
         assertThrows<IOException> {
+            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+        }
+    }
+
+    @Test
+    fun maintenance_authenticationShouldThrowMaintenanceException() = runBlockingTest {
+        coEvery { authManagerMock.requestAuthToken(any()) } throws BackendMaintenanceException()
+
+        assertThrows<BackendMaintenanceException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
     }
@@ -84,7 +113,10 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun safetyNetFailed_shouldThrowRightException() = runBlockingTest {
-        every { attestationManagerMock.requestAttestation(any(), any()) } throws SafetyNetException("", SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
+        every { attestationManagerMock.requestAttestation(any(), any()) } throws SafetyNetException(
+            "",
+            SafetyNetExceptionReason.SERVICE_UNAVAILABLE
+        )
 
         assertThrows<SafetyNetException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
@@ -107,7 +139,10 @@ class ProjectAuthenticatorImplTest {
     }
 
     private fun mockManagers() {
-        coEvery { authenticationDataManagerMock.requestAuthenticationData(any(), any()) } returns AuthenticationData(Nonce(""), PublicKeyString(""))
+        coEvery { authenticationDataManagerMock.requestAuthenticationData(any(), any()) } returns AuthenticationData(
+            Nonce(""),
+            PublicKeyString("")
+        )
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
         coEvery { authManagerMock.requestAuthToken(any()) } returns Token("", "", "", "")
         coEvery { projectRepository.fetchProjectConfigurationAndSave(any()) } returns mockk()
