@@ -7,6 +7,7 @@ import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.extentions.isBackendMaitenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -15,6 +16,7 @@ import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
@@ -34,10 +36,13 @@ class EventUpSyncUploaderWorker(
 
     @Inject
     lateinit var upSyncHelper: EventUpSyncHelper
+
     @Inject
     lateinit var eventSyncCache: EventSyncCache
+
     @Inject
     lateinit var jsonHelper: JsonHelper
+
     @Inject
     lateinit var dispatcher: DispatcherProvider
 
@@ -76,14 +81,16 @@ class EventUpSyncUploaderWorker(
             } catch (t: Throwable) {
                 Simber.d(t)
                 Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
-                retryOrFailIfCloudIntegrationError(t)
+                retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
             }
         }
     }
 
-    private fun retryOrFailIfCloudIntegrationError(t: Throwable): Result {
+    private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
         return if (t is SyncCloudIntegrationException) {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+        } else if (t.isBackendMaitenanceException()) {
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true))
         } else {
             retry(t)
         }
@@ -105,8 +112,8 @@ class EventUpSyncUploaderWorker(
         fun parseUpSyncInput(input: String): EventUpSyncScope {
             return try {
                 JsonHelper.fromJson(input)
-            } catch(ex: MissingKotlinParameterException) {
-                val result =  JsonHelper.fromJson<OldEventUpSyncScope>(input)
+            } catch (ex: MissingKotlinParameterException) {
+                val result = JsonHelper.fromJson<OldEventUpSyncScope>(input)
                 result.toNewScope()
             }
         }

@@ -192,6 +192,7 @@
     <string name="dashboard_sync_card_progress">Syncing… %1$s</string>
     <string name="dashboard_sync_card_sync_button">Sync now</string>
     <string name="dashboard_sync_card_failed_message">Sync failed. Please contact your supervisor</string>
+    <string name="dashboard_sync_card_failed_because_backend_error_message">Sync failed. The systems are under currently under maintenance. Please try again later.</string>
     <string name="dashboard_sync_card_no_modules_message">Please select modules to sync</string>
     <string name="dashboard_sync_card_no_modules_button">Modules</string>
     <string name="dashboard_sync_card_offline_message">Please turn on internet connection in settings</string>
