@@ -18,6 +18,7 @@ enum class FaceErrorReason {
     UNEXPECTED_ERROR,
     FACE_LICENSE_MISSING,
     FACE_LICENSE_INVALID,
+    BACKEND_MAINTENANCE_ERROR,
     FACE_CONFIGURATION_ERROR;
 
     fun toAppErrorReason(): AppErrorResponse.Reason = when (this) {
@@ -25,6 +26,7 @@ enum class FaceErrorReason {
         FACE_LICENSE_MISSING -> AppErrorResponse.Reason.FACE_LICENSE_MISSING
         FACE_LICENSE_INVALID -> AppErrorResponse.Reason.FACE_LICENSE_INVALID
         FACE_CONFIGURATION_ERROR -> AppErrorResponse.Reason.FACE_CONFIGURATION_ERROR
+        BACKEND_MAINTENANCE_ERROR -> AppErrorResponse.Reason.BACKEND_MAINTENANCE_ERROR
     }
 }
 
@@ -33,5 +35,6 @@ fun IFaceErrorReason.fromModuleApiToDomain() = when (this) {
     IFaceErrorReason.LICENSE_MISSING -> FaceErrorReason.FACE_LICENSE_MISSING
     IFaceErrorReason.LICENSE_INVALID -> FaceErrorReason.FACE_LICENSE_INVALID
     IFaceErrorReason.FACE_CONFIGURATION_ERROR -> FaceErrorReason.FACE_CONFIGURATION_ERROR
+    IFaceErrorReason.BACKEND_MAINTENANCE_ERROR -> FaceErrorReason.BACKEND_MAINTENANCE_ERROR
 }
 

@@ -4,6 +4,8 @@ import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.core.tools.extentions.getEstimatedOutage
+import com.simprints.core.tools.extentions.isBackendMaitenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.logging.Simber
@@ -29,10 +31,11 @@ class LicenseRemoteDataSourceImpl(
         }
     } catch (t: Throwable) {
         Simber.e(t)
-
         if (t is SyncCloudIntegrationException)
             handleCloudException(t)
-        else
+        else if (t.isBackendMaitenanceException()) {
+            ApiLicenseResult.BackendMaintenanceError(t.getEstimatedOutage())
+        } else
             ApiLicenseResult.Error(unknownErrorCode)
     }
 

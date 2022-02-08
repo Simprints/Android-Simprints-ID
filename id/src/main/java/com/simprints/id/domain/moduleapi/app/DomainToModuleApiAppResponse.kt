@@ -41,6 +41,7 @@ object DomainToModuleApiAppResponse {
             SETUP_MODALITY_DOWNLOAD_CANCELLED -> IAppErrorReason.SETUP_MODALITY_DOWNLOAD_CANCELLED
             FINGERPRINT_CONFIGURATION_ERROR -> IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR
             FACE_CONFIGURATION_ERROR -> IAppErrorReason.FACE_CONFIGURATION_ERROR
+            BACKEND_MAINTENANCE_ERROR -> IAppErrorReason.BACKEND_MAINTENANCE_ERROR
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)

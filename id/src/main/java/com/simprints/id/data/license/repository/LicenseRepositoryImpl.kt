@@ -25,6 +25,7 @@ class LicenseRepositoryImpl(
                 when (apiLicenseResult) {
                     is ApiLicenseResult.Success -> handleLicenseResultSuccess(apiLicenseResult)
                     is ApiLicenseResult.Error -> handleLicenseResultError(apiLicenseResult)
+                    is ApiLicenseResult.BackendMaintenanceError -> handleLicenseResultBackendMaintenanceError(apiLicenseResult)
                 }
             }
         } else {
@@ -39,6 +40,12 @@ class LicenseRepositoryImpl(
 
     private suspend fun FlowCollector<LicenseState>.handleLicenseResultError(apiLicenseResult: ApiLicenseResult.Error) {
         emit(LicenseState.FinishedWithError(apiLicenseResult.errorCode))
+    }
+
+    private suspend fun FlowCollector<LicenseState>.handleLicenseResultBackendMaintenanceError(
+        apiLicenseResult: ApiLicenseResult.BackendMaintenanceError
+    ) {
+        emit(LicenseState.FinishedWithBackendMaintenanceError(apiLicenseResult.estimatedOutage))
     }
 
     override fun deleteCachedLicense() {

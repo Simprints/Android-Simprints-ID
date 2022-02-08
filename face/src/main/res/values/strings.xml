@@ -87,4 +87,5 @@
     <string name="face_configuration_downloading">Downloading necessary files</string>
     <string name="error_backend_maintenance_title">Maintenance mode</string>
     <string name="error_backend_maintenance_message">The systems are currently under maintenance. Please try again later.</string>
+    <string name="error_backend_maintenance_with_time_message">The systems are currently under maintenance. Please try again after %s</string>
 </resources>
