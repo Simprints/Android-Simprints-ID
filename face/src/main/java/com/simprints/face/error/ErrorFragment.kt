@@ -14,6 +14,7 @@ import com.simprints.face.controllers.core.events.model.FaceAlertType
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentErrorBinding
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
+import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
