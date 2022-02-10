@@ -42,7 +42,9 @@ class PrivacyNoticeViewModel(
                 language,
                 consent
             )
-            is LongConsentFetchResult.Failed -> PrivacyNoticeViewState.ConsentNotAvailable(language, isMaintenanceMode)
+            is LongConsentFetchResult.Failed -> PrivacyNoticeViewState.ConsentNotAvailable(language)
+            is LongConsentFetchResult.FailedBecauseBackendMaintenance ->
+                PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance(language, estimatedOutage)
             is LongConsentFetchResult.InProgress -> PrivacyNoticeViewState.DownloadInProgress(
                 language
             )

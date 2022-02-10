@@ -210,7 +210,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
 
     private fun prepareSyncFailedBecauseBackendMaintenanceView(syncCardState: SyncFailedBackendMaintenance): View =
         withVisible(viewForSyncFailedState) {
-            titleCardFailed().text = context.getString(R.string.dashboard_sync_card_failed_because_backend_error_message)
+            titleCardFailed().text = context.getString(R.string.error_backend_maintenance_message)
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
