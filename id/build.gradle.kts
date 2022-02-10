@@ -26,7 +26,7 @@ android {
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
     }
@@ -107,10 +107,10 @@ android {
         // The below files are duplicated from kotlinx-coroutines-debug.
         // We should exclude them in the packaging options as per kotlinx.coroutines/kotlinx-coroutines-debug documentation
         // https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-debug#build-failures-due-to-duplicate-resource-files
-        resources.excludes.add ("**/attach_hotspot_windows.dll")
-        resources.excludes.add ("META-INF/AL2.0")
-        resources.excludes.add ( "META-INF/LGPL2.1")
-        resources.excludes.add ("META-INF/licenses/ASM")
+        resources.excludes.add("**/attach_hotspot_windows.dll")
+        resources.excludes.add("META-INF/AL2.0")
+        resources.excludes.add("META-INF/LGPL2.1")
+        resources.excludes.add("META-INF/licenses/ASM")
     }
 
     buildFeatures.viewBinding = true
@@ -288,15 +288,15 @@ dependencies {
     }
     androidTestImplementation(Dependencies.Testing.kappuccino)
 
-    debugImplementation(Dependencies.Testing.fragment_testing){
-        exclude( "androidx.test",  "core")
+    debugImplementation(Dependencies.Testing.fragment_testing) {
+        exclude("androidx.test", "core")
     }
 }
 configurations {
-    debugImplementation{
+    debugImplementation {
         // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
         // And a full feature version that should be added in debug build types
-        exclude("com.github.chuckerteam.chucker","library-no-op")
+        exclude("com.github.chuckerteam.chucker", "library-no-op")
     }
     androidTestImplementation {
         // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
