@@ -73,7 +73,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             when (it) {
                 is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
                 is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
-                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(it)
+                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(it.estimatedOutage)
                 is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress()
             }
         })
@@ -93,12 +93,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         showDownloadErrorToast()
     }
 
-    private fun setConsentNotAvailableBecauseBackendMaintenance(consentAvailableState: PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance) {
-        showBackendMaintenanceErrorView(consentAvailableState)
-    }
-
-    private fun showBackendMaintenanceErrorView(consentAvailableState: PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance) {
-        val estimatedOutage = consentAvailableState.estimatedOutage
+    private fun setConsentNotAvailableBecauseBackendMaintenance(estimatedOutage: Long?) {
         binding.apply {
             longConsentTextView.isVisible = false
             longConsentDownloadProgressBar.isVisible = false

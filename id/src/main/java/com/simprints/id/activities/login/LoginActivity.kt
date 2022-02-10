@@ -3,6 +3,7 @@ package com.simprints.id.activities.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportTag
@@ -28,6 +29,7 @@ import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
+import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import com.simprints.logging.Simber
 import javax.inject.Inject
 
@@ -37,8 +39,10 @@ class LoginActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var viewModelFactory: LoginViewModelFactory
+
     @Inject
     lateinit var loginActivityHelper: LoginActivityHelper
+
     @Inject
     lateinit var baseUrlProvider: BaseUrlProvider
 
@@ -106,6 +110,7 @@ class LoginActivity : BaseSplitActivity() {
             Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
             Result.SAFETYNET_INVALID_CLAIM,
             Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
+            is Result.BACKEND_MAINTENANCE -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
             Result.UNKNOWN -> handleSignInFailedUnknownReason()
         }
     }
@@ -222,6 +227,18 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleSignInFailedServerError() {
         progressDialog.dismiss()
         showToast(R.string.login_server_error)
+    }
+
+    private fun handleSignInFailedBackendMaintenanceError(estimatedOutage: Long?) {
+        progressDialog.dismiss()
+        binding.apply {
+            errorTextView.isVisible = true
+            errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
+                R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                    estimatedOutage
+                )
+            ) else getString(R.string.error_backend_maintenance_message)
+        }
     }
 
     private fun handleSafetyNetDownError() {
