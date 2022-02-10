@@ -1,4 +1,4 @@
-package com.simprints.face.error
+package com.simprints.id.tools.utils
 
 fun getFormattedEstimatedOutage(estimatedOutage: Long): String {
     val elapsedTime = secondsToHoursAndMinutes(estimatedOutage).split(':').map { it.toLong() }
