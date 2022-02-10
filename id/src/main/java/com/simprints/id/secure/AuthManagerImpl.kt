@@ -8,8 +8,8 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.Token
 import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.id.tools.extensions.checkForMaintenanceAndThrow
-import org.json.JSONObject
+import com.simprints.id.tools.extensions.getEstimatedOutage
+import com.simprints.id.tools.extensions.isBackendMaitenanceException
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -32,7 +32,11 @@ class AuthManagerImpl(private val simApiClientFactory: SimApiClientFactory) : Au
     private fun handleResponseError(response: Response<ApiToken>): Nothing =
         when (response.code()) {
             401, 404 -> throw AuthRequestInvalidCredentialsException()
-            in 500..599 -> response.checkForMaintenanceAndThrow()
+            in 500..599 -> throw if (response.isBackendMaitenanceException()) {
+                BackendMaintenanceException(estimatedOutage = response.getEstimatedOutage())
+            } else {
+                SimprintsInternalServerException()
+            }
             else -> throw HttpException(response)
         }
 
