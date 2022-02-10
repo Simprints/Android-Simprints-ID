@@ -226,6 +226,7 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleSignInFailedServerError() {
         progressDialog.dismiss()
+        binding.errorCard.isVisible = false
         showToast(R.string.login_server_error)
     }
 
@@ -243,11 +244,13 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleSafetyNetDownError() {
         progressDialog.dismiss()
+        binding.errorCard.isVisible = false
         launchAlert(this, AlertType.SAFETYNET_ERROR)
     }
 
     private fun handleSignInFailedUnknownReason() {
         progressDialog.dismiss()
+        binding.errorCard.isVisible = false
         launchAlert(this, AlertType.UNEXPECTED_ERROR)
     }
 

@@ -97,14 +97,17 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         binding.apply {
             longConsentTextView.isVisible = false
             longConsentDownloadProgressBar.isVisible = false
-            longConsentHeader.isVisible = true
+            longConsentHeader.isVisible = false
             longConsentDownloadButton.isVisible = true
+            errorCard.isVisible = true
 
-            longConsentHeader.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
-                R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
-                    estimatedOutage
+            errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) {
+                getString(
+                    R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                        estimatedOutage
+                    )
                 )
-            ) else getString(R.string.error_backend_maintenance_message)
+            } else getString(R.string.error_backend_maintenance_message)
         }
     }
 
@@ -117,6 +120,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             longConsentTextView.isVisible = true
             longConsentTextView.text = text
             longConsentTextView.movementMethod = ScrollingMovementMethod()
+            errorCard.isVisible = false
         }
     }
 
@@ -126,12 +130,14 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             longConsentDownloadProgressBar.isVisible = false
             longConsentHeader.isVisible = false
             longConsentDownloadButton.isVisible = true
+            errorCard.isVisible = false
         }
     }
 
 
     private fun setDownloadProgress() {
         binding.apply {
+            errorCard.isVisible = false
             longConsentDownloadButton.isVisible = false
             longConsentTextView.isVisible = false
 
