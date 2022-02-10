@@ -9,8 +9,13 @@ sealed class LongConsentFetchResult(open val language: String) {
 
     data class Failed(
         override val language: String,
+        val error: Throwable
+    ) : LongConsentFetchResult(language)
+
+    data class FailedBecauseBackendMaintenance(
+        override val language: String,
         val error: Throwable,
-        val isMaintenanceMode: Boolean = false
+        val estimatedOutage: Long? = null
     ) : LongConsentFetchResult(language)
 
     data class InProgress(override val language: String) : LongConsentFetchResult(language)

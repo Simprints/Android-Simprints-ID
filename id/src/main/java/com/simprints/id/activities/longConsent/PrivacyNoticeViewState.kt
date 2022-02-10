@@ -5,7 +5,10 @@ sealed class PrivacyNoticeViewState {
     data class ConsentAvailable(val language: String,
                                 val consent: String) : PrivacyNoticeViewState()
 
-    data class ConsentNotAvailable(val language: String, val isMaitenanceMode: Boolean = false) : PrivacyNoticeViewState()
+    data class ConsentNotAvailable(val language: String) : PrivacyNoticeViewState()
+
+    data class ConsentNotAvailableBecauseBackendMaintenance(val language: String, val estimatedOutage: Long? = null) :
+        PrivacyNoticeViewState()
 
     data class DownloadInProgress(val language: String) : PrivacyNoticeViewState()
 }
