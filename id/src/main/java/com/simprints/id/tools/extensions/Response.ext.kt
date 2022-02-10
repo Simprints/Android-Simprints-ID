@@ -15,12 +15,3 @@ fun <T> Response<T>.isBackendMaitenanceException(): Boolean {
     }
     return false
 }
-
-fun <T> Response<T>.getEstimatedOutage(): Long? {
-    return if (this.isBackendMaitenanceException()) {
-        val headers = this.headers()
-        headers.get("Retry-After")?.toLong()
-    } else {
-        null
-    }
-}

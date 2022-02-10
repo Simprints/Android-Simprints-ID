@@ -3,10 +3,8 @@ package com.simprints.eventsystem.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-
 import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
-import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class AuthenticationEvent(
@@ -26,7 +24,8 @@ data class AuthenticationEvent(
         UUID.randomUUID().toString(),
         labels,
         AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
-        AUTHENTICATION)
+        AUTHENTICATION
+    )
 
 
     @Keep
@@ -42,15 +41,16 @@ data class AuthenticationEvent(
         @Keep
         data class UserInfo(val projectId: String, val userId: String)
 
-        enum class Result {
-            AUTHENTICATED,
-            BAD_CREDENTIALS,
-            OFFLINE,
-            TECHNICAL_FAILURE,
-            BACKEND_MAINTENANCE,
-            SAFETYNET_UNAVAILABLE,
-            SAFETYNET_INVALID_CLAIM,
-            UNKNOWN
+        @Suppress("ClassName")
+        sealed class Result {
+            object AUTHENTICATED : Result()
+            object BAD_CREDENTIALS : Result()
+            object OFFLINE : Result()
+            object TECHNICAL_FAILURE : Result()
+            data class BACKEND_MAINTENANCE(val estimatedOutage: Long? = null) : Result()
+            object SAFETYNET_UNAVAILABLE : Result()
+            object SAFETYNET_INVALID_CLAIM : Result()
+            object UNKNOWN : Result()
         }
     }
 
