@@ -13,7 +13,7 @@ apply {
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
     buildTypes {
