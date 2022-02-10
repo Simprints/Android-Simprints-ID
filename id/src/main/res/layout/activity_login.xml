@@ -83,14 +83,23 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp" />
 
-        <TextView
-            android:id="@+id/errorTextView"
-            style="@style/SimprintsStyle.TextView"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/errorCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/simprints_white"
-            android:textSize="16sp"
-            tools:text="Some text goes here" />
+            android:layout_marginTop="12dp"
+            android:background="@color/simprints_white"
+            android:visibility="gone"
+            app:cardCornerRadius="12dp">
+
+            <TextView
+                android:id="@+id/errorTextView"
+                style="@style/SimprintsStyle.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textSize="16sp"
+                tools:text="Some text goes here" />
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 </RelativeLayout>
