@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.extentions.getEstimatedOutage
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
@@ -67,7 +68,7 @@ class AuthenticationHelperImpl(
             is IOException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
             is SimprintsInternalServerException -> TECHNICAL_FAILURE
-            is BackendMaintenanceException -> BACKEND_MAINTENANCE
+            is BackendMaintenanceException -> BACKEND_MAINTENANCE(t.getEstimatedOutage())
             is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
             else -> UNKNOWN
         }

@@ -8,7 +8,6 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.toDomainAuthData
-import com.simprints.id.tools.extensions.getEstimatedOutage
 import com.simprints.id.tools.extensions.isBackendMaitenanceException
 import retrofit2.HttpException
 import retrofit2.Response
@@ -32,7 +31,7 @@ class AuthenticationDataManagerImpl(
         when (response.code()) {
             401, 404 -> throw AuthRequestInvalidCredentialsException()
             in 500..599 -> throw if (response.isBackendMaitenanceException()) {
-                BackendMaintenanceException(estimatedOutage = response.getEstimatedOutage())
+                BackendMaintenanceException()
             } else {
                 SimprintsInternalServerException()
             }
