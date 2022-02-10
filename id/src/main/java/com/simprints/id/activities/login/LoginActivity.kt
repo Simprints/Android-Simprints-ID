@@ -232,7 +232,7 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleSignInFailedBackendMaintenanceError(estimatedOutage: Long?) {
         progressDialog.dismiss()
         binding.apply {
-            errorTextView.isVisible = true
+            errorCard.isVisible = true
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
                 R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
                     estimatedOutage
