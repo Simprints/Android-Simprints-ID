@@ -16,7 +16,15 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncComplete
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncDefault
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailed
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailedBackendMaintenance
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncHasNoModules
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -24,7 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.*
+import java.util.Calendar
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -39,6 +47,8 @@ class DashboardSyncCardDisplayerImplTest {
         cal.add(Calendar.DATE, -1)
         cal.time
     }
+
+    private val estimatedOutage = 600L
 
     @Before
     fun setUp() {
@@ -58,6 +68,18 @@ class DashboardSyncCardDisplayerImplTest {
     fun syncCardDisplayer_failedSyncState_shouldDisplayTheCorrectUI() {
         syncCardDisplayer.displayState(SyncFailed(lastSyncTime))
         syncCardRootLayout.assessFailedStateSyncUI()
+    }
+
+    @Test
+    fun syncCardDisplayer_backendFailedSyncState_shouldDisplayTheCorrectUIWithTime() {
+        syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime, estimatedOutage))
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
+    }
+
+    @Test
+    fun syncCardDisplayer_backendFailedSyncState_shouldDisplayTheCorrectUI() {
+        syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime))
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
     }
 
     @Test
@@ -125,6 +147,19 @@ class DashboardSyncCardDisplayerImplTest {
         with(cardContent) {
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(failedMessage()).isEqualTo(SYNC_CARD_FAILED_STATE_MESSAGE)
+            assertThat(failedIcon().visibility).isEqualTo(VISIBLE)
+            assessLastSyncTime()
+            assertThat(cardContent.childCount).isEqualTo(4)
+        }
+    }
+
+    private fun LinearLayout.assessSyncFailedBackendMaintenanceSyncUI(failedMessage: String) {
+        assertThat(childCount).isEqualTo(1)
+        val card = this.children.first() as CardView
+        val cardContent = card.children.first() as ConstraintLayout
+        with(cardContent) {
+            assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
+            assertThat(failedMessage()).isEqualTo(failedMessage)
             assertThat(failedIcon().visibility).isEqualTo(VISIBLE)
             assessLastSyncTime()
             assertThat(cardContent.childCount).isEqualTo(4)
@@ -224,7 +259,8 @@ class DashboardSyncCardDisplayerImplTest {
     private fun View.lastSyncTimeTextView() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
     private fun View.lastSyncTime() = lastSyncTimeTextView().text.toString()
 
-    private fun View.defaultSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_default_state_sync_button).text.toString()
+    private fun View.defaultSyncButton() =
+        this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_default_state_sync_button).text.toString()
 
     private fun View.failedMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message).text.toString()
     private fun View.failedIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_failed_icon)
@@ -240,7 +276,9 @@ class DashboardSyncCardDisplayerImplTest {
     private fun View.offlineSettingsButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_offline_button)
 
     private fun View.progressMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message).text.toString()
-    private fun View.progressConnectingProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
+    private fun View.progressConnectingProgressBar() =
+        this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
+
     private fun View.progressSyncProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
 
     private fun View.assessLastSyncTime() {
@@ -253,6 +291,10 @@ class DashboardSyncCardDisplayerImplTest {
         const val SYNC_CARD_DEFAULT_STATE_SYNC_BUTTON = "Sync now"
         const val LAST_SYNC_TEXT = "Last sync: Yesterday"
         const val SYNC_CARD_FAILED_STATE_MESSAGE = "Sync failed. Please contact your supervisor"
+        const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE =
+            "The systems are currently under maintenance. Please try again after 10 minutes 00 seconds."
+        const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE =
+            "The systems are currently under maintenance. Please try again later."
         const val SYNC_CARD_TRY_AGAIN_STATE_MESSAGE = "Sync incomplete"
         const val SYNC_CARD_TRY_AGAIN_STATE_SYNC_BUTTON = "Try again"
         const val SYNC_CARD_NO_MODULES_STATE_BUTTON = "Modules"
