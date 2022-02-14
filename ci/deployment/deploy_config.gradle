@@ -9,7 +9,7 @@ android {
     buildTypes {
         staging {
             firebaseAppDistribution {
-                apkPath = "id/build/outputs/universal_apk/staging/id-staging-universal.apk"
+                artifactPath = "id/build/outputs/universal_apk/staging/id-staging-universal.apk"
                 serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
                 groups = "pre-release-testers"
             }
