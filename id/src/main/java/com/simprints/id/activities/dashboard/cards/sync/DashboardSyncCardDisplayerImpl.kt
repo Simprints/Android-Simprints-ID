@@ -24,6 +24,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.S
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
+import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import org.jetbrains.anko.layoutInflater
@@ -210,7 +211,14 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
 
     private fun prepareSyncFailedBecauseBackendMaintenanceView(syncCardState: SyncFailedBackendMaintenance): View =
         withVisible(viewForSyncFailedState) {
-            titleCardFailed().text = context.getString(R.string.error_backend_maintenance_message)
+            titleCardFailed().text = if (syncCardState.estimatedOutage != null && syncCardState.estimatedOutage != 0L) {
+                context.getString(
+                    R.string.error_backend_maintenance_with_time_message,
+                    getFormattedEstimatedOutage(syncCardState.estimatedOutage)
+                )
+            } else {
+                context.getString(R.string.error_backend_maintenance_message)
+            }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 

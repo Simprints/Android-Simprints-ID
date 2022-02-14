@@ -11,7 +11,7 @@ sealed class EventSyncWorkerState(val state: String) {
     class Failed(
         val failedBecauseCloudIntegration: Boolean = false,
         val failedBecauseBackendMaintenance: Boolean = false,
-        val estimatedOutage: Int = 0
+        val estimatedOutage: Long = 0L
     ) :
         EventSyncWorkerState("Failed")
 
@@ -23,7 +23,7 @@ sealed class EventSyncWorkerState(val state: String) {
             state: WorkInfo.State,
             failedBecauseCloudIntegration: Boolean = false,
             failedBecauseBackendMaintenance: Boolean = false,
-            estimatedOutage: Int = 0
+            estimatedOutage: Long = 0L
         ) =
             when (state) {
                 WorkInfo.State.ENQUEUED -> Enqueued
