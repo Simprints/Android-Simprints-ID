@@ -25,7 +25,7 @@ buildscript {
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
         classpath("org.ow2.asm:asm:9.2")
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.78.0")
+        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.80.0")
         classpath("org.gradle:test-retry-gradle-plugin:1.3.1")
 
         // Firebase
@@ -36,16 +36,16 @@ buildscript {
         // Dependency Publishing
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.24.18")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.27.1")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.8.0")
+        classpath("io.realm:realm-gradle-plugin:10.10.1")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
 
         // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.6.0")
+        classpath("com.github.triplet.gradle:play-publisher:3.7.0")
         classpath("com.google.firebase:firebase-appdistribution-gradle:2.2.0")
     }
 
@@ -89,7 +89,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.2.0"
+    id("org.gradle.test-retry") version "1.3.1"
 }
 
 /*
