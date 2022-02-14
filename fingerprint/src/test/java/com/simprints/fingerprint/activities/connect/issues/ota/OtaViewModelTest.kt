@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
@@ -19,6 +20,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
 import com.simprints.testtools.common.livedata.testObserver
@@ -142,7 +144,7 @@ class OtaViewModelTest {
         assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
         assertThat(capturedEvents[1].failureReason).isNotEmpty()
 
-        otaViewModel.otaFailed.assertEventReceived()
+        otaViewModel.otaFailed.assertEventReceivedWithContent(FetchOtaResult())
     }
 
     @Test
