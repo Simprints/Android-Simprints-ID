@@ -46,7 +46,7 @@ dependencies {
     // the central buildSrc module because we do not want or expect these dependencies to be used in
     // multiple modules
     implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.8")
-    implementation("com.google.firebase:firebase-analytics-ktx:19.0.2")
+    implementation("com.google.firebase:firebase-analytics-ktx:20.1.0")
     implementation("com.google.firebase:firebase-perf:20.0.3")
 
     //4.7.1 breaks realm:
