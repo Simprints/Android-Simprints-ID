@@ -292,7 +292,7 @@ class DashboardSyncCardDisplayerImplTest {
         const val LAST_SYNC_TEXT = "Last sync: Yesterday"
         const val SYNC_CARD_FAILED_STATE_MESSAGE = "Sync failed. Please contact your supervisor"
         const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE =
-            "The systems are currently under maintenance. Please try again after 10 minutes 00 seconds."
+            "The systems are currently under maintenance. Please try again after 10 minutes, 00 seconds."
         const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE =
             "The systems are currently under maintenance. Please try again later."
         const val SYNC_CARD_TRY_AGAIN_STATE_MESSAGE = "Sync incomplete"
