@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.extentions.getEstimatedOutage
 import com.simprints.core.tools.extentions.isBackendMaitenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -15,6 +16,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.logging.Simber
@@ -37,13 +39,16 @@ class EventDownSyncDownloaderWorker(
 
     @Inject
     lateinit var downSyncHelper: EventDownSyncHelper
+
     @Inject
     lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     @Inject
     lateinit var syncCache: EventSyncCache
+
     @Inject
     lateinit var jsonHelper: JsonHelper
+
     @Inject
     lateinit var dispatcher: DispatcherProvider
 
@@ -91,7 +96,11 @@ class EventDownSyncDownloaderWorker(
         return if (t is SyncCloudIntegrationException) {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
         } else if (t.isBackendMaitenanceException()) {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true))
+            fail(
+                t,
+                t.message,
+                workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.getEstimatedOutage())
+            )
         } else {
             retry(t)
         }
