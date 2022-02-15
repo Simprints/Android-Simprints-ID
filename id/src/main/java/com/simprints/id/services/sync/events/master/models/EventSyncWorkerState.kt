@@ -11,7 +11,7 @@ sealed class EventSyncWorkerState(val state: String) {
     class Failed(
         val failedBecauseCloudIntegration: Boolean = false,
         val failedBecauseBackendMaintenance: Boolean = false,
-        val estimatedOutage: Long = 0L
+        val estimatedOutage: Long? = null
     ) :
         EventSyncWorkerState("Failed")
 
