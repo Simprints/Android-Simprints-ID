@@ -168,11 +168,15 @@ class DashboardSyncCardStateRepositoryImpl(
         allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
 
     private fun isSyncFailedBecauseBackendMaintenance(allSyncStates: List<EventSyncState.SyncWorkerInfo>): Boolean {
-        val syncWorkerInfo =
-            allSyncStates.find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
-        val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
-        estimatedOutage = failedWorkerState?.estimatedOutage
-        return allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseBackendMaintenance }
+        val isBackendMaintenance =
+            allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseBackendMaintenance }
+        if (isBackendMaintenance) {
+            val syncWorkerInfo =
+                allSyncStates.find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
+            val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
+            estimatedOutage = failedWorkerState?.estimatedOutage
+        }
+        return isBackendMaintenance
     }
 
     private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
