@@ -15,6 +15,7 @@ import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveData
 import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProviderImpl
 import com.simprints.id.services.sync.events.master.internal.didFailBecauseBackendMaintenance
 import com.simprints.id.services.sync.events.master.internal.didFailBecauseCloudIntegration
+import com.simprints.id.services.sync.events.master.internal.getEstimatedOutageTime
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Companion.fromWorkInfo
@@ -99,25 +100,25 @@ class EventSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.upSyncUploadersStates(): List<SyncWorkerInfo> =
         filterByTags(tagForType(UPLOADER)).map { SyncWorkerInfo(
             UPLOADER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance())
+            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
         ) }
 
     private fun List<WorkInfo>.downSyncDownloadersStates(): List<SyncWorkerInfo> =
         filterByTags(tagForType(DOWNLOADER)).map { SyncWorkerInfo(
             DOWNLOADER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance())
+            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
         ) }
 
     private fun List<WorkInfo>.downSyncCountersStates(): List<SyncWorkerInfo> =
         filterByTags(tagForType(DOWN_COUNTER)).map { SyncWorkerInfo(
             DOWN_COUNTER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance())
+            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
         ) }
 
     private fun List<WorkInfo>.upSyncCountersStates(): List<SyncWorkerInfo> =
         filterByTags(tagForType(UP_COUNTER)).map { SyncWorkerInfo(
             UP_COUNTER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance())
+            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
         ) }
 
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
