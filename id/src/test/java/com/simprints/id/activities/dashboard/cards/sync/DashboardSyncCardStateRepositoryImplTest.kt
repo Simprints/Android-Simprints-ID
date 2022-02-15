@@ -30,6 +30,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.D
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
@@ -234,9 +235,9 @@ class DashboardSyncCardStateRepositoryImplTest {
         )
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val state = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncFailedBackendMaintenance(lastSyncTime))
+        assertThat(state).isEqualTo(SyncFailedBackendMaintenance(lastSyncTime))
     }
 
     @Test
