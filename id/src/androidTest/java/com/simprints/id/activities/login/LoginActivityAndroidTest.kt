@@ -5,7 +5,7 @@ import androidx.test.espresso.intent.Intents
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
@@ -134,7 +134,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenBackendMaintained_clickSignIn_shouldShowTimedError() {
-        mockAuthenticationResult(BACKEND_MAINTENANCE(estimatedOutage))
+        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR(estimatedOutage))
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -149,7 +149,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenBackendMaintained_clickSignIn_shouldShowError() {
-        mockAuthenticationResult(BACKEND_MAINTENANCE())
+        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR())
 
         loginActivity {
             withMandatoryCredentialsPresent()

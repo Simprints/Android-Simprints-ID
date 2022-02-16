@@ -2,7 +2,14 @@ package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.eventsystem.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
@@ -23,7 +30,7 @@ data class ApiAuthenticationPayload(override val startTime: Long,
         AUTHENTICATED,
         BAD_CREDENTIALS,
         OFFLINE,
-        BACKEND_MAINTENANCE,
+        BACKEND_MAINTENANCE_ERROR,
         TECHNICAL_FAILURE,
         SAFETYNET_UNAVAILABLE,
         SAFETYNET_INVALID_CLAIM
@@ -46,6 +53,6 @@ fun AuthenticationPayload.Result.fromDomainToApi() =
         TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
         SAFETYNET_UNAVAILABLE -> ApiResult.SAFETYNET_UNAVAILABLE
         SAFETYNET_INVALID_CLAIM -> ApiResult.SAFETYNET_INVALID_CLAIM
-        is BACKEND_MAINTENANCE -> ApiResult.BACKEND_MAINTENANCE
+        is BACKEND_MAINTENANCE_ERROR -> ApiResult.BACKEND_MAINTENANCE_ERROR
         UNKNOWN -> ApiResult.TECHNICAL_FAILURE
     }

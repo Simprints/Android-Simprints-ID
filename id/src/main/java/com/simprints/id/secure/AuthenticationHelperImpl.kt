@@ -8,7 +8,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
@@ -68,7 +68,7 @@ class AuthenticationHelperImpl(
             is IOException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
             is SimprintsInternalServerException -> TECHNICAL_FAILURE
-            is BackendMaintenanceException -> BACKEND_MAINTENANCE(t.getEstimatedOutage())
+            is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR(t.getEstimatedOutage())
             is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
             else -> UNKNOWN
         }

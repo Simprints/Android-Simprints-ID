@@ -47,7 +47,7 @@ data class AuthenticationEvent(
             object BAD_CREDENTIALS : Result()
             object OFFLINE : Result()
             object TECHNICAL_FAILURE : Result()
-            data class BACKEND_MAINTENANCE(val estimatedOutage: Long? = null) : Result()
+            data class BACKEND_MAINTENANCE_ERROR(val estimatedOutage: Long? = null) : Result()
             object SAFETYNET_UNAVAILABLE : Result()
             object SAFETYNET_INVALID_CLAIM : Result()
             object UNKNOWN : Result()
