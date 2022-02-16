@@ -1,5 +1,6 @@
 package com.simprints.core.tools.extentions
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.simprints.core.network.NetworkConstants
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -9,8 +10,9 @@ fun Throwable.isCloudRecoverableIssue() =
 
 fun Throwable.isBackendMaitenanceException(): Boolean {
     if (this is HttpException) {
-        val responseJson = response()?.errorBody().toString()
-        val jsonObect = JSONObject(responseJson.substring(responseJson.indexOf("{"), responseJson.lastIndexOf("}") + 1))
+        val ow = ObjectMapper().writer().withDefaultPrettyPrinter()
+        val jsonResponse = ow.writeValueAsString(response()?.errorBody())
+        val jsonObect = JSONObject(jsonResponse)
         if (response()?.code() == 503 && jsonObect.has("error")) {
             if (jsonObect.getString("error") == "002") {
                 return true
