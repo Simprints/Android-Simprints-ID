@@ -110,7 +110,7 @@ class LoginActivity : BaseSplitActivity() {
             Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
             Result.SAFETYNET_INVALID_CLAIM,
             Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
-            is Result.BACKEND_MAINTENANCE -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
+            is Result.BACKEND_MAINTENANCE_ERROR -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
             Result.UNKNOWN -> handleSignInFailedUnknownReason()
         }
     }
