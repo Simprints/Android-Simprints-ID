@@ -4,7 +4,14 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.id.Application
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
@@ -36,6 +43,8 @@ class LoginActivityAndroidTest {
     private val appModule by lazy {
         TestAppModule(app)
     }
+
+    private val estimatedOutage = 600L
 
     private val securityModule by lazy {
         TestSecurityModule(
@@ -120,6 +129,36 @@ class LoginActivityAndroidTest {
             withSecurityStatusRunning()
         } clickSignIn {
             offlineToastIsDisplayed()
+        }
+    }
+
+    @Test
+    fun whenBackendMaintained_clickSignIn_shouldShowTimedError() {
+        mockAuthenticationResult(BACKEND_MAINTENANCE(estimatedOutage))
+
+        loginActivity {
+            withMandatoryCredentialsPresent()
+            withSuppliedProjectIdAndIntentProjectIdMatching()
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+            withSecurityStatusRunning()
+        } clickSignIn {
+            assertErrorViewHasCorrectText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
+        }
+    }
+
+    @Test
+    fun whenBackendMaintained_clickSignIn_shouldShowError() {
+        mockAuthenticationResult(BACKEND_MAINTENANCE())
+
+        loginActivity {
+            withMandatoryCredentialsPresent()
+            withSuppliedProjectIdAndIntentProjectIdMatching()
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+            withSecurityStatusRunning()
+        } clickSignIn {
+            assertErrorViewHasCorrectText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
         }
     }
 
