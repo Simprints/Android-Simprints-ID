@@ -7,7 +7,7 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 
-class Throwable_extKtTest {
+class ThrowableExtKtTest {
 
     @Test
     fun gettingNoBackendMaintenanceErrorReturnsFalse() {
