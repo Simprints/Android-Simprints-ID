@@ -8,7 +8,7 @@ fun Throwable.isCloudRecoverableIssue() =
 
 fun Throwable.isBackendMaitenanceException(): Boolean {
     if (this is HttpException && response()?.code() == 503) {
-        val jsonReseponse = response()?.errorBody()?.string()
+        val jsonReseponse = response()?.errorBody()?.string()?.filterNot { it.isWhitespace() }
         return jsonReseponse != null && jsonReseponse.contains(NetworkConstants.BACKEND_MAINTENANCE_ERROR_STRING)
     }
     return false
