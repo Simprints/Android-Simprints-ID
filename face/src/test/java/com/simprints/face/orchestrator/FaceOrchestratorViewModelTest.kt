@@ -108,6 +108,16 @@ class FaceOrchestratorViewModelTest {
         }
     }
 
+    @Test
+    fun `route user to backend maintenance error flow if needed`() {
+        viewModel.configurationFinished(false)
+        viewModel.finishWithError(ErrorType.BACKEND_MAINTENANCE_ERROR)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.BACKEND_MAINTENANCE_ERROR)
+        }
+    }
+
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {
         every { nFaceSamplesToCapture } returns captures
     }
