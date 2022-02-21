@@ -46,4 +46,37 @@
     <string name="why_did_you_skip_face_capture">Pourquoi avez-vous ignoré la capture du visage ?</string>
     <string name="error_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système.</string>
     <string name="error_unexpected_error_title">Erreur survenue</string>
+
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">Comparé à %d candidats.</item>
+        <item quantity="other">Comparé à %d candidats.</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">A retourné %d résultats.</item>
+        <item quantity="other">A retourné %d résultats.</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">Pas de très bonnes correspondances</item>
+        <item quantity="one">%d très bonne correspondance</item>
+        <item quantity="other">%d très bonnes correspondances</item>
+    </plurals>
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">Pas de bonnes correspondances</item>
+        <item quantity="one">%d bonne correspondance</item>
+        <item quantity="other">%d bonnes correspondances</item>
+    </plurals>
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">Aucune correspondance</item>
+        <item quantity="one">%d correspondance</item>
+        <item quantity="other">%d correspondances</item>
+    </plurals>
+
+
+
+
+
 </resources>
