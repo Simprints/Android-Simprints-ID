@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Client API</string>
+    <string name="configuration_error_title">Erreur de configuration</string>
+    <string name="close">Fermez</string>
+    <string name="different_projectId_message">Une erreur de configuration s\'est produite (Id de projet différent), veuillez vous déconnecter de l\'écran d\'accueil ou contacter votre administrateur système.</string>
+    <string name="different_userId_message">Une erreur de configuration s\'est produite (Id utilisateur différent), veuillez vous déconnecter de l\'écran d\'accueil ou contacter votre administrateur système.</string>
+    <string name="guid_selection_data_sent">Données envoyées</string>
+    <string name="guid_selection_result_sent">Résultat envoyé</string>
+    <string name="invalid_intentAction_message">Une erreur de configuration s\'est produite (action intentionnelle invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_metadata_message">Une erreur de configuration s\'est produite (le champ metadata est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_moduleId_message">Une erreur de configuration s\'est produite (le champ module ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_projectId_message">Une erreur de configuration s\'est produite (le champ project ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_selectedId_message">Une erreur de configuration s\'est produite (le champ selected Id est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_sessionId_message">Une erreur de configuration s\'est produite (le champ session ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_userId_message">Une erreur de configuration s\'est produite (le champ user ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_verifyId_message">Une erreur de configuration s\'est produite (le champ verify GUID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="rooted_device_message">\"1. Contactez votre superviseur - appareil rooté détecté  2. Tapez sur Fermer\"</string>
+    <string name="rooted_device_title">Appareil rooter détecté</string>
+    <string name="configuration_error_message">Une erreur de configuration est apparue (%1$s), veuillez contactez votre administrateur système</string>
+</resources>
