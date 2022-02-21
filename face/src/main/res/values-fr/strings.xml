@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="capture_title_howto">Comment scanner un visage</string>
+    <string name="btn_capture_again">Capturer à nouveau</string>
+    <string name="btn_finish">Touchez pour continuer</string>
+    <string name="btn_recapture">Recapturer</string>
+    <string name="capture_error_face_too_close">Reculez</string>
+    <string name="capture_error_face_too_far">Rapprochez-vous</string>
+    <string name="capture_error_look_straight">Assurez-vous que la personne regarde droit vers la caméra.</string>
+    <string name="capture_error_no_face">Assurez-vous que le visage soit dans le cercle</string>
+    <string name="capture_hold">Maintenez la position...</string>
+    <string name="capture_prep_begin_btn" translatable="false">Touchez pour capturer</string>
+    <string name="capture_prep_begin_btn_capturing">Capture en cours...</string>
+    <string name="capture_ready" translatable="false">Prêt à capturer</string>
+    <string name="capture_title_face_too_far">Trop loin</string>
+    <string name="capture_title_look_straight">La personne ne regarde pas droit devant elle</string>
+    <string name="capture_title_looks_good">Le scan est prêt !</string>
+    <string name="capture_title_no_face">Aucun visage détecté</string>
+    <string name="capture_title_previewing">Préparation du scan</string>
+    <string name="capture_title_scan_progress">Scan en cours</string>
+    <string name="capture_title_too_close">Trop près</string>
+    <string name="captured_successfully">Le visage a été capturé avec succès.</string>
+    <string name="captured_unsuccessful">Impossible de capturer le visage en raison d\'un problème technique.</string>
+    <string name="error_close_button">Fermez</string>
+    <string name="error_configuration_error_message">Une erreur s\'est produite lors de la configuration de la modalité de visage, veuillez contacter votre administrateur système.</string>
+    <string name="error_configuration_error_title">Erreur de configuration</string>
+    <string name="error_licence_invalid_message">La licence pour la reconnaissance facile n\'est pas valide, veuillez contacter votre administrateur système</string>
+    <string name="error_licence_invalid_title">Licence invalide</string>
+    <string name="error_licence_missing_message">La licence pour la reconnaissance facile est manquante, veuillez contacter votre administrateur système</string>
+    <string name="error_licence_missing_title">Licence manquante</string>
+    <string name="exit_form_return_to_face_capture">Capturer le visage</string>
+    <string name="face_configuration_downloading">Téléchargement des fichiers nécessaires</string>
+    <string name="face_configuration_started">Configuration de la modalité de reconnaissance facile</string>
+    <string name="face_match_loading_candidates">Chargement des candidats...</string>
+    <string name="face_match_matching_candidates">Comparaison des candidats</string>
+    <string name="face_match_please_wait">Veuillez attendre pendant que nous procédons à l\'identification</string>
+    <string name="matching_x_records">Comparaison avec %s enregistrements</string>
+    <string name="onboarding_continue">Touchez n\'importe où pour continuer</string>
+    <string name="onboarding_fill">Placez le visage dans le cadre circulaire.</string>
+    <string name="onboarding_light">Trouvez un endroit bien éclairé.</string>
+    <string name="onboarding_straight">Assurez-vous que la personne regarde droit devant elle.</string>
+    <string name="retry_tips">Voici comment vous pouvez résoudre ce problème : \\1. Assurez-vous d\'être dans un endroit bien éclairé. 2. Assurez-vous que la personne regarde droit devant elle.\\n3. Restez immobile et maintenez la position.</string>
+    <string name="title_capturing">Capture en direct</string>
+    <string name="title_confirmation">Confirmation</string>
+    <string name="title_preparation">Préparation</string>
+    <string name="why_did_you_skip_face_capture">Pourquoi avez-vous ignoré la capture du visage ?</string>
+    <string name="error_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système.</string>
+    <string name="error_unexpected_error_title">Erreur survenue</string>
+</resources>
