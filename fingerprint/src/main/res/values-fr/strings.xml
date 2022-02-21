@@ -114,4 +114,35 @@
     <string name="why_did_you_skip_fingerprinting">Pourquoi avez-vous ignoré le scan d\'empreinte digitale ?</string>
     <string name="turn_on_nfc">Allumez le NFC</string>
     <string name="try_again_label">Réessayez</string>
+
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d candidat chargé</item>
+        <item quantity="other">%d candidats chargés</item>
+    </plurals>
+
+    <plurals name="returned_results">
+        <item quantity="one">%d resultat retourné.</item>
+        <item quantity="other">A retourné %d résultats.</item>
+    </plurals>
+
+
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">Pas de très bonnes correspondances</item>
+        <item quantity="one">%d très bonne correspondance</item>
+        <item quantity="other">%d très bonnes correspondances</item>
+    </plurals>
+
+
+    <plurals name="tier3_matches">
+        <item quantity="zero">Pas de bonnes correspondances</item>
+        <item quantity="one">%d bonne correspondance</item>
+        <item quantity="other">%d bonnes correspondances</item>
+    </plurals>
+
+
+    <plurals name="tier4_matches">
+        <item quantity="zero">Aucune correspondance</item>
+        <item quantity="one">%d correspondance</item>
+        <item quantity="other">%d correspondances</item>
+    </plurals>
 </resources>

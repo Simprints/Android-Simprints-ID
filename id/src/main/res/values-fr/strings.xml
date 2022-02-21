@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Simprints ID</string>
     <string name="alert_title">Alerte</string>
     <string name="alert_try_again">Réessayez</string>
@@ -186,4 +187,22 @@
     <string name="why_did_you_skip_face_capture">Pourquoi avez-vous ignoré la capture du visage ?</string>
     <string name="why_did_you_skip_fingerprinting">Pourquoi avez-vous ignoré le scan d\'empreinte digitale ?</string>
     <string name="title_fingerprint" translatable="false">Continue</string>
+
+    <plurals name="test_loaded_candidatest">
+        <item quantity="one">%d candidat chargé</item>
+        <item quantity="other">%d candidats chargés</item>
+    </plurals>
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">Inscription</item>
+        <item quantity="other">Inscriptions</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">Identification</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">Vérification</item>
+        <item quantity="other">Vérifications</item>
+    </plurals>
+
 </resources>
