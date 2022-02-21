@@ -3,7 +3,6 @@ package com.simprints.id.activities.longConsent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -54,5 +53,19 @@ class PrivacyNoticeViewModelTest {
 
         val value = privacyNoticeLiveData.getOrAwaitValue()
         assertThat(value).isInstanceOf(PrivacyNoticeViewState.ConsentAvailable::class.java)
+    }
+
+    @Test
+    fun retrievePrivacyNotice_shouldReturn_ContentNotAvailable_wheneverFailedBecauseBackendMaintenance_isReturned() {
+        every { longConsentRepository.getLongConsentResultForLanguage(language) } returns flowOf(
+            LongConsentFetchResult.InProgress(language),
+            LongConsentFetchResult.FailedBecauseBackendMaintenance(language, Throwable())
+        )
+
+        val privacyNoticeLiveData = privacyNoticeViewModel.getPrivacyNoticeViewStateLiveData()
+        privacyNoticeViewModel.retrievePrivacyNotice()
+
+        val value = privacyNoticeLiveData.getOrAwaitValue()
+        assertThat(value).isInstanceOf(PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance::class.java)
     }
 }
