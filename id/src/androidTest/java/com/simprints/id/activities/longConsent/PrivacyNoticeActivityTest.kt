@@ -22,7 +22,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import org.hamcrest.CoreMatchers.anyOf
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
@@ -86,7 +85,12 @@ class PrivacyNoticeActivityTest {
 
         ActivityScenario.launch(PrivacyNoticeActivity::class.java)
 
-        onView(anyOf(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE))).check(matches(isDisplayed()))
+        onView(withId(R.id.errorTextView)).check(matches(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)));
+        onView(withId(R.id.errorCard)).check(matches(isDisplayed()));
+        onView(withId(R.id.longConsent_TextView)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.longConsent_downloadProgressBar)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.longConsent_header)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.longConsent_downloadButton)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -96,7 +100,12 @@ class PrivacyNoticeActivityTest {
 
         ActivityScenario.launch(PrivacyNoticeActivity::class.java)
 
-        onView(anyOf(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE))).check(matches(isDisplayed()))
+        onView(withId(R.id.errorTextView)).check(matches(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)));
+        onView(withId(R.id.errorCard)).check(matches(isDisplayed()));
+        onView(withId(R.id.longConsent_TextView)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.longConsent_downloadProgressBar)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.longConsent_header)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.longConsent_downloadButton)).check(matches(isDisplayed()))
     }
 
     @Test
