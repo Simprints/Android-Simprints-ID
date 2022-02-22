@@ -85,8 +85,8 @@ class PrivacyNoticeActivityTest {
 
         ActivityScenario.launch(PrivacyNoticeActivity::class.java)
 
-        onView(withId(R.id.errorTextView)).check(matches(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)));
-        onView(withId(R.id.errorCard)).check(matches(isDisplayed()));
+        onView(withId(R.id.errorTextView)).check(matches(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
+        onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         onView(withId(R.id.longConsent_TextView)).check(matches(not(isDisplayed())))
         onView(withId(R.id.longConsent_downloadProgressBar)).check(matches(not(isDisplayed())))
         onView(withId(R.id.longConsent_header)).check(matches(not(isDisplayed())))
@@ -100,8 +100,8 @@ class PrivacyNoticeActivityTest {
 
         ActivityScenario.launch(PrivacyNoticeActivity::class.java)
 
-        onView(withId(R.id.errorTextView)).check(matches(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)));
-        onView(withId(R.id.errorCard)).check(matches(isDisplayed()));
+        onView(withId(R.id.errorTextView)).check(matches(withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)))
+        onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         onView(withId(R.id.longConsent_TextView)).check(matches(not(isDisplayed())))
         onView(withId(R.id.longConsent_downloadProgressBar)).check(matches(not(isDisplayed())))
         onView(withId(R.id.longConsent_header)).check(matches(not(isDisplayed())))
