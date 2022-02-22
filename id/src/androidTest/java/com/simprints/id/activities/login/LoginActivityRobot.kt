@@ -256,15 +256,6 @@ class LoginActivityAssertions(
         }
     }
 
-    fun assertErrorViewHasCorrectText(text: String) {
-        displayed {
-            allOf {
-                id(R.id.errorTextView)
-                text(text)
-            }
-        }
-    }
-
     fun loginNotCompleteIntentIsReturned() {
         val result = activityScenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)

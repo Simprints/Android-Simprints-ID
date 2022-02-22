@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -148,7 +149,7 @@ class LoginActivityAndroidTest {
             typeProjectSecret(VALID_PROJECT_SECRET)
             withSecurityStatusRunning()
         } clickSignIn {
-            assertErrorViewHasCorrectText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
+            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)))
             onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
             onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
@@ -165,7 +166,7 @@ class LoginActivityAndroidTest {
             typeProjectSecret(VALID_PROJECT_SECRET)
             withSecurityStatusRunning()
         } clickSignIn {
-            assertErrorViewHasCorrectText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
             onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
             onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
