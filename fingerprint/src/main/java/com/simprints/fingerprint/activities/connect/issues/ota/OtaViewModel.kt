@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaitenanceException
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -74,7 +74,7 @@ class OtaViewModel(
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
         Simber.e(e)
-        if (e.isBackendMaitenanceException()) {
+        if (e.isBackendMaintenanceException()) {
             otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = true, estimatedOutage = e.getEstimatedOutage()))
         } else if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = false))

@@ -6,16 +6,16 @@ import retrofit2.HttpException
 fun Throwable.isCloudRecoverableIssue() =
     this is HttpException && NetworkConstants.httpCodesForRecoverableCloudIssues.contains(this.code())
 
-fun Throwable.isBackendMaitenanceException(): Boolean {
+fun Throwable.isBackendMaintenanceException(): Boolean {
     if (this is HttpException && response()?.code() == 503) {
-        val jsonReseponse = response()?.errorBody()?.string()?.filterNot { it.isWhitespace() }
-        return jsonReseponse != null && jsonReseponse.contains(NetworkConstants.BACKEND_MAINTENANCE_ERROR_STRING)
+        val jsonResponse = response()?.errorBody()?.string()?.filterNot { it.isWhitespace() }
+        return jsonResponse != null && jsonResponse.contains(NetworkConstants.BACKEND_MAINTENANCE_ERROR_STRING)
     }
     return false
 }
 
 fun Throwable.getEstimatedOutage(): Long? {
-    return if (this.isBackendMaitenanceException()) {
+    return if (this.isBackendMaintenanceException()) {
         try {
             val exception = this as HttpException
             val headers = exception.response()?.headers()

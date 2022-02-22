@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent.longconsent
 
 import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaitenanceException
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Failed
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.FailedBecauseBackendMaintenance
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.InProgress
@@ -28,7 +28,7 @@ class LongConsentRepositoryImpl(
             }
         } catch (t: Throwable) {
             Simber.e(t)
-            if (t.isBackendMaitenanceException()) {
+            if (t.isBackendMaintenanceException()) {
                 emit(FailedBecauseBackendMaintenance(language, t, t.getEstimatedOutage()))
             } else {
                 emit(Failed(language, t))
@@ -54,7 +54,7 @@ class LongConsentRepositoryImpl(
         } catch (t: Throwable) {
             Simber.e(t)
             flowCollector.emit(
-                if (t.isBackendMaitenanceException()) {
+                if (t.isBackendMaintenanceException()) {
                     FailedBecauseBackendMaintenance(language, t, t.getEstimatedOutage())
                 } else {
                     Failed(language, t)

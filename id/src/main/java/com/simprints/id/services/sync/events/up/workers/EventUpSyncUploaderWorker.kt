@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaitenanceException
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -91,7 +91,7 @@ class EventUpSyncUploaderWorker(
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
         return if (t is SyncCloudIntegrationException) {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-        } else if (t.isBackendMaitenanceException()) {
+        } else if (t.isBackendMaintenanceException()) {
             fail(
                 t,
                 t.message,
