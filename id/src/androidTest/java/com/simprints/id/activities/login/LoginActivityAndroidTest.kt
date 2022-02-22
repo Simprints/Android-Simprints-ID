@@ -1,7 +1,11 @@
 package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
@@ -13,6 +17,7 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.Authent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -133,7 +138,7 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun whenBackendMaintained_clickSignIn_shouldShowTimedError() {
+    fun whenBackendMaintenance_clickSignIn_shouldShowTimedError() {
         mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR(estimatedOutage))
 
         loginActivity {
@@ -144,11 +149,13 @@ class LoginActivityAndroidTest {
             withSecurityStatusRunning()
         } clickSignIn {
             assertErrorViewHasCorrectText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
+            onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
     }
 
     @Test
-    fun whenBackendMaintained_clickSignIn_shouldShowError() {
+    fun whenBackendMaintenance_clickSignIn_shouldShowError() {
         mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR())
 
         loginActivity {
@@ -159,6 +166,8 @@ class LoginActivityAndroidTest {
             withSecurityStatusRunning()
         } clickSignIn {
             assertErrorViewHasCorrectText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+            onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
     }
 
