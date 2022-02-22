@@ -11,7 +11,7 @@ class ThrowableExtKtTest {
 
     @Test
     fun gettingNoBackendMaintenanceErrorReturnsFalse() {
-        assertThat(Throwable().isBackendMaitenanceException()).isFalse()
+        assertThat(Throwable().isBackendMaintenanceException()).isFalse()
     }
 
     @Test
@@ -22,6 +22,6 @@ class ThrowableExtKtTest {
         val mockResponse = Response.error<Any>(503, errorResponseBody)
         val throwable = HttpException(mockResponse)
 
-        assertThat(throwable.isBackendMaitenanceException()).isTrue()
+        assertThat(throwable.isBackendMaintenanceException()).isTrue()
     }
 }
