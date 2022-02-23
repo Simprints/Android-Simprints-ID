@@ -109,6 +109,26 @@ class FaceOrchestratorViewModelTest {
     }
 
     @Test
+    fun `route user to configuration error flow if needed when code is not null`() {
+        viewModel.configurationFinished(false, errorCode = "98")
+        viewModel.finishWithError(ErrorType.CONFIGURATION_ERROR)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.FACE_CONFIGURATION_ERROR)
+        }
+    }
+
+    @Test
+    fun `route user to backend error flow if needed when code is null and estimated outage is not`() {
+        viewModel.configurationFinished(false, estimatedOutage = 897)
+        viewModel.finishWithError(ErrorType.BACKEND_MAINTENANCE_ERROR)
+        viewModel.flowFinished.value?.peekContent()?.let { response ->
+            assertThat(response).isInstanceOf(IFaceErrorResponse::class.java)
+            assertThat((response as IFaceErrorResponse).reason).isEqualTo(IFaceErrorReason.BACKEND_MAINTENANCE_ERROR)
+        }
+    }
+
+    @Test
     fun `route user to backend maintenance error flow if needed`() {
         viewModel.configurationFinished(false)
         viewModel.finishWithError(ErrorType.BACKEND_MAINTENANCE_ERROR)
