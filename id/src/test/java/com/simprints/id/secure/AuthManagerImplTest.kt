@@ -6,6 +6,8 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.exceptions.safe.BackendMaintenanceException
+import com.simprints.id.exceptions.safe.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.network.SimApiClientImpl
@@ -28,6 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import retrofit2.HttpException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -69,6 +72,54 @@ class AuthManagerImplTest {
             )
 
             assertThrows<BackendMaintenanceException> {
+                makeTestRequestForTokenData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving503ErrorFromServer_shouldThrowServerException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    505,
+                    "backendMaintenanceErrorResponse"
+                )
+            )
+
+            assertThrows<BackendMaintenanceException> {
+                makeTestRequestForTokenData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving504ErrorFromServer_shouldThrowInternalServerException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    504,
+                    "backendMaintenanceErrorResponse"
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForTokenData()
+            }
+        }
+    }
+
+    @Test
+    fun receivingErrorFromServer_shouldThrowHttpException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    600,
+                    "backendMaintenanceErrorResponse"
+                )
+            )
+
+            assertThrows<HttpException> {
                 makeTestRequestForTokenData()
             }
         }
