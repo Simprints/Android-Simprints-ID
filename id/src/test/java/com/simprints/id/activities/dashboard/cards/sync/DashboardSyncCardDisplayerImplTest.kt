@@ -83,6 +83,18 @@ class DashboardSyncCardDisplayerImplTest {
     }
 
     @Test
+    fun syncCardDisplayer_backendFailedSyncStateWithNullTime_shouldDisplayTheCorrectUI() {
+        syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime, estimatedOutage = null))
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+    }
+
+    @Test
+    fun syncCardDisplayer_backendFailedSyncStateWith0Time_shouldDisplayTheCorrectUI() {
+        syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime, estimatedOutage = 0L))
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+    }
+
+    @Test
     fun syncCardDisplayer_tryAgainSyncState_shouldDisplayTheCorrectUI() {
         syncCardDisplayer.displayState(SyncTryAgain(lastSyncTime))
         syncCardRootLayout.assessTryAgainStateSyncUI()

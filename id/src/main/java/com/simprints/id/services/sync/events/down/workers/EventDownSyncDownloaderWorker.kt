@@ -37,20 +37,15 @@ class EventDownSyncDownloaderWorker(
 
     override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
 
-    @Inject
-    lateinit var downSyncHelper: EventDownSyncHelper
+    @Inject lateinit var downSyncHelper: EventDownSyncHelper
 
-    @Inject
-    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
-    @Inject
-    lateinit var syncCache: EventSyncCache
+    @Inject lateinit var syncCache: EventSyncCache
 
-    @Inject
-    lateinit var jsonHelper: JsonHelper
+    @Inject lateinit var jsonHelper: JsonHelper
 
-    @Inject
-    lateinit var dispatcher: DispatcherProvider
+    @Inject lateinit var dispatcher: DispatcherProvider
 
     internal var eventDownSyncDownloaderTask: EventDownSyncDownloaderTask = EventDownSyncDownloaderTaskImpl()
 
