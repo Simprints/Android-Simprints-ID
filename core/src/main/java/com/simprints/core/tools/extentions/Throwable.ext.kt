@@ -19,7 +19,7 @@ fun Throwable.getEstimatedOutage(): Long? {
         try {
             val exception = this as HttpException
             val headers = exception.response()?.headers()
-            headers?.get(NetworkConstants.HEADER_RETRY_AFTER)?.toLong()
+            headers?.get(NetworkConstants.HEADER_RETRY_AFTER)?.toLong() ?: 0L
         } catch (e: NumberFormatException) {
             null
         }
