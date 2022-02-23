@@ -109,6 +109,23 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
     }
 
     @Test
+    fun receivingErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    503,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
     fun receivingABackendErrorFromServer_shouldThrowABackendMaintenanceException() {
         runBlocking {
             apiClient.okHttpClientConfig.addInterceptor(
