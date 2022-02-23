@@ -12,11 +12,14 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.toCollection
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.io.ByteArrayInputStream
+import retrofit2.HttpException
+import retrofit2.Response
 import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset
@@ -43,14 +46,14 @@ class LongConsentRepositoryImplTest {
     )
 
     @Test
-    fun `Delete all consents`() {
+    fun `delete all consents`() {
         longConsentRepository.deleteLongConsents()
 
         verify(exactly = 1) { longConsentLocalDataSourceMock.deleteLongConsents() }
     }
 
     @Test
-    fun `Return local consent`() = testCoroutineRule.runBlockingTest {
+    fun `return local consent`() = testCoroutineRule.runBlockingTest {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns DEFAULT_LONG_CONSENT_TEXT
 
         val states = mutableListOf<LongConsentFetchResult>()
@@ -63,7 +66,7 @@ class LongConsentRepositoryImplTest {
     }
 
     @Test
-    fun `Download the consent in multiple parts`() = testCoroutineRule.runBlockingTest {
+    fun `download the consent in multiple parts`() = testCoroutineRule.runBlockingTest {
         val bytesSize = 2048
         val consentBytes = Random.nextBytes(bytesSize)
         val consentText = consentBytes.toString(Charset.defaultCharset())
@@ -85,7 +88,7 @@ class LongConsentRepositoryImplTest {
     }
 
     @Test
-    fun `Return error on something wrong`() = testCoroutineRule.runBlockingTest {
+    fun `return error on something wrong`() = testCoroutineRule.runBlockingTest {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
         coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws IOException()
 
@@ -96,6 +99,27 @@ class LongConsentRepositoryImplTest {
             assertThat(size).isEqualTo(2)
             assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
             assertThat(get(1)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+        }
+    }
+
+    @Test
+    fun `return backend error on backend maintenance`() = testCoroutineRule.runBlockingTest {
+        val errorResponse =
+            "{\"error\":\"002\"}"
+        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<Any>(503, errorResponseBody)
+        val backendMaintenanceException = HttpException(mockResponse)
+
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws backendMaintenanceException
+
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+
+        with(states) {
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
+            assertThat(get(1)).isInstanceOf(LongConsentFetchResult.FailedBecauseBackendMaintenance::class.java)
         }
     }
 }
