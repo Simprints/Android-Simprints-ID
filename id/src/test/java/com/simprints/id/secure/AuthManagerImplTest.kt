@@ -82,12 +82,12 @@ class AuthManagerImplTest {
         runBlocking {
             apiClient.okHttpClientConfig.addInterceptor(
                 FakeResponseInterceptor(
-                    505,
+                    500,
                     "backendMaintenanceErrorResponse"
                 )
             )
 
-            assertThrows<BackendMaintenanceException> {
+            assertThrows<SimprintsInternalServerException> {
                 makeTestRequestForTokenData()
             }
         }
@@ -114,7 +114,7 @@ class AuthManagerImplTest {
         runBlocking {
             apiClient.okHttpClientConfig.addInterceptor(
                 FakeResponseInterceptor(
-                    600,
+                    602,
                     "backendMaintenanceErrorResponse"
                 )
             )
