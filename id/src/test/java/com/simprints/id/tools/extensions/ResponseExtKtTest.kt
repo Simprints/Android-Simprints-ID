@@ -22,4 +22,14 @@ class ResponseExtKtTest {
 
         assertThat(mockResponse.isBackendMaitenanceException()).isTrue()
     }
+
+    @Test
+    fun gettingHttpErrorReturnsFalse() {
+        val errorResponse =
+            "{\"some\":\"data\"}"
+        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<Any>(503, errorResponseBody)
+
+        assertThat(mockResponse.isBackendMaitenanceException()).isFalse()
+    }
 }
