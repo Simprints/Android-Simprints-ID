@@ -28,11 +28,7 @@ class LongConsentRepositoryImpl(
             }
         } catch (t: Throwable) {
             Simber.e(t)
-            if (t.isBackendMaintenanceException()) {
-                emit(FailedBecauseBackendMaintenance(language, t, t.getEstimatedOutage()))
-            } else {
-                emit(Failed(language, t))
-            }
+            emit(Failed(language, t))
         }
     }
 
