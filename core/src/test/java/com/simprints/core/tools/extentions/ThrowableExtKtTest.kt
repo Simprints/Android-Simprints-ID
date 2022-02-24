@@ -29,6 +29,43 @@ class ThrowableExtKtTest {
     }
 
     @Test
+    fun gettingExceptionWithEmptyResponseReturnsFalse() {
+        val throwable = createHttpException(503, "")
+
+        assertThat(throwable.isBackendMaintenanceException()).isFalse()
+    }
+
+    @Test
+    fun gettingExceptionWithNullResponseReturnsFalse() {
+        val exception: HttpException = mockk()
+
+        every {
+            exception.response()?.errorBody()
+        } returns null
+
+        every {
+            exception.response()?.code()
+        } returns 503
+
+        assertThat(exception.isBackendMaintenanceException()).isFalse()
+    }
+
+    @Test
+    fun gettingExceptionWithNullErrorBodyStringReturnsFalse() {
+        val exception: HttpException = mockk()
+
+        every {
+            exception.response()?.errorBody()?.string()
+        } returns null
+
+        every {
+            exception.response()?.code()
+        } returns 503
+
+        assertThat(exception.isBackendMaintenanceException()).isFalse()
+    }
+
+    @Test
     fun gettingNoBackendErrorReturnsFalse() {
         val throwable = createHttpException(500, errorResponse)
 
@@ -71,9 +108,57 @@ class ThrowableExtKtTest {
         assertThat(exception.getEstimatedOutage()).isEqualTo(600L)
     }
 
-    private fun createHttpException(code: Int, errorResponse: String): HttpException {
-        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
-        val mockResponse = Response.error<Any>(code, errorResponseBody)
+    @Test
+    fun gettingBackendErrorWithNullHeaderReturns0() {
+        val exception: HttpException = mockk()
+
+        every {
+            exception.response()
+        } returns mockk()
+
+        every {
+            exception.response()?.code()
+        } returns 503
+
+        every {
+            exception.response()?.errorBody()?.string()
+        } returns backendMaintenanceErroresponse
+
+        every {
+            exception.response()?.headers()
+        } returns Headers.Builder()
+            .add("Retry-After", "hello")
+            .build()
+
+        assertThat(exception.getEstimatedOutage()).isNull()
+    }
+
+    @Test
+    fun gettingBackendErrorWithInvalidHeaderReturnsNull() {
+        val exception: HttpException = mockk()
+
+        every {
+            exception.response()
+        } returns mockk()
+
+        every {
+            exception.response()?.code()
+        } returns 503
+
+        every {
+            exception.response()?.errorBody()?.string()
+        } returns backendMaintenanceErroresponse
+
+        every {
+            exception.response()?.headers()
+        } returns null
+
+        assertThat(exception.getEstimatedOutage()).isEqualTo(0L)
+    }
+
+    private fun createHttpException(code: Int, errorResponse: String?): HttpException {
+        val errorResponseBody = errorResponse?.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<Any>(code, errorResponseBody!!)
         return HttpException(mockResponse)
     }
 }

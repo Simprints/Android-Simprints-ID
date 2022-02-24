@@ -32,6 +32,7 @@ class AuthenticationHelperImplTest {
         val result = mockException(BackendMaintenanceException())
 
         assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
+        assertThat((result as Result.BACKEND_MAINTENANCE_ERROR).estimatedOutage).isNull()
     }
 
     @Test
