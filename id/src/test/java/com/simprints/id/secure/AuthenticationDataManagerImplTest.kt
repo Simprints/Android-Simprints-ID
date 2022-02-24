@@ -36,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
 import org.robolectric.annotation.Config
+import retrofit2.HttpException
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -114,6 +115,57 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
             apiClient.okHttpClientConfig.addInterceptor(
                 FakeResponseInterceptor(
                     503,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving504ErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    504,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving602ErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    602,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<HttpException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving599ErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    599,
                     "Some response",
                     validateUrl = validateUrl
                 )

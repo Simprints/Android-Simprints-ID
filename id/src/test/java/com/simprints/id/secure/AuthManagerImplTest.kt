@@ -94,6 +94,22 @@ class AuthManagerImplTest {
     }
 
     @Test
+    fun receiving599ErrorFromServer_shouldThrowServerException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    599,
+                    "backendMaintenanceErrorResponse"
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForTokenData()
+            }
+        }
+    }
+
+    @Test
     fun receiving504ErrorFromServer_shouldThrowInternalServerException() {
         runBlocking {
             apiClient.okHttpClientConfig.addInterceptor(
