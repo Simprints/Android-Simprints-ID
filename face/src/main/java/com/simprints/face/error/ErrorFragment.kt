@@ -37,9 +37,8 @@ class ErrorFragment : Fragment(R.layout.fragment_error) {
             binding.errorTitle.text = errorCode?.let { getString(title) + " ($it)" } ?: getString(title)
             binding.errorMessage.text =
                 if (estimatedOutage != null && estimatedOutage != 0L) getString(
-                    R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
-                        estimatedOutage!!
-                    )
+                    R.string.error_backend_maintenance_with_time_message,
+                    getFormattedEstimatedOutage(estimatedOutage!!)
                 ) else getString(message)
             binding.errorButton.text = getString(buttonText)
             binding.errorImage.setImageResource(mainDrawable)
