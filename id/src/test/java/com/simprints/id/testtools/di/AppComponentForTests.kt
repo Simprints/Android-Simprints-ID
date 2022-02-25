@@ -6,6 +6,8 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenterTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.consent.ConsentActivityTest
+import com.simprints.id.activities.login.LoginActivityTest
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivityUnitTest
 import com.simprints.id.activities.settings.SettingsActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragmentTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelTest
@@ -61,6 +63,8 @@ interface AppComponentForTests : AppComponent {
     fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
     fun inject(settingsActivityTest: SettingsActivityTest)
     fun inject(moduleSelectionFragmentTest: ModuleSelectionFragmentTest)
+    fun inject(loginActivityTest: LoginActivityTest)
+    fun inject(privacyNoticeActivityUnitTest: PrivacyNoticeActivityUnitTest)
 
     @ExperimentalCoroutinesApi
     fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
