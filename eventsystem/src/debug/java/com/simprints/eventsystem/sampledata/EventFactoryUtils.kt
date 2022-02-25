@@ -11,7 +11,7 @@ import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Authenticated
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
@@ -269,7 +269,7 @@ fun createAuthenticationEvent() =
         CREATED_AT,
         ENDED_AT,
         UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
-        AUTHENTICATED,
+        Authenticated,
         eventLabels
     )
 

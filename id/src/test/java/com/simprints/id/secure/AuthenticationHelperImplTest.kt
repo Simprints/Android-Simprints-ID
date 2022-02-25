@@ -31,15 +31,15 @@ class AuthenticationHelperImplTest {
     fun shouldSetBackendErrorIfBackendMaintenanceException() = runBlocking {
         val result = mockException(BackendMaintenanceException())
 
-        assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
-        assertThat((result as Result.BACKEND_MAINTENANCE_ERROR).estimatedOutage).isNull()
+        assertThat(result).isInstanceOf(Result.BackendMaintenanceError::class.java)
+        assertThat((result as Result.BackendMaintenanceError).estimatedOutage).isNull()
     }
 
     @Test
     fun shouldSetOfflineIfIOException() = runBlocking {
         val result = mockException(IOException())
 
-        assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
+        assertThat(result).isInstanceOf(Result.Offline::class.java)
     }
 
     private suspend fun mockException(exception: Exception): Result {

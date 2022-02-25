@@ -9,14 +9,14 @@ class ApiAuthenticationPayloadKtTest {
     @Test
     fun `should map backend error correctly`() {
         val result =
-            AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR().fromDomainToApi()
+            AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError().fromDomainToApi()
         assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.BACKEND_MAINTENANCE_ERROR::class.java)
     }
 
     @Test
     fun `should map offline error correctly`() {
         val result =
-            AuthenticationEvent.AuthenticationPayload.Result.OFFLINE.fromDomainToApi()
+            AuthenticationEvent.AuthenticationPayload.Result.Offline.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.OFFLINE::class.java)
     }
 }

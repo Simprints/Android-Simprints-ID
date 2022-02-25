@@ -9,14 +9,14 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BadCredentials
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Offline
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetInvalidClaim
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetUnavailable
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TechnicalFailure
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Unknown
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
@@ -110,7 +110,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeValidCredentials_clickSignIn_shouldBeAuthenticated() {
-        mockAuthenticationResult(AUTHENTICATED)
+        mockAuthenticationResult(Authenticated)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -125,7 +125,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenOffline_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(OFFLINE)
+        mockAuthenticationResult(Offline)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -140,7 +140,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenBackendMaintenance_clickSignIn_shouldShowTimedError() {
-        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR(estimatedOutage))
+        mockAuthenticationResult(BackendMaintenanceError(estimatedOutage))
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -157,7 +157,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenBackendMaintenance_clickSignIn_shouldShowError() {
-        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR())
+        mockAuthenticationResult(BackendMaintenanceError())
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -174,7 +174,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeInvalidCredentials_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(BAD_CREDENTIALS)
+        mockAuthenticationResult(BadCredentials)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -189,7 +189,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withServerError_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(TECHNICAL_FAILURE)
+        mockAuthenticationResult(TechnicalFailure)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -204,7 +204,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(SAFETYNET_INVALID_CLAIM)
+        mockAuthenticationResult(SafetyNetInvalidClaim)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -219,7 +219,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(SAFETYNET_UNAVAILABLE)
+        mockAuthenticationResult(SafetyNetUnavailable)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -234,7 +234,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withUnknownError_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(UNKNOWN)
+        mockAuthenticationResult(Unknown)
 
         loginActivity {
             withMandatoryCredentialsPresent()

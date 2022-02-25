@@ -193,15 +193,15 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addAuthenticationEvent() {
         listOf(
-            Result.OFFLINE,
-            Result.AUTHENTICATED,
-            Result.BAD_CREDENTIALS,
-            Result.OFFLINE,
-            Result.TECHNICAL_FAILURE,
-            Result.BACKEND_MAINTENANCE_ERROR(),
-            Result.SAFETYNET_UNAVAILABLE,
-            Result.SAFETYNET_INVALID_CLAIM,
-            Result.UNKNOWN
+            Result.Offline,
+            Result.Authenticated,
+            Result.BadCredentials,
+            Result.Offline,
+            Result.TechnicalFailure,
+            Result.BackendMaintenanceError(),
+            Result.SafetyNetUnavailable,
+            Result.SafetyNetInvalidClaim,
+            Result.Unknown
         ).forEach {
             add(AuthenticationEvent(DEFAULT_TIME, DEFAULT_TIME, UserInfo("some_project", DEFAULT_USER_ID), it, eventLabels))
         }

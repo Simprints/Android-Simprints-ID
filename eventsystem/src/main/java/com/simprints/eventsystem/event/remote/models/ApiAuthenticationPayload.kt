@@ -2,14 +2,14 @@ package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BadCredentials
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Offline
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetInvalidClaim
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetUnavailable
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TechnicalFailure
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Unknown
 import com.simprints.eventsystem.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
@@ -47,12 +47,12 @@ data class ApiAuthenticationPayload(override val startTime: Long,
 
 fun AuthenticationPayload.Result.fromDomainToApi() =
     when (this) {
-        AUTHENTICATED -> ApiResult.AUTHENTICATED
-        BAD_CREDENTIALS -> ApiResult.BAD_CREDENTIALS
-        OFFLINE -> ApiResult.OFFLINE
-        TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
-        SAFETYNET_UNAVAILABLE -> ApiResult.SAFETYNET_UNAVAILABLE
-        SAFETYNET_INVALID_CLAIM -> ApiResult.SAFETYNET_INVALID_CLAIM
-        is BACKEND_MAINTENANCE_ERROR -> ApiResult.BACKEND_MAINTENANCE_ERROR
-        UNKNOWN -> ApiResult.TECHNICAL_FAILURE
+        Authenticated -> ApiResult.AUTHENTICATED
+        BadCredentials -> ApiResult.BAD_CREDENTIALS
+        Offline -> ApiResult.OFFLINE
+        TechnicalFailure -> ApiResult.TECHNICAL_FAILURE
+        SafetyNetUnavailable -> ApiResult.SAFETYNET_UNAVAILABLE
+        SafetyNetInvalidClaim -> ApiResult.SAFETYNET_INVALID_CLAIM
+        is BackendMaintenanceError -> ApiResult.BACKEND_MAINTENANCE_ERROR
+        Unknown -> ApiResult.TECHNICAL_FAILURE
     }
