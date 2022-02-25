@@ -32,6 +32,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
@@ -107,6 +108,33 @@ class EventDownSyncDownloaderWorkerTest {
             doWork()
 
             verify { resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to null)) }
+        }
+    }
+
+    @Test
+    fun worker_failForTimedBackendMaintenanceError_shouldFail() = runBlocking {
+        val exception: HttpException = mockk()
+
+        every {
+            exception.response()?.errorBody()?.string()
+        } returns "{\"error\":\"002\"}"
+
+        every {
+            exception.response()?.code()
+        } returns 503
+
+        every {
+            exception.response()?.headers()
+        } returns Headers.Builder()
+            .add("Retry-After", "600")
+            .build()
+
+        with(eventDownSyncDownloaderWorker) {
+            coEvery { eventDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws exception
+
+            doWork()
+
+            verify { resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L)) }
         }
     }
 
