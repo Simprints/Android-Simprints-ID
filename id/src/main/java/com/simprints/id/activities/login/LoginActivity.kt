@@ -104,14 +104,14 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleSignInResult(result: Result) {
         when (result) {
-            Result.AUTHENTICATED -> handleSignInSuccess()
-            Result.OFFLINE -> handleSignInFailedNoConnection()
-            Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
-            Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
-            Result.SAFETYNET_INVALID_CLAIM,
-            Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
-            is Result.BACKEND_MAINTENANCE_ERROR -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
-            Result.UNKNOWN -> handleSignInFailedUnknownReason()
+            Result.Authenticated -> handleSignInSuccess()
+            Result.Offline -> handleSignInFailedNoConnection()
+            Result.BadCredentials -> handleSignInFailedInvalidCredentials()
+            Result.TechnicalFailure -> handleSignInFailedServerError()
+            Result.SafetyNetInvalidClaim,
+            Result.SafetyNetUnavailable -> handleSafetyNetDownError()
+            is Result.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
+            Result.Unknown -> handleSignInFailedUnknownReason()
         }
     }
 

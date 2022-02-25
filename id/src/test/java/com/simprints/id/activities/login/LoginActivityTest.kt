@@ -83,7 +83,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+            } returns AuthenticationEvent.AuthenticationPayload.Result.Authenticated
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -104,7 +104,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR()
+            } returns AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError()
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -127,7 +127,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR(600L)
+            } returns AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError(600L)
 
             createAndStartActivity<LoginActivity>(loginBundle)
 

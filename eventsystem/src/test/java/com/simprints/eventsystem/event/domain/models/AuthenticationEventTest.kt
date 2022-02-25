@@ -2,9 +2,9 @@ package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Unknown
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
@@ -19,42 +19,42 @@ class AuthenticationEventTest {
 
     @Test
     fun create_AuthenticationEvent() {
-        createAuthenticationEvent(AUTHENTICATED)
+        createAuthenticationEvent(Authenticated)
     }
 
     @Test
     fun create_AuthenticationEvent_withBackendError() {
-        createAuthenticationEvent(BACKEND_MAINTENANCE_ERROR())
+        createAuthenticationEvent(BackendMaintenanceError())
     }
 
     @Test
     fun create_AuthenticationEvent_withbadCredsError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.BAD_CREDENTIALS)
+        createAuthenticationEvent(AuthenticationPayload.Result.BadCredentials)
     }
 
     @Test
     fun create_AuthenticationEvent_withUnknownError() {
-        createAuthenticationEvent(UNKNOWN)
+        createAuthenticationEvent(Unknown)
     }
 
     @Test
     fun create_AuthenticationEvent_withOfflineError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.OFFLINE)
+        createAuthenticationEvent(AuthenticationPayload.Result.Offline)
     }
 
     @Test
     fun create_AuthenticationEvent_withTechnicalError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.TECHNICAL_FAILURE)
+        createAuthenticationEvent(AuthenticationPayload.Result.TechnicalFailure)
     }
 
     @Test
     fun create_AuthenticationEvent_withSafetyUnavailableError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE)
+        createAuthenticationEvent(AuthenticationPayload.Result.SafetyNetUnavailable)
     }
 
     @Test
     fun create_AuthenticationEvent_withSafetyInvalidError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM)
+        createAuthenticationEvent(AuthenticationPayload.Result.SafetyNetInvalidClaim)
     }
 
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {

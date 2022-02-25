@@ -8,13 +8,13 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BadCredentials
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Offline
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetInvalidClaim
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetUnavailable
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TechnicalFailure
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Unknown
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.exceptions.safe.BackendMaintenanceException
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
@@ -49,7 +49,7 @@ class AuthenticationHelperImpl(
             projectAuthenticator.authenticate(nonceScope, projectSecret, deviceId)
 
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
-            Result.AUTHENTICATED
+            Result.Authenticated
         } catch (t: Throwable) {
             Simber.e(t)
 
@@ -65,12 +65,12 @@ class AuthenticationHelperImpl(
 
     private fun extractResultFromException(t: Throwable): Result {
         return when (t) {
-            is IOException -> OFFLINE
-            is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
-            is SimprintsInternalServerException -> TECHNICAL_FAILURE
-            is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR(t.getEstimatedOutage())
+            is IOException -> Offline
+            is AuthRequestInvalidCredentialsException -> BadCredentials
+            is SimprintsInternalServerException -> TechnicalFailure
+            is BackendMaintenanceException -> BackendMaintenanceError(t.getEstimatedOutage())
             is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
-            else -> UNKNOWN
+            else -> Unknown
         }
     }
 
@@ -78,8 +78,8 @@ class AuthenticationHelperImpl(
         reason: SafetyNetExceptionReason
     ): Result {
         return when (reason) {
-            SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
-            SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
+            SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SafetyNetUnavailable
+            SafetyNetExceptionReason.INVALID_CLAIMS -> SafetyNetInvalidClaim
         }
     }
 
