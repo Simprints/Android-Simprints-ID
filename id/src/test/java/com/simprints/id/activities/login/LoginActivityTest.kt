@@ -100,6 +100,132 @@ class LoginActivityTest {
     }
 
     @Test
+    fun withOfflineConfirmViews() {
+        runBlocking {
+            coEvery {
+                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
+            } returns AuthenticationEvent.AuthenticationPayload.Result.Offline
+
+            createAndStartActivity<LoginActivity>(loginBundle)
+
+            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
+            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
+            onView(withId(R.id.loginButtonSignIn)).perform(click())
+            onView(withId(R.id.errorCard)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+            onView(withId(R.id.errorTextView)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+        }
+    }
+
+    @Test
+    fun withBadCredentialsConfirmViews() {
+        runBlocking {
+            coEvery {
+                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
+            } returns AuthenticationEvent.AuthenticationPayload.Result.BadCredentials
+
+            createAndStartActivity<LoginActivity>(loginBundle)
+
+            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
+            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
+            onView(withId(R.id.loginButtonSignIn)).perform(click())
+            onView(withId(R.id.errorCard)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+            onView(withId(R.id.errorTextView)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+        }
+    }
+
+    @Test
+    fun withTechnicalErrorConfirmViews() {
+        runBlocking {
+            coEvery {
+                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
+            } returns AuthenticationEvent.AuthenticationPayload.Result.TechnicalFailure
+
+            createAndStartActivity<LoginActivity>(loginBundle)
+
+            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
+            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
+            onView(withId(R.id.loginButtonSignIn)).perform(click())
+            onView(withId(R.id.errorCard)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+            onView(withId(R.id.errorTextView)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+        }
+    }
+
+    @Test
+    fun withUnknownErrorConfirmViews() {
+        runBlocking {
+            coEvery {
+                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
+            } returns AuthenticationEvent.AuthenticationPayload.Result.Unknown
+
+            createAndStartActivity<LoginActivity>(loginBundle)
+
+            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
+            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
+            onView(withId(R.id.loginButtonSignIn)).perform(click())
+            onView(withId(R.id.errorCard)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+            onView(withId(R.id.errorTextView)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+        }
+    }
+
+    @Test
+    fun withSafetyNetInvalidErrorConfirmViews() {
+        runBlocking {
+            coEvery {
+                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
+            } returns AuthenticationEvent.AuthenticationPayload.Result.SafetyNetInvalidClaim
+
+            createAndStartActivity<LoginActivity>(loginBundle)
+
+            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
+            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
+            onView(withId(R.id.loginButtonSignIn)).perform(click())
+            onView(withId(R.id.errorCard)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+            onView(withId(R.id.errorTextView)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+        }
+    }
+
+    @Test
+    fun withSafetyNetUnavailableErrorConfirmViews() {
+        runBlocking {
+            coEvery {
+                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
+            } returns AuthenticationEvent.AuthenticationPayload.Result.SafetyNetUnavailable
+
+            createAndStartActivity<LoginActivity>(loginBundle)
+
+            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
+            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
+            onView(withId(R.id.loginButtonSignIn)).perform(click())
+            onView(withId(R.id.errorCard)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+            onView(withId(R.id.errorTextView)).check(
+                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+            )
+        }
+    }
+
+    @Test
     fun withBackendMaintenanceErrorConfirmViews() {
         runBlocking {
             coEvery {
