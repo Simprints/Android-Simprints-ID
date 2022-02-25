@@ -104,7 +104,7 @@ class CoreExitFormActivityTest {
                                      exitFormText: String) {
 
         result.resultData.setExtrasClassLoader(CoreExitFormActivityResult::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<CoreExitFormActivityResult>(EXIT_FORM_BUNDLE_KEY)
+        val response = result.resultData.getParcelableExtra<CoreExitFormActivityResult>(EXIT_FORM_BUNDLE_KEY)!!
 
         with(response) {
             assertThat(this).isInstanceOf(CoreExitFormActivityResult::class.java)
