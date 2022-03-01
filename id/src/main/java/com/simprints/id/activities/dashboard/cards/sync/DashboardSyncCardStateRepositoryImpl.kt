@@ -4,7 +4,15 @@ import androidx.lifecycle.MediatorLiveData
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncComplete
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncDefault
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailed
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailedBackendMaintenance
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncHasNoModules
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -19,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 import kotlin.coroutines.coroutineContext
 
 class DashboardSyncCardStateRepositoryImpl(
@@ -37,6 +45,7 @@ class DashboardSyncCardStateRepositoryImpl(
     private var isConnectedLiveData = deviceManager.isConnectedLiveData
 
     private var lastTimeSyncRun: Date? = null
+    private var estimatedOutage: Long? = null
 
     private val lastTimeSyncSucceed
         get() = cacheSync.readLastSuccessfulSyncTime()
@@ -90,6 +99,7 @@ class DashboardSyncCardStateRepositoryImpl(
                 syncState.total
             )
             isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
+            isSyncFailedBecauseBackendMaintenance(allSyncStates) -> SyncFailedBackendMaintenance(lastTimeSyncSucceed, estimatedOutage)
             isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed)
             else -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
         }
@@ -156,6 +166,18 @@ class DashboardSyncCardStateRepositoryImpl(
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
+
+    private fun isSyncFailedBecauseBackendMaintenance(allSyncStates: List<EventSyncState.SyncWorkerInfo>): Boolean {
+        val isBackendMaintenance =
+            allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseBackendMaintenance }
+        if (isBackendMaintenance) {
+            val syncWorkerInfo =
+                allSyncStates.find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
+            val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
+            estimatedOutage = failedWorkerState?.estimatedOutage
+        }
+        return isBackendMaintenance
+    }
 
     private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.isEmpty()

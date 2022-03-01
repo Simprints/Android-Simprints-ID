@@ -1,12 +1,12 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-
 import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
-import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class AuthenticationEvent(
@@ -26,7 +26,8 @@ data class AuthenticationEvent(
         UUID.randomUUID().toString(),
         labels,
         AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
-        AUTHENTICATION)
+        AUTHENTICATION
+    )
 
 
     @Keep
@@ -42,14 +43,19 @@ data class AuthenticationEvent(
         @Keep
         data class UserInfo(val projectId: String, val userId: String)
 
-        enum class Result {
-            AUTHENTICATED,
-            BAD_CREDENTIALS,
-            OFFLINE,
-            TECHNICAL_FAILURE,
-            SAFETYNET_UNAVAILABLE,
-            SAFETYNET_INVALID_CLAIM,
-            UNKNOWN
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
+        @JsonSubTypes(
+            JsonSubTypes.Type(value = Result.BackendMaintenanceError::class)
+        )
+        sealed class Result {
+            object Authenticated : Result()
+            object BadCredentials : Result()
+            object Offline : Result()
+            object TechnicalFailure : Result()
+            data class BackendMaintenanceError(val estimatedOutage: Long? = null) : Result()
+            object SafetyNetUnavailable : Result()
+            object SafetyNetInvalidClaim : Result()
+            object Unknown : Result()
         }
     }
 

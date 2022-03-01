@@ -8,14 +8,16 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
-import java.util.*
+import java.util.UUID
 
 typealias InterfaceInvocation<T, V> = suspend (T) -> V
 
@@ -50,6 +52,9 @@ class LicenseRemoteDataSourceImplTest {
                 )
             )
         )
+        coEvery { remoteInterface.getLicense("backendMaintenanceErrorProject", any(), any()) } throws
+            createBackendMaintenanceException()
+
         coEvery { remoteInterface.getLicense("noQuotaProject", any(), any()) } throws SyncCloudIntegrationException(
             cause = HttpException(
                 Response.error<ApiLicense>(
@@ -81,6 +86,14 @@ class LicenseRemoteDataSourceImplTest {
     }
 
     @Test
+    fun `Get no license if is a backend maintenance exception`() = runBlocking {
+        val newLicense =
+            licenseRemoteDataSourceImpl.getLicense("backendMaintenanceErrorProject", "deviceId", LicenseVendor.RANK_ONE_FACE)
+
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.BackendMaintenanceError())
+    }
+
+    @Test
     fun `Get no license if is an exception - project quota`() = runBlockingTest {
         val newLicense =
             licenseRemoteDataSourceImpl.getLicense("noQuotaProject", "deviceId", LicenseVendor.RANK_ONE_FACE)
@@ -94,5 +107,13 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense("serviceUnavailable", "deviceId", LicenseVendor.RANK_ONE_FACE)
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+    }
+
+    private fun createBackendMaintenanceException(): HttpException {
+        val errorResponse =
+            "{\"error\":\"002\"}"
+        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<ApiLicense>(503, errorResponseBody)
+        return HttpException(mockResponse)
     }
 }

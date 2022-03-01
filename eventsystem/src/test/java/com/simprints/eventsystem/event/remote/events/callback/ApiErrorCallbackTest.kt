@@ -2,7 +2,9 @@ package com.simprints.eventsystem.event.remote.events.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback
 import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.*
+import com.simprints.eventsystem.event.remote.models.callback.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.callback.fromDomainToApi
 import org.junit.Test
 
@@ -56,4 +58,27 @@ class ApiErrorCallbackTest {
         assertThat(domain.fromDomainToApi()).isEqualTo(api)
     }
 
+    @Test
+    fun backendError_fromDomainToApi() {
+        val domain = ErrorCallbackEvent.ErrorCallbackPayload.Reason.BACKEND_MAINTENANCE_ERROR
+        val api = BACKEND_MAINTENANCE_ERROR
+
+        assertThat(domain.fromDomainToApi()).isEqualTo(api)
+    }
+
+    @Test
+    fun backendError_fromApiToDomain() {
+        val api = BACKEND_MAINTENANCE_ERROR
+        val domain = ErrorCallbackEvent.ErrorCallbackPayload.Reason.BACKEND_MAINTENANCE_ERROR
+
+        assertThat(api.fromApiToDomain()).isEqualTo(domain)
+    }
+
+    @Test
+    fun loginNotComplete_fromApiToDomain() {
+        val api = LOGIN_NOT_COMPLETE
+        val domain = ErrorCallbackEvent.ErrorCallbackPayload.Reason.LOGIN_NOT_COMPLETE
+
+        assertThat(api.fromApiToDomain()).isEqualTo(domain)
+    }
 }

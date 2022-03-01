@@ -223,6 +223,10 @@
 
     <string name="menu_settings">Settings</string>
 
+    <!--Maintenance mode errors-->
+    <string name="error_backend_maintenance_message">The systems are currently under maintenance. Please try again later.</string>
+    <string name="error_backend_maintenance_with_time_message">The systems are currently under maintenance. Please try again after %s.</string>
+
     <!--Settings Activity-->
     <string name="title_activity_settings">Settings</string>
     <string name="settings_general">GENERAL</string>

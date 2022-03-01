@@ -1,11 +1,24 @@
 package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BadCredentials
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Offline
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetInvalidClaim
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SafetyNetUnavailable
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TechnicalFailure
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Unknown
 import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -36,6 +49,8 @@ class LoginActivityAndroidTest {
     private val appModule by lazy {
         TestAppModule(app)
     }
+
+    private val estimatedOutage = 600L
 
     private val securityModule by lazy {
         TestSecurityModule(
@@ -95,7 +110,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeValidCredentials_clickSignIn_shouldBeAuthenticated() {
-        mockAuthenticationResult(AUTHENTICATED)
+        mockAuthenticationResult(Authenticated)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -110,7 +125,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenOffline_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(OFFLINE)
+        mockAuthenticationResult(Offline)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -124,8 +139,42 @@ class LoginActivityAndroidTest {
     }
 
     @Test
+    fun whenBackendMaintenance_clickSignIn_shouldShowTimedError() {
+        mockAuthenticationResult(BackendMaintenanceError(estimatedOutage))
+
+        loginActivity {
+            withMandatoryCredentialsPresent()
+            withSuppliedProjectIdAndIntentProjectIdMatching()
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+            withSecurityStatusRunning()
+        } clickSignIn {
+            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)))
+            onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
+    fun whenBackendMaintenance_clickSignIn_shouldShowError() {
+        mockAuthenticationResult(BackendMaintenanceError())
+
+        loginActivity {
+            withMandatoryCredentialsPresent()
+            withSuppliedProjectIdAndIntentProjectIdMatching()
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+            withSecurityStatusRunning()
+        } clickSignIn {
+            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
+            onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
     fun typeInvalidCredentials_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(BAD_CREDENTIALS)
+        mockAuthenticationResult(BadCredentials)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -140,7 +189,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withServerError_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(TECHNICAL_FAILURE)
+        mockAuthenticationResult(TechnicalFailure)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -155,7 +204,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(SAFETYNET_INVALID_CLAIM)
+        mockAuthenticationResult(SafetyNetInvalidClaim)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -170,7 +219,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(SAFETYNET_UNAVAILABLE)
+        mockAuthenticationResult(SafetyNetUnavailable)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -185,7 +234,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withUnknownError_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(UNKNOWN)
+        mockAuthenticationResult(Unknown)
 
         loginActivity {
             withMandatoryCredentialsPresent()

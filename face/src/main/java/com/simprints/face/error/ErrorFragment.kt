@@ -14,6 +14,7 @@ import com.simprints.face.controllers.core.events.model.FaceAlertType
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentErrorBinding
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
+import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -34,7 +35,11 @@ class ErrorFragment : Fragment(R.layout.fragment_error) {
                 ContextCompat.getColor(requireContext(), backgroundColor)
             )
             binding.errorTitle.text = errorCode?.let { getString(title) + " ($it)" } ?: getString(title)
-            binding.errorMessage.text = getString(message)
+            binding.errorMessage.text =
+                if (estimatedOutage != null && estimatedOutage != 0L) getString(
+                    R.string.error_backend_maintenance_with_time_message,
+                    getFormattedEstimatedOutage(estimatedOutage!!)
+                ) else getString(message)
             binding.errorButton.text = getString(buttonText)
             binding.errorImage.setImageResource(mainDrawable)
         }

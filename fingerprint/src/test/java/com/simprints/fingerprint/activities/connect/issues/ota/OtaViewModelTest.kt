@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
@@ -19,17 +20,23 @@ import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
+import com.simprints.id.data.license.remote.ApiLicense
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Observable
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 
 class OtaViewModelTest {
 
@@ -114,7 +121,10 @@ class OtaViewModelTest {
     fun otaFailsFirstAttempt_otaException_correctlyUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performStmOta() } returns Observable.concat(Observable.just(STM_OTA_STEPS[0]), Observable.error(OtaFailedException("oops")))
+        every { scannerMock.performStmOta() } returns Observable.concat(
+            Observable.just(STM_OTA_STEPS[0]),
+            Observable.error(OtaFailedException("oops"))
+        )
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
@@ -133,7 +143,10 @@ class OtaViewModelTest {
     fun otaFailsLastAttempt_otaException_correctlyUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performStmOta() } returns Observable.concat(Observable.just(STM_OTA_STEPS[0]), Observable.error(OtaFailedException("oops")))
+        every { scannerMock.performStmOta() } returns Observable.concat(
+            Observable.just(STM_OTA_STEPS[0]),
+            Observable.error(OtaFailedException("oops"))
+        )
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), OtaViewModel.MAX_RETRY_ATTEMPTS)
 
@@ -142,14 +155,36 @@ class OtaViewModelTest {
         assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
         assertThat(capturedEvents[1].failureReason).isNotEmpty()
 
-        otaViewModel.otaFailed.assertEventReceived()
+        otaViewModel.otaFailed.assertEventReceivedWithContent(FetchOtaResult())
+    }
+
+    @Test
+    fun otaFailsLastAttempt_backendMaintenanceException_correctlyUpdatesStateAndSavesEvent() {
+        val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
+        every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
+        every { scannerMock.performStmOta() } returns Observable.concat(
+            Observable.just(STM_OTA_STEPS[0]),
+            Observable.error(createBackendMaintenanceException())
+        )
+
+        otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), OtaViewModel.MAX_RETRY_ATTEMPTS)
+
+        verify(exactly = 2) { sessionEventsManagerMock.addEventInBackground(any()) }
+        assertThat(capturedEvents[1].chip).isEqualTo("stm")
+        assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
+        assertThat(capturedEvents[1].failureReason).isNotEmpty()
+
+        otaViewModel.otaFailed.assertEventReceivedWithContent(FetchOtaResult(isMaintenanceMode = true))
     }
 
     @Test
     fun otaFailsFirstAttempt_otaExceptionRequiringDelay_correctlyDelaysThenUpdatesStateAndSavesEvent() {
         val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
-        every { scannerMock.performUn20Ota() } returns Observable.concat(Observable.just(Un20OtaStep.AwaitingCacheCommit), Observable.error(OtaFailedException("oops")))
+        every { scannerMock.performUn20Ota() } returns Observable.concat(
+            Observable.just(Un20OtaStep.AwaitingCacheCommit),
+            Observable.error(OtaFailedException("oops"))
+        )
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
@@ -185,17 +220,40 @@ class OtaViewModelTest {
 
         private val CYPRESS_OTA_STEPS = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
-            listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion, CypressOtaStep.UpdatingUnifiedVersionInformation)
+            listOf(
+                CypressOtaStep.ReconnectingAfterTransfer,
+                CypressOtaStep.ValidatingNewFirmwareVersion,
+                CypressOtaStep.UpdatingUnifiedVersionInformation
+            )
 
-        private val STM_OTA_STEPS = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
-            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
+        private val STM_OTA_STEPS = listOf(
+            StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
+            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer
+        ) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
-            listOf(StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion,
-                StmOtaStep.ReconnectingAfterValidating, StmOtaStep.UpdatingUnifiedVersionInformation)
+            listOf(
+                StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion,
+                StmOtaStep.ReconnectingAfterValidating, StmOtaStep.UpdatingUnifiedVersionInformation
+            )
 
-        private val UN20_OTA_STEPS = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
-            OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
-                Un20OtaStep.ValidatingNewFirmwareVersion, Un20OtaStep.ReconnectingAfterValidating, Un20OtaStep.UpdatingUnifiedVersionInformation)
+        private val UN20_OTA_STEPS =
+            listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
+                OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
+                listOf(
+                    Un20OtaStep.AwaitingCacheCommit,
+                    Un20OtaStep.TurningOffUn20AfterTransfer,
+                    Un20OtaStep.TurningOnUn20AfterTransfer,
+                    Un20OtaStep.ValidatingNewFirmwareVersion,
+                    Un20OtaStep.ReconnectingAfterValidating,
+                    Un20OtaStep.UpdatingUnifiedVersionInformation
+                )
+    }
+
+    private fun createBackendMaintenanceException(): HttpException {
+        val errorResponse =
+            "{\"error\":\"002\"}"
+        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<ApiLicense>(503, errorResponseBody)
+        return HttpException(mockResponse)
     }
 }
