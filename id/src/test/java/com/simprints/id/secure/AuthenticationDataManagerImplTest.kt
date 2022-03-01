@@ -6,6 +6,7 @@ import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.exceptions.safe.BackendMaintenanceException
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactoryImpl
@@ -20,8 +21,12 @@ import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.logging.HttpLoggingInterceptor
@@ -31,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
 import org.robolectric.annotation.Config
+import retrofit2.HttpException
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -40,11 +46,15 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
+    private val backendMaintenanceErrorResponse = "{\"error\":\"002\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
     private val expectedUrl = DEFAULT_BASE_URL + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?deviceId=$DEVICE_ID"
 
-    @MockK lateinit var mockBaseUrlProvider: BaseUrlProvider
-    @MockK lateinit var mockRemoteDbManager: RemoteDbManager
+    @MockK
+    lateinit var mockBaseUrlProvider: BaseUrlProvider
+
+    @MockK
+    lateinit var mockRemoteDbManager: RemoteDbManager
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -64,15 +74,23 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         coEvery { mockRemoteDbManager.getCurrentToken() } returns "token"
         runBlocking {
-            apiClient = SimApiClientFactoryImpl(mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, JsonHelper,
-                testDispatcherProvider, HttpLoggingInterceptor()).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
+            apiClient = SimApiClientFactoryImpl(
+                mockBaseUrlProvider, "deviceId", "versionName", mockRemoteDbManager, JsonHelper,
+                testDispatcherProvider, HttpLoggingInterceptor()
+            ).buildClient(SecureApiInterface::class) as SimApiClientImpl<SecureApiInterface>
         }
     }
 
     @Test
     fun successfulResponse_shouldObtainValidAuthenticationData() {
         runBlocking {
-            apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    200,
+                    validAuthenticationJsonResponse,
+                    validateUrl = validateUrl
+                )
+            )
 
             val actualAuthenticationData = makeTestRequestForAuthenticationData()
 
@@ -86,6 +104,91 @@ class AuthenticationDataManagerImplTest : AutoCloseKoinTest() {
             apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500, validateUrl = validateUrl))
 
             assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receivingErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    503,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving504ErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    504,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving602ErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    602,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<HttpException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receiving599ErrorFromServer_shouldThrowException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    599,
+                    "Some response",
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<SimprintsInternalServerException> {
+                makeTestRequestForAuthenticationData()
+            }
+        }
+    }
+
+    @Test
+    fun receivingABackendErrorFromServer_shouldThrowABackendMaintenanceException() {
+        runBlocking {
+            apiClient.okHttpClientConfig.addInterceptor(
+                FakeResponseInterceptor(
+                    503,
+                    backendMaintenanceErrorResponse,
+                    validateUrl = validateUrl
+                )
+            )
+
+            assertThrows<BackendMaintenanceException> {
                 makeTestRequestForAuthenticationData()
             }
         }

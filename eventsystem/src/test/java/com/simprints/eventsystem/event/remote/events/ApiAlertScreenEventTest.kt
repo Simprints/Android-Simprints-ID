@@ -168,4 +168,43 @@ class ApiAlertScreenEventTest {
         assertThat(domain.fromDomainToApi()).isEqualTo(api)
     }
 
+    @Test
+    fun backendMaintenanceError_fromDomainToApi() {
+        val domain = AlertScreenEventType.BACKEND_MAINTENANCE_ERROR
+        val api = ApiAlertScreenEventType.BACKEND_MAINTENANCE_ERROR
+
+        assertThat(domain.fromDomainToApi()).isEqualTo(api)
+    }
+
+    @Test
+    fun faceLicenseMissingError_fromDomainToApi() {
+        val domain = AlertScreenEventType.FACE_LICENSE_MISSING
+        val api = ApiAlertScreenEventType.FACE_LICENSE_MISSING
+
+        assertThat(domain.fromDomainToApi()).isEqualTo(api)
+    }
+
+    @Test
+    fun faceLicenseInvalidError_fromDomainToApi() {
+        val domain = AlertScreenEventType.FACE_LICENSE_INVALID
+        val api = ApiAlertScreenEventType.FACE_LICENSE_INVALID
+
+        assertThat(domain.fromDomainToApi()).isEqualTo(api)
+    }
+
+    @Test
+    fun invalidStateForIntentError_fromDomainToApi() {
+        val domain = AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION
+        val api = ApiAlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION
+
+        assertThat(domain.fromDomainToApi()).isEqualTo(api)
+    }
+
+    @Test
+    fun enrollastBiometricsFailedError_fromDomainToApi() {
+        val domain = AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
+        val api = ApiAlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
+
+        assertThat(domain.fromDomainToApi()).isEqualTo(api)
+    }
 }

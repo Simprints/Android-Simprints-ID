@@ -12,6 +12,7 @@ import com.simprints.id.R
 import com.simprints.id.databinding.ActivityPrivacyNoticeBinding
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
+import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import javax.inject.Inject
 
 class PrivacyNoticeActivity : BaseSplitActivity() {
@@ -72,6 +73,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             when (it) {
                 is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
                 is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
+                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(it.estimatedOutage)
                 is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress()
             }
         })
@@ -91,6 +93,24 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         showDownloadErrorToast()
     }
 
+    private fun setConsentNotAvailableBecauseBackendMaintenance(estimatedOutage: Long?) {
+        binding.apply {
+            longConsentTextView.isVisible = false
+            longConsentDownloadProgressBar.isVisible = false
+            longConsentHeader.isVisible = false
+            longConsentDownloadButton.isVisible = true
+            errorCard.isVisible = true
+
+            errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) {
+                getString(
+                    R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                        estimatedOutage
+                    )
+                )
+            } else getString(R.string.error_backend_maintenance_message)
+        }
+    }
+
     private fun setLongConsentText(text: String) {
         binding.apply {
             longConsentDownloadButton.isVisible = false
@@ -100,6 +120,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             longConsentTextView.isVisible = true
             longConsentTextView.text = text
             longConsentTextView.movementMethod = ScrollingMovementMethod()
+            errorCard.isVisible = false
         }
     }
 
@@ -109,11 +130,14 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             longConsentDownloadProgressBar.isVisible = false
             longConsentHeader.isVisible = false
             longConsentDownloadButton.isVisible = true
+            errorCard.isVisible = false
         }
     }
 
+
     private fun setDownloadProgress() {
         binding.apply {
+            errorCard.isVisible = false
             longConsentDownloadButton.isVisible = false
             longConsentTextView.isVisible = false
 

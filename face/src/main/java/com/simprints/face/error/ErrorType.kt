@@ -14,7 +14,8 @@ enum class ErrorType(
     @StringRes val buttonText: Int,
     @ColorRes val backgroundColor: Int,
     @DrawableRes val mainDrawable: Int,
-    var errorCode: String? = null
+    var errorCode: String? = null,
+    var estimatedOutage: Long? = null
 ) {
     LICENSE_MISSING(
         R.string.error_licence_missing_title,
@@ -26,6 +27,13 @@ enum class ErrorType(
     LICENSE_INVALID(
         R.string.error_licence_invalid_title,
         R.string.error_licence_invalid_message,
+        R.string.error_close_button,
+        CR.color.simprints_grey,
+        R.drawable.ic_exclamation_92dp
+    ),
+    BACKEND_MAINTENANCE_ERROR(
+        R.string.error_backend_maintenance_title,
+        R.string.error_backend_maintenance_message,
         R.string.error_close_button,
         CR.color.simprints_grey,
         R.drawable.ic_exclamation_92dp

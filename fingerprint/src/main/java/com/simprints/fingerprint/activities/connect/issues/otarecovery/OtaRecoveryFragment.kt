@@ -76,6 +76,6 @@ class OtaRecoveryFragment : FingerprintFragment() {
     }
 
     private fun goToOtaFailed() {
-        findNavController().navigate(OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment())
+        findNavController().navigate(OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment(null))
     }
 }

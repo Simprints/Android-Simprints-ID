@@ -19,6 +19,8 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloade
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -30,12 +32,17 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import okhttp3.Headers
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.*
+import retrofit2.HttpException
+import retrofit2.Response
+import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -84,6 +91,50 @@ class EventDownSyncDownloaderWorkerTest {
             doWork()
 
             verify { resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)) }
+        }
+    }
+
+    @Test
+    fun worker_failForBackendMaintenanceError_shouldFail() = runBlocking {
+        val errorResponse =
+            "{\"error\":\"002\"}"
+        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = Response.error<Any>(503, errorResponseBody)
+        val exception = HttpException(mockResponse)
+
+        with(eventDownSyncDownloaderWorker) {
+            coEvery { eventDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws exception
+
+            doWork()
+
+            verify { resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to null)) }
+        }
+    }
+
+    @Test
+    fun worker_failForTimedBackendMaintenanceError_shouldFail() = runBlocking {
+        val exception: HttpException = mockk()
+
+        every {
+            exception.response()?.errorBody()?.string()
+        } returns "{\"error\":\"002\"}"
+
+        every {
+            exception.response()?.code()
+        } returns 503
+
+        every {
+            exception.response()?.headers()
+        } returns Headers.Builder()
+            .add("Retry-After", "600")
+            .build()
+
+        with(eventDownSyncDownloaderWorker) {
+            coEvery { eventDownSyncDownloaderTask.execute(any(), any(), any(), any(), any(), any()) } throws exception
+
+            doWork()
+
+            verify { resultSetter.failure(workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L)) }
         }
     }
 

@@ -63,6 +63,7 @@ dependencies {
     testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.coroutines_test)
     testImplementation(Dependencies.Testing.KoTest.kotlin_assert)
+    testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(project(":testtools"))
 
     androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)

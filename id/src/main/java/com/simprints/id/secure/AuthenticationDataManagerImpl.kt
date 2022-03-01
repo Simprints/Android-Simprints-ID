@@ -2,18 +2,20 @@ package com.simprints.id.secure
 
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.exceptions.safe.BackendMaintenanceException
 import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.toDomainAuthData
+import com.simprints.id.tools.extensions.isBackendMaitenanceException
 import retrofit2.HttpException
 import retrofit2.Response
 
 class AuthenticationDataManagerImpl(
     private val simApiClientFactory: SimApiClientFactory,
     private val deviceId: String
-): AuthenticationDataManager {
+) : AuthenticationDataManager {
 
     override suspend fun requestAuthenticationData(projectId: String, userId: String): AuthenticationData {
         val response = executeCall("requestAuthData") {
@@ -28,7 +30,11 @@ class AuthenticationDataManagerImpl(
     private fun handleResponseError(response: Response<ApiAuthenticationData>): Nothing =
         when (response.code()) {
             401, 404 -> throw AuthRequestInvalidCredentialsException()
-            in 500..599 -> throw SimprintsInternalServerException()
+            in 500..599 -> throw if (response.isBackendMaitenanceException()) {
+                BackendMaintenanceException()
+            } else {
+                SimprintsInternalServerException()
+            }
             else -> throw HttpException(response)
         }
 

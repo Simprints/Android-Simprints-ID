@@ -19,6 +19,7 @@ data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType
         @Deprecated("User can't leave the app anymore in case of GUID_NOT_FOUND_OFFLINE. He exits through the ExitForm.")
         GUID_NOT_FOUND_OFFLINE,
         UNEXPECTED_ERROR,
+        BACKEND_MAINTENANCE_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         @Deprecated("User can't leave the app anymore in case of SCANNER_LOW_BATTERY. He exits through the ExitForm.")
         SCANNER_LOW_BATTERY,
@@ -45,6 +46,7 @@ fun ErrorCallbackPayload.Reason.fromDomainToApi() =
         SETUP_MODALITY_DOWNLOAD_CANCELLED -> ApiReason.UNEXPECTED_ERROR
         FINGERPRINT_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         FACE_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
+        BACKEND_MAINTENANCE_ERROR -> ApiReason.BACKEND_MAINTENANCE_ERROR
     }
 
 
@@ -61,4 +63,5 @@ fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
         ApiReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
         ApiReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+        ApiReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
     }
