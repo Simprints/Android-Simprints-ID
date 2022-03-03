@@ -8,6 +8,9 @@ interface SimNetworkUtils {
     @Keep
     data class Connection(val type: String = "", val state: NetworkInfo.DetailedState? = null)
 
+    @Keep
+    data class Connection(val type: ConnectionType, val state: ConnectionState)
+
     val connectionsStates: List<Connection>
 
 }
