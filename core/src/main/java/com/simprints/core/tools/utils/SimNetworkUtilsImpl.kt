@@ -1,8 +1,7 @@
-package com.simprints.id.tools.utils
+package com.simprints.core.tools.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
-import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionType
 import android.net.NetworkCapabilities
