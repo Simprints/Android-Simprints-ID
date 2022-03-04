@@ -55,6 +55,9 @@
         <item>
             Portuguese
         </item>
+        <item>
+            French
+        </item>
     </string-array>
     <string-array name="language_values">
         <item>
@@ -110,6 +113,9 @@
         </item>
         <item>
             pt
+        </item>
+        <item>
+            fr
         </item>
     </string-array>
 
