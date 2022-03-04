@@ -1,14 +1,9 @@
-package com.simprints.id.tools.utils
+package com.simprints.core.tools.utils
 
 import android.content.Context
-import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
-import android.net.NetworkCapabilities.TRANSPORT_WIFI
-import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState
+import com.google.common.truth.Truth
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -16,12 +11,16 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
-internal class SimNetworkUtilsImplTest {
+class SimNetworkUtilsImplTest {
 
     @MockK
-    private lateinit var context: Context
+    lateinit var context: Context
 
-    private var networkCapabilities: NetworkCapabilities? = null
+    @MockK
+    lateinit var networkCapabilities: NetworkCapabilities
+
+    @MockK
+    lateinit var connectivityManager: ConnectivityManager
 
     private lateinit var simNetworkUtils: SimNetworkUtils
 
@@ -33,9 +32,10 @@ internal class SimNetworkUtilsImplTest {
     }
 
     private fun setUpNetworkCapabilities() {
-        networkCapabilities = mockk()
-        val connectivityManager: ConnectivityManager = mockk()
-        every { context.getSystemService(CONNECTIVITY_SERVICE) } returns connectivityManager
+        MockKAnnotations.init(this)
+
+        every { connectivityManager.activeNetwork } returns mockk()
+        every { context.getSystemService(Context.CONNECTIVITY_SERVICE) } returns connectivityManager
         every { connectivityManager.getNetworkCapabilities(any()) } returns networkCapabilities
     }
 
@@ -48,8 +48,8 @@ internal class SimNetworkUtilsImplTest {
         //Then
         verifyConnectionStates(
             connectionStates,
-            mobileState = ConnectionState.CONNECTED,
-            wifiState = ConnectionState.DISCONNECTED
+            mobileState = SimNetworkUtils.ConnectionState.CONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.DISCONNECTED
         )
     }
 
@@ -62,8 +62,8 @@ internal class SimNetworkUtilsImplTest {
         //Then
         verifyConnectionStates(
             connectionStates,
-            mobileState = ConnectionState.DISCONNECTED,
-            wifiState = ConnectionState.CONNECTED
+            mobileState = SimNetworkUtils.ConnectionState.DISCONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.CONNECTED
         )
     }
 
@@ -71,32 +71,33 @@ internal class SimNetworkUtilsImplTest {
     fun `getConnectionsStates networkCapabilities is null`() {
         //Given
         simNetworkUtils = SimNetworkUtilsImpl(context)
-        networkCapabilities = null
+        every { connectivityManager.getNetworkCapabilities(any()) } returns null
+
         //When
         val connectionStates = simNetworkUtils.connectionsStates
         //Then
         verifyConnectionStates(
             connectionStates,
-            mobileState = ConnectionState.DISCONNECTED,
-            wifiState = ConnectionState.DISCONNECTED
+            mobileState = SimNetworkUtils.ConnectionState.DISCONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.DISCONNECTED
         )
     }
 
     private fun verifyConnectionStates(
         connectionStates: List<SimNetworkUtils.Connection>,
-        mobileState: ConnectionState,
-        wifiState: ConnectionState
+        mobileState: SimNetworkUtils.ConnectionState,
+        wifiState: SimNetworkUtils.ConnectionState
     ) {
-        assertThat(connectionStates.size).isEqualTo(2)
-        assertThat(connectionStates.first().state).isEqualTo(mobileState)
-        assertThat(connectionStates.last().state).isEqualTo(wifiState)
+        Truth.assertThat(connectionStates.size).isEqualTo(2)
+        Truth.assertThat(connectionStates.first().state).isEqualTo(mobileState)
+        Truth.assertThat(connectionStates.last().state).isEqualTo(wifiState)
 
     }
 
     private fun buildConnections(mobileState: Boolean, wifiState: Boolean) {
-        networkCapabilities?.apply {
-            every { hasTransport(TRANSPORT_CELLULAR) } returns mobileState
-            every { hasTransport(TRANSPORT_WIFI) } returns wifiState
+        networkCapabilities.apply {
+            every { hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) } returns mobileState
+            every { hasTransport(NetworkCapabilities.TRANSPORT_WIFI) } returns wifiState
         }
         simNetworkUtils = SimNetworkUtilsImpl(context)
     }

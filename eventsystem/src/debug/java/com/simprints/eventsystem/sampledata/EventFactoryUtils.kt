@@ -291,7 +291,6 @@ fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventL
 fun createConnectivitySnapshotEvent() =
     ConnectivitySnapshotEvent(
         CREATED_AT,
-
         listOf(Connection(SimNetworkUtils.ConnectionType.MOBILE, SimNetworkUtils.ConnectionState.CONNECTED)),
         eventLabels
     )

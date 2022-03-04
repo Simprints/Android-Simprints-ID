@@ -246,9 +246,8 @@ fun validateConnectivitySnapshotEventApiModel(json: JSONObject) {
     validateCommonParams(json, "ConnectivitySnapshot")
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getInt("startTime"))
-        assertThat(getString("networkType"))
         val connections = getJSONArray("connections")
         for (i in 0 until connections.length()) {
             val connJson = connections.getJSONObject(i)
@@ -256,7 +255,7 @@ fun validateConnectivitySnapshotEventApiModel(json: JSONObject) {
             assertThat(connJson.getString("state")).isNotEmpty()
             assertThat(connJson.length()).isEqualTo(2)
         }
-        assertThat(length()).isEqualTo(5)
+        assertThat(length()).isEqualTo(4)
     }
 }
 
