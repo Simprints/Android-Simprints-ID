@@ -7,6 +7,7 @@ import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
@@ -19,6 +20,7 @@ import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
+import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
@@ -103,6 +105,30 @@ class EventRepositoryImplTest {
                     it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
                 })
             }
+        }
+    }
+
+    @Test
+    fun createSession_ForEmptyProjectId() {
+        runBlocking {
+            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
+            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+
+            val session = eventRepo.createSession()
+
+            assertThat(session.payload.projectId).isEqualTo(PROJECT_ID_FOR_NOT_SIGNED_IN)
+
+        }
+    }
+
+    @Test(expected = DuplicateGuidSelectEventValidatorException::class)
+    fun createSession_ReportDuplicateGuidSelectEventValidatorExceptionException() {
+        runBlocking {
+            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+            coEvery {
+                eventLocalDataSource.insertOrUpdate(any())
+            } throws DuplicateGuidSelectEventValidatorException("oops...")
+            val session = eventRepo.createSession()
         }
     }
 

@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.subjects_sync.down
+package com.simprints.eventsystem.event_sync.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
@@ -24,7 +24,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
 import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -52,7 +51,7 @@ class EventDownSyncScopeRepositoryImplTest {
     @MockK
     lateinit var loginInfoManager: LoginInfoManager
     @MockK
-    lateinit var preferencesManager: IdPreferencesManager
+    lateinit var preferencesManager: PreferencesManager
     @MockK
     lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
 
@@ -78,14 +77,12 @@ class EventDownSyncScopeRepositoryImplTest {
         eventDownSyncScopeRepository =
             EventDownSyncScopeRepositoryImpl(
                 loginInfoManager,
-                preferencesManager,
                 downSyncOperationOperationDao,
                 testDispatcherProvider
             )
 
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { loginInfoManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
-        every { preferencesManager.modalities } returns listOf(Modality.FINGER)
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 

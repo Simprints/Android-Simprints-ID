@@ -9,7 +9,6 @@ import com.simprints.eventsystem.event.remote.models.ApiEventLabels.Companion.MO
 import com.simprints.eventsystem.event.remote.models.ApiEventLabels.Companion.MODULE_ID_LABEL_KEY
 import com.simprints.eventsystem.event.remote.models.ApiEventLabels.Companion.PROJECT_ID_LABEL_KEY
 import com.simprints.eventsystem.event.remote.models.ApiEventLabels.Companion.SESSION_ID_LABEL_KEY
-import com.simprints.eventsystem.event.remote.models.ApiEventLabels.Companion.SUBJECT_ID_LABEL_KEY
 
 @Keep
 class ApiEventLabels : HashMap<String, List<String>>() {
