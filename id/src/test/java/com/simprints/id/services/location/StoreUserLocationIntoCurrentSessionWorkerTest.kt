@@ -8,6 +8,8 @@ import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.TestData
 import com.simprints.id.tools.LocationManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
@@ -19,6 +21,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 import org.junit.runner.RunWith
@@ -38,11 +41,15 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     @RelaxedMockK
     lateinit var mockLocationManager: LocationManager
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        Dispatchers.setMain(Dispatchers.Unconfined)
         worker = TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(app).build()
+        worker.dispatcherProvider =dispatcherProvider
         app.component = mockk(relaxed = true)
         mockDependencies()
     }
@@ -71,8 +78,4 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
         coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 }

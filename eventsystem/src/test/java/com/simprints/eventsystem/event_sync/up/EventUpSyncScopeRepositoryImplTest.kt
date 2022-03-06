@@ -18,6 +18,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
@@ -25,9 +26,14 @@ import org.junit.Test
 
 class EventUpSyncScopeRepositoryImplTest {
 
-    @MockK lateinit var loginInfoManager: LoginInfoManager
-    @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var upSyncOperationOperationDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
+    @MockK
+    lateinit var loginInfoManager: LoginInfoManager
+
+    @MockK
+    lateinit var preferencesManager: PreferencesManager
+
+    @MockK
+    lateinit var upSyncOperationOperationDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 
     private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
 
@@ -57,6 +63,22 @@ class EventUpSyncScopeRepositoryImplTest {
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns SampleDefaults.DEFAULT_PROJECT_ID
         coEvery { upSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
+
+    @Test
+    fun `test delete all`() = runBlocking {
+        //when
+        eventUpSyncScopeRepository.deleteAll()
+        // Then
+        coVerify { upSyncOperationOperationDao.deleteAll() }
+    }
+
+    @Test
+    fun `test insertOrUpdate shouldInsertIntoTheDb`() = runBlocking {
+        eventUpSyncScopeRepository.insertOrUpdate(SampleDefaults.projectUpSyncScope.operation)
+
+        coVerify { upSyncOperationOperationDao.insertOrUpdate(any()) }
+    }
+
 
     @Test
     fun buildProjectUpSyncScope() {

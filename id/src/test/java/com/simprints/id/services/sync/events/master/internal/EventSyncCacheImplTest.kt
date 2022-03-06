@@ -57,6 +57,13 @@ class EventSyncCacheImplTest {
     }
 
     @Test
+    fun cache_shouldStoreLastTimeDoesNothingIfLastSyncTimeIsNull() {
+
+        eventSyncCache.storeLastSuccessfulSyncTime(null)
+        val stored = sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 0)
+        assertThat(stored).isEqualTo(-1)
+    }
+    @Test
     fun cache_shouldStoreLastTime() {
         val now = Date()
         eventSyncCache.storeLastSuccessfulSyncTime(now)
@@ -72,6 +79,14 @@ class EventSyncCacheImplTest {
         val stored = eventSyncCache.readLastSuccessfulSyncTime()
 
         assertThat(stored?.time).isEqualTo(now.time)
+    }
+
+    @Test
+    fun cache_shouldReadLastTimeShouldBeNullifPrefsEmpty() {
+
+        val stored = eventSyncCache.readLastSuccessfulSyncTime()
+
+        assertThat(stored).isNull()
     }
 
     private fun storeProgresses(workInfo: String, progress: Int) =

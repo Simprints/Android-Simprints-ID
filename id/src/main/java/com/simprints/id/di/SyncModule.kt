@@ -112,7 +112,6 @@ open class SyncModule {
     ): EventDownSyncScopeRepository =
         EventDownSyncScopeRepositoryImpl(
             loginInfoManager,
-            preferencesManager,
             downSyncOperationStateDao,
             dispatcher
         )

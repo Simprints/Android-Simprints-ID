@@ -3,12 +3,12 @@ package com.simprints.id.services.location
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationRequest
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.tools.LocationManager
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
@@ -27,8 +27,10 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
     lateinit var eventRepository: EventRepository
     @Inject
     lateinit var locationManager: LocationManager
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.Main) {
+    override suspend fun doWork(): Result = withContext(dispatcherProvider.main()) {
         getComponent<StoreUserLocationIntoCurrentSessionWorker> { it.inject(this@StoreUserLocationIntoCurrentSessionWorker) }
         try {
             val locationsFlow = createLocationFlow()

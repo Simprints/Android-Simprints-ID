@@ -47,8 +47,7 @@ import kotlin.math.min
 @ExperimentalCoroutinesApi
 class SetupActivity : BaseSplitActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: SetupViewModelFactory
+    @Inject lateinit var viewModelFactory: SetupViewModelFactory
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
@@ -123,11 +122,7 @@ class SetupActivity : BaseSplitActivity() {
     }
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSIONS_REQUEST_CODE -> {

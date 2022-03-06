@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.WindowManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -65,7 +66,7 @@ class FaceMatchActivity : FaceActivity() {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             // wait a bit for the user to see the results
-            Handler().postDelayed({ finish() }, FaceMatchViewModel.matchingEndWaitTimeInMillis)
+            Handler(Looper.getMainLooper()).postDelayed({ finish() }, FaceMatchViewModel.matchingEndWaitTimeInMillis)
         })
         vm.matchState.observe(this, Observer { matchState ->
             when (matchState) {

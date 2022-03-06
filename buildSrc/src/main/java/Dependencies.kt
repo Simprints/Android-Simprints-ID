@@ -23,7 +23,7 @@ object Dependencies {
     private const val rootbeer_version = "0.0.7"
     private const val mockito_version = "4.0.0"
     private const val objenesis_version ="3.2"
-    private const val robolectric_version = "4.6.1"
+    private const val robolectric_version = "4.7.3"
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
     private const val fragment_version = "1.3.6"
