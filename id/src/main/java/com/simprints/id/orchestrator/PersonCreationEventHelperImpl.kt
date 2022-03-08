@@ -8,8 +8,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -53,7 +52,6 @@ class PersonCreationEventHelperImpl(
             }
         }.flatten()
 
-
     private fun extractFaceSamples(responses: List<FaceCaptureResponse>) =
         responses.map {
             it.capturingResult.mapNotNull { captureResult ->
@@ -70,7 +68,7 @@ class PersonCreationEventHelperImpl(
         val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
         val fingerprintCaptureEvents =
             eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
-                .filterIsInstance<FingerprintCaptureEvent>().toList()
+                .filterIsInstance<FingerprintCaptureEventV3>().toList()
         val faceCaptureEvents = eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
             .filterIsInstance<FaceCaptureEvent>().toList()
 
@@ -88,14 +86,13 @@ class PersonCreationEventHelperImpl(
     fun build(
         timeHelper: TimeHelper,
         faceCaptureEvents: List<FaceCaptureEvent>,
-        fingerprintCaptureEvents: List<FingerprintCaptureEvent>,
+        fingerprintCaptureEvents: List<FingerprintCaptureEventV3>,
         faceSamplesForPersonCreation: List<FaceSample>?,
         fingerprintSamplesForPersonCreation: List<FingerprintSample>?
     ) = PersonCreationEvent(
         startTime = timeHelper.now(),
-        fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-            fingerprintCaptureEvents,
-            fingerprintSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }
+        fingerprintCaptureIds = extractFingerprintCaptureEventIds(
+            fingerprintCaptureEvents
         ),
         fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
         faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
@@ -105,14 +102,12 @@ class PersonCreationEventHelperImpl(
         faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
     )
 
-    private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-        captureEvents: List<FingerprintCaptureEvent>,
-        personTemplates: List<String>?
+    private fun extractFingerprintCaptureEventIds(
+        captureEvents: List<FingerprintCaptureEventV3>
     ): List<String>? =
         captureEvents
             .filter {
-                personTemplates?.contains(it.payload.fingerprint?.template) ?: false
-                    && it.payload.result != SKIPPED
+                it.payload.result != FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.SKIPPED
             }.map { it.id }
             .nullIfEmpty()
 
