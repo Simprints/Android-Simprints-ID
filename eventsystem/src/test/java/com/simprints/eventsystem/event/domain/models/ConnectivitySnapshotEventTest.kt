@@ -10,7 +10,6 @@ import com.simprints.eventsystem.sampledata.ConnectivitySnapshotEventSample
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.testtools.common.syntax.mock
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
