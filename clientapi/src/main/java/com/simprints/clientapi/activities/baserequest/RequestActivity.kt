@@ -101,7 +101,8 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
     private fun handleResponse(response: Intent) {
         response.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
-        } ?: routeAppResponse(response.getParcelableExtra(IAppResponse.BUNDLE_KEY))
+        } ?: response.getParcelableExtra<IAppResponse>(IAppResponse.BUNDLE_KEY)
+            ?.let { routeAppResponse(it) }
     }
 
     private fun routeAppResponse(response: IAppResponse?) = when (response?.type) {
