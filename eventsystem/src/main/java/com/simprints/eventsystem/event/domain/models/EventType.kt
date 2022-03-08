@@ -31,6 +31,8 @@ enum class EventType {
     AUTHORIZATION,
     /* key added: FINGERPRINT_CAPTURE_KEY */
     FINGERPRINT_CAPTURE,
+    /* key added: FINGERPRINT_CAPTURE_V3_KEY */
+    FINGERPRINT_CAPTURE_V3,
     /* key added: ONE_TO_ONE_MATCH_KEY */
     ONE_TO_ONE_MATCH,
     /* key added: ONE_TO_MANY_MATCH_KEY */
@@ -119,6 +121,7 @@ enum class EventType {
         const val ENROLMENT_V2_KEY = "ENROLMENT_V2"
         const val AUTHORIZATION_KEY = "AUTHORIZATION"
         const val FINGERPRINT_CAPTURE_KEY = "FINGERPRINT_CAPTURE"
+        const val FINGERPRINT_CAPTURE_KEY_V2 = "FINGERPRINT_CAPTURE_V2"
         const val ONE_TO_ONE_MATCH_KEY = "ONE_TO_ONE_MATCH"
         const val ONE_TO_MANY_MATCH_KEY = "ONE_TO_MANY_MATCH"
         const val PERSON_CREATION_KEY = "PERSON_CREATION"

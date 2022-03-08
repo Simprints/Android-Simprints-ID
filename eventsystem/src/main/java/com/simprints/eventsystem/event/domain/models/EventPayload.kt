@@ -37,7 +37,8 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmatio
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -74,7 +75,8 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = ConsentPayload::class, name = EventType.CONSENT_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV1.EnrolmentPayload::class, name = EventType.ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2.EnrolmentPayload::class, name = EventType.ENROLMENT_V2_KEY),
-    JsonSubTypes.Type(value = FingerprintCapturePayload::class, name = EventType.FINGERPRINT_CAPTURE_KEY),
+    JsonSubTypes.Type(value = FingerprintCaptureEvent.FingerprintCapturePayload::class, name = EventType.FINGERPRINT_CAPTURE_KEY),
+    JsonSubTypes.Type(value = FingerprintCaptureEventV3.FingerprintCapturePayloadV3::class, name = EventType.FINGERPRINT_CAPTURE_KEY_V2),
     JsonSubTypes.Type(value = GuidSelectionPayload::class, name = EventType.GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingPayload::class, name = EventType.INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = InvalidIntentPayload::class, name = EventType.INVALID_INTENT_KEY),
