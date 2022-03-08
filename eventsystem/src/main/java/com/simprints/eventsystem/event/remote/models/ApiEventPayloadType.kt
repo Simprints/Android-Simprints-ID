@@ -119,6 +119,7 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
+    FINGERPRINT_CAPTURE_V3 -> ApiEventPayloadType.FingerprintCapture
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
     ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
     PERSON_CREATION -> ApiEventPayloadType.PersonCreation
@@ -162,7 +163,7 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.Consent -> CONSENT
     ApiEventPayloadType.Enrolment -> ENROLMENT_V2
     ApiEventPayloadType.Authorization -> AUTHORIZATION
-    ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE
+    ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE_V3
     ApiEventPayloadType.OneToOneMatch -> ONE_TO_MANY_MATCH
     ApiEventPayloadType.OneToManyMatch -> ONE_TO_MANY_MATCH
     ApiEventPayloadType.PersonCreation -> PERSON_CREATION

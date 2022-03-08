@@ -2,7 +2,6 @@ package com.simprints.eventsystem.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
@@ -32,6 +31,7 @@ import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CA
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_FALLBACK_CAPTURE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY_V2
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.GUID_SELECTION_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.INTENT_PARSING_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.INVALID_INTENT_KEY
@@ -51,6 +51,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
@@ -112,6 +113,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
+    JsonSubTypes.Type(value = FingerprintCaptureEventV3::class, name = FINGERPRINT_CAPTURE_KEY_V2),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = InvalidIntentEvent::class, name = INVALID_INTENT_KEY),

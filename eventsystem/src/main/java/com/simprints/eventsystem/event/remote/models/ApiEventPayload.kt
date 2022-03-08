@@ -41,7 +41,8 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmatio
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -77,7 +78,7 @@ import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordM
     JsonSubTypes.Type(value = ApiConnectivitySnapshotPayload::class, name = Companion.CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ApiConsentPayload::class, name = Companion.CONSENT_KEY),
     JsonSubTypes.Type(value = ApiEnrolmentPayloadV2::class, name = Companion.ENROLMENT_KEY),
-    JsonSubTypes.Type(value = ApiFingerprintCapturePayload::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiFingerprintCapturePayloadV3::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiGuidSelectionPayload::class, name = Companion.GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = ApiIntentParsingPayload::class, name = Companion.INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = ApiInvalidIntentPayload::class, name = Companion.INVALID_INTENT_KEY),
@@ -110,7 +111,8 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         ENROLMENT_V1 -> ApiEnrolmentPayloadV1(this as EnrolmentEventV1.EnrolmentPayload)
         ENROLMENT_V2 -> ApiEnrolmentPayloadV2(this as EnrolmentEventV2.EnrolmentPayload)
         AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
-        FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCapturePayload)
+        FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCaptureEvent.FingerprintCapturePayload)
+        FINGERPRINT_CAPTURE_V3 ->ApiFingerprintCapturePayloadV3(this as FingerprintCaptureEventV3.FingerprintCapturePayloadV3)
         ONE_TO_ONE_MATCH -> ApiOneToOneMatchPayload(this as OneToOneMatchPayload)
         ONE_TO_MANY_MATCH -> ApiOneToManyMatchPayload(this as OneToManyMatchPayload)
         PERSON_CREATION -> ApiPersonCreationPayload(this as PersonCreationPayload)
