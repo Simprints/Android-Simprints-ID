@@ -1,12 +1,16 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.models.FaceDetection
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
+import kotlin.Boolean
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.let
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3 as CoreFaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.FaceCapturePayloadV3.Face as CoreFaceCaptureEventFace
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.FaceCapturePayloadV3.Result as CoreFaceCaptureEventResult
 import com.simprints.face.detection.Face as DetectionFace
 
 @Keep
@@ -28,7 +32,7 @@ class FaceCaptureEvent(
         result.fromDomainToCore(),
         isFallback,
         eventFace?.fromDomainToCore(),
-        id =id
+        id = id
     )
 
     @Keep
@@ -36,11 +40,10 @@ class FaceCaptureEvent(
         val yaw: Float,
         var roll: Float,
         val quality: Float,
-        val template: String,
         val format: FaceTemplateFormat
     ) {
         fun fromDomainToCore(): CoreFaceCaptureEventFace =
-            CoreFaceCaptureEventFace(yaw, roll, quality, template, format)
+            CoreFaceCaptureEventFace(yaw, roll, quality, format)
 
         companion object {
             fun fromFaceDetectionFace(face: DetectionFace?): EventFace? =
@@ -49,7 +52,6 @@ class FaceCaptureEvent(
                         it.yaw,
                         it.roll,
                         it.quality,
-                        EncodingUtilsImpl.byteArrayToBase64(it.template),
                         it.format.fromDomainToCore()
                     )
                 }
