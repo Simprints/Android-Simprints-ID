@@ -39,6 +39,7 @@ import com.simprints.eventsystem.event.domain.models.callout.IdentificationCallo
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
@@ -52,6 +53,7 @@ import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutPayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceFallbackCapturePayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceOnboardingCompletePayload
 import com.simprints.eventsystem.event.remote.models.session.ApiSessionCapturePayload
@@ -62,6 +64,7 @@ import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordM
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
     JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
+    JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
@@ -131,6 +134,7 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
         FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
         FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
+        FACE_CAPTURE_V3 -> ApiFaceCapturePayloadV3(this as FaceCaptureEventV3.FaceCapturePayloadV3)
         FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
         SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
         CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
