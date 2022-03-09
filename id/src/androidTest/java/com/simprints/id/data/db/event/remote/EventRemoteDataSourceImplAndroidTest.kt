@@ -12,26 +12,106 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.event.domain.models.*
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload
+import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent
+import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
+import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.eventsystem.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
+import com.simprints.eventsystem.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ENROLMENT
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_IDENTIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_REFUSAL
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_VERIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.eventsystem.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.eventsystem.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
+import com.simprints.eventsystem.event.domain.models.EventType.CONSENT
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
+import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.eventsystem.event.domain.models.EventType.INVALID_INTENT
+import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_ONE_MATCH
+import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
+import com.simprints.eventsystem.event.domain.models.EventType.REFUSAL
+import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_CONNECTION
+import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
+import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.SUSPICIOUS_INTENT
+import com.simprints.eventsystem.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
+import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
+import com.simprints.eventsystem.event.domain.models.MatchEntry
+import com.simprints.eventsystem.event.domain.models.Matcher
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
+import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
+import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent
+import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
-import com.simprints.eventsystem.event.domain.models.callback.*
+import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.eventsystem.event.domain.models.callout.*
-import com.simprints.eventsystem.event.domain.models.face.*
+import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.RefusalCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.VerificationCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -557,7 +637,7 @@ class EventRemoteDataSourceImplAndroidTest {
             CONSENT -> addConsentEvent()
             ENROLMENT_V2 -> addEnrolmentEvent()
             AUTHORIZATION -> addAuthorizationEvent()
-            FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
+            FINGERPRINT_CAPTURE_V3 -> addFingerprintCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
             PERSON_CREATION -> addPersonCreationEvent(
@@ -589,14 +669,14 @@ class EventRemoteDataSourceImplAndroidTest {
             COMPLETION_CHECK -> addCompletionCheckEvent()
             FACE_ONBOARDING_COMPLETE -> addFaceOnboardingCompleteEvent()
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
-            FACE_CAPTURE -> addFaceCaptureEvent()
+            FACE_CAPTURE_V3 -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
-            ENROLMENT_V1 -> {
-            }
+            ENROLMENT_V1 -> {}
+            FINGERPRINT_CAPTURE -> {}
+            FACE_CAPTURE -> {}
         }.safeSealedWhens
     }
-
 }
 
