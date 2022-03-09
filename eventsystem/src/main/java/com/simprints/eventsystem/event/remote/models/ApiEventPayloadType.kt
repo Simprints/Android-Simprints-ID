@@ -2,7 +2,49 @@ package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.eventsystem.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
+import com.simprints.eventsystem.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ENROLMENT
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_IDENTIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_REFUSAL
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_VERIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.eventsystem.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.eventsystem.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.eventsystem.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
+import com.simprints.eventsystem.event.domain.models.EventType.CONSENT
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
+import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.eventsystem.event.domain.models.EventType.INVALID_INTENT
+import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_ONE_MATCH
+import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
+import com.simprints.eventsystem.event.domain.models.EventType.REFUSAL
+import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_CONNECTION
+import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
+import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.SUSPICIOUS_INTENT
+import com.simprints.eventsystem.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 
 @Keep
 enum class ApiEventPayloadType {
@@ -13,64 +55,94 @@ enum class ApiEventPayloadType {
 
     /* key added: ENROLMENT_RECORD_CREATION_KEY */
     EnrolmentRecordCreation,
+
     /* key added: ENROLMENT_RECORD_DELETION_KEY */
     EnrolmentRecordDeletion,
+
     /* key added: ENROLMENT_RECORD_MOVE_KEY */
     EnrolmentRecordMove,
+
     /* key added: CALLOUT_KEY */
     Callout,
+
     /* key added: CALLBACK_KEY */
     Callback,
+
     /* key added: ARTIFICIAL_TERMINATION_KEY */
     ArtificialTermination,
+
     /* key added: AUTHENTICATION_KEY */
     Authentication,
+
     /* key added: CONSENT_KEY */
     Consent,
+
     /* key added: ENROLMENT_KEY */
     Enrolment,
+
     /* key added: AUTHORIZATION_KEY */
     Authorization,
+
     /* key added: FINGERPRINT_CAPTURE_KEY */
     FingerprintCapture,
+
     /* key added: ONE_TO_ONE_MATCH_KEY */
     OneToOneMatch,
+
     /* key added: ONE_TO_MANY_MATCH_KEY */
     OneToManyMatch,
+
     /* key added: PERSON_CREATION_KEY */
     PersonCreation,
+
     /* key added: ALERT_SCREEN_KEY */
     AlertScreen,
+
     /* key added: GUID_SELECTION_KEY */
     GuidSelection,
+
     /* key added: CONNECTIVITY_SNAPSHOT_KEY */
     ConnectivitySnapshot,
+
     /* key added: REFUSAL_KEY */
     Refusal,
+
     /* key added: CANDIDATE_READ_KEY */
     CandidateRead,
+
     /* key added: SCANNER_CONNECTION_KEY */
     ScannerConnection,
+
     /* key added: VERO_2_INFO_SNAPSHOT_KEY */
     Vero2InfoSnapshot,
+
     /* key added: SCANNER_FIRMWARE_UPDATE_KEY */
     ScannerFirmwareUpdate,
+
     /* key added: INVALID_INTENT_KEY */
     InvalidIntent,
+
     /* key added: SUSPICIOUS_INTENT_KEY */
     SuspiciousIntent,
+
     /* key added: INTENT_PARSING_KEY */
     IntentParsing,
+
     /* key added: COMPLETION_CHECK_KEY */
     CompletionCheck,
+
     /* key added: SESSION_CAPTURE_KEY */
     SessionCapture,
+
     /* key added: FACE_ONBOARDING_COMPLETE_KEY */
     FaceOnboardingComplete,
+
     /* key added: FACE_FALLBACK_CAPTURE_KEY */
     FaceFallbackCapture,
+
     /* key added: FACE_CAPTURE_KEY */
     FaceCapture,
+
     /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
     FaceCaptureConfirmation;
 
@@ -151,6 +223,7 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
     FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
+    FACE_CAPTURE_V3 -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
 }
 
@@ -183,7 +256,7 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.EnrolmentRecordMove -> ENROLMENT_RECORD_MOVE
     ApiEventPayloadType.FaceOnboardingComplete -> FACE_ONBOARDING_COMPLETE
     ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
-    ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
+    ApiEventPayloadType.FaceCapture -> FACE_CAPTURE_V3
     ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
