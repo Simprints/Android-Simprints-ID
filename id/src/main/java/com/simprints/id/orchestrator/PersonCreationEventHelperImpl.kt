@@ -7,7 +7,7 @@ import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -70,7 +70,7 @@ class PersonCreationEventHelperImpl(
             eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
                 .filterIsInstance<FingerprintCaptureEventV3>().toList()
         val faceCaptureEvents = eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
-            .filterIsInstance<FaceCaptureEvent>().toList()
+            .filterIsInstance<FaceCaptureEventV3>().toList()
 
         eventRepository.addOrUpdateEvent(
             build(
@@ -85,7 +85,7 @@ class PersonCreationEventHelperImpl(
 
     fun build(
         timeHelper: TimeHelper,
-        faceCaptureEvents: List<FaceCaptureEvent>,
+        faceCaptureEvents: List<FaceCaptureEventV3>,
         fingerprintCaptureEvents: List<FingerprintCaptureEventV3>,
         faceSamplesForPersonCreation: List<FaceSample>?,
         fingerprintSamplesForPersonCreation: List<FingerprintSample>?
@@ -95,9 +95,8 @@ class PersonCreationEventHelperImpl(
             fingerprintCaptureEvents
         ),
         fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
-        faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
-            faceCaptureEvents,
-            faceSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }
+        faceCaptureIds = extractFaceCaptureEventIds(
+            faceCaptureEvents
         ),
         faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
     )
@@ -111,13 +110,12 @@ class PersonCreationEventHelperImpl(
             }.map { it.id }
             .nullIfEmpty()
 
-    private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
-        captureEvents: List<FaceCaptureEvent>,
-        personTemplates: List<String>?
+    private fun extractFaceCaptureEventIds(
+        captureEvents: List<FaceCaptureEventV3>
     ): List<String>? =
         captureEvents
             .filter {
-                personTemplates?.contains(it.payload.face?.template) ?: false
+                it.payload.result != FaceCaptureEventV3.FaceCapturePayloadV3.Result.INVALID
             }.map { it.id }
             .nullIfEmpty()
 
