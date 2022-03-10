@@ -714,4 +714,23 @@ fun validateFaceCaptureConfirmationEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateFaceCaptureBiometricsEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "FaceCaptureBiometrics")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(0)
+        assertThat(getLong("startTime")).isNotNull()
+        assertThat(getString("result")).isIn(listOf("VALID", "INVALID", "OFF_YAW", "OFF_ROLL", "TOO_CLOSE", "TOO_FAR"))
+        assertThat(length()).isEqualTo(7)
+    }
+}
+
+fun validateFingerprintCaptureBiometricsEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "FingerprintCaptureBiometrics")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(0)
+        assertThat(getLong("startTime")).isNotNull()
+        assertThat(getString("result")).isAnyOf("GOOD_SCAN", "BAD_QUALITY", "NO_FINGER_DETECTED", "SKIPPED", "FAILURE_TO_ACQUIRE")
+        assertThat(length()).isEqualTo(6)
+    }
+}
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }
