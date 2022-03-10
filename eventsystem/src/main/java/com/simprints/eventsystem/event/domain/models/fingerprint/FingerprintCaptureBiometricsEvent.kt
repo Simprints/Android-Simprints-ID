@@ -9,7 +9,7 @@ import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import java.util.UUID
 
 @Keep
-data class FingerprintCaptureBiometrics(
+data class FingerprintCaptureBiometricsEvent(
     override val id: String = UUID.randomUUID().toString(),
     override var labels: EventLabels,
     override val payload: FingerprintCaptureBiometricsPayload,
@@ -18,7 +18,6 @@ data class FingerprintCaptureBiometrics(
 
     constructor(
         createdAt: Long,
-        finger: IFingerIdentifier,
         result: FingerprintCaptureBiometricsPayload.Result,
         fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint?,
         id: String = UUID.randomUUID().toString(),
@@ -26,7 +25,7 @@ data class FingerprintCaptureBiometrics(
     ) : this(
         id = id,
         labels = labels,
-        payload = FingerprintCaptureBiometricsPayload(createdAt, EVENT_VERSION, finger, result, fingerprint, id),
+        payload = FingerprintCaptureBiometricsPayload(createdAt, EVENT_VERSION, result, fingerprint, id),
         type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
     )
 
@@ -34,7 +33,6 @@ data class FingerprintCaptureBiometrics(
     data class FingerprintCaptureBiometricsPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val finger: IFingerIdentifier,
         val result: Result,
         val fingerprint: Fingerprint?,
         val id: String,
