@@ -3,7 +3,6 @@ package com.simprints.eventsystem.event.remote.models.face
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.FaceCapturePayloadV3
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
