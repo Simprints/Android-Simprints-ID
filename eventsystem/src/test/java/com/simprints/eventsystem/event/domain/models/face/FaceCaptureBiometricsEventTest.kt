@@ -32,6 +32,7 @@ class FaceCaptureBiometricsEventTest {
             assertThat(qualityThreshold).isEqualTo(1.0F)
             assertThat(result).isEqualTo(Result.VALID)
             assertThat(face).isEqualTo(faceArg)
+            assertThat(eventVersion).isEqualTo(0)
         }
     }
 }
