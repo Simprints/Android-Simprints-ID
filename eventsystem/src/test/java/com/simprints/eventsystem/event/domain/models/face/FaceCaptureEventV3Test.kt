@@ -20,7 +20,7 @@ class FaceCaptureEventV3Test {
         )
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
-        assertThat(event.type).isEqualTo(EventType.FACE_CAPTURE)
+        assertThat(event.type).isEqualTo(EventType.FACE_CAPTURE_V3)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)
             assertThat(endedAt).isEqualTo(SampleDefaults.ENDED_AT)
