@@ -33,11 +33,13 @@ import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEve
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
@@ -61,6 +63,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = FaceCaptureConfirmationPayload::class, name = EventType.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = FaceCapturePayload::class, name = EventType.FACE_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceCaptureEventV3.FaceCapturePayloadV3::class, name = EventType.FACE_CAPTURE_V3_KEY),
+    JsonSubTypes.Type(value = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload::class, name = EventType.FACE_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = FaceFallbackCapturePayload::class, name = EventType.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceOnboardingCompletePayload::class, name = EventType.FACE_ONBOARDING_COMPLETE_KEY),
     JsonSubTypes.Type(value = SessionCapturePayload::class, name = EventType.SESSION_CAPTURE_KEY),
@@ -79,6 +82,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = EnrolmentEventV2.EnrolmentPayload::class, name = EventType.ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent.FingerprintCapturePayload::class, name = EventType.FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEventV3.FingerprintCapturePayloadV3::class, name = EventType.FINGERPRINT_CAPTURE_V3_KEY),
+    JsonSubTypes.Type(value = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload::class, name = EventType.FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = GuidSelectionPayload::class, name = EventType.GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingPayload::class, name = EventType.INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = InvalidIntentPayload::class, name = EventType.INVALID_INTENT_KEY),

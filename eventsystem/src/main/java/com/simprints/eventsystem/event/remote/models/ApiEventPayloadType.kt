@@ -27,11 +27,13 @@ import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
@@ -85,6 +87,9 @@ enum class ApiEventPayloadType {
 
     /* key added: FINGERPRINT_CAPTURE_KEY */
     FingerprintCapture,
+
+    /* key added: FINGERPRINT_CAPTURE_BIOMETRICS_KEY */
+    FingerprintCaptureBiometrics,
 
     /* key added: ONE_TO_ONE_MATCH_KEY */
     OneToOneMatch,
@@ -143,6 +148,9 @@ enum class ApiEventPayloadType {
     /* key added: FACE_CAPTURE_KEY */
     FaceCapture,
 
+    /* key added: FACE_CAPTURE_BIOMETRICS_KEY */
+    FaceCaptureBiometrics,
+
     /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
     FaceCaptureConfirmation;
 
@@ -178,6 +186,8 @@ enum class ApiEventPayloadType {
         const val FACE_FALLBACK_CAPTURE_KEY = "FaceFallbackCapture"
         const val FACE_CAPTURE_KEY = "FaceCapture"
         const val FACE_CAPTURE_CONFIRMATION_KEY = "FaceCaptureConfirmation"
+        const val FACE_CAPTURE_BIOMETRICS_KEY = "FaceCaptureBiometrics"
+        const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FingerprintCaptureBiometrics"
     }
 }
 
@@ -225,6 +235,8 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_V3 -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
+    FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics
+    FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
 }
 
 
@@ -258,6 +270,8 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
     ApiEventPayloadType.FaceCapture -> FACE_CAPTURE_V3
     ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
+    ApiEventPayloadType.FingerprintCaptureBiometrics -> FINGERPRINT_CAPTURE_BIOMETRICS
+    ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }
