@@ -3,6 +3,7 @@ package com.simprints.fingerprint.scanner.data.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.di.KoinInjector
 import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.logging.Simber
@@ -23,8 +24,8 @@ class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
             KoinInjector.acquireFingerprintKoinModules()
 
             val firmwareRepository: FirmwareRepository by inject()
-
-            firmwareRepository.updateStoredFirmwareFilesWithLatest()
+            val preferenceManager: FingerprintPreferencesManager by inject()
+            firmwareRepository.updateStoredFirmwareFilesWithLatest(preferenceManager.lastScannerVersion)
 
             Simber.d("FirmwareFileUpdateWorker succeeded")
             Result.success()

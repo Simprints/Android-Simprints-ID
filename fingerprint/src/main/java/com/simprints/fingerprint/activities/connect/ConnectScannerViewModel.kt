@@ -139,7 +139,7 @@ class ConnectScannerViewModel(
         scannerManager.scanner?.run {
             if (versionInformation().generation == ScannerGeneration.VERO_1) {
                 sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                    versionInformation().computeMasterVersion().toString()
+                    versionInformation().firmware.stm
                 )
             }
         } ?: retryConnect()
@@ -211,7 +211,7 @@ class ConnectScannerViewModel(
         message.postValue(R.string.connect_scanner_finished)
         preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
         preferencesManager.lastScannerVersion =
-            scannerManager.scanner?.versionInformation()?.computeMasterVersion().toString()
+            scannerManager.scanner?.versionInformation()?.hardwareVersion.toString()
 
         Simber.tag(MAC_ADDRESS, true).i(scannerManager.currentMacAddress ?: "")
         Simber.tag(SCANNER_ID, true).i(scannerManager.currentScannerId ?: "")

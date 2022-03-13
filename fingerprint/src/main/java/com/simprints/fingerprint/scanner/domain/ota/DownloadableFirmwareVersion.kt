@@ -1,10 +1,8 @@
 package com.simprints.fingerprint.scanner.domain.ota
 
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
-
 data class DownloadableFirmwareVersion(
     val chip: Chip,
-    val version: ChipFirmwareVersion,
+    val version: String,
     val downloadUrl: String
 ) {
     enum class Chip(val chipName: String) {
