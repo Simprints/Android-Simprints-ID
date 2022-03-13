@@ -36,13 +36,10 @@ data class Vero2InfoSnapshotEvent(
 
         @Keep
         data class Vero2Version(
-            val master: Long,
+            val hardwareVersion: String,
             val cypressApp: String,
-            val cypressApi: String,
             val stmApp: String,
-            val stmApi: String,
-            val un20App: String,
-            val un20Api: String
+            val un20App: String
         )
 
         @Keep
@@ -55,7 +52,7 @@ data class Vero2InfoSnapshotEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }
 

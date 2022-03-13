@@ -12,13 +12,10 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
         isClosed: Boolean
     ): Vero2InfoSnapshotEvent {
         val versionArg = Vero2Version(
-            0,
+            "E-1",
             "cypressApp",
             "cypressApi",
-            "stmApp",
-            "stpApi",
-            "un20App",
-            "un20Api"
+            "stmApp"
         )
         val batteryArg = BatteryInfo(0, 1, 2, 3)
         return Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg, labels)

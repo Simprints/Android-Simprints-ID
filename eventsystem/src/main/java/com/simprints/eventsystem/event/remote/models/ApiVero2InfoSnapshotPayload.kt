@@ -13,22 +13,16 @@ data class ApiVero2InfoSnapshotPayload(override val startTime: Long,
                                        val battery: ApiBatteryInfo) : ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, startTime) {
 
     @Keep
-    data class ApiVero2Version(val master: Long,
+    data class ApiVero2Version(val hardwareVersion: String,
                                val cypressApp: String,
-                               val cypressApi: String,
                                val stmApp: String,
-                               val stmApi: String,
-                               val un20App: String,
-                               val un20Api: String) {
+                               val un20App: String) {
 
         constructor(vero2Version: Vero2Version) :
-            this(vero2Version.master,
+            this(vero2Version.hardwareVersion,
                 vero2Version.cypressApp,
-                vero2Version.cypressApi,
                 vero2Version.stmApp,
-                vero2Version.stmApi,
-                vero2Version.un20App,
-                vero2Version.un20Api)
+                vero2Version.un20App)
     }
 
     @Keep
