@@ -16,7 +16,7 @@ class VeroEventParser : MessageParser<VeroEvent> {
                 when (val type = VeroMessageProtocol.getMessageType(messageBytes)) {
                     VeroMessageType.UN20_STATE_CHANGE -> Un20StateChangeEvent.fromBytes(data)
                     VeroMessageType.TRIGGER_BUTTON_PRESSED -> TriggerButtonPressedEvent.fromBytes(data)
-                    VeroMessageType.GET_STM_FIRMWARE_VERSION,
+                    VeroMessageType.GET_STM_EXTENDED_FIRMWARE_VERSION,
                     VeroMessageType.GET_UN20_ON,
                     VeroMessageType.SET_UN20_ON,
                     VeroMessageType.GET_TRIGGER_BUTTON_ACTIVE,

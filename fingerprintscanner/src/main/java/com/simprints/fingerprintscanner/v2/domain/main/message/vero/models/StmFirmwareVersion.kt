@@ -3,6 +3,7 @@ package com.simprints.fingerprintscanner.v2.domain.main.message.vero.models
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroMessageProtocol
 import com.simprints.fingerprintscanner.v2.tools.primitives.toByteArray
 
+@Deprecated(message = "Use new extension api: [StmExtendedFirmwareVersion]")
 class StmFirmwareVersion(
     val apiMajorVersion: Short,
     val apiMinorVersion: Short,

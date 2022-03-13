@@ -97,6 +97,11 @@ class SimulatedCommandInputStream {
                     GET_CYPRESS_VERSION -> GetCypressVersionCommand.fromBytes(data)
                     GET_VERSION -> GetVersionCommand.fromBytes(data)
                     SET_VERSION -> SetVersionCommand.fromBytes(data)
+
+                    GET_EXTENDED_VERSION -> GetExtendedVersionCommand.fromBytes(data)
+                    GET_HARDWARE_VERSION -> GetHardwareVersionCommand.fromBytes(data)
+                    GET_CYPRESS_EXTENDED_VERSION -> GetCypressExtendedVersionCommand.fromBytes(data)
+                    SET_EXTENDED_VERSION -> SetExtendedVersionCommand.fromBytes(data)
                 }
             }
     }
@@ -106,7 +111,7 @@ class SimulatedCommandInputStream {
         override fun parse(messageBytes: ByteArray): VeroCommand =
             VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
                 when (VeroMessageProtocol.getMessageType(messageBytes)) {
-                    GET_STM_FIRMWARE_VERSION -> GetStmFirmwareVersionCommand.fromBytes(data)
+                    GET_STM_EXTENDED_FIRMWARE_VERSION -> GetStmExtendedFirmwareVersionCommand.fromBytes(data)
                     GET_UN20_ON -> GetUn20OnCommand.fromBytes(data)
                     SET_UN20_ON -> SetUn20OnCommand.fromBytes(data)
                     GET_TRIGGER_BUTTON_ACTIVE -> GetTriggerButtonActiveCommand.fromBytes(data)
@@ -132,7 +137,7 @@ class SimulatedCommandInputStream {
                 Un20MessageProtocol.getDataBytes(messageBytes)
             ).let { (minorTypeByte, data) ->
                 when (Un20MessageProtocol.getMessageType(messageBytes)) {
-                    Un20MessageType.GetUn20AppVersion -> GetUn20AppVersionCommand.fromBytes(data)
+                    Un20MessageType.GetUn20ExtendedAppVersion -> GetUn20ExtendedAppVersionCommand.fromBytes(data)
                     Un20MessageType.CaptureFingerprint -> CaptureFingerprintCommand.fromBytes(data)
                     Un20MessageType.GetImageQualityPreview -> GetImageQualityPreviewCommand.fromBytes(data)
                     Un20MessageType.SetScanLedState -> SetScanLedStateCommand.fromBytes(data)

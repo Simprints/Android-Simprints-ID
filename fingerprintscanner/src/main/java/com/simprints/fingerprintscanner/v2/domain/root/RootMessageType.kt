@@ -8,7 +8,13 @@ enum class RootMessageType(val byte: Byte) {
     ENTER_STM_OTA_MODE(0x30),
     GET_CYPRESS_VERSION(0xC0.toByte()),
     GET_VERSION(0xD0.toByte()),
-    SET_VERSION(0xE0.toByte());
+    SET_VERSION(0xE0.toByte()),
+
+    // extended api
+    GET_EXTENDED_VERSION(0xD1.toByte()),
+    GET_HARDWARE_VERSION(0xF0.toByte()),
+    GET_CYPRESS_EXTENDED_VERSION(0xC1.toByte()),
+    SET_EXTENDED_VERSION(0xE1.toByte());
 
     companion object {
         fun fromByte(byte: Byte) = values().find { it.byte == byte }

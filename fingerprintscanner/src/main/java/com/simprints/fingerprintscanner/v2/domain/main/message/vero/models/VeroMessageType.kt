@@ -6,7 +6,7 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
 
     // 0x1_ : Versioning
-    GET_STM_FIRMWARE_VERSION(0x10, 0x00),
+    GET_STM_EXTENDED_FIRMWARE_VERSION(0x10, 0x01),
 
     // 0x2_ : UN20 control
     GET_UN20_ON(0x20, 0x10),

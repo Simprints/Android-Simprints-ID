@@ -16,13 +16,12 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Trigg
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
-import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
+import com.simprints.fingerprintscanner.v2.domain.root.models.*
 import com.simprints.fingerprintscanner.v2.domain.root.responses.*
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
@@ -38,6 +37,7 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.*
 import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.rx2.rxSingle
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -54,6 +54,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Digit
 class Scanner(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
+    private val scannerInfoReaderHelper: ScannerInfoReaderHelper,
     private val cypressOtaMessageChannel: CypressOtaMessageChannel,
     private val stmOtaMessageChannel: StmOtaMessageChannel,
     private val cypressOtaController: CypressOtaController,
@@ -121,26 +122,32 @@ class Scanner(
         mainMessageChannel.sendMainModeCommandAndReceiveResponse<R>(command)
             .handleErrorsWith(responseErrorHandler)
 
-    fun getVersionInformation(): Single<UnifiedVersionInformation> =
-        assertConnected().andThen(assertMode(ROOT)).andThen(
-            sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
-                GetVersionCommand()
-            ))
-            .map { it.version }
+    fun getVersionInformation(): Single<ScannerInformation> =
+        assertConnected()
+            .andThen(assertMode(ROOT))
+            .andThen(scannerInfoReaderHelper.readScannerInfo())
 
-    fun setVersionInformation(versionInformation: UnifiedVersionInformation): Completable =
-        assertConnected().andThen(assertMode(ROOT)).andThen(
-            sendRootModeCommandAndReceiveResponse<SetVersionResponse>(
-                SetVersionCommand(versionInformation)
-            ))
+
+    fun getExtendedVersionInformation(): Single<ExtendedVersionInformation> =
+        assertConnected()
+            .andThen(assertMode(ROOT))
+            .andThen(rxSingle { scannerInfoReaderHelper.getExtendedVersionInfo().version })
+
+
+    fun setVersionInformation(versionInformation: ExtendedVersionInformation): Completable =
+        assertConnected().andThen(assertMode(ROOT))
+            .andThen(scannerInfoReaderHelper.setExtendedVersionInformation(versionInformation))
             .completeOnceReceived()
 
     fun getCypressFirmwareVersion(): Single<CypressFirmwareVersion> =
-        assertConnected().andThen(assertMode(ROOT)).andThen(
-            sendRootModeCommandAndReceiveResponse<GetCypressVersionResponse>(
-                GetCypressVersionCommand()
-            ))
-            .map { it.version }
+        assertConnected().andThen(assertMode(ROOT))
+            .andThen(scannerInfoReaderHelper.getCypressVersion())
+
+
+    fun getCypressExtendedFirmwareVersion(): Single<CypressExtendedFirmwareVersion> =
+        assertConnected().andThen(assertMode(ROOT))
+            .andThen(scannerInfoReaderHelper.getCypressExtendedVersion())
+
 
     fun enterMainMode(): Completable =
         assertConnected().andThen(assertMode(ROOT)).andThen(
@@ -193,10 +200,10 @@ class Scanner(
         state.mode = STM_OTA
     }
 
-    fun getStmFirmwareVersion(): Single<StmFirmwareVersion> =
+    fun getStmFirmwareVersion(): Single<StmExtendedFirmwareVersion> =
         assertConnected().andThen(assertMode(MAIN)).andThen(
-            sendMainModeCommandAndReceiveResponse<GetStmFirmwareVersionResponse>(
-                GetStmFirmwareVersionCommand()
+            sendMainModeCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
+                GetStmExtendedFirmwareVersionCommand()
             ))
             .map { it.stmFirmwareVersion }
 
@@ -317,10 +324,10 @@ class Scanner(
             .map { it.batteryTemperature.deciKelvin.unsignedToInt() }
             .doOnSuccess { state.batteryTemperatureDeciKelvin = it }
 
-    fun getUn20AppVersion(): Single<Un20AppVersion> =
+    fun getUn20AppVersion(): Single<Un20ExtendedAppVersion> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
-            sendMainModeCommandAndReceiveResponse<GetUn20AppVersionResponse>(
-                GetUn20AppVersionCommand()
+            sendMainModeCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
+                GetUn20ExtendedAppVersionCommand()
             ))
             .map { it.un20AppVersion }
 
