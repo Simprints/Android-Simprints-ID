@@ -1,14 +1,18 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
-data class ScannerFirmwareVersions(val cypress: ChipFirmwareVersion,
-                                   val stm: ChipFirmwareVersion,
-                                   val un20: ChipFirmwareVersion) {
+data class ScannerFirmwareVersions(val cypress: String,
+                                   val stm: String,
+                                   val un20: String) {
 
-    fun combined(): Int = cypress.combined() + stm.combined() + un20.combined()
 
-    operator fun compareTo(other: ScannerFirmwareVersions) = this.combined() - other.combined()
+    operator fun compareTo(other: ScannerFirmwareVersions) = if (this == other) 0 else -1
 
     companion object {
-        val UNKNOWN = ScannerFirmwareVersions(ChipFirmwareVersion.UNKNOWN, ChipFirmwareVersion.UNKNOWN, ChipFirmwareVersion.UNKNOWN)
+        const val UNKNOWN_VERSION = ""
+        val UNKNOWN = ScannerFirmwareVersions(
+            cypress = "",
+            stm = "",
+            un20 = "",
+        )
     }
 }
