@@ -12,10 +12,13 @@ data class ApiDownloadableFirmwareVersion(
 )
 
 /** @throws IllegalArgumentException */
-fun ApiDownloadableFirmwareVersion.toDomain() =
-    DownloadableFirmwareVersion(
-        DownloadableFirmwareVersion.Chip.values().find { it.chipName == chipType }
-            ?: throw IllegalArgumentException("Unexpected chipType in ApiFirmwareVersionResponse: $chipType"),
-        ChipFirmwareVersion.parse(version),
-        versionURL
+fun ApiDownloadableFirmwareVersion.toDomain(): DownloadableFirmwareVersion {
+    val chip = DownloadableFirmwareVersion.Chip.values().find { it.chipName == chipType }
+        ?: throw IllegalArgumentException("Unexpected chipType in ApiFirmwareVersionResponse: $chipType")
+
+    return DownloadableFirmwareVersion(
+        chip = chip,
+        version = version,
+        downloadUrl = versionURL
     )
+}

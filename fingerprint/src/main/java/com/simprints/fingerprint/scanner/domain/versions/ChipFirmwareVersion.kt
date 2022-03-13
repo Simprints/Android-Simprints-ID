@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
+@Deprecated(message = "Firmware versions are no longer represented in this form")
 data class ChipFirmwareVersion(val major: Int, val minor: Int) : Comparable<ChipFirmwareVersion> {
 
     fun combined(): Int = (major shl 16) + minor.toShort()
@@ -10,13 +11,5 @@ data class ChipFirmwareVersion(val major: Int, val minor: Int) : Comparable<Chip
 
     companion object {
         val UNKNOWN = ChipFirmwareVersion(-1, -1)
-
-        /** @throws IllegalArgumentException */
-        fun parse(s: String) =
-            try {
-                s.split(".").let { ChipFirmwareVersion(it[0].toInt(), it[1].toInt()) }
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Incorrect ChipFirmwareVersion String format: $s", e)
-            }
     }
 }

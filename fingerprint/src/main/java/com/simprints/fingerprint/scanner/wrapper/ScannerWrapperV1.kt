@@ -7,7 +7,6 @@ import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
-import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
@@ -26,13 +25,13 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
     override fun versionInformation(): ScannerVersion =
         ScannerVersion(
-            ScannerGeneration.VERO_1,
-            ScannerFirmwareVersions(
-                cypress = ChipFirmwareVersion.UNKNOWN,
-                stm = ChipFirmwareVersion(scannerV1.ucVersion.toInt(), 0),
-                un20 = ChipFirmwareVersion(scannerV1.unVersion.toInt(), 0)
-            ),
-            ScannerApiVersions.UNKNOWN
+            hardwareVersion = "",
+            generation = ScannerGeneration.VERO_1,
+            firmware = ScannerFirmwareVersions(
+                cypress = ScannerFirmwareVersions.UNKNOWN_VERSION,
+                stm = scannerV1.ucVersion.toInt().toString(),
+                un20 = scannerV1.unVersion.toInt().toString()
+            )
         )
 
     override fun batteryInformation(): BatteryInfo = BatteryInfo.UNKNOWN
