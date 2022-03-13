@@ -30,6 +30,7 @@ dependencies {
     // Kotlin
     implementation(libs.kotlin.reflect)
     implementation(libs.androidX.annotation.annotation)
+    implementation(libs.kotlin.coroutine_rx2_adapter)
 
     // Logging
     implementation(project(":logging"))
