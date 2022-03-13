@@ -38,8 +38,8 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
     ): Completable =
         Completable.complete()
             .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
-            .andThen(scanner.getVersionInformation().doOnSuccess { unifiedVersion ->
-                unifiedVersion.toScannerVersion().also {
+            .andThen(scanner.getVersionInformation().doOnSuccess { scannerVersionInfo ->
+                scannerVersionInfo.toScannerVersion().also {
                     withScannerVersion(it)
                     scannerVersion = it
                 }
@@ -47,7 +47,7 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
             .flatMapCompletable { scanner.enterMainMode() }
             .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
             .andThen(getBatteryInfo(scanner, withBatteryInfo))
-            .flatMapCompletable { ifAvailableOtasPrepareScannerThenThrow(scanner, macAddress, it) }
+            .flatMapCompletable { ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, it) }
 
     private fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): Single<BatteryInfo> =
         Singles.zip(
@@ -59,8 +59,8 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
             BatteryInfo(charge, voltage, current, temperature).also { withBatteryInfo(it) }
         }
 
-    private fun ifAvailableOtasPrepareScannerThenThrow(scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
-        val availableVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+    private fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
+        val availableVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion)
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
         return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
             Completable.complete()

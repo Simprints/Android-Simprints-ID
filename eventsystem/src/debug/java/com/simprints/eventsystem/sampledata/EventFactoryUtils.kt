@@ -480,7 +480,7 @@ fun createSuspiciousIntentEvent() =
 
 fun createVero2InfoSnapshotEvent(): Vero2InfoSnapshotEvent {
     val vero2Version =
-        Vero2Version(0, "cypressApp", "cypressApi", "stmApp", "stmApi", "un20App", "un20Api")
+        Vero2Version("E-1", "cypressApp", "cypressApi", "stmApp")
     val batteryInfo = BatteryInfo(0, 1, 2, 3)
     return Vero2InfoSnapshotEvent(CREATED_AT, vero2Version, batteryInfo, eventLabels)
 }
