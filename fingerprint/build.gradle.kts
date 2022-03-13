@@ -102,6 +102,7 @@ dependencies {
 
     // Kotlin
     implementation(libs.kotlin.reflect)
+    implementation(libs.Kotlin.coroutine_rx2_adapter)
 
     // Android X
     implementation(libs.androidX.core)
