@@ -5,13 +5,14 @@ import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.logging.Simber
 
 class FirmwareRepository(private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
                          private val firmwareLocalDataSource: FirmwareLocalDataSource) {
 
-    suspend fun updateStoredFirmwareFilesWithLatest() {
-        val savedVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+    suspend fun updateStoredFirmwareFilesWithLatest(hardwareVersion: String) {
+        val savedVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion)
         Simber.d("Saved firmware versions: $savedVersions")
 
         val downloadableFirmwares = firmwareRemoteDataSource.getDownloadableFirmwares(savedVersions)
@@ -24,23 +25,22 @@ class FirmwareRepository(private val firmwareRemoteDataSource: FirmwareRemoteDat
         val stmToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.STM, savedVersions.stm)
         val un20ToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.UN20, savedVersions.un20)
 
-        cypressToDownload?.downloadAndSave()
-        stmToDownload?.downloadAndSave()
-        un20ToDownload?.downloadAndSave()
+        cypressToDownload?.downloadAndSave(hardwareVersion)
+        stmToDownload?.downloadAndSave(hardwareVersion)
+        un20ToDownload?.downloadAndSave(hardwareVersion)
     }
 
-    private fun List<DownloadableFirmwareVersion>.getVersionToDownloadOrNull(chip: Chip, savedVersion: ChipFirmwareVersion?): DownloadableFirmwareVersion? {
+    private fun List<DownloadableFirmwareVersion>.getVersionToDownloadOrNull(chip: Chip, savedVersion: String): DownloadableFirmwareVersion? {
         val downloadableVersion = this.find { it.chip == chip } ?: return null
-        if (savedVersion == null || savedVersion == ChipFirmwareVersion.UNKNOWN) return downloadableVersion
-        return if (downloadableVersion.version > savedVersion) downloadableVersion else null
+        return if (downloadableVersion.version != savedVersion) downloadableVersion else null
     }
 
-    private suspend fun DownloadableFirmwareVersion.downloadAndSave() {
+    private suspend fun DownloadableFirmwareVersion.downloadAndSave(hardwareVersion: String) {
         val firmwareBytes = firmwareRemoteDataSource.downloadFile(this.downloadUrl)
         when (chip) {
-            Chip.CYPRESS -> firmwareLocalDataSource.saveCypressFirmwareBytes(version, firmwareBytes)
-            Chip.STM -> firmwareLocalDataSource.saveStmFirmwareBytes(version, firmwareBytes)
-            Chip.UN20 -> firmwareLocalDataSource.saveUn20FirmwareBytes(version, firmwareBytes)
+            Chip.CYPRESS -> firmwareLocalDataSource.saveCypressFirmwareBytes(hardwareVersion, version, firmwareBytes)
+            Chip.STM -> firmwareLocalDataSource.saveStmFirmwareBytes(hardwareVersion, version, firmwareBytes)
+            Chip.UN20 -> firmwareLocalDataSource.saveUn20FirmwareBytes(hardwareVersion, version, firmwareBytes)
         }
     }
 }

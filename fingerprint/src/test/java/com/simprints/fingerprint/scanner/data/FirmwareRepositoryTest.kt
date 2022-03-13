@@ -70,10 +70,6 @@ class FirmwareRepositoryTest {
         private val UN20_VERSION_HIGH = ChipFirmwareVersion(1, 3)
         private const val UN20_URL = "un20_url.com"
 
-        private val CYPRESS_API_RESPONSE = ApiDownloadableFirmwareVersion(CYPRESS_NAME, CYPRESS_VERSION_HIGH.toString(), CYPRESS_URL)
-        private val STM_API_RESPONSE = ApiDownloadableFirmwareVersion(STM_NAME, STM_VERSION_HIGH.toString(), STM_URL)
-        private val UN20_API_RESPONSE = ApiDownloadableFirmwareVersion(UN20_NAME, UN20_VERSION_HIGH.toString(), UN20_URL)
-
         private val RESPONSE_MAP = mapOf(
             CYPRESS_NAME to CYPRESS_API_RESPONSE,
             STM_NAME to STM_API_RESPONSE,

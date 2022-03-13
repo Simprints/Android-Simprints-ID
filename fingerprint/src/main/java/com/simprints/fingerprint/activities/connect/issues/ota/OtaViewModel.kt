@@ -11,6 +11,7 @@ import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecove
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
@@ -32,7 +33,8 @@ class OtaViewModel(
     private val scannerManager: ScannerManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val timeHelper: FingerprintTimeHelper
+    private val timeHelper: FingerprintTimeHelper,
+    private val fingerprintPreferenceManager: FingerprintPreferencesManager
 ) : ViewModel() {
 
     val progress = MutableLiveData(0f)
@@ -98,10 +100,12 @@ class OtaViewModel(
             AvailableOta.UN20 -> "un20"
         }
 
+        val scannerVersion = fingerprintPreferenceManager.lastScannerVersion
+
         val targetVersion = when (availableOta) {
-            AvailableOta.CYPRESS -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().cypress.toString()
-            AvailableOta.STM -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().stm.toString()
-            AvailableOta.UN20 -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().un20.toString()
+            AvailableOta.CYPRESS -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions(scannerVersion).cypress
+            AvailableOta.STM -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions(scannerVersion).stm
+            AvailableOta.UN20 -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions(scannerVersion).un20
         }
 
         val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
