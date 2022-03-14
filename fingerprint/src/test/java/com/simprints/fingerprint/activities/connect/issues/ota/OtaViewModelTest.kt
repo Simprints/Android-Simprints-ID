@@ -6,6 +6,7 @@ import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.commontesttools.time.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
@@ -57,16 +58,21 @@ class OtaViewModelTest {
         it.scanner = scannerMock
     }
 
+    private val fingerprintManager: FingerprintPreferencesManager = mockk (relaxed = true){
+        every { lastScannerVersion } returns  HARDWARE_VERSION
+    }
+
     private val otaViewModel = OtaViewModel(
         scannerManager,
         firmwareLocalDataSource,
         sessionEventsManagerMock,
-        timeHelperMock
+        timeHelperMock,
+        fingerprintManager
     )
 
     @Before
     fun setup() {
-        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns
+        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions(HARDWARE_VERSION) } returns
             ScannerFirmwareVersions(cypress = NEW_CYPRESS_VERSION, stm = NEW_STM_VERSION, un20 = NEW_UN20_VERSION)
         every { scannerMock.performCypressOta() } returns Observable.fromIterable(CYPRESS_OTA_STEPS)
         every { scannerMock.performStmOta() } returns Observable.fromIterable(STM_OTA_STEPS)
@@ -208,13 +214,14 @@ class OtaViewModelTest {
     }
 
     companion object {
+        private const val HARDWARE_VERSION = "E-1"
         private const val NEW_CYPRESS_STRING = "5.1"
         private const val NEW_STM_STRING = "4.7"
         private const val NEW_UN20_STRING = "8.0"
 
-        private val NEW_CYPRESS_VERSION = ChipFirmwareVersion(5, 1)
-        private val NEW_STM_VERSION = ChipFirmwareVersion(4, 7)
-        private val NEW_UN20_VERSION = ChipFirmwareVersion(8, 0)
+        private val NEW_CYPRESS_VERSION = "5.E-1.1"
+        private val NEW_STM_VERSION = "4.E-1.7"
+        private val NEW_UN20_VERSION = "8.E-1.0"
 
         private val OTA_PROGRESS_VALUES = listOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
 

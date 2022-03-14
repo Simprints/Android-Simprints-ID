@@ -52,18 +52,18 @@ class FirmwareRemoteDataSourceTest {
 
     companion object {
         private const val CYPRESS_NAME = "cypress"
-        private val CYPRESS_VERSION_LOW = ChipFirmwareVersion(1, 0)
-        private val CYPRESS_VERSION_HIGH = ChipFirmwareVersion(1, 1)
+        private val CYPRESS_VERSION_LOW = "1.E-1.0"
+        private val CYPRESS_VERSION_HIGH = "1.E-1.1"
         private const val CYPRESS_URL = "cypress_url.com"
 
         private const val STM_NAME = "stm"
-        private val STM_VERSION_LOW = ChipFirmwareVersion(1, 1)
-        private val STM_VERSION_HIGH = ChipFirmwareVersion(1, 2)
+        private val STM_VERSION_LOW = "1.E-1.1"
+        private val STM_VERSION_HIGH = "1.E-1.2"
         private const val STM_URL = "stm_url.com"
 
         private const val UN20_NAME = "un20"
-        private val UN20_VERSION_LOW = ChipFirmwareVersion(1, 2)
-        private val UN20_VERSION_HIGH = ChipFirmwareVersion(1, 3)
+        private val UN20_VERSION_LOW = "1.E-1.2"
+        private val UN20_VERSION_HIGH = "1.E-1.3"
         private const val UN20_URL = "un20_url.com"
 
         private val CYPRESS_API_RESPONSE = ApiDownloadableFirmwareVersion(CYPRESS_NAME, CYPRESS_VERSION_HIGH.toString(), CYPRESS_URL)
