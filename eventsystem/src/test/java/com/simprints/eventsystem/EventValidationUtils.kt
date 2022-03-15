@@ -579,18 +579,15 @@ fun validateScannerConnectionEventApiModel(json: JSONObject) {
 fun validateVero2InfoSnapshotEventApiModel(json: JSONObject) {
     validateCommonParams(json, "Vero2InfoSnapshot")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
 
         with(getJSONObject("scannerVersion")) {
-            assertThat(getString("master")).isNotEmpty()
+            assertThat(getString("hardwareVersion")).isNotEmpty()
             assertThat(getString("cypressApp")).isNotEmpty()
-            assertThat(getString("cypressApi")).isNotEmpty()
             assertThat(getString("stmApp")).isNotEmpty()
-            assertThat(getString("stmApi")).isNotEmpty()
             assertThat(getString("un20App")).isNotEmpty()
-            assertThat(getString("un20Api")).isNotEmpty()
-            assertThat(length()).isEqualTo(7)
+            assertThat(length()).isEqualTo(4)
         }
 
         with(getJSONObject("battery")) {
