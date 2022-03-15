@@ -215,9 +215,9 @@ class OtaViewModelTest {
 
     companion object {
         private const val HARDWARE_VERSION = "E-1"
-        private const val NEW_CYPRESS_STRING = "5.1"
-        private const val NEW_STM_STRING = "4.7"
-        private const val NEW_UN20_STRING = "8.0"
+        private const val NEW_CYPRESS_STRING = "5.E-1.1"
+        private const val NEW_STM_STRING = "4.E-1.7"
+        private const val NEW_UN20_STRING = "8.E-1.0"
 
         private val NEW_CYPRESS_VERSION = "5.E-1.1"
         private val NEW_STM_VERSION = "4.E-1.7"
