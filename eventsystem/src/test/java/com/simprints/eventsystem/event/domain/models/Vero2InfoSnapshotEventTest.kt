@@ -17,7 +17,7 @@ class Vero2InfoSnapshotEventTest {
     @Test
     fun create_Vero2InfoSnapshotEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val versionArg = Vero2Version(0, "cypressApp", "cypressApi", "stmApp", "stpApi", "un20App", "un20Api")
+        val versionArg = Vero2Version("E-1", "cypressApp", "cypressApi", "stmApp")
         val batteryArg = BatteryInfo(0, 1, 2, 3)
         val event = Vero2InfoSnapshotEventSample.getEvent(labels)
 
