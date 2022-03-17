@@ -54,7 +54,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Digit
 class Scanner(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
-    private val scannerInfoReaderHelper: ScannerInfoReaderHelper,
+    private val scannerInfoReaderHelper: ScannerExtendedInfoReaderHelper,
     private val cypressOtaMessageChannel: CypressOtaMessageChannel,
     private val stmOtaMessageChannel: StmOtaMessageChannel,
     private val cypressOtaController: CypressOtaController,
@@ -201,11 +201,8 @@ class Scanner(
     }
 
     fun getStmFirmwareVersion(): Single<StmExtendedFirmwareVersion> =
-        assertConnected().andThen(assertMode(MAIN)).andThen(
-            sendMainModeCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
-                GetStmExtendedFirmwareVersionCommand()
-            ))
-            .map { it.stmFirmwareVersion }
+        assertConnected().andThen(assertMode(MAIN))
+            .andThen(scannerInfoReaderHelper.getStmExtendedFirmwareVersion())
 
     fun getUn20Status(): Single<Boolean> =
         assertConnected().andThen(assertMode(MAIN)).andThen(
@@ -325,11 +322,9 @@ class Scanner(
             .doOnSuccess { state.batteryTemperatureDeciKelvin = it }
 
     fun getUn20AppVersion(): Single<Un20ExtendedAppVersion> =
-        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
-            sendMainModeCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
-                GetUn20ExtendedAppVersionCommand()
-            ))
-            .map { it.un20AppVersion }
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On())
+            .andThen(scannerInfoReaderHelper.getUn20ExtendedAppVersion())
+
 
     fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): Single<CaptureFingerprintResult> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(

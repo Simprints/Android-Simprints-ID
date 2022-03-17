@@ -3,7 +3,7 @@ package com.simprints.fingerprintscanner.v2.domain.root.models
 
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf as byteArrayOfAny
 
-class CypressExtendedFirmwareVersion(val versionAsString: String) {
+data class CypressExtendedFirmwareVersion(val versionAsString: String) {
 
     fun getBytes(): ByteArray {
         val bytes = versionAsString.toByteArray()
