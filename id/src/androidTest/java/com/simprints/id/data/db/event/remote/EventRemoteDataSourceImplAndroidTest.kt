@@ -633,8 +633,8 @@ class EventRemoteDataSourceImplAndroidTest {
             Vero2InfoSnapshotEvent(
                 createdAt = DEFAULT_TIME,
                 version = Vero2InfoSnapshotPayload.Vero2Version(
-                    Int.MAX_VALUE.toLong() + 1, "1.23",
-                    "api", "stmApp", "stmApi", "un20App", "un20Api"
+                    "E-1", "1.23",
+                    "api", "stmApp"
                 ),
                 battery = Vero2InfoSnapshotPayload.BatteryInfo(70, 15, 1, 37),
                 labels = eventLabels
