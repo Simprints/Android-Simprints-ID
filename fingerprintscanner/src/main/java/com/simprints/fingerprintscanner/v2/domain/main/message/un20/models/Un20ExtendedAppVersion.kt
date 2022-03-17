@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.domain.main.message.un20.models
 
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf as byteArrayOfAny
 
-class Un20ExtendedAppVersion(val versionAsString: String) {
+data class Un20ExtendedAppVersion(val versionAsString: String) {
 
     fun getBytes(): ByteArray {
         val bytes = versionAsString.toByteArray()

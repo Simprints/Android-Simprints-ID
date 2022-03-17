@@ -4,6 +4,12 @@ import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
 import com.simprints.fingerprintscanner.v2.domain.main.message.IncomingMainMessage
 import com.simprints.fingerprintscanner.v2.domain.main.message.OutgoingMainMessage
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.commands.GetUn20ExtendedAppVersionCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses.GetUn20ExtendedAppVersionResponse
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.GetStmExtendedFirmwareVersionCommand
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.GetStmExtendedFirmwareVersionResponse
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
 import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.*
@@ -15,13 +21,11 @@ import io.reactivex.Single
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxSingle
 
-class ScannerInfoReaderHelper(
+class ScannerExtendedInfoReaderHelper(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
     private val responseErrorHandler: ResponseErrorHandler
 ) {
-
-    lateinit var hardwareVersion: String
 
     fun readScannerInfo(): Single<ScannerInformation>  {
         return getCypressVersion().flatMap { cypressVersion ->
@@ -49,6 +53,17 @@ class ScannerInfoReaderHelper(
         ).map { it.version }
     }
 
+    fun getStmExtendedFirmwareVersion(): Single<StmExtendedFirmwareVersion>  {
+        return sendMainModeCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
+            GetStmExtendedFirmwareVersionCommand()
+        ).map { it.stmFirmwareVersion }
+    }
+
+    fun getUn20ExtendedAppVersion(): Single<Un20ExtendedAppVersion> {
+        return sendMainModeCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
+            GetUn20ExtendedAppVersionCommand()
+        ).map { it.un20AppVersion }
+    }
 
     fun setExtendedVersionInformation(versionInformation: ExtendedVersionInformation): Single<SetVersionResponse> {
         return sendRootModeCommandAndReceiveResponse(

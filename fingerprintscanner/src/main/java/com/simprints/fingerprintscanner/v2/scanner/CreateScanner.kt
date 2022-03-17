@@ -70,7 +70,7 @@ fun Scanner.Companion.create(): Scanner {
     )
 
     val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
-    val scannerInfoReaderHelper = ScannerInfoReaderHelper(
+    val scannerInfoReaderHelper = ScannerExtendedInfoReaderHelper(
         mainMessageChannel,
         rootMessageChannel,
         responseErrorHandler
