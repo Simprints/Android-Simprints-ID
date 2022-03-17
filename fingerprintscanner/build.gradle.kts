@@ -54,8 +54,6 @@ dependencies {
     testImplementation(libs.testing.mockito.core)
     testImplementation(libs.testing.mockito.inline)
 
-    testImplementation(Dependencies.Testing.Mockk.core)
-
     // Truth
     testImplementation(libs.testing.truth)
 }
