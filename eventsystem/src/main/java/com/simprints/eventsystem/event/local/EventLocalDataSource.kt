@@ -11,7 +11,6 @@ interface EventLocalDataSource {
     suspend fun count(type: EventType): Int
     suspend fun loadAll(): Flow<Event>
     suspend fun loadAllFromSession(sessionId: String): List<Event>
-    suspend fun loadAllFromProject(projectId: String): Flow<Event>
     suspend fun loadAllSessions(isClosed: Boolean): Flow<Event>
     suspend fun loadAllClosedSessionIds(projectId: String): List<String>
     suspend fun delete(ids: List<String>)

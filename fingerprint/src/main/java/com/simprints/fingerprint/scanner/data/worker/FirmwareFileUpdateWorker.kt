@@ -18,14 +18,14 @@ import org.koin.core.component.inject
 class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
     : CoroutineWorker(context, params), KoinComponent {
 
+
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             Simber.d("FirmwareFileUpdateWorker started")
             KoinInjector.acquireFingerprintKoinModules()
 
             val firmwareRepository: FirmwareRepository by inject()
-            val preferenceManager: FingerprintPreferencesManager by inject()
-            firmwareRepository.updateStoredFirmwareFilesWithLatest(preferenceManager.lastScannerVersion)
+            firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
             Simber.d("FirmwareFileUpdateWorker succeeded")
             Result.success()

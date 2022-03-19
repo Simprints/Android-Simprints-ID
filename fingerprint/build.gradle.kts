@@ -102,7 +102,7 @@ dependencies {
 
     // Kotlin
     implementation(libs.kotlin.reflect)
-    implementation(libs.Kotlin.coroutine_rx2_adapter)
+    implementation(libs.kotlin.coroutine_rx2_adapter)
 
     // Android X
     implementation(libs.androidX.core)
@@ -135,12 +135,12 @@ dependencies {
     implementation(libs.retrofit.adapter)
     implementation(libs.retrofit.logging)
     implementation(libs.retrofit.okhttp)
+    implementation(libs.retrofit.jackson)
     // Splitties
     implementation(libs.splitties.core)
     // Koin
     implementation(libs.koin.core)
     implementation(libs.koin.android)
-
 
     // ######################################################
     //                      Unit test

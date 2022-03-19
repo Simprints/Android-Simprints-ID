@@ -273,6 +273,18 @@ open class SettingsPreferencesManagerImpl(
             fingerprintsToCollectSerializer
         )
 
+   /**
+     * The Vero2FirmwareVersions as a JSON string
+     */
+
+   override var firmwareDownloadableVersionsJson: String
+       by RemoteConfigPrimitivePreference(
+           prefs,
+           remoteConfigWrapper,
+           VERO2_FIRMWARE_VEdRSIONS_KEY,
+           VERO2_FIRMWARE_VERSIONS_DEFAULT
+       )
+
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -504,6 +516,11 @@ open class SettingsPreferencesManagerImpl(
             FaceConfidenceThresholds.MEDIUM to 0,
             FaceConfidenceThresholds.HIGH to 700
         )
+
+        const val VERO2_FIRMWARE_VEdRSIONS_KEY = "Vero2FirmwareVersions"
+        val VERO2_FIRMWARE_VERSIONS_DEFAULT =
+            "{\"E-1\":{\"cypress\":\"1.E-1.1\",\"stm\":\"1.E-1.1\",\"un20\":\"1.E-1.0\"}}"
+
     }
 
 }
