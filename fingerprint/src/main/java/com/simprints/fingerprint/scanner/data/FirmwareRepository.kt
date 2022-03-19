@@ -21,7 +21,8 @@ class FirmwareRepository(
     }
 
     private suspend fun updateStoredFirmwareFilesWithLatest(hardwareVersion: String) {
-        val savedVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+        val savedVersions =
+            firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion)
         Simber.d("Saved firmware versions: $savedVersions")
 
         val downloadableFirmwares = firmwareRemoteDataSource.getDownloadableFirmwares(
@@ -48,7 +49,7 @@ class FirmwareRepository(
     private fun List<DownloadableFirmwareVersion>.getVersionToDownloadOrNull(
         chip: Chip,
     ): DownloadableFirmwareVersion? {
-        return  this.find { it.chip == chip }
+        return this.find { it.chip == chip }
     }
 
     private suspend fun DownloadableFirmwareVersion.downloadAndSave() {
