@@ -166,10 +166,6 @@ suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecord
     }
 
     coEvery {
-        eventLocalDataSource.loadAllFromProject(projectId = DEFAULT_PROJECT_ID)
-    } returns events.asFlow()
-
-    coEvery {
         eventLocalDataSource.loadOldSubjectCreationEvents(any())
     } returns events.filter { it.labels.sessionId.isNullOrBlank() }
 

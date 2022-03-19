@@ -1,25 +1,25 @@
 package com.simprints.fingerprint.scanner.data.remote
 
-import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
 import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 
-class FirmwareRemoteDataSource(private val fingerprintApiClientFactory: FingerprintApiClientFactory,
-                               private val fingerprintFileDownloader: FingerprintFileDownloader) {
+class FirmwareRemoteDataSource(
+    private val fingerprintFileDownloader: FingerprintFileDownloader,
+    private val preferencesManager: FingerprintPreferencesManager
+) {
 
     /**
      * Allows for querying whether there are more up-to-date firmware versions by sending the currently saved versions
      */
-    suspend fun getDownloadableFirmwares(savedVersion: ScannerFirmwareVersions): List<DownloadableFirmwareVersion> =
-        fingerprintApiClientFactory.buildClient(FirmwareRemoteInterface::class)
-            .executeCall("downloadFirmware") { api ->
-                api.getAvailableDownloadableVersions(
-                    aboveCypressVersion = savedVersion.cypress,
-                    aboveStmVersion = savedVersion.stm,
-                    aboveUn20Version = savedVersion.un20
-                )
-            }.values.map { it.toDomain() }
+    fun getDownloadableFirmwares(hardwareVersion: String,
+                                 localFirmwareVersions: ScannerFirmwareVersions)
+    : List<DownloadableFirmwareVersion> =
+        preferencesManager.scannerRevisions.availableForDownload(
+            hardwareVersion,
+            localFirmwareVersions
+        )
 
     /**
      * Downloads the firmware binary at the given URL

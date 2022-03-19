@@ -22,8 +22,8 @@ class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: 
 
     private fun scheduleWork() {
         WorkManager
-            .getInstance(context)
-            .enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, buildWork())
+            .getInstance(context).enqueueUniqueWork(WORK_NAME,
+                ExistingWorkPolicy.REPLACE,buildWork())
     }
 
     private fun cancelWork() {
@@ -32,8 +32,8 @@ class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: 
             .cancelUniqueWork(WORK_NAME)
     }
 
-    private fun buildWork(): PeriodicWorkRequest =
-        PeriodicWorkRequestBuilder<FirmwareFileUpdateWorker>(REPEAT_INTERVAL, REPEAT_INTERVAL_UNIT)
+    private fun buildWork(): OneTimeWorkRequest =
+        OneTimeWorkRequestBuilder<FirmwareFileUpdateWorker>()
             .setConstraints(getConstraints())
             .build()
 

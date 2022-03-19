@@ -1,8 +1,12 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
-data class ScannerFirmwareVersions(val cypress: String,
-                                   val stm: String,
-                                   val un20: String) {
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class ScannerFirmwareVersions(
+    @JsonProperty val cypress: String,
+    @JsonProperty val stm: String,
+    @JsonProperty val un20: String
+) {
 
 
     operator fun compareTo(other: ScannerFirmwareVersions) = if (this == other) 0 else -1
