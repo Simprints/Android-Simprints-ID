@@ -5,7 +5,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20A
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20MessageType
 
-class GetUn20ExtendedAppVersionResponse(val un20AppVersion: Un20ExtendedAppVersion) : Un20Response(Un20MessageType.GetUn20ExtendedAppVersion) {
+data class GetUn20ExtendedAppVersionResponse(val un20AppVersion: Un20ExtendedAppVersion) : Un20Response(Un20MessageType.GetUn20ExtendedAppVersion) {
 
     override fun getDataBytes(): ByteArray = un20AppVersion.getBytes()
 
