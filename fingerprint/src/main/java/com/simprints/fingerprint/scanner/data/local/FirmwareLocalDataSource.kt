@@ -45,7 +45,7 @@ class FirmwareLocalDataSource(private val context: Context) {
         getFile( chipDirName, version).writeBytes(bytes)
         existingVersions.filter { it != version }.forEach { getFile( chipDirName, it).delete() }
     }
-
+// Ebi to decide how to use hardware version
     private fun getFirmwareVersionsInDir(hardwareVersion: String, chipDirName: String): List<String> =
         getDir( chipDirName).listFiles { _, name ->
             FIRMWARE_FILE_NAME_REGEX.containsMatchIn(name)

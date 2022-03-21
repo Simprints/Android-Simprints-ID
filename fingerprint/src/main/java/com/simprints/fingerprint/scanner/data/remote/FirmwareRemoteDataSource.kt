@@ -17,7 +17,7 @@ class FirmwareRemoteDataSource(
     fun getDownloadableFirmwares(hardwareVersion: String,
                                  localFirmwareVersions: ScannerFirmwareVersions)
     : List<DownloadableFirmwareVersion> =
-        preferencesManager.scannerRevisions.availableForDownload(
+        preferencesManager.scannerHardwareRevisions.availableForDownload(
             hardwareVersion,
             localFirmwareVersions
         )

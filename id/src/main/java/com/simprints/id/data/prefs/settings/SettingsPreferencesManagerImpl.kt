@@ -281,7 +281,7 @@ open class SettingsPreferencesManagerImpl(
        by RemoteConfigPrimitivePreference(
            prefs,
            remoteConfigWrapper,
-           VERO2_FIRMWARE_VEdRSIONS_KEY,
+           VERO2_FIRMWARE_VERSIONS_KEY,
            VERO2_FIRMWARE_VERSIONS_DEFAULT
        )
 
@@ -517,9 +517,8 @@ open class SettingsPreferencesManagerImpl(
             FaceConfidenceThresholds.HIGH to 700
         )
 
-        const val VERO2_FIRMWARE_VEdRSIONS_KEY = "Vero2FirmwareVersions"
-        val VERO2_FIRMWARE_VERSIONS_DEFAULT =
-            "{\"E-1\":{\"cypress\":\"1.E-1.1\",\"stm\":\"1.E-1.1\",\"un20\":\"1.E-1.0\"}}"
+        const val VERO2_FIRMWARE_VERSIONS_KEY = "Vero2FirmwareVersions"
+        const val VERO2_FIRMWARE_VERSIONS_DEFAULT = ""
 
     }
 

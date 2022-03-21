@@ -1,16 +1,17 @@
 package com.simprints.fingerprint.controllers.core.network
 
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
 
 class FingerprintFileDownloader(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
-    private val loginInfoManager: LoginInfoManager
+    private val loginInfoManager: LoginInfoManager,
+    private val dispatcherProvider: DispatcherProvider
     ) {
 
 
@@ -18,7 +19,7 @@ class FingerprintFileDownloader(
         loginInfoManager.getSignedInProjectIdOrEmpty()
     }
     /** @throws IOException */
-    suspend fun download(url: String): ByteArray = withContext(Dispatchers.IO) {
+    suspend fun download(url: String): ByteArray = withContext(dispatcherProvider.io()) {
         // issue with timber logging URLs when interpolated in kotlin, check out this article
         // https://proandroiddev.com/be-careful-what-you-log-it-could-crash-your-app-5fc67a44c842
         Simber.d("Downloading firmware file at %s", url)

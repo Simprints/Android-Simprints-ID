@@ -3,7 +3,7 @@ package com.simprints.fingerprint.controllers.core.preferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.versions.ScannerRevisions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 
 interface FingerprintPreferencesManager {
     var lastScannerUsed: String
@@ -14,6 +14,6 @@ interface FingerprintPreferencesManager {
     val scannerGenerations: List<ScannerGeneration>
     val qualityThreshold: Int
     val liveFeedbackOn: Boolean
-    val scannerRevisions: ScannerRevisions
+    val scannerHardwareRevisions: ScannerHardwareRevisions
     val isCrossFingerComparisonEnabledInVerification:Boolean
 }

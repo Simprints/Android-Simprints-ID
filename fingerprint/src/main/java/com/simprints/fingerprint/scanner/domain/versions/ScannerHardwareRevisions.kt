@@ -4,7 +4,14 @@ import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 
 
 
-class ScannerRevisions : HashMap<String, ScannerFirmwareVersions>() {
+class ScannerHardwareRevisions : HashMap<String, ScannerFirmwareVersions>() {
+    /**
+     * Allows for querying whether there are more up-to-date firmware versions by sending the currently saved versions
+     *
+     * @param hardwareVersion
+     * @param localFirmwareVersions
+     * @return
+     */
     fun availableForDownload(
         hardwareVersion: String,
         localFirmwareVersions: ScannerFirmwareVersions

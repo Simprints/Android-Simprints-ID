@@ -3,6 +3,7 @@ package com.simprints.fingerprint.di
 import com.simprints.id.Application
 import android.bluetooth.BluetoothAdapter
 import android.nfc.NfcAdapter
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
@@ -52,7 +53,7 @@ import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
-import com.simprints.fingerprint.scanner.domain.versions.ScannerRevisionsSerializer
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisionsSerializer
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -127,8 +128,8 @@ object KoinInjector {
      * These are classes that are wrappers of ones that appear in the main app module
      */
     private fun Module.defineBuildersForFingerprintManagers() {
-        single { ScannerRevisionsSerializer(JsonHelper) }
-        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get(),get()) }
+        single { ScannerHardwareRevisionsSerializer(JsonHelper) }
+        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get(), get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
@@ -147,10 +148,10 @@ object KoinInjector {
 
         factory { get<Application>().component }
         factory { get<AppComponent>().getLoginInfoManager() }
-
-        factory { FingerprintFileDownloader(get(),get()) }
+        factory { DefaultDispatcherProvider() }
+        factory { FingerprintFileDownloader(get(), get(), get()) }
         factory { FirmwareRemoteDataSource(get(), get()) }
-        factory { FirmwareRepository(get(), get(),get()) }
+        factory { FirmwareRepository(get(), get(), get()) }
         factory { FirmwareFileUpdateScheduler(androidContext(), get()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
