@@ -4,10 +4,11 @@ import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloa
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.logging.Simber
 
 class FirmwareRemoteDataSource(
     private val fingerprintFileDownloader: FingerprintFileDownloader,
-    private val preferencesManager: FingerprintPreferencesManager
+    private val preferencesManager: FingerprintPreferencesManager,
 ) {
 
     /**
@@ -24,5 +25,11 @@ class FirmwareRemoteDataSource(
     /**
      * Downloads the firmware binary at the given URL
      */
-    suspend fun downloadFile(url: String) = fingerprintFileDownloader.download(url)
+    suspend fun downloadFirmware(firmwareVersion: DownloadableFirmwareVersion): ByteArray {
+        val fileUrl = fingerprintFileDownloader.getFileUrl(firmwareVersion.toStringForApi())
+        Simber.d("Downloading firmware file at %s", fileUrl)
+        return fingerprintFileDownloader.download(fileUrl)
+    }
+
+
 }

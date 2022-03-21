@@ -27,27 +27,27 @@ class FirmwareLocalDataSource(private val context: Context) {
     private fun loadFirmwareBytes(hardwareVersion: String, chipDirName: String): ByteArray {
         val version = getFirmwareVersionsInDir(hardwareVersion, chipDirName).maxOrNull()
             ?: throw IllegalStateException("No available firmware file in $FIRMWARE_DIR/$chipDirName/")
-        return getFile(hardwareVersion, chipDirName, version).readBytes()
+        return getFile( chipDirName, version).readBytes()
     }
 
-    fun saveCypressFirmwareBytes(hardwareVersion: String, version: String, bytes: ByteArray) =
-        saveFirmwareBytes(hardwareVersion, CYPRESS_DIR, version, bytes)
+    fun saveCypressFirmwareBytes( version: String, bytes: ByteArray) =
+        saveFirmwareBytes( CYPRESS_DIR, version, bytes)
 
-    fun saveStmFirmwareBytes(hardwareVersion: String, version: String, bytes: ByteArray) =
-        saveFirmwareBytes(hardwareVersion, STM_DIR, version, bytes)
+    fun saveStmFirmwareBytes( version: String, bytes: ByteArray) =
+        saveFirmwareBytes( STM_DIR, version, bytes)
 
-    fun saveUn20FirmwareBytes(hardwareVersion: String, version: String, bytes: ByteArray) =
-        saveFirmwareBytes(hardwareVersion, UN20_DIR, version, bytes)
+    fun saveUn20FirmwareBytes( version: String, bytes: ByteArray) =
+        saveFirmwareBytes( UN20_DIR, version, bytes)
 
-    private fun saveFirmwareBytes(hardwareVersion: String, chipDirName: String, version: String, bytes: ByteArray) {
+    private fun saveFirmwareBytes( chipDirName: String, version: String, bytes: ByteArray) {
         Simber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/${version.replace(".", "-")}.$BIN_FILE_EXTENSION")
-        val existingVersions = getFirmwareVersionsInDir(hardwareVersion, chipDirName)
-        getFile(hardwareVersion, chipDirName, version).writeBytes(bytes)
-        existingVersions.filter { it != version }.forEach { getFile(hardwareVersion, chipDirName, it).delete() }
+        val existingVersions = getFirmwareVersionsInDir( "Ebi to remove this param",chipDirName)
+        getFile( chipDirName, version).writeBytes(bytes)
+        existingVersions.filter { it != version }.forEach { getFile( chipDirName, it).delete() }
     }
 
     private fun getFirmwareVersionsInDir(hardwareVersion: String, chipDirName: String): List<String> =
-        getDir(hardwareVersion, chipDirName).listFiles { _, name ->
+        getDir( chipDirName).listFiles { _, name ->
             FIRMWARE_FILE_NAME_REGEX.containsMatchIn(name)
         }?.mapNotNull {
             try {
@@ -58,11 +58,11 @@ class FirmwareLocalDataSource(private val context: Context) {
             }
         } ?: emptyList()
 
-    private fun getDir(hardware: String, chipDirName: String): File =
-        File(context.filesDir, "$FIRMWARE_DIR/$hardware/$chipDirName").also { it.mkdirs() }
+    private fun getDir( chipDirName: String): File =
+        File(context.filesDir, "$FIRMWARE_DIR/$chipDirName").also { it.mkdirs() }
 
-    private fun getFile(hardware: String, chipDirName: String, version: String): File =
-        File(getDir(hardware, chipDirName), "${version.replace(".", "-")}.$BIN_FILE_EXTENSION")
+    private fun getFile( chipDirName: String, version: String): File =
+        File(getDir( chipDirName), "${version.replace(".", "-")}.$BIN_FILE_EXTENSION")
 
     companion object {
         // Todo find fitting regex for new naming scheme
