@@ -8,6 +8,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootMessageType
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.GetCypressExtendedVersionResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.GetExtendedVersionResponse
 import com.simprints.fingerprintscanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
@@ -42,6 +43,24 @@ class RootResponseParserTest {
 
         val rawBytes = "F4 B9 00 00".hexToByteArray()
         assertThrows<InvalidMessageException> { messageParser.parse(rawBytes) }
+    }
+
+    @Test
+    fun shouldParse_cypressExtendedVersion_correctly() {
+        val expectedResponse = CypressExtendedFirmwareVersion("1.E-1.1")
+        val payloadBytes = byteArrayOf(0x31, 0x2E, 0x45, 0x2D, 0x31, 0x2E, 0x31)
+        val messageRawBytes = RootMessageProtocol.buildMessageBytes(
+            // message type
+            RootMessageType.GET_CYPRESS_EXTENDED_VERSION,
+            payloadBytes
+        )
+
+        val messageParser = RootResponseParser()
+        val actualResponse = messageParser.parse(messageRawBytes)
+
+
+        assertThat(actualResponse).isInstanceOf(GetCypressExtendedVersionResponse::class.java)
+        assertThat((actualResponse as GetCypressExtendedVersionResponse).version).isEqualTo(expectedResponse)
     }
 
     @Test
