@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.domain.versions
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.logging.Simber
 
-class ScannerRevisionsSerializer(
+class ScannerHardwareRevisionsSerializer(
     private val jsonHelper: JsonHelper
 ) {
     /**
@@ -15,6 +15,6 @@ class ScannerRevisionsSerializer(
         jsonHelper.fromJson(firmwareDownloadableVersionsJson)
     } catch (e: Throwable) {
         Simber.e(Exception("Malformed json", e))
-        ScannerRevisions()
+        ScannerHardwareRevisions()
     }
 }

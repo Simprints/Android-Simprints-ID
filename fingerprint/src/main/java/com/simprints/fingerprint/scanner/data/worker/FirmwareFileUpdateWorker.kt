@@ -3,7 +3,6 @@ package com.simprints.fingerprint.scanner.data.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.di.KoinInjector
 import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.logging.Simber

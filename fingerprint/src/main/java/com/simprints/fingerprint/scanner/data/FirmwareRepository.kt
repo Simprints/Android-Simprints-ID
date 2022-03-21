@@ -15,7 +15,7 @@ class FirmwareRepository(
 ) {
 
     suspend fun updateStoredFirmwareFilesWithLatest() {
-        fingerprintPreferencesManager.scannerRevisions.keys.forEach { hardwareVersion ->
+        fingerprintPreferencesManager.scannerHardwareRevisions.keys.forEach { hardwareVersion ->
             updateStoredFirmwareFilesWithLatest(hardwareVersion)
         }
     }

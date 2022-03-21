@@ -4,7 +4,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerRevisions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -26,18 +26,20 @@ class FirmwareRepositoryTest {
 
     @Before
     fun setup() {
-        every { fingerprintPreferencesMock.scannerRevisions } returns RESPONSE_MAP
+        every { fingerprintPreferencesMock.scannerHardwareRevisions } returns RESPONSE_MAP
     }
 
     @Test
     fun updateStoredFirmwareFilesWithLatest_versionsAvailable_downloadsAndSavesFiles() =
         runBlockingTest {
-            coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any())} returns CYPRESS_BIN
+            coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION)
+            } returns SCANNER_VERSIONS_LOW
             val availableForDownload = RESPONSE_MAP.availableForDownload(
                 HARDWARE_VERSION,
                 ScannerFirmwareVersions.UNKNOWN
             )
-            every { firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION) } returns SCANNER_VERSIONS_LOW
             coEvery {
                 firmwareRemoteDataSourceMock.getDownloadableFirmwares(
                     any(),
@@ -49,7 +51,6 @@ class FirmwareRepositoryTest {
 
             coVerify(exactly = 3) {
                 firmwareRemoteDataSourceMock.downloadFirmware(any())
-                // Will add better verification later
             }
             coVerify(Ordering.ORDERED) {
                 firmwareLocalDataSourceMock.saveCypressFirmwareBytes(
@@ -59,16 +60,17 @@ class FirmwareRepositoryTest {
                     any(), any()
                 )
                 firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
-                any(), any()
-            )
-
+                    any(), any()
+                )
             }
         }
 
     @Test
     fun updateStoredFirmwareFilesWithLatest_noVersionsAvailable_downloadsNoFiles() =
         runBlockingTest {
-            every { firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION) } returns SCANNER_VERSIONS_LOW
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION)
+            } returns SCANNER_VERSIONS_LOW
             coEvery {
                 firmwareRemoteDataSourceMock.getDownloadableFirmwares(
                     any(),
@@ -94,23 +96,43 @@ class FirmwareRepositoryTest {
             }
         }
 
+    @Test
+    fun updateStoredFirmwareFilesWithLatest_onlyOneVersionsAvailable_downloadsOtherFiles() =
+        runBlockingTest {
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION)
+            } returns SCANNER_VERSIONS_LOW_UN20_HIGH
+            val availableForDownload = RESPONSE_MAP.availableForDownload(
+                HARDWARE_VERSION,
+                ScannerFirmwareVersions(CYPRESS_VERSION_HIGH, STM_VERSION_HIGH, UN20_VERSION_HIGH)
+            )
+            coEvery {
+                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
+                    any(),
+                    any()
+                )
+            } returns availableForDownload
+
+            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+
+            coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
+
+            coVerify(exactly = 0) {
+                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
+                    any(),
+                    any()
+                )
+            }
+        }
+
     companion object {
         private const val HARDWARE_VERSION = "E-1"
-// I will use this variables in more tests soon
-        private const val CYPRESS_NAME = "cypress"
-        private val CYPRESS_VERSION_LOW = "1.E-1.0"
-        private val CYPRESS_VERSION_HIGH = "1.E-1.1"
-        private const val CYPRESS_URL = "cypress_url.com"
-
-        private const val STM_NAME = "stm"
-        private val STM_VERSION_LOW = "1.E-1.1"
-        private val STM_VERSION_HIGH = "1.E-1.2"
-        private const val STM_URL = "stm_url.com"
-
-        private const val UN20_NAME = "un20"
-        private val UN20_VERSION_LOW = "1.E-1.2"
-        private val UN20_VERSION_HIGH = "1.E-1.3"
-        private const val UN20_URL = "un20_url.com"
+        private const val CYPRESS_VERSION_LOW = "1.E-1.0"
+        private const val CYPRESS_VERSION_HIGH = "1.E-1.1"
+        private const val STM_VERSION_LOW = "1.E-1.1"
+        private const val STM_VERSION_HIGH = "1.E-1.2"
+        private const val UN20_VERSION_LOW = "1.E-1.2"
+        private const val UN20_VERSION_HIGH = "1.E-1.3"
 
 
         private val scannerFirmwareVersions =
@@ -119,16 +141,16 @@ class FirmwareRepositoryTest {
                 stm = STM_VERSION_HIGH,
                 un20 = UN20_VERSION_HIGH,
             )
-        private val RESPONSE_MAP = ScannerRevisions().apply {
+        private val RESPONSE_MAP = ScannerHardwareRevisions().apply {
             put(HARDWARE_VERSION, scannerFirmwareVersions)
         }
 
 
         private val SCANNER_VERSIONS_LOW =
             ScannerFirmwareVersions(CYPRESS_VERSION_LOW, STM_VERSION_LOW, UN20_VERSION_LOW)
+        private val SCANNER_VERSIONS_LOW_UN20_HIGH =
+            ScannerFirmwareVersions(CYPRESS_VERSION_LOW, STM_VERSION_LOW, UN20_VERSION_HIGH)
 
         private val CYPRESS_BIN = byteArrayOf(0x00, 0x01, 0x02)
-        private val STM_BIN = byteArrayOf(0x03, 0x04)
-        private val UN20_BIN = byteArrayOf(0x05, 0x06, 0x07, 0x08)
     }
 }
