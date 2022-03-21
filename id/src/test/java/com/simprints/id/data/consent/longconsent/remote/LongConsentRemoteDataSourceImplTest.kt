@@ -4,29 +4,28 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.data.file.FileUrl
+import com.simprints.id.data.file.FileUrlRemoteInterface
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
-import java.net.URL
 
 class LongConsentRemoteDataSourceImplTest {
 
     @MockK
     lateinit var loginInfoManagerMock: LoginInfoManager
     @MockK
-    lateinit var remoteApi: LongConsentRemoteInterface
+    lateinit var remoteApi: FileUrlRemoteInterface
     @MockK
     lateinit var simApiFactory: SimApiClientFactory
     @MockK
     lateinit var consentDownloader: (FileUrl) -> ByteArray
     @MockK
-    lateinit var remoteApiClient: SimApiClient<LongConsentRemoteInterface>
+    lateinit var remoteApiClient: SimApiClient<FileUrlRemoteInterface>
 
 
     private lateinit var remoteDataSource: LongConsentRemoteDataSourceImpl
@@ -36,7 +35,7 @@ class LongConsentRemoteDataSourceImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { remoteApiClient.api } returns remoteApi
-        coEvery { simApiFactory.buildClient(LongConsentRemoteInterface::class) } returns remoteApiClient
+        coEvery { simApiFactory.buildClient(FileUrlRemoteInterface::class) } returns remoteApiClient
         every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
 
         remoteDataSource = LongConsentRemoteDataSourceImpl(
@@ -52,7 +51,7 @@ class LongConsentRemoteDataSourceImplTest {
         val fileUrl = FileUrl("https://simprints/mock-longconsent-file-url")
 
         every { consentDownloader.invoke(any()) } returns longConsentByteStream
-        coEvery { remoteApi.getLongConsentDownloadUrl(any(), any()) } returns fileUrl
+        coEvery { remoteApi.getFileUrl(any(), any()) } returns fileUrl
 
         val longConsent = remoteDataSource.downloadLongConsent(DEFAULT_LANGUAGE)
 

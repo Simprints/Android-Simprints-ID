@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.di
 
+import com.simprints.id.Application
 import android.bluetooth.BluetoothAdapter
 import android.nfc.NfcAdapter
 import com.simprints.core.tools.json.JsonHelper
@@ -64,6 +65,7 @@ import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.id.di.AppComponent
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
@@ -138,10 +140,15 @@ object KoinInjector {
     private fun Module.defineBuildersForDomainClasses() {
         factory { SerialNumberConverter() }
         factory { ScannerGenerationDeterminer() }
-        factory { FingerprintFileDownloader() }
 
         factory { BatteryLevelChecker(androidContext()) }
         factory { FirmwareLocalDataSource(androidContext()) }
+        factory { androidContext().applicationContext as Application }
+
+        factory { get<Application>().component }
+        factory { get<AppComponent>().getLoginInfoManager() }
+
+        factory { FingerprintFileDownloader(get(),get()) }
         factory { FirmwareRemoteDataSource(get(), get()) }
         factory { FirmwareRepository(get(), get(),get()) }
         factory { FirmwareFileUpdateScheduler(androidContext(), get()) }
