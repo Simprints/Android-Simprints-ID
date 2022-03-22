@@ -52,7 +52,7 @@ fun Vero2InfoSnapshotEvent.fromDomainToCore(): Vero2InfoSnapshotEventCore =
     Vero2InfoSnapshotEventCore(startTime, version.fromDomainToCore(), battery.fromDomainToCore())
 
 fun Vero2InfoSnapshotEvent.Vero2Version.fromDomainToCore(): Vero2VersionCore =
-    Vero2VersionCore(hardwareVersion, cypressApp, stmApp, un20App)
+    Vero2VersionCore.Vero2NewApiVersion(hardwareVersion, cypressApp, stmApp, un20App)
 
 fun Vero2InfoSnapshotEvent.BatteryInfo.fromDomainToCore(): BatteryInfoCore =
     BatteryInfoCore(charge, voltage, current, temperature)
