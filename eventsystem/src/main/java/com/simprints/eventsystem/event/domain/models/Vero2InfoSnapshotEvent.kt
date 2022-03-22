@@ -91,7 +91,7 @@ data class Vero2InfoSnapshotEvent(
     sealed class Vero2Version {
         @Keep
         data class Vero2NewApiVersion(
-            val hardwareVersion: String,
+            val hardwareRevision: String,
             val cypressApp: String,
             val stmApp: String,
             val un20App: String

@@ -39,7 +39,7 @@ class Vero2InfoSnapshotEventTest {
     @Test
     fun shouldParseEvent_vero2Event_usingNewApi_successfully() {
         val versionArg = Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
-            hardwareVersion = "E-1",
+            hardwareRevision = "E-1",
             cypressApp = "1.1",
             stmApp = "1.0",
             un20App = "1.2",

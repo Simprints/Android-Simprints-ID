@@ -32,7 +32,7 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
                 "createdAt": 1234,
                 "eventVersion": 2,
                 "version": {
-                    "hardwareVersion": "E-1",
+                    "hardwareRevision": "E-1",
                     "cypressApp": "1.1",
                     "stmApp": "1.0",
                     "un20App": "1.2",

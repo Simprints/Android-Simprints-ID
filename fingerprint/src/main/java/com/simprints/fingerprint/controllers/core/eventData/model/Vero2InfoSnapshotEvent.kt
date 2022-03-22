@@ -4,8 +4,8 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.domain.BatteryInfo as BatteryInfoDomain
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent as Vero2InfoSnapshotEventCore
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo as BatteryInfoCore
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version as Vero2VersionCore
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo as BatteryInfoCore
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version as Vero2VersionCore
 
 @Keep
 class Vero2InfoSnapshotEvent(startTime: Long,
@@ -23,9 +23,9 @@ class Vero2InfoSnapshotEvent(startTime: Long,
             fun get(scannerVersion: ScannerVersion) =
                 with(scannerVersion) {
                     Vero2Version(
-                        cypressApp = firmware.cypress.toString(),
-                        stmApp = firmware.stm.toString(),
-                        un20App = firmware.un20.toString(),
+                        cypressApp = firmware.cypress,
+                        stmApp = firmware.stm,
+                        un20App = firmware.un20,
                         hardwareVersion = hardwareVersion
                     )
                 }
