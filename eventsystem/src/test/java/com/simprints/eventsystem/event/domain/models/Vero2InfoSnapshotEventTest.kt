@@ -5,8 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Companion.NEW_EVENT_VERSION
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
@@ -19,8 +17,9 @@ class Vero2InfoSnapshotEventTest {
     fun create_Vero2InfoSnapshotEvent() {
         val labels = EventLabels(sessionId = GUID1)
         val versionArg =
-            Vero2Version.Vero2NewApiVersion("E-1", "cypressApp", "cypressApi", "stmApp")
-        val batteryArg = BatteryInfo(0, 1, 2, 3)
+            Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
+                "E-1", "cypressApp", "cypressApi", "stmApp")
+        val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
         val event = Vero2InfoSnapshotEventSample.getEvent(labels)
 
         assertThat(event.id).isNotNull()
@@ -39,19 +38,19 @@ class Vero2InfoSnapshotEventTest {
 
     @Test
     fun shouldParseEvent_vero2Event_usingNewApi_successfully() {
-        val versionArg = Vero2Version.Vero2NewApiVersion(
+        val versionArg = Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
             hardwareVersion = "E-1",
             cypressApp = "1.1",
             stmApp = "1.0",
             un20App = "1.2",
         )
-        val batteryArg = BatteryInfo(0, 1, 2, 3)
+        val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
         val labels = EventLabels(sessionId = "af4eca90-c599-4323-97c7-c70e490c5568")
-        val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload(
+        val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
             CREATED_AT,
-            versionArg.eventVersion,
-            versionArg,
-            batteryArg
+            Vero2InfoSnapshotEvent.NEW_EVENT_VERSION,
+            batteryArg,
+            versionArg
         )
         val expectedEvent = Vero2InfoSnapshotEvent(
             id = "5bc59283-a448-4911-a21a-5d39b0e346a7",
@@ -69,7 +68,7 @@ class Vero2InfoSnapshotEventTest {
 
     @Test
     fun shouldParse_vero2Event_usingOldApi_successfully() {
-        val versionArg = Vero2Version.Vero2OldApiVersion(
+        val versionArg = Vero2InfoSnapshotEvent.Vero2Version.Vero2OldApiVersion(
             master = 10129L,
             cypressApi = "1.1",
             cypressApp = "1.1",
@@ -79,12 +78,12 @@ class Vero2InfoSnapshotEventTest {
             un20App = "1.2",
         )
         val labels = EventLabels(sessionId = "6dcb3810-4789-4149-8fea-473ffb520958")
-        val batteryArg = BatteryInfo(0, 1, 2, 3)
-        val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload(
+        val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
+        val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi(
             CREATED_AT,
-            versionArg.eventVersion,
+            Vero2InfoSnapshotEvent.OLD_EVENT_VERSION,
+            batteryArg,
             versionArg,
-            batteryArg
         )
         val expectedEvent = Vero2InfoSnapshotEvent(
             id = "3afb1b9e-b263-4073-b773-6e1dac20d72f",

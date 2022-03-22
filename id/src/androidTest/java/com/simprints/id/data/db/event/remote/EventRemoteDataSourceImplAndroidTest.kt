@@ -486,7 +486,8 @@ class EventRemoteDataSourceImplAndroidTest {
             payloadId = facePayloadId
         )
 
-        add(event)
+            add(event)
+        }
     }
 
     private fun MutableList<Event>.addFaceCaptureConfirmationEvent() {
@@ -632,7 +633,7 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             Vero2InfoSnapshotEvent(
                 createdAt = DEFAULT_TIME,
-                version = Vero2InfoSnapshotPayload.Vero2Version(
+                version = Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
                     "E-1", "1.23",
                     "api", "stmApp"
                 ),

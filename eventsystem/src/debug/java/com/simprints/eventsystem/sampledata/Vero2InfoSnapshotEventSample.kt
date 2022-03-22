@@ -3,8 +3,8 @@ package com.simprints.eventsystem.sampledata
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 
 object Vero2InfoSnapshotEventSample : SampleEvent() {
