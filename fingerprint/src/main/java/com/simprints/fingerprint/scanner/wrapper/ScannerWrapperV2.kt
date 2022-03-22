@@ -20,6 +20,7 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -46,7 +47,7 @@ class ScannerWrapperV2(
 
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
-            hardwareVersion = "",
+            hardwareVersion = ScannerExtendedInfoReaderHelper.DEFAULT_HARDWARE_VERSION,
             generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN,
         )
