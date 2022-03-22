@@ -1,19 +1,59 @@
 package com.simprints.eventsystem.event.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.*
 
-
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "version",
+    visible = true
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(
+        value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi::class,
+        name = Vero2InfoSnapshotEvent.NEW_EVENT_VERSION.toString()
+    ),
+    JsonSubTypes.Type(
+        value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi::class,
+        name = Vero2InfoSnapshotEvent.OLD_EVENT_VERSION.toString()
+    ),
+)
 @Keep
-data class ApiVero2InfoSnapshotPayload(
+sealed class ApiVero2InfoSnapshotPayload(
     override val startTime: Long,
     override val version: Int,
-    val scannerVersion: ApiVero2Version,
-    val battery: ApiBatteryInfo
+    open val scannerVersion: ApiVero2Version,
+    open val battery: ApiBatteryInfo
 ): ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, startTime) {
 
+    data class ApiVero2InfoSnapshotPayloadForNewApi(
+        override val startTime: Long,
+        override val version: Int,
+        override val scannerVersion: ApiVero2Version,
+        override val battery: ApiBatteryInfo
+    ): ApiVero2InfoSnapshotPayload(
+        startTime,
+        version,
+        scannerVersion,
+        battery
+    )
+
+    @Deprecated(message = "used only for backwards compatibility")
+    data class ApiVero2InfoSnapshotPayloadForOldApi(
+        override val startTime: Long,
+        override val version: Int,
+        override val scannerVersion: ApiVero2Version,
+        override val battery: ApiBatteryInfo
+    ): ApiVero2InfoSnapshotPayload(
+        startTime,
+        version,
+        scannerVersion,
+        battery
+    )
 
     sealed class ApiVero2Version {
 
@@ -74,20 +114,32 @@ data class ApiVero2InfoSnapshotPayload(
                 batteryInfo.temperature
             )
     }
-
-    constructor(domainPayload: Vero2InfoSnapshotPayload):
-        this(
-            domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.version.toApiVero2Version(),
-            ApiBatteryInfo(domainPayload.battery)
-        )
 }
 
 
-private fun Vero2Version.toApiVero2Version() = when(this){
+private fun Vero2Version.toApiVero2Version() = when (this) {
     is Vero2Version.Vero2OldApiVersion ->
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiOldVero2Version(this)
     is Vero2Version.Vero2NewApiVersion ->
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiNewVero2Version(this)
 }
+
+fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPayload): ApiVero2InfoSnapshotPayload =
+    when (domainPayload) {
+        is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi -> {
+            ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForNewApi(
+                domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.version.toApiVero2Version(),
+                ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery)
+            )
+        }
+        is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi -> {
+            ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi(
+                domainPayload.createdAt,
+                domainPayload.eventVersion,
+                domainPayload.version.toApiVero2Version(),
+                ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery)
+            )
+        }
+    }

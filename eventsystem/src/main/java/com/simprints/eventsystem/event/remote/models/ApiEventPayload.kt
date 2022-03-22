@@ -125,7 +125,7 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         REFUSAL -> ApiRefusalPayload(this as RefusalPayload)
         CANDIDATE_READ -> ApiCandidateReadPayload(this as CandidateReadPayload)
         SCANNER_CONNECTION -> ApiScannerConnectionPayload(this as ScannerConnectionPayload)
-        VERO_2_INFO_SNAPSHOT -> ApiVero2InfoSnapshotPayload(this as Vero2InfoSnapshotPayload)
+        VERO_2_INFO_SNAPSHOT -> toApiVero2InfoSnapshotPayload(this as Vero2InfoSnapshotPayload)
         INVALID_INTENT -> ApiInvalidIntentPayload(this as InvalidIntentPayload)
         SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
         INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
