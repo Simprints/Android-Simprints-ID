@@ -59,7 +59,7 @@ sealed class ApiVero2InfoSnapshotPayload(
 
         @Keep
         data class ApiNewVero2Version(
-            val hardwareVersion: String,
+            val hardwareRevision: String,
             val cypressApp: String,
             val stmApp: String,
             val un20App: String
@@ -67,7 +67,7 @@ sealed class ApiVero2InfoSnapshotPayload(
 
             constructor(vero2Version: Vero2Version.Vero2NewApiVersion):
                 this(
-                    vero2Version.hardwareVersion,
+                    vero2Version.hardwareRevision,
                     vero2Version.cypressApp,
                     vero2Version.stmApp,
                     vero2Version.un20App
