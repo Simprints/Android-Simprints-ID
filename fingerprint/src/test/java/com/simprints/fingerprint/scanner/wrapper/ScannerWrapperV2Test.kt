@@ -1,17 +1,26 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import arrow.core.extensions.id.applicative.just
+import com.simprints.fingerprintscanner.v2.tools.lang.objects
+import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
+import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageData
+import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -20,6 +29,7 @@ import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.toObservable
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -52,6 +62,79 @@ class ScannerWrapperV2Test {
             stmOtaHelper,
             un20OtaHelper
         )
+    }
+
+
+    @Test
+    fun shouldReturn_scannerVersion_withEmptyDefaults_inTheCorrectFormat_withNewApiFormat() {
+        // Given
+        val expectedVersionInfo = ScannerVersion(
+            hardwareVersion = "E-1",
+            generation = ScannerGeneration.VERO_1,
+            firmware = ScannerFirmwareVersions.UNKNOWN
+        )
+
+        // When
+        val actualVersionInfo = scannerWrapper.versionInformation()
+
+        // Then
+        assertEquals(expectedVersionInfo, actualVersionInfo)
+    }
+
+
+    @Test
+    fun `should throw NoFingerDetectedException when FINGERPRINT_NOT_FOUND error is returned during capture`() {
+        // Given
+        every { scannerV2.captureFingerprint(any()) } returns Single.just(CaptureFingerprintResult.FINGERPRINT_NOT_FOUND)
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+        every { scannerV2.getImageQualityScore() } returns Maybe.empty()
+
+        // When
+        val testObserver = scannerWrapper.captureFingerprint(
+            CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
+            timeOutMs = 30000,
+            qualityThreshold = 7
+        ).test()
+
+        // Then
+        testObserver.assertError { it is NoFingerDetectedException }
+        verify(exactly = 1) { scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()) }
+    }
+
+    @Test
+    fun `should throw UnexpectedScannerException when DPI_UNSUPPORTED error is returned during capture`() {
+        // Given
+        every { scannerV2.captureFingerprint(any()) } returns Single.just(CaptureFingerprintResult.DPI_UNSUPPORTED)
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+        every { scannerV2.getImageQualityScore() } returns Maybe.empty()
+
+        // When
+        val testObserver = scannerWrapper.captureFingerprint(
+            CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
+            timeOutMs = 30000,
+            qualityThreshold = 7
+        ).test()
+
+        // Then
+        testObserver.assertError { it is UnexpectedScannerException }
+    }
+
+    @Test
+    fun `should throw UnknownScannerIssueException when UNKNOWN_ERROR error is returned during capture`() {
+        // Given
+        every { scannerV2.captureFingerprint(any()) } returns Single.just(CaptureFingerprintResult.UNKNOWN_ERROR)
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+        every { scannerV2.getImageQualityScore() } returns Maybe.empty()
+
+        // When
+        val testObserver = scannerWrapper.captureFingerprint(
+            CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
+            timeOutMs = 30000,
+            qualityThreshold = 7
+        ).test()
+
+        // Then
+        testObserver.assertError { it is UnknownScannerIssueException }
     }
 
 
@@ -209,5 +292,69 @@ class ScannerWrapperV2Test {
         assertEquals(testObserver.values().first().imageBytes, imageBytes)
     }
 
+    @Test
+    fun `should throw OtaFailedException when trying to perform ota without available scanner hardwareVersion`() {
+        // when
+        val cypressTestObserver = scannerWrapper.performCypressOta().test()
+        val stmTestObserver = scannerWrapper.performStmOta().test()
+        val un20TestObserver = scannerWrapper.performUn20Ota().test()
+
+
+        // then
+        cypressTestObserver.assertError { it is OtaFailedException }
+        stmTestObserver.assertError { it is OtaFailedException }
+        un20TestObserver.assertError { it is OtaFailedException }
+    }
+
+    @Test
+    fun `should return corresponding Ota response from ota helper classes when scanner hardwareVersion is available`() {
+        // Given
+        val expectedScannerVersion = ScannerVersion(
+            hardwareVersion = "E-1",
+            generation = ScannerGeneration.VERO_2,
+            firmware = ScannerFirmwareVersions(
+                cypress = "1.E-1.0",
+                stm = "1.E-1.1",
+                un20 = "1.E-1.0"
+            )
+        )
+        val scannerVersionReaderSlot = CapturingSlot<((ScannerVersion) -> Unit)>()
+        every {
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                scannerV2,
+                macAddress,
+                capture(scannerVersionReaderSlot),
+                any()
+            )
+        } answers {
+            scannerVersionReaderSlot.captured.invoke(expectedScannerVersion)
+            Completable.complete()
+        }
+
+        val cypressOtaSteps = (CypressOtaStep::class.objects())
+        val stmOtaSteps = (StmOtaStep::class.objects())
+        val un20OtaSteps = (Un20OtaStep::class.objects())
+
+        every { cypressOtaHelper.performOtaSteps(scannerV2, any(), any()) } returns cypressOtaSteps.toObservable()
+        every { stmOtaHelper.performOtaSteps(scannerV2, any(), any()) } returns stmOtaSteps.toObservable()
+        every { un20OtaHelper.performOtaSteps(scannerV2, any(), any()) } returns un20OtaSteps.toObservable()
+        // initialize scanner version
+        scannerWrapper.setup()
+
+
+        // When
+        val cypressTestObserver = scannerWrapper.performCypressOta().test()
+        val stmTestObserver = scannerWrapper.performStmOta().test()
+        val un20TestObserver = scannerWrapper.performUn20Ota().test()
+
+        // Then
+        cypressTestObserver.awaitAndAssertSuccess()
+        stmTestObserver.awaitAndAssertSuccess()
+        un20TestObserver.awaitAndAssertSuccess()
+
+        assertEquals(cypressTestObserver.values(), cypressOtaSteps)
+        assertEquals(stmTestObserver.values(), stmOtaSteps)
+        assertEquals(un20TestObserver.values(), un20OtaSteps)
+    }
 
 }

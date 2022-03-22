@@ -3,6 +3,9 @@ package com.simprints.fingerprint.scanner.wrapper
 
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
@@ -11,6 +14,7 @@ import com.simprints.fingerprintscanner.v1.Scanner
 import com.simprints.fingerprintscanner.v1.ScannerCallback
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -26,6 +30,28 @@ class ScannerWrapperV1Test {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         scannerWrapper = ScannerWrapperV1(scanner)
+    }
+
+    @Test
+    fun shouldRead_scannerVersion_correctlyFormatted_withNewApiFormat() {
+        // Given
+        every { scanner.ucVersion } returns 1
+        every { scanner.unVersion } returns 2
+        val expectedVersionInfo = ScannerVersion(
+            hardwareVersion = "",
+            generation = ScannerGeneration.VERO_1,
+            firmware = ScannerFirmwareVersions(
+                cypress = "",
+                stm = "1",
+                un20 = "2"
+            )
+        )
+
+        // When
+        val actualVersionInfo = scannerWrapper.versionInformation()
+
+        // Then
+        assertEquals(expectedVersionInfo, actualVersionInfo)
     }
 
     @Test
