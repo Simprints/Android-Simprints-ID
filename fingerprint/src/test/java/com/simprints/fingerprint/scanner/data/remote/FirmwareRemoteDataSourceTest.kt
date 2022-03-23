@@ -33,7 +33,7 @@ class FirmwareRemoteDataSourceTest {
 
         val response = firmwareRemoteDataSource.getDownloadableFirmwares(
             HARDWARE_VERSION,
-            ScannerFirmwareVersions.UNKNOWN
+            emptyMap()
         )
 
         assertThat(response.size).isEqualTo(3)

@@ -25,27 +25,26 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
      * Expects a connected scanner in root mode
      * If completes successfully, will finish with a connected scanner in root mode
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, hardwareVersion: String): Observable<StmOtaStep> =
+    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Observable<StmOtaStep> =
         Observable.just<StmOtaStep>(StmOtaStep.EnteringOtaModeFirstTime)
             .concatWith(scanner.enterStmOtaMode().onErrorComplete() thenEmitStep StmOtaStep.ReconnectingAfterEnteringOtaMode)
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.EnteringOtaModeSecondTime)
             .concatWith(scanner.enterStmOtaMode().addSmallDelay() thenEmitStep StmOtaStep.CommencingTransfer)
-            .concatWith(scanner.startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes(hardwareVersion)).map { StmOtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes(firmwareVersion)).map { StmOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(StmOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.EnteringMainMode)
             .concatWith(scanner.enterMainMode().addSmallDelay() thenEmitStep StmOtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateStmFirmwareVersion(hardwareVersion, scanner) thenEmitStep StmOtaStep.ReconnectingAfterValidating)
+            .concatWith(validateStmFirmwareVersion(firmwareVersion, scanner) thenEmitStep StmOtaStep.ReconnectingAfterValidating)
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep StmOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
     private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)
 
-    private fun validateStmFirmwareVersion(hardwareVersion: String, scanner: Scanner): Completable =
+    private fun validateStmFirmwareVersion(firmwareVersion: String, scanner: Scanner): Completable =
         scanner.getStmFirmwareVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion).stm
             val actualFirmwareVersion = it.versionAsString
-            if (expectedFirmwareVersion != actualFirmwareVersion) {
-                Completable.error(OtaFailedException("STM OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
+            if (firmwareVersion != actualFirmwareVersion) {
+                Completable.error(OtaFailedException("STM OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion"))
             } else {
                 newFirmwareVersion = it
                 Completable.complete()

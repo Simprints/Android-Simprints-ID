@@ -3,6 +3,7 @@ package com.simprints.fingerprint.scanner.data
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import io.mockk.*
@@ -34,11 +35,11 @@ class FirmwareRepositoryTest {
         runBlockingTest {
             coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
             every {
-                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION)
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
             val availableForDownload = RESPONSE_MAP.availableForDownload(
                 HARDWARE_VERSION,
-                ScannerFirmwareVersions.UNKNOWN
+                emptyMap()
             )
             coEvery {
                 firmwareRemoteDataSourceMock.getDownloadableFirmwares(
@@ -69,7 +70,7 @@ class FirmwareRepositoryTest {
     fun updateStoredFirmwareFilesWithLatest_noVersionsAvailable_downloadsNoFiles() =
         runBlockingTest {
             every {
-                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION)
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
             coEvery {
                 firmwareRemoteDataSourceMock.getDownloadableFirmwares(
@@ -100,11 +101,11 @@ class FirmwareRepositoryTest {
     fun updateStoredFirmwareFilesWithLatest_onlyOneVersionsAvailable_downloadsOtherFiles() =
         runBlockingTest {
             every {
-                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION)
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW_UN20_HIGH
             val availableForDownload = RESPONSE_MAP.availableForDownload(
                 HARDWARE_VERSION,
-                ScannerFirmwareVersions(CYPRESS_VERSION_HIGH, STM_VERSION_HIGH, UN20_VERSION_HIGH)
+                SCANNER_VERSIONS_HIGH
             )
             coEvery {
                 firmwareRemoteDataSourceMock.getDownloadableFirmwares(
@@ -146,10 +147,21 @@ class FirmwareRepositoryTest {
         }
 
 
-        private val SCANNER_VERSIONS_LOW =
-            ScannerFirmwareVersions(CYPRESS_VERSION_LOW, STM_VERSION_LOW, UN20_VERSION_LOW)
-        private val SCANNER_VERSIONS_LOW_UN20_HIGH =
-            ScannerFirmwareVersions(CYPRESS_VERSION_LOW, STM_VERSION_LOW, UN20_VERSION_HIGH)
+        private val SCANNER_VERSIONS_LOW = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_LOW),
+        )
+        private val SCANNER_VERSIONS_HIGH = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_HIGH),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_HIGH),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_HIGH),
+        )
+        private val SCANNER_VERSIONS_LOW_UN20_HIGH = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_HIGH),
+        )
 
         private val CYPRESS_BIN = byteArrayOf(0x00, 0x01, 0x02)
     }

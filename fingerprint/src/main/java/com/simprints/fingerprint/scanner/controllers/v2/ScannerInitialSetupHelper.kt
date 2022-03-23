@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
@@ -20,10 +21,12 @@ import java.util.concurrent.TimeUnit
  * For handling the initial setup to the scanner upon connection, such as retrieving and checking
  * the firmware version and battery level, and determining whether OTA is necessary.
  */
-class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLocalDataSource,
-                                private val connectionHelper: ConnectionHelper,
-                                private val batteryLevelChecker: BatteryLevelChecker,
-                                private val timeScheduler: Scheduler = Schedulers.io()) {
+class ScannerInitialSetupHelper(
+    private val connectionHelper: ConnectionHelper,
+    private val batteryLevelChecker: BatteryLevelChecker,
+    private val fingerprintPreferenceManager: FingerprintPreferencesManager,
+    private val timeScheduler: Scheduler = Schedulers.io()
+) {
 
     private lateinit var scannerVersion: ScannerVersion
 
@@ -60,7 +63,7 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
         }
 
     private fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
-        val availableVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion)
+        val availableVersions = fingerprintPreferenceManager.scannerHardwareRevisions[hardwareVersion]
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
         return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
             Completable.complete()
@@ -70,10 +73,10 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
         }
     }
 
-    private fun determineAvailableOtas(current: ScannerFirmwareVersions, available: ScannerFirmwareVersions): List<AvailableOta> =
+    private fun determineAvailableOtas(current: ScannerFirmwareVersions, available: ScannerFirmwareVersions?): List<AvailableOta> =
         listOfNotNull(
-            if (current.cypress < available.cypress) AvailableOta.CYPRESS else null,
-            if (current.stm < available.stm) AvailableOta.STM else null,
-            if (current.un20 < available.un20) AvailableOta.UN20 else null
+            if (available!= null && current.cypress != available.cypress) AvailableOta.CYPRESS else null,
+            if (available!= null && current.stm != available.stm) AvailableOta.STM else null,
+            if (available!= null && current.un20 != available.un20) AvailableOta.UN20 else null
         )
 }

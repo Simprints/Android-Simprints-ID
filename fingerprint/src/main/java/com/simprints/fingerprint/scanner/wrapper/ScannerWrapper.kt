@@ -9,6 +9,7 @@ import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
+import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
 import io.reactivex.Completable
@@ -48,9 +49,9 @@ interface ScannerWrapper {
     fun batteryInformation(): BatteryInfo
 
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performCypressOta(): Observable<CypressOtaStep>
+    fun performCypressOta(firmwareVersion: String): Observable<CypressOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performStmOta(): Observable<StmOtaStep>
+    fun performStmOta(firmwareVersion: String): Observable<StmOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performUn20Ota(): Observable<Un20OtaStep>
+    fun performUn20Ota(firmwareVersion: String): Observable<Un20OtaStep>
 }

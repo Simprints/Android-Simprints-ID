@@ -24,16 +24,16 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
      * Expects a connected scanner in root mode
      * If completes successfully, will finish with a connected scanner in root mode
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, hardwareVersion: String): Observable<Un20OtaStep> =
+    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Observable<Un20OtaStep> =
         Observable.just<Un20OtaStep>(Un20OtaStep.EnteringMainMode)
             .concatWith(scanner.enterMainMode().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20BeforeTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.CommencingTransfer)
-            .concatWith(scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes(hardwareVersion)).map { Un20OtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes(firmwareVersion)).map { Un20OtaStep.TransferInProgress(it) })
             .concatWith(emitStep(Un20OtaStep.AwaitingCacheCommit))
             .concatWith(waitCacheCommitTime() thenEmitStep Un20OtaStep.TurningOffUn20AfterTransfer)
             .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
             .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateUn20FirmwareVersion(hardwareVersion, scanner) thenEmitStep Un20OtaStep.ReconnectingAfterValidating)
+            .concatWith(validateUn20FirmwareVersion(firmwareVersion, scanner) thenEmitStep Un20OtaStep.ReconnectingAfterValidating)
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
@@ -42,12 +42,11 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
     private fun waitCacheCommitTime(): Completable =
         Completable.timer(CACHE_COMMIT_TIME, TimeUnit.MILLISECONDS, timeScheduler)
 
-    private fun validateUn20FirmwareVersion(hardwareVersion: String, scanner: Scanner): Completable =
+    private fun validateUn20FirmwareVersion(firmwareVersion: String, scanner: Scanner): Completable =
         scanner.getUn20AppVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion).un20
             val actualFirmwareVersion = it.versionAsString
-            if (expectedFirmwareVersion != actualFirmwareVersion) {
-                Completable.error(OtaFailedException("UN20 OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
+            if (firmwareVersion != actualFirmwareVersion) {
+                Completable.error(OtaFailedException("UN20 OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion"))
             } else {
                 newFirmwareVersion = it
                 Completable.complete()
