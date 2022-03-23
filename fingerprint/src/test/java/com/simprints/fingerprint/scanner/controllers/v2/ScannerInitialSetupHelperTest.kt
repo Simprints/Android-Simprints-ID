@@ -35,11 +35,13 @@ class ScannerInitialSetupHelperTest {
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val batteryLevelChecker = mockk<BatteryLevelChecker>()
     private val fingerprintPreferenceManager= mockk<FingerprintPreferencesManager>()
+    private val firmwareLocalDataSource= mockk<FirmwareLocalDataSource>()
     private val testScheduler = TestScheduler()
     private val scannerInitialSetupHelper = ScannerInitialSetupHelper(
         connectionHelperMock,
         batteryLevelChecker,
         fingerprintPreferenceManager,
+        firmwareLocalDataSource,
         testScheduler
     )
 

@@ -63,6 +63,7 @@ class OtaViewModel(
             )
     }
     private fun targetVersions(availableOta: AvailableOta): String {
+        // Todo check if the hardware version is acquired
         val scannerVersion = fingerprintPreferenceManager.lastScannerVersion
         val availableFirmwareVersions = fingerprintPreferenceManager.scannerHardwareRevisions
         return when (availableOta) {
