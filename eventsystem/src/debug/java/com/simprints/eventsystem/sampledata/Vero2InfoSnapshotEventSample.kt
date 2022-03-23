@@ -1,6 +1,5 @@
 package com.simprints.eventsystem.sampledata
 
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
@@ -15,8 +14,8 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
         val versionArg = Vero2Version.Vero2NewApiVersion(
             "E-1",
             "cypressApp",
-            "cypressApi",
-            "stmApp"
+            "stmApp",
+            "un20App"
         )
         val batteryArg = BatteryInfo(0, 1, 2, 3)
         return Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg, labels)
