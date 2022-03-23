@@ -21,8 +21,7 @@ class FirmwareRepository(
     }
 
     private suspend fun updateStoredFirmwareFilesWithLatest(hardwareVersion: String) {
-        val savedVersions =
-            firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion)
+        val savedVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         Simber.d("Saved firmware versions: $savedVersions")
 
         val downloadableFirmwares = firmwareRemoteDataSource.getDownloadableFirmwares(
@@ -35,11 +34,11 @@ class FirmwareRepository(
         Simber.d("Firmwares available for download: %s", versionString)
 
         val cypressToDownload =
-            downloadableFirmwares.getVersionToDownloadOrNull(Chip.CYPRESS, savedVersions.cypress)
+            downloadableFirmwares.getVersionToDownloadOrNull(Chip.CYPRESS)
         val stmToDownload =
-            downloadableFirmwares.getVersionToDownloadOrNull(Chip.STM, savedVersions.stm)
+            downloadableFirmwares.getVersionToDownloadOrNull(Chip.STM)
         val un20ToDownload =
-            downloadableFirmwares.getVersionToDownloadOrNull(Chip.UN20, savedVersions.un20)
+            downloadableFirmwares.getVersionToDownloadOrNull(Chip.UN20)
 
         cypressToDownload?.downloadAndSave()
         stmToDownload?.downloadAndSave()
@@ -48,18 +47,16 @@ class FirmwareRepository(
 
     private fun List<DownloadableFirmwareVersion>.getVersionToDownloadOrNull(
         chip: Chip,
-        savedVersion: String
     ): DownloadableFirmwareVersion? {
-        val downloadableVersion = this.find { it.chip == chip } ?: return null
-        return if (downloadableVersion.version != savedVersion) downloadableVersion else null
+        return  this.find { it.chip == chip }
     }
 
     private suspend fun DownloadableFirmwareVersion.downloadAndSave() {
         val firmwareBytes = firmwareRemoteDataSource.downloadFirmware(this)
         when (chip) {
-            Chip.CYPRESS -> firmwareLocalDataSource.saveCypressFirmwareBytes( version, firmwareBytes)
-            Chip.STM -> firmwareLocalDataSource.saveStmFirmwareBytes( version, firmwareBytes)
-            Chip.UN20 -> firmwareLocalDataSource.saveUn20FirmwareBytes( version, firmwareBytes)
+            Chip.CYPRESS -> firmwareLocalDataSource.saveCypressFirmwareBytes(version, firmwareBytes)
+            Chip.STM -> firmwareLocalDataSource.saveStmFirmwareBytes(version, firmwareBytes)
+            Chip.UN20 -> firmwareLocalDataSource.saveUn20FirmwareBytes(version, firmwareBytes)
         }
     }
 }

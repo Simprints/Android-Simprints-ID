@@ -162,13 +162,13 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }
     }
 
-    override fun performCypressOta(): Observable<CypressOtaStep> =
+    override fun performCypressOta(firmwareVersion: String): Observable<CypressOtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
-    override fun performStmOta(): Observable<StmOtaStep> =
+    override fun performStmOta(firmwareVersion: String): Observable<StmOtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
-    override fun performUn20Ota(): Observable<Un20OtaStep> =
+    override fun performUn20Ota(firmwareVersion: String): Observable<Un20OtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
     private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {

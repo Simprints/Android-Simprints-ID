@@ -70,7 +70,7 @@ class ScannerWrapperV2Test {
         // Given
         val expectedVersionInfo = ScannerVersion(
             hardwareVersion = "E-1",
-            generation = ScannerGeneration.VERO_1,
+            generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN
         )
 
@@ -295,9 +295,9 @@ class ScannerWrapperV2Test {
     @Test
     fun `should throw OtaFailedException when trying to perform ota without available scanner hardwareVersion`() {
         // when
-        val cypressTestObserver = scannerWrapper.performCypressOta().test()
-        val stmTestObserver = scannerWrapper.performStmOta().test()
-        val un20TestObserver = scannerWrapper.performUn20Ota().test()
+        val cypressTestObserver = scannerWrapper.performCypressOta("1.E-1.0").test()
+        val stmTestObserver = scannerWrapper.performStmOta("1.E-1.0").test()
+        val un20TestObserver = scannerWrapper.performUn20Ota("1.E-1.0").test()
 
 
         // then
@@ -343,9 +343,9 @@ class ScannerWrapperV2Test {
 
 
         // When
-        val cypressTestObserver = scannerWrapper.performCypressOta().test()
-        val stmTestObserver = scannerWrapper.performStmOta().test()
-        val un20TestObserver = scannerWrapper.performUn20Ota().test()
+        val cypressTestObserver = scannerWrapper.performCypressOta("1.E-1.2").test()
+        val stmTestObserver = scannerWrapper.performStmOta("1.E-1.2").test()
+        val un20TestObserver = scannerWrapper.performUn20Ota("1.E-1.2").test()
 
         // Then
         cypressTestObserver.awaitAndAssertSuccess()

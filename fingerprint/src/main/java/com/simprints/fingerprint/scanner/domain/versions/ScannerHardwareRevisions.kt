@@ -3,7 +3,6 @@ package com.simprints.fingerprint.scanner.domain.versions
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 
 
-
 class ScannerHardwareRevisions : HashMap<String, ScannerFirmwareVersions>() {
     /**
      * Allows for querying whether there are more up-to-date firmware versions by sending the currently saved versions
@@ -14,35 +13,73 @@ class ScannerHardwareRevisions : HashMap<String, ScannerFirmwareVersions>() {
      */
     fun availableForDownload(
         hardwareVersion: String,
-        localFirmwareVersions: ScannerFirmwareVersions
+        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>
     ): List<DownloadableFirmwareVersion> {
         val result = ArrayList<DownloadableFirmwareVersion>()
-        val firmwareVersions = get(hardwareVersion) ?: return result
+        val availableFirmwareVersions = get(hardwareVersion) ?: return result
 
-        if (firmwareVersions.cypress != localFirmwareVersions.cypress) {
+        addAvailableCypressVersions(localFirmwareVersions, availableFirmwareVersions, result)
+        addAvailableSTMVersions(localFirmwareVersions, availableFirmwareVersions, result)
+        addAvailableUN20Versions(localFirmwareVersions, availableFirmwareVersions, result)
+
+        return result
+    }
+
+    private fun addAvailableCypressVersions(
+        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>,
+        availableFirmwareVersions: ScannerFirmwareVersions,
+        result: ArrayList<DownloadableFirmwareVersion>
+    ) {
+        val localCypressVersions = localFirmwareVersions[DownloadableFirmwareVersion.Chip.CYPRESS]
+        if (localCypressVersions == null || !localCypressVersions.contains(
+                availableFirmwareVersions.cypress
+            )
+        ) {
             result.add(
                 DownloadableFirmwareVersion(
                     DownloadableFirmwareVersion.Chip.CYPRESS,
-                    firmwareVersions.cypress
+                    availableFirmwareVersions.cypress
                 )
             )
         }
-        if (firmwareVersions.stm != localFirmwareVersions.stm) {
+    }
+
+    private fun addAvailableSTMVersions(
+        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>,
+        availableFirmwareVersions: ScannerFirmwareVersions,
+        result: ArrayList<DownloadableFirmwareVersion>
+    ) {
+        val localSTMVersions = localFirmwareVersions[DownloadableFirmwareVersion.Chip.STM]
+
+        if (localSTMVersions == null || !localSTMVersions.contains(
+                availableFirmwareVersions.stm
+            )
+        ) {
             result.add(
                 DownloadableFirmwareVersion(
                     DownloadableFirmwareVersion.Chip.STM,
-                    firmwareVersions.stm
+                    availableFirmwareVersions.stm
                 )
             )
         }
-        if (firmwareVersions.un20 != localFirmwareVersions.un20) {
+    }
+
+    private fun addAvailableUN20Versions(
+        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>,
+        availableFirmwareVersions: ScannerFirmwareVersions,
+        result: ArrayList<DownloadableFirmwareVersion>
+    ) {
+        val localUN20Versions = localFirmwareVersions[DownloadableFirmwareVersion.Chip.UN20]
+        if (localUN20Versions == null || !localUN20Versions.contains(
+                availableFirmwareVersions.un20
+            )
+        ) {
             result.add(
                 DownloadableFirmwareVersion(
                     DownloadableFirmwareVersion.Chip.UN20,
-                    firmwareVersions.un20
+                    availableFirmwareVersions.un20
                 )
             )
         }
-        return result
     }
 }

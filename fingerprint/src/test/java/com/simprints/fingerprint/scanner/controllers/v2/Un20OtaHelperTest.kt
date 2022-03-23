@@ -9,7 +9,6 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20E
 import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerVersionInfo
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -46,8 +45,7 @@ class Un20OtaHelperTest {
         every { scannerMock.setVersionInformation(any()) } returns Completable.complete()
         every { scannerMock.getUn20AppVersion() } returns Single.just(NEW_UN20_VERSION)
 
-        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION) } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.loadUn20FirmwareBytes(HARDWARE_VERSION) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.loadUn20FirmwareBytes(NEW_UN20_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
@@ -57,7 +55,7 @@ class Un20OtaHelperTest {
             listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
                 Un20OtaStep.ValidatingNewFirmwareVersion, Un20OtaStep.ReconnectingAfterValidating, Un20OtaStep.UpdatingUnifiedVersionInformation)
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitAndAssertSuccess()
@@ -82,7 +80,7 @@ class Un20OtaHelperTest {
         every { scannerMock.startUn20Ota(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -103,7 +101,7 @@ class Un20OtaHelperTest {
 
         every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returnsMany listOf(Completable.complete(), Completable.error(error))
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -124,7 +122,7 @@ class Un20OtaHelperTest {
 
         every { scannerMock.getUn20AppVersion() } returns Single.just(OLD_UN20_VERSION)
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -140,7 +138,8 @@ class Un20OtaHelperTest {
         private const val HARDWARE_VERSION = "E-1"
         private val OTA_PROGRESS_VALUES = listOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
         private val OLD_UN20_VERSION = Un20ExtendedAppVersion( "14.E-1.15")
-        private val NEW_UN20_VERSION = Un20ExtendedAppVersion( "14.E-1.16")
+        private const val NEW_UN20_VERSION_STRING = "14.E-1.16"
+        private val NEW_UN20_VERSION = Un20ExtendedAppVersion( NEW_UN20_VERSION_STRING)
 
         private val OLD_SCANNER_INFORMATION =
             ScannerInformation(

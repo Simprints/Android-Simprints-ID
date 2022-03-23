@@ -223,23 +223,18 @@ class ScannerWrapperV2(
         }
     }
 
-    override fun performCypressOta(): Observable<CypressOtaStep> =
-        readHardwareVersionForOta().flatMap { hardwareVersion ->
-            cypressOtaHelper.performOtaSteps(scannerV2, macAddress, hardwareVersion)
+    override fun performCypressOta(firmwareVersion: String): Observable<CypressOtaStep> =
+            cypressOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
                 .wrapErrorsFromScanner()
-        }
 
-    override fun performStmOta(): Observable<StmOtaStep> =
-        readHardwareVersionForOta().flatMap { hardwareVersion ->
-            stmOtaHelper.performOtaSteps(scannerV2, macAddress, hardwareVersion)
+    override fun performStmOta(firmwareVersion: String): Observable<StmOtaStep> =
+            stmOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
                 .wrapErrorsFromScanner()
-        }
 
-    override fun performUn20Ota(): Observable<Un20OtaStep> =
-        readHardwareVersionForOta().flatMap { hardwareVersion ->
-            un20OtaHelper.performOtaSteps(scannerV2, macAddress, hardwareVersion)
+    override fun performUn20Ota(firmwareVersion: String): Observable<Un20OtaStep> =
+             un20OtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
                 .wrapErrorsFromScanner()
-        }
+
 
 
     private fun readHardwareVersionForOta(): Observable<String> {

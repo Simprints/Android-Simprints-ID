@@ -25,23 +25,22 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
      * Expects a connected scanner in root mode
      * If completes successfully, will finish with a connected scanner in root mode
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, hardwareVersion: String): Observable<CypressOtaStep> =
+    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Observable<CypressOtaStep> =
         Observable.just<CypressOtaStep>(CypressOtaStep.EnteringOtaMode)
             .concatWith(scanner.enterCypressOtaMode().addSmallDelay() thenEmitStep CypressOtaStep.CommencingTransfer)
-            .concatWith(scanner.startCypressOta(firmwareLocalDataSource.loadCypressFirmwareBytes(hardwareVersion)).map { CypressOtaStep.TransferInProgress(it) })
+            .concatWith(scanner.startCypressOta(firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)).map { CypressOtaStep.TransferInProgress(it) })
             .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
             .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateCypressFirmwareVersion(hardwareVersion, scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
+            .concatWith(validateCypressFirmwareVersion(firmwareVersion, scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
             .concatWith(updateUnifiedVersionInformation(scanner))
 
     private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)
 
-    private fun validateCypressFirmwareVersion(hardwareVersion: String, scanner: Scanner): Completable =
+    private fun validateCypressFirmwareVersion(firmwareVersion: String, scanner: Scanner): Completable =
         scanner.getCypressExtendedFirmwareVersion().flatMapCompletable {
-            val expectedFirmwareVersion = firmwareLocalDataSource.getAvailableScannerFirmwareVersions(hardwareVersion).cypress
             val actualFirmwareVersion = it.versionAsString
-            if (expectedFirmwareVersion != actualFirmwareVersion) {
-                Completable.error(OtaFailedException("Cypress OTA did not increment firmware version. Expected $expectedFirmwareVersion, but was $actualFirmwareVersion"))
+            if (firmwareVersion != actualFirmwareVersion) {
+                Completable.error(OtaFailedException("Cypress OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion"))
             } else {
                 newFirmwareVersion = it
                 Completable.complete()

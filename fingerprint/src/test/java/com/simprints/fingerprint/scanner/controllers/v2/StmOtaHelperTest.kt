@@ -46,8 +46,7 @@ class StmOtaHelperTest {
         every { scannerMock.enterMainMode() } returns Completable.complete()
         every { scannerMock.getStmFirmwareVersion() } returns Single.just(NEW_STM_VERSION)
 
-        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions(HARDWARE_VERSION) } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.loadStmFirmwareBytes(HARDWARE_VERSION) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.loadStmFirmwareBytes(NEW_STM_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
@@ -58,7 +57,7 @@ class StmOtaHelperTest {
             listOf(StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion,
                 StmOtaStep.ReconnectingAfterValidating, StmOtaStep.UpdatingUnifiedVersionInformation)
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitAndAssertSuccess()
@@ -84,7 +83,7 @@ class StmOtaHelperTest {
         every { scannerMock.startStmOta(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -107,7 +106,7 @@ class StmOtaHelperTest {
         every { connectionHelperMock.reconnect(any(), any()) } returnsMany
             listOf(Completable.complete(), Completable.error(error))
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -128,7 +127,7 @@ class StmOtaHelperTest {
 
         every { scannerMock.getStmFirmwareVersion() } returns Single.just(OLD_STM_VERSION)
 
-        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", HARDWARE_VERSION).test()
+        val testObserver = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -144,7 +143,8 @@ class StmOtaHelperTest {
         private const val HARDWARE_VERSION = "E-1"
         private val OTA_PROGRESS_VALUES = listOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
         private val OLD_STM_VERSION = StmExtendedFirmwareVersion("14.E-1.15")
-        private val NEW_STM_VERSION = StmExtendedFirmwareVersion( "14.E-1.16")
+        private const val NEW_STM_VERSION_STRING = "14.E-1.16"
+        private val NEW_STM_VERSION = StmExtendedFirmwareVersion( NEW_STM_VERSION_STRING)
 
         private val CYPRESS_VERSION = CypressExtendedFirmwareVersion( "3.E-1.4")
         private val UN20_VERSION = Un20ExtendedAppVersion("7.E-1.8")
