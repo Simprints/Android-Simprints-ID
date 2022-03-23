@@ -16,7 +16,7 @@ data class Vero2InfoSnapshotEvent(
 
     constructor(
         createdAt: Long,
-        version: Vero2Version,
+        version: Vero2Version.Vero2NewApiVersion,
         battery: BatteryInfo,
         labels: EventLabels = EventLabels()
     ): this(
@@ -26,7 +26,7 @@ data class Vero2InfoSnapshotEvent(
             createdAt,
             NEW_EVENT_VERSION,
             battery,
-            version as Vero2Version.Vero2NewApiVersion
+            version
         ),
         VERO_2_INFO_SNAPSHOT
     )
@@ -88,7 +88,7 @@ data class Vero2InfoSnapshotEvent(
 
     }
 
-    sealed class Vero2Version {
+    sealed class Vero2Version(val master: Long = 0) {
         @Keep
         data class Vero2NewApiVersion(
             val hardwareRevision: String,
@@ -101,7 +101,6 @@ data class Vero2InfoSnapshotEvent(
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
         data class Vero2OldApiVersion(
-            val master: Long,
             val cypressApp: String,
             val cypressApi: String,
             val stmApp: String,

@@ -51,7 +51,7 @@ class Vero2InfoSnapshotEvent(startTime: Long,
 fun Vero2InfoSnapshotEvent.fromDomainToCore(): Vero2InfoSnapshotEventCore =
     Vero2InfoSnapshotEventCore(startTime, version.fromDomainToCore(), battery.fromDomainToCore())
 
-fun Vero2InfoSnapshotEvent.Vero2Version.fromDomainToCore(): Vero2VersionCore =
+fun Vero2InfoSnapshotEvent.Vero2Version.fromDomainToCore(): Vero2VersionCore.Vero2NewApiVersion =
     Vero2VersionCore.Vero2NewApiVersion(hardwareVersion, cypressApp, stmApp, un20App)
 
 fun Vero2InfoSnapshotEvent.BatteryInfo.fromDomainToCore(): BatteryInfoCore =
