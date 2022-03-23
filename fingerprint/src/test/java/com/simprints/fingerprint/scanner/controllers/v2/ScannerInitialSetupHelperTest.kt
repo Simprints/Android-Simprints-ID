@@ -6,7 +6,7 @@ import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -47,6 +47,7 @@ class ScannerInitialSetupHelperTest {
 
     @Before
     fun setup() {
+        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns LOCAL_SCANNER_VERSION
         every { scannerMock.enterMainMode() } returns Completable.complete()
         every {
             connectionHelperMock.reconnect(
@@ -175,6 +176,26 @@ class ScannerInitialSetupHelperTest {
     }
 
     @Test
+    fun ifAvailableVersionGreaterThanExistingVersion_noLocalDownloadedFirmwares_completesNormally() {
+        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns mapOf()
+
+        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
+            put(HARDWARE_VERSION, SCANNER_VERSION_HIGH.toScannerVersion().firmware)
+        }
+
+        every { batteryLevelChecker.isLowBattery() } returns false
+        setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
+
+        val testSubscriber =
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
+                .test()
+        testScheduler.advanceTime()
+
+        testSubscriber.awaitAndAssertSuccess()
+
+    }
+    @Test
     fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() {
         every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
         every { fingerprintPreferenceManager.scannerHardwareRevisions } returns ScannerHardwareRevisions().apply {
@@ -250,9 +271,14 @@ class ScannerInitialSetupHelperTest {
         val HIGH_BATTERY_INFO = BatteryInfo(80, 2, 3, 4)
         val LOW_BATTERY_INFO = BatteryInfo(10, 2, 3, 4)
 
-        private val STM_VERSION = StmExtendedFirmwareVersion( "14.E-1.16")
-        private val CYPRESS_VERSION = CypressExtendedFirmwareVersion( "3.E-1.4")
-        private val UN20_VERSION = Un20ExtendedAppVersion("7.E-1.8")
+        private val STM_VERSION_STRING = ( "14.E-1.16")
+        private val CYPRESS_VERSION_STRING = ( "3.E-1.4")
+        private val UN20_VERSION_STRING = ("7.E-1.8")
+
+        private val STM_VERSION = StmExtendedFirmwareVersion( STM_VERSION_STRING)
+        private val CYPRESS_VERSION = CypressExtendedFirmwareVersion( CYPRESS_VERSION_STRING)
+        private val UN20_VERSION = Un20ExtendedAppVersion(UN20_VERSION_STRING)
+
 
         val SCANNER_VERSION_LOW = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
@@ -267,6 +293,11 @@ class ScannerInitialSetupHelperTest {
         )
 
 
+        val LOCAL_SCANNER_VERSION =  mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_STRING),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_STRING),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_STRING)
+        )
         val SCANNER_VERSION_HIGH = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
             firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(

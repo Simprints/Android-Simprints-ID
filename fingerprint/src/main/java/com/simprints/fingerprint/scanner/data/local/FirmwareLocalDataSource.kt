@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner.data.local
 
 import android.content.Context
-import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.logging.Simber
 import java.io.File
 
@@ -13,9 +13,9 @@ class FirmwareLocalDataSource(private val context: Context) {
 
     fun getAvailableScannerFirmwareVersions() =
         mapOf(
-            DownloadableFirmwareVersion.Chip.CYPRESS to getFirmwareVersionsInDir(CYPRESS_DIR),
-            DownloadableFirmwareVersion.Chip.STM to getFirmwareVersionsInDir(STM_DIR),
-            DownloadableFirmwareVersion.Chip.UN20 to getFirmwareVersionsInDir(UN20_DIR)
+            Chip.CYPRESS to getFirmwareVersionsInDir(CYPRESS_DIR),
+            Chip.STM to getFirmwareVersionsInDir(STM_DIR),
+            Chip.UN20 to getFirmwareVersionsInDir(UN20_DIR)
         )
 
     fun loadCypressFirmwareBytes(chipVersion:String) = loadFirmwareBytes(chipVersion, CYPRESS_DIR)
