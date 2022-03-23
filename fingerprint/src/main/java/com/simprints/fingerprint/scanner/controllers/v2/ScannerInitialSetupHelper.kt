@@ -5,6 +5,7 @@ import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
@@ -25,6 +26,7 @@ class ScannerInitialSetupHelper(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
     private val fingerprintPreferenceManager: FingerprintPreferencesManager,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val timeScheduler: Scheduler = Schedulers.io()
 ) {
 
@@ -73,10 +75,25 @@ class ScannerInitialSetupHelper(
         }
     }
 
-    private fun determineAvailableOtas(current: ScannerFirmwareVersions, available: ScannerFirmwareVersions?): List<AvailableOta> =
-        listOfNotNull(
-            if (available!= null && current.cypress != available.cypress) AvailableOta.CYPRESS else null,
-            if (available!= null && current.stm != available.stm) AvailableOta.STM else null,
-            if (available!= null && current.un20 != available.un20) AvailableOta.UN20 else null
+    private fun determineAvailableOtas(
+        current: ScannerFirmwareVersions,
+        available: ScannerFirmwareVersions?
+    ): List<AvailableOta> {
+        if (available == null) {
+            return emptyList()
+        }
+        val localFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+        return listOfNotNull(
+            if (
+                localFiles[Chip.CYPRESS]?.contains(available.cypress) == true
+                && current.cypress != available.cypress
+            ) AvailableOta.CYPRESS else null,
+            if (localFiles[Chip.STM]?.contains(available.stm) == true &&
+                current.stm != available.stm
+            ) AvailableOta.STM else null,
+            if (localFiles[Chip.UN20]?.contains(available.un20) == true &&
+                current.un20 != available.un20
+            ) AvailableOta.UN20 else null
         )
+    }
 }
