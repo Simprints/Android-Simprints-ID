@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 
 
 class ScannerHardwareRevisions : HashMap<String, ScannerFirmwareVersions>() {
@@ -13,7 +14,7 @@ class ScannerHardwareRevisions : HashMap<String, ScannerFirmwareVersions>() {
      */
     fun availableForDownload(
         hardwareVersion: String,
-        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>
+        localFirmwareVersions: Map<Chip, Set<String>>
     ): List<DownloadableFirmwareVersion> {
         val result = ArrayList<DownloadableFirmwareVersion>()
         val availableFirmwareVersions = get(hardwareVersion) ?: return result
@@ -26,60 +27,45 @@ class ScannerHardwareRevisions : HashMap<String, ScannerFirmwareVersions>() {
     }
 
     private fun addAvailableCypressVersions(
-        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>,
+        localFirmwareVersions: Map<Chip, Set<String>>,
         availableFirmwareVersions: ScannerFirmwareVersions,
         result: ArrayList<DownloadableFirmwareVersion>
     ) {
-        val localCypressVersions = localFirmwareVersions[DownloadableFirmwareVersion.Chip.CYPRESS]
+        val localCypressVersions = localFirmwareVersions[Chip.CYPRESS]
         if (localCypressVersions == null || !localCypressVersions.contains(
                 availableFirmwareVersions.cypress
             )
         ) {
-            result.add(
-                DownloadableFirmwareVersion(
-                    DownloadableFirmwareVersion.Chip.CYPRESS,
-                    availableFirmwareVersions.cypress
-                )
-            )
+            result.add(DownloadableFirmwareVersion(Chip.CYPRESS, availableFirmwareVersions.cypress))
         }
     }
 
     private fun addAvailableSTMVersions(
-        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>,
+        localFirmwareVersions: Map<Chip, Set<String>>,
         availableFirmwareVersions: ScannerFirmwareVersions,
         result: ArrayList<DownloadableFirmwareVersion>
     ) {
-        val localSTMVersions = localFirmwareVersions[DownloadableFirmwareVersion.Chip.STM]
+        val localSTMVersions = localFirmwareVersions[Chip.STM]
 
         if (localSTMVersions == null || !localSTMVersions.contains(
                 availableFirmwareVersions.stm
             )
         ) {
-            result.add(
-                DownloadableFirmwareVersion(
-                    DownloadableFirmwareVersion.Chip.STM,
-                    availableFirmwareVersions.stm
-                )
-            )
+            result.add(DownloadableFirmwareVersion(Chip.STM, availableFirmwareVersions.stm))
         }
     }
 
     private fun addAvailableUN20Versions(
-        localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>,
+        localFirmwareVersions: Map<Chip, Set<String>>,
         availableFirmwareVersions: ScannerFirmwareVersions,
         result: ArrayList<DownloadableFirmwareVersion>
     ) {
-        val localUN20Versions = localFirmwareVersions[DownloadableFirmwareVersion.Chip.UN20]
+        val localUN20Versions = localFirmwareVersions[Chip.UN20]
         if (localUN20Versions == null || !localUN20Versions.contains(
                 availableFirmwareVersions.un20
             )
         ) {
-            result.add(
-                DownloadableFirmwareVersion(
-                    DownloadableFirmwareVersion.Chip.UN20,
-                    availableFirmwareVersions.un20
-                )
-            )
+            result.add(DownloadableFirmwareVersion(Chip.UN20, availableFirmwareVersions.un20))
         }
     }
 }
