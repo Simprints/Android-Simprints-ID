@@ -69,7 +69,6 @@ class Vero2InfoSnapshotEventTest {
     @Test
     fun shouldParse_vero2Event_usingOldApi_successfully() {
         val versionArg = Vero2InfoSnapshotEvent.Vero2Version.Vero2OldApiVersion(
-            master = 10129L,
             cypressApi = "1.1",
             cypressApp = "1.1",
             stmApi = "1.0",
