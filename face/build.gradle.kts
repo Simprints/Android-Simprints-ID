@@ -18,6 +18,7 @@ sonarqube {
 
 
 android {
+    ndkVersion = "25.0.8221429"
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
