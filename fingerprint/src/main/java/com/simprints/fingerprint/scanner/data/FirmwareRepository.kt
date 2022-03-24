@@ -60,4 +60,39 @@ class FirmwareRepository(
             Chip.UN20 -> firmwareLocalDataSource.saveUn20FirmwareBytes(version, firmwareBytes)
         }
     }
+
+    /**
+     * Clean up old firmware files
+     *
+     */
+     fun cleanUpOldFirmwareFiles() {
+        Simber.d("Starting local Firmware files cleanup")
+
+        val locallySavedFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+        val cypressOfficialVersions = mutableSetOf<String>()
+        val stmOfficialVersions = mutableSetOf<String>()
+        val un20OfficialVersions = mutableSetOf<String>()
+        fingerprintPreferencesManager.scannerHardwareRevisions.entries.forEach {
+            cypressOfficialVersions.add(it.value.cypress)
+            stmOfficialVersions.add(it.value.stm)
+            un20OfficialVersions.add(it.value.un20)
+        }
+        locallySavedFiles.entries.forEach {
+            when (it.key) {
+                Chip.CYPRESS -> obsoleteItems(it.value, cypressOfficialVersions).forEach { firmwareFile ->
+                    firmwareLocalDataSource.deleteCypressFirmware(firmwareFile)
+                }
+                Chip.STM -> obsoleteItems(it.value, stmOfficialVersions).forEach { firmwareFile ->
+                    firmwareLocalDataSource.deleteStmFirmware(firmwareFile)
+                }
+                Chip.UN20 -> obsoleteItems(it.value, un20OfficialVersions).forEach { firmwareFile ->
+                    firmwareLocalDataSource.deleteUn20Firmware(firmwareFile)
+                }
+            }
+        }
+    }
+
+    private fun obsoleteItems(localVersions: Set<String>, officialVersions: Set<String>)=
+        localVersions.filter { !officialVersions.contains(it) }
+
 }
