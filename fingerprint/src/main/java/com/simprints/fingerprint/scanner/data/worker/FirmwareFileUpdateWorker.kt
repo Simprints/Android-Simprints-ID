@@ -25,6 +25,7 @@ class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
 
             val firmwareRepository: FirmwareRepository by inject()
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
+            firmwareRepository.cleanUpOldFirmwareFiles()
 
             Simber.d("FirmwareFileUpdateWorker succeeded")
             Result.success()

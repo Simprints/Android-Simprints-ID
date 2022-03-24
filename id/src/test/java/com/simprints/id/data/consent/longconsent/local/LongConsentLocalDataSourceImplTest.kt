@@ -73,7 +73,7 @@ class LongConsentLocalDataSourceImplTest {
         }
 
         every { FileUtil.createDirectory(any()) } returns mockDirectory
-        every { FileUtil.createFile(any(), any()) } returns mockk()
+        every { FileUtil.createFile(any<String>(), any()) } returns mockk()
 
 
         every { mockDirectory.listFiles() } returns arrayOf(directory)
@@ -106,7 +106,7 @@ class LongConsentLocalDataSourceImplTest {
         }
 
         every { FileUtil.createDirectory(any()) } returns mockDirectory
-        every { FileUtil.createFile(any(), any()) } returns mockk()
+        every { FileUtil.createFile(any<String>(), any()) } returns mockk()
         every { FileUtil.exists(any(), any()) } returns true
         every { FileUtil.readFile(any()) } returns expectedLongConsent.reader().buffered()
 

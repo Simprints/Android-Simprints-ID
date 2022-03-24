@@ -37,7 +37,7 @@ class FirmwareRepositoryTest {
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
-            val availableForDownload = RESPONSE_MAP.availableForDownload(
+            val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
                 HARDWARE_VERSION,
                 emptyMap()
             )
@@ -103,7 +103,7 @@ class FirmwareRepositoryTest {
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW_UN20_HIGH
-            val availableForDownload = RESPONSE_MAP.availableForDownload(
+            val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
                 HARDWARE_VERSION,
                 SCANNER_VERSIONS_HIGH
             )
@@ -126,6 +126,43 @@ class FirmwareRepositoryTest {
             }
         }
 
+    @Test
+    fun `test cleanUpOldFirmwareFiles should remove all low version firmwares`() {
+        //Given
+        every {
+            firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+        } returns SCANNER_VERSIONS_LOW_AND_HIGH
+        firmwareLocalDataSourceMock.apply{
+            every { deleteCypressFirmware(any()) } returns true
+            every { deleteStmFirmware(any()) } returns true
+            every { deleteUn20Firmware(any()) } returns true
+        }
+        // When
+        firmwareFileUpdater.cleanUpOldFirmwareFiles()
+        // Then
+        verify {
+            firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteStmFirmware(STM_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteUn20Firmware(UN20_VERSION_LOW)
+        }
+    }
+
+    @Test
+    fun `test cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() {
+        //Given
+        every {
+            firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+        } returns SCANNER_VERSIONS_HIGH
+
+        // When
+        firmwareFileUpdater.cleanUpOldFirmwareFiles()
+        // Then
+        verify (exactly = 0){
+            firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteStmFirmware(CYPRESS_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteUn20Firmware(CYPRESS_VERSION_LOW)
+        }
+    }
     companion object {
         private const val HARDWARE_VERSION = "E-1"
         private const val CYPRESS_VERSION_LOW = "1.E-1.0"
@@ -151,6 +188,14 @@ class FirmwareRepositoryTest {
             DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
             DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),
             DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_LOW),
+        )
+        private val SCANNER_VERSIONS_LOW_AND_HIGH = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(
+                CYPRESS_VERSION_LOW,
+                CYPRESS_VERSION_HIGH
+            ),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW, STM_VERSION_HIGH),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_LOW, UN20_VERSION_HIGH),
         )
         private val SCANNER_VERSIONS_HIGH = mapOf(
             DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_HIGH),

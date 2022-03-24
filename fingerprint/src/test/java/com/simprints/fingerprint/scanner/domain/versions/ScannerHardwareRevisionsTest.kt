@@ -21,7 +21,7 @@ class ScannerHardwareRevisionsTest {
         val local = emptyMap<DownloadableFirmwareVersion.Chip, Set<String>>()
         // When
         val result =
-            scannerHardwareRevisions.availableForDownload(FirmwareTestData.HARDWARE_VERSION, local)
+            scannerHardwareRevisions.getAvailableVersionsForDownload(FirmwareTestData.HARDWARE_VERSION, local)
         // Then
         Truth.assertThat(result.size).isEqualTo(3)
     }
@@ -34,7 +34,7 @@ class ScannerHardwareRevisionsTest {
         val local = SCANNER_VERSIONS_HIGH
         // When
         val result =
-            scannerHardwareRevisions.availableForDownload(FirmwareTestData.HARDWARE_VERSION, local)
+            scannerHardwareRevisions.getAvailableVersionsForDownload(FirmwareTestData.HARDWARE_VERSION, local)
         // Then
         Truth.assertThat(result.size).isEqualTo(0)
     }
@@ -47,7 +47,7 @@ class ScannerHardwareRevisionsTest {
         val local = SCANNER_VERSIONS_HIGH
         // When
         val result =
-            scannerHardwareRevisions.availableForDownload(FirmwareTestData.HARDWARE_VERSION, local)
+            scannerHardwareRevisions.getAvailableVersionsForDownload(FirmwareTestData.HARDWARE_VERSION, local)
         // Then
         Truth.assertThat(result.size).isEqualTo(0)
     }
