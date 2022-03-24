@@ -9,7 +9,7 @@ object Dependencies {
     private const val espresso_version = "3.4.0"
     private const val uiAutomator_version ="2.2.0-alpha3"
     private const val androidx_lifecycle_version = "2.2.0"
-    private const val androidx_room_version = "2.3.0"
+    private const val androidx_room_version = "2.4.2"
     private const val androidx_camerax_version = "1.0.0-beta01"
     private const val dagger_version = "2.22"
     private const val work_version = "2.4.0"
