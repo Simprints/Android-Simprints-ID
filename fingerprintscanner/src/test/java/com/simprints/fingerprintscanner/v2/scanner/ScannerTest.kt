@@ -24,10 +24,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.Set
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.commands.SetUn20OnCommand
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.OperationResultCode
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.*
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetSmileLedStateResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprintscanner.v2.domain.root.RootCommand
@@ -35,9 +32,12 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterCypressOtaModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterMainModeCommand
 import com.simprints.fingerprintscanner.v2.domain.root.commands.EnterStmOtaModeCommand
+import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion
+import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterCypressOtaModeResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterStmOtaModeResponse
+import com.simprints.fingerprintscanner.v2.domain.root.responses.GetExtendedVersionResponse
 import com.simprints.fingerprintscanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprintscanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
@@ -56,13 +56,13 @@ import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Observable
+import io.reactivex.*
 import io.reactivex.observers.TestObserver
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxSingle
 import org.junit.Test
 import java.io.InputStream
 import java.io.OutputStream
@@ -511,6 +511,79 @@ class ScannerTest {
         scanner.disconnect().blockingAwait()
 
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
+    }
+
+
+    @Test
+    fun scanner_getStmVersion_shouldReturnStmExtendedVersion() {
+        val expectedVersion = StmExtendedFirmwareVersion("1.E-1.1")
+        val scannerInfoReaderMock = mock<ScannerExtendedInfoReaderHelper> {
+            whenever(it.getStmExtendedFirmwareVersion()) thenReturn Single.just(expectedVersion)
+        }
+        val mockMessageInputStream = setupMock<MainMessageInputStream> {
+            whenThis { veroEvents } thenReturn Flowable.empty()
+        }
+        val mockMessageOutputStream = mock<MainMessageOutputStream>()
+
+        val scanner = Scanner(
+            MainMessageChannel(mockMessageInputStream, mockMessageOutputStream),
+            setupRootMessageChannelMock(),
+            scannerInfoReaderMock,
+            mock(), mock(), mock(), mock(), mock(),
+            responseErrorHandler
+        )
+        scanner.connect(mock(), mock()).blockingAwait()
+        scanner.enterMainMode().blockingAwait()
+
+        val testObserver = scanner.getStmFirmwareVersion().test()
+        testObserver.awaitAndAssertSuccess()
+
+        assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
+    }
+
+
+    @Test
+    fun scanner_getCypressExtendedVersion_shouldReturnCypressExtendedVersion() {
+        val expectedVersion = CypressExtendedFirmwareVersion("1.E-1.1")
+        val scannerInfoReaderMock = mock<ScannerExtendedInfoReaderHelper> {
+            whenever(it.getCypressExtendedVersion()) thenReturn Single.just(expectedVersion)
+        }
+
+        val scanner = Scanner(
+            mock(),
+            setupRootMessageChannelMock(),
+            scannerInfoReaderMock,
+            mock(), mock(), mock(), mock(), mock(),
+            responseErrorHandler
+        )
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        val testObserver = scanner.getCypressExtendedFirmwareVersion().test()
+        testObserver.awaitAndAssertSuccess()
+
+        assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
+    }
+
+    @Test
+    fun scanner_getExtendedVersion_shouldReturn_ExtendedVersionInformation() = runBlocking {
+        val expectedVersion = mock<ExtendedVersionInformation>()
+        val scannerInfoReaderMock = mock<ScannerExtendedInfoReaderHelper> {
+            whenever(it.getExtendedVersionInfo()) thenReturn GetExtendedVersionResponse(expectedVersion)
+        }
+
+        val scanner = Scanner(
+            mock(),
+            setupRootMessageChannelMock(),
+            scannerInfoReaderMock,
+            mock(), mock(), mock(), mock(), mock(),
+            responseErrorHandler
+        )
+        scanner.connect(mock(), mock()).blockingAwait()
+
+        val testObserver = scanner.getExtendedVersionInformation().test()
+        testObserver.awaitAndAssertSuccess()
+
+        assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
     }
 
     private fun setupRootMessageChannelMock(): RootMessageChannel {
