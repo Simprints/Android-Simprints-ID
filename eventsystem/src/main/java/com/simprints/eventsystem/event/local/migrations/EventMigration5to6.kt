@@ -36,12 +36,21 @@ class EventMigration5to6 : Migration(5, 6) {
     /**
      * Remove the template field and update the event version
      */
-    private fun migrateFingerprintCaptureEventPayloadType(it: Cursor?, database: SupportSQLiteDatabase, id: String?) {
+    private fun migrateFingerprintCaptureEventPayloadType(
+        it: Cursor?,
+        database: SupportSQLiteDatabase,
+        id: String?
+    ) {
         val jsonData = it?.getStringWithColumnName(DB_EVENT_JSON_FIELD)
 
         jsonData?.let {
-            val originalJson = JSONObject(jsonData)
+            val originalJson = JSONObject(it)
+            originalJson.remove(OLD_FINGERPRINT_CAPTURE_EVENT)
+            originalJson.put(DB_EVENT_TYPE_FIELD, NEW_FINGERPRINT_CAPTURE_EVENT)
+
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
+            newPayload.remove(OLD_FINGERPRINT_CAPTURE_EVENT)
+            newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FINGERPRINT_CAPTURE_EVENT)
 
             val fingerprint = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT)
             fingerprint.remove(PAYLOAD_TYPE_NAME)
@@ -71,12 +80,21 @@ class EventMigration5to6 : Migration(5, 6) {
     /**
      * Remove the template field and update the event version
      */
-    private fun migrateFaceCaptureEventPayloadType(it: Cursor?, database: SupportSQLiteDatabase, id: String?) {
+    private fun migrateFaceCaptureEventPayloadType(
+        it: Cursor?,
+        database: SupportSQLiteDatabase,
+        id: String?
+    ) {
         val jsonData = it?.getStringWithColumnName(DB_EVENT_JSON_FIELD)
 
         jsonData?.let {
             val originalJson = JSONObject(jsonData)
+            originalJson.remove(OLD_FACE_CAPTURE_EVENT)
+            originalJson.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
+
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
+            newPayload.remove(OLD_FACE_CAPTURE_EVENT)
+            newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
 
             val fingerprint = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
             fingerprint.remove(PAYLOAD_TYPE_NAME)
@@ -88,10 +106,13 @@ class EventMigration5to6 : Migration(5, 6) {
     }
 
     companion object {
-        private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE_EVENT"
-        private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE_EVENT"
+        private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
+        private const val NEW_FACE_CAPTURE_EVENT = "FACE_CAPTURE_V3"
+        private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
+        private const val NEW_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE_V3"
         private const val VERSION_PAYLOAD_NAME = "eventVersion"
         private const val DB_EVENT_JSON_FIELD = "eventJson"
+        private const val DB_EVENT_TYPE_FIELD = "type"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FACE = "face"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT = "fingerprint"
