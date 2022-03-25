@@ -115,11 +115,13 @@ class ConnectScannerViewModel(
             scannerManager.initScanner()
         )
 
-    private fun connectToVero() =
-        veroTask(computeProgress(4),
-            R.string.connect_scanner_bt_connect,
-            "ScannerManager: connectToVero",
-            scannerManager.scanner { connect() }) { addBluetoothConnectivityEvent() }
+    private fun connectToVero() = veroTask(computeProgress(4),
+        R.string.connect_scanner_bt_connect,
+        "ScannerManager: connectToVero",
+        scannerManager.scanner { connect() }) {
+        setLastConnectedScannerInfo()
+        addBluetoothConnectivityEvent()
+    }
 
     private fun setupVero() =
         veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: setupVero",
@@ -206,12 +208,15 @@ class ConnectScannerViewModel(
         }
     }
 
+    private fun setLastConnectedScannerInfo() {
+        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
+        preferencesManager.lastScannerVersion =
+            scannerManager.scanner?.versionInformation()?.hardwareVersion ?: ""
+    }
+
     private fun handleSetupFinished() {
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
-        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
-        preferencesManager.lastScannerVersion =
-            scannerManager.scanner?.versionInformation()?.hardwareVersion.toString()
 
         Simber.tag(MAC_ADDRESS, true).i(scannerManager.currentMacAddress ?: "")
         Simber.tag(SCANNER_ID, true).i(scannerManager.currentScannerId ?: "")

@@ -236,14 +236,6 @@ class ScannerWrapperV2(
                 .wrapErrorsFromScanner()
 
 
-
-    private fun readHardwareVersionForOta(): Observable<String> {
-        val hardwareVersion = scannerVersion?.hardwareVersion ?: return Observable.error(
-            ScannerV2OtaFailedException("No hardware version specified for connected scanner")
-        )
-        return Observable.just(hardwareVersion)
-    }
-
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
         when (this) {
             CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> Dpi(500)
