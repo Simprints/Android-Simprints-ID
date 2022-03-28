@@ -1,6 +1,5 @@
 package com.simprints.eventsystem.event.remote
 
-import android.net.NetworkInfo
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -190,8 +189,12 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             ConnectivitySnapshotEvent(
                 DEFAULT_TIME,
-                "Unknown",
-                listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED)), eventLabels
+                listOf(
+                    SimNetworkUtils.Connection(
+                        SimNetworkUtils.ConnectionType.MOBILE,
+                        SimNetworkUtils.ConnectionState.CONNECTED
+                    )
+                ), eventLabels
             )
         )
     }
