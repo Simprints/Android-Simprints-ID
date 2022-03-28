@@ -260,7 +260,7 @@ class LoginActivityAssertions(
         val response =
             result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
 
-        assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
+        assertThat(response!!.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
     }
 
     private fun assertToastIsDisplayed(message: String) {

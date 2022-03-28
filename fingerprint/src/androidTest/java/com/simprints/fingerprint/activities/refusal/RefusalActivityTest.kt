@@ -120,9 +120,9 @@ class RefusalActivityTest {
         val response = result.resultData.getParcelableExtra<RefusalTaskResult>(RefusalTaskResult.BUNDLE_KEY)
 
         Truth.assertThat(response).isInstanceOf(RefusalTaskResult::class.java)
-        Truth.assertThat(response.action).isEqualTo(action)
-        Truth.assertThat(response.answer.reason).isEqualTo(refusalReason)
-        Truth.assertThat(response.answer.optionalText).isEqualTo(refusalReasonText)
+        Truth.assertThat(response?.action).isEqualTo(action)
+        Truth.assertThat(response?.answer?.reason).isEqualTo(refusalReason)
+        Truth.assertThat(response?.answer?.optionalText).isEqualTo(refusalReasonText)
     }
 
     @After

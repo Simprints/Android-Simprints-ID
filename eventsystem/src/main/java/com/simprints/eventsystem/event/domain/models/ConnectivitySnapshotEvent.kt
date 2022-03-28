@@ -16,13 +16,12 @@ data class ConnectivitySnapshotEvent(
 
     constructor(
         createdAt: Long,
-        networkType: String,
         connections: List<SimNetworkUtils.Connection>,
         labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, networkType, connections),
+        ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, connections),
         CONNECTIVITY_SNAPSHOT
     )
 
@@ -30,7 +29,6 @@ data class ConnectivitySnapshotEvent(
     data class ConnectivitySnapshotPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val networkType: String,
         val connections: List<SimNetworkUtils.Connection>,
         override val type: EventType = CONNECTIVITY_SNAPSHOT,
         override val endedAt: Long = 0
@@ -42,18 +40,15 @@ data class ConnectivitySnapshotEvent(
                 timeHelper: TimeHelper
             ): ConnectivitySnapshotEvent {
 
-                return simNetworkUtils.let {
-                    ConnectivitySnapshotEvent(
-                        timeHelper.now(),
-                        it.mobileNetworkType ?: "",
-                        it.connectionsStates
-                    )
-                }
+                return ConnectivitySnapshotEvent(
+                    timeHelper.now(),
+                    simNetworkUtils.connectionsStates
+                )
             }
         }
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }
