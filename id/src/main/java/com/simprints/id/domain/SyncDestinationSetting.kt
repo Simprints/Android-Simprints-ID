@@ -12,4 +12,4 @@ fun List<SyncDestinationSetting>.containsCommcare() =
     this.contains(SyncDestinationSetting.COMMCARE)
 
 fun List<SyncDestinationSetting>.containsSimprints() =
-    this.contains(SyncDestinationSetting.COMMCARE)
+    this.contains(SyncDestinationSetting.SIMPRINTS)
