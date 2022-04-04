@@ -38,50 +38,38 @@ class ExitFormHelperImpl : ExitFormHelper {
         data?.getParcelableExtra<ExitFormResult>(EXIT_FORM_BUNDLE_KEY)?.let {
             when (it.type) {
                 CORE_EXIT_FORM -> {
-                    buildCoreResponseFromActivityResultIfSubmitted(
-                        data.getParcelableExtra(
-                            EXIT_FORM_BUNDLE_KEY
-                        )
-                    )
+                    buildCoreResponseFromActivityResultIfSubmitted(it as CoreExitFormActivityResult)
                 }
                 CORE_FINGERPRINT_EXIT_FROM -> {
-                    buildFingerprintResponseFromActivityResultIfSubmitted(
-                        data.getParcelableExtra(
-                            EXIT_FORM_BUNDLE_KEY
-                        )
-                    )
+                    buildFingerprintResponseFromActivityResultIfSubmitted(it as FingerprintExitFormActivityResult)
                 }
                 CORE_FACE_EXIT_FORM -> {
-                    buildFaceResponseFromActivityResultIfSubmitted(
-                        data.getParcelableExtra(
-                            EXIT_FORM_BUNDLE_KEY
-                        )
-                    )
+                    buildFaceResponseFromActivityResultIfSubmitted(it as FaceExitFormActivityResult)
                 }
             }
         }
 
-    private fun buildCoreResponseFromActivityResultIfSubmitted(result: CoreExitFormActivityResult?) =
-        when (result?.action) {
+    private fun buildCoreResponseFromActivityResultIfSubmitted(result: CoreExitFormActivityResult) =
+        when (result.action) {
             CoreExitFormActivityResult.Action.SUBMIT -> {
                 CoreExitFormResponse(result.answer.reason, result.answer.optionalText)
             }
-            CoreExitFormActivityResult.Action.GO_BACK, null -> null
+            CoreExitFormActivityResult.Action.GO_BACK -> null
         }
 
-    private fun buildFingerprintResponseFromActivityResultIfSubmitted(result: FingerprintExitFormActivityResult?) =
-        when (result?.action) {
+    private fun buildFingerprintResponseFromActivityResultIfSubmitted(result: FingerprintExitFormActivityResult) =
+        when (result.action) {
             FingerprintExitFormActivityResult.Action.SUBMIT -> {
                 CoreFingerprintExitFormResponse(result.answer.reason, result.answer.optionalText)
             }
-            FingerprintExitFormActivityResult.Action.SCAN_FINGERPRINTS, null -> null
+            FingerprintExitFormActivityResult.Action.SCAN_FINGERPRINTS -> null
         }
 
-    private fun buildFaceResponseFromActivityResultIfSubmitted(result: FaceExitFormActivityResult?) =
-        when (result?.action) {
+    private fun buildFaceResponseFromActivityResultIfSubmitted(result: FaceExitFormActivityResult) =
+        when (result.action) {
             FaceExitFormActivityResult.Action.SUBMIT -> {
                 CoreFaceExitFormResponse(result.answer.reason, result.answer.optionalText)
             }
-            FaceExitFormActivityResult.Action.GO_BACK, null -> null
+            FaceExitFormActivityResult.Action.GO_BACK -> null
         }
 }
