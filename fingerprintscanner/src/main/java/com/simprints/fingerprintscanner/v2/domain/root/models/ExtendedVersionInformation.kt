@@ -25,6 +25,12 @@ data class ExtendedVersionInformation(
         fun fromBytes(bytes: ByteArray): ExtendedVersionInformation {
             val extractor = ByteExtractor(bytes)
 
+            if (bytes.isEmpty()) return ExtendedVersionInformation(
+                cypressFirmwareVersion = CypressExtendedFirmwareVersion.fromString(""),
+                stmFirmwareVersion = StmExtendedFirmwareVersion.fromString(""),
+                un20AppVersion = Un20ExtendedAppVersion.fromString("")
+            )
+
             val cypressVersionString = extractor.nextData()
             val stmVersionString = extractor.nextData()
             val un20VersionString = extractor.nextData()
