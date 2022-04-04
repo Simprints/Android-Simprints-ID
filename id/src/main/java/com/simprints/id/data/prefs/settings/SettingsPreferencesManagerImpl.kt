@@ -18,6 +18,8 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.Overr
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
@@ -39,7 +41,9 @@ open class SettingsPreferencesManagerImpl(
     private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
     fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
     faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>,
-    syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>
+    syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
+    simprintsSyncSerializer: Serializer<List<SimprintsSyncSetting>>,
+    cosyncSyncSerializer: Serializer<List<CosyncSetting>>
 ) : SettingsPreferencesManager {
 
     /**
@@ -251,6 +255,24 @@ open class SettingsPreferencesManagerImpl(
             syncDestinationSerializer
         )
 
+    override var simprintsSyncSettings: List<SimprintsSyncSetting>
+        by RemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            SIMPRINTS_SYNC_KEY,
+            SIMPRINTS_SYNC_SETTINGS_DEFAULT,
+            simprintsSyncSerializer
+        )
+
+    override var cosyncSyncSettings: List<CosyncSetting>
+        by RemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            COSYNC_SYNC_KEY,
+            COSYNC_SYNC_SETTINGS_DEFAULT,
+            cosyncSyncSerializer
+        )
+
     override var fingerprintsToCollect: List<FingerIdentifier>
         by OverridableRemoteConfigComplexPreference(
             prefs,
@@ -402,10 +424,12 @@ open class SettingsPreferencesManagerImpl(
         const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
 
         const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String =
+            JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.GeneralConsentOptions())
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String =
+            JsonHelper.toJson(com.simprints.id.data.consent.shortconsent.ParentalConsentOptions())
 
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
@@ -424,6 +448,12 @@ open class SettingsPreferencesManagerImpl(
 
         const val SYNC_DESTINATION_SETTINGS_KEY = "SyncDestination"
         val SYNC_DESTINATION_SETTINGS_DEFAULT = emptyList<SyncDestinationSetting>()
+
+        const val SIMPRINTS_SYNC_KEY = ""
+        val SIMPRINTS_SYNC_SETTINGS_DEFAULT = emptyList<SimprintsSyncSetting>()
+
+        const val COSYNC_SYNC_KEY = ""
+        val COSYNC_SYNC_SETTINGS_DEFAULT = emptyList<CosyncSetting>()
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
