@@ -9,6 +9,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -54,6 +56,16 @@ class SerializerModule {
     @Singleton
     @Named("SyncDestinationSerializer")
     fun provideSyncDestinationSettingSerializer(): Serializer<List<SyncDestinationSetting>> = SyncDestinationListSerializer()
+
+    @Provides
+    @Singleton
+    @Named("SimprintsSyncSerializer")
+    fun provideSimprintsSyncSerializer(): Serializer<List<SimprintsSyncSetting>> = SimprintsSyncSerializer()
+
+    @Provides
+    @Singleton
+    @Named("CosyncSerializer")
+    fun provideCosyncSerializer(): Serializer<List<CosyncSetting>> = CosyncSerializer()
 
     @Provides
     @Singleton
