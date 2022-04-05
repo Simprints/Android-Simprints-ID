@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 class ConnectivityLiveData(private val connectivityHelper: ConnectivityHelper) : LiveData<Boolean>() {
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+
         override fun onAvailable(network: Network) {
             postValue(true)
         }
