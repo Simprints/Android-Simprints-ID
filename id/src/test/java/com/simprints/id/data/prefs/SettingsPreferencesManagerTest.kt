@@ -9,6 +9,7 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
@@ -94,6 +95,19 @@ class SettingsPreferencesManagerTest {
     }
 
     @Test
+    fun fetchingSimprintsSyncReturnsall() {
+        val simprintsSyncSetting = settingsPreferencesManager.simprintsSyncSettings
+
+        assertThat(simprintsSyncSetting).isEqualTo(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT)
+
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ALL"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSettings
+
+        assertThat(syncSetting).isEqualTo(listOf(SimprintsSyncSetting.ALL))
+    }
+
+    @Test
     fun fetchingRemoteConfigEnum_revertsToDefaultIfSetToWrongType() {
         every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) } returns "1"
 
@@ -105,7 +119,9 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingOverridableRemoteConfigFingersToCollect_worksAndBecomesOverridden() {
         val oldFingersToCollect = settingsPreferencesManager.fingerprintsToCollect
-        assertThat(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT).isEqualTo(oldFingersToCollect)
+        assertThat(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT).isEqualTo(
+            oldFingersToCollect
+        )
 
         settingsPreferencesManager.fingerprintsToCollect = NON_DEFAULT_FINGERS_TO_COLLECT
 
