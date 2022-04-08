@@ -96,13 +96,13 @@ class SettingsPreferencesManagerTest {
 
     @Test
     fun fetchingSimprintsSyncReturnsall() {
-        val simprintsSyncSetting = settingsPreferencesManager.simprintsSyncSettings
+        val simprintsSyncSetting = settingsPreferencesManager.simprintsSyncSetting
 
         assertThat(simprintsSyncSetting).isEqualTo(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT)
 
         every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ALL"
 
-        val syncSetting = settingsPreferencesManager.simprintsSyncSettings
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
 
         assertThat(syncSetting).isEqualTo(listOf(SimprintsSyncSetting.ALL))
     }
@@ -111,7 +111,7 @@ class SettingsPreferencesManagerTest {
     fun fetchingSimprintsSyncReturnsOnlyBiometrics() {
         every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ONLY_BIOMETRICS"
 
-        val syncSetting = settingsPreferencesManager.simprintsSyncSettings
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
 
         assertThat(syncSetting).isEqualTo(listOf(SimprintsSyncSetting.ONLY_BIOMETRICS))
     }
@@ -120,7 +120,7 @@ class SettingsPreferencesManagerTest {
     fun fetchingSimprintsSyncReturnsEmptyList() {
         every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns null
 
-        val syncSetting = settingsPreferencesManager.simprintsSyncSettings
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
 
         assertThat(syncSetting).isEqualTo(emptyList<SimprintsSyncSetting>())
     }

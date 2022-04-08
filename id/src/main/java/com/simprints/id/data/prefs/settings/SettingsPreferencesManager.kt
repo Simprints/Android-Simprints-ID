@@ -41,8 +41,8 @@ interface SettingsPreferencesManager {
     var modalities: List<Modality>
     var eventDownSyncSetting: EventDownSyncSetting
     var syncDestinationSettings: List<SyncDestinationSetting>
-    var simprintsSyncSettings: List<SimprintsSyncSetting>
-    var cosyncSyncSettings: CosyncSetting
+    var simprintsSyncSetting: SimprintsSyncSetting
+    var cosyncSyncSetting: CosyncSetting
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
@@ -67,5 +67,4 @@ interface SettingsPreferencesManager {
 
 }
 
-fun SettingsPreferencesManager.canSyncToSimprints(): Boolean =
-    SimprintsSyncSetting.NONE !in simprintsSyncSettings
+fun SettingsPreferencesManager.canSyncToSimprints(): Boolean = SimprintsSyncSetting.NONE != simprintsSyncSetting

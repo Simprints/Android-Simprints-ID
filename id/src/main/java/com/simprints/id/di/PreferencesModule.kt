@@ -71,7 +71,7 @@ open class PreferencesModule {
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
         @Named("SyncDestinationSerializer") syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
-        @Named("SimprintsSyncSerializer") simprintsSyncSerializer: Serializer<List<SimprintsSyncSetting>>,
+        @Named("SimprintsSyncSerializer") simprintsSyncSerializer: Serializer<SimprintsSyncSetting>,
         @Named("CosyncSerializer") cosyncSerializer: Serializer<CosyncSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,

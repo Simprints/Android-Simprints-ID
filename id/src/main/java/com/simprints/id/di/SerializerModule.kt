@@ -60,7 +60,7 @@ class SerializerModule {
     @Provides
     @Singleton
     @Named("SimprintsSyncSerializer")
-    fun provideSimprintsSyncSerializer(): Serializer<List<SimprintsSyncSetting>> = SimprintsSyncSerializer()
+    fun provideSimprintsSyncSerializer(): Serializer<SimprintsSyncSetting> = SimprintsSyncSerializer()
 
     @Provides
     @Singleton
