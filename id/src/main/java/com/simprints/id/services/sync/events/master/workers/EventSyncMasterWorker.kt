@@ -1,12 +1,20 @@
 package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
-import com.simprints.id.services.sync.events.common.*
+import com.simprints.id.domain.canSyncDataToSimprints
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.id.services.sync.events.common.getAllSubjectsSyncWorkersInfo
+import com.simprints.id.services.sync.events.common.getUniqueSyncId
+import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
@@ -14,7 +22,7 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.logging.Simber
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 
 open class EventSyncMasterWorker(
@@ -76,7 +84,9 @@ open class EventSyncMasterWorker(
             try {
                 crashlyticsLog("Start")
 
-                if (!preferenceManager.canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
+                if (!preferenceManager.simprintsSyncSetting.canSyncDataToSimprints()) return@withContext success(
+                    message = "Can't sync to SimprintsID, skip"
+                )
 
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
@@ -96,7 +106,8 @@ open class EventSyncMasterWorker(
                     val chain = upSyncWorkers + downSyncWorkers
                     val endSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker).enqueue()
+                    wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker)
+                        .enqueue()
 
                     eventSyncCache.clearProgresses()
 
