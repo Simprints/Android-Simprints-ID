@@ -65,7 +65,7 @@ class SerializerModule {
     @Provides
     @Singleton
     @Named("CosyncSerializer")
-    fun provideCosyncSerializer(): Serializer<List<CosyncSetting>> = CosyncSerializer()
+    fun provideCosyncSerializer(): Serializer<CosyncSetting> =CosyncSerializer()
 
     @Provides
     @Singleton

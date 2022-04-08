@@ -8,7 +8,7 @@ import com.simprints.id.domain.SyncDestinationSetting
 interface SharedPreferencesManager {
     val syncDestinationSettings: List<SyncDestinationSetting>
 
-    val cosyncSyncSettings: List<CosyncSetting>
+    val cosyncSyncSettings: CosyncSetting
 
     val modalities: List<Modality>
 

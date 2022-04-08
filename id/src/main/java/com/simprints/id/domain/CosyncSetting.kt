@@ -10,12 +10,10 @@ enum class CosyncSetting {
     ALL
 }
 
-fun List<CosyncSetting>.canCoSyncAllData() = this.contains(CosyncSetting.ALL)
+fun CosyncSetting.canCoSyncAllData() = this.name == CosyncSetting.ALL.name
 
-fun List<CosyncSetting>.canCoSyncBiometricData() =
-    this.contains(CosyncSetting.ONLY_BIOMETRICS)
+fun CosyncSetting.canCoSyncBiometricData() = this.name == CosyncSetting.ONLY_BIOMETRICS.name
 
-fun List<CosyncSetting>.canCoSyncAnalyticsData() =
-    this.contains(CosyncSetting.ONLY_ANALYTICS)
+fun CosyncSetting.canCoSyncAnalyticsData() = this.name == CosyncSetting.ONLY_ANALYTICS.name
 
-fun List<CosyncSetting>.cannotCoSyncAnyData() = this.contains(CosyncSetting.NONE)
+fun CosyncSetting.cannotCoSyncAnyData() = this.name == CosyncSetting.NONE.name

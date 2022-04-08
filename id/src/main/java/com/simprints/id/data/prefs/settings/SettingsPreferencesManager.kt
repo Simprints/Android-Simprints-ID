@@ -42,7 +42,7 @@ interface SettingsPreferencesManager {
     var eventDownSyncSetting: EventDownSyncSetting
     var syncDestinationSettings: List<SyncDestinationSetting>
     var simprintsSyncSettings: List<SimprintsSyncSetting>
-    var cosyncSyncSettings: List<CosyncSetting>
+    var cosyncSyncSettings: CosyncSetting
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
