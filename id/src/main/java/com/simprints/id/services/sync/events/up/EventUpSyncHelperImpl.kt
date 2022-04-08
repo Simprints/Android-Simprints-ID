@@ -1,7 +1,13 @@
 package com.simprints.id.services.sync.events.up
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.FAILED
+import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.domain.canSyncAllData
+import com.simprints.id.domain.canSyncAnalyticsData
+import com.simprints.id.domain.canSyncBiometricData
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
@@ -12,18 +18,27 @@ import kotlinx.coroutines.flow.flow
 class EventUpSyncHelperImpl(
     private val eventRepository: com.simprints.eventsystem.event.EventRepository,
     private val eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-    private val timerHelper: TimeHelper
+    private val timerHelper: TimeHelper,
+    private val settingsPreferencesManager: SettingsPreferencesManager
 ) : EventUpSyncHelper {
 
     override suspend fun countForUpSync(operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation): Int =
         eventRepository.localCount(operation.projectId)
 
-    override suspend fun upSync(scope: CoroutineScope, operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation) =
+    override suspend fun upSync(
+        scope: CoroutineScope,
+        operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
+    ) =
         flow<EventUpSyncProgress> {
             var lastOperation = operation.copy()
             var count = 0
             try {
-                eventRepository.uploadEvents(operation.projectId).collect {
+                eventRepository.uploadEvents(
+                    projectId = operation.projectId,
+                    canSyncAllData = settingsPreferencesManager.simprintsSyncSettings.canSyncAllData(),
+                    canSyncBiometricData = settingsPreferencesManager.simprintsSyncSettings.canSyncBiometricData(),
+                    canSyncAnalyticsData = settingsPreferencesManager.simprintsSyncSettings.canSyncAnalyticsData()
+                ).collect {
                     Simber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
                     count = it
                     lastOperation =
