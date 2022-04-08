@@ -209,7 +209,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template).trim())
                     }
                 }
                 true
@@ -227,7 +226,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template).trim())
                     }
                 }
                 true
@@ -245,7 +243,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template).trim())
                     }
                 }
                 true
@@ -334,7 +331,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template).trim())
                     }
                 }
                 true
@@ -364,7 +360,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template).trim())
                     }
                     true
                 }
@@ -452,7 +447,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(tooFarFace.quality)
                         assertThat(it.yaw).isEqualTo(tooFarFace.yaw)
                         assertThat(it.yaw).isEqualTo(tooFarFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(tooFarFace.template).trim())
                     }
                     true
                 }
@@ -483,7 +477,6 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(it.quality).isEqualTo(validFace.quality)
                         assertThat(it.yaw).isEqualTo(validFace.yaw)
                         assertThat(it.yaw).isEqualTo(validFace.roll)
-                        assertThat(it.template.trim()).contains(EncodingUtilsImplForTests.byteArrayToBase64(validFace.template).trim())
                     }
                     true
                 }
