@@ -14,7 +14,7 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
+import com.simprints.id.domain.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
@@ -112,9 +112,19 @@ class SyncInformationViewModelTest {
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManager.eventDownSyncSetting } returns ON
-        every { preferencesManager.canSyncToSimprints() } returns true
-        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
-        coEvery { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns projectDownSyncScope
+        every { preferencesManager.simprintsSyncSetting.canSyncDataToSimprints() } returns true
+        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
+            buildSubjectsSyncState(
+                Succeeded
+            )
+        )
+        coEvery {
+            eventDownSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns projectDownSyncScope
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
@@ -148,8 +158,12 @@ class SyncInformationViewModelTest {
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManager.eventDownSyncSetting } returns OFF
-        every { preferencesManager.canSyncToSimprints() } returns true
-        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
+        every { preferencesManager.simprintsSyncSetting.canSyncDataToSimprints() } returns true
+        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
+            buildSubjectsSyncState(
+                Succeeded
+            )
+        )
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
@@ -178,14 +192,24 @@ class SyncInformationViewModelTest {
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManager.eventDownSyncSetting } returns ON
-        every { preferencesManager.canSyncToSimprints() } returns true
-        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(buildSubjectsSyncState(Succeeded))
+        every { preferencesManager.simprintsSyncSetting.canSyncDataToSimprints() } returns true
+        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
+            buildSubjectsSyncState(
+                Succeeded
+            )
+        )
         every { preferencesManager.selectedModules } returns setOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
-        coEvery { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } throws IOException()
+        coEvery {
+            eventDownSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } throws IOException()
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         viewModel.fetchSyncInformation()
@@ -201,7 +225,7 @@ class SyncInformationViewModelTest {
     }
 
     @Test
-    fun syncing_ShouldOnlyRequestCountForSelectedModules(){
+    fun syncing_ShouldOnlyRequestCountForSelectedModules() {
         coEvery { eventRepository.localCount(any()) } returns 0
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns 0
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0

@@ -19,8 +19,8 @@ import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
+import com.simprints.id.domain.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -194,7 +194,7 @@ class SyncInformationActivity : BaseSplitActivity() {
             binding.recordsToDeleteCardView.visibility = View.GONE
         }
 
-        if (!preferencesManager.canSyncToSimprints()) {
+        if (!preferencesManager.simprintsSyncSetting.canSyncDataToSimprints()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
             binding.recordsToDeleteCardView.visibility = View.GONE
             binding.recordsToUploadCardView.visibility = View.GONE

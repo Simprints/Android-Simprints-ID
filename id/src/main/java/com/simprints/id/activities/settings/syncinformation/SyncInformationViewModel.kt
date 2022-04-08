@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
+import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncToSimprints
+import com.simprints.id.domain.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -80,7 +82,7 @@ class SyncInformationViewModel(
             eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
-        if (isDownSyncAllowed() && preferencesManager.canSyncToSimprints()) {
+        if (isDownSyncAllowed() && preferencesManager.simprintsSyncSetting.canSyncDataToSimprints()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             null
