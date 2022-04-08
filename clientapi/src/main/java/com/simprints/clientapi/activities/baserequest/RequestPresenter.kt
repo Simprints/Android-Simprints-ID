@@ -43,8 +43,8 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.containsCommcare
-import com.simprints.id.domain.containsSimprints
+import com.simprints.id.domain.canCoSyncData
+import com.simprints.id.domain.canSyncDataToSimprints
 import com.simprints.libsimprints.Constants
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.firstOrNull
@@ -146,7 +146,7 @@ abstract class RequestPresenter(
         sessionId: String,
         jsonHelper: JsonHelper
     ): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare()) {
+        if (sharedPreferencesManager.cosyncSyncSettings.canCoSyncData()) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CoSyncEvents(events))
         } else {
@@ -159,7 +159,7 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.containsCommcare()) return null
+        if (!sharedPreferencesManager.cosyncSyncSettings.canCoSyncData()) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -180,11 +180,11 @@ abstract class RequestPresenter(
     }
 
     /**
-     * Delete the events if returning to CommCare but not Simprints
+     * Delete the events if returning to a cosync app but not Simprints
      */
     override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare() &&
-            !sharedPreferencesManager.syncDestinationSettings.containsSimprints()
+        if (sharedPreferencesManager.cosyncSyncSettings.canCoSyncData() &&
+            !sharedPreferencesManager.simprintsSyncSetting.canSyncDataToSimprints()
         ) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
