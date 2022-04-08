@@ -5,7 +5,7 @@ import com.simprints.id.domain.CosyncSetting
 
 class CosyncSerializer : Serializer<CosyncSetting> {
 
-    override fun serialize(value: CosyncSetting): String = value.toString()
+    override fun serialize(value: CosyncSetting): String = value.name
 
     override fun deserialize(string: String): CosyncSetting {
         return when (string.replace(Regex("[ \n\r\t]"), "")) {
