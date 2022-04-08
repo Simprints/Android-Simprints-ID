@@ -10,9 +10,13 @@ import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.isNotASubjectEvent
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
@@ -151,7 +155,12 @@ open class EventRepositoryImpl(
      * upload, and how critical this system is, we are happy to trade off speed for reliability
      * (through simplicity and low resource usage)
      */
-    override suspend fun uploadEvents(projectId: String): Flow<Int> = flow {
+    override suspend fun uploadEvents(
+        projectId: String,
+        canSyncAllData: Boolean,
+        canSyncBiometricData: Boolean,
+        canSyncAnalyticsData: Boolean
+    ): Flow<Int> = flow {
         Simber.tag("SYNC").d("[EVENT_REPO] Uploading")
 
         if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
@@ -164,7 +173,12 @@ open class EventRepositoryImpl(
             // The events will include the SessionCaptureEvent event
             Simber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
             eventLocalDataSource.loadAllFromSession(sessionId).let {
-                attemptEventUpload(it, projectId)
+                attemptEventUpload(
+                    it, projectId,
+                    canSyncAllData,
+                    canSyncBiometricData,
+                    canSyncAnalyticsData
+                )
                 this.emit(it.size)
             }
         }
@@ -173,7 +187,12 @@ open class EventRepositoryImpl(
         eventLocalDataSource.loadOldSubjectCreationEvents(projectId).let {
             Simber.tag(CrashReportTag.SYNC.name).i("Old SubjectCreation: ${it.size}")
             if (it.isNotEmpty()) {
-                attemptEventUpload(it, projectId)
+                attemptEventUpload(
+                    it, projectId,
+                    canSyncAllData,
+                    canSyncBiometricData,
+                    canSyncAnalyticsData
+                )
                 this.emit(it.size)
             }
         }
@@ -186,10 +205,33 @@ open class EventRepositoryImpl(
         }
     }
 
-    private suspend fun attemptEventUpload(events: List<Event>, projectId: String) {
+    private suspend fun attemptEventUpload(
+        events: List<Event>, projectId: String,
+        canSyncAllData: Boolean,
+        canSyncBiometricData: Boolean,
+        canSyncAnalyticsData: Boolean
+    ) {
         try {
-            uploadEvents(events, projectId)
-            deleteEventsFromDb(events.map { it.id })
+            val filteredEvents = when {
+                canSyncAllData -> {
+                    events
+                }
+                canSyncBiometricData -> {
+                    events.filter {
+                        it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
+                    }
+                }
+                canSyncAnalyticsData -> {
+                    events.filterNot {
+                        it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
+                    }
+                }
+                else -> {
+                    emptyList()
+                }
+            }
+            uploadEvents(filteredEvents, projectId)
+            deleteEventsFromDb(filteredEvents.map { it.id })
         } catch (t: Throwable) {
             Simber.w(t)
             // We don't need to report http exceptions as cloud logs all of them.
