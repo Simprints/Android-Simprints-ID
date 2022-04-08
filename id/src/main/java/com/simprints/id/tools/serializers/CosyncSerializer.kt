@@ -7,15 +7,14 @@ class CosyncSerializer : Serializer<CosyncSetting> {
 
     override fun serialize(value: CosyncSetting): String = value.name
 
-    override fun deserialize(string: String): CosyncSetting {
-        return when (string.replace(Regex("[ \n\r\t]"), "")) {
+    override fun deserialize(string: String): CosyncSetting =
+        when (string.replace(Regex("[ \n\r\t]"), "")) {
             ALL -> CosyncSetting.ALL
             ONLY_BIOMETRICS -> CosyncSetting.ONLY_BIOMETRICS
             ONLY_ANALYTICS -> CosyncSetting.ONLY_ANALYTICS
             NONE -> CosyncSetting.NONE
             else -> SettingsPreferencesManagerImpl.COSYNC_SYNC_SETTINGS_DEFAULT
         }
-    }
 
     companion object {
         private const val ALL = "ALL"
