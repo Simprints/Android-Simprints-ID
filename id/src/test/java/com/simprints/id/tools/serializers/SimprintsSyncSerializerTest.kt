@@ -10,69 +10,59 @@ class SimprintsSyncSerializerTest {
     private val simprintsSyncSerializer = SimprintsSyncSerializer()
 
     @Test
-    fun `serializing a list - one item`() {
-        val destinationList = listOf(SimprintsSyncSetting.ALL)
+    fun `serializing a list - returns ALL`() {
+        val dest = SimprintsSyncSetting.ALL
         val expectedString = "ALL"
 
-        val serializedDestinations = simprintsSyncSerializer.serialize(destinationList)
+        val serializedDestinations = simprintsSyncSerializer.serialize(dest)
 
         assertThat(serializedDestinations).isEqualTo(expectedString)
     }
 
     @Test
-    fun `serializing a list - all items`() {
-        val destinationList =
-            listOf(SimprintsSyncSetting.ONLY_BIOMETRICS, SimprintsSyncSetting.ONLY_ANALYTICS)
-        val expectedString = "ONLY_BIOMETRICS,ONLY_ANALYTICS"
+    fun `serializing a list - returns ONLY BIOMETRICS`() {
+        val dest = SimprintsSyncSetting.ONLY_BIOMETRICS
+        val expectedString = "ONLY_BIOMETRICS"
 
-        val serializedDestinations = simprintsSyncSerializer.serialize(destinationList)
+        val serializedDestinations = simprintsSyncSerializer.serialize(dest)
 
         assertThat(serializedDestinations).isEqualTo(expectedString)
     }
 
     @Test
-    fun `deserializing a list - empty`() {
+    fun `deserializing a list - empty returns DEFAULT`() {
         val destinationString = ""
-        val expectedList = SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT
+        val expected = SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT
 
         val deserialization = simprintsSyncSerializer.deserialize(destinationString)
-        assertThat(deserialization).isEqualTo(expectedList)
+        assertThat(deserialization).isEqualTo(expected)
     }
 
     @Test
-    fun `deserializing a list - all options`() {
-        val destinationString = "ALL, ONLY_BIOMETRICS, ONLY_ANALYTICS, NONE"
-        val expectedList = listOf(
-            SimprintsSyncSetting.ALL,
-            SimprintsSyncSetting.ONLY_BIOMETRICS,
-            SimprintsSyncSetting.ONLY_ANALYTICS,
-            SimprintsSyncSetting.NONE
-        )
+    fun `deserializing a list - returns ALL`() {
+        val destinationString = "ALL"
+        val expected = SimprintsSyncSetting.ALL
 
         val deserialization = simprintsSyncSerializer.deserialize(destinationString)
-        assertThat(deserialization).isEqualTo(expectedList)
+        assertThat(deserialization).isEqualTo(expected)
     }
 
     @Test
-    fun `deserializing a list - bad format`() {
-        val destinationString = """     ALL   ,
-                        SOME_VALUE
+    fun `deserializing a list - bad format returns NONE`() {
+        val destinationString = """     NONE   
             """
-        val expectedList = listOf(SimprintsSyncSetting.ALL)
+        val expected = SimprintsSyncSetting.NONE
 
         val deserializedDestinations = simprintsSyncSerializer.deserialize(destinationString)
-        assertThat(deserializedDestinations).isEqualTo(expectedList)
+        assertThat(deserializedDestinations).isEqualTo(expected)
     }
 
     @Test
-    fun `deserializing a list - inexisted options`() {
-        val destinationString = "ALL, ONLY_BIOMETRIC, ONLY_ANALYTIC, NONE"
-        val expectedList = listOf(
-            SimprintsSyncSetting.ALL,
-            SimprintsSyncSetting.NONE
-        )
+    fun `deserializing a list - inexisted options returns default`() {
+        val destinationString = "ALAL, ONLYY_BIOMETRIC, ONLY_ANALYTIC, NONEE"
+        val expected = SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT
 
         val deserialization = simprintsSyncSerializer.deserialize(destinationString)
-        assertThat(deserialization).isEqualTo(expectedList)
+        assertThat(deserialization).isEqualTo(expected)
     }
 }

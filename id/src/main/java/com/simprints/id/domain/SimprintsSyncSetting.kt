@@ -10,13 +10,13 @@ enum class SimprintsSyncSetting {
     ALL
 }
 
-fun List<SimprintsSyncSetting>.canSyncAllData() = this.contains(SimprintsSyncSetting.ALL)
+fun SimprintsSyncSetting.canSyncAllData() = this.name == SimprintsSyncSetting.ALL.name
 
-fun List<SimprintsSyncSetting>.canSyncBiometricData() =
-    this.contains(SimprintsSyncSetting.ONLY_BIOMETRICS)
+fun SimprintsSyncSetting.canSyncBiometricData() =
+    this.name == SimprintsSyncSetting.ONLY_BIOMETRICS.name
 
-fun List<SimprintsSyncSetting>.canSyncAnalyticsData() =
-    this.contains(SimprintsSyncSetting.ONLY_ANALYTICS)
+fun SimprintsSyncSetting.canSyncAnalyticsData() =
+    this.name == SimprintsSyncSetting.ONLY_ANALYTICS.name
 
-fun List<SimprintsSyncSetting>.cannotSyncAnyData() = this.contains(SimprintsSyncSetting.NONE)
+fun SimprintsSyncSetting.cannotSyncAnyData() = this.name == SimprintsSyncSetting.NONE.name
 

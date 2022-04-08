@@ -34,7 +34,7 @@ class SharedPreferencesManagerImpl(
         get() = corePreferencesManager.syncDestinationSettings
 
     override val cosyncSyncSettings: CosyncSetting
-        get() = corePreferencesManager.cosyncSyncSettings
+        get() = corePreferencesManager.cosyncSyncSetting
 
     override val modalities: List<Modality>
         get() = corePreferencesManager.modalities
