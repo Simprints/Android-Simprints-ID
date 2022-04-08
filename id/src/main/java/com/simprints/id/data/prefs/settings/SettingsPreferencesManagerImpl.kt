@@ -20,7 +20,6 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintIm
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
-import com.simprints.id.domain.SyncDestinationSetting
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
@@ -41,7 +40,6 @@ open class SettingsPreferencesManagerImpl(
     private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
     fingerprintConfidenceThresholdsSerializer: Serializer<Map<FingerprintConfidenceThresholds, Int>>,
     faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>,
-    syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
     simprintsSyncSerializer: Serializer<SimprintsSyncSetting>,
     cosyncSyncSerializer: Serializer<CosyncSetting>
 ) : SettingsPreferencesManager {
@@ -246,15 +244,6 @@ open class SettingsPreferencesManagerImpl(
             eventDownSyncSettingSerializer
         )
 
-    override var syncDestinationSettings: List<SyncDestinationSetting>
-        by RemoteConfigComplexPreference(
-            prefs,
-            remoteConfigWrapper,
-            SYNC_DESTINATION_SETTINGS_KEY,
-            SYNC_DESTINATION_SETTINGS_DEFAULT,
-            syncDestinationSerializer
-        )
-
     override var simprintsSyncSetting: SimprintsSyncSetting
         by RemoteConfigComplexPreference(
             prefs,
@@ -445,9 +434,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val PEOPLE_DOWN_SYNC_SETTING_KEY = "DownSyncSetting"
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
-
-        const val SYNC_DESTINATION_SETTINGS_KEY = "SyncDestination"
-        val SYNC_DESTINATION_SETTINGS_DEFAULT = emptyList<SyncDestinationSetting>()
 
         const val SIMPRINTS_SYNC_KEY = "SimprintsSync"
         val SIMPRINTS_SYNC_SETTINGS_DEFAULT = SimprintsSyncSetting.NONE
