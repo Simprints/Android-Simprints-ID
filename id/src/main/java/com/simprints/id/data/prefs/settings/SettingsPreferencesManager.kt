@@ -68,4 +68,4 @@ interface SettingsPreferencesManager {
 }
 
 fun SettingsPreferencesManager.canSyncToSimprints(): Boolean =
-    syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
+    SimprintsSyncSetting.NONE !in simprintsSyncSettings
