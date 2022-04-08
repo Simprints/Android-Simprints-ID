@@ -5,7 +5,7 @@ import androidx.core.content.edit
 import com.simprints.core.domain.modality.Modality
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.CosyncSetting
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 
 
 class SharedPreferencesManagerImpl(
@@ -30,8 +30,8 @@ class SharedPreferencesManagerImpl(
         stashSessionId("")
     }
 
-    override val syncDestinationSettings: List<SyncDestinationSetting>
-        get() = corePreferencesManager.syncDestinationSettings
+    override val simprintsSyncSetting: SimprintsSyncSetting
+        get() = corePreferencesManager.simprintsSyncSetting
 
     override val cosyncSyncSettings: CosyncSetting
         get() = corePreferencesManager.cosyncSyncSetting
