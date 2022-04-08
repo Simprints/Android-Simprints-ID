@@ -36,6 +36,7 @@ class ClientApiEventRepositoryImplTest {
             coreEventEventsMgrMock,
             mockk(relaxed = true),
             mockk(relaxed = true),
+            mockk(relaxed = true),
             testCoroutineRule.testCoroutineDispatcher
         )
     }

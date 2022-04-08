@@ -55,11 +55,13 @@ import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
@@ -105,15 +107,17 @@ import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEve
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
@@ -161,7 +165,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class EventRemoteDataSourceImplAndroidTest {
 
@@ -205,7 +208,9 @@ class EventRemoteDataSourceImplAndroidTest {
                 })
                 addNetworkInterceptor {
                     var request = it.request()
-                    val url: HttpUrl = request.url.newBuilder().addQueryParameter("acceptInvalidEvents", "false").build()
+                    val url: HttpUrl =
+                        request.url.newBuilder().addQueryParameter("acceptInvalidEvents", "false")
+                            .build()
                     request = request.newBuilder().url(url).build()
                     return@addNetworkInterceptor it.proceed(request)
                 }
@@ -218,7 +223,8 @@ class EventRemoteDataSourceImplAndroidTest {
         testProject = testProjectRule.testProject
         eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 
-        val firebaseTestToken = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
+        val firebaseTestToken =
+            remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
@@ -283,20 +289,44 @@ class EventRemoteDataSourceImplAndroidTest {
             Result.SafetyNetInvalidClaim,
             Result.Unknown
         ).forEach {
-            add(AuthenticationEvent(DEFAULT_TIME, DEFAULT_TIME, UserInfo("some_project", DEFAULT_USER_ID), it, eventLabels))
+            add(
+                AuthenticationEvent(
+                    DEFAULT_TIME,
+                    DEFAULT_TIME,
+                    UserInfo("some_project", DEFAULT_USER_ID),
+                    it,
+                    eventLabels
+                )
+            )
         }
     }
 
     private fun MutableList<Event>.addAuthorizationEvent() {
         AuthorizationPayload.AuthorizationResult.values().forEach {
-            add(AuthorizationEvent(DEFAULT_TIME, it, AuthorizationPayload.UserInfo("some_project", DEFAULT_USER_ID), eventLabels))
+            add(
+                AuthorizationEvent(
+                    DEFAULT_TIME,
+                    it,
+                    AuthorizationPayload.UserInfo("some_project", DEFAULT_USER_ID),
+                    eventLabels
+                )
+            )
         }
     }
 
     private fun MutableList<Event>.addCandidateReadEvent() {
         CandidateReadPayload.LocalResult.values().forEach { local ->
             CandidateReadPayload.RemoteResult.values().forEach { remote ->
-                add(CandidateReadEvent(DEFAULT_TIME, DEFAULT_TIME, randomUUID(), local, remote, eventLabels))
+                add(
+                    CandidateReadEvent(
+                        DEFAULT_TIME,
+                        DEFAULT_TIME,
+                        randomUUID(),
+                        local,
+                        remote,
+                        eventLabels
+                    )
+                )
             }
         }
     }
@@ -324,24 +354,30 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addEnrolmentEvent() {
-        add(EnrolmentEventV2(DEFAULT_TIME, randomUUID(), testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, randomUUID(), eventLabels))
+        add(
+            EnrolmentEventV2(
+                DEFAULT_TIME,
+                randomUUID(),
+                testProject.id,
+                DEFAULT_MODULE_ID,
+                DEFAULT_USER_ID,
+                randomUUID(),
+                eventLabels
+            )
+        )
     }
 
-    private fun MutableList<Event>.addFingerprintCaptureEvent() {
-        FingerprintCapturePayload.Result.values().forEach { result ->
+    private fun MutableList<Event>.addFingerprintCaptureEventV3() {
+        FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
-                val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
-                    SubjectsGeneratorUtils.getRandomFingerprintSample().template
-                )
 
-                val fingerprint = FingerprintCapturePayload.Fingerprint(
+                val fingerprint = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint(
                     fingerIdentifier.fromDomainToModuleApi(),
                     0,
-                    fakeTemplate,
                     FingerprintTemplateFormat.ISO_19794_2
                 )
 
-                val event = FingerprintCaptureEvent(
+                val event = FingerprintCaptureEventV3(
                     DEFAULT_TIME,
                     DEFAULT_TIME,
                     fingerIdentifier.fromDomainToModuleApi(),
@@ -357,15 +393,47 @@ class EventRemoteDataSourceImplAndroidTest {
         }
     }
 
-    private fun MutableList<Event>.addFaceCaptureEvent() {
-        FaceCapturePayload.Result.values().forEachIndexed { index, result ->
-            val template = EncodingUtilsImpl.byteArrayToBase64(
-                SubjectsGeneratorUtils.getRandomFaceSample().template
-            )
+    private fun MutableList<Event>.addFingerprintBiometricCaptureEvent() {
+        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.values()
+            .forEach { result ->
+                FingerIdentifier.values().forEach { fingerIdentifier ->
+                    val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
+                        SubjectsGeneratorUtils.getRandomFingerprintSample().template
+                    )
 
-            val face = FaceCapturePayload.Face(30f, 40f, 100f, template, FaceTemplateFormat.RANK_ONE_1_23)
+                    val fingerprint =
+                        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+                            finger = fingerIdentifier.fromDomainToModuleApi(),
+                            template = fakeTemplate,
+                            format = FingerprintTemplateFormat.ISO_19794_2
+                        )
 
-            val event = FaceCaptureEvent(
+                    val event = FingerprintCaptureBiometricsEvent(
+                        DEFAULT_TIME,
+                        result,
+                        fingerprint,
+                        randomUUID(),
+                        eventLabels
+                    )
+
+                    add(event)
+                }
+            }
+    }
+
+
+    private fun MutableList<Event>.addFaceCaptureEventV3() {
+        FaceCaptureEventV3.FaceCapturePayloadV3.Result.values().forEachIndexed { index, result ->
+
+            val face =
+                FaceCaptureEventV3.FaceCapturePayloadV3.Face(
+                    30f,
+                    40f,
+                    100f,
+                    FaceTemplateFormat.RANK_ONE_1_23
+                )
+
+            val event = FaceCaptureEventV3(
                 DEFAULT_TIME,
                 DEFAULT_TIME + 100,
                 index + 1,
@@ -378,6 +446,31 @@ class EventRemoteDataSourceImplAndroidTest {
 
             add(event)
         }
+    }
+
+    private fun MutableList<Event>.addFaceCaptureBiometricCaptureEvent() {
+        FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.values()
+            .forEachIndexed { index, result ->
+                val template = EncodingUtilsImpl.byteArrayToBase64(
+                    SubjectsGeneratorUtils.getRandomFaceSample().template
+                )
+
+                val face =
+                    FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+                        template,
+                        FaceTemplateFormat.RANK_ONE_1_23
+                    )
+
+                val event = FaceCaptureBiometricsEvent(
+                    DEFAULT_TIME,
+                    0f,
+                    result,
+                    face,
+                    eventLabels
+                )
+
+                add(event)
+            }
     }
 
     private fun MutableList<Event>.addFaceCaptureConfirmationEvent() {
@@ -414,7 +507,14 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addInvalidIntentEvent() {
-        add(InvalidIntentEvent(DEFAULT_TIME, "some_action", mapOf("wrong_field" to "wrong_value"), eventLabels))
+        add(
+            InvalidIntentEvent(
+                DEFAULT_TIME,
+                "some_action",
+                mapOf("wrong_field" to "wrong_value"),
+                eventLabels
+            )
+        )
     }
 
     private fun MutableList<Event>.addOneToManyMatchEvent() {
@@ -572,13 +672,26 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addCallbackVerificationEvent() {
         IAppResponseTier.values().forEach {
-            add(VerificationCallbackEvent(DEFAULT_TIME, CallbackComparisonScore(randomUUID(), 0, it), eventLabels))
+            add(
+                VerificationCallbackEvent(
+                    DEFAULT_TIME,
+                    CallbackComparisonScore(randomUUID(), 0, it),
+                    eventLabels
+                )
+            )
         }
     }
 
     private fun MutableList<Event>.addCallbackIdentificationEvent() {
         IAppResponseTier.values().forEach {
-            add(IdentificationCallbackEvent(DEFAULT_TIME, randomUUID(), listOf(CallbackComparisonScore(randomUUID(), 0, it)), eventLabels))
+            add(
+                IdentificationCallbackEvent(
+                    DEFAULT_TIME,
+                    randomUUID(),
+                    listOf(CallbackComparisonScore(randomUUID(), 0, it)),
+                    eventLabels
+                )
+            )
         }
     }
 
@@ -587,11 +700,29 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addCalloutEnrolmentEvent() {
-        add(EnrolmentCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
+        add(
+            EnrolmentCalloutEvent(
+                DEFAULT_TIME,
+                testProject.id,
+                DEFAULT_USER_ID,
+                DEFAULT_MODULE_ID,
+                "metadata",
+                eventLabels
+            )
+        )
     }
 
     private fun MutableList<Event>.addCalloutIdentificationEvent() {
-        add(IdentificationCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", eventLabels))
+        add(
+            IdentificationCalloutEvent(
+                DEFAULT_TIME,
+                testProject.id,
+                DEFAULT_USER_ID,
+                DEFAULT_MODULE_ID,
+                "metadata",
+                eventLabels
+            )
+        )
     }
 
     private fun MutableList<Event>.addCalloutVerificationEvent() {
@@ -623,7 +754,15 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addCalloutConfirmationCallbackEvent() {
-        add(ConfirmationCalloutEvent(DEFAULT_TIME, testProject.id, randomUUID(), randomUUID(), eventLabels))
+        add(
+            ConfirmationCalloutEvent(
+                DEFAULT_TIME,
+                testProject.id,
+                randomUUID(),
+                randomUUID(),
+                eventLabels
+            )
+        )
     }
 
     // Never invoked, but used to enforce that the implementation of a test for every event class
@@ -637,7 +776,8 @@ class EventRemoteDataSourceImplAndroidTest {
             CONSENT -> addConsentEvent()
             ENROLMENT_V2 -> addEnrolmentEvent()
             AUTHORIZATION -> addAuthorizationEvent()
-            FINGERPRINT_CAPTURE_V3 -> addFingerprintCaptureEvent()
+            FINGERPRINT_CAPTURE_V3 -> addFingerprintCaptureEventV3()
+            FINGERPRINT_CAPTURE_BIOMETRICS -> addFingerprintBiometricCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
             PERSON_CREATION -> addPersonCreationEvent(
@@ -669,11 +809,13 @@ class EventRemoteDataSourceImplAndroidTest {
             COMPLETION_CHECK -> addCompletionCheckEvent()
             FACE_ONBOARDING_COMPLETE -> addFaceOnboardingCompleteEvent()
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
-            FACE_CAPTURE_V3 -> addFaceCaptureEvent()
+            FACE_CAPTURE_V3 -> addFaceCaptureEventV3()
+            FACE_CAPTURE_BIOMETRICS -> addFaceCaptureBiometricCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
-            ENROLMENT_V1 -> {}
+            ENROLMENT_V1 -> {
+            }
             FINGERPRINT_CAPTURE -> {}
             FACE_CAPTURE -> {}
         }.safeSealedWhens
