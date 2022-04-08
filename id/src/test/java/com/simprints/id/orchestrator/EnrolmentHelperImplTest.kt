@@ -104,7 +104,11 @@ class EnrolmentHelperImplTest {
                 )
             )
         }
-        coVerify(exactly = 0) { eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID) }
+        coVerify(exactly = 0) { eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID,
+            canSyncAllData = false,
+            canSyncBiometricData = false,
+            canSyncAnalyticsData = false
+        ) }
 
     }
 
