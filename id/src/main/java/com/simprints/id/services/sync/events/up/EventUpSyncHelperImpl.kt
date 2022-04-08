@@ -5,9 +5,9 @@ import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSy
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.FAILED
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.domain.canSyncAllData
-import com.simprints.id.domain.canSyncAnalyticsData
-import com.simprints.id.domain.canSyncBiometricData
+import com.simprints.id.domain.canSyncAllDataToSimprints
+import com.simprints.id.domain.canSyncAnalyticsDataToSimprints
+import com.simprints.id.domain.canSyncBiometricDataToSimprints
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
@@ -35,9 +35,9 @@ class EventUpSyncHelperImpl(
             try {
                 eventRepository.uploadEvents(
                     projectId = operation.projectId,
-                    canSyncAllData = settingsPreferencesManager.simprintsSyncSetting.canSyncAllData(),
-                    canSyncBiometricData = settingsPreferencesManager.simprintsSyncSetting.canSyncBiometricData(),
-                    canSyncAnalyticsData = settingsPreferencesManager.simprintsSyncSetting.canSyncAnalyticsData()
+                    canSyncAllData = settingsPreferencesManager.simprintsSyncSetting.canSyncAllDataToSimprints(),
+                    canSyncBiometricData = settingsPreferencesManager.simprintsSyncSetting.canSyncBiometricDataToSimprints(),
+                    canSyncAnalyticsData = settingsPreferencesManager.simprintsSyncSetting.canSyncAnalyticsDataToSimprints()
                 ).collect {
                     Simber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
                     count = it
