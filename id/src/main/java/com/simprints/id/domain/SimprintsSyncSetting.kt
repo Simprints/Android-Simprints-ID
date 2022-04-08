@@ -10,12 +10,12 @@ enum class SimprintsSyncSetting {
     ALL
 }
 
-fun SimprintsSyncSetting.canSyncAllData() = this.name == SimprintsSyncSetting.ALL.name
+fun SimprintsSyncSetting.canSyncAllDataToSimprints() = this.name == SimprintsSyncSetting.ALL.name
 
-fun SimprintsSyncSetting.canSyncBiometricData() =
+fun SimprintsSyncSetting.canSyncBiometricDataToSimprints() =
     this.name == SimprintsSyncSetting.ONLY_BIOMETRICS.name
 
-fun SimprintsSyncSetting.canSyncAnalyticsData() =
+fun SimprintsSyncSetting.canSyncAnalyticsDataToSimprints() =
     this.name == SimprintsSyncSetting.ONLY_ANALYTICS.name
 
 fun SimprintsSyncSetting.canSyncDataToSimprints() = this.name != SimprintsSyncSetting.NONE.name
