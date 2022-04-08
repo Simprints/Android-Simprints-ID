@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import com.simprints.core.domain.modality.Modality
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SyncDestinationSetting
 
 
@@ -31,6 +32,9 @@ class SharedPreferencesManagerImpl(
 
     override val syncDestinationSettings: List<SyncDestinationSetting>
         get() = corePreferencesManager.syncDestinationSettings
+
+    override val cosyncSyncSettings: List<CosyncSetting>
+        get() = corePreferencesManager.cosyncSyncSettings
 
     override val modalities: List<Modality>
         get() = corePreferencesManager.modalities
