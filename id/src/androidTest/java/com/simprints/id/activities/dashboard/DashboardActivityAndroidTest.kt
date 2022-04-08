@@ -15,7 +15,8 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
@@ -87,28 +88,34 @@ class DashboardActivityAndroidTest {
     @Test
     fun withOnlyCommCareAsSyncLocation_shouldNotTriggerSyncAndNotShowSyncCard() {
 
-        every { mockPreferencesManager.syncDestinationSettings } returns
-            listOf(SyncDestinationSetting.COMMCARE)
+        every { mockPreferencesManager.cosyncSyncSetting } returns
+            CosyncSetting.ALL
+
+        every { mockPreferencesManager.simprintsSyncSetting } returns
+            SimprintsSyncSetting.NONE
 
         ActivityScenario.launch(DashboardActivity::class.java)
 
         waitOnUi(1000)
 
-        coVerify(exactly = 0) {  mockViewModel.syncIfRequired() }
+        coVerify(exactly = 0) { mockViewModel.syncIfRequired() }
 
         onView(withId(R.id.dashboard_sync_card)).check(matches(not(isDisplayed())))
     }
 
     @Test
     fun withSimprintsAsSyncLocation_shouldTriggerSyncAndShowSyncCard() {
-        every { mockPreferencesManager.syncDestinationSettings } returns
-            listOf(SyncDestinationSetting.COMMCARE, SyncDestinationSetting.SIMPRINTS)
+        every { mockPreferencesManager.cosyncSyncSetting } returns
+            CosyncSetting.ALL
+
+        every { mockPreferencesManager.simprintsSyncSetting } returns
+            SimprintsSyncSetting.ALL
 
         val mockSyncStateLiveData = MutableLiveData<DashboardSyncCardState>()
 
         every { mockViewModel.syncCardStateLiveData } returns mockSyncStateLiveData
 
-        coEvery { mockViewModel.syncIfRequired() } answers  {
+        coEvery { mockViewModel.syncIfRequired() } answers {
             val connectingState = DashboardSyncCardState.SyncConnecting(null, 0, null)
             mockSyncStateLiveData.postValue(connectingState)
         }
@@ -117,7 +124,7 @@ class DashboardActivityAndroidTest {
 
         waitOnUi(1000)
 
-        coVerify(exactly = 1) {  mockViewModel.syncIfRequired() }
+        coVerify(exactly = 1) { mockViewModel.syncIfRequired() }
 
         onView(withId(R.id.dashboard_sync_card)).check(matches(isDisplayed()))
     }
