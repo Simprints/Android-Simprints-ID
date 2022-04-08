@@ -18,5 +18,5 @@ fun SimprintsSyncSetting.canSyncBiometricData() =
 fun SimprintsSyncSetting.canSyncAnalyticsData() =
     this.name == SimprintsSyncSetting.ONLY_ANALYTICS.name
 
-fun SimprintsSyncSetting.cannotSyncAnyData() = this.name == SimprintsSyncSetting.NONE.name
+fun SimprintsSyncSetting.canSyncDataToSimprints() = this.name != SimprintsSyncSetting.NONE.name
 

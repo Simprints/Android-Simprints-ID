@@ -16,4 +16,4 @@ fun CosyncSetting.canCoSyncBiometricData() = this.name == CosyncSetting.ONLY_BIO
 
 fun CosyncSetting.canCoSyncAnalyticsData() = this.name == CosyncSetting.ONLY_ANALYTICS.name
 
-fun CosyncSetting.cannotCoSyncAnyData() = this.name == CosyncSetting.NONE.name
+fun CosyncSetting.canCoSyncData() = this.name != CosyncSetting.NONE.name
