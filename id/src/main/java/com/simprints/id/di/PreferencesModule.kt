@@ -28,7 +28,6 @@ import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.id.tools.serializers.SimprintsSyncSerializer
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -73,7 +72,7 @@ open class PreferencesModule {
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
         @Named("SyncDestinationSerializer") syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
         @Named("SimprintsSyncSerializer") simprintsSyncSerializer: Serializer<List<SimprintsSyncSetting>>,
-        @Named("CosyncSerializer") cosyncSerializer: Serializer<List<CosyncSetting>>,
+        @Named("CosyncSerializer") cosyncSerializer: Serializer<CosyncSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,

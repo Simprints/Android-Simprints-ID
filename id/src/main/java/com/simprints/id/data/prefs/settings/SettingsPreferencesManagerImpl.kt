@@ -43,7 +43,7 @@ open class SettingsPreferencesManagerImpl(
     faceConfidenceThresholdsSerializer: Serializer<Map<FaceConfidenceThresholds, Int>>,
     syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
     simprintsSyncSerializer: Serializer<List<SimprintsSyncSetting>>,
-    cosyncSyncSerializer: Serializer<List<CosyncSetting>>
+    cosyncSyncSerializer: Serializer<CosyncSetting>
 ) : SettingsPreferencesManager {
 
     /**
@@ -264,7 +264,7 @@ open class SettingsPreferencesManagerImpl(
             simprintsSyncSerializer
         )
 
-    override var cosyncSyncSettings: List<CosyncSetting>
+    override var cosyncSyncSettings: CosyncSetting
         by RemoteConfigComplexPreference(
             prefs,
             remoteConfigWrapper,
@@ -449,11 +449,11 @@ open class SettingsPreferencesManagerImpl(
         const val SYNC_DESTINATION_SETTINGS_KEY = "SyncDestination"
         val SYNC_DESTINATION_SETTINGS_DEFAULT = emptyList<SyncDestinationSetting>()
 
-        const val SIMPRINTS_SYNC_KEY = ""
+        const val SIMPRINTS_SYNC_KEY = "SimprintsSync"
         val SIMPRINTS_SYNC_SETTINGS_DEFAULT = emptyList<SimprintsSyncSetting>()
 
-        const val COSYNC_SYNC_KEY = ""
-        val COSYNC_SYNC_SETTINGS_DEFAULT = emptyList<CosyncSetting>()
+        const val COSYNC_SYNC_KEY = "Cosync"
+        val COSYNC_SYNC_SETTINGS_DEFAULT = CosyncSetting.NONE
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
