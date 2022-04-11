@@ -6,6 +6,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.coroutines.retryIO
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.extentions.isCloudRecoverableIssue
 import com.simprints.core.tools.json.JsonHelper
 import kotlinx.coroutines.withContext
@@ -66,7 +67,7 @@ open class SimApiClientImpl<T : SimRemoteInterface>(
                     }
                 }
             },
-            retryIf = { it !is SyncCloudIntegrationException })
+            retryIf = { it !is SyncCloudIntegrationException && !it.isBackendMaintenanceException() })
     }
 
 }
