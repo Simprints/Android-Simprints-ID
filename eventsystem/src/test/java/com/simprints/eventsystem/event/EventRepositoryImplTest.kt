@@ -292,7 +292,7 @@ class EventRepositoryImplTest {
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
+                canSyncAllData = true,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
             ).toList()
@@ -332,7 +332,7 @@ class EventRepositoryImplTest {
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
+                canSyncAllData = true,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
             ).toList()
