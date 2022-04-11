@@ -31,12 +31,13 @@ class LicenseRemoteDataSourceImpl(
         }
     } catch (t: Throwable) {
         Simber.e(t)
-        if (t is SyncCloudIntegrationException)
-            handleCloudException(t)
-        else if (t.isBackendMaintenanceException()) {
+        if (t.isBackendMaintenanceException()) {
             ApiLicenseResult.BackendMaintenanceError(t.getEstimatedOutage())
-        } else
+        } else if (t is SyncCloudIntegrationException) {
+            handleCloudException(t)
+        } else {
             ApiLicenseResult.Error(unknownErrorCode)
+        }
     }
 
     /**
@@ -52,7 +53,8 @@ class LicenseRemoteDataSourceImpl(
     }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
-        val errorCode = exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
+        val errorCode =
+            exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
         return ApiLicenseResult.Error(errorCode)
     }
 
@@ -60,7 +62,10 @@ class LicenseRemoteDataSourceImpl(
         return jsonHelper.fromJson<ApiLicenseError>(errorBody.string()).error
     }
 
-    private suspend fun <T> executeCall(nameCall: String, block: suspend (LicenseRemoteInterface) -> T): T =
+    private suspend fun <T> executeCall(
+        nameCall: String,
+        block: suspend (LicenseRemoteInterface) -> T
+    ): T =
         with(getProjectApiClient()) {
             executeCall(nameCall) {
                 block(it)
