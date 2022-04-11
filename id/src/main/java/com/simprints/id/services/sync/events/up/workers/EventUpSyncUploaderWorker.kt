@@ -89,14 +89,17 @@ class EventUpSyncUploaderWorker(
     }
 
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
-        return if (t is SyncCloudIntegrationException) {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-        } else if (t.isBackendMaintenanceException()) {
+        return if (t.isBackendMaintenanceException()) {
             fail(
                 t,
                 t.message,
-                workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.getEstimatedOutage())
+                workDataOf(
+                    OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.getEstimatedOutage()
+                )
             )
+        } else if (t is SyncCloudIntegrationException) {
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
         } else {
             retry(t)
         }
