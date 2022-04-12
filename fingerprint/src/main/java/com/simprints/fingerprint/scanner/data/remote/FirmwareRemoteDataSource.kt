@@ -17,7 +17,7 @@ class FirmwareRemoteDataSource(
         hardwareVersion: String,
         localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>
     ): List<DownloadableFirmwareVersion> =
-        preferencesManager.scannerHardwareRevisions.availableForDownload(
+        preferencesManager.scannerHardwareRevisions.getAvailableVersionsForDownload (
             hardwareVersion,
             localFirmwareVersions
         )
