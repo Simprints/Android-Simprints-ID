@@ -69,6 +69,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmatio
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
@@ -76,6 +77,7 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCapt
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
@@ -175,22 +177,26 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
 )
 
 fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
-    val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(template = "", format = FaceTemplateFormat.RANK_ONE_1_23)
+    val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+        template = "",
+        format = FaceTemplateFormat.RANK_ONE_1_23
+    )
     return FaceCaptureBiometricsEvent(
         CREATED_AT,
         2F,
         FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.VALID,
         faceArg,
-         eventLabels
+        eventLabels
     )
 }
 
 fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent {
-    val fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-        LEFT_3RD_FINGER,
-        "",
-        FingerprintTemplateFormat.ISO_19794_2
-    )
+    val fingerprint =
+        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+            LEFT_3RD_FINGER,
+            "",
+            FingerprintTemplateFormat.ISO_19794_2
+        )
     return FingerprintCaptureBiometricsEvent(
         CREATED_AT,
         FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
@@ -205,6 +211,21 @@ fun createFaceCaptureConfirmationEvent() =
 fun createFaceCaptureEvent(): FaceCaptureEvent {
     val faceArg = Face(0F, 1F, 2F, "", FaceTemplateFormat.RANK_ONE_1_23)
     return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, eventLabels)
+}
+
+fun createFaceCaptureEventV3(): FaceCaptureEventV3 {
+    val faceArg =
+        FaceCaptureEventV3.FaceCapturePayloadV3.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
+    return FaceCaptureEventV3(
+        startTime = CREATED_AT,
+        endTime = ENDED_AT,
+        attemptNb = 0,
+        qualityThreshold = 1F,
+        result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.VALID,
+        isFallback = true,
+        face = faceArg,
+        labels = eventLabels
+    )
 }
 
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, eventLabels)
@@ -358,7 +379,12 @@ fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventL
 fun createConnectivitySnapshotEvent() =
     ConnectivitySnapshotEvent(
         CREATED_AT,
-        listOf(Connection(SimNetworkUtils.ConnectionType.MOBILE, SimNetworkUtils.ConnectionState.CONNECTED)),
+        listOf(
+            Connection(
+                SimNetworkUtils.ConnectionType.MOBILE,
+                SimNetworkUtils.ConnectionState.CONNECTED
+            )
+        ),
         eventLabels
     )
 
@@ -380,16 +406,35 @@ fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
     return FingerprintCaptureEvent(
-        CREATED_AT,
-        ENDED_AT,
-        LEFT_THUMB,
-        10,
-        BAD_QUALITY,
-        fingerprint,
-        GUID1,
-        eventLabels
+        createdAt = CREATED_AT,
+        endTime = ENDED_AT,
+        finger = LEFT_THUMB,
+        qualityThreshold = 10,
+        result = BAD_QUALITY,
+        fingerprint = fingerprint,
+        id = GUID1,
+        labels = eventLabels
     )
 }
+
+fun createFingerprintCaptureEventV3(): FingerprintCaptureEventV3 {
+    val fingerprint = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint(
+        LEFT_THUMB,
+        8,
+        FingerprintTemplateFormat.ISO_19794_2
+    )
+
+    return FingerprintCaptureEventV3(
+        createdAt = CREATED_AT,
+        endTime = ENDED_AT,
+        finger = LEFT_THUMB,
+        qualityThreshold = 10,
+        result = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.BAD_QUALITY,
+        fingerprint = fingerprint,
+        labels = eventLabels
+    )
+}
+
 
 fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, GUID1, eventLabels)
 
