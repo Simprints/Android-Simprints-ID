@@ -53,8 +53,7 @@ class LicenseRemoteDataSourceImpl(
     }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
-        val errorCode =
-            exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
+        val errorCode = exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
         return ApiLicenseResult.Error(errorCode)
     }
 
