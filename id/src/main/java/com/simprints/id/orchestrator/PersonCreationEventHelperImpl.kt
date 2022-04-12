@@ -5,7 +5,6 @@ import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
@@ -18,8 +17,7 @@ import kotlinx.coroutines.flow.toList
 
 class PersonCreationEventHelperImpl(
     val eventRepository: com.simprints.eventsystem.event.EventRepository,
-    val timeHelper: TimeHelper,
-    private val encodingUtils: EncodingUtils
+    val timeHelper: TimeHelper
 ) : PersonCreationEventHelper {
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
