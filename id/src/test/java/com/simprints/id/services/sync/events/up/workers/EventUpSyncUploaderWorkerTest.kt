@@ -85,7 +85,8 @@ class EventUpSyncUploaderWorkerTest {
         runBlocking {
             val errorResponse =
                 "{\"error\":\"002\"}"
-            val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
+            val errorResponseBody =
+                errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
             val mockResponse = Response.error<Any>(503, errorResponseBody)
             val exception = HttpException(mockResponse)
 
@@ -162,6 +163,23 @@ class EventUpSyncUploaderWorkerTest {
                             OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true
                         )
                     )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun worker_shouldRetryIfNotBackendMaintenanceOrSyncIssue() {
+        runBlocking {
+            with(eventUpSyncUploaderWorker) {
+                coEvery {
+                    upSyncHelper.upSync(any(), any())
+                } throws Throwable()
+
+                doWork()
+
+                verify {
+                    resultSetter.retry()
                 }
             }
         }
