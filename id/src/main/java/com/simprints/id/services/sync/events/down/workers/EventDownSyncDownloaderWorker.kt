@@ -70,8 +70,8 @@ class EventDownSyncDownloaderWorker(
     override suspend fun doWork(): Result {
         getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
 
-        return withContext(dispatcher.io()) {
-            try {
+        return try {
+            withContext(dispatcher.io()) {
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
                 crashlyticsLog("Start - Params: $downSyncOperationInput")
@@ -90,11 +90,10 @@ class EventDownSyncDownloaderWorker(
                     workDataOf(OUTPUT_DOWN_SYNC to count),
                     "Total downloaded: $0 for $downSyncOperationInput"
                 )
-
-            } catch (t: Throwable) {
-                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
-                retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
             }
+        } catch (t: Throwable) {
+            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
+            retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
         }
     }
 

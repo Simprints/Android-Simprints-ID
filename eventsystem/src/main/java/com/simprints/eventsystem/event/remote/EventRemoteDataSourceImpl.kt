@@ -45,11 +45,16 @@ class EventRemoteDataSourceImpl(
         query: ApiRemoteEventQuery,
         scope: CoroutineScope
     ): ReceiveChannel<Event> {
-        val streaming = takeStreaming(query)
-        Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
+        return try {
+            val streaming = takeStreaming(query)
+            Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
-        return scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
-            parseStreamAndEmitEvents(streaming, this)
+            scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
+                parseStreamAndEmitEvents(streaming, this)
+            }
+        } catch (t: Throwable) {
+            val throwable = Throwable(t)
+            throw throwable.cause!!
         }
     }
 
