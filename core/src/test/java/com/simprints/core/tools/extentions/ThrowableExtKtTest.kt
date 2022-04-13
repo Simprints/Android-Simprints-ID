@@ -88,7 +88,7 @@ class ThrowableExtKtTest {
     fun gettingBackendMaintenanceErrorWithNoHeaderReturns0() {
         val throwable = createThrowable(503, backendMaintenanceErroresponse)
         assertThat(throwable.isBackendMaintenanceException()).isTrue()
-        assertThat(throwable.getEstimatedOutage()).isEqualTo(0L)
+        assertThat(throwable.getEstimatedOutage()).isNull()
     }
 
     @Test
@@ -161,7 +161,7 @@ class ThrowableExtKtTest {
             exception.response()?.headers()
         } returns null
 
-        assertThat(exception.getEstimatedOutage()).isEqualTo(0L)
+        assertThat(exception.getEstimatedOutage()).isNull()
     }
 
     private fun createThrowable(code: Int, errorResponse: String?): Throwable {
