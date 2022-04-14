@@ -587,7 +587,8 @@ fun validateVero2InfoSnapshotEventApiModel(json: JSONObject) {
             assertThat(getString("cypressApp")).isNotEmpty()
             assertThat(getString("stmApp")).isNotEmpty()
             assertThat(getString("un20App")).isNotEmpty()
-            assertThat(length()).isEqualTo(4)
+            assertThat(getString("master")).isNotEmpty()
+            assertThat(length()).isEqualTo(5)
         }
 
         with(getJSONObject("battery")) {
