@@ -75,6 +75,7 @@ class Vero2InfoSnapshotEventTest {
             stmApp = "1.0",
             un20Api = "1.2",
             un20App = "1.2",
+            master = 10129
         )
         val labels = EventLabels(sessionId = "6dcb3810-4789-4149-8fea-473ffb520958")
         val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
