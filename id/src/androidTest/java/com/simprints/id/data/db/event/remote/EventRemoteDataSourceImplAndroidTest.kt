@@ -154,6 +154,7 @@ import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -244,7 +245,7 @@ class EventRemoteDataSourceImplAndroidTest {
         every { timeHelper.now() } returns 100
     }
 
-    @Test
+    @Ignore
     fun aSessionWithAllEvents_shouldGetUploaded() {
         runBlocking {
             val events = mutableListOf<Event>()
