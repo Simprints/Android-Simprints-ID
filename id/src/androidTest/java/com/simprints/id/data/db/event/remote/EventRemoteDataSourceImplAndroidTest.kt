@@ -245,7 +245,7 @@ class EventRemoteDataSourceImplAndroidTest {
         every { timeHelper.now() } returns 100
     }
 
-    @Ignore
+    @Test
     fun aSessionWithAllEvents_shouldGetUploaded() {
         runBlocking {
             val events = mutableListOf<Event>()
