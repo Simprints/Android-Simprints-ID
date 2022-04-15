@@ -14,6 +14,7 @@ import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState.CONNECTED
+import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState.DISCONNECTED
 import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionType
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.EventSystemApplication
@@ -52,7 +53,8 @@ class EventMigration5to6Test {
         val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration5to6())
 
         val eventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId).getStringWithColumnName("eventJson")!!
+            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+                .getStringWithColumnName("eventJson")!!
         val event = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
 
         Truth.assertThat(event).isInstanceOf(ConnectivitySnapshotEvent::class.java)
@@ -80,14 +82,14 @@ class EventMigration5to6Test {
         helper.runMigrationsAndValidate(TEST_DB, 6, true, migrationSpy)
 
         verify(exactly = 1) {
-            migrationSpy.migrateEnrolmentEventPayloadType(
+            migrationSpy.migrateConnectivityEventPayloadType(
                 any(),
                 any(),
                 eventId1
             )
         }
         verify(exactly = 1) {
-            migrationSpy.migrateEnrolmentEventPayloadType(
+            migrationSpy.migrateConnectivityEventPayloadType(
                 any(),
                 any(),
                 eventId2
@@ -116,7 +118,10 @@ class EventMigration5to6Test {
             ConnectivitySnapshotEvent.ConnectivitySnapshotPayload(
                 1611584017198,
                 2,
-                listOf(Connection(ConnectionType.WIFI, CONNECTED)),
+                listOf(
+                    Connection(ConnectionType.WIFI, CONNECTED),
+                    Connection(ConnectionType.MOBILE, DISCONNECTED)
+                ),
                 EventType.CONNECTIVITY_SNAPSHOT,
                 0
             ),
