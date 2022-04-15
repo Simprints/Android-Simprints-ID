@@ -81,7 +81,7 @@ class EventMigration5to6 : Migration(5, 6) {
                     item.put(CONNECTIONS_STATE, CONNECTIONS_STATE_VALUE_DISCONNECTED)
 
                 newConnectionsArray.remove(i)
-                item?.let { newConnectionsArray.put(item) }
+                item?.let { newConnectionsArray.put(i, item) }
             }
 
             newPayload.remove(DB_EVENT_JSON_CONNECTIONS_ARRAY)
