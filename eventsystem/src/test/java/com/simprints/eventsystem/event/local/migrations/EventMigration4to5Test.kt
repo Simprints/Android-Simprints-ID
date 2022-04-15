@@ -7,11 +7,11 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.eventsystem.EventSystemApplication
+import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +27,12 @@ class EventMigration4to5Test {
 
     // Array of all migrations
     private val ALL_MIGRATIONS = arrayOf(
-        EventMigration1to2(), EventMigration2to3(), EventMigration3to4(), EventMigration4to5())
+        EventMigration1to2(),
+        EventMigration2to3(),
+        EventMigration3to4(),
+        EventMigration4to5(),
+        EventMigration5to6()
+    )
 
     @get:Rule
     val helper = MigrationTestHelper(
@@ -51,7 +56,8 @@ class EventMigration4to5Test {
 
         // re-open the database with version 5 and initiate MIGRATION 4 to 5
         val db = helper.runMigrationsAndValidate(
-            TEST_DB, 5, true, EventMigration4to5())
+            TEST_DB, 5, true, EventMigration4to5()
+        )
 
         // validate that the data was migrated properly.
         val event = MigrationTestingTools.retrieveCursorWithEventById(db, EVENT_ID)
@@ -59,7 +65,7 @@ class EventMigration4to5Test {
             if (key == "subjectId") continue
 
             val field = version4Event[key]
-            val dbValue = when(field) {
+            val dbValue = when (field) {
                 is Int -> event.getIntWithColumnName(key)
                 else -> event.getStringWithColumnName(key)
             }
