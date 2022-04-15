@@ -25,13 +25,13 @@ class EventMigration5to6 : Migration(5, 6) {
     }
 
     fun migrateConnectivityEvents(database: SupportSQLiteDatabase) {
-        val enrolmentEventsQuery = database.query(
+        val eventsQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ?", arrayOf("CONNECTIVITY_SNAPSHOT")
         )
-        enrolmentEventsQuery.use {
+        eventsQuery.use {
             while (it.moveToNext()) {
                 val id = it.getStringWithColumnName("id")
-                migrateEnrolmentEventPayloadType(it, database, id)
+                migrateConnectivityEventPayloadType(it, database, id)
             }
         }
     }
@@ -39,7 +39,7 @@ class EventMigration5to6 : Migration(5, 6) {
     /**
      * Update the connections array in the payload.
      */
-    fun migrateEnrolmentEventPayloadType(
+    fun migrateConnectivityEventPayloadType(
         it: Cursor,
         database: SupportSQLiteDatabase,
         id: String?
@@ -60,7 +60,8 @@ class EventMigration5to6 : Migration(5, 6) {
                  */
                 val type = item.getString(CONNECTIONS_TYPE)
                 when {
-                    type.lowercase().contains(CONNECTIONS_TYPE_VALUE_MOBILE.lowercase()) -> item.put(
+                    type.lowercase()
+                        .contains(CONNECTIONS_TYPE_VALUE_MOBILE.lowercase()) -> item.put(
                         CONNECTIONS_TYPE,
                         CONNECTIONS_TYPE_VALUE_MOBILE
                     )
@@ -74,7 +75,7 @@ class EventMigration5to6 : Migration(5, 6) {
                  * The current states in BQ are SUSPENDED, BLOCKED, IDLE, CONNECTING, OBTAINING_IPADDR,
                  * DISCONNECTED, CONNECTED. We map everything that isn't connected to disconnected.
                  */
-                val state = item?.getString(CONNECTIONS_STATE)
+                val state = item.getString(CONNECTIONS_STATE)
                 if (state.equals(CONNECTIONS_STATE_VALUE_CONNECTED))
                     item.put(CONNECTIONS_STATE, CONNECTIONS_STATE_VALUE_CONNECTED)
                 else
