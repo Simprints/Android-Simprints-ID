@@ -5,6 +5,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.logging.Simber
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -47,10 +48,11 @@ class EventMigration5to6 : Migration(5, 6) {
         jsonData?.let {
             val originalJson = JSONObject(jsonData)
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            val newConnectionsArray = newPayload.getJSONArray(DB_EVENT_JSON_CONNECTIONS_ARRAY)
+            val oldConnectionsArray = newPayload.getJSONArray(DB_EVENT_JSON_CONNECTIONS_ARRAY)
+            val newConnectionsArray = JSONArray()
 
-            for (i in 0 until newConnectionsArray.length()) {
-                var item = newConnectionsArray.getJSONObject(i)
+            for (i in 0 until oldConnectionsArray.length()) {
+                val item = oldConnectionsArray.getJSONObject(i)
 
                 /**
                  * We map mobile and wifi connections to the enum. If it's neither wifi or mobile we
@@ -66,8 +68,6 @@ class EventMigration5to6 : Migration(5, 6) {
                         CONNECTIONS_TYPE,
                         CONNECTIONS_TYPE_VALUE_WIFI
                     )
-                    else -> item = null
-
                 }
 
                 /**
@@ -80,8 +80,7 @@ class EventMigration5to6 : Migration(5, 6) {
                 else
                     item.put(CONNECTIONS_STATE, CONNECTIONS_STATE_VALUE_DISCONNECTED)
 
-                newConnectionsArray.remove(i)
-                item?.let { newConnectionsArray.put(i, item) }
+                newConnectionsArray.put(item)
             }
 
             newPayload.remove(DB_EVENT_JSON_CONNECTIONS_ARRAY)
