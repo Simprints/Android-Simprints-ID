@@ -245,6 +245,11 @@ class EventRemoteDataSourceImplAndroidTest {
         every { timeHelper.now() } returns 100
     }
 
+    /**
+     * This test case makes calls to BFSID, and its a way for us to validate that, changes to any of
+     * the [Event] subtypes, is accepted by BFSID. Thus ensuring that at development time, we catch
+     * any issues that might arise as a result of updating the captured events' data structures.
+     */
     @Test(expected = Test.None::class)
     fun aSessionWithAllEvents_shouldGetUploaded() {
         runBlocking {
