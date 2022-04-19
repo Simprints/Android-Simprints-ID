@@ -69,7 +69,7 @@ class ScannerWrapperV2Test {
     fun shouldReturn_scannerVersion_withEmptyDefaults_inTheCorrectFormat_withNewApiFormat() {
         // Given
         val expectedVersionInfo = ScannerVersion(
-            hardwareVersion = "E-1",
+            hardwareVersion = "",
             generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN
         )
