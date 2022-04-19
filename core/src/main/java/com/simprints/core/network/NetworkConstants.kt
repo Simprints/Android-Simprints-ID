@@ -10,7 +10,7 @@ class NetworkConstants {
         val httpCodesForRecoverableCloudIssues = listOf(500, 502, 503)
         const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
         const val AUTHORIZATION_ERROR = 403
-        const val BACKEND_MAINTENANCE_ERROR_STRING = "{\"error\":\"002\"}"
-        const val HEADER_RETRY_AFTER = "Retry-After"
+        const val BACKEND_MAINTENANCE_ERROR_STRING = "002"
+        const val HEADER_RETRY_AFTER = "retry-after"
     }
 }
