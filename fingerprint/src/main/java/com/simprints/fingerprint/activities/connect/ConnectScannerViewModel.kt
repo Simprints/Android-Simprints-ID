@@ -119,13 +119,17 @@ class ConnectScannerViewModel(
         R.string.connect_scanner_bt_connect,
         "ScannerManager: connectToVero",
         scannerManager.scanner { connect() }) {
-        setLastConnectedScannerInfo()
-        addBluetoothConnectivityEvent()
-    }
+            addBluetoothConnectivityEvent()
+        }
 
-    private fun setupVero() =
-        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: setupVero",
-            scannerManager.scanner { setup() }) { addInfoSnapshotEventIfNecessary() }
+    private fun setupVero() = veroTask(
+        computeProgress(5),
+        R.string.connect_scanner_setup,
+        "ScannerManager: setupVero",
+        scannerManager.scanner { setup() }) {
+            setLastConnectedScannerInfo()
+            addInfoSnapshotEventIfNecessary()
+        }
 
     private fun resetVeroUI() =
         veroTask(computeProgress(6), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
