@@ -23,15 +23,14 @@ class ThrowableExtKtTest {
 
     @Test
     fun gettingBackendMaintenanceErrorReturnsTrue() {
-        val throwable = createHttpException(503, backendMaintenanceErroresponse)
+        val throwable = createThrowable(503, backendMaintenanceErroresponse)
 
         assertThat(throwable.isBackendMaintenanceException()).isTrue()
     }
 
     @Test
-    fun gettingExceptionWithEmptyResponseReturnsFalse() {
-        val throwable = createHttpException(503, "")
-
+    fun gettingExceptionWitResponseReturnsFalse() {
+        val throwable = createThrowable(503, null)
         assertThat(throwable.isBackendMaintenanceException()).isFalse()
     }
 
@@ -67,8 +66,14 @@ class ThrowableExtKtTest {
 
     @Test
     fun gettingNoBackendErrorReturnsFalse() {
-        val throwable = createHttpException(500, otherErrorResponse)
+        val throwable = createThrowable(500, otherErrorResponse)
+        assertThat(throwable.isBackendMaintenanceException()).isFalse()
+    }
 
+    @Test
+
+    fun gettingNoBackendErrorReturnsFalseWith503() {
+        val throwable = createThrowable(503, otherErrorResponse)
         assertThat(throwable.isBackendMaintenanceException()).isFalse()
     }
 
@@ -79,8 +84,9 @@ class ThrowableExtKtTest {
 
     @Test
     fun gettingBackendMaintenanceErrorWithNoHeaderReturns0() {
-        val throwable = createHttpException(503, backendMaintenanceErroresponse)
-        assertThat(throwable.getEstimatedOutage()).isEqualTo(0L)
+        val throwable = createThrowable(503, backendMaintenanceErroresponse)
+        assertThat(throwable.isBackendMaintenanceException()).isTrue()
+        assertThat(throwable.getEstimatedOutage()).isNull()
     }
 
     @Test
@@ -153,12 +159,13 @@ class ThrowableExtKtTest {
             exception.response()?.headers()
         } returns null
 
-        assertThat(exception.getEstimatedOutage()).isEqualTo(0L)
+        assertThat(exception.getEstimatedOutage()).isNull()
     }
 
-    private fun createHttpException(code: Int, errorResponse: String?): HttpException {
-        val errorResponseBody = errorResponse?.toResponseBody("application/json".toMediaTypeOrNull())
-        val mockResponse = Response.error<Any>(code, errorResponseBody!!)
-        return HttpException(mockResponse)
+    private fun createThrowable(code: Int, errorResponse: String?): Throwable {
+        val errorResponseBody =
+            errorResponse?.toResponseBody("application/json".toMediaTypeOrNull())
+        val mockResponse = errorResponseBody?.let { Response.error<Any>(code, it) }
+        return if (mockResponse != null) HttpException(mockResponse) else Throwable()
     }
 }
