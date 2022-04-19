@@ -1,4 +1,4 @@
-ackage com.simprints.id.data.license.remote
+package com.simprints.id.data.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.exceptions.SyncCloudIntegrationException
