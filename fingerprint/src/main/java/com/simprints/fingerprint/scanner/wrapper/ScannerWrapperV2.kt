@@ -47,7 +47,7 @@ class ScannerWrapperV2(
 
     override fun versionInformation(): ScannerVersion =
         scannerVersion ?: ScannerVersion(
-            hardwareVersion = ScannerExtendedInfoReaderHelper.DEFAULT_HARDWARE_VERSION,
+            hardwareVersion = ScannerExtendedInfoReaderHelper.UNKNOWN_HARDWARE_VERSION,
             generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN,
         )
