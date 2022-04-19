@@ -12,7 +12,7 @@ import retrofit2.Response
 
 class ThrowableExtKtTest {
 
-    private val errorResponse =
+    private val otherErrorResponse =
         "{\"some\":\"thing\"}"
     private val backendMaintenanceErroresponse = "{\"error\":\"002\"}"
 
@@ -67,7 +67,7 @@ class ThrowableExtKtTest {
 
     @Test
     fun gettingNoBackendErrorReturnsFalse() {
-        val throwable = createHttpException(500, errorResponse)
+        val throwable = createHttpException(500, otherErrorResponse)
 
         assertThat(throwable.isBackendMaintenanceException()).isFalse()
     }
