@@ -127,5 +127,6 @@ class ScannerExtendedInfoReaderHelper(
         private const val CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION = 1
         private const val CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION = 0
         const val DEFAULT_HARDWARE_VERSION = "E-1"
+        const val UNKNOWN_HARDWARE_VERSION = ""
     }
 }
