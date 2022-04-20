@@ -69,6 +69,7 @@ class EventMigration5to6 : Migration(5, 6) {
                         CONNECTIONS_TYPE,
                         CONNECTIONS_TYPE_VALUE_WIFI
                     )
+                    else -> break
                 }
 
                 /**
