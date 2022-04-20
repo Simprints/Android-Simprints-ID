@@ -187,11 +187,7 @@ class EventDownSyncHelperImpl(
                 }
 
                 if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
-                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                        actions.add(
-                            it
-                        )
-                    }
+                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
             attendantUnderSyncing != null -> {
@@ -200,20 +196,12 @@ class EventDownSyncHelperImpl(
                 }
 
                 if (attendantUnderSyncing == enrolmentRecordCreation.attendantId) {
-                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                        actions.add(
-                            it
-                        )
-                    }
+                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
                 }
             }
             else -> {
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
-                createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                    actions.add(
-                        it
-                    )
-                }
+                createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
             }
         }
 
