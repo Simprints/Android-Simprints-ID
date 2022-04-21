@@ -7,10 +7,13 @@ import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.*
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.isNotASubjectEvent
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
@@ -155,10 +158,15 @@ open class EventRepositoryImpl(
 
         eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
             // The events will include the SessionCaptureEvent event
-            Simber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
-            eventLocalDataSource.loadAllFromSession(sessionId).let {
-                attemptEventUpload(it, projectId)
-                this.emit(it.size)
+            Simber.tag("SYNC").i("Uploading session $sessionId")
+            try {
+                eventLocalDataSource.loadAllFromSession(sessionId).let {
+                    attemptEventUpload(it, projectId)
+                    this.emit(it.size)
+                }
+            } catch (ex: Exception) {
+                Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
+                Simber.e(ex)
             }
         }
 
