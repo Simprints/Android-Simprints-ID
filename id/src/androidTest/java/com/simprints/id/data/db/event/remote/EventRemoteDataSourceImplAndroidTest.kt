@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.event.remote
+package com.simprints.id.data.db.event.remote
 
 import android.os.Build
 import android.os.Build.VERSION
@@ -40,6 +40,8 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
@@ -60,6 +62,8 @@ import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -68,6 +72,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
@@ -85,12 +90,21 @@ class EventRemoteDataSourceImplAndroidTest {
         const val DEFAULT_TIME = 1000L
     }
 
-    private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
-    @MockK lateinit var timeHelper: TimeHelper
+    private val remoteTestingManager: RemoteTestingManager by lazy {
+        RemoteTestingManager.create(testDispatcherProvider)
+    }
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    private lateinit var testProject: TestProject
 
     @get:Rule
-    val testProjectRule = TestProjectRule()
-    private lateinit var testProject: TestProject
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
+    @get:Rule
+    val testProjectRule = TestProjectRule(testDispatcherProvider)
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private lateinit var eventLabels: EventLabels
@@ -99,10 +113,13 @@ class EventRemoteDataSourceImplAndroidTest {
     var remoteDbManager = mockk<RemoteDbManager>()
 
     private val okHttpClientBuilder = object : DefaultOkHttpClientBuilder() {
-        override fun get(authToken: String?,
-                         deviceId: String,
-                         versionName: String): OkHttpClient.Builder =
-            super.get(authToken, deviceId, versionName).apply {
+        override fun get(
+            authToken: String?,
+            deviceId: String,
+            versionName: String,
+            interceptor: Interceptor
+        ): OkHttpClient.Builder =
+            super.get(authToken, deviceId, versionName, interceptor).apply {
                 addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })
@@ -126,7 +143,16 @@ class EventRemoteDataSourceImplAndroidTest {
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(mockBaseUrlProvider, "some_device","some_version", remoteDbManager, mockk(relaxed = true), JsonHelper, okHttpClientBuilder),
+            SimApiClientFactoryImpl(
+                mockBaseUrlProvider,
+                "some_device",
+                "some_version",
+                remoteDbManager,
+                JsonHelper,
+                testDispatcherProvider,
+                HttpLoggingInterceptor(),
+                okHttpClientBuilder
+            ),
             JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100
@@ -166,7 +192,17 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addAuthenticationEvent() {
-        Result.values().forEach {
+        listOf(
+            Result.OFFLINE,
+            Result.OFFLINE,
+            Result.OFFLINE,
+            Result.OFFLINE,
+            Result.TECHNICAL_FAILURE,
+            Result.BACKEND_MAINTENANCE_ERROR,
+            Result.SAFETYNET_UNAVAILABLE,
+            Result.SAFETYNET_INVALID_CLAIM,
+            Result.UNKNOWN
+        ).forEach {
             add(AuthenticationEvent(DEFAULT_TIME, DEFAULT_TIME, UserInfo("some_project", DEFAULT_USER_ID), it, eventLabels))
         }
     }
@@ -329,9 +365,18 @@ class EventRemoteDataSourceImplAndroidTest {
         )
     }
 
-    private fun MutableList<Event>.addPersonCreationEvent(fingerprintCaptureEvent: FingerprintCaptureEvent?, faceCaptureEvent: FaceCaptureEvent?) {
-        add(PersonCreationEvent(DEFAULT_TIME, listOf(fingerprintCaptureEvent?.id
-            ?: ""), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels))
+    private fun MutableList<Event>.addPersonCreationEvent(
+        fingerprintCaptureEvent: FingerprintCaptureEvent?,
+        faceCaptureEvent: FaceCaptureEvent?
+    ) {
+        add(
+            PersonCreationEvent(
+                DEFAULT_TIME, listOf(
+                    fingerprintCaptureEvent?.id
+                        ?: ""
+                ), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels
+            )
+        )
     }
 
     private fun MutableList<Event>.addRefusalEvent() {
@@ -389,7 +434,8 @@ class EventRemoteDataSourceImplAndroidTest {
         val deviceArg = Device(
             VERSION.SDK_INT.toString(),
             Build.MANUFACTURER + "_" + Build.MODEL,
-            GUID1)
+            GUID1
+        )
 
         val event = SessionCaptureEvent(
             randomUUID(),
@@ -411,9 +457,22 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
-        add(EnrolmentRecordCreationEvent(
-            CREATED_AT, GUID1, testProject.id, DEFAULT_MODULE_ID, DEFAULT_USER_ID, listOf(FINGERPRINT, FACE), buildFakeBiometricReferences(EncodingUtilsImplForTests),
-            EventLabels(subjectId = GUID1, projectId = testProject.id, moduleIds = listOf(GUID2), attendantId = DEFAULT_USER_ID, mode = listOf(FINGERPRINT, FACE)))
+        add(
+            EnrolmentRecordCreationEvent(
+                CREATED_AT,
+                GUID1,
+                testProject.id,
+                DEFAULT_MODULE_ID,
+                DEFAULT_USER_ID,
+                listOf(FINGERPRINT, FACE),
+                buildFakeBiometricReferences(EncodingUtilsImplForTests),
+                EventLabels(
+                    projectId = testProject.id,
+                    moduleIds = listOf(GUID2),
+                    attendantId = DEFAULT_USER_ID,
+                    mode = listOf(FINGERPRINT, FACE)
+                )
+            )
         )
     }
 
@@ -456,11 +515,31 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addCalloutVerificationEvent() {
-        add(VerificationCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, randomUUID(), "metadata", eventLabels))
+        add(
+            VerificationCalloutEvent(
+                DEFAULT_TIME,
+                testProject.id,
+                DEFAULT_USER_ID,
+                DEFAULT_MODULE_ID,
+                randomUUID(),
+                "metadata",
+                eventLabels
+            )
+        )
     }
 
     private fun MutableList<Event>.addCalloutLastBiomentricsEvent() {
-        add(EnrolmentLastBiometricsCalloutEvent(DEFAULT_TIME, testProject.id, DEFAULT_USER_ID, DEFAULT_MODULE_ID, "metadata", randomUUID(), eventLabels))
+        add(
+            EnrolmentLastBiometricsCalloutEvent(
+                DEFAULT_TIME,
+                testProject.id,
+                DEFAULT_USER_ID,
+                DEFAULT_MODULE_ID,
+                "metadata",
+                randomUUID(),
+                eventLabels
+            )
+        )
     }
 
     private fun MutableList<Event>.addCalloutConfirmationCallbackEvent() {
@@ -481,7 +560,10 @@ class EventRemoteDataSourceImplAndroidTest {
             FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
-            PERSON_CREATION -> addPersonCreationEvent(this.filterIsInstance<FingerprintCaptureEvent>().firstOrNull(), this.filterIsInstance<FaceCaptureEvent>().firstOrNull())
+            PERSON_CREATION -> addPersonCreationEvent(
+                this.filterIsInstance<FingerprintCaptureEvent>().firstOrNull(),
+                this.filterIsInstance<FaceCaptureEvent>().firstOrNull()
+            )
             ALERT_SCREEN -> addAlertScreenEvents()
             GUID_SELECTION -> addGuidSelectionEvent()
             CONNECTIVITY_SNAPSHOT -> addConnectivitySnapshotEvent()
@@ -511,7 +593,8 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
-            ENROLMENT_V1 -> { }
+            ENROLMENT_V1 -> {
+            }
         }.safeSealedWhens
     }
 

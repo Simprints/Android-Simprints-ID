@@ -1,7 +1,47 @@
 package com.simprints.eventsystem.event.local.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.*
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
+import com.simprints.eventsystem.sampledata.createAlertScreenEvent
+import com.simprints.eventsystem.sampledata.createArtificialTerminationEvent
+import com.simprints.eventsystem.sampledata.createAuthenticationEvent
+import com.simprints.eventsystem.sampledata.createAuthorizationEvent
+import com.simprints.eventsystem.sampledata.createCandidateReadEvent
+import com.simprints.eventsystem.sampledata.createCompletionCheckEvent
+import com.simprints.eventsystem.sampledata.createConfirmationCallbackEvent
+import com.simprints.eventsystem.sampledata.createConfirmationCalloutEvent
+import com.simprints.eventsystem.sampledata.createConnectivitySnapshotEvent
+import com.simprints.eventsystem.sampledata.createConsentEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentCallbackEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentEventV2
+import com.simprints.eventsystem.sampledata.createEnrolmentRecordCreationEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentRecordDeletionEvent
+import com.simprints.eventsystem.sampledata.createEnrolmentRecordMoveEvent
+import com.simprints.eventsystem.sampledata.createErrorCallbackEvent
+import com.simprints.eventsystem.sampledata.createFaceCaptureConfirmationEvent
+import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
+import com.simprints.eventsystem.sampledata.createFaceFallbackCaptureEvent
+import com.simprints.eventsystem.sampledata.createFaceOnboardingCompleteEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
+import com.simprints.eventsystem.sampledata.createGuidSelectionEvent
+import com.simprints.eventsystem.sampledata.createIdentificationCallbackEvent
+import com.simprints.eventsystem.sampledata.createIdentificationCalloutEvent
+import com.simprints.eventsystem.sampledata.createIntentParsingEvent
+import com.simprints.eventsystem.sampledata.createInvalidIntentEvent
+import com.simprints.eventsystem.sampledata.createLastBiometricsEnrolmentCalloutEvent
+import com.simprints.eventsystem.sampledata.createOneToManyMatchEvent
+import com.simprints.eventsystem.sampledata.createOneToOneMatchEvent
+import com.simprints.eventsystem.sampledata.createPersonCreationEvent
+import com.simprints.eventsystem.sampledata.createRefusalCallbackEvent
+import com.simprints.eventsystem.sampledata.createRefusalEvent
+import com.simprints.eventsystem.sampledata.createScannerConnectionEvent
+import com.simprints.eventsystem.sampledata.createScannerFirmwareUpdateEvent
+import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
+import com.simprints.eventsystem.sampledata.createSuspiciousIntentEvent
+import com.simprints.eventsystem.sampledata.createVerificationCallbackEvent
+import com.simprints.eventsystem.sampledata.createVerificationCalloutEvent
+import com.simprints.eventsystem.sampledata.createVero2InfoSnapshotEvent
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import org.junit.Test
 
@@ -179,7 +219,17 @@ class DbEventTest {
         val original = createAuthenticationEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
-        assertThat(original).isEqualTo(transformed)
+        with(original) {
+            assertThat(id).isEqualTo(transformed.id)
+            assertThat(type).isEqualTo(transformed.type)
+            assertThat(labels).isEqualTo(transformed.labels)
+        }
+
+        with(transformed) {
+            assertThat((payload)).isInstanceOf(AuthenticationPayload::class.java)
+            //These are basically enums so if they are the same instance, we are golden
+            assertThat((payload as AuthenticationPayload).result).isInstanceOf(original.payload.result::class.java)
+        }
     }
 
     @Test

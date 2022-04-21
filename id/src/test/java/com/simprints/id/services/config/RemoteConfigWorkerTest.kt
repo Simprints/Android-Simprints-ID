@@ -6,12 +6,11 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.*
-import kotlinx.coroutines.CoroutineDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,15 +27,7 @@ class RemoteConfigWorkerTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val loginInfoManagerMock: LoginInfoManager = mockk {
         every { getSignedInProjectIdOrEmpty() } returns UUID.randomUUID().toString()

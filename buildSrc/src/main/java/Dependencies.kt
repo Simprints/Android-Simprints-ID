@@ -1,29 +1,34 @@
 object Dependencies {
 
-    const val kotlin_version = "1.5.10"
+    const val kotlin_version = "1.5.30"
     const val androidx_navigation_version = "2.3.0-alpha04"
 
-    private const val kotlin_coroutine_version = "1.3.1"
+    private const val kotlin_coroutine_version = "1.5.2"
     private const val app_compat_version = "1.2.0"
-    private const val androidx_version = "1.3.0-beta01"
-    private const val espresso_version = "3.2.0-alpha04"
+    private const val androidx_version = "1.4.0"
+    private const val espresso_version = "3.4.0"
+    private const val uiAutomator_version ="2.2.0-alpha3"
     private const val androidx_lifecycle_version = "2.2.0"
     private const val androidx_room_version = "2.3.0"
     private const val androidx_camerax_version = "1.0.0-beta01"
     private const val dagger_version = "2.22"
     private const val work_version = "2.4.0"
-    private const val playservices_version = "16.0.0"
+    private const val location_services_version = "18.0.0"
+    private const val saftynet_services_version = "17.0.1"
     private const val retrofit_version = "2.7.1"
     private const val okttp_version = "4.2.2"
     private const val fuzzywuzzy_version = "1.2.0"
     private const val jackson_version = "2.11.1"
     private const val koin_version = "2.2.2"
     private const val rootbeer_version = "0.0.7"
-    private const val mockito_version = "3.2.4"
-    private const val robolectric_version = "4.3.1"
+    private const val mockito_version = "4.0.0"
+    private const val objenesis_version ="3.2"
+    private const val robolectric_version = "4.7.3"
     private const val commons_io_version = "2.6"
     private const val kronos_version = "0.0.1-alpha09"
-    private const val fragment_version = "1.3.3"
+    private const val fragment_version = "1.3.6"
+    private const val chuck_version = "3.5.2"
+    private const val simmatcher_version ="1.0.0"
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -67,7 +72,7 @@ object Dependencies {
             const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
         }
 
-        const val security = "androidx.security:security-crypto:1.0.0-rc04"
+        const val security = "androidx.security:security-crypto:1.0.0"
 
         object CameraX {
             const val core = "androidx.camera:camera-core:$androidx_camerax_version"
@@ -103,7 +108,7 @@ object Dependencies {
     }
 
     object Support {
-        const val material = "com.google.android.material:material:1.1.0-alpha03"
+        const val material = "com.google.android.material:material:1.4.0"
     }
 
     object WorkManager {
@@ -111,9 +116,8 @@ object Dependencies {
     }
 
     object PlayServices {
-        const val location = "com.google.android.gms:play-services-location:$playservices_version"
-        const val places = "com.google.android.gms:play-services-places:$playservices_version"
-        const val safetynet = "com.google.android.gms:play-services-safetynet:$playservices_version"
+        const val location = "com.google.android.gms:play-services-location:$location_services_version"
+        const val safetynet = "com.google.android.gms:play-services-safetynet:$saftynet_services_version"
     }
 
     object Playcore {
@@ -123,7 +127,6 @@ object Dependencies {
 
     object Firebase {
         const val auth = "com.google.firebase:firebase-auth:19.2.0"
-        const val perf = "com.google.firebase:firebase-perf:19.0.5"
         const val storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
         const val mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
         const val mlkit_barcode = "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
@@ -136,6 +139,11 @@ object Dependencies {
         const val converterScalars = "com.squareup.retrofit2:converter-scalars:$retrofit_version"
         const val logging = "com.squareup.okhttp3:logging-interceptor:$okttp_version"
         const val okhttp = "com.squareup.okhttp3:okhttp:$okttp_version"
+    }
+
+    object Chuck {
+        const val debug = "com.github.chuckerteam.chucker:library:$chuck_version"
+        const val release = "com.github.chuckerteam.chucker:library-no-op:$chuck_version"
     }
 
     object Jackson {
@@ -178,7 +186,7 @@ object Dependencies {
 
         object KoTest {
             const val kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
-            const val kotlin_assert = "io.kotest:kotest-assertions-core:4.6.0"
+            const val kotlin_assert = "io.kotest:kotest-assertions-core:5.0.0.M3"
         }
 
         object Robolectric {
@@ -187,7 +195,7 @@ object Dependencies {
             const val annotation = "org.robolectric:annotations:$robolectric_version"
         }
 
-        const val truth = "com.google.truth:truth:0.42"
+        const val truth = "com.google.truth:truth:1.1.3"
 
         object Mockito {
             const val core = "org.mockito:mockito-core:$mockito_version"
@@ -195,12 +203,15 @@ object Dependencies {
                 "org.mockito:mockito-inline:$mockito_version" //Required to mock final classes
             const val android =
                 "org.mockito:mockito-android:$mockito_version" //Required to use Mock in AndroidTests
-            const val kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+            const val kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+        }
+        object Objenesis {
+            const val core ="org.objenesis:objenesis:$objenesis_version"
         }
 
         object Mockk {
-            const val core = "io.mockk:mockk:1.9.2"
-            const val android = "io.mockk:mockk-android:1.9.2"
+            const val core = "io.mockk:mockk:1.12.0"
+            const val android = "io.mockk:mockk-android:1.12.0"
         }
 
         const val mockwebserver = "com.squareup.okhttp3:mockwebserver:$okttp_version"
@@ -210,20 +221,20 @@ object Dependencies {
             const val intents = "androidx.test.espresso:espresso-intents:$espresso_version"
             const val contrib = "androidx.test.espresso:espresso-contrib:$espresso_version"
             const val barista =
-                "com.schibsted.spain:barista:2.7.1" //Used to grant permissions in AndroidTests
+                "com.schibsted.spain:barista:2.3.0" //Used to grant permissions in AndroidTests
             const val idling = "androidx.test.espresso:espresso-idling-resource:$espresso_version"
 
         }
 
-        const val dagger = "com.github.fabioCollini.daggermock:daggermock:0.8.4"
-        const val dagger_kotlin = "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4"
+        const val dagger = "com.github.fabioCollini.daggermock:daggermock:0.8.5"
+        const val dagger_kotlin = "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.5"
         const val work = "androidx.work:work-testing:$work_version"
         const val retrofit = "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
 
         //https://developer.android.com/jetpack/androidx/releases/test
         object AndroidX {
             const val monitor = "androidx.test:monitor:$androidx_version"
-            const val ext_junit = "androidx.test.ext:junit:1.1.2-beta01"
+            const val ext_junit = "androidx.test.ext:junit:1.1.3"
             const val core = "androidx.test:core:$androidx_version"
             const val core_testing = "android.arch.core:core-testing:$androidx_version"
             const val orchestrator = "androidx.test:orchestrator:$androidx_version"
@@ -232,6 +243,7 @@ object Dependencies {
             const val room = "androidx.room:room-testing:$androidx_room_version"
             const val navigation =
                 "androidx.navigation:navigation-testing:$androidx_navigation_version"
+            const val uiAutomator="androidx.test.uiautomator:uiautomator:$uiAutomator_version"
         }
 
         const val rx2_idler = "com.squareup.rx.idler:rx2-idler:0.9.1"
@@ -259,6 +271,7 @@ object Dependencies {
     }
 
     const val libsimprints = "com.simprints:libsimprints:2021.3.0"
+    const val simmatcher ="com.simprints:libsimmatcher:$simmatcher_version"
 
 }
 

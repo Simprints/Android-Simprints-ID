@@ -2,8 +2,10 @@ package com.simprints.id.activities.consent
 
 import android.content.Intent
 import android.widget.Button
+import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.material.tabs.TabLayout
 import com.simprints.core.domain.modality.Modality
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
@@ -19,10 +21,12 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,7 +40,8 @@ class ConsentActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject lateinit var preferencesManagerSpy: IdPreferencesManager
+    @Inject
+    lateinit var preferencesManagerSpy: IdPreferencesManager
 
     private val preferencesModule by lazy {
         TestPreferencesModule(
@@ -45,11 +50,14 @@ class ConsentActivityTest {
     }
 
     private val module by lazy {
-        TestAppModule(app,
+        TestAppModule(
+            app,
             dbManagerRule = MockkRule,
-            sessionEventsLocalDbManagerRule = MockkRule)
+            sessionEventsLocalDbManagerRule = MockkRule
+        )
     }
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         UnitTestConfig(this, module, preferencesModule).fullSetup()
@@ -88,6 +96,134 @@ class ConsentActivityTest {
         assertActivityStarted(FaceExitFormActivity::class.java, activity)
     }
 
+    @Test
+    fun `declining on parental tab should still exit correctly`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+        activity.consentDeclineButton.performClick()
+
+        assertActivityStarted(FaceExitFormActivity::class.java, activity)
+    }
+
+    @Test
+    fun `declining on un-known tab should throw error`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.addTab(activity.tabHost.newTab(), 2, true)
+
+        assertThrows<IllegalStateException> { activity.consentDeclineButton.performClick() }
+    }
+
+    @Test
+    fun `general consent text should show first`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        assert(activity.tabHost.selectedTabPosition == 0)
+        assert(activity.consentTextHolderView.text.contains(GEN_CONSENT_HINT))
+    }
+
+    @Test
+    fun `parental tab click should select correct tab`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+
+        activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                assert(tab.position == ConsentActivity.PARENTAL_CONSENT_TAB_TAG)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+    }
+
+    @Test
+    fun `general tab click should select correct tab`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+        activity.tabHost.getTabAt(0)!!.select()
+
+        activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                assert(tab.position == ConsentActivity.GENERAL_CONSENT_TAB_TAG)
+                assert(activity.consentTextHolderView.text.contains(GEN_CONSENT_HINT))
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+    }
+
+    @Test
+    fun `selecting parental consent should set correct text`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+
+        assert(activity.tabHost.selectedTabPosition == 1)
+        assert(
+            activity.consentTextHolderView.text.contains(PARENTAL_CONSENT_HINT)
+        )
+    }
+
+    @Test
+    fun `re-selecting a tab shouldn't change the text`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        activity.tabHost.getTabAt(1)!!.select()
+        activity.tabHost.getTabAt(1)!!.select()
+
+        assert(activity.tabHost.selectedTabPosition == 1)
+        assert(
+            activity.consentTextHolderView.text.contains(PARENTAL_CONSENT_HINT)
+        )
+    }
+
+    @Test
+    fun `no parental consent should remove tab`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns false
+
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        assert(activity.tabHost.tabCount == 1)
+    }
+
+    @Test
+    fun `existing parental consent should leave tab`() {
+        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        every { preferencesManagerSpy.parentalConsentExists } returns true
+
+        val controller = createRoboConsentActivity(getIntentForConsentAct())
+        val activity = controller.get()
+
+        assert(activity.tabHost.tabCount == 2)
+    }
+
     private fun createRoboConsentActivity(intent: Intent) = createActivity<ConsentActivity>(intent)
 
     private fun getIntentForConsentAct() = Intent().apply {
@@ -96,4 +232,18 @@ class ConsentActivityTest {
 
     private val ConsentActivity.consentDeclineButton
         get() = findViewById<Button>(R.id.consentDeclineButton)
+
+    private val ConsentActivity.tabHost
+        get() = findViewById<TabLayout>(R.id.tabHost)
+
+    private val ConsentActivity.consentTextHolderView
+        get() = findViewById<TextView>(R.id.consentTextHolderView)
+
+    companion object {
+        private const val GEN_CONSENT_HINT =
+            "I'd like to take photographs of your face to enrol you in this program and identify you"
+
+        private const val PARENTAL_CONSENT_HINT =
+            "I'd like to take photographs of your child's face to enrol them"
+    }
 }

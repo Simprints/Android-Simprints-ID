@@ -1,26 +1,28 @@
 package com.simprints.id.activities.setup
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.location.Location
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.common.truth.Truth
 import com.simprints.core.domain.modality.Modality
-import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.tools.LocationManager
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.impl.annotations.RelaxedMockK
-import kotlinx.coroutines.flow.flowOf
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockkStatic
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,35 +31,32 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SetupActivityTest {
 
-    companion object {
-        private const val PROVIDER = "flp"
-        private const val LAT = 37.377166
-        private const val LNG = -122.086966
-        private const val ACCURACY = 3.0f
-    }
+    @MockK
+    lateinit var mockSplitInstallManager: SplitInstallManager
 
-    @RelaxedMockK lateinit var mockEventRepository: com.simprints.eventsystem.event.EventRepository
-    @RelaxedMockK lateinit var mockLocationManager: LocationManager
+    @MockK
+    lateinit var mockkWorkManager: WorkManager
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @get:Rule val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @get:Rule
+    val permissionRule: GrantPermissionRule =
+        GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private val appModule by lazy {
-        TestAppModule(app,
-            sessionEventsManagerRule = DependencyRule.ReplaceRule {
-                mockEventRepository
-            },
-            locationManagerRule = DependencyRule.ReplaceRule {
-                mockLocationManager
-            }
-        )
+        TestAppModule(app)
     }
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { mockLocationManager.requestLocation(any()) } returns flowOf(listOf(buildFakeLocation()))
+        mockkStatic(SplitInstallManagerFactory::class)
+        every { mockSplitInstallManager.installedModules } returns setOf("fingerprint", "face")
+
+        mockkStatic(WorkManager::class)
+        every { WorkManager.getInstance(any()) } returns mockkWorkManager
+        every { SplitInstallManagerFactory.create(any()) } returns mockSplitInstallManager
+
 
         app.component = AndroidTestConfig(this, appModule = appModule)
             .componentBuilder()
@@ -65,25 +64,22 @@ class SetupActivityTest {
     }
 
     @Test
-    fun launchSetupActivityWithLocationPermissions_shouldAddLocationToSession() {
-        coEvery { mockEventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+    fun launchSetupActivityWithLocationPermissions_shouldFinishWithSuccess() {
 
-        val request = SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
+        val request =
+            SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
         val intent = Intent().apply {
-            setClassName(ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
-                SetupActivity::class.qualifiedName!!)
+            setClassName(
+                ApplicationProvider.getApplicationContext<android.app.Application>().packageName,
+                SetupActivity::class.qualifiedName!!
+            )
             putExtra(CoreResponse.CORE_STEP_BUNDLE, request)
         }
 
-        ActivityScenario.launch<SetupActivity>(intent)
+        val activityScenario = ActivityScenario.launch<SetupActivity>(intent)
 
-        coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent()}
-        coVerify(exactly = 1) { mockEventRepository.addOrUpdateEvent(any())}
-    }
+        coVerify(exactly = 1) { mockkWorkManager.enqueue(any<WorkRequest>()) }
+        Truth.assertThat(activityScenario.result.resultCode).isEqualTo(RESULT_OK)
 
-    private fun buildFakeLocation() = Location(PROVIDER).apply {
-        longitude = LNG
-        latitude = LAT
-        accuracy = ACCURACY
     }
 }

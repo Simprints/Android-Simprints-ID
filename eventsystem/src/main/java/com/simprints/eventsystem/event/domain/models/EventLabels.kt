@@ -6,7 +6,6 @@ import com.simprints.core.domain.modality.Modes
 @Keep
 data class EventLabels(
     val projectId: String? = null,
-    val subjectId: String? = null,
     val attendantId: String? = null,
     val moduleIds: List<String>? = null,
     val mode: List<Modes>? = null,

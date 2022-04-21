@@ -14,6 +14,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+// Sonarqube always show an issue in this file "Don't extend "Thread", since the "run" method is not overridden.
+// This is a false warning from sonarqube, so I am going to suppress it
+@SuppressWarnings("java:S2134")
 class MessageDispatcher extends Thread {
 
     private static class PendingRequest {
@@ -39,6 +42,7 @@ class MessageDispatcher extends Thread {
         this.buttonListeners = new HashSet<>();
     }
 
+    @Override
     public void run() {
         Message msg;
         while (!Thread.interrupted()) {

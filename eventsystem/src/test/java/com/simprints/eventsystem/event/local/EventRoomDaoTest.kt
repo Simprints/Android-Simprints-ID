@@ -37,7 +37,6 @@ class EventRoomDaoTest {
         GUID1,
         EventLabels(
             projectId = DEFAULT_PROJECT_ID,
-            subjectId = DEFAULT_USER_ID_2,
             attendantId = DEFAULT_USER_ID,
             moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             mode = listOf(Modes.FACE, Modes.FINGERPRINT),

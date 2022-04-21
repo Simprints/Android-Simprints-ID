@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync.events.master
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -28,6 +29,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -47,6 +49,9 @@ class EventSyncStateProcessorImplTest {
         const val UPLOADED = 10
         const val TO_UPLOAD = 10
     }
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
     private val successfulMasterWorkers: List<WorkInfo> =
         listOf(createStartSyncRerporterWorker(SUCCEEDED, "${UNIQUE_SYNC_ID}_older"), createStartSyncRerporterWorker(SUCCEEDED, UNIQUE_SYNC_ID))

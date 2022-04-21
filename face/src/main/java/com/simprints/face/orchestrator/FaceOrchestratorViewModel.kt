@@ -74,18 +74,24 @@ class FaceOrchestratorViewModel : ViewModel() {
         errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
-    fun configurationFinished(isSuccess: Boolean, errorCode: String? = null) {
+    fun configurationFinished(isSuccess: Boolean, errorCode: String? = null, estimatedOutage: Long? = null) {
         if (isSuccess) {
             flowFinished.send(
                 DomainToFaceResponse.fromDomainToFaceResponse(
                     FaceConfigurationResponse()
                 )
             )
-        } else {
+        } else if (errorCode != null && estimatedOutage == null) {
             Simber.tag(CrashReportTag.FACE_LICENSE.name)
                 .i("Error with configuration download. Error Code = $errorCode")
             errorEvent.send(ErrorType.CONFIGURATION_ERROR.apply {
                 this.errorCode = errorCode
+            })
+        } else {
+            Simber.tag(CrashReportTag.FACE_LICENSE.name)
+                .i("Error with configuration download. The backend is under maintenance")
+            errorEvent.send(ErrorType.BACKEND_MAINTENANCE_ERROR.apply {
+                this.estimatedOutage = estimatedOutage
             })
         }
     }

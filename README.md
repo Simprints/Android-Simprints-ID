@@ -2,14 +2,22 @@
 
 ## Cloning
 
-There are submodules in this repository [LibSimprints](https://github.com/Simprints/LibSimprints) and [SimMatcher](https://bitbucket.org/simprints/fingerprint-simmatcher.git), so recursive cloning is necessary:
+`git clone  git@bitbucket.org:simprints/android-simprints-id.git`
 
-`git clone --recursive git@bitbucket.org:simprints/android-simprints-id.git`
+Simprints ID  project uses [Simmatcher](https://github.com/simprints/Lib-android-simmatcher) library which is hosted as a private github package.
+
+Use your personal access token (PAT) to authenticate to GitHub Packages(see "[creating a PAT docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)").
+By adding it to local.properties file:
+
+    GITHUB_USERNAME=username
+    GITHUB_TOKEN=personal access token
+
+or set the `GITHUB_USERNAME` and `GITHUB_TOKEN` as environment variables.
 
 ### Full CI Workflow
 The aim of the `ci` workflow is to run all tests in all modules, assemble production and debug builds of the APK, and report to the main CI Slack channel.
 When run, it immediately triggers all the other relevant workflows such that all tests are run.
-In the mean-time, the `ci` build awaits for the other workflows to finish and, if they pass, continue to the assembly and deploy steps.
+In the mean-time, the `ci` build awaits for the other workflows to finish and, if they pass, continue to the assemble and deploy steps.
 
 It is triggered upon pull requests and serves as validation of the integrity of the branch for any pull requests into `develop`.
 
@@ -36,10 +44,10 @@ The following matrix shows the support for each type of test suites:
 DF modules are: clientapi, fingeprint, face
 App module is: id
 
-*To run android tests for a specific DF module: ./gradlew _name_of_df_module_:cAT
-
-During the development of new android tests in DF modules, it can be useful to run a specific test only.
-That is possible marking the test with @SmallTest annotation and run ./gradlew _name_of_df_module_:cAT  -Pandroid.testInstrumentationRunnerArguments.size=small
+* To run android tests for a specific DF module: ./gradlew _name_of_df_module_:cAT
+* To run android tests for a specific class in a DF module: ./gradlew _name_of_df_module_:cAT -Pandroid.testInstrumentationRunnerArguments.class=com.simprints.**.ClassName
+* During the development of new android tests in DF modules, it can be useful to run specific tests only.
+  That is possible marking the test with @SmallTest annotation and run ./gradlew _name_of_df_module_:cAT  -Pandroid.testInstrumentationRunnerArguments.size=small
 
 ### Limitations
 
@@ -52,9 +60,11 @@ To use Mockito in DF modules for android tests, a different dexer is required: c
 
 ### Technical documentation on features
 
-More about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
+A high level documentation on how each module works can be found in the [project's wiki](https://bitbucket.org/simprints/android-simprints-id/wiki/Home) on bitbucket.
+More details about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
 
 ## Build types
+
 Simprints ID has 3 different build types: `debug`, `staging` and `release`.
 
 - `debug`: to be used only in development. Uses the development environment of the backend
@@ -81,6 +91,10 @@ To create an universal apk that can be shared you need to:
 `bundletool build-apks --bundle=id/build/outputs/bundle/debug/id-debug.aab --output=id-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
 
 To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).
+
+## Deploying to a connected device
+After creating the universal apk from app bundle, run command to install apk on connected device.
+`bundletool install-apks --apks=/MyApp/my_app.apks`
 
 ## Deploying to the Google Play Store
 For a full guide go [here](https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+a+new+version) to get the complete breakdown. 

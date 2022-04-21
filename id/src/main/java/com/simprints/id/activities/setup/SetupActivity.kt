@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.google.android.play.core.ktx.requestSessionStates
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
@@ -15,7 +17,6 @@ import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -23,21 +24,19 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.TRY_AGAIN
+import com.simprints.id.activities.setup.PermissionsHelper.extractPermissionsFromRequest
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
-import com.simprints.id.activities.setup.SetupActivityHelper.extractPermissionsFromRequest
-import com.simprints.id.activities.setup.SetupActivityHelper.storeUserLocationIntoCurrentSession
 import com.simprints.id.databinding.ActivitySetupBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
+import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.*
@@ -48,9 +47,7 @@ import kotlin.math.min
 @ExperimentalCoroutinesApi
 class SetupActivity : BaseSplitActivity() {
 
-    @Inject lateinit var locationManager: LocationManager
     @Inject lateinit var viewModelFactory: SetupViewModelFactory
-    @Inject lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
@@ -92,7 +89,9 @@ class SetupActivity : BaseSplitActivity() {
         viewModel.getViewStateLiveData().observe(this, Observer {
             when (it) {
                 StartingDownload -> updateUiForDownloadStarting()
-                is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(it.state)
+                is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(
+                    it.state
+                )
                 is Downloading -> {
                     updateUiForDownloadProgress(it.bytesDownloaded, it.totalBytesToDownload)
                     rescheduleTimerForSlowDownloadUI()
@@ -114,7 +113,9 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun launchAlertIfNecessary() {
         lifecycleScope.launchWhenResumed {
-            if (splitInstallManager.requestSessionStates().lastOrNull()?.status() != REQUIRES_USER_CONFIRMATION) {
+            if (splitInstallManager.requestSessionStates().lastOrNull()
+                    ?.status() != REQUIRES_USER_CONFIRMATION
+            ) {
                 launchAlert(this@SetupActivity, AlertType.OFFLINE_DURING_SETUP)
             }
         }
@@ -134,13 +135,8 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun collectLocationInBackground() {
-        inBackground(Dispatchers.Main) {
-            try {
-                storeUserLocationIntoCurrentSession(locationManager, eventRepository)
-            } catch (t: Throwable) {
-                Simber.d(t)
-            }
-        }
+        val request = OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java).build()
+        WorkManager.getInstance(applicationContext).enqueue(request)
     }
 
     private fun askPermissionsOrPerformSpecificActions() {
@@ -185,7 +181,11 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun requestUserConfirmationDoDownloadModalities(state: SplitInstallSessionState) {
-        splitInstallManager.startConfirmationDialogForResult(state, this, MODALITIES_DOWNLOAD_REQUEST_CODE)
+        splitInstallManager.startConfirmationDialogForResult(
+            state,
+            this,
+            MODALITIES_DOWNLOAD_REQUEST_CODE
+        )
     }
 
     private fun updateUiForDownloadProgress(bytesDownloaded: Long, totalBytesToDownload: Long) {
@@ -239,7 +239,10 @@ class SetupActivity : BaseSplitActivity() {
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             when (it.buttonAction) {
                 CLOSE -> setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
-                TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(splitInstallManager, getRequiredModules())
+                TRY_AGAIN -> viewModel.reStartDownloadIfNecessary(
+                    splitInstallManager,
+                    getRequiredModules()
+                )
             }
         } ?: setResultAndFinish(SETUP_NOT_COMPLETE_FLAG)
     }

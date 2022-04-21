@@ -14,9 +14,12 @@ open class DefaultOkHttpClientBuilder {
         const val USER_AGENT_HEADER = "User-Agent"
     }
 
-    open fun get(authToken: String? = null,
-                 deviceId: String,
-                 versionName: String): OkHttpClient.Builder =
+    open fun get(
+        authToken: String? = null,
+        deviceId: String,
+        versionName: String,
+        interceptor: Interceptor =HttpLoggingInterceptor()
+    ): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)
@@ -29,7 +32,8 @@ open class DefaultOkHttpClientBuilder {
             }
             .apply {
                 if (BuildConfig.DEBUG_MODE) {
-                    addInterceptor(buildLoggingInterceptor())
+                    addInterceptor(buildSimperLoggingInterceptor())
+                    addInterceptor(interceptor)
                 }
             }
             .addInterceptor(buildDeviceIdInterceptor(deviceId))
@@ -51,7 +55,7 @@ open class DefaultOkHttpClientBuilder {
             return@Interceptor chain.proceed(newRequest)
         }
 
-    private fun buildLoggingInterceptor(): Interceptor {
+    private fun buildSimperLoggingInterceptor(): Interceptor {
         val logger = SimberLogger
         return HttpLoggingInterceptor(logger).apply {
             level = HttpLoggingInterceptor.Level.HEADERS

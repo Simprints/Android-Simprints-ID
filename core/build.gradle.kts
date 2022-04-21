@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
-        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     testOptions {
@@ -63,8 +63,10 @@ dependencies {
     testImplementation(Dependencies.Testing.junit)
     testImplementation(Dependencies.Testing.coroutines_test)
     testImplementation(Dependencies.Testing.KoTest.kotlin_assert)
+    testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(project(":testtools"))
     testImplementation(Dependencies.Testing.Mockk.core)
+
 
     androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
     androidTestImplementation(Dependencies.Testing.AndroidX.monitor)
@@ -73,6 +75,6 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.AndroidX.runner)
     androidTestImplementation(Dependencies.Testing.AndroidX.rules)
     androidTestImplementation(Dependencies.Testing.truth)
-    androidTestUtil(Dependencies.Testing.AndroidX.orchestrator)
+    androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
     androidTestImplementation(Dependencies.Testing.live_data)
 }

@@ -1,11 +1,11 @@
 package com.simprints.id.commontesttools
 
+import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
-import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import java.util.*
 import kotlin.random.Random
 

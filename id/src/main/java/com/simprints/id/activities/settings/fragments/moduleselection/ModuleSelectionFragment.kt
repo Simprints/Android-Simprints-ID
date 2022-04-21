@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
@@ -143,14 +144,18 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     private fun configureSearchViewEditText() {
-        val editText = requireActivity().findViewById<EditText>(
+        val editText: EditText? = requireActivity().findViewById(
             androidx.appcompat.R.id.search_src_text
         )
 
-        with(editText) {
-            typeface = ResourcesCompat.getFont(requireContext(), R.font.muli)
-            observeSearchButton()
-            observeFocus()
+        editText?.let {
+            it.typeface = try {
+                ResourcesCompat.getFont(requireContext(), R.font.muli)
+            } catch (ex: Exception) {
+                Typeface.DEFAULT
+            }
+            it.observeSearchButton()
+            it.observeFocus()
         }
     }
 

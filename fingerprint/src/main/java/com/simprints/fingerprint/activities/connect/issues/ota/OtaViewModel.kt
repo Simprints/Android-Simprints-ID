@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.extentions.getEstimatedOutage
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
+import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -35,7 +38,7 @@ class OtaViewModel(
     val progress = MutableLiveData(0f)
     val otaComplete = MutableLiveData<LiveDataEvent>()
     val otaRecovery = MutableLiveData<LiveDataEventWithContent<OtaRecoveryFragmentRequest>>()
-    val otaFailed = MutableLiveData<LiveDataEvent>()
+    val otaFailed = MutableLiveData<LiveDataEventWithContent<FetchOtaResult>>()
 
     private var currentStep: OtaStep? = null
     private val remainingOtas = mutableListOf<AvailableOta>()
@@ -71,8 +74,10 @@ class OtaViewModel(
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
         Simber.e(e)
-        if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
-            otaFailed.postEvent()
+        if (e.isBackendMaintenanceException()) {
+            otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = true, estimatedOutage = e.getEstimatedOutage()))
+        } else if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
+            otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = false))
         } else {
             when (val strategy = currentStep?.recoveryStrategy) {
                 HARD_RESET, SOFT_RESET ->
@@ -81,7 +86,7 @@ class OtaViewModel(
                     timeHelper.newTimer().schedule(OtaRecoveryStrategy.DELAY_TIME_MS) {
                         otaRecovery.postEvent(OtaRecoveryFragmentRequest(SOFT_RESET, remainingOtas, currentRetryAttempt))
                     }
-                null -> otaFailed.postEvent()
+                null -> otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = false))
             }
         }
     }
@@ -101,13 +106,15 @@ class OtaViewModel(
 
         val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
 
-        sessionEventsManager.addEventInBackground(ScannerFirmwareUpdateEvent(
-            startTime,
-            timeHelper.now(),
-            chipName,
-            targetVersion,
-            failureReason
-        ))
+        sessionEventsManager.addEventInBackground(
+            ScannerFirmwareUpdateEvent(
+                startTime,
+                timeHelper.now(),
+                chipName,
+                targetVersion,
+                failureReason
+            )
+        )
     }
 
     private fun Float.mapToTotalProgress(nRemainingOtas: Int, nTotalOtas: Int): Float {

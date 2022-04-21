@@ -26,7 +26,7 @@
     <string name="toast_login_failed">Login falhou. Por favor contacte seu supervisor.</string>
     <string name="modality_starting_download">Iniciando download…</string>
     <string name="alert_title">Alerta</string>
-    <string name="consent_enrol_only">Gostaria de %1$s para inscrevê-lo em %2$s. </string>
+    <string name="consent_enrol_only">Gostaria de %2$s para inscrevê-lo em %1$s. </string>
     <string name="consent_enrol">Gostaria de %2$s para inscrevê-lo em %1$s e identificá-lo no futuro.</string>
     <string name="consent_id_verify">Gostaria de %2$s para localizar os seus registos em %1$s. </string>
     <string name="consent_share_data_no">Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %1$s e à localização actual. </string>
@@ -153,6 +153,8 @@
     </plurals>
     <string name="confirm_module_selection_title">Módulos selecionados</string>
     <string name="scan_qr">Scannear QR</string>
+    <string name="confirmation_sent">Confirmação enviada</string>
+    <string name="redirecting_you_back">Redirecionando você de volta</string>
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">Inscrição</item>
         <item quantity="other">Inscrições</item>

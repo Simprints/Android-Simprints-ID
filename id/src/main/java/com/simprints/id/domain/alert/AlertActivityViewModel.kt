@@ -5,6 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.id.R
+import com.simprints.core.R as coreR
 
 //TODO: originally in the pro-guard. Do we really need it unobfuscated?
 @Keep
@@ -49,7 +50,7 @@ enum class AlertActivityViewModel(val type: Type,
 
     SAFETYNET_ERROR(
         type = Type.ConfigurationError(title = R.string.alert_try_again,
-            backgroundColor = R.color.simprints_grey,
+            backgroundColor = coreR.color.simprints_grey,
             mainDrawable = R.drawable.error_icon),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
@@ -119,7 +120,7 @@ enum class AlertActivityViewModel(val type: Type,
 
         @Keep
         class DataError(title: Int,
-                        backgroundColor: Int = R.color.simprints_grey,
+                        backgroundColor: Int = coreR.color.simprints_grey,
                         mainDrawable: Int = R.drawable.error_icon,
                         hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
@@ -127,14 +128,14 @@ enum class AlertActivityViewModel(val type: Type,
 
         @Keep
         class ConfigurationError(title: Int = R.string.configuration_error_title,
-                                 backgroundColor: Int = R.color.simprints_yellow,
+                                 backgroundColor: Int = coreR.color.simprints_yellow,
                                  mainDrawable: Int = R.drawable.error_icon,
                                  hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         @Keep
         class UnexpectedError(title: Int = R.string.error_occurred_title,
-                              backgroundColor: Int = R.color.simprints_red,
+                              backgroundColor: Int = coreR.color.simprints_red,
                               mainDrawable: Int = R.drawable.error_icon,
                               hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)

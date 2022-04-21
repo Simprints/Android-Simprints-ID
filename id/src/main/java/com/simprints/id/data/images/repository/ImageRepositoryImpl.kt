@@ -1,8 +1,6 @@
 package com.simprints.id.data.images.repository
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.images.local.ImageLocalDataSource
 import com.simprints.id.data.images.local.ImageLocalDataSourceImpl

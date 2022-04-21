@@ -5,6 +5,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.exceptions.SyncCloudIntegrationException
+import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.extentions.getEstimatedOutage
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -13,14 +16,18 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
+class EventDownSyncDownloaderWorker(
+    context: Context,
+    params: WorkerParameters
+) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
@@ -31,10 +38,14 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
     override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
 
     @Inject lateinit var downSyncHelper: EventDownSyncHelper
+
     @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 
     @Inject lateinit var syncCache: EventSyncCache
+
     @Inject lateinit var jsonHelper: JsonHelper
+
+    @Inject lateinit var dispatcher: DispatcherProvider
 
     internal var eventDownSyncDownloaderTask: EventDownSyncDownloaderTask = EventDownSyncDownloaderTaskImpl()
 
@@ -48,35 +59,43 @@ class EventDownSyncDownloaderWorker(context: Context, params: WorkerParameters) 
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
     @ExperimentalCoroutinesApi
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+    override suspend fun doWork(): Result {
+        getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
 
-        try {
-            traceWorkerPerformance()
-            getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
+        return withContext(dispatcher.io()) {
+            try {
+                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
-            crashlyticsLog("Start - Params: $downSyncOperationInput")
+                crashlyticsLog("Start - Params: $downSyncOperationInput")
 
-            val count = eventDownSyncDownloaderTask.execute(
-                this@EventDownSyncDownloaderWorker.id.toString(),
-                getDownSyncOperation(),
-                downSyncHelper,
-                syncCache,
-                this@EventDownSyncDownloaderWorker,
-                this)
+                val count = eventDownSyncDownloaderTask.execute(
+                    this@EventDownSyncDownloaderWorker.id.toString(),
+                    getDownSyncOperation(),
+                    downSyncHelper,
+                    syncCache,
+                    this@EventDownSyncDownloaderWorker,
+                    this
+                )
 
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
-            success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperationInput")
+                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
+                success(workDataOf(OUTPUT_DOWN_SYNC to count), "Total downloaded: $0 for $downSyncOperationInput")
 
-        } catch (t: Throwable) {
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
-            retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t)
+            } catch (t: Throwable) {
+                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
+                retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
+            }
         }
     }
 
-    private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperation(t: Throwable): Result {
+    private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
         return if (t is SyncCloudIntegrationException) {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+        } else if (t.isBackendMaintenanceException()) {
+            fail(
+                t,
+                t.message,
+                workDataOf(OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true, OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.getEstimatedOutage())
+            )
         } else {
             retry(t)
         }

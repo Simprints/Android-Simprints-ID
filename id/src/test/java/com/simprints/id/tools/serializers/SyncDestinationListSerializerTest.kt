@@ -1,6 +1,7 @@
 package com.simprints.id.tools.serializers
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.SyncDestinationSetting
 import org.junit.Test
 
@@ -69,7 +70,7 @@ class SyncDestinationListSerializerTest {
     @Test
     fun `deserializing a list - empty`() {
         val destinationString = ""
-        val expectedList = listOf<SyncDestinationSetting>()
+        val expectedList = SettingsPreferencesManagerImpl.SYNC_DESTINATION_SETTINGS_DEFAULT
 
         val deserializedDestinations = syncDestinationListSerializer.deserialize(destinationString)
         assertThat(deserializedDestinations).isEqualTo(expectedList)

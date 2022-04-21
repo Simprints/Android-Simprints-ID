@@ -25,13 +25,19 @@ class ClientApiEventRepositoryImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK(relaxed = true) lateinit var coreEventEventsMgrMock: com.simprints.eventsystem.event.EventRepository
+    @MockK(relaxed = true)
+    lateinit var coreEventEventsMgrMock: EventRepository
     private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManager
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        clientSessionEventsMgr = ClientApiSessionEventsManagerImpl(coreEventEventsMgrMock, mockk(relaxed = true), testCoroutineRule.testCoroutineDispatcher)
+        clientSessionEventsMgr = ClientApiSessionEventsManagerImpl(
+            coreEventEventsMgrMock,
+            mockk(relaxed = true),
+            mockk(relaxed = true),
+            testCoroutineRule.testCoroutineDispatcher
+        )
     }
 
     @Test

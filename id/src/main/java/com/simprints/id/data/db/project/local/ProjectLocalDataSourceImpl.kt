@@ -2,19 +2,19 @@ package com.simprints.id.data.db.project.local
 
 import android.content.Context
 import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDbToDomain
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.awaitFirst
 import com.simprints.id.tools.extensions.transactAwait
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 
@@ -22,7 +22,8 @@ import kotlinx.coroutines.withContext
 class ProjectLocalDataSourceImpl(
     private val appContext: Context,
     val secureDataManager: SecureLocalDbKeyProvider,
-    val loginInfoManager: LoginInfoManager
+    val loginInfoManager: LoginInfoManager,
+    private val dispatcher: DispatcherProvider
 ) : ProjectLocalDataSource {
 
     companion object {
@@ -47,7 +48,7 @@ class ProjectLocalDataSourceImpl(
         SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
     override suspend fun load(projectId: String): Project? =
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use { realm ->
                 realm.where(DbProject::class.java)
                     .equalTo(PROJECT_ID_FIELD, projectId)
@@ -57,7 +58,7 @@ class ProjectLocalDataSourceImpl(
         }
 
     override suspend fun save(project: Project) =
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use { realm ->
                 realm.transactAwait {
                     it.insertOrUpdate(project.fromDomainToDb())

@@ -5,13 +5,15 @@ import android.os.Build.VERSION
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.tools.extentions.isClientAndCloudIntegrationIssue
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.*
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.isNotASubjectEvent
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
@@ -22,10 +24,12 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
+import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
+import retrofit2.HttpException
 import java.util.*
 
 open class EventRepositoryImpl(
@@ -89,8 +93,9 @@ open class EventRepositoryImpl(
         reportException {
             val session = getCurrentCaptureSessionEvent()
 
+            val currentEvents = sessionDataCache.eventCache.values.toList()
             validators.forEach {
-                it.validate(sessionDataCache.eventCache.values.toList(), event)
+                it.validate(currentEvents, event)
             }
 
             sessionDataCache.eventCache[event.id] = event
@@ -153,10 +158,15 @@ open class EventRepositoryImpl(
 
         eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
             // The events will include the SessionCaptureEvent event
-            Simber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
-            eventLocalDataSource.loadAllFromSession(sessionId).let {
-                attemptEventUpload(it, projectId)
-                this.emit(it.size)
+            Simber.tag("SYNC").i("Uploading session $sessionId")
+            try {
+                eventLocalDataSource.loadAllFromSession(sessionId).let {
+                    attemptEventUpload(it, projectId)
+                    this.emit(it.size)
+                }
+            } catch (ex: Exception) {
+                Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
+                Simber.e(ex)
             }
         }
 
@@ -183,10 +193,9 @@ open class EventRepositoryImpl(
             deleteEventsFromDb(events.map { it.id })
         } catch (t: Throwable) {
             Simber.w(t)
-            if (t.isClientAndCloudIntegrationIssue()) {
+            // We don't need to report http exceptions as cloud logs all of them.
+            if (t !is HttpException) {
                 Simber.e(t)
-                // We do not delete subject events (pokedex) since they are important.
-                deleteEventsFromDb(events.filter { it.type.isNotASubjectEvent() }.map { it.id })
             }
         }
     }
@@ -266,7 +275,10 @@ open class EventRepositoryImpl(
         try {
             block()
         } catch (t: Throwable) {
-            Simber.e(t)
+            // prevent crashlytics logging of duplicate guid-selection
+            if (t is DuplicateGuidSelectEventValidatorException) Simber.d(t)
+            else Simber.e(t)
+
             throw t
         }
 

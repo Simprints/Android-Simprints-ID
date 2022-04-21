@@ -3,10 +3,10 @@ package com.simprints.id.tools
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -16,17 +16,21 @@ class LocationManagerImpl(val ctx: Context) : LocationManager {
     private val locationClient = LocationServices.getFusedLocationProviderClient(ctx)
 
     @SuppressLint("MissingPermission")
-    override suspend fun requestLocation(request: LocationRequest): Flow<List<Location>> = channelFlow {
-        val locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                offer(result.locations)
+    override fun requestLocation(request: LocationRequest): Flow<Location?> = channelFlow {
+        val cancellationTokenSource = CancellationTokenSource()
+        val currentLocationTask: Task<Location> =
+            locationClient.getCurrentLocation(request.priority, cancellationTokenSource.token)
+        currentLocationTask.addOnCompleteListener {
+            val result: Location? = if (it.isSuccessful) {
+                it.result
+            } else {
+                null
             }
+            trySend(result)
         }
 
-        locationClient.requestLocationUpdates(request, locationCallback, null)
-
         awaitClose {
-            locationClient.removeLocationUpdates(locationCallback)
+            cancellationTokenSource.cancel()
         }
     }
 

@@ -7,11 +7,14 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -24,11 +27,17 @@ class SecurityStateWorkerTest {
 
     private lateinit var worker: SecurityStateWorker
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
+
     @Before
     fun setUp() {
         worker = TestListenableWorkerBuilder<SecurityStateWorker>(app).build().apply {
             repository = mockk()
             securityStateProcessor = mockk()
+            dispatcher = testDispatcherProvider
         }
         app.component = mockk(relaxed = true)
     }

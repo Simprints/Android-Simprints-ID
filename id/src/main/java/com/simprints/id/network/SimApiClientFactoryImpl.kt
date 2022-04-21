@@ -3,9 +3,10 @@ package com.simprints.id.network
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.network.SimRemoteInterface
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
+import okhttp3.Interceptor
 import kotlin.reflect.KClass
 
 class SimApiClientFactoryImpl(
@@ -13,8 +14,9 @@ class SimApiClientFactoryImpl(
     val deviceId: String,
     private val versionName: String,
     private val remoteDbManager: RemoteDbManager,
-    private val performanceTracer: FirebasePerformanceTraceFactory,
     private val jsonHelper: JsonHelper,
+    private val dispatcher: DispatcherProvider,
+    private val interceptor: Interceptor,
     private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
 ): SimApiClientFactory {
 
@@ -28,8 +30,9 @@ class SimApiClientFactoryImpl(
             deviceId,
             versionName,
             remoteDbManager.getCurrentToken(),
-            performanceTracer,
             jsonHelper,
+            dispatcher,
+            interceptor,
             okHttpClientBuilder
         )
     }
@@ -41,8 +44,9 @@ class SimApiClientFactoryImpl(
             deviceId,
             versionName,
             null,
-            performanceTracer,
             jsonHelper,
+            dispatcher,
+            interceptor,
             okHttpClientBuilder
         )
     }

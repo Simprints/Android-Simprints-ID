@@ -39,5 +39,6 @@ class ConfigurationViewModel(
             LicenseState.Downloading -> ConfigurationState.Downloading
             is LicenseState.FinishedWithSuccess -> ConfigurationState.FinishedWithSuccess(license)
             is LicenseState.FinishedWithError -> ConfigurationState.FinishedWithError(errorCode)
+            is LicenseState.FinishedWithBackendMaintenanceError -> ConfigurationState.FinishedWithBackendMaintenanceError(estimatedOutage)
         }
 }

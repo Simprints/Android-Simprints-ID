@@ -44,11 +44,9 @@ class ModuleChipHelper(private val context: Context, private val listener: ChipC
     private fun createChipDrawable(): ChipDrawable {
         return ChipDrawable.createFromResource(context, R.xml.module_selection_chip).apply {
             setTextAppearanceResource(R.style.SimprintsStyle_TextView_Chip)
-            shapeAppearanceModel = ShapeAppearanceModel().also { shapeAppearanceModel ->
-                val cornerSize = context.dimen(R.dimen.chip_corner_size_module_selection)
-                shapeAppearanceModel.setAllCorners(CornerFamily.CUT, cornerSize)
-            }
+            val cornerSize = context.dimen(R.dimen.chip_corner_size_module_selection).toFloat()
+            shapeAppearanceModel =
+                ShapeAppearanceModel.builder().setAllCorners(CornerFamily.CUT, cornerSize).build()
         }
     }
-
 }

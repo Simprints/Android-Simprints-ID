@@ -67,12 +67,19 @@ open class ViewModelModule {
         FaceExitFormViewModelFactory(eventRepository)
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(guidFetchGuidHelper: FetchGuidHelper,
-                                              deviceManager: DeviceManager,
-                                              eventRepository: EventRepository,
-                                              timeHelper: TimeHelper
-    ) =
-        FetchGuidViewModelFactory(guidFetchGuidHelper, deviceManager, eventRepository, timeHelper)
+    open fun provideFetchGuidViewModelFactory(
+        guidFetchGuidHelper: FetchGuidHelper,
+        deviceManager: DeviceManager,
+        eventRepository: EventRepository,
+        timeHelper: TimeHelper,
+        dispatcher: DispatcherProvider
+    ) = FetchGuidViewModelFactory(
+        guidFetchGuidHelper,
+        deviceManager,
+        eventRepository,
+        timeHelper,
+        dispatcher
+    )
 
     @Provides
     open fun provideSyncInformationViewModelFactory(
@@ -83,7 +90,8 @@ open class ViewModelModule {
         loginInfoManager: LoginInfoManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        eventSyncManager: EventSyncManager
+        eventSyncManager: EventSyncManager,
+        dispatcher: DispatcherProvider
     ): SyncInformationViewModelFactory =
         SyncInformationViewModelFactory(
             downySyncHelper,
@@ -92,7 +100,8 @@ open class ViewModelModule {
             preferencesManager,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             eventDownSyncScopeRepository,
-            imageRepository
+            imageRepository,
+            dispatcher
         )
 
     @Provides
@@ -134,9 +143,10 @@ open class ViewModelModule {
 
     @Provides
     open fun provideLoginViewModelFactory(
-        authenticationHelper: AuthenticationHelper
+        authenticationHelper: AuthenticationHelper,
+        dispatcher: DispatcherProvider
     ): LoginViewModelFactory {
-        return LoginViewModelFactory(authenticationHelper)
+        return LoginViewModelFactory(authenticationHelper, dispatcher)
     }
 
     @Provides

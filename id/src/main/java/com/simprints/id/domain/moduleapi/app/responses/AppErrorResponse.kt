@@ -25,6 +25,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         FACE_LICENSE_MISSING,
         FACE_LICENSE_INVALID,
         FINGERPRINT_CONFIGURATION_ERROR,
+        BACKEND_MAINTENANCE_ERROR,
         FACE_CONFIGURATION_ERROR;
 
         companion object {

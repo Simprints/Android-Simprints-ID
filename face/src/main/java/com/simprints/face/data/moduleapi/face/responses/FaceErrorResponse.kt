@@ -17,6 +17,7 @@ enum class FaceErrorReason {
     UNEXPECTED_ERROR,
     LICENSE_MISSING,
     LICENSE_INVALID,
+    BACKEND_MAINTENANCE_ERROR,
     CONFIGURATION_ERROR;
 
     fun fromDomainToFaceErrorReason(): IFaceErrorReason =
@@ -25,6 +26,7 @@ enum class FaceErrorReason {
             LICENSE_MISSING -> IFaceErrorReason.LICENSE_MISSING
             LICENSE_INVALID -> IFaceErrorReason.LICENSE_INVALID
             CONFIGURATION_ERROR -> IFaceErrorReason.FACE_CONFIGURATION_ERROR
+            BACKEND_MAINTENANCE_ERROR -> IFaceErrorReason.BACKEND_MAINTENANCE_ERROR
         }
 
     companion object {
@@ -34,6 +36,7 @@ enum class FaceErrorReason {
                 ErrorType.LICENSE_INVALID -> LICENSE_INVALID
                 ErrorType.CONFIGURATION_ERROR -> CONFIGURATION_ERROR
                 ErrorType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                ErrorType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
             }
     }
 }

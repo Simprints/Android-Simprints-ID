@@ -1,7 +1,6 @@
 package com.simprints.eventsystem.event.local.migrations
 
 import android.content.ContentValues
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -18,6 +17,7 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
+import com.simprints.eventsystem.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +32,7 @@ class EventMigration2to3Test {
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        "${EventRoomDatabase::class.java.canonicalName}",
+        EventRoomDatabase::class.java.canonicalName,
         FrameworkSQLiteOpenHelperFactory()
     )
 
@@ -99,9 +99,6 @@ class EventMigration2to3Test {
         val cursor = retrieveCursorWithEventById(db, closedId)
         Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(1)
     }
-
-    private fun retrieveCursorWithEventById(db: SupportSQLiteDatabase, id: String): Cursor =
-        db.query("SELECT * from DbEvent where id= ?", arrayOf(id)).apply { moveToNext() }
 
     companion object {
         private const val TEST_DB = "test"

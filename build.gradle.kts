@@ -1,6 +1,7 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 apply {
     from("ci${File.separator}scanning${File.separator}sonarqube.gradle")
-    from("ci${File.separator}scanning${File.separator}jacoco.gradle")
     from("ci${File.separator}scanning${File.separator}dependency_health.gradle")
 }
 
@@ -8,42 +9,45 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven(url = "http://storage.googleapis.com/r8-releases/raw/master")
+        mavenCentral()
+        maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://plugins.gradle.org/m2/")
         maven(url = "https://kotlin.bintray.com/kotlinx/")
     }
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:4.2.1")
+        classpath("com.android.tools.build:gradle:7.1.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
 
         // CI Scanning & Retry
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1")
-        classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
-        classpath("org.ow2.asm:asm:9.0")
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.74.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.2.0")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
+
+        classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
+
+        classpath("org.ow2.asm:asm:9.2")
+        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.80.0")
+        classpath("org.gradle:test-retry-gradle-plugin:1.3.1")
 
         // Firebase
-        classpath("com.google.gms:google-services:4.3.8")
-        classpath("com.google.firebase:perf-plugin:1.4.0")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.1")
+        classpath("com.google.gms:google-services:4.3.10")
+        classpath("com.google.firebase:perf-plugin:1.4.1")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.1")
 
         // Dependency Publishing
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.24.4")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.27.1")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.4.0")
+        classpath("io.realm:realm-gradle-plugin:10.10.1")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
 
         // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.4.0-agp4.2")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:2.1.2")
+        classpath("com.github.triplet.gradle:play-publisher:3.7.0")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.0")
     }
 
 }
@@ -53,6 +57,16 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        maven {
+            name = "SimMatcherGitHubPackages"
+            url = uri("https://maven.pkg.github.com/simprints/lib-android-simmatcher")
+            credentials {
+                username = gradleLocalProperties(rootDir).getProperty("GITHUB_USERNAME")
+                    ?: System.getenv("GITHUB_USERNAME")
+                password = gradleLocalProperties(rootDir).getProperty("GITHUB_TOKEN")
+                    ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).forEach {
@@ -76,7 +90,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.2.0"
+    id("org.gradle.test-retry") version "1.3.1"
 }
 
 /*

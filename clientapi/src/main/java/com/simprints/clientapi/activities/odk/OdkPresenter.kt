@@ -72,13 +72,9 @@ class OdkPresenter(
 
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-
-            // There is a bug that creates a malformed session on multiple callouts
-            // of EnrolLastBiometrics, this tries to fix that, here is a ticket detailing the issue:
-            // https://simprints.atlassian.net/browse/CORE-612
-            if (action != EnrolLastBiometrics) {
-                sessionEventsManager.closeCurrentSessionNormally()
-            }
+            // As requested in https://simprints.atlassian.net/browse/CORE-987
+            // we should close the session after any enrollment request
+            sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnRegistration(enrol.guid, currentSessionId, flowCompletedCheck)
         }

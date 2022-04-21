@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
@@ -22,27 +23,13 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.EventRepositoryImpl
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
-import com.simprints.eventsystem.event.local.DbEventDatabaseFactoryImpl
-import com.simprints.eventsystem.event.local.EventDatabaseFactory
-import com.simprints.eventsystem.event.local.EventLocalDataSource
-import com.simprints.eventsystem.event.local.EventLocalDataSourceImpl
-import com.simprints.eventsystem.event.local.SessionDataCache
-import com.simprints.eventsystem.event.local.SessionDataCacheImpl
+import com.simprints.eventsystem.event.local.*
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
-import com.simprints.id.activities.qrcapture.tools.CameraFocusManager
-import com.simprints.id.activities.qrcapture.tools.CameraFocusManagerImpl
-import com.simprints.id.activities.qrcapture.tools.CameraHelper
-import com.simprints.id.activities.qrcapture.tools.CameraHelperImpl
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetector
-import com.simprints.id.activities.qrcapture.tools.QrCodeDetectorImpl
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
-import com.simprints.id.activities.qrcapture.tools.QrCodeProducerImpl
-import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
-import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilderImpl
+import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -51,11 +38,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
-import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
-import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
-import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
+import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -84,8 +67,6 @@ import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
-import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactory
-import com.simprints.id.tools.extensions.FirebasePerformanceTraceFactoryImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
@@ -93,6 +74,7 @@ import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import okhttp3.Interceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -108,8 +90,9 @@ open class AppModule {
     @Singleton
     open fun provideRemoteDbManager(
         loginInfoManager: LoginInfoManager,
-        context: Context
-    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
+        context: Context,
+        dispatcher: DispatcherProvider
+    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context, dispatcher)
 
     @Provides
     @Singleton
@@ -122,7 +105,8 @@ open class AppModule {
         RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
-    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache = SessionDataCacheImpl(app)
+    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
+        SessionDataCacheImpl(app)
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
@@ -172,23 +156,21 @@ open class AppModule {
     )
 
     @Provides
-    open fun provideFirebasePerformanceTraceFactory(): FirebasePerformanceTraceFactory =
-        FirebasePerformanceTraceFactoryImpl()
-
-    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
-        performanceTracer: FirebasePerformanceTraceFactory,
-        jsonHelper: JsonHelper
+        jsonHelper: JsonHelper,
+        dispatcher: DispatcherProvider,
+        @Named("ChuckerInterceptor") interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
         ctx.packageVersionName,
         remoteDbManager,
-        performanceTracer,
-        jsonHelper
+        jsonHelper,
+        dispatcher,
+        interceptor
     )
 
     @Provides
@@ -207,6 +189,11 @@ open class AppModule {
     @Provides
     open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
         SessionEventValidatorsFactoryImpl()
+
+    @Provides
+    @Named("ChuckerInterceptor")
+    open fun provideChuckerInterceptor(ctx: Context): Interceptor =
+        ChuckerInterceptor.Builder(ctx).build()
 
     @Provides
     open fun provideDbEventDatabaseFactory(

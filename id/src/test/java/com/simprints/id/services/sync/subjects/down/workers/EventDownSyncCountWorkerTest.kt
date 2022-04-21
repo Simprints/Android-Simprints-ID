@@ -18,18 +18,17 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.UUID
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -39,6 +38,10 @@ class EventDownSyncCountWorkerTest {
     private val tagForMasterSyncId = "${TAG_MASTER_SYNC_ID}$syncId"
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var countWorker: EventDownSyncCountWorker
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setUp() {
@@ -53,6 +56,7 @@ class EventDownSyncCountWorkerTest {
             eventDownSyncHelper = mockk(relaxed = true)
             jsonHelper = JsonHelper
             eventDownSyncScopeRepository = mockk(relaxed = true)
+            dispatcher = testDispatcherProvider
         }
 
         coEvery { countWorker.eventDownSyncScopeRepository.refreshState(any()) } coAnswers { args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }
