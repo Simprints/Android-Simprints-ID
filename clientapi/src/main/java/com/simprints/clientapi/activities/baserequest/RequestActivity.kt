@@ -7,33 +7,17 @@ import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
-import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
-import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
-import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
-import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.*
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
-import com.simprints.clientapi.domain.responses.ConfirmationResponse
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.logging.Simber
-import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
-import com.simprints.moduleapi.app.responses.IAppEnrolResponse
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
-import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.moduleapi.app.responses.IAppResponseType
-import com.simprints.moduleapi.app.responses.IAppVerifyResponse
+import com.simprints.moduleapi.app.responses.*
 import kotlinx.coroutines.launch
 
 abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestView {
@@ -121,7 +105,7 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
             ?.let { routeAppResponse(it) }
     }
 
-    private fun routeAppResponse(response: IAppResponse) = when (response.type) {
+    private fun routeAppResponse(response: IAppResponse?) = when (response?.type) {
         IAppResponseType.ENROL, IAppResponseType.ENROL_LAST_BIOMETRICS -> presenter.handleEnrolResponse(
             EnrolResponse(response as IAppEnrolResponse)
         )
@@ -133,6 +117,6 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
                 response as IAppConfirmationResponse
             )
         )
-        IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
+        IAppResponseType.ERROR, null -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
     }
 }

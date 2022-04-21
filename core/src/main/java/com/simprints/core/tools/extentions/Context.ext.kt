@@ -2,7 +2,6 @@ package com.simprints.core.tools.extentions
 
 import android.content.Context
 import android.widget.Toast
-import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 
 fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {

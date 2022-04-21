@@ -25,7 +25,7 @@ data class EnrolmentRecordDeletionEvent(
         extraLabels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        extraLabels.copy(subjectId = subjectId, projectId = projectId, moduleIds = listOf(moduleId), attendantId = attendantId),
+        extraLabels.copy(projectId = projectId, moduleIds = listOf(moduleId), attendantId = attendantId),
         EnrolmentRecordDeletionPayload(createdAt, EVENT_VERSION, subjectId, projectId, moduleId, attendantId),
         ENROLMENT_RECORD_DELETION)
 

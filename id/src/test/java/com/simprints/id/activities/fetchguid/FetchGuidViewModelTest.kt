@@ -12,6 +12,8 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -40,15 +42,14 @@ class FetchGuidViewModelTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
-    companion object {
-        private const val PROJECT_ID = "project_id"
-        private const val VERIFY_GUID = "verify_guid"
-    }
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = FetchGuidViewModel(fetchGuidHelper, deviceManager, eventRepository, timeHelper)
+        viewModel = FetchGuidViewModel(fetchGuidHelper, deviceManager, eventRepository, timeHelper, testDispatcherProvider)
 
         configureMocks()
     }
@@ -233,5 +234,11 @@ class FetchGuidViewModelTest {
                 )
             }
         }
+    }
+
+
+    companion object {
+        private const val PROJECT_ID = "project_id"
+        private const val VERIFY_GUID = "verify_guid"
     }
 }

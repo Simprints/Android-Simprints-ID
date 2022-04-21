@@ -15,13 +15,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Answer
-import com.simprints.id.data.exitform.FaceExitFormReason.APP_NOT_WORKING
-import com.simprints.id.data.exitform.FaceExitFormReason.OTHER
-import com.simprints.id.data.exitform.FaceExitFormReason.REFUSED_DATA_CONCERNS
-import com.simprints.id.data.exitform.FaceExitFormReason.REFUSED_NOT_PRESENT
-import com.simprints.id.data.exitform.FaceExitFormReason.REFUSED_PERMISSION
-import com.simprints.id.data.exitform.FaceExitFormReason.REFUSED_RELIGION
-import com.simprints.id.data.exitform.FaceExitFormReason.REFUSED_YOUNG
+import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.databinding.ActivityFaceExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.extensions.showToast

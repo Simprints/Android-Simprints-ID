@@ -1,12 +1,12 @@
 package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-
 import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
-import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class AuthenticationEvent(
@@ -26,7 +26,8 @@ data class AuthenticationEvent(
         UUID.randomUUID().toString(),
         labels,
         AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
-        AUTHENTICATION)
+        AUTHENTICATION
+    )
 
 
     @Keep
@@ -49,6 +50,7 @@ data class AuthenticationEvent(
             TECHNICAL_FAILURE,
             SAFETYNET_UNAVAILABLE,
             SAFETYNET_INVALID_CLAIM,
+            BACKEND_MAINTENANCE_ERROR,
             UNKNOWN
         }
     }

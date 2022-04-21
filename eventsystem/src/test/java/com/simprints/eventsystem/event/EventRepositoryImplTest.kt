@@ -7,6 +7,7 @@ import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
@@ -19,18 +20,15 @@ import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
+import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -107,6 +105,30 @@ class EventRepositoryImplTest {
                     it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
                 })
             }
+        }
+    }
+
+    @Test
+    fun createSession_ForEmptyProjectId() {
+        runBlocking {
+            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
+            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+
+            val session = eventRepo.createSession()
+
+            assertThat(session.payload.projectId).isEqualTo(PROJECT_ID_FOR_NOT_SIGNED_IN)
+
+        }
+    }
+
+    @Test(expected = DuplicateGuidSelectEventValidatorException::class)
+    fun createSession_ReportDuplicateGuidSelectEventValidatorExceptionException() {
+        runBlocking {
+            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+            coEvery {
+                eventLocalDataSource.insertOrUpdate(any())
+            } throws DuplicateGuidSelectEventValidatorException("oops...")
+            val session = eventRepo.createSession()
         }
     }
 
@@ -226,6 +248,17 @@ class EventRepositoryImplTest {
     }
 
     @Test
+    fun upload_shouldSkipInvalidSessions() {
+        runBlocking {
+            mockDbToLoadInvalidSessions(2)
+
+            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+
+            coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID1) }
+        }
+    }
+
+    @Test
     fun upload_shouldNotUploadOpenSession() {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
@@ -309,7 +342,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_fails_shouldDeleteSessionEventsAfterIntegrationIssues() {
+    fun upload_fails_shouldNotDeleteSessionEventsAfterIntegrationIssues() {
         runBlocking {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
                 Response.error<String>(
@@ -323,7 +356,7 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
 
-            coVerify {
+            coVerify(exactly = 0) {
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
                     .map { it.id })
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }

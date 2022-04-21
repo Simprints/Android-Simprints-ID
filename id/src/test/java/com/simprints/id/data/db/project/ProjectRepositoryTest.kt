@@ -2,7 +2,6 @@ package com.simprints.id.data.db.project
 
 import android.accounts.NetworkErrorException
 import com.google.common.truth.Truth.assertThat
-import com.google.firebase.perf.FirebasePerformance
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -11,7 +10,6 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -45,20 +43,16 @@ class ProjectRepositoryTest {
     private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mockk()
     private val projectLocalDataSourceMock: ProjectLocalDataSource = mockk(relaxUnitFun = true)
     private val remoteConfigWrapper: RemoteConfigWrapper = mockk(relaxUnitFun = true)
-    private val firebasePerformanceMock: FirebasePerformance = mockk()
 
     private val projectRepository = ProjectRepositoryImpl(
         projectLocalDataSourceMock,
         projectRemoteDataSourceMock,
-        remoteConfigWrapper,
-        firebasePerformanceMock
+        remoteConfigWrapper
     )
 
     @Before
     fun setup() {
         BaseUnitTestConfig().coroutinesMainThread()
-
-        every { firebasePerformanceMock.newTrace(any()) } returns mockk(relaxUnitFun = true)
     }
 
     @Test

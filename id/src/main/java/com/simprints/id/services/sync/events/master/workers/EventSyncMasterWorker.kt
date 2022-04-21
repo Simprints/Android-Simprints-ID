@@ -2,6 +2,7 @@ package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
 import androidx.work.*
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.canSyncToSimprints
@@ -12,7 +13,6 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -52,6 +52,9 @@ open class EventSyncMasterWorker(
     @Inject
     lateinit var timeHelper: TimeHelper
 
+    @Inject
+    lateinit var dispatcher: DispatcherProvider
+
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
 
@@ -66,10 +69,11 @@ open class EventSyncMasterWorker(
         UUID.randomUUID().toString()
     }
 
-    override suspend fun doWork(): Result =
-        withContext(Dispatchers.IO) {
+    override suspend fun doWork(): Result {
+        getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
+
+        return withContext(dispatcher.io()) {
             try {
-                getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
                 crashlyticsLog("Start")
 
                 if (!preferenceManager.canSyncToSimprints()) return@withContext success(message = "Can't sync to SimprintsID, skip")
@@ -112,6 +116,7 @@ open class EventSyncMasterWorker(
                 fail(t)
             }
         }
+    }
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val downSyncChainRequired = isEventDownSyncAllowed()

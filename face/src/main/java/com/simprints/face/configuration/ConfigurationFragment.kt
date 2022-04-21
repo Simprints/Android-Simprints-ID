@@ -36,6 +36,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
                 ConfigurationState.Downloading -> renderDownloading()
                 is ConfigurationState.FinishedWithSuccess -> renderFinishedWithSuccess(it.license)
                 is ConfigurationState.FinishedWithError -> renderFinishedWithError(it.errorCode)
+                is ConfigurationState.FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaitenanceError(it.estimatedOutage)
             }
         })
     }
@@ -61,4 +62,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
         mainVm.configurationFinished(false, errorCode)
     }
 
+    private fun renderFinishedWithBackendMaitenanceError(estimatedOutage: Long?) {
+        mainVm.configurationFinished(false, estimatedOutage = estimatedOutage)
+    }
 }

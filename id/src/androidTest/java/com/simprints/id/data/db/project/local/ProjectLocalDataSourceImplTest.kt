@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.RealmTestsBase
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
@@ -26,6 +27,9 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var projectLocalDataSource: ProjectLocalDataSource
+
+
+    private val testDispatcherProvider = DefaultDispatcherProvider()
 
     private val project = Project(
         DEFAULT_PROJECT_ID,
@@ -57,7 +61,8 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
         projectLocalDataSource = ProjectLocalDataSourceImpl(
             testContext,
             secureLocalDbKeyProviderMock,
-            loginInfoManagerMock
+            loginInfoManagerMock,
+            testDispatcherProvider
         )
     }
 

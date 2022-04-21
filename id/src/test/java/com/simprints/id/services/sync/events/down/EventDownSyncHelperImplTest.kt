@@ -14,6 +14,8 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class EventDownSyncHelperImplTest {
@@ -43,6 +46,11 @@ class EventDownSyncHelperImplTest {
     @MockK private lateinit var preferencesManager: IdPreferencesManager
     private val subjectFactory = SubjectFactoryImpl(EncodingUtilsImplForTests)
 
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -53,7 +61,8 @@ class EventDownSyncHelperImplTest {
             eventDownSyncScopeRepository,
             subjectFactory,
             preferencesManager,
-            timeHelper
+            timeHelper,
+            testDispatcherProvider
         )
 
         runBlockingTest {

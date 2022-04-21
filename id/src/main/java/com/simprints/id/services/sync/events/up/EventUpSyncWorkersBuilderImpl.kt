@@ -2,8 +2,6 @@ package com.simprints.id.services.sync.events.up
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker

@@ -23,6 +23,7 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
+import com.simprints.eventsystem.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Rule
 import org.junit.Test
@@ -35,9 +36,9 @@ import java.io.IOException
 class EventMigration1to2Test {
 
     @get:Rule
-    public val helper: MigrationTestHelper = MigrationTestHelper(
+    val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        "${EventRoomDatabase::class.java.canonicalName}",
+        EventRoomDatabase::class.java.canonicalName,
         FrameworkSQLiteOpenHelperFactory()
     )
 
@@ -124,9 +125,6 @@ class EventMigration1to2Test {
         cursor.getStringWithColumnName("eventJson")!!,
         object : TypeReference<Event>() {}
     )
-
-    private fun retrieveCursorWithEventById(db: SupportSQLiteDatabase, id: String): Cursor =
-        db.query("SELECT * from DbEvent where id= ?", arrayOf(id)).apply { moveToNext() }
 
     companion object {
         private const val TEST_DB = "test"

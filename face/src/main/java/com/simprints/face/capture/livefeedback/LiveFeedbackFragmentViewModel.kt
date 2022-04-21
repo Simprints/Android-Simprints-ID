@@ -40,6 +40,13 @@ class LiveFeedbackFragmentViewModel(
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
+    /**
+     * Processes the image
+     *
+     * @param frame is the camera frame
+     * @param faceRectF is the box on the screen
+     * @param size is the screen size
+     */
     fun process(frame: Frame, faceRectF: RectF, size: Size) {
         val captureStartTime = faceTimeHelper.now()
         val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)

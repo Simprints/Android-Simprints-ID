@@ -24,8 +24,9 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew clientapi:jacocoTestReportDebug
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew clientapi:jacocoTestReport
                 artifacts:
                     - clientapi/build/reports/**
 
@@ -40,14 +41,33 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew core:jacocoTestReportDebug
-                    - ./gradlew id:jacocoTestReportDebug
-                    - ./gradlew eventsystem:jacocoTestReportDebug
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew id:jacocoTestReport
                 artifacts:
                     - id/build/reports/**
+
+        ######################################################################
+        # Run the Core, Event system and Logging unit tests with coverage and
+        # upload report to artifacts.
+        ######################################################################
+        -   step: &run-module-unit-tests
+                name: "Run the Core, Event system and Logging unit tests"
+                size: 2x
+                max-time: 30
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew core:jacocoTestReport
+                    - ./gradlew eventsystem:jacocoTestReport
+                    - ./gradlew logging:jacocoTestReport
+                artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
+                    - logging/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -60,8 +80,9 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReportDebug
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew face:jacocoTestReport
                 artifacts:
                     - face/build/reports/**
 
@@ -77,8 +98,9 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprint:jacocoTestReportDebug
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew fingerprint:jacocoTestReport
                 artifacts:
                     - fingerprint/build/reports/**
 
@@ -94,8 +116,9 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew fingerprintscanner:jacocoTestReportDebug
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew fingerprintscanner:jacocoTestReport
                 artifacts:
                     - fingerprintscanner/build/reports/**
 
@@ -112,10 +135,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
-                    - ./gradlew assembleDebug
-                    - bash ./ci/tools/install_java_11
-                    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+                    - source ci/pipeline/setup
                     - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
@@ -130,7 +150,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
                     - ./gradlew :clientapi:projectHealth
@@ -155,7 +175,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     # Build ID Android Test APK
                     - ./gradlew id:assembleDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
@@ -210,7 +230,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
                     - ./gradlew packageStagingUniversalApk
@@ -234,7 +254,7 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - bash ./ci/deployment/signing_properties_setup
                     - mkdir -p id/src/release
@@ -257,10 +277,21 @@ definitions:
                     - gradle
                     - gradlewrapper
                 script:
-                    - bash ./ci/pipeline/setup
+                    - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
+
+
+        ######################################################################
+        # Run dependabot tool which scans all gradle files and open automatic PRs
+        ######################################################################
+        -   step: &update-dependencies
+                name: "Update project dependencies"
+                image: ruby:2.6.6
+                max-time: 30
+                script:
+                    - bash ./ci/dependabot/run_dependabot
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -273,6 +304,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-module-unit-tests
                     -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
@@ -285,6 +317,7 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
+                    -   step: *run-module-unit-tests
                     -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
@@ -294,19 +327,23 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
     -   flow: &ci-test # For CI testing purposes only
-            -   step: *sign-and-deploy-to-staging
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-internal-to-alpha
+            -   parallel:
+                    -   step: *run-id-unit-tests
+                    -   step: *run-clientapi-unit-tests
+    -   flow: &update-dependencies-flow
+            -   step: *update-dependencies
+
 
 ######################################################################
 # Define the triggers that launch the pipeline.
 ######################################################################
 pipelines:
-    branches:
+    pull-requests:
+        '**': *development_flow
         main: *release_flow
-        develop: *development_flow
         release/*: *release_flow
     custom:
         develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
         release-pipeline: *release_flow # Pipeline to create a release manually
         ci-test-pipeline: *ci-test # For CI testing purposes only
+        dependabot: *update-dependencies-flow

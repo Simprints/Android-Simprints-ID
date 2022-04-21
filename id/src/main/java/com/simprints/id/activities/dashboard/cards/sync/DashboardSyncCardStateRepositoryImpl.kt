@@ -8,6 +8,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.S
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncDefault
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailed
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailedBackendMaintenance
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncHasNoModules
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
@@ -44,6 +45,7 @@ class DashboardSyncCardStateRepositoryImpl(
     private var isConnectedLiveData = deviceManager.isConnectedLiveData
 
     private var lastTimeSyncRun: Date? = null
+    private var estimatedOutage: Long? = null
 
     private val lastTimeSyncSucceed
         get() = cacheSync.readLastSuccessfulSyncTime()
@@ -97,6 +99,7 @@ class DashboardSyncCardStateRepositoryImpl(
                 syncState.total
             )
             isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
+            isSyncFailedBecauseBackendMaintenance(allSyncStates) -> SyncFailedBackendMaintenance(lastTimeSyncSucceed, estimatedOutage)
             isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed)
             else -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
         }
@@ -163,6 +166,18 @@ class DashboardSyncCardStateRepositoryImpl(
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
+
+    private fun isSyncFailedBecauseBackendMaintenance(allSyncStates: List<EventSyncState.SyncWorkerInfo>): Boolean {
+        val isBackendMaintenance =
+            allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseBackendMaintenance }
+        if (isBackendMaintenance) {
+            val syncWorkerInfo =
+                allSyncStates.find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
+            val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
+            estimatedOutage = failedWorkerState?.estimatedOutage
+        }
+        return isBackendMaintenance
+    }
 
     private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.isEmpty()

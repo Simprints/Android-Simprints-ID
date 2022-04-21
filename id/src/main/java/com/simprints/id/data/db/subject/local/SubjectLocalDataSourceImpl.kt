@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -21,7 +22,6 @@ import com.simprints.id.tools.extensions.transactAwait
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -34,7 +34,8 @@ import java.io.Serializable
 class SubjectLocalDataSourceImpl(
     private val appContext: Context,
     val secureDataManager: SecureLocalDbKeyProvider,
-    val loginInfoManager: LoginInfoManager
+    val loginInfoManager: LoginInfoManager,
+    private val dispatcher: DispatcherProvider
 ) : SubjectLocalDataSource {
 
     companion object {
@@ -67,7 +68,7 @@ class SubjectLocalDataSourceImpl(
 
 
     override suspend fun insertOrUpdate(subjects: List<Subject>) {
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use { realm ->
                 realm.transactAwait {
                     it.insertOrUpdate(subjects.map(Subject::fromDomainToDb))
@@ -77,7 +78,7 @@ class SubjectLocalDataSourceImpl(
     }
 
     override suspend fun load(query: SubjectQuery?): Flow<Subject> =
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use {
                 it.buildRealmQueryForSubject(query)
                     .await()
@@ -106,7 +107,7 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use { realmInstance ->
                 realmInstance.transactAwait { realm ->
                     queries.forEach {
@@ -124,7 +125,7 @@ class SubjectLocalDataSourceImpl(
     }
 
     override suspend fun count(query: SubjectQuery): Int =
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use { realm ->
                 realm.buildRealmQueryForSubject(query)
                     .await()
@@ -133,7 +134,7 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun performActions(actions: List<SubjectAction>) {
-        withContext(Dispatchers.Main) {
+        withContext(dispatcher.main()) {
             Realm.getInstance(config).use {
                 it.transactAwait { realm ->
                     actions.forEach { action ->

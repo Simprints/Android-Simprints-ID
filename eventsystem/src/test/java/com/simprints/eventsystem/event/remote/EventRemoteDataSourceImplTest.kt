@@ -23,15 +23,12 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.coVerifySequence
-import io.mockk.excludeRecords
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -73,7 +70,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun count_shouldMakeANetworkRequest() {
         runBlocking {
-            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any(), any()) } returns listOf(ApiEventCount(EnrolmentRecordCreation, 1))
+            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any()) } returns listOf(ApiEventCount(EnrolmentRecordCreation, 1))
 
             val count = eventRemoteDataSource.count(query)
 
@@ -84,8 +81,7 @@ class EventRemoteDataSourceImplTest {
                     listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
                     DEFAULT_USER_ID, GUID1,
                     listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
-                    GUID2,
-                    listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove)
+                    GUID2
                 )
             }
         }
@@ -94,7 +90,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun errorForCountRequestFails_shouldThrowAnException() {
         runBlocking {
-            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
+            coEvery { eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
 
             shouldThrow<Throwable> {
                 eventRemoteDataSource.count(query)
@@ -137,7 +133,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun getEvents_shouldThrowAnException() {
         runBlocking {
-            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
+            coEvery { eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any()) } throws Throwable("Request issue")
 
             shouldThrow<Throwable> {
                 eventRemoteDataSource.getEvents(query, this)
@@ -148,14 +144,15 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun getEvents_shouldMakeTheRightRequest() {
         runBlocking {
-            shouldThrow<Throwable> {
-                eventRemoteDataSource.getEvents(query, this)
-            }
+            val mockedScope: CoroutineScope = mockk()
+            mockkStatic("kotlinx.coroutines.channels.ProduceKt")
+            every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
+            eventRemoteDataSource.getEvents(query, mockedScope)
 
             with(query) {
                 coVerify {
                     eventRemoteInterface.downloadEvents(
-                        projectId, moduleIds, userId, subjectId, modes, lastEventId, types.map { it.name }
+                        projectId, moduleIds, userId, subjectId, modes, lastEventId
                     )
                 }
             }

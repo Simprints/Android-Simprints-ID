@@ -103,7 +103,7 @@ class OtaFragment : FingerprintFragment() {
 
     private fun listenForFailedEvent() {
         viewModel.otaFailed.fragmentObserveEventWith {
-            findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment())
+            findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment(it))
         }
     }
 

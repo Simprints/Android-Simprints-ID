@@ -3,10 +3,12 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View.VISIBLE
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -15,6 +17,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
+import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -30,11 +33,13 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
 
     @Inject lateinit var preferencesManager: PreferencesManager
 
+    private val binding by viewBinding(CheckLoginFromIntentScreenBinding::inflate)
+
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.splash_screen)
+        setContentView(binding.root)
 
         val component = (application as Application).component
         component.inject(this)
@@ -78,6 +83,10 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
 
     override fun getCheckCallingApp() = getCallingPackageName()
 
+    override fun showConfirmationText() {
+        binding.confirmationSent.visibility = VISIBLE
+        binding.redirectingBack.visibility = VISIBLE
+    }
     open fun getCallingPackageName(): String {
         return callingPackage ?: ""
     }

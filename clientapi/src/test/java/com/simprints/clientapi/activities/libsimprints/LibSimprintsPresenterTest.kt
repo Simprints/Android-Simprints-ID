@@ -393,7 +393,7 @@ class LibSimprintsPresenterTest {
     }
 
     @Test
-    fun shouldNot_closeSession_whenHandling_responseFrom_enrolLastBiometrics_request() {
+    fun should_closeSession_whenHandling_responseFrom_enrolLastBiometrics_request() {
         val newSessionId = "session_id_changed"
         val enrolLastBiometricsExtractor = EnrolLastBiometricsFactory.getMockExtractor()
         every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
@@ -416,8 +416,8 @@ class LibSimprintsPresenterTest {
         ).handleEnrolResponse(mockk())
         runBlocking {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
-            assertThat(sessionId).isNotEqualTo(newSessionId)
-            coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
+            assertThat(sessionId).isEqualTo(newSessionId)
+            coVerify(exactly = 1) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
         }
     }
 }

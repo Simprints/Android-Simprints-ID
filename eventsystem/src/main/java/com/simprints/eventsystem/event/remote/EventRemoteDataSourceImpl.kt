@@ -36,8 +36,7 @@ class EventRemoteDataSourceImpl(
                     attendantId = userId,
                     subjectId = subjectId,
                     modes = modes,
-                    lastEventId = lastEventId,
-                    eventType = types
+                    lastEventId = lastEventId
                 ).map { it.fromApiToDomain() }
             }
         }
@@ -86,8 +85,7 @@ class EventRemoteDataSourceImpl(
                     attendantId = userId,
                     subjectId = subjectId,
                     modes = modes,
-                    lastEventId = lastEventId,
-                    eventType = types.map { it.name }
+                    lastEventId = lastEventId
                 )
             }
         }.byteStream()

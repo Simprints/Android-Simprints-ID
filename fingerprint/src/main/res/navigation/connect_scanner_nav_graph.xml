@@ -119,7 +119,12 @@
         android:id="@+id/otaFailedFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.otafailed.OtaFailedFragment"
         android:label="fragment_ota_failed"
-        tools:layout="@layout/fragment_ota_failed" />
+        tools:layout="@layout/fragment_ota_failed" >
+        <argument
+            android:name="fetchOtaResult"
+            app:argType="com.simprints.fingerprint.activities.connect.result.FetchOtaResult"
+            app:nullable="true"/>
+    </fragment>
     <fragment
         android:id="@+id/serialEntryPairFragment"
         android:name="com.simprints.fingerprint.activities.connect.issues.serialentrypair.SerialEntryPairFragment"

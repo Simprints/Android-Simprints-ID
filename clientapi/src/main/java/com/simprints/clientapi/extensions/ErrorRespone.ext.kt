@@ -27,5 +27,6 @@ internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
         ErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED,
         ErrorResponse.Reason.FACE_LICENSE_INVALID,
         ErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR,
+        ErrorResponse.Reason.BACKEND_MAINTENANCE_ERROR,
         ErrorResponse.Reason.FACE_CONFIGURATION_ERROR -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
     }

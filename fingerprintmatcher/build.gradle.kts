@@ -22,14 +22,11 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake.path("src/main/jni/CMakeLists.txt")
-    }
-}
 
+}
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
+    implementation(Dependencies.simmatcher)
     // Kotlin
     implementation(Dependencies.Kotlin.coroutines_android)
     compileOnly(Dependencies.AndroidX.Annotation.annotation)

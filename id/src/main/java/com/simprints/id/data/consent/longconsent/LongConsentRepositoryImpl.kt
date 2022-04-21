@@ -1,8 +1,13 @@
 package com.simprints.id.data.consent.longconsent
 
+import com.simprints.core.tools.extentions.getEstimatedOutage
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Failed
-import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Progress
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.FailedBecauseBackendMaintenance
+import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.InProgress
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Succeed
+import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
+import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -10,12 +15,8 @@ import kotlinx.coroutines.flow.flow
 
 class LongConsentRepositoryImpl(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
-    private val longConsentRemoteDataSource: LongConsentRemoteDataSource
+    private val longConsentRemoteDataSource: LongConsentRemoteDataSource,
 ) : LongConsentRepository {
-
-    companion object {
-        const val DEFAULT_SIZE = 1024
-    }
 
     override fun getLongConsentResultForLanguage(language: String): Flow<LongConsentFetchResult> = flow {
         try {
@@ -36,30 +37,25 @@ class LongConsentRepositoryImpl(
         language: String
     ) {
         try {
-            val stream = longConsentRemoteDataSource.downloadLongConsent(language)
-            val file = longConsentLocalDataSource.createFileForLanguage(language)
 
-            stream.inputStream.use { input ->
+            flowCollector.emit(InProgress(language))
+
+            val fileBytes = longConsentRemoteDataSource.downloadLongConsent(language)
+            val file = longConsentLocalDataSource.createFileForLanguage(language)
                 file.outputStream().use { output ->
-                    var bytesCopied: Long = 0
-                    val buffer = ByteArray(DEFAULT_SIZE)
-                    var bytesToWrite = input.read(buffer)
-                    while (bytesToWrite >= 0) {
-                        output.write(buffer, 0, bytesToWrite)
-                        bytesCopied += bytesToWrite
-                        flowCollector.emit(
-                            Progress(language, bytesCopied / stream.total.toFloat())
-                        )
-                        bytesToWrite = input.read(buffer)
-                    }
+                    output.write(fileBytes.bytes)
                 }
-            }
 
             flowCollector.emit(Succeed(language, file.readText()))
-
         } catch (t: Throwable) {
             Simber.e(t)
-            flowCollector.emit(Failed(language, t))
+            flowCollector.emit(
+                if (t.isBackendMaintenanceException()) {
+                    FailedBecauseBackendMaintenance(language, t, t.getEstimatedOutage())
+                } else {
+                    Failed(language, t)
+                }
+            )
         }
     }
 

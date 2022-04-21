@@ -1,16 +1,17 @@
 package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -35,6 +36,7 @@ class LoginActivityAndroidTest {
     @MockK
     lateinit var mockLoginActivityHelper: LoginActivityHelper
 
+    private val testDispatcherProvider = DefaultDispatcherProvider()
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     private val appModule by lazy {
@@ -53,7 +55,7 @@ class LoginActivityAndroidTest {
     private val viewModelModule by lazy {
         TestViewModelModule(
             loginViewModelFactoryRule = DependencyRule.ReplaceRule {
-                LoginViewModelFactory(mockAuthenticationHelper)
+                LoginViewModelFactory(mockAuthenticationHelper, testDispatcherProvider)
             }
         )
     }
@@ -124,6 +126,41 @@ class LoginActivityAndroidTest {
             withSecurityStatusRunning()
         } clickSignIn {
             offlineToastIsDisplayed()
+        }
+    }
+
+    @Test
+    fun whenBackendMaintenance_clickSignIn_shouldShowTimedError() {
+        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR)
+
+        loginActivity {
+            withMandatoryCredentialsPresent()
+            withSuppliedProjectIdAndIntentProjectIdMatching()
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+            withSecurityStatusRunning()
+        } clickSignIn {
+            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(
+                SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
+            onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
+    fun whenBackendMaintenance_clickSignIn_shouldShowError() {
+        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR)
+
+        loginActivity {
+            withMandatoryCredentialsPresent()
+            withSuppliedProjectIdAndIntentProjectIdMatching()
+            typeProjectId(VALID_PROJECT_ID)
+            typeProjectSecret(VALID_PROJECT_SECRET)
+            withSecurityStatusRunning()
+        } clickSignIn {
+            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
+            onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
+            onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
     }
 

@@ -13,7 +13,7 @@ apply {
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
     buildTypes {
@@ -47,9 +47,13 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
     }
+    packagingOptions {
+        resources {
+            pickFirsts += setOf("mockito-extensions/org.mockito.plugins.MockMaker")
+        }
+    }
 
     // https://github.com/mockito/mockito/issues/1376
-    packagingOptions.pickFirst("mockito-extensions/org.mockito.plugins.MockMaker")
 
     buildFeatures.viewBinding = true
 
@@ -218,4 +222,12 @@ dependencies {
     // Trust me I hate this fix more than you
     // This is to solve multiple imports of guava https://stackoverflow.com/a/60492942/4072335
     androidTestImplementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
+}
+
+configurations {
+    androidTestImplementation {
+        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
+        // the issue is reported here https://github.com/mockk/mockk/issues/722
+        exclude("io.mockk", "mockk-agent-jvm")
+    }
 }

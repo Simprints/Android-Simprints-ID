@@ -57,6 +57,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/longConsent_header" />
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/errorCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/longConsent_downloadButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/longConsentAppBarLayout"
+        app:layout_constraintVertical_chainStyle="spread">
+
+        <TextView
+            android:id="@+id/errorTextView"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/simprints_blue"
+            android:padding="8dp"
+            android:textColor="@color/simprints_white"
+            android:textSize="16sp"
+            tools:text="Some text goes here" />
+    </androidx.cardview.widget.CardView>
+
     <TextView
         android:id="@+id/longConsent_header"
         android:layout_width="wrap_content"
@@ -73,7 +100,6 @@
 
     <ProgressBar
         android:id="@+id/longConsent_downloadProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.id">
     <!-- Permissions -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -37,7 +36,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
-            android:launchMode="standard"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,12 +46,11 @@
         </activity>
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
-            android:launchMode="standard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Launcher" />
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
-            android:launchMode="standard"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.clientapp.REGISTER_LAST_BIOMETRICS" />
@@ -142,12 +140,6 @@
         <activity android:name=".activities.setup.SetupActivity"
             android:screenOrientation="portrait" />
 
-        <meta-data
-            android:name="firebase_analytics_collection_enabled"
-            android:value="${firebase_analytics_collection_enabled}" />
-        <meta-data
-            android:name="firebase_performance_logcat_enabled"
-            android:value="${firebase_performance_logcat_enabled}" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

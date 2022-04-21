@@ -1,10 +1,10 @@
 package com.simprints.id.data.secure
 
 import android.util.Base64
+import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 
 @Deprecated("Use SecureLocalDbKeyProviderImpl")
 open class LegacyLocalDbKeyProviderImpl(

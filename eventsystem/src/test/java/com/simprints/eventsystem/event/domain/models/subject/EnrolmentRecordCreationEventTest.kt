@@ -41,7 +41,6 @@ class EnrolmentRecordCreationEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(
             EventLabels(
-                subjectId = GUID1,
                 projectId = DEFAULT_PROJECT_ID,
                 moduleIds = listOf(DEFAULT_MODULE_ID),
                 attendantId = GUID2,

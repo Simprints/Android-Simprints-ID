@@ -41,6 +41,7 @@ data class AlertScreenEvent(
             BLUETOOTH_NOT_SUPPORTED,
             LOW_BATTERY,
             UNEXPECTED_ERROR,
+            BACKEND_MAINTENANCE_ERROR,
             DISCONNECTED,
             MULTIPLE_PAIRED_SCANNERS,
             NOT_PAIRED,

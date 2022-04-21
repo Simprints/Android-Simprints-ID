@@ -26,12 +26,10 @@ android {
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(Pair("clearPackageData", "true")))
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
-        ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
     }
-
-    lintOptions.warning("InvalidPackage")
 
     bundle {
         language {
@@ -41,11 +39,8 @@ android {
 
     buildTypes {
         getByName("release") {
-            minifyEnabled(true)
-            extra.set("enableCrashlytics", true)
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
-            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$RELEASE_SAFETYNET_KEY\"")
             buildConfigField(
                 "String",
@@ -56,11 +51,8 @@ android {
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
         getByName("staging") {
-            minifyEnabled(true)
-            extra.set("enableCrashlytics", true)
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
-            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$STAGING_SAFETYNET_KEY\"")
             buildConfigField(
                 "String",
@@ -71,11 +63,8 @@ android {
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
         getByName("debug") {
-            minifyEnabled(false)
-            extra.set("enableCrashlytics", false)
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            manifestPlaceholders["firebase_performance_logcat_enabled"] = false
-            manifestPlaceholders["firebase_analytics_collection_enabled"] = true
             withGroovyBuilder {
                 "FirebasePerformance" {
                     invokeMethod("setInstrumentationEnabled", false)
@@ -112,10 +101,22 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
     }
+    packagingOptions {
+        // The below files are duplicated from kotlinx-coroutines-debug.
+        // We should exclude them in the packaging options as per kotlinx.coroutines/kotlinx-coroutines-debug documentation
+        // https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-debug#build-failures-due-to-duplicate-resource-files
+        resources.excludes.add("**/attach_hotspot_windows.dll")
+        resources.excludes.add("META-INF/AL2.0")
+        resources.excludes.add("META-INF/LGPL2.1")
+        resources.excludes.add("META-INF/licenses/ASM")
+    }
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures = mutableSetOf(":fingerprint", ":face", ":clientapi")
+    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":face", ":clientapi"))
+    lint {
+        warning += setOf("InvalidPackage")
+    }
 }
 
 repositories {
@@ -152,7 +153,6 @@ dependencies {
     implementation(Dependencies.Support.material)
     implementation(Dependencies.WorkManager.work)
     implementation(Dependencies.PlayServices.location)
-    implementation(Dependencies.PlayServices.places)
     implementation(Dependencies.PlayServices.safetynet)
     implementation(Dependencies.Retrofit.core)
     implementation(Dependencies.Retrofit.adapter)
@@ -173,7 +173,6 @@ dependencies {
 
     // Firebase
     implementation(Dependencies.Firebase.auth)
-    implementation(Dependencies.Firebase.perf)
     implementation(Dependencies.Firebase.storage)
     implementation(Dependencies.Firebase.mlkit)
     implementation(Dependencies.Firebase.mlkit_barcode)
@@ -197,6 +196,9 @@ dependencies {
     implementation(Dependencies.Playcore.core_ktx)
     implementation(Dependencies.AndroidX.sqlite)
     implementation(Dependencies.SqlCipher.core)
+
+    implementation(Dependencies.Chuck.release)
+    debugImplementation(Dependencies.Chuck.debug)
 
     // ######################################################
     //                      Unit test
@@ -262,6 +264,7 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.rx2_idler)
     androidTestImplementation(Dependencies.Testing.Mockk.core)
     androidTestImplementation(Dependencies.Testing.Mockk.android)
+
     androidTestImplementation(Dependencies.Testing.mockwebserver)
     androidTestImplementation(Dependencies.Testing.coroutines_test)
     androidTestImplementation(Dependencies.Testing.AndroidX.room)
@@ -286,9 +289,22 @@ dependencies {
     }
     androidTestImplementation(Dependencies.Testing.kappuccino)
 
-    debugImplementation(Dependencies.Testing.fragment_testing)
+    debugImplementation(Dependencies.Testing.fragment_testing) {
+        exclude("androidx.test", "core")
+    }
 }
-
+configurations {
+    debugImplementation {
+        // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
+        // And a full feature version that should be added in debug build types
+        exclude("com.github.chuckerteam.chucker", "library-no-op")
+    }
+    androidTestImplementation {
+        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
+        // the issue is reported here https://github.com/mockk/mockk/issues/722
+        exclude("io.mockk", "mockk-agent-jvm")
+    }
+}
 kapt {
     useBuildCache = true
     arguments {

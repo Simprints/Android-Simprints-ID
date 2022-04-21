@@ -45,6 +45,7 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.config.RemoteConfigWorker
+import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
@@ -137,6 +138,7 @@ interface AppComponent {
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(preferencesManager: IdPreferencesManager)
     fun inject(remoteConfigWorker: RemoteConfigWorker)
+    fun inject(storeUserLocationIntoCurrentSessionWorker: StoreUserLocationIntoCurrentSessionWorker)
 
     fun getSessionEventsManager(): EventRepository
     fun getTimeHelper(): TimeHelper

@@ -10,7 +10,9 @@ class FingerprintFileDownloader {
 
     /** @throws IOException */
     suspend fun download(url: String): ByteArray = withContext(Dispatchers.IO) {
-        Simber.d("Downloading firmware file at $url")
+        // issue with timber logging URLs when interpolated in kotlin, check out this article
+        // https://proandroiddev.com/be-careful-what-you-log-it-could-crash-your-app-5fc67a44c842
+        Simber.d("Downloading firmware file at %s", url)
         URL(url).readBytes()
     }
 }
