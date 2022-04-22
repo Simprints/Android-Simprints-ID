@@ -225,6 +225,7 @@ definitions:
                 deployment: Staging
                 max-time: 30
                 size: 2x
+                trigger: manual
                 caches:
                     - gradle
                     - gradlewrapper
