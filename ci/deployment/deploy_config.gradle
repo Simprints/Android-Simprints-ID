@@ -9,6 +9,7 @@ android {
     buildTypes {
         staging {
             firebaseAppDistribution {
+                artifactType="AAB"
                 serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
                 groups = "pre-release-testers"
             }
