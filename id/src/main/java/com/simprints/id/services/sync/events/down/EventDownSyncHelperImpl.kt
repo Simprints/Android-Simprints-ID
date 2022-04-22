@@ -24,6 +24,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EventDownSyncHelperImpl(
@@ -69,14 +73,16 @@ class EventDownSyncHelperImpl(
                 close()
 
             } catch (t: Throwable) {
-                Simber.d(t)
+                val error = Throwable(t)
+                val throwable = error.cause!!
+                Simber.d(throwable)
 
                 lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                 emitProgress(lastOperation, count)
 
                 lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
-                close()
+                close(throwable.cause)
             }
 
         }
