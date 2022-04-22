@@ -233,7 +233,7 @@ definitions:
                     - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - echo $FIREBASE_DIST_CREDENTIALS > id/src/staging/serviceCredentialsFile.json
-                    - ./gradlew bundleStaging
+                    - ./gradlew packageStagingUniversalApk
                     - ./gradlew id:appDistributionUploadStaging
                 artifacts:
                     - id/build/outputs/**
