@@ -83,7 +83,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+            } returns AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -104,7 +104,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.Offline
+            } returns AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -125,7 +125,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BadCredentials
+            } returns AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -146,7 +146,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.TechnicalFailure
+            } returns AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -167,7 +167,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.Unknown
+            } returns AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -188,7 +188,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.SafetyNetInvalidClaim
+            } returns AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -209,7 +209,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.SafetyNetUnavailable
+            } returns AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -230,7 +230,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError()
+            } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -253,7 +253,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BackendMaintenanceError(600L)
+            } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -265,7 +265,7 @@ class LoginActivityTest {
             )
             onView(withId(R.id.errorTextView)).check(
                 matches(
-                    ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
+                    ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
                 )
             )
         }
