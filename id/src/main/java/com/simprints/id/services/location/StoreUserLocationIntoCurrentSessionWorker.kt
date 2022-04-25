@@ -22,26 +22,34 @@ import javax.inject.Inject
 class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params) {
 
+
     override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
+
     @Inject
     lateinit var eventRepository: EventRepository
+
     @Inject
     lateinit var locationManager: LocationManager
+
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    override suspend fun doWork(): Result = withContext(dispatcherProvider.main()) {
-        getComponent<StoreUserLocationIntoCurrentSessionWorker> { it.inject(this@StoreUserLocationIntoCurrentSessionWorker) }
-        try {
-            val locationsFlow = createLocationFlow()
-            locationsFlow.filterNotNull().collect{ location ->
-                saveUserLocation(location)
-            }
-        } catch (t: Throwable) {
-            Simber.e(t)
-            fail(t)
+    override suspend fun doWork(): Result {
+        getComponent<StoreUserLocationIntoCurrentSessionWorker> {
+            it.inject(this@StoreUserLocationIntoCurrentSessionWorker)
         }
-        success()
+        return withContext(dispatcherProvider.main()) {
+            try {
+                val locationsFlow = createLocationFlow()
+                locationsFlow.filterNotNull().collect { location ->
+                    saveUserLocation(location)
+                }
+            } catch (t: Throwable) {
+                Simber.e(t)
+                fail(t)
+            }
+            success()
+        }
     }
 
     private fun createLocationFlow(): Flow<android.location.Location?> {

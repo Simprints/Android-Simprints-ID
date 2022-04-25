@@ -2,6 +2,7 @@ package com.simprints.core.tools.utils
 
 import androidx.annotation.Keep
 
+@Keep
 interface SimNetworkUtils {
 
     @Keep
