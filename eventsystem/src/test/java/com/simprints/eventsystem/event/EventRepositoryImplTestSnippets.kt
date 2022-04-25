@@ -126,6 +126,33 @@ fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
     return (group1 + group2)
 }
 
+fun EventRepositoryImplTest.mockDbToLoadInvalidSessions(
+    nEventsInTotal: Int,
+    sessionEvent1: String = GUID1,
+    sessionEvent2: String = GUID2
+): List<Event> {
+    val group1 = mockDbToLoadSessionWithEvents(sessionEvent1, true, nEventsInTotal / 2 - 1)
+    val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
+
+    coEvery {
+        eventLocalDataSource.loadAllSessions(true)
+    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
+
+    coEvery {
+        eventLocalDataSource.loadAllFromSession(GUID2)
+    } throws IllegalArgumentException()
+
+    coEvery {
+        eventLocalDataSource.loadAllClosedSessionIds(any())
+    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
+
+    coEvery {
+        eventLocalDataSource.loadOldSubjectCreationEvents(any())
+    } returns (group1 + group2).filter { it.labels.sessionId.isNullOrBlank() }
+
+    return (group1 + group2)
+}
+
 fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
     val session = createSessionCaptureEvent(id).openSession()
     coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns listOf(session)
