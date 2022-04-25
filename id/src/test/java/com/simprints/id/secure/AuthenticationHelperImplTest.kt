@@ -35,50 +35,49 @@ class AuthenticationHelperImplTest {
     fun shouldSetBackendErrorIfBackendMaintenanceException() = runBlocking {
         val result = mockException(BackendMaintenanceException())
 
-        assertThat(result).isInstanceOf(Result.BackendMaintenanceError::class.java)
-        assertThat((result as Result.BackendMaintenanceError).estimatedOutage).isNull()
+        assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
     }
 
     @Test
     fun shouldSetOfflineIfIOException() = runBlocking {
         val result = mockException(IOException())
 
-        assertThat(result).isInstanceOf(Result.Offline::class.java)
+        assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
     }
 
     @Test
     fun shouldSetSafetyNetUnavailableIfServiceUnavailableException() = runBlocking {
         val result = mockException(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
-        assertThat(result).isInstanceOf(Result.SafetyNetUnavailable::class.java)
+        assertThat(result).isInstanceOf(Result.SAFETYNET_UNAVAILABLE::class.java)
     }
 
     @Test
     fun shouldSetSafetyNetInvalidIfSafetyNextInvalidException() = runBlocking {
         val result = mockException(SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS))
 
-        assertThat(result).isInstanceOf(Result.SafetyNetInvalidClaim::class.java)
+        assertThat(result).isInstanceOf(Result.SAFETYNET_INVALID_CLAIM::class.java)
     }
 
     @Test
     fun shouldSetUnknownIfGenericException() = runBlocking {
         val result = mockException(Exception())
 
-        assertThat(result).isInstanceOf(Result.Unknown::class.java)
+        assertThat(result).isInstanceOf(Result.UNKNOWN::class.java)
     }
 
     @Test
     fun shouldTechnicalFailureIfSimprintsInternalServerException() = runBlocking {
         val result = mockException(SimprintsInternalServerException())
 
-        assertThat(result).isInstanceOf(Result.TechnicalFailure::class.java)
+        assertThat(result).isInstanceOf(Result.TECHNICAL_FAILURE::class.java)
     }
 
     @Test
     fun shouldBadCredentialsIfAuthRequestInvalidCredentialsException() = runBlocking {
         val result = mockException(AuthRequestInvalidCredentialsException())
 
-        assertThat(result).isInstanceOf(Result.BadCredentials::class.java)
+        assertThat(result).isInstanceOf(Result.BAD_CREDENTIALS::class.java)
     }
 
     private suspend fun mockException(exception: Exception): Result {
