@@ -33,11 +33,6 @@ buildscript {
         classpath("com.google.firebase:perf-plugin:1.4.1")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.1")
 
-        // Dependency Publishing
-        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
-        classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.28.2")
-
         // Realm Database
         classpath("io.realm:realm-gradle-plugin:10.10.1")
 
