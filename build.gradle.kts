@@ -90,7 +90,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.3.1"
+    id("org.gradle.test-retry") version "1.3.2"
 }
 
 /*
