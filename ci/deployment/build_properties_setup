@@ -2,6 +2,9 @@
 
 echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
 
+# Get the branch name after the last '/'. ex release/2020.4.0 = 2020.4.0
+var_branchSuffix=$(echo "$BITBUCKET_BRANCH" | sed 's:.*/::')
+
 cat << EOF >> buildSrc/build_properties.gradle
 ext {
   VERSION_CODE=${BITBUCKET_BUILD_NUMBER} as Integer
@@ -9,5 +12,6 @@ ext {
   DEBUGGABLE="${BUILD_IS_DEBUGGABLE}"
   RELEASE_SAFETYNET_KEY="${RELEASE_SAFETYNET_KEY}"
   DB_ENCRYPTION="${DB_IS_ENCRYPTED}"
+  VERSION_NAME="${var_branchSuffix}" as String
 }
 EOF
