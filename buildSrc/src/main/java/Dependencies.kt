@@ -19,7 +19,7 @@ object Dependencies {
     private const val okttp_version = "4.2.2"
     private const val fuzzywuzzy_version = "1.2.0"
     private const val jackson_version = "2.11.1"
-    private const val koin_version = "2.2.2"
+    private const val koin_version= "3.1.6"
     private const val rootbeer_version = "0.0.7"
     private const val mockito_version = "4.0.0"
     private const val objenesis_version ="3.2"
@@ -32,7 +32,6 @@ object Dependencies {
 
     object Kotlin {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-        const val anko = "org.jetbrains.anko:anko:0.10.8"
         const val coroutines_android =
             "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutine_version"
         const val coroutines_play_services =
@@ -166,10 +165,8 @@ object Dependencies {
 
     // Koin Service Location
     object Koin {
-        const val core = "org.koin:koin-core:$koin_version"
-        const val core_ext = "org.koin:koin-core-ext:$koin_version"
-        const val android = "org.koin:koin-android:$koin_version"
-        const val viewmodel = "org.koin:koin-android-viewmodel:$koin_version"
+        const val core = "io.insert-koin:koin-core:$koin_version"
+        const val android = "io.insert-koin:koin-android:$koin_version"
     }
 
     // RootBeer (root detection)
@@ -177,7 +174,7 @@ object Dependencies {
         const val core = "com.scottyab:rootbeer-lib:$rootbeer_version"
     }
 
-    const val cameraView = "com.otaliastudios:cameraview:2.7.0"
+    const val cameraView = "com.otaliastudios:cameraview:2.7.2"
     const val circleImageView = "de.hdodenhof:circleimageview:3.0.1"
 
     // Testing
@@ -213,7 +210,9 @@ object Dependencies {
             const val core = "io.mockk:mockk:1.12.0"
             const val android = "io.mockk:mockk-android:1.12.0"
         }
+        object Splitties{
 
+        }
         const val mockwebserver = "com.squareup.okhttp3:mockwebserver:$okttp_version"
 
         object Espresso {
@@ -249,7 +248,7 @@ object Dependencies {
         const val rx2_idler = "com.squareup.rx.idler:rx2-idler:0.9.1"
         const val coroutines_test =
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutine_version"
-        const val koin = "org.koin:koin-test:$koin_version"
+        const val koin = "io.insert-koin:koin-test-junit4:$koin_version"
         const val live_data = "com.jraska.livedata:testing-ktx:1.1.0"
         const val kappuccino = "br.com.concretesolutions:kappuccino:1.2.1"
         const val awaitility = "org.awaitility:awaitility-kotlin:4.0.1"

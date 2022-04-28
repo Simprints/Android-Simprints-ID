@@ -103,7 +103,6 @@ dependencies {
     }
 
     // Koin
-    androidTestImplementation(Dependencies.Koin.core_ext)
     androidTestImplementation(Dependencies.Testing.koin)
 
     // ######################################################
