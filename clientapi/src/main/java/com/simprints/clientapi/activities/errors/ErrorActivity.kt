@@ -13,10 +13,9 @@ import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.databinding.ActivityErrorBinding
 import com.simprints.core.tools.activity.BaseSplitActivity
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.backgroundColor
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-
+import splitties.views.backgroundColor
 
 class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
 

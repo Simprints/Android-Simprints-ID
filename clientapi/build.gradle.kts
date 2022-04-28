@@ -60,10 +60,10 @@ dependencies {
     implementation(Dependencies.AndroidX.security)
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.Lifecycle.scope)
-
     implementation(Dependencies.Support.material)
     implementation(Dependencies.Kotlin.reflect)
-
+    // Splitties
+    implementation(Dependencies.Splitties.core)
     // Kotlin
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.multidex)

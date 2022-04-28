@@ -31,8 +31,6 @@ import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
-import org.jetbrains.anko.sdk27.coroutines.onEditorAction
-import org.jetbrains.anko.sdk27.coroutines.onFocusChange
 import javax.inject.Inject
 
 class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
@@ -278,17 +276,18 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     private fun List<Module>.getUnselected() = filter { !it.isSelected }
 
     private fun EditText.observeSearchButton() {
-        onEditorAction { v, actionId, _ ->
+        setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 hideKeyboard()
                 v?.clearFocus()
                 rvModules?.requestFocus()
-            }
+                true
+            } else false
         }
     }
 
     private fun EditText.observeFocus() {
-        onFocusChange { v, hasFocus ->
+        setOnFocusChangeListener { v, hasFocus ->
             (v as EditText).isCursorVisible = hasFocus
             if (!hasFocus)
                 rvModules?.scrollToPosition(0)

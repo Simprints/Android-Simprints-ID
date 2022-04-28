@@ -27,8 +27,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.S
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
-import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.textColor
+import splitties.systemservices.layoutInflater
 import java.util.Date
 import kotlin.math.min
 
@@ -124,7 +123,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
         withVisible(viewForConnectingState) {
             withVisible(progressCardStateText()) {
-                textColor = getDefaultGrayTextColor(viewForConnectingState)
+                setTextColor(getDefaultGrayTextColor(viewForConnectingState))
                 text = context.getString(R.string.dashboard_sync_card_connecting)
             }
             withVisible(progressCardSyncProgress()) {
@@ -146,7 +145,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
                     ""
                 }
                 text = String.format(context.getString(R.string.dashboard_sync_card_progress), percentageText)
-                textColor = getDefaultGrayTextColor(viewForConnectingState)
+                setTextColor( getDefaultGrayTextColor(viewForConnectingState))
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)

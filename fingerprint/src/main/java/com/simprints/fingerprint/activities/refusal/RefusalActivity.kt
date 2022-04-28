@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
+import androidx.core.view.doOnLayout
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
@@ -14,10 +15,9 @@ import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
-import org.jetbrains.anko.inputMethodManager
-import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import splitties.systemservices.inputMethodManager
 
 class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
@@ -72,8 +72,7 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListeners() {
-        binding.refusalScrollView.onLayoutChange { _, _, _, _,
-                                           _, _, _, _, _ ->
+        binding.refusalScrollView.doOnLayout {
             viewPresenter.handleLayoutChange()
         }
     }

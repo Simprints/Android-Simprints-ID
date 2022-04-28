@@ -125,6 +125,12 @@ dependencies {
     implementation(Dependencies.Retrofit.adapter)
     implementation(Dependencies.Retrofit.logging)
     implementation(Dependencies.Retrofit.okhttp)
+    // Splitties
+    implementation(Dependencies.Splitties.core)
+    // Koin
+    implementation(Dependencies.Koin.core)
+    implementation(Dependencies.Koin.android)
+
 
     // ######################################################
     //                      Unit test

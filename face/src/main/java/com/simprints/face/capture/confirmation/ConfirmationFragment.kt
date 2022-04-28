@@ -14,7 +14,7 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationE
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentConfirmationBinding
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 /**
  * This class represents the screen the user is presented with once they have made a succesful capture

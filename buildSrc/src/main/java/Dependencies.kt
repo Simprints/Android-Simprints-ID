@@ -176,7 +176,9 @@ object Dependencies {
 
     const val cameraView = "com.otaliastudios:cameraview:2.7.2"
     const val circleImageView = "de.hdodenhof:circleimageview:3.0.1"
-
+    object Splitties{
+        const val core ="com.louiscad.splitties:splitties-fun-pack-android-base-with-views-dsl:3.0.0"
+    }
     // Testing
     object Testing {
         const val junit = "junit:junit:4.13"
@@ -210,9 +212,7 @@ object Dependencies {
             const val core = "io.mockk:mockk:1.12.0"
             const val android = "io.mockk:mockk-android:1.12.0"
         }
-        object Splitties{
 
-        }
         const val mockwebserver = "com.squareup.okhttp3:mockwebserver:$okttp_version"
 
         object Espresso {
@@ -220,7 +220,7 @@ object Dependencies {
             const val intents = "androidx.test.espresso:espresso-intents:$espresso_version"
             const val contrib = "androidx.test.espresso:espresso-contrib:$espresso_version"
             const val barista =
-                "com.schibsted.spain:barista:2.3.0" //Used to grant permissions in AndroidTests
+                "com.adevinta.android:barista:4.2.0" //Used to grant permissions in AndroidTests
             const val idling = "androidx.test.espresso:espresso-idling-resource:$espresso_version"
 
         }
@@ -248,7 +248,8 @@ object Dependencies {
         const val rx2_idler = "com.squareup.rx.idler:rx2-idler:0.9.1"
         const val coroutines_test =
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutine_version"
-        const val koin = "io.insert-koin:koin-test-junit4:$koin_version"
+        const val koin = "io.insert-koin:koin-test:$koin_version"
+        const val koin_junit4 = "io.insert-koin:koin-test-junit4:$koin_version"
         const val live_data = "com.jraska.livedata:testing-ktx:1.1.0"
         const val kappuccino = "br.com.concretesolutions:kappuccino:1.2.1"
         const val awaitility = "org.awaitility:awaitility-kotlin:4.0.1"

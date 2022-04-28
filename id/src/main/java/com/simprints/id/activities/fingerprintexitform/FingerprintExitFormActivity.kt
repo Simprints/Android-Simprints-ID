@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -21,8 +22,7 @@ import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDL
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.logging.Simber
-import org.jetbrains.anko.inputMethodManager
-import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
+import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 
 class FingerprintExitFormActivity : BaseSplitActivity() {
@@ -88,7 +88,7 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        binding.fingerprintExitFormScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
+        binding.fingerprintExitFormScrollView.doOnLayout {
             binding.fingerprintExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
