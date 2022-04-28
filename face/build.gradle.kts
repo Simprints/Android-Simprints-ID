@@ -72,6 +72,10 @@ dependencies {
     // Fragment
     implementation(Dependencies.AndroidX.UI.fragment)
 
+    // Koin
+    implementation(Dependencies.Koin.core)
+    implementation(Dependencies.Koin.android)
+
     // Android X
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.CameraX.core)

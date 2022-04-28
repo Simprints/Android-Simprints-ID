@@ -139,6 +139,7 @@ dependencies {
     implementation(Dependencies.libsimprints)
 
     implementation(Dependencies.Dagger.core)
+    implementation(Dependencies.Splitties.core)
     implementation(Dependencies.Kotlin.reflect)
     implementation(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Room.ktx)
@@ -225,6 +226,7 @@ dependencies {
 
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.koin)
+    testImplementation(Dependencies.Testing.koin_junit4)
 
     testImplementation(Dependencies.Testing.mockwebserver)
     testImplementation(Dependencies.Testing.work)
