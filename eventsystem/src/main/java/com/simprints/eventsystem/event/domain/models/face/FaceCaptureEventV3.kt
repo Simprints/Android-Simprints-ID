@@ -5,14 +5,13 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.FaceCapturePayloadV3.Face
 import java.util.UUID
 
 @Keep
 data class FaceCaptureEventV3(
-    override val id: String = UUID.randomUUID().toString(),
+    override val id: String = FACE_CAPTURE_ID,
     override var labels: EventLabels,
     override val payload: FaceCapturePayloadV3,
     override val type: EventType
@@ -27,7 +26,7 @@ data class FaceCaptureEventV3(
         isFallback: Boolean,
         face: Face?,
         labels: EventLabels = EventLabels(),
-        id: String = UUID.randomUUID().toString()
+        id: String = FACE_CAPTURE_ID
     ) : this(
         id,
         labels,
@@ -70,5 +69,6 @@ data class FaceCaptureEventV3(
 
     companion object {
         const val EVENT_VERSION = 3
+         val FACE_CAPTURE_ID = UUID.randomUUID().toString()
     }
 }

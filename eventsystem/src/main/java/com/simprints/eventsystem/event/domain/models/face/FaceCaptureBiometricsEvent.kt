@@ -5,11 +5,11 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-import java.util.UUID
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.Companion.FACE_CAPTURE_ID
 
 @Keep
 data class FaceCaptureBiometricsEvent(
-    override val id: String = UUID.randomUUID().toString(),
+    override val id: String = FACE_CAPTURE_ID,
     override var labels: EventLabels,
     override val payload: FaceCaptureBiometricsPayload,
     override val type: EventType
@@ -21,7 +21,7 @@ data class FaceCaptureBiometricsEvent(
         result: FaceCaptureBiometricsPayload.Result,
         face: FaceCaptureBiometricsPayload.Face?,
         labels: EventLabels = EventLabels(),
-        id: String = UUID.randomUUID().toString(),
+        id: String = FACE_CAPTURE_ID,
     ) : this(
         id,
         labels,

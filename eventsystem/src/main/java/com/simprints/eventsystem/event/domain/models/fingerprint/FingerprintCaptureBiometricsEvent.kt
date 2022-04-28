@@ -5,12 +5,12 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3.Companion.FINGERPRINT_CAPTURE_ID
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import java.util.UUID
 
 @Keep
 data class FingerprintCaptureBiometricsEvent(
-    override val id: String = UUID.randomUUID().toString(),
+    override val id: String = FINGERPRINT_CAPTURE_ID,
     override var labels: EventLabels,
     override val payload: FingerprintCaptureBiometricsPayload,
     override val type: EventType
@@ -20,7 +20,7 @@ data class FingerprintCaptureBiometricsEvent(
         createdAt: Long,
         result: FingerprintCaptureBiometricsPayload.Result,
         fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint?,
-        id: String = UUID.randomUUID().toString(),
+        id: String = FINGERPRINT_CAPTURE_ID,
         labels: EventLabels = EventLabels()
     ) : this(
         id = id,
