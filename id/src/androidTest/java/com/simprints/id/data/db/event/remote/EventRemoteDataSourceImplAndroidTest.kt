@@ -222,20 +222,23 @@ class EventRemoteDataSourceImplAndroidTest {
         eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 
         val firebaseTestToken =
-            remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
+            remoteTestingManager.generateFirebaseToken(
+                projectId = testProject.id,
+                userId = SIGNED_ID_USER
+            )
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
             SimApiClientFactoryImpl(
-                mockBaseUrlProvider,
-                "some_device",
-                "some_version",
-                remoteDbManager,
-                JsonHelper,
-                testDispatcherProvider,
-                HttpLoggingInterceptor(),
-                okHttpClientBuilder
+                baseUrlProvider = mockBaseUrlProvider,
+                deviceId = "some_device",
+                versionName = "some_version",
+                remoteDbManager = remoteDbManager,
+                jsonHelper = JsonHelper,
+                dispatcher = testDispatcherProvider,
+                interceptor = HttpLoggingInterceptor(),
+                okHttpClientBuilder = okHttpClientBuilder
             ),
             JsonHelper
         )
@@ -259,19 +262,23 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private suspend fun executeUpload(events: List<Event>) {
-        eventRemoteDataSource.post(testProject.id, events.toImmutableList())
+        eventRemoteDataSource.post(projectId = testProject.id, events = events.toImmutableList())
     }
 
     private fun MutableList<Event>.addAlertScreenEvents() {
         AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.values()
             .forEach {
-                add(AlertScreenEvent(DEFAULT_TIME, it, eventLabels))
+                add(AlertScreenEvent(createdAt = DEFAULT_TIME, alertType = it, labels = eventLabels))
             }
     }
 
     private fun MutableList<Event>.addArtificialTerminationEvent() {
         ArtificialTerminationPayload.Reason.values().forEach {
-            add(ArtificialTerminationEvent(DEFAULT_TIME, it, eventLabels))
+            add(ArtificialTerminationEvent(
+                createdAt = DEFAULT_TIME,
+                reason = it,
+                labels = eventLabels
+            ))
         }
     }
 
@@ -289,11 +296,11 @@ class EventRemoteDataSourceImplAndroidTest {
         ).forEach {
             add(
                 AuthenticationEvent(
-                    DEFAULT_TIME,
-                    DEFAULT_TIME,
-                    UserInfo("some_project", DEFAULT_USER_ID),
-                    it,
-                    eventLabels
+                    createdAt = DEFAULT_TIME,
+                    endTime = DEFAULT_TIME,
+                    userInfo = UserInfo("some_project", DEFAULT_USER_ID),
+                    result = it,
+                    labels = eventLabels
                 )
             )
         }
@@ -303,10 +310,10 @@ class EventRemoteDataSourceImplAndroidTest {
         AuthorizationPayload.AuthorizationResult.values().forEach {
             add(
                 AuthorizationEvent(
-                    DEFAULT_TIME,
-                    it,
-                    AuthorizationPayload.UserInfo("some_project", DEFAULT_USER_ID),
-                    eventLabels
+                    createdAt = DEFAULT_TIME,
+                    result = it,
+                    userInfo = AuthorizationPayload.UserInfo("some_project", DEFAULT_USER_ID),
+                    labels = eventLabels
                 )
             )
         }
@@ -317,12 +324,12 @@ class EventRemoteDataSourceImplAndroidTest {
             CandidateReadPayload.RemoteResult.values().forEach { remote ->
                 add(
                     CandidateReadEvent(
-                        DEFAULT_TIME,
-                        DEFAULT_TIME,
-                        randomUUID(),
-                        local,
-                        remote,
-                        eventLabels
+                        createdAt = DEFAULT_TIME,
+                        endTime = DEFAULT_TIME,
+                        candidateId = randomUUID(),
+                        localResult = local,
+                        remoteResult = remote,
+                        labels = eventLabels
                     )
                 )
             }
@@ -332,13 +339,13 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addConnectivitySnapshotEvent() {
         add(
             ConnectivitySnapshotEvent(
-                DEFAULT_TIME,
-                listOf(
+                createdAt = DEFAULT_TIME,
+                connections = listOf(
                     SimNetworkUtils.Connection(
                         SimNetworkUtils.ConnectionType.MOBILE,
                         SimNetworkUtils.ConnectionState.CONNECTED
                     )
-                ), eventLabels
+                ), labels = eventLabels
             )
         )
     }
@@ -346,7 +353,13 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addConsentEvent() {
         ConsentPayload.Type.values().forEach { type ->
             ConsentPayload.Result.values().forEach { result ->
-                add(ConsentEvent(DEFAULT_TIME, DEFAULT_TIME, type, result, eventLabels))
+                add(ConsentEvent(
+                    createdAt = DEFAULT_TIME,
+                    endTime = DEFAULT_TIME,
+                    consentType = type,
+                    result = result,
+                    labels = eventLabels
+                ))
             }
         }
     }
@@ -354,13 +367,13 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addEnrolmentEvent() {
         add(
             EnrolmentEventV2(
-                DEFAULT_TIME,
-                randomUUID(),
-                testProject.id,
-                DEFAULT_MODULE_ID,
-                DEFAULT_USER_ID,
-                randomUUID(),
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                subjectId = randomUUID(),
+                projectId = testProject.id,
+                moduleId = DEFAULT_MODULE_ID,
+                attendantId = DEFAULT_USER_ID,
+                personCreationEventId = randomUUID(),
+                labels = eventLabels
             )
         )
     }
@@ -370,9 +383,9 @@ class EventRemoteDataSourceImplAndroidTest {
             FingerIdentifier.values().forEach { fingerIdentifier ->
 
                 val fingerprint = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint(
-                    fingerIdentifier.fromDomainToModuleApi(),
-                    0,
-                    FingerprintTemplateFormat.ISO_19794_2
+                    finger = fingerIdentifier.fromDomainToModuleApi(),
+                    quality = 0,
+                    format = FingerprintTemplateFormat.ISO_19794_2
                 )
 
                 val event = FingerprintCaptureEventV3(
@@ -423,21 +436,21 @@ class EventRemoteDataSourceImplAndroidTest {
 
             val face =
                 FaceCaptureEventV3.FaceCapturePayloadV3.Face(
-                    30f,
-                    40f,
-                    100f,
-                    FaceTemplateFormat.RANK_ONE_1_23
+                    yaw = 30f,
+                    roll = 40f,
+                    quality = 100f,
+                    format = FaceTemplateFormat.RANK_ONE_1_23
                 )
 
             val event = FaceCaptureEventV3(
-                DEFAULT_TIME,
-                DEFAULT_TIME + 100,
-                index + 1,
-                0f,
-                result,
-                false,
-                face,
-                eventLabels
+                startTime = DEFAULT_TIME,
+                endTime = DEFAULT_TIME + 100,
+                attemptNb = index + 1,
+                qualityThreshold = 0f,
+                result = result,
+                isFallback = false,
+                face = face,
+                labels = eventLabels
             )
 
             add(event)
@@ -453,16 +466,16 @@ class EventRemoteDataSourceImplAndroidTest {
 
                 val face =
                     FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
-                        template,
-                        FaceTemplateFormat.RANK_ONE_1_23
+                        template = template,
+                        format = FaceTemplateFormat.RANK_ONE_1_23
                     )
 
                 val event = FaceCaptureBiometricsEvent(
-                    DEFAULT_TIME,
-                    0f,
-                    result,
-                    face,
-                    eventLabels
+                    startTime = DEFAULT_TIME,
+                    qualityThreshold = 0f,
+                    result = result,
+                    face = face,
+                    labels = eventLabels
                 )
 
                 add(event)
@@ -472,10 +485,10 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addFaceCaptureConfirmationEvent() {
         FaceCaptureConfirmationPayload.Result.values().forEach { result ->
             val event = FaceCaptureConfirmationEvent(
-                DEFAULT_TIME,
-                DEFAULT_TIME + 100,
-                result,
-                eventLabels
+                startTime = DEFAULT_TIME,
+                endTime = DEFAULT_TIME + 100,
+                result = result,
+                labels = eventLabels
             )
 
             add(event)
@@ -483,32 +496,44 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addFaceFallbackCaptureEvent() {
-        val event = FaceFallbackCaptureEvent(DEFAULT_TIME, DEFAULT_TIME + 100, eventLabels)
+        val event = FaceFallbackCaptureEvent(
+            startTime = DEFAULT_TIME,
+            endTime = DEFAULT_TIME + 100,
+            labels = eventLabels
+        )
         add(event)
     }
 
     private fun MutableList<Event>.addFaceOnboardingCompleteEvent() {
-        val event = FaceOnboardingCompleteEvent(DEFAULT_TIME, DEFAULT_TIME + 100, eventLabels)
+        val event = FaceOnboardingCompleteEvent(
+            startTime = DEFAULT_TIME,
+            endTime = DEFAULT_TIME + 100,
+            labels = eventLabels
+        )
         add(event)
     }
 
     private fun MutableList<Event>.addGuidSelectionEvent() {
-        add(GuidSelectionEvent(DEFAULT_TIME, randomUUID(), eventLabels))
+        add(GuidSelectionEvent(
+            createdAt = DEFAULT_TIME,
+            selectedId = randomUUID(),
+            labels = eventLabels
+        ))
     }
 
     private fun MutableList<Event>.addIntentParsingEvent() {
         IntentParsingPayload.IntegrationInfo.values().forEach {
-            add(IntentParsingEvent(DEFAULT_TIME, it, eventLabels))
+            add(IntentParsingEvent(createdAt = DEFAULT_TIME, integration = it, labels = eventLabels))
         }
     }
 
     private fun MutableList<Event>.addInvalidIntentEvent() {
         add(
             InvalidIntentEvent(
-                DEFAULT_TIME,
-                "some_action",
-                mapOf("wrong_field" to "wrong_value"),
-                eventLabels
+                creationTime = DEFAULT_TIME,
+                action = "some_action",
+                extras = mapOf("wrong_field" to "wrong_value"),
+                labels = eventLabels
             )
         )
     }
@@ -517,12 +542,12 @@ class EventRemoteDataSourceImplAndroidTest {
         OneToManyMatchPayload.MatchPoolType.values().forEach {
             add(
                 OneToManyMatchEvent(
-                    DEFAULT_TIME,
-                    DEFAULT_TIME,
-                    OneToManyMatchPayload.MatchPool(it, 0),
-                    Matcher.SIM_AFIS,
-                    emptyList(),
-                    eventLabels
+                    createdAt = DEFAULT_TIME,
+                    endTime = DEFAULT_TIME,
+                    pool = OneToManyMatchPayload.MatchPool(it, 0),
+                    matcher = Matcher.SIM_AFIS,
+                    result = emptyList(),
+                    labels = eventLabels
                 )
             )
         }
@@ -531,12 +556,12 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addOneToOneMatchEvent() {
         add(
             OneToOneMatchEvent(
-                DEFAULT_TIME,
-                DEFAULT_TIME,
-                randomUUID(),
-                Matcher.SIM_AFIS,
-                MatchEntry(randomUUID(), 0F),
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                endTime = DEFAULT_TIME,
+                candidateId = randomUUID(),
+                matcher = Matcher.SIM_AFIS,
+                result = MatchEntry(randomUUID(), 0F),
+                labels = eventLabels
             )
         )
     }
@@ -547,29 +572,40 @@ class EventRemoteDataSourceImplAndroidTest {
     ) {
         add(
             PersonCreationEvent(
-                DEFAULT_TIME, listOf(
+                startTime = DEFAULT_TIME,
+                fingerprintCaptureIds = listOf(
                     fingerprintCaptureEvent?.id
                         ?: ""
-                ), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels
+                ),
+                fingerprintReferenceId = randomUUID(),
+                faceCaptureIds = listOf(faceCaptureEvent?.id ?: ""),
+                faceReferenceId = randomUUID(),
+                labels = eventLabels
             )
         )
     }
 
     private fun MutableList<Event>.addRefusalEvent() {
         RefusalPayload.Answer.values().forEach {
-            add(RefusalEvent(DEFAULT_TIME, DEFAULT_TIME, it, "other_text", eventLabels))
+            add(RefusalEvent(
+                createdAt = DEFAULT_TIME,
+                endTime = DEFAULT_TIME,
+                reason = it,
+                otherText = "other_text",
+                labels = eventLabels
+            ))
         }
     }
 
     private fun MutableList<Event>.addScannerConnectionEvent() {
         add(
             ScannerConnectionEvent(
-                DEFAULT_TIME,
-                ScannerConnectionPayload.ScannerInfo(
+                createdAt = DEFAULT_TIME,
+                scannerInfo = ScannerConnectionPayload.ScannerInfo(
                     "scanner_id", "macAddress",
                     ScannerGeneration.VERO_2, "hardware"
                 ),
-                eventLabels
+                labels = eventLabels
             )
         )
     }
@@ -577,13 +613,13 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addVero2InfoSnapshotEvents() {
         add(
             Vero2InfoSnapshotEvent(
-                DEFAULT_TIME,
-                Vero2InfoSnapshotPayload.Vero2Version(
+                createdAt = DEFAULT_TIME,
+                version = Vero2InfoSnapshotPayload.Vero2Version(
                     Int.MAX_VALUE.toLong() + 1, "1.23",
                     "api", "stmApp", "stmApi", "un20App", "un20Api"
                 ),
-                Vero2InfoSnapshotPayload.BatteryInfo(70, 15, 1, 37),
-                eventLabels
+                battery = Vero2InfoSnapshotPayload.BatteryInfo(70, 15, 1, 37),
+                labels = eventLabels
             )
         )
     }
@@ -591,41 +627,45 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addScannerFirmwareUpdateEvent() {
         add(
             ScannerFirmwareUpdateEvent(
-                DEFAULT_TIME, DEFAULT_TIME, "stm",
-                "targetApp", "failureReason",
-                eventLabels
+                createdAt = DEFAULT_TIME, endTime = DEFAULT_TIME, chip = "stm",
+                targetAppVersion = "targetApp", failureReason = "failureReason",
+                labels = eventLabels
             )
         )
     }
 
     private fun MutableList<Event>.addSuspiciousIntentEvent() {
-        add(SuspiciousIntentEvent(DEFAULT_TIME, mapOf("some_extra_key" to "value"), eventLabels))
+        add(SuspiciousIntentEvent(
+            createdAt = DEFAULT_TIME,
+            unexpectedExtras = mapOf("some_extra_key" to "value"),
+            labels = eventLabels
+        ))
     }
 
     private fun MutableList<Event>.addCompletionCheckEvent() {
-        add(CompletionCheckEvent(DEFAULT_TIME, true, eventLabels))
+        add(CompletionCheckEvent(createdAt = DEFAULT_TIME, completed = true, labels = eventLabels))
     }
 
     private fun MutableList<Event>.addSessionCaptureEvent() {
         val deviceArg = Device(
-            VERSION.SDK_INT.toString(),
-            Build.MANUFACTURER + "_" + Build.MODEL,
-            GUID1
+            androidSdkVersion = VERSION.SDK_INT.toString(),
+            deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
+            deviceId = GUID1
         )
 
         val event = SessionCaptureEvent(
-            randomUUID(),
-            testProject.id,
-            CREATED_AT,
-            listOf(FINGERPRINT, FACE),
-            "appVersionName",
-            "libSimprintsVersionName",
-            "EN",
-            deviceArg,
-            DatabaseInfo(0, 2)
+            id = randomUUID(),
+            projectId = testProject.id,
+            createdAt = CREATED_AT,
+            modalities = listOf(FINGERPRINT, FACE),
+            appVersionName = "appVersionName",
+            libVersionName = "libSimprintsVersionName",
+            language = "EN",
+            device = deviceArg,
+            databaseInfo = DatabaseInfo(sessionCount = 0, recordCount = 2)
         )
 
-        event.payload.location = Location(0.0, 0.0)
+        event.payload.location = Location(latitude = 0.0, longitude = 0.0)
         event.payload.uploadedAt = 1
         event.payload.endedAt = 1
 
@@ -635,14 +675,14 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addEnrolmentRecordCreation() {
         add(
             EnrolmentRecordCreationEvent(
-                CREATED_AT,
-                GUID1,
-                testProject.id,
-                DEFAULT_MODULE_ID,
-                DEFAULT_USER_ID,
-                listOf(FINGERPRINT, FACE),
-                buildFakeBiometricReferences(EncodingUtilsImplForTests),
-                EventLabels(
+                createdAt = CREATED_AT,
+                subjectId = GUID1,
+                projectId = testProject.id,
+                moduleId = DEFAULT_MODULE_ID,
+                attendantId = DEFAULT_USER_ID,
+                modes = listOf(FINGERPRINT, FACE),
+                biometricReferences = buildFakeBiometricReferences(EncodingUtilsImplForTests),
+                extraLabels = EventLabels(
                     projectId = testProject.id,
                     moduleIds = listOf(GUID2),
                     attendantId = DEFAULT_USER_ID,
@@ -654,25 +694,34 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addCallbackErrorEvent() {
         ErrorCallbackPayload.Reason.values().forEach {
-            add(ErrorCallbackEvent(DEFAULT_TIME, it, eventLabels))
+            add(ErrorCallbackEvent(createdAt = DEFAULT_TIME, reason = it, labels = eventLabels))
         }
     }
 
     private fun MutableList<Event>.addCallbackEnrolmentEvent() {
-        add(EnrolmentCallbackEvent(DEFAULT_TIME, randomUUID(), eventLabels))
+        add(EnrolmentCallbackEvent(
+            createdAt = DEFAULT_TIME,
+            guid = randomUUID(),
+            eventLabels = eventLabels
+        ))
     }
 
     private fun MutableList<Event>.addCallbackRefusalEvent() {
-        add(RefusalCallbackEvent(DEFAULT_TIME, "reason", "other_text", eventLabels))
+        add(RefusalCallbackEvent(
+            createdAt = DEFAULT_TIME,
+            reason = "reason",
+            extra = "other_text",
+            labels = eventLabels
+        ))
     }
 
     private fun MutableList<Event>.addCallbackVerificationEvent() {
         IAppResponseTier.values().forEach {
             add(
                 VerificationCallbackEvent(
-                    DEFAULT_TIME,
-                    CallbackComparisonScore(randomUUID(), 0, it),
-                    eventLabels
+                    createdAt = DEFAULT_TIME,
+                    score = CallbackComparisonScore(randomUUID(), 0, it),
+                    labels = eventLabels
                 )
             )
         }
@@ -682,28 +731,32 @@ class EventRemoteDataSourceImplAndroidTest {
         IAppResponseTier.values().forEach {
             add(
                 IdentificationCallbackEvent(
-                    DEFAULT_TIME,
-                    randomUUID(),
-                    listOf(CallbackComparisonScore(randomUUID(), 0, it)),
-                    eventLabels
+                    createdAt = DEFAULT_TIME,
+                    sessionId = randomUUID(),
+                    scores = listOf(CallbackComparisonScore(randomUUID(), 0, it)),
+                    labels = eventLabels
                 )
             )
         }
     }
 
     private fun MutableList<Event>.addCallbackConfirmationEvent() {
-        add(ConfirmationCallbackEvent(DEFAULT_TIME, true, eventLabels))
+        add(ConfirmationCallbackEvent(
+            createdAt = DEFAULT_TIME,
+            identificationOutcome = true,
+            labels = eventLabels
+        ))
     }
 
     private fun MutableList<Event>.addCalloutEnrolmentEvent() {
         add(
             EnrolmentCalloutEvent(
-                DEFAULT_TIME,
-                testProject.id,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                "metadata",
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                projectId = testProject.id,
+                userId = DEFAULT_USER_ID,
+                moduleId = DEFAULT_MODULE_ID,
+                metadata = "metadata",
+                labels = eventLabels
             )
         )
     }
@@ -711,12 +764,12 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addCalloutIdentificationEvent() {
         add(
             IdentificationCalloutEvent(
-                DEFAULT_TIME,
-                testProject.id,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                "metadata",
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                projectId = testProject.id,
+                userId = DEFAULT_USER_ID,
+                moduleId = DEFAULT_MODULE_ID,
+                metadata = "metadata",
+                labels = eventLabels
             )
         )
     }
@@ -724,13 +777,13 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addCalloutVerificationEvent() {
         add(
             VerificationCalloutEvent(
-                DEFAULT_TIME,
-                testProject.id,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                randomUUID(),
-                "metadata",
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                projectId = testProject.id,
+                userId = DEFAULT_USER_ID,
+                moduleId = DEFAULT_MODULE_ID,
+                verifyGuid = randomUUID(),
+                metadata = "metadata",
+                labels = eventLabels
             )
         )
     }
@@ -738,13 +791,13 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addCalloutLastBiomentricsEvent() {
         add(
             EnrolmentLastBiometricsCalloutEvent(
-                DEFAULT_TIME,
-                testProject.id,
-                DEFAULT_USER_ID,
-                DEFAULT_MODULE_ID,
-                "metadata",
-                randomUUID(),
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                projectId = testProject.id,
+                userId = DEFAULT_USER_ID,
+                moduleId = DEFAULT_MODULE_ID,
+                metadata = "metadata",
+                sessionId = randomUUID(),
+                labels = eventLabels
             )
         )
     }
@@ -752,11 +805,11 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addCalloutConfirmationCallbackEvent() {
         add(
             ConfirmationCalloutEvent(
-                DEFAULT_TIME,
-                testProject.id,
-                randomUUID(),
-                randomUUID(),
-                eventLabels
+                createdAt = DEFAULT_TIME,
+                projectId = testProject.id,
+                selectedGuid = randomUUID(),
+                sessionId = randomUUID(),
+                labels = eventLabels
             )
         )
     }
