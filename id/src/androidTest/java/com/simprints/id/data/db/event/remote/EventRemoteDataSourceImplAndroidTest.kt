@@ -110,13 +110,11 @@ import com.simprints.eventsystem.event.domain.models.callout.VerificationCallout
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
@@ -378,14 +376,13 @@ class EventRemoteDataSourceImplAndroidTest {
                 )
 
                 val event = FingerprintCaptureEventV3(
-                    DEFAULT_TIME,
-                    DEFAULT_TIME,
-                    fingerIdentifier.fromDomainToModuleApi(),
-                    0,
-                    result,
-                    fingerprint,
-                    randomUUID(),
-                    eventLabels
+                    createdAt = DEFAULT_TIME,
+                    endTime = DEFAULT_TIME,
+                    finger = fingerIdentifier.fromDomainToModuleApi(),
+                    qualityThreshold = 0,
+                    result = result,
+                    fingerprint = fingerprint,
+                    labels = eventLabels
                 )
 
                 add(event)
@@ -409,11 +406,10 @@ class EventRemoteDataSourceImplAndroidTest {
                         )
 
                     val event = FingerprintCaptureBiometricsEvent(
-                        DEFAULT_TIME,
-                        result,
-                        fingerprint,
-                        randomUUID(),
-                        eventLabels
+                        createdAt = DEFAULT_TIME,
+                        result = result,
+                        fingerprint = fingerprint,
+                        labels = eventLabels
                     )
 
                     add(event)
@@ -546,8 +542,8 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addPersonCreationEvent(
-        fingerprintCaptureEvent: FingerprintCaptureEvent?,
-        faceCaptureEvent: FaceCaptureEvent?
+        fingerprintCaptureEvent: FingerprintCaptureEventV3?,
+        faceCaptureEvent: FaceCaptureEventV3?
     ) {
         add(
             PersonCreationEvent(
@@ -781,8 +777,8 @@ class EventRemoteDataSourceImplAndroidTest {
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
             PERSON_CREATION -> addPersonCreationEvent(
-                this.filterIsInstance<FingerprintCaptureEvent>().firstOrNull(),
-                this.filterIsInstance<FaceCaptureEvent>().firstOrNull()
+                this.filterIsInstance<FingerprintCaptureEventV3>().firstOrNull(),
+                this.filterIsInstance<FaceCaptureEventV3>().firstOrNull()
             )
             ALERT_SCREEN -> addAlertScreenEvents()
             GUID_SELECTION -> addGuidSelectionEvent()
