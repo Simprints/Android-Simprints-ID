@@ -13,7 +13,7 @@ import java.util.UUID
 * object, which also needed incrementing*/
 @Keep
 data class FingerprintCaptureEventV3(
-    override val id: String = UUID.randomUUID().toString(),
+    override val id: String = FINGERPRINT_CAPTURE_ID,
     override var labels: EventLabels,
     override val payload: FingerprintCapturePayloadV3,
     override val type: EventType
@@ -26,7 +26,7 @@ data class FingerprintCaptureEventV3(
         qualityThreshold: Int,
         result: FingerprintCapturePayloadV3.Result,
         fingerprint: FingerprintCapturePayloadV3.Fingerprint?,
-        id: String = UUID.randomUUID().toString(),
+        id: String = FINGERPRINT_CAPTURE_ID,
         labels: EventLabels = EventLabels()
     ) : this(
         id,
@@ -67,5 +67,6 @@ data class FingerprintCaptureEventV3(
 
     companion object {
         const val EVENT_VERSION = 3
+        val FINGERPRINT_CAPTURE_ID = UUID.randomUUID().toString()
     }
 }
