@@ -17,7 +17,6 @@ dependencyAnalysis {
                     'org.jetbrains.kotlin:kotlin-stdlib',
                     'org.koin:koin-android-viewmodel',
                     'androidx.navigation:navigation-dynamic-features-fragment',
-                    'org.jetbrains.anko:anko',
                     'io.realm:realm-android-kotlin-extensions',
                     'io.realm:realm-annotations',
                     'io.realm:realm-android-library',

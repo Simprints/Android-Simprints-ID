@@ -140,7 +140,6 @@ dependencies {
 
     implementation(Dependencies.Dagger.core)
     implementation(Dependencies.Kotlin.reflect)
-    api(Dependencies.Kotlin.anko)
     implementation(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Room.ktx)
     implementation(Dependencies.AndroidX.UI.cardview)
@@ -191,7 +190,6 @@ dependencies {
     implementation(Dependencies.AndroidX.CameraX.core)
     implementation(Dependencies.Koin.core)
     implementation(Dependencies.Koin.android)
-    api(Dependencies.Koin.viewmodel)
     implementation(Dependencies.Playcore.core)
     implementation(Dependencies.Playcore.core_ktx)
     implementation(Dependencies.AndroidX.sqlite)
