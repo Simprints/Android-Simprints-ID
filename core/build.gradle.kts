@@ -51,7 +51,6 @@ dependencies {
     implementation(Dependencies.AndroidX.CameraX.camera2)
 
     implementation(Dependencies.Kotlin.coroutines_android)
-    api(Dependencies.Testing.Espresso.idling)
     implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Retrofit.core)
     api(Dependencies.Dagger.javax)
@@ -76,5 +75,4 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.AndroidX.rules)
     androidTestImplementation(Dependencies.Testing.truth)
     androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
-    androidTestImplementation(Dependencies.Testing.live_data)
 }

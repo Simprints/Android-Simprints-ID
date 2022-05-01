@@ -221,7 +221,6 @@ object Dependencies {
             const val contrib = "androidx.test.espresso:espresso-contrib:$espresso_version"
             const val barista =
                 "com.adevinta.android:barista:4.2.0" //Used to grant permissions in AndroidTests
-            const val idling = "androidx.test.espresso:espresso-idling-resource:$espresso_version"
 
         }
 
@@ -250,8 +249,7 @@ object Dependencies {
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutine_version"
         const val koin = "io.insert-koin:koin-test:$koin_version"
         const val koin_junit4 = "io.insert-koin:koin-test-junit4:$koin_version"
-        const val live_data = "com.jraska.livedata:testing-ktx:1.1.0"
-        const val kappuccino = "br.com.concretesolutions:kappuccino:1.2.1"
+        const val live_data = "com.jraska.livedata:testing-ktx:1.2.0"
         const val awaitility = "org.awaitility:awaitility-kotlin:4.0.1"
 
         // Navigation

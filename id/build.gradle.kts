@@ -287,7 +287,6 @@ dependencies {
         exclude("org.robolectric")
         exclude("org.jetbrains.kotlinx")
     }
-    androidTestImplementation(Dependencies.Testing.kappuccino)
 
     debugImplementation(Dependencies.Testing.fragment_testing) {
         exclude("androidx.test", "core")
@@ -303,6 +302,12 @@ configurations {
         // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
         // the issue is reported here https://github.com/mockk/mockk/issues/722
         exclude("io.mockk", "mockk-agent-jvm")
+        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
+        // https://github.com/android/android-test/issues/861
+        // and https://github.com/android/android-test/issues/999
+        exclude("org.checkerframework","checker")
+        exclude("com.google.protobuf", "protobuf-lite")
+
     }
 }
 kapt {
