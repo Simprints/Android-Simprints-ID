@@ -8,7 +8,7 @@ import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
@@ -79,9 +79,7 @@ class DashboardActivityAndroidTest {
 
         openActionBarOverflowOrOptionsMenu(app.applicationContext)
 
-        displayed {
-            text("Privacy Notice")
-        }
+        assertDisplayed("Privacy Notice")
     }
 
     @Test
