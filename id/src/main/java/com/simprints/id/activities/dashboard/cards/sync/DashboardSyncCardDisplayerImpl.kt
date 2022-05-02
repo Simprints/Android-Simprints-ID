@@ -24,6 +24,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.S
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
+import com.simprints.id.tools.extensions.textColor
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
@@ -123,7 +124,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
         withVisible(viewForConnectingState) {
             withVisible(progressCardStateText()) {
-                setTextColor(getDefaultGrayTextColor(viewForConnectingState))
+                textColor = getDefaultGrayTextColor(viewForConnectingState)
                 text = context.getString(R.string.dashboard_sync_card_connecting)
             }
             withVisible(progressCardSyncProgress()) {
@@ -145,7 +146,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
                     ""
                 }
                 text = String.format(context.getString(R.string.dashboard_sync_card_progress), percentageText)
-                setTextColor( getDefaultGrayTextColor(viewForConnectingState))
+                textColor = getDefaultGrayTextColor(viewForConnectingState)
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
