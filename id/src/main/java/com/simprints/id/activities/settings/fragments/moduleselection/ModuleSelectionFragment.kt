@@ -281,8 +281,8 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
                 hideKeyboard()
                 v?.clearFocus()
                 rvModules?.requestFocus()
-                true
-            } else false
+            }
+            false
         }
     }
 

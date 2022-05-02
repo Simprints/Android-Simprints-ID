@@ -37,7 +37,6 @@ import com.simprints.fingerprint.tools.extensions.showToast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.android.ext.android.inject
 
-
 class CollectFingerprintsActivity : FingerprintActivity() {
 
     private val masterFlowManager: MasterFlowManager by inject()

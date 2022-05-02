@@ -21,7 +21,9 @@ fun Context.showToast(string: String) =
         Toast.makeText(this, string, Toast.LENGTH_LONG).show()
     }
 fun Context.runOnUiThread(f: Context.() -> Unit) {
-    if (Looper.getMainLooper() === Looper.myLooper()) f() else Handler(Looper.getMainLooper()).post { f() }
+    if (Looper.getMainLooper() === Looper.myLooper()) f() else
+        Handler(Looper.getMainLooper()).post {
+            f() }
 }
 fun Activity.logActivityCreated() {
     Simber.d("Fingerprint Activity Log : created ${this::class.simpleName}")

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -88,7 +87,7 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        binding.fingerprintExitFormScrollView.doOnLayout {
+        binding.fingerprintExitFormScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             binding.fingerprintExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
