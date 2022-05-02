@@ -53,7 +53,6 @@ object Dependencies {
 
         object Lifecycle {
             const val livedata = "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version"
-            const val compiler = "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version"
             const val viewmodel =
                 "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version"
             const val scope = "androidx.lifecycle:lifecycle-runtime-ktx:$androidx_lifecycle_version"
