@@ -14,6 +14,7 @@ import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
+import com.simprints.id.tools.extensions.onLayoutChange
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import splitties.systemservices.inputMethodManager
@@ -71,7 +72,7 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListeners() {
-        binding.refusalScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        binding.refusalScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
             viewPresenter.handleLayoutChange()
         }
     }

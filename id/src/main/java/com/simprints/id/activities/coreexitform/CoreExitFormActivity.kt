@@ -18,6 +18,7 @@ import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResul
 import com.simprints.id.data.exitform.CoreExitFormReason.*
 import com.simprints.id.databinding.ActivityCoreExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.extensions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.logging.Simber
@@ -86,7 +87,7 @@ class CoreExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        binding.coreExitFormScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        binding.coreExitFormScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
             binding.coreExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }

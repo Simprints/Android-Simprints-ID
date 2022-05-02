@@ -18,6 +18,7 @@ import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFor
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.databinding.ActivityFingerprintExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.extensions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.logging.Simber
@@ -87,7 +88,7 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
 
     //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListener() {
-        binding.fingerprintExitFormScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        binding.fingerprintExitFormScrollView.onLayoutChange { _, _, _, _, _, _, _, _, _ ->
             binding.fingerprintExitFormScrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
