@@ -111,6 +111,7 @@ dependencies {
     implementation(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Lifecycle.viewmodel)
     implementation(Dependencies.AndroidX.Lifecycle.livedata)
+    implementation(Dependencies.AndroidX.Lifecycle.ext)
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.UI.cardview)
     implementation(Dependencies.AndroidX.UI.preference)
