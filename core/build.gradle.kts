@@ -66,13 +66,4 @@ dependencies {
     testImplementation(project(":testtools"))
     testImplementation(Dependencies.Testing.Mockk.core)
 
-
-    androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
-    androidTestImplementation(Dependencies.Testing.AndroidX.monitor)
-    androidTestImplementation(Dependencies.Testing.AndroidX.core)
-    androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
-    androidTestImplementation(Dependencies.Testing.AndroidX.runner)
-    androidTestImplementation(Dependencies.Testing.AndroidX.rules)
-    androidTestImplementation(Dependencies.Testing.truth)
-    androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
 }
