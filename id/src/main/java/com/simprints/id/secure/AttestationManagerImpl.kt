@@ -42,7 +42,7 @@ class AttestationManagerImpl : AttestationManager {
     private fun checkForErrorClaimAndThrow(jwsResult: String?) {
         val response = JwtTokenHelper.extractTokenPayloadAsJson(jwsResult)
 
-        Simber.i(response.toString())
+        Simber.tag("SafetyNet Response").i(response.toString())
 
         if (response?.has(SAFETYNET_TOKEN_ERROR_FILED) == true || response == null) {
             throw SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS)
