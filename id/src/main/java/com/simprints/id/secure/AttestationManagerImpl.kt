@@ -28,12 +28,7 @@ class AttestationManagerImpl : AttestationManager {
         nonce: Nonce
     ): SafetyNetApi.AttestationResponse {
         return try {
-            Tasks.await(
-                safetyNetClient.attest(
-                    Base64.decode(nonce.value, Base64.NO_WRAP),
-                    BuildConfig.SAFETYNET_API_KEY
-                )
-            )
+            Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, Base64.NO_WRAP), BuildConfig.SAFETYNET_API_KEY))
         } catch (e: Throwable) {
             throw SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
         }
