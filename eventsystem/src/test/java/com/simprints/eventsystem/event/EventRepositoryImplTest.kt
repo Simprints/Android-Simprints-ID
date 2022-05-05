@@ -244,7 +244,8 @@ class EventRepositoryImplTest {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE, GUID1, GUID2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = false,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
@@ -261,7 +262,8 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadOpenSession(GUID3)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = false,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
@@ -275,7 +277,8 @@ class EventRepositoryImplTest {
     fun upload_shouldNotUploadSessionsForNotSignedProject() {
         runBlocking {
             shouldThrow<TryToUploadEventsForNotSignedProject> {
-                eventRepo.uploadEvents(randomUUID(),
+                eventRepo.uploadEvents(
+                    randomUUID(),
                     canSyncAllData = false,
                     canSyncBiometricData = false,
                     canSyncAnalyticsData = false
@@ -291,7 +294,8 @@ class EventRepositoryImplTest {
                 mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = true,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
@@ -312,7 +316,8 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            val progress = eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            val progress = eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = false,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
@@ -331,7 +336,8 @@ class EventRepositoryImplTest {
                 mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = true,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
@@ -352,7 +358,8 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = false,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
@@ -375,7 +382,8 @@ class EventRepositoryImplTest {
             val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID,
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
                 canSyncAllData = false,
                 canSyncBiometricData = false,
                 canSyncAnalyticsData = false
