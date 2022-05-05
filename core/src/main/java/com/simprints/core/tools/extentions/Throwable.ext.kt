@@ -11,8 +11,7 @@ fun Throwable.isCloudRecoverableIssue() =
 fun Throwable.isBackendMaintenanceException(): Boolean {
     if (this is HttpException && response()?.code() == 503) {
         return try {
-            val error =
-                response()?.errorBody()?.string()?.let { JsonHelper.fromJson<ApiError>(it).error }
+            val error = response()?.errorBody()?.string()?.let { JsonHelper.fromJson<ApiError>(it).error }
             error != null && error == NetworkConstants.BACKEND_MAINTENANCE_ERROR_STRING
         } catch (e: Throwable) {
             false

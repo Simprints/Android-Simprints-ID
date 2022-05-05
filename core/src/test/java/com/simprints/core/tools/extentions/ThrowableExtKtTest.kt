@@ -31,6 +31,7 @@ class ThrowableExtKtTest {
     @Test
     fun gettingExceptionWitResponseReturnsFalse() {
         val throwable = createThrowable(503, null)
+
         assertThat(throwable.isBackendMaintenanceException()).isFalse()
     }
 
@@ -67,13 +68,14 @@ class ThrowableExtKtTest {
     @Test
     fun gettingNoBackendErrorReturnsFalse() {
         val throwable = createThrowable(500, otherErrorResponse)
+
         assertThat(throwable.isBackendMaintenanceException()).isFalse()
     }
 
     @Test
-
     fun gettingNoBackendErrorReturnsFalseWith503() {
         val throwable = createThrowable(503, otherErrorResponse)
+
         assertThat(throwable.isBackendMaintenanceException()).isFalse()
     }
 
@@ -163,8 +165,7 @@ class ThrowableExtKtTest {
     }
 
     private fun createThrowable(code: Int, errorResponse: String?): Throwable {
-        val errorResponseBody =
-            errorResponse?.toResponseBody("application/json".toMediaTypeOrNull())
+        val errorResponseBody = errorResponse?.toResponseBody("application/json".toMediaTypeOrNull())
         val mockResponse = errorResponseBody?.let { Response.error<Any>(code, it) }
         return if (mockResponse != null) HttpException(mockResponse) else Throwable()
     }
