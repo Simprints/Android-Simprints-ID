@@ -14,7 +14,7 @@ import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCo
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.domain.canSyncDataToSimprints
+import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
@@ -112,7 +112,7 @@ class SyncInformationViewModelTest {
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManager.eventDownSyncSetting } returns ON
-        every { preferencesManager.simprintsSyncSetting.canSyncDataToSimprints() } returns true
+        every { preferencesManager.canSyncDataToSimprints() } returns true
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(
                 Succeeded
@@ -158,7 +158,7 @@ class SyncInformationViewModelTest {
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManager.eventDownSyncSetting } returns OFF
-        every { preferencesManager.simprintsSyncSetting.canSyncDataToSimprints() } returns true
+        every { preferencesManager.canSyncDataToSimprints() } returns true
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(
                 Succeeded
@@ -192,7 +192,7 @@ class SyncInformationViewModelTest {
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
         every { preferencesManager.eventDownSyncSetting } returns ON
-        every { preferencesManager.simprintsSyncSetting.canSyncDataToSimprints() } returns true
+        every { preferencesManager.canSyncDataToSimprints() } returns true
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(
                 Succeeded
