@@ -9,7 +9,7 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.domain.canSyncDataToSimprints
+import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.getAllSubjectsSyncWorkersInfo
@@ -84,7 +84,7 @@ open class EventSyncMasterWorker(
             try {
                 crashlyticsLog("Start")
 
-                if (!preferenceManager.simprintsSyncSetting.canSyncDataToSimprints()) return@withContext success(
+                if (!preferenceManager.canSyncDataToSimprints()) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
                 )
 

@@ -14,7 +14,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.domain.canSyncDataToSimprints
+import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
@@ -82,7 +82,7 @@ class SyncInformationViewModel(
             eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
-        if (isDownSyncAllowed() && preferencesManager.simprintsSyncSetting.canSyncDataToSimprints()) {
+        if (isDownSyncAllowed() && preferencesManager.canSyncDataToSimprints()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             null

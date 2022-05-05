@@ -25,10 +25,10 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivityDashboardBinding
 import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
 import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
-import com.simprints.id.domain.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.logging.Simber
@@ -146,7 +146,7 @@ class DashboardActivity : BaseSplitActivity() {
         dailyActivityCardDisplayer.initRoot(dailyActivityBinding.dashboardDailyActivityCardRoot)
 
         // init sync-card only when syncing to BFSID is allowed
-        if (settingsPreferencesManager.simprintsSyncSetting.canSyncDataToSimprints()) {
+        if (settingsPreferencesManager.canSyncDataToSimprints()) {
             syncCardDisplayer.initRoot(binding.dashboardSyncCard)
         }
     }
@@ -206,7 +206,7 @@ class DashboardActivity : BaseSplitActivity() {
         loadDailyActivity()
 
         // trigger sync ticker only when syncing to BFSID
-        if (settingsPreferencesManager.simprintsSyncSetting.canSyncDataToSimprints()) {
+        if (settingsPreferencesManager.canSyncDataToSimprints()) {
             startTickerToCheckIfSyncIsRequired()
         }
     }

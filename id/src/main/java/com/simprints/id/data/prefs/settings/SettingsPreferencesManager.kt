@@ -64,3 +64,6 @@ interface SettingsPreferencesManager {
     fun getRemoteConfigFingerprintsToCollect(): List<FingerIdentifier>
 
 }
+
+fun SettingsPreferencesManager.canSyncDataToSimprints(): Boolean =
+    simprintsSyncSetting.name != SimprintsSyncSetting.NONE.name
