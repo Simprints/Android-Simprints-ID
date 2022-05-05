@@ -27,7 +27,7 @@ buildscript {
 
         classpath("org.ow2.asm:asm:9.2")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.80.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.3.1")
+        classpath("org.gradle:test-retry-gradle-plugin:1.3.2")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.10")
@@ -47,7 +47,7 @@ buildscript {
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.0")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.1")
     }
 
 }
@@ -90,7 +90,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.3.1"
+    id("org.gradle.test-retry") version "1.3.2"
 }
 
 /*
