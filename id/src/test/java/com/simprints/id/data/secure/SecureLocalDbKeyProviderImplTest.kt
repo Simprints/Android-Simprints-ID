@@ -8,7 +8,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
-import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
@@ -23,7 +22,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -37,7 +35,6 @@ class SecureLocalDbKeyProviderImplTest {
     private val ctx = ApplicationProvider.getApplicationContext<Context>()
     private val sharedPrefs = ctx.getSharedPreferences(SHARED_PREFS_FOR_TEST, 0)
 
-    private val legacyLocalDbKeyProviderMock = mockk<LegacyLocalDbKeyProvider>()
     private val randomGenerator = mockk<RandomGenerator>().apply {
         every { this@apply.generateByteArray(any()) } returns DEFAULT_REALM_KEY
     }
@@ -49,7 +46,7 @@ class SecureLocalDbKeyProviderImplTest {
 
     @Before
     fun setUp() {
-        secureLocalDbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPrefs, randomGenerator, legacyLocalDbKeyProviderMock)
+        secureLocalDbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPrefs, randomGenerator)
         sharedPrefs.edit().clear().apply()
     }
 
@@ -65,7 +62,7 @@ class SecureLocalDbKeyProviderImplTest {
     @Test
     fun setLocalDatabaseKey_shouldReturnTheExistingKeyIfPresent() {
         val sharedPrefsMock = mockStoredRealmKeyInSharedPrefs()
-        secureLocalDbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPrefsMock, randomGenerator, mockk())
+        secureLocalDbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPrefsMock, randomGenerator)
 
         secureLocalDbKeyProvider.setLocalDatabaseKey(DEFAULT_PROJECT_ID)
 
@@ -82,31 +79,8 @@ class SecureLocalDbKeyProviderImplTest {
     }
 
     @Test
-    fun getLocalDbKeyOrThrow_shouldMigrateLegacyLocalKeyIfPresent() {
-        val legacyKey = DEFAULT_REALM_KEY
-        every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns
-            LocalDbKey(DEFAULT_PROJECT_ID, legacyKey)
-
-        secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
-        val localKey = secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
-
-        verify(exactly = 1) { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
-        assertThat(localKey.value).isEqualTo(legacyKey)
-        assertThat(realmKeyStored).isEqualTo(encodeToString(legacyKey, DEFAULT))
-    }
-
-    @Test
     fun getLocalDbKeyOrThrow_shouldThrowIfLocalKeyNotPresent() {
-        every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } throws Throwable("Some Error")
         getLocalDbKeyAndVerifyThatMissingKeyWasThrown()
-    }
-
-    @Test
-    fun legacyLocalDbProviderThrows_secureLocalDbKeyProviderShouldThrowMissingLocalDatabaseKeyException() {
-        every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } throws IOException("some error")
-        getLocalDbKeyAndVerifyThatMissingKeyWasThrown()
-
-        verify { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) }
     }
 
     private fun getLocalDbKeyAndVerifyThatMissingKeyWasThrown() {
