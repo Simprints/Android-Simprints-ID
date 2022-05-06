@@ -34,7 +34,7 @@ definitions:
         # Run the ID unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-id-unit-tests
-                name: "Run Id, Core & Event System unit tests"
+                name: "Run Id unit tests"
                 size: 2x
                 max-time: 30
                 caches:
