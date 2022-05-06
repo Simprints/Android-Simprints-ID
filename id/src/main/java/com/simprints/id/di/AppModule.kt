@@ -10,7 +10,6 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.security.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
@@ -39,8 +38,6 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.*
-import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
@@ -110,10 +107,6 @@ open class AppModule {
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
-
-    @Provides
-    @Singleton
-    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl()
 
     @Provides
     @Singleton

@@ -26,7 +26,6 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.LocationManager
@@ -108,9 +107,6 @@ class TestAppModule(
                 randomGenerator
             )
         }
-
-    override fun provideKeystoreManager(): KeystoreManager =
-        keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
     override fun provideEventRepository(
         ctx: Context,
