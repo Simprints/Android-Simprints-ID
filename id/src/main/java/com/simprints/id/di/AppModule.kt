@@ -123,22 +123,12 @@ open class AppModule {
     @Singleton
     open fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
-        randomGenerator: RandomGenerator,
-        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
+        randomGenerator: RandomGenerator
     ): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
-            randomGenerator,
-            unsecuredLocalDbKeyProvider
+            randomGenerator
         )
-
-    @Provides
-    @Singleton
-    open fun provideLegacyLocalDbKeyProvider(
-        preferencesManager: PreferencesManager,
-        keystoreManager: KeystoreManager
-    ): LegacyLocalDbKeyProvider =
-        LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
     @Provides
     @Singleton
