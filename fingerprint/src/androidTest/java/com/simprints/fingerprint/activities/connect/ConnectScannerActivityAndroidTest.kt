@@ -14,19 +14,27 @@ import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.commontesttools.time.MockTimer
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.Application
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
+import io.reactivex.Completable
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -36,6 +44,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
+
 
 @RunWith(AndroidJUnit4::class)
 class ConnectScannerActivityAndroidTest : KoinTest {
@@ -49,23 +58,50 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
-    private val viewModelMock: ConnectScannerViewModel = mockk(relaxed = true)
+    private lateinit var viewModelMock: ConnectScannerViewModel
+
+
+    private val mockTimer = MockTimer()
+    private val timeHelper: FingerprintTimeHelper = mockk(relaxed = true) {
+        every { newTimer() } returns mockTimer
+    }
+    private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
+    private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
+        every { qualityThreshold } returns 60
+        every { liveFeedbackOn } returns false
+        every { saveFingerprintImagesStrategy.isImageTransferRequired() } returns true
+    }
+    private val scanner: ScannerWrapper = mockk<ScannerWrapper>().apply {
+        every { isLiveFeedbackAvailable() } returns false
+    }
+    private val scannerManager: ScannerManager =
+        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())){
+            every { checkBluetoothStatus() } returns Completable.complete()
+        }
+    private val nfcManager: NfcManager = mockk()
 
     @Before
     fun setUp() {
-        loadKoinModules(module(override = true) {
+        scannerManager.scanner = scanner
+
+        viewModelMock = spyk(
+            ConnectScannerViewModel(
+                scannerManager, timeHelper, sessionEventsManager, preferencesManager, nfcManager
+            )
+        ){
+            every { start(any()) } just Runs
+             connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
+        }
+        loadKoinModules(module {
             viewModel { viewModelMock }
         })
     }
 
     @Test
     fun receivesFinishEvent_finishesActivityWithCorrectResult() {
-        val finishLiveData = MutableLiveData<LiveDataEvent>()
-        every { viewModelMock.finish } returns finishLiveData
-
         scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
-        finishLiveData.postEvent()
+        viewModelMock.finishConnectActivity()
 
         tryOnSystemUntilTimeout(2000, 200) {
             assertThat(scenario.state).isEqualTo(Lifecycle.State.DESTROYED)
