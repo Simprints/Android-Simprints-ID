@@ -77,7 +77,6 @@ internal fun WorkRequest.Builder<*, *>.addTagForBackgroundSyncMasterWorker(): Wo
  */
 internal fun getUniqueSyncIdTag(syncId: String) = "$TAG_MASTER_SYNC_ID$syncId"
 
-internal fun WorkInfo.isPartOfSubjectsSync(syncId: String) = tags.contains("$TAG_MASTER_SYNC_ID$syncId")
 internal fun WorkInfo.getUniqueSyncId() = tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }?.removePrefix(TAG_MASTER_SYNC_ID)
 internal fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =
     this.filter {
