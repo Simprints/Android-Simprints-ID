@@ -19,7 +19,7 @@ object Dependencies {
     private const val okttp_version = "4.2.2"
     private const val fuzzywuzzy_version = "1.2.0"
     private const val jackson_version = "2.11.1"
-    private const val koin_version= "3.1.6"
+    private const val koin_version= "3.2.0"
     private const val rootbeer_version = "0.0.7"
     private const val mockito_version = "4.0.0"
     private const val objenesis_version ="3.2"
