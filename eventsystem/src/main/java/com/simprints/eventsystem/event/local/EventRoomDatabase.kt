@@ -8,15 +8,12 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.simprints.eventsystem.BuildConfig
 import com.simprints.eventsystem.common.Converters
-import com.simprints.eventsystem.event.local.migrations.EventMigration1to2
-import com.simprints.eventsystem.event.local.migrations.EventMigration2to3
-import com.simprints.eventsystem.event.local.migrations.EventMigration3to4
-import com.simprints.eventsystem.event.local.migrations.EventMigration4to5
+import com.simprints.eventsystem.event.local.migrations.*
 import com.simprints.eventsystem.event.local.models.DbEvent
 import net.sqlcipher.database.SupportFactory
 
 
-@Database(entities = [DbEvent::class], version = 5, exportSchema = true)
+@Database(entities = [DbEvent::class], version = 6, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
@@ -35,6 +32,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations(EventMigration2to3())
                 .addMigrations(EventMigration3to4())
                 .addMigrations(EventMigration4to5())
+                .addMigrations(EventMigration5to6())
 
             if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)

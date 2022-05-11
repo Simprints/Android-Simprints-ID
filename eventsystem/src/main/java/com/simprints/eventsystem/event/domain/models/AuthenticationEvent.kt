@@ -43,19 +43,15 @@ data class AuthenticationEvent(
         @Keep
         data class UserInfo(val projectId: String, val userId: String)
 
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
-        @JsonSubTypes(
-            JsonSubTypes.Type(value = Result.BackendMaintenanceError::class)
-        )
-        sealed class Result {
-            object Authenticated : Result()
-            object BadCredentials : Result()
-            object Offline : Result()
-            object TechnicalFailure : Result()
-            data class BackendMaintenanceError(val estimatedOutage: Long? = null) : Result()
-            object SafetyNetUnavailable : Result()
-            object SafetyNetInvalidClaim : Result()
-            object Unknown : Result()
+        enum class Result {
+            AUTHENTICATED,
+            BAD_CREDENTIALS,
+            OFFLINE,
+            TECHNICAL_FAILURE,
+            SAFETYNET_UNAVAILABLE,
+            SAFETYNET_INVALID_CLAIM,
+            BACKEND_MAINTENANCE_ERROR,
+            UNKNOWN
         }
     }
 
