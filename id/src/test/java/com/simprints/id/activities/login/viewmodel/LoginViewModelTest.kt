@@ -45,7 +45,7 @@ class LoginViewModelTest {
             authenticationHelper.authenticateSafely(
                 "userId", "projectId", "projectSecret", "deviceId"
             )
-        } returns AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+        } returns AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 
         //When
         loginViewModel.signIn(
@@ -54,6 +54,6 @@ class LoginViewModelTest {
         val result = loginViewModel.getSignInResult().getOrAwaitValue()
         //Then
         Truth.assertThat(result)
-            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.Authenticated)
+            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED)
     }
 }

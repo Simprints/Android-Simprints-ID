@@ -12,11 +12,12 @@ buildscript {
         mavenCentral()
         maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://plugins.gradle.org/m2/")
+        maven(url = "https://kotlin.bintray.com/kotlinx/")
     }
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:7.1.1")
+        classpath("com.android.tools.build:gradle:7.1.3")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
 
         // CI Scanning & Retry
@@ -24,9 +25,9 @@ buildscript {
 
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
-        classpath("org.ow2.asm:asm:9.2")
+        classpath("org.ow2.asm:asm:9.3")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.80.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.3.1")
+        classpath("org.gradle:test-retry-gradle-plugin:1.3.2")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.10")
@@ -46,7 +47,7 @@ buildscript {
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.0")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.1")
     }
 
 }
@@ -89,7 +90,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.3.1"
+    id("org.gradle.test-retry") version "1.3.2"
 }
 
 /*
