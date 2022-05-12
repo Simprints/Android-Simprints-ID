@@ -1,19 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "dependencyDashboard": "true",
+  "major": {
+    "dependencyDashboardApproval": "true"
+  },
   "extends": [
     "config:base",
     ":switchToGradleLite"
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": [
-        "maven"
-      ],
-      "registryUrls": [
-        "https://dl.google.com/android/maven2/",
-        "https://jcenter.bintray.com/"
-      ]
-    }
   ],
   "regexManagers": [
     {
