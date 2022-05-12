@@ -1,3 +1,29 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":switchToGradleLite"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "maven"
+      ],
+      "registryUrls": [
+        "https://dl.google.com/android/maven2/",
+        "https://jcenter.bintray.com/"
+      ]
+    }
+  ],
+  "regexManagers": [
+    {
+      "description": "Detect template under buildSrc",
+      "fileMatch": [
+        "(^|/)buildSrc/.*"
+      ],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)\n([a-z A-Z]*)Version = \"(?<currentValue>.*?)\"\n"
+      ]
+    }
+  ]
 }
