@@ -21,7 +21,7 @@ import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchViewModel.MatchState.*
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 class FaceMatchActivity : FaceActivity() {

@@ -21,15 +21,3 @@ val Context.packageVersionName: String
     } catch (e: PackageManager.NameNotFoundException) {
         "Version Name Not Found"
     }
-
-fun Context.isXLargeTablet(): Boolean =
-    resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_XLARGE
-
-@ColorInt
-@SuppressLint("ResourceAsColor")
-fun Context.getColorResCompat(@AttrRes id: Int): Int {
-    val resolvedAttr = TypedValue()
-    theme.resolveAttribute(id, resolvedAttr, true)
-    val colorRes = resolvedAttr.run { if (resourceId != 0) resourceId else data }
-    return ContextCompat.getColor(this, colorRes)
-}

@@ -95,8 +95,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
 
         scannerManager.scanner = scanner
 
-        val mockModule = module(override = true) {
-            factory(override = true) { timeHelper }
+        val mockModule = module {
             factory { timeHelper }
             factory { sessionEventsManager }
             factory { preferencesManager }

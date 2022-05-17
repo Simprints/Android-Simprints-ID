@@ -11,8 +11,8 @@ import com.simprints.face.databinding.FragmentConfigurationBinding
 import com.simprints.face.initializers.SdkInitializer
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
     private val mainVm: FaceOrchestratorViewModel by sharedViewModel()

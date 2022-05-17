@@ -1,20 +1,23 @@
 package com.simprints.id.activities.login
 
 import android.app.Activity
+import android.app.Instrumentation
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.intent.matcher.IntentMatchers.isInternal
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
-import br.com.concretesolutions.kappuccino.actions.ClickActions.click
-import br.com.concretesolutions.kappuccino.actions.TextActions.typeText
-import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
-import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.sentIntent
-import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions.stubIntent
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivity
@@ -27,6 +30,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.testtools.android.getCurrentActivity
 import io.mockk.every
 import org.hamcrest.CoreMatchers.not
+
 
 const val USER_ID = "user_id"
 const val VALID_PROJECT_ID = "project_id"
@@ -62,15 +66,11 @@ class LoginActivityRobot(
 ) {
 
     fun typeProjectId(projectId: String) {
-        typeText(projectId) {
-            id(R.id.loginEditTextProjectId)
-        }
+        writeTo(R.id.loginEditTextProjectId,projectId)
     }
 
     fun typeProjectSecret(projectSecret: String) {
-        typeText(projectSecret) {
-            id(R.id.loginEditTextProjectSecret)
-        }
+        writeTo(R.id.loginEditTextProjectSecret,projectSecret)
     }
 
     fun withMandatoryCredentialsPresent() {
@@ -93,10 +93,6 @@ class LoginActivityRobot(
         every { mockLoginActivityHelper.isSecurityStatusRunning() } returns true
     }
 
-    fun withSecurityStatusCompromisedOrProjectEnded() {
-        every { mockLoginActivityHelper.isSecurityStatusRunning() } returns false
-    }
-
     fun receiveValidQrCodeResponse() {
         every {
             mockLoginActivityHelper.tryParseQrCodeResponse(any())
@@ -113,26 +109,21 @@ class LoginActivityRobot(
     }
 
     fun receiveQrScanError() {
-        stubIntent {
-            respondWith {
-                canceled()
-            }
-        }
+        intending(isInternal()).respondWith(
+            Instrumentation.ActivityResult(
+                Activity.RESULT_CANCELED,
+                null
+            )
+        )
     }
 
     infix fun clickScanQr(assertion: LoginActivityAssertions.() -> Unit) {
-        click {
-            id(R.id.loginButtonScanQr)
-        }
-
+        clickOn(R.id.loginButtonScanQr)
         assert(assertion)
     }
 
     infix fun clickSignIn(assertion: LoginActivityAssertions.() -> Unit) {
-        click {
-            id(R.id.loginButtonSignIn)
-        }
-
+        clickOn(R.id.loginButtonSignIn)
         assert(assertion)
     }
 
@@ -159,15 +150,13 @@ class LoginActivityRobot(
     }
 
     private fun stubQrScanIntent() {
-        stubIntent {
-            respondWith {
-                val data = Intent().putExtra(EXTRA_SCAN_RESULT, "mock_qr_code")
-                ok()
-                data(data)
-            }
-        }
+        intending(isInternal()).respondWith(
+            Instrumentation.ActivityResult(
+                Activity.RESULT_OK,
+                Intent().putExtra(EXTRA_SCAN_RESULT, "mock_qr_code")
+            )
+        )
     }
-
 }
 
 class LoginActivityAssertions(
@@ -175,12 +164,7 @@ class LoginActivityAssertions(
 ) {
 
     fun userIdFieldHasText(text: String) {
-        displayed {
-            allOf {
-                id(R.id.loginEditTextUserId)
-                text(text)
-            }
-        }
+        assertDisplayed(R.id.loginEditTextUserId,text)
     }
 
     fun missingCredentialsToastIsDisplayed() {
@@ -195,11 +179,7 @@ class LoginActivityAssertions(
         )
     }
 
-    fun securityStateToastIsDisplayed() {
-        assertToastIsDisplayed("Login failed. Please contact your supervisor.")
-    }
-
-    fun userIsSignedIn() {
+       fun userIsSignedIn() {
         val result = activityScenario.result
         assertThat(result.resultCode).isEqualTo(LoginActivityResponse.RESULT_CODE_LOGIN_SUCCEED)
     }
@@ -219,15 +199,11 @@ class LoginActivityAssertions(
     }
 
     fun alertScreenIsLaunched() {
-        sentIntent {
-            className(AlertActivity::class.java.name)
-        }
+        Intents.intended(IntentMatchers.hasComponent(AlertActivity::class.java.name))
     }
 
     fun qrCaptureActivityIsOpened() {
-        sentIntent {
-            className(QrCaptureActivity::class.java.name)
-        }
+        Intents.intended(IntentMatchers.hasComponent(QrCaptureActivity::class.java.name))
     }
 
     fun invalidQrCodeToastIsDisplayed() {
@@ -239,21 +215,11 @@ class LoginActivityAssertions(
     }
 
     fun projectIdFieldHasText(text: String) {
-        displayed {
-            allOf {
-                id(R.id.loginEditTextProjectId)
-                text(text)
-            }
-        }
+        assertDisplayed(R.id.loginEditTextProjectId,text)
     }
 
     fun projectSecretFieldHasText(text: String) {
-        displayed {
-            allOf {
-                id(R.id.loginEditTextProjectSecret)
-                text(text)
-            }
-        }
+        assertDisplayed(R.id.loginEditTextProjectSecret,text)
     }
 
     fun loginNotCompleteIntentIsReturned() {
@@ -272,5 +238,4 @@ class LoginActivityAssertions(
             .inRoot(withDecorView(not((getCurrentActivity()?.window?.decorView))))
             .check(matches(isDisplayed()))
     }
-
 }
