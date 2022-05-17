@@ -287,14 +287,14 @@ definitions:
 
 
         ######################################################################
-        # Run dependabot tool which scans all gradle files and open automatic PRs
+        # Run renovate automated dependency update tool
         ######################################################################
         -   step: &update-dependencies
                 name: "Update project dependencies"
-                image: ruby:2.6.6
+                image: renovate/renovate
                 max-time: 30
                 script:
-                    - bash ./ci/dependabot/run_dependabot
+                    - bash ./ci/renovate/run_renovate
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -347,4 +347,4 @@ pipelines:
         release/*: *release_flow
     custom:
         ci-test-pipeline: *ci-test # For CI testing purposes only
-        dependabot: *update-dependencies-flow
+        renovate: *update-dependencies-flow
