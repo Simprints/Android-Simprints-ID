@@ -8,7 +8,6 @@ apply {
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://plugins.gradle.org/m2/")
@@ -55,7 +54,6 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven {
             name = "SimMatcherGitHubPackages"

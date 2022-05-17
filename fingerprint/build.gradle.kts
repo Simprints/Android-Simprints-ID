@@ -10,6 +10,16 @@ apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
 }
 
+configurations {
+
+    androidTestImplementation {
+        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
+        // https://github.com/android/android-test/issues/861
+        // and https://github.com/android/android-test/issues/999
+        exclude("org.checkerframework", "checker")
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
+}
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -101,6 +111,7 @@ dependencies {
     implementation(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Lifecycle.viewmodel)
     implementation(Dependencies.AndroidX.Lifecycle.livedata)
+    implementation(Dependencies.AndroidX.Lifecycle.ext)
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.UI.cardview)
     implementation(Dependencies.AndroidX.UI.preference)
@@ -125,6 +136,12 @@ dependencies {
     implementation(Dependencies.Retrofit.adapter)
     implementation(Dependencies.Retrofit.logging)
     implementation(Dependencies.Retrofit.okhttp)
+    // Splitties
+    implementation(Dependencies.Splitties.core)
+    // Koin
+    implementation(Dependencies.Koin.core)
+    implementation(Dependencies.Koin.android)
+
 
     // ######################################################
     //                      Unit test
@@ -179,7 +196,6 @@ dependencies {
     }
 
     // Koin
-    androidTestImplementation(Dependencies.Koin.core_ext)
     androidTestImplementation(Dependencies.Testing.koin)
 
     // Android X

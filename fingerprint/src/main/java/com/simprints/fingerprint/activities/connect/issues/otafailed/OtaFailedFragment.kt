@@ -18,7 +18,7 @@ import com.simprints.fingerprint.databinding.FragmentOtaFailedBinding
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 /**
  * This fragment is show when an Over The Air update fails,

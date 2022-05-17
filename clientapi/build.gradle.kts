@@ -60,10 +60,10 @@ dependencies {
     implementation(Dependencies.AndroidX.security)
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.Lifecycle.scope)
-
     implementation(Dependencies.Support.material)
     implementation(Dependencies.Kotlin.reflect)
-
+    // Splitties
+    implementation(Dependencies.Splitties.core)
     // Kotlin
     implementation(Dependencies.AndroidX.core)
     implementation(Dependencies.AndroidX.multidex)
@@ -89,7 +89,6 @@ dependencies {
     testImplementation(Dependencies.Testing.KoTest.kotlin)
 
     testImplementation(Dependencies.Testing.Espresso.intents)
-    testImplementation(Dependencies.Koin.core_ext)
     testImplementation(Dependencies.Testing.koin)
 
     androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
@@ -105,7 +104,6 @@ dependencies {
     androidTestImplementation(Dependencies.Testing.Espresso.core)
     androidTestImplementation(Dependencies.Testing.Espresso.intents)
 
-    androidTestImplementation(Dependencies.Koin.core_ext)
     androidTestImplementation(Dependencies.Testing.koin)
     androidTestImplementation(Dependencies.Testing.truth)
     androidTestImplementation(Dependencies.Testing.Objenesis.core)

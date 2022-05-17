@@ -139,8 +139,8 @@ dependencies {
     implementation(Dependencies.libsimprints)
 
     implementation(Dependencies.Dagger.core)
+    implementation(Dependencies.Splitties.core)
     implementation(Dependencies.Kotlin.reflect)
-    api(Dependencies.Kotlin.anko)
     implementation(Dependencies.AndroidX.Room.core)
     implementation(Dependencies.AndroidX.Room.ktx)
     implementation(Dependencies.AndroidX.UI.cardview)
@@ -191,7 +191,6 @@ dependencies {
     implementation(Dependencies.AndroidX.CameraX.core)
     implementation(Dependencies.Koin.core)
     implementation(Dependencies.Koin.android)
-    api(Dependencies.Koin.viewmodel)
     implementation(Dependencies.Playcore.core)
     implementation(Dependencies.Playcore.core_ktx)
     implementation(Dependencies.AndroidX.sqlite)
@@ -227,6 +226,7 @@ dependencies {
 
     testImplementation(Dependencies.Testing.Mockk.core)
     testImplementation(Dependencies.Testing.koin)
+    testImplementation(Dependencies.Testing.koin_junit4)
 
     testImplementation(Dependencies.Testing.mockwebserver)
     testImplementation(Dependencies.Testing.work)
@@ -287,7 +287,6 @@ dependencies {
         exclude("org.robolectric")
         exclude("org.jetbrains.kotlinx")
     }
-    androidTestImplementation(Dependencies.Testing.kappuccino)
 
     debugImplementation(Dependencies.Testing.fragment_testing) {
         exclude("androidx.test", "core")
@@ -303,6 +302,12 @@ configurations {
         // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
         // the issue is reported here https://github.com/mockk/mockk/issues/722
         exclude("io.mockk", "mockk-agent-jvm")
+        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
+        // https://github.com/android/android-test/issues/861
+        // and https://github.com/android/android-test/issues/999
+        exclude("org.checkerframework","checker")
+        exclude("com.google.protobuf", "protobuf-lite")
+
     }
 }
 kapt {
