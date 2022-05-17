@@ -11,7 +11,7 @@ import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 abstract class ConnectFragment(@LayoutRes private val layout: Int) : FingerprintFragment() {
 

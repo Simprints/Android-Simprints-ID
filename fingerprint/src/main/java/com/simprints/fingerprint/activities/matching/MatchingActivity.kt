@@ -18,7 +18,7 @@ import com.simprints.fingerprint.databinding.ActivityMatchingBinding
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MatchingActivity : FingerprintActivity() {
 

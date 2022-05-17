@@ -51,7 +51,6 @@ dependencies {
     implementation(Dependencies.AndroidX.CameraX.camera2)
 
     implementation(Dependencies.Kotlin.coroutines_android)
-    api(Dependencies.Testing.Espresso.idling)
     implementation(Dependencies.Jackson.core)
     implementation(Dependencies.Retrofit.core)
     api(Dependencies.Dagger.javax)
@@ -67,14 +66,4 @@ dependencies {
     testImplementation(project(":testtools"))
     testImplementation(Dependencies.Testing.Mockk.core)
 
-
-    androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
-    androidTestImplementation(Dependencies.Testing.AndroidX.monitor)
-    androidTestImplementation(Dependencies.Testing.AndroidX.core)
-    androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
-    androidTestImplementation(Dependencies.Testing.AndroidX.runner)
-    androidTestImplementation(Dependencies.Testing.AndroidX.rules)
-    androidTestImplementation(Dependencies.Testing.truth)
-    androidTestImplementation(Dependencies.Testing.AndroidX.orchestrator)
-    androidTestImplementation(Dependencies.Testing.live_data)
 }

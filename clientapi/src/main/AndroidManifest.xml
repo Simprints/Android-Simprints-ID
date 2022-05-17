@@ -16,6 +16,7 @@
 
         <activity
             android:name=".activities.odk.OdkActivity"
+            android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
@@ -44,6 +45,7 @@
 
         <activity
             android:name=".activities.libsimprints.LibSimprintsActivity"
+            android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
@@ -71,6 +73,7 @@
 
         <activity
             android:name=".activities.commcare.CommCareActivity"
+            android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.commcare.REGISTER" />

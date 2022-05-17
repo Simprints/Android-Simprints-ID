@@ -16,8 +16,8 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentOtaBinding
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.concurrent.schedule
 
 /**
