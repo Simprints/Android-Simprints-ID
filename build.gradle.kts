@@ -17,7 +17,7 @@ buildscript {
     dependencies {
         // Gradle & Kotlin
         classpath("com.android.tools.build:gradle:7.1.3")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
 
         // CI Scanning & Retry
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
@@ -42,7 +42,7 @@ buildscript {
         classpath("io.realm:realm-gradle-plugin:10.10.1")
 
         // Android X Navigation components
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")

@@ -30,15 +30,15 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Kotlin
-    implementation(Dependencies.Kotlin.reflect)
-    implementation(Dependencies.AndroidX.Annotation.annotation)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.androidX.annotation.annotation)
 
     // Logging
     implementation(project(":logging"))
 
     // RxJava
-    api(Dependencies.RxJava2.core)
-    implementation(Dependencies.RxJava2.kotlin)
+    api(libs.rxJava2.core)
+    implementation(libs.rxJava2.kotlin)
 
     // ######################################################
     //                      Unit test
@@ -48,13 +48,13 @@ dependencies {
     testImplementation(project(":testtools"))
 
     // JUnit
-    testImplementation(Dependencies.Testing.junit)
+    testImplementation(libs.testing.junit)
 
     // Mockito
-    testImplementation(Dependencies.Testing.Mockito.kotlin)
-    testImplementation(Dependencies.Testing.Mockito.core)
-    testImplementation(Dependencies.Testing.Mockito.inline)
+    testImplementation(libs.testing.mockito.kotlin)
+    testImplementation(libs.testing.mockito.core)
+    testImplementation(libs.testing.mockito.inline)
 
     // Truth
-    testImplementation(Dependencies.Testing.truth)
+    testImplementation(libs.testing.truth)
 }
