@@ -66,7 +66,7 @@ class MatchingViewModelTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        loadKoinModules(module(override = true) {
+        loadKoinModules(module {
             factory { dbManagerMock }
             factory { masterFlowManager }
             factory<FingerprintPreferencesManager> { mockk(relaxed = true) }

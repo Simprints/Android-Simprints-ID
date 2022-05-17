@@ -16,7 +16,15 @@ sonarqube {
     }
 }
 
-
+configurations {
+    androidTestImplementation {
+        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
+        // https://github.com/android/android-test/issues/861
+        // and https://github.com/android/android-test/issues/999
+        exclude("org.checkerframework", "checker")
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
+}
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -72,6 +80,10 @@ dependencies {
     // Fragment
     implementation(Dependencies.AndroidX.UI.fragment)
 
+    // Koin
+    implementation(Dependencies.Koin.core)
+    implementation(Dependencies.Koin.android)
+
     // Android X
     implementation(Dependencies.AndroidX.UI.constraintlayout)
     implementation(Dependencies.AndroidX.CameraX.core)
@@ -103,7 +115,6 @@ dependencies {
     }
 
     // Koin
-    androidTestImplementation(Dependencies.Koin.core_ext)
     androidTestImplementation(Dependencies.Testing.koin)
 
     // ######################################################
