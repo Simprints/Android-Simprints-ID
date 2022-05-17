@@ -23,14 +23,14 @@ dependencies {
     api(project(":fingerprintscanner"))
 
     // Reactive
-    api(Dependencies.RxJava2.core)
-    implementation(Dependencies.RxJava2.kotlin)
+    api(libs.rxJava2.core)
+    implementation(libs.rxJava2.kotlin)
 
     // For Tee-ing output streams
-    implementation(Dependencies.CommonsIO.commons_io)
+    implementation(libs.commonsIO.commons.io)
 
     // Unit tests
-    testImplementation(Dependencies.Testing.junit)
-    testImplementation(Dependencies.Testing.Robolectric.core)
-    testImplementation(Dependencies.RxJava2.android)
+    testImplementation(libs.testing.junit)
+    testImplementation(libs.testing.robolectric.core)
+    testImplementation(libs.rxJava2.android)
 }
