@@ -1,15 +1,15 @@
 [versions]
 kotlin_version = "1.5.30"
 kotlin_serialization_json_version = "1.2.1"
-androidx_navigation_version = "2.3.0-alpha04"
+androidx_navigation_version = "2.3.5"
 kotlin_coroutine_version = "1.5.2"
 app_compat_version = "1.2.0"
 androidx_version = "1.4.0"
 espresso_version = "3.4.0"
-uiAutomator_version = "2.2.0-alpha3"
+uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.2.0"
 androidx_room_version = "2.3.0"
-androidx_camerax_version = "1.0.0-beta01"
+androidx_camerax_version = "1.0.2"
 dagger_version = "2.22"
 work_version = "2.4.0"
 location_services_version = "18.0.0"
@@ -53,7 +53,7 @@ androidX-lifecycle-ext = { module = "androidx.lifecycle:lifecycle-extensions", v
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
-androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
+androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.4"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
 androidX-uI-preference = "androidx.preference:preference:1.1.1"
@@ -65,7 +65,7 @@ androidX-security = "androidx.security:security-crypto:1.0.0"
 androidX-cameraX-core = { module = "androidx.camera:camera-core", version.ref = "androidx_camerax_version" }
 androidX-cameraX-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx_camerax_version" }
 androidX-cameraX-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx_camerax_version" }
-androidX-cameraX-view = "androidx.camera:camera-view:1.0.0-alpha08"
+androidX-cameraX-view = "androidx.camera:camera-view:1.0.0-alpha32"
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
