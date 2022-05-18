@@ -57,8 +57,8 @@ dependencies {
     }
 
     // Unit Tests
-    testImplementation(Dependencies.Testing.junit)
-    testImplementation(Dependencies.Testing.Mockk.core)
-    testImplementation(Dependencies.Testing.Robolectric.core)
+    testImplementation(libs.testing.junit)
+    testImplementation(libs.testing.mockk.core)
+    testImplementation(libs.testing.robolectric.core)
 
 }
