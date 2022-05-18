@@ -85,7 +85,7 @@ class EventSyncMasterWorkerTest {
     private lateinit var masterWorker: EventSyncMasterWorker
     private val preferencesManager = mockk<IdPreferencesManager>(relaxed = true) {
         every { eventDownSyncSetting } returns ON
-        every { simprintsSyncSetting } returns SimprintsSyncSetting.ALL
+        every { simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_ALL
     }
 
     @Before
@@ -199,8 +199,8 @@ class EventSyncMasterWorkerTest {
     fun doWork_cantSyncSimprints() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
-        every { preferencesManager.cosyncSyncSetting } returns CosyncSetting.ALL
-        every { preferencesManager.simprintsSyncSetting } returns SimprintsSyncSetting.NONE
+        every { preferencesManager.cosyncSyncSetting } returns CosyncSetting.COSYNC_ALL
+        every { preferencesManager.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_NONE
 
         masterWorker.doWork()
 

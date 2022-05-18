@@ -488,8 +488,8 @@ class CommCareCoSyncPresenterTest {
             refusalEvent
         )
         val sharedPreferences = mockSharedPrefs().apply {
-            every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.ALL
-            every { this@apply.cosyncSyncSettings } returns CosyncSetting.ALL
+            every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_ALL
+            every { this@apply.cosyncSyncSettings } returns CosyncSetting.COSYNC_ALL
         }
 
         runBlockingTest {
@@ -527,8 +527,8 @@ class CommCareCoSyncPresenterTest {
     private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
-        every { this@apply.cosyncSyncSettings } returns CosyncSetting.ALL
-        every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.NONE
+        every { this@apply.cosyncSyncSettings } returns CosyncSetting.COSYNC_ALL
+        every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_NONE
         every { this@apply.modalities } returns listOf(Modality.FACE)
     }
 

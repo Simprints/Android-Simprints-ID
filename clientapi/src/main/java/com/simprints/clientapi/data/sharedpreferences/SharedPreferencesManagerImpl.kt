@@ -39,3 +39,15 @@ class SharedPreferencesManagerImpl(
     override val modalities: List<Modality>
         get() = corePreferencesManager.modalities
 }
+
+fun SharedPreferencesManager.canSyncDataToSimprints(): Boolean =
+    simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
+
+fun SharedPreferencesManager.canCoSyncAllData() =
+    cosyncSyncSettings.name == CosyncSetting.COSYNC_ALL.name
+
+fun SharedPreferencesManager.canCoSyncBiometricData() =
+    cosyncSyncSettings.name == CosyncSetting.COSYNC_ONLY_BIOMETRICS.name
+
+fun SharedPreferencesManager.canCoSyncAnalyticsData() =
+    cosyncSyncSettings.name == CosyncSetting.COSYNC_ONLY_ANALYTICS.name

@@ -89,10 +89,10 @@ class DashboardActivityAndroidTest {
     fun withOnlyCommCareAsSyncLocation_shouldNotTriggerSyncAndNotShowSyncCard() {
 
         every { mockPreferencesManager.cosyncSyncSetting } returns
-            CosyncSetting.ALL
+            CosyncSetting.COSYNC_ALL
 
         every { mockPreferencesManager.simprintsSyncSetting } returns
-            SimprintsSyncSetting.NONE
+            SimprintsSyncSetting.SIM_SYNC_NONE
 
         ActivityScenario.launch(DashboardActivity::class.java)
 
@@ -106,10 +106,10 @@ class DashboardActivityAndroidTest {
     @Test
     fun withSimprintsAsSyncLocation_shouldTriggerSyncAndShowSyncCard() {
         every { mockPreferencesManager.cosyncSyncSetting } returns
-            CosyncSetting.ALL
+            CosyncSetting.COSYNC_ALL
 
         every { mockPreferencesManager.simprintsSyncSetting } returns
-            SimprintsSyncSetting.ALL
+            SimprintsSyncSetting.SIM_SYNC_ALL
 
         val mockSyncStateLiveData = MutableLiveData<DashboardSyncCardState>()
 

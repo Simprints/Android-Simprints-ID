@@ -436,10 +436,10 @@ open class SettingsPreferencesManagerImpl(
         val PEOPLE_DOWN_SYNC_SETTING_DEFAULT = EventDownSyncSetting.ON
 
         const val SIMPRINTS_SYNC_KEY = "SimprintsSync"
-        val SIMPRINTS_SYNC_SETTINGS_DEFAULT = SimprintsSyncSetting.NONE
+        val SIMPRINTS_SYNC_SETTINGS_DEFAULT = SimprintsSyncSetting.SIM_SYNC_NONE
 
         const val COSYNC_SYNC_KEY = "Cosync"
-        val COSYNC_SYNC_SETTINGS_DEFAULT = CosyncSetting.NONE
+        val COSYNC_SYNC_SETTINGS_DEFAULT = CosyncSetting.COSYNC_NONE
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"

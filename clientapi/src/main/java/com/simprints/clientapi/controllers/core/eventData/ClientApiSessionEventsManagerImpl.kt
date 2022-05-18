@@ -4,6 +4,9 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncAnalyticsData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
@@ -20,9 +23,6 @@ import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEve
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.id.domain.canCoSyncAllData
-import com.simprints.id.domain.canCoSyncAnalyticsData
-import com.simprints.id.domain.canCoSyncBiometricData
 import com.simprints.id.orchestrator.cache.HotCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -119,15 +119,15 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
         when {
-            sharedPreferencesManager.cosyncSyncSettings.canCoSyncAllData() -> {
+            sharedPreferencesManager.canCoSyncAllData() -> {
                 coreEventRepository.getEventsFromSession(sessionId)
             }
-            sharedPreferencesManager.cosyncSyncSettings.canCoSyncBiometricData() -> {
+            sharedPreferencesManager.canCoSyncBiometricData() -> {
                 coreEventRepository.getEventsFromSession(sessionId).filter {
                     it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                 }
             }
-            sharedPreferencesManager.cosyncSyncSettings.canCoSyncAnalyticsData() -> {
+            sharedPreferencesManager.canCoSyncAnalyticsData() -> {
                 coreEventRepository.getEventsFromSession(sessionId).filterNot {
                     it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                 }
