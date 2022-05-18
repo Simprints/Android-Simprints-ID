@@ -19,7 +19,7 @@ class RemoteConfigComplexPreferenceTest {
         prefs = prefs,
         remoteConfigWrapper = mockk(),
         key = simprintsSyncSettingClass.name,
-        defValue = SimprintsSyncSetting.NONE,
+        defValue = SimprintsSyncSetting.SIM_SYNC_NONE,
         serializer = simprintsSyncSettingEnumSerializer
     )
 
@@ -27,14 +27,19 @@ class RemoteConfigComplexPreferenceTest {
         prefs = prefs,
         remoteConfigWrapper = mockk(),
         key = coSyncSettingClass.name,
-        defValue = CosyncSetting.NONE,
+        defValue = CosyncSetting.COSYNC_NONE,
         serializer = coSyncSettingEnumSerializer
     )
 
     @Test
     fun `return correct value of all for simprints`() {
-        every { prefs.getPrimitive(simprintsSyncSettingClass.name, DEFAULT_RETURN) } returns ALL
-        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.ALL)
+        every {
+            prefs.getPrimitive(
+                simprintsSyncSettingClass.name,
+                SIM_SYNC_DEFAULT_RETURN
+            )
+        } returns SIM_SYNC_ALL
+        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ALL)
     }
 
     @Test
@@ -42,10 +47,10 @@ class RemoteConfigComplexPreferenceTest {
         every {
             prefs.getPrimitive(
                 simprintsSyncSettingClass.name,
-                DEFAULT_RETURN
+                SIM_SYNC_DEFAULT_RETURN
             )
-        } returns ONLY_ANALYTICS
-        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.ONLY_ANALYTICS)
+        } returns SIM_SYNC_ONLY_ANALYTICS
+        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ONLY_ANALYTICS)
     }
 
     @Test
@@ -53,10 +58,10 @@ class RemoteConfigComplexPreferenceTest {
         every {
             prefs.getPrimitive(
                 simprintsSyncSettingClass.name,
-                DEFAULT_RETURN
+                SIM_SYNC_DEFAULT_RETURN
             )
-        } returns ONLY_BIOMETRICS
-        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.ONLY_BIOMETRICS)
+        } returns SIM_SYNC_ONLY_BIOMETRICS
+        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS)
     }
 
     @Test
@@ -64,22 +69,32 @@ class RemoteConfigComplexPreferenceTest {
         every {
             prefs.getPrimitive(
                 simprintsSyncSettingClass.name,
-                DEFAULT_RETURN
+                SIM_SYNC_DEFAULT_RETURN
             )
-        } returns DEFAULT_RETURN
-        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.NONE)
+        } returns SIM_SYNC_DEFAULT_RETURN
+        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_NONE)
     }
 
     @Test
     fun `return default value if deserialization fails for simprints`() {
-        every { prefs.getPrimitive(simprintsSyncSettingClass.name, DEFAULT_RETURN) } returns UNKNOWN
-        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.NONE)
+        every {
+            prefs.getPrimitive(
+                simprintsSyncSettingClass.name,
+                SIM_SYNC_DEFAULT_RETURN
+            )
+        } returns UNKNOWN
+        assertThat(simprintsSyncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_NONE)
     }
 
     @Test
     fun `return correct value of all for cosync`() {
-        every { prefs.getPrimitive(coSyncSettingClass.name, DEFAULT_RETURN) } returns ALL
-        assertThat(coSyncSetting).isEqualTo(CosyncSetting.ALL)
+        every {
+            prefs.getPrimitive(
+                coSyncSettingClass.name,
+                COSYNC_DEFAULT_RETURN
+            )
+        } returns COSYNC_ALL
+        assertThat(coSyncSetting).isEqualTo(CosyncSetting.COSYNC_ALL)
     }
 
     @Test
@@ -87,10 +102,10 @@ class RemoteConfigComplexPreferenceTest {
         every {
             prefs.getPrimitive(
                 coSyncSettingClass.name,
-                DEFAULT_RETURN
+                COSYNC_DEFAULT_RETURN
             )
-        } returns ONLY_ANALYTICS
-        assertThat(coSyncSetting).isEqualTo(CosyncSetting.ONLY_ANALYTICS)
+        } returns COSYNC_ONLY_ANALYTICS
+        assertThat(coSyncSetting).isEqualTo(CosyncSetting.COSYNC_ONLY_ANALYTICS)
     }
 
     @Test
@@ -98,10 +113,10 @@ class RemoteConfigComplexPreferenceTest {
         every {
             prefs.getPrimitive(
                 coSyncSettingClass.name,
-                DEFAULT_RETURN
+                COSYNC_DEFAULT_RETURN
             )
-        } returns ONLY_BIOMETRICS
-        assertThat(coSyncSetting).isEqualTo(CosyncSetting.ONLY_BIOMETRICS)
+        } returns COSYNC_ONLY_BIOMETRICS
+        assertThat(coSyncSetting).isEqualTo(CosyncSetting.COSYNC_ONLY_BIOMETRICS)
     }
 
     @Test
@@ -109,23 +124,27 @@ class RemoteConfigComplexPreferenceTest {
         every {
             prefs.getPrimitive(
                 coSyncSettingClass.name,
-                DEFAULT_RETURN
+                COSYNC_DEFAULT_RETURN
             )
-        } returns DEFAULT_RETURN
-        assertThat(coSyncSetting).isEqualTo(CosyncSetting.NONE)
+        } returns COSYNC_DEFAULT_RETURN
+        assertThat(coSyncSetting).isEqualTo(CosyncSetting.COSYNC_NONE)
     }
 
     @Test
     fun `return default value if deserialization fails for cosync`() {
-        every { prefs.getPrimitive(coSyncSettingClass.name, DEFAULT_RETURN) } returns UNKNOWN
-        assertThat(coSyncSetting).isEqualTo(CosyncSetting.NONE)
+        every { prefs.getPrimitive(coSyncSettingClass.name, COSYNC_DEFAULT_RETURN) } returns UNKNOWN
+        assertThat(coSyncSetting).isEqualTo(CosyncSetting.COSYNC_NONE)
     }
 
     companion object {
-        private const val DEFAULT_RETURN = "NONE"
+        private const val SIM_SYNC_DEFAULT_RETURN = "SIM_SYNC_NONE"
+        private const val SIM_SYNC_ALL = "SIM_SYNC_ALL"
+        private const val SIM_SYNC_ONLY_BIOMETRICS = "SIM_SYNC_ONLY_BIOMETRICS"
+        private const val SIM_SYNC_ONLY_ANALYTICS = "SIM_SYNC_ONLY_ANALYTICS"
+        private const val COSYNC_DEFAULT_RETURN = "COSYNC_NONE"
+        private const val COSYNC_ONLY_BIOMETRICS = "COSYNC_ONLY_BIOMETRICS"
+        private const val COSYNC_ONLY_ANALYTICS = "COSYNC_ONLY_ANALYTICS"
+        private const val COSYNC_ALL = "COSYNC_ALL"
         private const val UNKNOWN = "UNKNOWN_VALUE"
-        private const val ONLY_BIOMETRICS = "ONLY_BIOMETRICS"
-        private const val ONLY_ANALYTICS = "ONLY_ANALYTICS"
-        private const val ALL = "ALL"
     }
 }

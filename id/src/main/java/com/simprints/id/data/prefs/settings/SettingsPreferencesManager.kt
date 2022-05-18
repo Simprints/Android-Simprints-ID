@@ -66,4 +66,13 @@ interface SettingsPreferencesManager {
 }
 
 fun SettingsPreferencesManager.canSyncDataToSimprints(): Boolean =
-    simprintsSyncSetting.name != SimprintsSyncSetting.NONE.name
+    simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
+
+fun SettingsPreferencesManager.canSyncAllDataToSimprints() =
+    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ALL.name
+
+fun SettingsPreferencesManager.canSyncBiometricDataToSimprints() =
+    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS.name
+
+fun SettingsPreferencesManager.canSyncAnalyticsDataToSimprints() =
+    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ONLY_ANALYTICS.name

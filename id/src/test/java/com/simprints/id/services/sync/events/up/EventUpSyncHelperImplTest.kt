@@ -8,12 +8,10 @@ import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSy
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.domain.canSyncBiometricDataToSimprints
 import com.simprints.testtools.common.syntax.mock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
