@@ -1,17 +1,17 @@
 [versions]
 kotlin_version = "1.5.30"
 kotlin_serialization_json_version = "1.2.1"
-androidx_navigation_version = "2.3.0-alpha04"
+androidx_navigation_version = "2.4.2"
 kotlin_coroutine_version = "1.5.2"
-app_compat_version = "1.2.0"
+app_compat_version = "1.4.1"
 androidx_version = "1.4.0"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0-alpha3"
-androidx_lifecycle_version = "2.2.0"
-androidx_room_version = "2.3.0"
+androidx_lifecycle_version = "2.4.1"
+androidx_room_version = "2.4.2"
 androidx_camerax_version = "1.0.0-beta01"
 dagger_version = "2.22"
-work_version = "2.4.0"
+work_version = "2.7.1"
 location_services_version = "18.0.0"
 safetynet_services_version = "17.0.1"
 retrofit_version = "2.7.1"
@@ -25,7 +25,7 @@ objenesis_version = "3.2"
 robolectric_version = "4.7.3"
 commons_io_version = "2.6"
 kronos_version = "0.0.1-alpha09"
-fragment_version = "1.3.6"
+fragment_version = "1.4.1"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
 
@@ -37,7 +37,7 @@ kotlin-coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlin-coroutinesPlayServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlin_coroutine_version" }
 kotlin-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin_serialization_json_version" }
 #AndroidX
-androidX-core = "androidx.core:core-ktx:1.0.2"
+androidX-core = "androidx.core:core-ktx:1.7.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
 androidX-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "app_compat_version" }
 androidX-legacy = "androidx.legacy:legacy-support-v4:1.0.0"
@@ -53,10 +53,10 @@ androidX-lifecycle-ext = { module = "androidx.lifecycle:lifecycle-extensions", v
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
-androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
+androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.3"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
-androidX-uI-preference = "androidx.preference:preference:1.1.1"
+androidX-uI-preference = "androidx.preference:preference:1.2.0"
 androidX-uI-viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
 #security
 androidX-security = "androidx.security:security-crypto:1.0.0"
@@ -73,10 +73,10 @@ androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", ver
 androidX-navigation-dynamicfeatures = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "androidx_navigation_version" }
 
 #Annotation
-androidX-annotation-annotation = "androidx.annotation:annotation:1.2.0"
+androidX-annotation-annotation = "androidx.annotation:annotation:1.3.0"
 
 #sqlite
-androidX-sqlite = "androidx.sqlite:sqlite:2.1.0"
+androidX-sqlite = "androidx.sqlite:sqlite:2.2.0"
 
 #Dagger
 dagger-core = { module = "com.google.dagger:dagger", version.ref = "dagger_version" }
