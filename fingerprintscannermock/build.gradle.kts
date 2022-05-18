@@ -1,8 +1,6 @@
 plugins {
     id("com.android.library")
-    id("com.jfrog.artifactory")
     id("kotlin-android")
-    id("maven-publish")
 }
 
 apply {
