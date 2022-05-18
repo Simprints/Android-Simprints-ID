@@ -75,7 +75,12 @@ class LoginActivityTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule, viewModelModule = viewModelModule).fullSetup()
+        UnitTestConfig(
+            this,
+            module,
+            preferencesModule,
+            viewModelModule = viewModelModule
+        ).fullSetup()
     }
 
     @Test
