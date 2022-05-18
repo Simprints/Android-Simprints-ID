@@ -43,8 +43,9 @@ class EventDownSyncHelperImpl(
     override suspend fun countForDownSync(operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation): List<EventCount> =
         eventRepository.countEventsToDownload(operation.queryEvent)
 
-    override suspend fun downSync(scope: CoroutineScope,
-                                  operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+    override suspend fun downSync(
+        scope: CoroutineScope,
+        operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
     ): ReceiveChannel<EventDownSyncProgress> =
 
         scope.produce(capacity = Channel.UNLIMITED) {
@@ -58,16 +59,19 @@ class EventDownSyncHelperImpl(
                     count++
                     //We immediately process the first event to initialise a progress
                     if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                        lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                        lastOperation =
+                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                         emitProgress(lastOperation, count)
                         batchOfEventsToProcess.clear()
                     }
                 }
 
-                lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                lastOperation =
+                    processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                 emitProgress(lastOperation, count)
 
-                lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
+                lastOperation =
+                    lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
 
                 close()
@@ -77,7 +81,8 @@ class EventDownSyncHelperImpl(
                 val throwable = error.cause!!
                 Simber.d(throwable)
 
-                lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                lastOperation =
+                    processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
                 emitProgress(lastOperation, count)
 
                 lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
@@ -87,9 +92,10 @@ class EventDownSyncHelperImpl(
 
         }
 
-    private suspend fun processBatchedEvents(operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
-                                             batchOfEventsToProcess: MutableList<Event>,
-                                             lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+    private suspend fun processBatchedEvents(
+        operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
+        batchOfEventsToProcess: MutableList<Event>,
+        lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
     ): com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
@@ -114,14 +120,21 @@ class EventDownSyncHelperImpl(
         Simber.tag(SYNC_LOG_TAG).d("[DOWN_SYNC_HELPER] batch processed")
 
         return if (batchOfEventsToProcess.size > 0) {
-            lastOperation.copy(state = RUNNING, lastEventId = batchOfEventsToProcess.last().id, lastSyncTime = timeHelper.now())
+            lastOperation.copy(
+                state = RUNNING,
+                lastEventId = batchOfEventsToProcess.last().id,
+                lastSyncTime = timeHelper.now()
+            )
         } else {
             lastOperation.copy(state = RUNNING, lastSyncTime = timeHelper.now())
         }
     }
 
 
-    private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation, count: Int) {
+    private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(
+        lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
+        count: Int
+    ) {
         Simber.d("[DOWN_SYNC_HELPER] Emit progress")
 
         if (!this.isClosedForSend) {
@@ -142,8 +155,10 @@ class EventDownSyncHelperImpl(
         }
     }
 
-    fun handleSubjectMoveEvent(operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
-                               event: EnrolmentRecordMoveEvent): List<SubjectAction> {
+    fun handleSubjectMoveEvent(
+        operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
+        event: EnrolmentRecordMoveEvent
+    ): List<SubjectAction> {
         val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
         val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
@@ -169,7 +184,8 @@ class EventDownSyncHelperImpl(
                  * then the deletion will be ignored and a the update is executed.)
                  */
                 if (enrolmentRecordDeletion.isUnderSyncingByCurrentDownSyncOperation(operation) &&
-                    (!enrolmentRecordCreation.isUnderOverallSyncing())) {
+                    (!enrolmentRecordCreation.isUnderOverallSyncing())
+                ) {
 
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
