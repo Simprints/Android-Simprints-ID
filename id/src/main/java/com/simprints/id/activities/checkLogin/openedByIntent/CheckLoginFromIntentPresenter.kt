@@ -10,7 +10,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
@@ -53,8 +52,6 @@ class CheckLoginFromIntentPresenter(
     @Inject
     lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
-    @Inject
-    lateinit var subjectLocalDataSource: SubjectLocalDataSource
 
     @Inject
     lateinit var simNetworkUtils: SimNetworkUtils
@@ -299,8 +296,6 @@ class CheckLoginFromIntentPresenter(
     private suspend fun updateDatabaseCountsInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
-        val payload = currentSessionEvent.payload
-        payload.databaseInfo.recordCount = subjectLocalDataSource.count()
 
         eventRepository.addOrUpdateEvent(currentSessionEvent)
         Simber.d("[CHECK_LOGIN] Updated Database count in current session")
