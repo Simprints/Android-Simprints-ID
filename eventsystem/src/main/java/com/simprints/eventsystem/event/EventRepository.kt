@@ -32,9 +32,9 @@ interface EventRepository {
 
     suspend fun uploadEvents(
         projectId: String,
-        canSyncAllData: Boolean,
-        canSyncBiometricData: Boolean,
-        canSyncAnalyticsData: Boolean
+        canSyncAllDataToSimprints: Boolean,
+        canSyncBiometricDataToSimprints: Boolean,
+        canSyncAnalyticsDataToSimprints: Boolean
     ): Flow<Int>
 
     suspend fun localCount(projectId: String): Int
