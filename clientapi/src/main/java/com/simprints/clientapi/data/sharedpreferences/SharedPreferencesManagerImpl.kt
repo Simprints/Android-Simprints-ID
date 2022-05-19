@@ -43,6 +43,9 @@ class SharedPreferencesManagerImpl(
 fun SharedPreferencesManager.canSyncDataToSimprints(): Boolean =
     simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
 
+fun SharedPreferencesManager.canCoSyncData() =
+    cosyncSyncSettings.name != CosyncSetting.COSYNC_NONE.name
+
 fun SharedPreferencesManager.canCoSyncAllData() =
     cosyncSyncSettings.name == CosyncSetting.COSYNC_ALL.name
 
