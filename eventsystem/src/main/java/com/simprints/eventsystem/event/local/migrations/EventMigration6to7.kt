@@ -7,7 +7,7 @@ import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.logging.Simber
 import org.json.JSONObject
 
-class EventMigration5to6 : Migration(5, 6) {
+class EventMigration6to7 : Migration(6, 7) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {

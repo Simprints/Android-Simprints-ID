@@ -32,7 +32,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = EventSystemApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class EventMigration5to6Test {
+class EventMigration6To7Test {
 
     @get:Rule
     val helper = MigrationTestHelper(
@@ -48,7 +48,7 @@ class EventMigration5to6Test {
 
         setupV5DbWithFingerprintCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration5to6())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration6to7())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
@@ -69,7 +69,7 @@ class EventMigration5to6Test {
 
         setupV5DbWithFaceCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration5to6())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration6to7())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
