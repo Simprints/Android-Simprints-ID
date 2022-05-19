@@ -246,9 +246,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID1) }
@@ -264,9 +264,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             verifySessionHasNotGotUploaded(GUID3)
@@ -279,9 +279,9 @@ class EventRepositoryImplTest {
             shouldThrow<TryToUploadEventsForNotSignedProject> {
                 eventRepo.uploadEvents(
                     randomUUID(),
-                    canSyncAllData = false,
-                    canSyncBiometricData = false,
-                    canSyncAnalyticsData = false
+                    canSyncAllDataToSimprints = false,
+                    canSyncBiometricDataToSimprints = false,
+                    canSyncAnalyticsDataToSimprints = false
                 ).toList()
             }
         }
@@ -296,9 +296,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = true,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = true,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             coVerify {
@@ -318,9 +318,9 @@ class EventRepositoryImplTest {
 
             val progress = eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
@@ -338,9 +338,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = true,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = true,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             coVerify {
@@ -360,9 +360,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             coVerify(exactly = 0) { eventLocalDataSource.delete(any()) }
@@ -384,9 +384,9 @@ class EventRepositoryImplTest {
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
-                canSyncAllData = false,
-                canSyncBiometricData = false,
-                canSyncAnalyticsData = false
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
             ).toList()
 
             coVerify(exactly = 0) {

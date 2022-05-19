@@ -35,9 +35,9 @@ class EventUpSyncHelperImpl(
             try {
                 eventRepository.uploadEvents(
                     projectId = operation.projectId,
-                    canSyncAllData = settingsPreferencesManager.canSyncAllDataToSimprints(),
-                    canSyncBiometricData = settingsPreferencesManager.canSyncBiometricDataToSimprints(),
-                    canSyncAnalyticsData = settingsPreferencesManager.canSyncAnalyticsDataToSimprints()
+                    canSyncAllDataToSimprints = settingsPreferencesManager.canSyncAllDataToSimprints(),
+                    canSyncBiometricDataToSimprints = settingsPreferencesManager.canSyncBiometricDataToSimprints(),
+                    canSyncAnalyticsDataToSimprints = settingsPreferencesManager.canSyncAnalyticsDataToSimprints()
                 ).collect {
                     Simber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
                     count = it

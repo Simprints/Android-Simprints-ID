@@ -157,9 +157,9 @@ open class EventRepositoryImpl(
      */
     override suspend fun uploadEvents(
         projectId: String,
-        canSyncAllData: Boolean,
-        canSyncBiometricData: Boolean,
-        canSyncAnalyticsData: Boolean
+        canSyncAllDataToSimprints: Boolean,
+        canSyncBiometricDataToSimprints: Boolean,
+        canSyncAnalyticsDataToSimprints: Boolean
     ): Flow<Int> = flow {
         Simber.tag("SYNC").d("[EVENT_REPO] Uploading")
 
@@ -175,9 +175,9 @@ open class EventRepositoryImpl(
             eventLocalDataSource.loadAllFromSession(sessionId).let {
                 attemptEventUpload(
                     it, projectId,
-                    canSyncAllData,
-                    canSyncBiometricData,
-                    canSyncAnalyticsData
+                    canSyncAllDataToSimprints,
+                    canSyncBiometricDataToSimprints,
+                    canSyncAnalyticsDataToSimprints
                 )
                 this.emit(it.size)
             }
@@ -189,9 +189,9 @@ open class EventRepositoryImpl(
             if (it.isNotEmpty()) {
                 attemptEventUpload(
                     it, projectId,
-                    canSyncAllData,
-                    canSyncBiometricData,
-                    canSyncAnalyticsData
+                    canSyncAllDataToSimprints,
+                    canSyncBiometricDataToSimprints,
+                    canSyncAnalyticsDataToSimprints
                 )
                 this.emit(it.size)
             }
@@ -207,21 +207,21 @@ open class EventRepositoryImpl(
 
     private suspend fun attemptEventUpload(
         events: List<Event>, projectId: String,
-        canSyncAllData: Boolean,
-        canSyncBiometricData: Boolean,
-        canSyncAnalyticsData: Boolean
+        canSyncAllDataToSimprints: Boolean,
+        canSyncBiometricDataToSimprints: Boolean,
+        canSyncAnalyticsDataToSimprints: Boolean
     ) {
         try {
             val filteredEvents = when {
-                canSyncAllData -> {
+                canSyncAllDataToSimprints -> {
                     events
                 }
-                canSyncBiometricData -> {
+                canSyncBiometricDataToSimprints -> {
                     events.filter {
                         it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                     }
                 }
-                canSyncAnalyticsData -> {
+                canSyncAnalyticsDataToSimprints -> {
                     events.filterNot {
                         it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                     }
