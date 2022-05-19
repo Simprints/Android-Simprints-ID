@@ -23,7 +23,7 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
 import com.simprints.clientapi.data.sharedpreferences.canSyncDataToSimprints
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.InvalidMetadataException
@@ -146,7 +146,7 @@ abstract class RequestPresenter(
         sessionId: String,
         jsonHelper: JsonHelper
     ): String? =
-        if (sharedPreferencesManager.canCoSyncAllData()) {
+        if (sharedPreferencesManager.canCoSyncData()) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CoSyncEvents(events))
         } else {
@@ -159,7 +159,7 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
-        if (!sharedPreferencesManager.canCoSyncAllData()) return null
+        if (!sharedPreferencesManager.canCoSyncData()) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -183,7 +183,7 @@ abstract class RequestPresenter(
      * Delete the events if returning to a cosync app but not Simprints
      */
     override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.canCoSyncAllData() &&
+        if (sharedPreferencesManager.canCoSyncData() &&
             !sharedPreferencesManager.canSyncDataToSimprints()
         ) {
             sessionEventsManager.deleteSessionEvents(sessionId)
