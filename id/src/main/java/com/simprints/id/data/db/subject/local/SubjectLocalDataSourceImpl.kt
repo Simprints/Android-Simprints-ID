@@ -58,13 +58,6 @@ class SubjectLocalDataSourceImpl(
         loginInfoManager.getSignedInProjectIdOrEmpty().let {
             return if (it.isNotEmpty()) {
                  createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
-
-                // switching keys with roomDB temporarily to reproduce realm issues
-                // uncomment the lines below comment the lines above
-//                val keyName = "dbevents"
-//                val key = secureDataManager.getLocalDbKeyOrThrow(keyName)
-//                val newKey = key.copy(projectId = it)
-//                createAndSaveRealmConfig(newKey)
             } else {
                 throw RealmUninitialisedException("No signed in project id found")
             }
@@ -72,17 +65,6 @@ class SubjectLocalDataSourceImpl(
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
         SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
-
-
-    override suspend fun insertOrUpdate(subjects: List<Subject>) {
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realm ->
-                realm.transactAwait {
-                    it.insertOrUpdate(subjects.map(Subject::fromDomainToDb))
-                }
-            }
-        }
-    }
 
     override suspend fun load(query: SubjectQuery?): Flow<Subject> =
         withContext(dispatcher.main()) {
