@@ -6,6 +6,7 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareAction
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
@@ -42,6 +43,7 @@ class CommCarePresenterTest {
     @Before
     fun setup() {
         BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
+        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @Test
@@ -313,10 +315,12 @@ class CommCarePresenterTest {
         coEvery { this@apply.createSession(any()) } returns "session_id"
     }
 
-    private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
-        coEvery { this@apply.peekSessionId() } returns "sessionId"
-        coEvery { this@apply.popSessionId() } returns "sessionId"
-    }
+    private fun mockSharedPrefs(canCosync: Boolean = false) =
+        mockk<SharedPreferencesManager>().apply {
+            coEvery { this@apply.peekSessionId() } returns "sessionId"
+            coEvery { this@apply.popSessionId() } returns "sessionId"
+            coEvery { this@apply.canCoSyncData() } returns canCosync
+        }
 
     private fun getNewPresenter(
         action: CommCareAction,
