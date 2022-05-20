@@ -1,0 +1,8 @@
+#!/bin/bash
+
+
+# Set env variables
+export GITHUB_COM_TOKEN=${GITHUB_TOKEN}
+export RENOVATE_PASSWORD=${BITBUCKET_BOT_APP_PASSWORD}
+export RENOVATE_USERNAME=${BITBUCKET_BOT_USERNAME}
+renovate   --platform=bitbucket simprints/android-simprints-id

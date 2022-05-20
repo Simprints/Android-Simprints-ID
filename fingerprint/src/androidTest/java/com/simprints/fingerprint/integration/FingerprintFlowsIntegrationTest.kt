@@ -66,7 +66,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
 
     private fun setupMocksAndKoinModules(simulationMode: SimulationMode, action: Action) {
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
-        loadKoinModules(module(override = true) {
+        loadKoinModules(module {
             single<ScannerFactory> {
                 spyk(ScannerFactoryImpl(
                     bluetoothAdapter = simulatedBluetoothAdapter,

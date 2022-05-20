@@ -7,16 +7,9 @@ import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.isNotASubjectEvent
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
@@ -39,6 +32,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.UUID
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
+import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 
 open class EventRepositoryImpl(
     private val deviceId: String,
@@ -172,14 +172,19 @@ open class EventRepositoryImpl(
         eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
             // The events will include the SessionCaptureEvent event
             Simber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
-            eventLocalDataSource.loadAllFromSession(sessionId).let {
-                attemptEventUpload(
-                    it, projectId,
-                    canSyncAllDataToSimprints,
-                    canSyncBiometricDataToSimprints,
-                    canSyncAnalyticsDataToSimprints
-                )
-                this.emit(it.size)
+            try {
+                eventLocalDataSource.loadAllFromSession(sessionId).let {
+                    attemptEventUpload(
+                        it, projectId,
+                        canSyncAllDataToSimprints,
+                        canSyncBiometricDataToSimprints,
+                        canSyncAnalyticsDataToSimprints
+                    )
+                    this.emit(it.size)
+                }
+            } catch (ex: Exception) {
+                Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
+                Simber.e(ex)
             }
         }
 

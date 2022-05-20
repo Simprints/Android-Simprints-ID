@@ -10,7 +10,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
-import org.jetbrains.anko.dimen
+import splitties.resources.dimen
 
 class ModuleChipHelper(private val context: Context, private val listener: ChipClickListener) {
 

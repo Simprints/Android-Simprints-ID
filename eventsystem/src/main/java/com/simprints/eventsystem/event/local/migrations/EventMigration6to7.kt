@@ -11,10 +11,10 @@ class EventMigration6to7 : Migration(6, 7) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Simber.d("Migrating room db from schema 5 to schema 6.")
+            Simber.d("Migrating room db from schema 6 to schema 7.")
             removeTemplateDataFromOldFaceCapture(database)
             removeTemplateDataFromOldFingerprintCapture(database)
-            Simber.d("Migration from schema 5 to schema 6 done.")
+            Simber.d("Migration from schema 6 to schema 7 done.")
         } catch (t: Throwable) {
             Simber.e(t)
         }

@@ -46,9 +46,9 @@ class EventMigration6To7Test {
     fun validateMigrationForFingerprintCaptureIsSuccessful() {
         val eventId = randomUUID()
 
-        setupV5DbWithFingerprintCaptureEvent(eventId)
+        setupV6DbWithFingerprintCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration6to7())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration6to7())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
@@ -67,9 +67,9 @@ class EventMigration6To7Test {
     fun validateMigrationForFaceCaptureIsSuccessful() {
         val eventId = randomUUID()
 
-        setupV5DbWithFaceCaptureEvent(eventId)
+        setupV6DbWithFaceCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration6to7())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration6to7())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
@@ -83,18 +83,18 @@ class EventMigration6To7Test {
         assertThat(fingerprintObject.has("template")).isFalse()
     }
 
-    private fun setupV5DbWithFaceCaptureEvent(
+    private fun setupV6DbWithFaceCaptureEvent(
         eventId: String, close: Boolean = true
-    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 5).apply {
+    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 6).apply {
         val event = createFaceCaptureEvent(eventId)
         this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
 
         if (close) close()
     }
 
-    private fun setupV5DbWithFingerprintCaptureEvent(
+    private fun setupV6DbWithFingerprintCaptureEvent(
         eventId: String, close: Boolean = true
-    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 5).apply {
+    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 6).apply {
         val event = createFingerprintCaptureEvent(eventId)
         this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
 

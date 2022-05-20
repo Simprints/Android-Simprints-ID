@@ -14,8 +14,8 @@ import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentExitFormBinding
 import com.simprints.id.tools.textWatcherOnChange
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import com.simprints.id.R as IDR
 

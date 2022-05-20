@@ -1,6 +1,4 @@
 plugins {
-    id("com.jfrog.artifactory")
-    id("maven-publish")
     id("com.android.library")
     id("kotlin-android")
 }
@@ -26,8 +24,8 @@ android {
 }
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(Dependencies.simmatcher)
+    implementation(libs.simmatcher)
     // Kotlin
-    implementation(Dependencies.Kotlin.coroutines_android)
-    compileOnly(Dependencies.AndroidX.Annotation.annotation)
+    implementation(libs.kotlin.coroutinesAndroid)
+    compileOnly(libs.androidX.annotation.annotation)
 }

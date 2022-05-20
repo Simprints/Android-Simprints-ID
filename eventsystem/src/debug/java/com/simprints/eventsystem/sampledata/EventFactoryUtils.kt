@@ -13,7 +13,7 @@ import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScree
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.Authenticated
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
@@ -360,7 +360,7 @@ fun createAuthenticationEvent() =
         CREATED_AT,
         ENDED_AT,
         UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
-        Authenticated,
+        AUTHENTICATED,
         eventLabels
     )
 
@@ -379,12 +379,7 @@ fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventL
 fun createConnectivitySnapshotEvent() =
     ConnectivitySnapshotEvent(
         CREATED_AT,
-        listOf(
-            Connection(
-                SimNetworkUtils.ConnectionType.MOBILE,
-                SimNetworkUtils.ConnectionState.CONNECTED
-            )
-        ),
+        listOf(Connection(SimNetworkUtils.ConnectionType.MOBILE, SimNetworkUtils.ConnectionState.CONNECTED)),
         eventLabels
     )
 
@@ -434,7 +429,6 @@ fun createFingerprintCaptureEventV3(): FingerprintCaptureEventV3 {
         labels = eventLabels
     )
 }
-
 
 fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, GUID1, eventLabels)
 

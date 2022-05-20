@@ -13,7 +13,7 @@ import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FaceOrchestratorActivity : FaceActivity() {
     private val viewModel: FaceOrchestratorViewModel by viewModel()

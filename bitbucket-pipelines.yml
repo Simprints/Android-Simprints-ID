@@ -34,7 +34,7 @@ definitions:
         # Run the ID unit tests with coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-id-unit-tests
-                name: "Run Id, Core & Event System unit tests"
+                name: "Run Id unit tests"
                 size: 2x
                 max-time: 30
                 caches:
@@ -242,6 +242,8 @@ definitions:
         # Build a signed Release bundle with the Playstore upload key, and
         # deploy it to the internal test track.
         #
+        # The final step is to set the release tag automatically to the version name.
+        #
         # Signing vars are only available on a deployment step.
         ######################################################################
         -   step: &sign-and-deploy-to-internal
@@ -261,6 +263,7 @@ definitions:
                     - echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
                     - ./gradlew id:bundleRelease
                     - ./gradlew id:publishReleaseBundle
+                    - bash ./ci/deployment/release_tag_setup
 
         ######################################################################
         # Promote the Internal track build to the Alpha Track
@@ -284,14 +287,14 @@ definitions:
 
 
         ######################################################################
-        # Run dependabot tool which scans all gradle files and open automatic PRs
+        # Run renovate automated dependency update tool
         ######################################################################
         -   step: &update-dependencies
                 name: "Update project dependencies"
-                image: ruby:2.6.6
+                image: renovate/renovate
                 max-time: 30
                 script:
-                    - bash ./ci/dependabot/run_dependabot
+                    - bash ./ci/renovate/run_renovate
 
 ######################################################################
 # Define the different pipelines flows as anchors.
@@ -327,9 +330,9 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
     -   flow: &ci-test # For CI testing purposes only
-            -   parallel:
-                    -   step: *run-id-unit-tests
-                    -   step: *run-clientapi-unit-tests
+            -   step: *run-fingerprintscanner-unit-tests
+            -   step: *sign-and-deploy-to-staging
+            -   step: *sign-and-deploy-to-internal
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
 
@@ -340,10 +343,8 @@ flows:
 pipelines:
     pull-requests:
         '**': *development_flow
-        main: *release_flow
+        main: *development_flow
         release/*: *release_flow
     custom:
-        develop-pipeline: *development_flow # Pipeline that can be triggered manually anywhere
-        release-pipeline: *release_flow # Pipeline to create a release manually
         ci-test-pipeline: *ci-test # For CI testing purposes only
-        dependabot: *update-dependencies-flow
+        renovate: *update-dependencies-flow
