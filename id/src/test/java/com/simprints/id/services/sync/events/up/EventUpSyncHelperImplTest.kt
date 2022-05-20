@@ -8,15 +8,18 @@ import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSy
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.canSyncAllDataToSimprints
+import com.simprints.id.data.prefs.settings.canSyncAnalyticsDataToSimprints
+import com.simprints.id.data.prefs.settings.canSyncBiometricDataToSimprints
 import com.simprints.testtools.common.syntax.mock
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockkStatic
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
@@ -27,6 +30,7 @@ class EventUpSyncHelperImplTest {
 
     private lateinit var eventUpSyncHelper: EventUpSyncHelper
 
+    @MockK
     private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
 
     @MockK
@@ -42,20 +46,6 @@ class EventUpSyncHelperImplTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        eventRepository = EventRepositoryImpl(
-            deviceId = "",
-            appVersionName = "",
-            loginInfoManager = mock(),
-            eventLocalDataSource =mock(),
-            eventRemoteDataSource =mock(),
-            timeHelper =mock(),
-            validatorsFactory =mock(),
-            libSimprintsVersionName = "",
-            sessionDataCache =mock(),
-            language = "",
-            modalities = listOf()
-        )
-
         eventUpSyncHelper = EventUpSyncHelperImpl(
             eventRepository,
             eventUpSyncScopeRepository,
@@ -63,14 +53,14 @@ class EventUpSyncHelperImplTest {
             settingsPreferencesManager
         )
 
-        runBlockingTest {
+        runBlocking {
             mockProgressEmission(emptyFlow())
         }
     }
 
     @Test
     fun countForUpSync_shouldInvokeTheEventRepo() {
-        runBlockingTest {
+        runBlocking {
             eventUpSyncHelper.countForUpSync(operation)
 
             coVerify { eventRepository.localCount(operation.projectId) }
