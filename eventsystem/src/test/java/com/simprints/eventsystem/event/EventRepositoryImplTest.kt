@@ -257,6 +257,22 @@ class EventRepositoryImplTest {
     }
 
     @Test
+    fun upload_shouldSkipInvalidSessions() {
+        runBlocking {
+            mockDbToLoadInvalidSessions(2)
+
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = true,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
+
+            coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID1) }
+        }
+    }
+
+    @Test
     fun upload_shouldNotUploadOpenSession() {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)

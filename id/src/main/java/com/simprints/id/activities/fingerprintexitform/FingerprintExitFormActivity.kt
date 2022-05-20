@@ -18,11 +18,11 @@ import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFor
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.databinding.ActivityFingerprintExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.extensions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.logging.Simber
-import org.jetbrains.anko.inputMethodManager
-import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
+import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 
 class FingerprintExitFormActivity : BaseSplitActivity() {

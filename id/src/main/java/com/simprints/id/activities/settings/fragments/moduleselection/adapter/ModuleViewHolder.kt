@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
-import org.jetbrains.anko.sdk27.coroutines.onClick
+import splitties.views.onClick
 
 class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

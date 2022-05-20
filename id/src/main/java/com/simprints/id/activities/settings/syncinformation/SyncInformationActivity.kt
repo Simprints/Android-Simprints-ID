@@ -78,7 +78,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         binding.imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sync_info_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }

@@ -12,12 +12,13 @@ import com.simprints.eventsystem.event.local.migrations.EventMigration1to2
 import com.simprints.eventsystem.event.local.migrations.EventMigration2to3
 import com.simprints.eventsystem.event.local.migrations.EventMigration3to4
 import com.simprints.eventsystem.event.local.migrations.EventMigration4to5
+import com.simprints.eventsystem.event.local.migrations.EventMigration5to6
 import com.simprints.eventsystem.event.local.migrations.EventMigration6to7
 import com.simprints.eventsystem.event.local.models.DbEvent
 import net.sqlcipher.database.SupportFactory
 
 
-@Database(entities = [DbEvent::class], version = 6, exportSchema = true)
+@Database(entities = [DbEvent::class], version = 7, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
@@ -36,6 +37,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations(EventMigration2to3())
                 .addMigrations(EventMigration3to4())
                 .addMigrations(EventMigration4to5())
+                .addMigrations(EventMigration5to6())
                 .addMigrations(EventMigration6to7())
 
             if (BuildConfig.DB_ENCRYPTION)

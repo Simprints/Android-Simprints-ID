@@ -16,7 +16,7 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 

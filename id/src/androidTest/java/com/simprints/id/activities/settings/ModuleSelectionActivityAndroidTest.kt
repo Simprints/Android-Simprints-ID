@@ -2,9 +2,10 @@ package com.simprints.id.activities.settings
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
-import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.notDisplayed
-import br.com.concretesolutions.kappuccino.custom.recyclerView.RecyclerViewInteractions.recyclerView
+import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
+import com.adevinta.android.barista.interaction.BaristaListInteractions.clickListItem
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.commontesttools.di.TestPreferencesModule
@@ -36,74 +37,48 @@ class ModuleSelectionActivityAndroidTest {
     @Test
     fun shouldLoadOnlyUnselectedModules() {
         launchWithModulesSelected()
-
-        recyclerView(R.id.rvModules) {
-            sizeIs(4)
-        }
+        assertRecyclerViewItemCount(R.id.rvModules,4)
     }
 
     @Test
     fun whenSelectingModules_noModulesSelectedTextShouldNotBeVisible() {
         launchWithModulesSelected()
+        clickListItem(R.id.rvModules,FIRST_MODULE_INDEX)
+        assertNotDisplayed(R.id.txtNoModulesSelected)
 
-        recyclerView(R.id.rvModules) {
-            atPosition(FIRST_MODULE_INDEX) {
-                click()
-            }
-        }
-
-        notDisplayed {
-            id(R.id.txtNoModulesSelected)
-        }
     }
 
     @Test
     fun whenSelectingAModule_shouldBeRemovedFromList() {
         launchWithModulesSelected()
-
-        recyclerView(R.id.rvModules) {
-            atPosition(0) {
-                click()
-            }
-
-            sizeIs(3)
-        }
+        clickListItem(R.id.rvModules,0)
+        assertRecyclerViewItemCount(R.id.rvModules,3)
     }
 
     @Test
     fun withSelectedModules_shouldDisplaySelectedModulesText() {
         launchWithModulesSelected()
-
-        displayed {
-            id(R.id.txtSelectedModules)
-        }
+        assertDisplayed(R.id.txtSelectedModules)
     }
 
     @Test
     fun withSelectedModules_shouldNotDisplayNoModulesSelectedText() {
         launchWithModulesSelected()
-
-        notDisplayed {
-            id(R.id.txtNoModulesSelected)
-        }
+        assertNotDisplayed(R.id.txtNoModulesSelected)
     }
 
     @Test
     fun withoutSelectedModules_shouldDisplayNoModulesSelectedText() {
         launchWithoutModulesSelected()
 
-        displayed {
-            id(R.id.txtNoModulesSelected)
-        }
+        assertDisplayed(R.id.txtNoModulesSelected)
     }
 
     @Test
     fun withoutSelectedModules_shouldNotDisplaySelectedModulesText() {
         launchWithoutModulesSelected()
 
-        notDisplayed {
-            id(R.id.txtSelectedModules)
-        }
+        assertNotDisplayed(R.id.txtSelectedModules)
     }
 
 

@@ -123,7 +123,7 @@ class DashboardActivity : BaseSplitActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
 
         menu?.run {

@@ -24,11 +24,11 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.S
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
+import com.simprints.id.tools.extensions.textColor
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
-import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.textColor
+import splitties.systemservices.layoutInflater
 import java.util.Date
 import kotlin.math.min
 

@@ -6,9 +6,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import br.com.concretesolutions.kappuccino.custom.intent.IntentMatcherInteractions
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionActivity
@@ -36,9 +37,7 @@ class SettingsPreferenceFragmentTest {
         scenario.moveToState(Lifecycle.State.RESUMED)
 
         onView(withText(R.string.preference_select_fingers_title)).perform(click())
-        IntentMatcherInteractions.sentIntent {
-            className(FingerSelectionActivity::class.java.name)
-        }
+        intended(hasComponent(FingerSelectionActivity::class.java.name))
     }
 
     @After
