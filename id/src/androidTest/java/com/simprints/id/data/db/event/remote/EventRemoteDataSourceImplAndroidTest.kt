@@ -525,11 +525,10 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     // Never invoked, but used to enforce that the implementation of a test for every event class
-    fun MutableList<Event>.addEventFor(type: EventType) {
+    private fun MutableList<Event>.addEventFor(type: EventType) {
 
         when (type) {
             SESSION_CAPTURE -> addSessionCaptureEvent()
-            ENROLMENT_RECORD_CREATION ->{}
             ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
             AUTHENTICATION -> addAuthenticationEvent()
             CONSENT -> addConsentEvent()
@@ -571,6 +570,7 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
+            ENROLMENT_RECORD_CREATION,
             ENROLMENT_V1 -> {
             }
         }.safeSealedWhens
