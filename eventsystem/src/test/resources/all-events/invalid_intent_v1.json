@@ -1,0 +1,19 @@
+{
+  "id": "e37ae724-a83e-467b-850f-b8edb8ff9456",
+  "type": "INVALID_INTENT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "INVALID_INTENT",
+    "eventVersion": 1,
+    "createdAt": 1078967890,
+    "endedAt": 0,
+    "action": "action",
+    "extras": {
+      "key": "value"
+    }
+  }
+}

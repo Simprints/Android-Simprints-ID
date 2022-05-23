@@ -2,7 +2,6 @@ package com.simprints.eventsystem.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.EventType.REFUSAL
-import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
 import java.util.*
 
 @Keep

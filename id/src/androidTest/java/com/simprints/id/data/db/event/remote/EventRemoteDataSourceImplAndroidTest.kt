@@ -39,15 +39,12 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.eventsystem.sampledata.buildFakeBiometricReferences
 import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.RemoteDbManager
@@ -64,7 +61,6 @@ import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
-import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -372,9 +368,9 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             PersonCreationEvent(
                 DEFAULT_TIME, listOf(
-                    fingerprintCaptureEvent?.id
-                        ?: ""
-                ), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels
+                fingerprintCaptureEvent?.id
+                    ?: ""
+            ), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels
             )
         )
     }
@@ -456,26 +452,6 @@ class EventRemoteDataSourceImplAndroidTest {
         add(event)
     }
 
-    private fun MutableList<Event>.addEnrolmentRecordCreation() {
-        add(
-            EnrolmentRecordCreationEvent(
-                CREATED_AT,
-                GUID1,
-                testProject.id,
-                DEFAULT_MODULE_ID,
-                DEFAULT_USER_ID,
-                listOf(FINGERPRINT, FACE),
-                buildFakeBiometricReferences(EncodingUtilsImplForTests),
-                EventLabels(
-                    projectId = testProject.id,
-                    moduleIds = listOf(GUID2),
-                    attendantId = DEFAULT_USER_ID,
-                    mode = listOf(FINGERPRINT, FACE)
-                )
-            )
-        )
-    }
-
     private fun MutableList<Event>.addCallbackErrorEvent() {
         ErrorCallbackPayload.Reason.values().forEach {
             add(ErrorCallbackEvent(DEFAULT_TIME, it, eventLabels))
@@ -551,7 +527,6 @@ class EventRemoteDataSourceImplAndroidTest {
 
         when (type) {
             SESSION_CAPTURE -> addSessionCaptureEvent()
-            ENROLMENT_RECORD_CREATION -> addEnrolmentRecordCreation()
             ARTIFICIAL_TERMINATION -> addArtificialTerminationEvent()
             AUTHENTICATION -> addAuthenticationEvent()
             CONSENT -> addConsentEvent()
@@ -591,6 +566,7 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
             FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
+            ENROLMENT_RECORD_CREATION,
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
             ENROLMENT_V1 -> {

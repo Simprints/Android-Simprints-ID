@@ -1,0 +1,25 @@
+{
+  "id": "e973a38a-9b0b-4c9e-a579-1b431f450498",
+  "type": "CONNECTIVITY_SNAPSHOT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CONNECTIVITY_SNAPSHOT",
+    "eventVersion": 2,
+    "createdAt": 2435356705,
+    "endedAt": 0,
+    "connections": [
+      {
+        "type": "WIFI",
+        "state": "CONNECTED"
+      },
+      {
+        "type": "MOBILE",
+        "state": "DISCONNECTED"
+      }
+    ]
+  }
+}
