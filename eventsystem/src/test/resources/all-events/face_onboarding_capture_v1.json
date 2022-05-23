@@ -1,0 +1,15 @@
+{
+  "id": "b3074635-8e9e-4882-be2f-51e9c3aa3f3d",
+  "type": "FACE_ONBOARDING_COMPLETE",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "FACE_ONBOARDING_COMPLETE",
+    "eventVersion": 1,
+    "createdAt": 6191345670,
+    "endedAt": 12345619930
+  }
+}
