@@ -143,7 +143,6 @@ import com.simprints.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
-import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

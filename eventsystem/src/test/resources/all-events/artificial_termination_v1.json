@@ -1,0 +1,16 @@
+{
+  "id": "cd63888d-e900-42d6-93bf-c583b4bce483",
+  "type": "ARTIFICIAL_TERMINATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "ARTIFICIAL_TERMINATION",
+    "eventVersion": 1,
+    "createdAt": 1346545024,
+    "endedAt": 0,
+    "reason":"TIMED_OUT"
+  }
+}

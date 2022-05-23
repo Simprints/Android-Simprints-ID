@@ -1,0 +1,23 @@
+{
+  "id": "7f2d26f9-d3d6-47c6-b18a-e50e85547cd6",
+  "type": "CALLBACK_IDENTIFICATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CALLBACK_IDENTIFICATION",
+    "eventVersion": 1,
+    "createdAt": 9345678901,
+    "endedAt": 0,
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "scores": [
+      {
+        "guid": "0eadadc3-89c5-4df1-8380-8eb019314559",
+        "confidence": 99,
+        "tier": "TIER_1"
+      }
+    ]
+  }
+}

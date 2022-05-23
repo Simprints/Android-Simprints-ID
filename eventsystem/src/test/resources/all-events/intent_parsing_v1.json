@@ -1,0 +1,16 @@
+{
+  "id": "8d465aba-70bc-4d61-b72d-c1a48d823d0f",
+  "type": "INTENT_PARSING",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "INTENT_PARSING",
+    "eventVersion": 1,
+    "createdAt": 9789678901,
+    "endedAt": 0,
+    "integration": "ODK"
+  }
+}

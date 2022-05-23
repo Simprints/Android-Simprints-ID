@@ -1,0 +1,17 @@
+{
+  "id": "5dbd251b-2d6c-43a9-a11c-cb2f9fdad658",
+  "type": "CONSENT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CONSENT",
+    "eventVersion": 1,
+    "createdAt": 121345670,
+    "endedAt": 3145678930,
+    "consentType": "PARENTAL",
+    "result":"ACCEPTED"
+  }
+}

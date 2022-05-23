@@ -1,0 +1,23 @@
+{
+  "id": "f9cb378f-eb6d-4c6f-86e8-c1621c7e2d23",
+  "type": "PERSON_CREATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "PERSON_CREATION",
+    "eventVersion": 1,
+    "createdAt": 1078967890,
+    "endedAt": 0,
+    "fingerprintCaptureIds": [
+      "dbc27bdb-cab3-463e-9004-68065e05f8ec"
+    ],
+    "fingerprintReferenceId": "b2bf55fd-6b26-4889-887e-4c7989388a0c",
+    "faceCaptureIds": [
+      "98112fc2-b2a7-4a84-a5e3-7711cb89dcf2"
+    ],
+    "faceReferenceId": "6ca0638d-90d2-415c-b455-833f9641b03c"
+  }
+}

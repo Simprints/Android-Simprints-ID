@@ -36,7 +36,6 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -481,7 +480,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun `should close current session correctly`() = runBlockingTest {
+    fun `should close current session correctly`() = runBlocking {
         val session = mockDbToHaveOneOpenSession(GUID1)
         eventRepo.closeCurrentSession(null)
 

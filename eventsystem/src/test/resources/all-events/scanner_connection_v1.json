@@ -1,0 +1,21 @@
+{
+  "id": "899289ba-3cd8-47e6-bafc-d9f800601db4",
+  "type": "SCANNER_CONNECTION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "SCANNER_CONNECTION",
+    "eventVersion": 1,
+    "createdAt": 91078967890,
+    "endedAt": 0,
+    "scannerInfo": {
+      "scannerId": "SP000552",
+      "macAddress": "F0:AC:D7:C0:02:28",
+      "generation": "VERO_1",
+      "hardwareVersion": "7"
+    }
+  }
+}
