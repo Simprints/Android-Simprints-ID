@@ -1,0 +1,16 @@
+{
+  "id": "b19e7594-e506-4636-aef1-8b4b12087b2c",
+  "type": "ALERT_SCREEN",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "ALERT_SCREEN",
+    "eventVersion": 1,
+    "createdAt": 1345678901,
+    "endedAt": 0,
+    "alertType": "UNEXPECTED_ERROR"
+  }
+}
