@@ -1,0 +1,29 @@
+{
+  "id": "5f71a6b0-8a78-40af-b259-49b0469de64b",
+  "labels": {
+    "projectId": "projectId",
+    "attendantId": "attId",
+    "moduleIds": [
+      "moduleId"
+    ],
+    "mode": [
+      "FACE"
+    ],
+    "sessionId": "sessionId",
+    "deviceId": "deviceId"
+  },
+  "payload": {
+    "id": "someId",
+    "createdAt": 0,
+    "eventVersion": 0,
+    "qualityThreshold": 1.0,
+    "result": "VALID",
+    "face": {
+      "template": "template",
+      "format": "RANK_ONE_1_23"
+    },
+    "endedAt": 0,
+    "type": "FACE_CAPTURE_BIOMETRICS"
+  },
+  "type": "FACE_CAPTURE_BIOMETRICS"
+}
