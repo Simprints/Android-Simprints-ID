@@ -438,7 +438,7 @@ open class SettingsPreferencesManagerImpl(
         const val SIMPRINTS_SYNC_KEY = "SimprintsSync"
         val SIMPRINTS_SYNC_SETTINGS_DEFAULT = SimprintsSyncSetting.SIM_SYNC_NONE
 
-        const val COSYNC_SYNC_KEY = "Cosync"
+        const val COSYNC_SYNC_KEY = "CoSync"
         val COSYNC_SYNC_SETTINGS_DEFAULT = CosyncSetting.COSYNC_NONE
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
