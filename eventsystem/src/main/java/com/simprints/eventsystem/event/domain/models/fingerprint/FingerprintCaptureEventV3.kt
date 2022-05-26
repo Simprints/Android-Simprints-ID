@@ -1,6 +1,7 @@
 package com.simprints.eventsystem.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
@@ -13,7 +14,7 @@ import java.util.UUID
 * object, which also needed incrementing*/
 @Keep
 data class FingerprintCaptureEventV3(
-    override val id: String = FINGERPRINT_CAPTURE_ID,
+    override val id: String = randomUUID(),
     override var labels: EventLabels,
     override val payload: FingerprintCapturePayloadV3,
     override val type: EventType
@@ -26,12 +27,12 @@ data class FingerprintCaptureEventV3(
         qualityThreshold: Int,
         result: FingerprintCapturePayloadV3.Result,
         fingerprint: FingerprintCapturePayloadV3.Fingerprint?,
-        id: String = FINGERPRINT_CAPTURE_ID,
+        id: String = randomUUID(),
         labels: EventLabels = EventLabels()
     ) : this(
         id,
         labels,
-        FingerprintCapturePayloadV3(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id),
+        FingerprintCapturePayloadV3(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint),
         FINGERPRINT_CAPTURE_V3
     )
 
@@ -44,7 +45,7 @@ data class FingerprintCaptureEventV3(
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
-        val id: String,
+        val id: String = FINGERPRINT_CAPTURE_ID,
         override val type: EventType = FINGERPRINT_CAPTURE_V3
     ) : EventPayload() {
 

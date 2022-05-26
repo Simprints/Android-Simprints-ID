@@ -1,6 +1,7 @@
 package com.simprints.eventsystem.event.domain.models.face
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
@@ -11,7 +12,7 @@ import java.util.UUID
 
 @Keep
 data class FaceCaptureEventV3(
-    override val id: String = FACE_CAPTURE_ID,
+    override val id: String = randomUUID(),
     override var labels: EventLabels,
     override val payload: FaceCapturePayloadV3,
     override val type: EventType
@@ -26,18 +27,26 @@ data class FaceCaptureEventV3(
         isFallback: Boolean,
         face: Face?,
         labels: EventLabels = EventLabels(),
-        id: String = FACE_CAPTURE_ID
+        id: String = randomUUID()
     ) : this(
         id,
         labels,
-        FaceCapturePayloadV3(id, startTime, endTime, EVENT_VERSION, attemptNb, qualityThreshold, result, isFallback, face),
+        FaceCapturePayloadV3(
+            createdAt = startTime,
+            endedAt = endTime,
+            eventVersion = EVENT_VERSION,
+            attemptNb = attemptNb,
+            qualityThreshold = qualityThreshold,
+            result = result,
+            isFallback = isFallback,
+            face = face
+        ),
         FACE_CAPTURE_V3
     )
 
-
     @Keep
     data class FaceCapturePayloadV3(
-        val id: String,
+        val id: String = FACE_CAPTURE_ID,
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int,
