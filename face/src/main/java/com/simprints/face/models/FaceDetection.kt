@@ -1,12 +1,13 @@
 package com.simprints.face.models
 
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEvent
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import java.util.*
+import java.util.UUID
 
 data class FaceDetection(
     val frame: PreviewFrame,
@@ -62,6 +63,14 @@ data class FaceDetection(
             FaceCaptureEvent.Result.fromFaceDetectionStatus(status),
             isFallback,
             FaceCaptureEvent.EventFace.fromFaceDetectionFace(face)
+        )
+
+    fun toFaceCapturBiomericsEvent(qualityThreshold: Float): FaceCaptureBiometricsEvent =
+        FaceCaptureBiometricsEvent(
+            startTime = detectionStartTime,
+            result = FaceCaptureBiometricsEvent.Result.fromFaceDetectionStatus(status),
+            qualityThreshold = qualityThreshold,
+            eventFace = FaceCaptureBiometricsEvent.EventFace.fromFaceDetectionFace(face)
         )
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING
