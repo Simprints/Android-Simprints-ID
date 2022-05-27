@@ -588,11 +588,11 @@ class EventRemoteDataSourceImplAndroidTest {
             PersonCreationEvent(
                 startTime = DEFAULT_TIME,
                 fingerprintCaptureIds = listOf(
-                    fingerprintCaptureEvent?.id
+                    fingerprintCaptureEvent?.payload?.id
                         ?: ""
                 ),
                 fingerprintReferenceId = randomUUID(),
-                faceCaptureIds = listOf(faceCaptureEvent?.id ?: ""),
+                faceCaptureIds = listOf(faceCaptureEvent?.payload?.id ?: ""),
                 faceReferenceId = randomUUID(),
                 labels = eventLabels
             )
