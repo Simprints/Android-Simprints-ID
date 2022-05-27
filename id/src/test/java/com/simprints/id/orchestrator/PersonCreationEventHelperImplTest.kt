@@ -125,7 +125,7 @@ class PersonCreationEventHelperImplTest {
                 eventRepository.addOrUpdateEvent(match {
                     it == PersonCreationEvent(
                         startTime = CREATED_AT,
-                        fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
+                        fingerprintCaptureIds = listOf(fingerprintCaptureEvent.payload.id),
                         fingerprintReferenceId = listOf(
                             FingerprintSample(
                                 fingerprintSample.fingerIdentifier.fromDomainToModuleApi(),
@@ -158,7 +158,7 @@ class PersonCreationEventHelperImplTest {
                         startTime = CREATED_AT,
                         fingerprintCaptureIds = null,
                         fingerprintReferenceId = null,
-                        faceCaptureIds = listOf(faceCaptureEvent.id),
+                        faceCaptureIds = listOf(faceCaptureEvent.payload.id),
                         faceReferenceId = listOf(
                             FaceSample(
                                 faceSample.template,
@@ -191,7 +191,7 @@ class PersonCreationEventHelperImplTest {
                 eventRepository.addOrUpdateEvent(match {
                     it == PersonCreationEvent(
                         startTime = CREATED_AT,
-                        fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
+                        fingerprintCaptureIds = listOf(fingerprintCaptureEvent.payload.id),
                         fingerprintReferenceId = listOf(
                             FingerprintSample(
                                 fingerprintSample.fingerIdentifier.fromDomainToModuleApi(),
@@ -200,7 +200,7 @@ class PersonCreationEventHelperImplTest {
                                 fingerprintSample.format.fromDomainToModuleApi()
                             )
                         ).uniqueId(),
-                        faceCaptureIds = listOf(faceCaptureEvent.id),
+                        faceCaptureIds = listOf(faceCaptureEvent.payload.id),
                         faceReferenceId = listOf(
                             FaceSample(
                                 faceSample.template,

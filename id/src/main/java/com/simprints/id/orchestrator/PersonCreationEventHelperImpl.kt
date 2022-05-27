@@ -105,7 +105,7 @@ class PersonCreationEventHelperImpl(
         captureEvents
             .filter {
                 it.payload.result != FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.SKIPPED
-            }.map { it.id }
+            }.map { it.payload.id }
             .nullIfEmpty()
 
     private fun extractFaceCaptureEventIds(
@@ -114,7 +114,7 @@ class PersonCreationEventHelperImpl(
         captureEvents
             .filter {
                 it.payload.result != FaceCaptureEventV3.FaceCapturePayloadV3.Result.INVALID
-            }.map { it.id }
+            }.map { it.payload.id }
             .nullIfEmpty()
 
     private fun List<String>.nullIfEmpty() =
