@@ -32,7 +32,7 @@ class CosyncSerializerTest {
     @Test
     fun `deserializing an empty string`() {
         val destinationString = ""
-        val expected = SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT
+        val expected = SettingsPreferencesManagerImpl.COSYNC_SYNC_SETTINGS_DEFAULT
 
         val deserialization = cosyncSerializer.deserialize(destinationString)
         assertThat(deserialization).isEqualTo(expected)
