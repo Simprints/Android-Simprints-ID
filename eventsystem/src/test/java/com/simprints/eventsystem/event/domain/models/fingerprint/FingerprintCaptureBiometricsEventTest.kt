@@ -22,12 +22,12 @@ class FingerprintCaptureBiometricsEventTest {
             labels = labels
         )
 
-        assertThat(event.id).isNotNull()
+        assertThat(event.id).isEqualTo("someId")
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(EventType.FINGERPRINT_CAPTURE_BIOMETRICS)
 
         with(event.payload) {
-            assertThat(id).isEqualTo("someId")
+            assertThat(id).isNotNull()
             assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE_BIOMETRICS)
             assertThat(result).isEqualTo(FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN)
             assertThat(fingerprint).isEqualTo(fingerArg)

@@ -22,12 +22,12 @@ class FaceCaptureBiometricsEventTest {
             id = "someId"
         )
 
-        assertThat(event.id).isNotNull()
+        assertThat(event.id).isEqualTo("someId")
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(EventType.FACE_CAPTURE_BIOMETRICS)
 
         with(event.payload) {
-            assertThat(id).isEqualTo("someId")
+            assertThat(id).isNotNull()
             assertThat(type).isEqualTo(EventType.FACE_CAPTURE_BIOMETRICS)
             assertThat(qualityThreshold).isEqualTo(1.0F)
             assertThat(result).isEqualTo(Result.VALID)
