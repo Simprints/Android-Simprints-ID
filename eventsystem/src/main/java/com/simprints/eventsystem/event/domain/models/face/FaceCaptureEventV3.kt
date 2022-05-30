@@ -27,7 +27,8 @@ data class FaceCaptureEventV3(
         isFallback: Boolean,
         face: Face?,
         labels: EventLabels = EventLabels(),
-        id: String = randomUUID()
+        id: String = randomUUID(),
+        payloadId: String = randomUUID()
     ) : this(
         id,
         labels,
@@ -39,14 +40,15 @@ data class FaceCaptureEventV3(
             qualityThreshold = qualityThreshold,
             result = result,
             isFallback = isFallback,
-            face = face
+            face = face,
+            id = payloadId
         ),
         FACE_CAPTURE_V3
     )
 
     @Keep
     data class FaceCapturePayloadV3(
-        val id: String = FACE_CAPTURE_ID,
+        val id: String,
         override val createdAt: Long,
         override var endedAt: Long,
         override val eventVersion: Int,
@@ -78,6 +80,5 @@ data class FaceCaptureEventV3(
 
     companion object {
         const val EVENT_VERSION = 3
-         val FACE_CAPTURE_ID = UUID.randomUUID().toString()
     }
 }

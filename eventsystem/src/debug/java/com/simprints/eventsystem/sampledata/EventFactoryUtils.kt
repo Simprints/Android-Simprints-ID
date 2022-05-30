@@ -183,7 +183,6 @@ fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
     )
     return FaceCaptureBiometricsEvent(
         CREATED_AT,
-        2F,
         FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.VALID,
         faceArg,
         eventLabels
