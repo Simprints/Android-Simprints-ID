@@ -12,7 +12,8 @@ class FingerprintCaptureBiometricsEvent(
     createdAt: Long,
     endedAt: Long = 0,
     val result: Result,
-    val fingerprint: Fingerprint?
+    val fingerprint: Fingerprint?,
+    val payloadId: String
 ) : Event(
     type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
     startTime = createdAt,
@@ -53,7 +54,8 @@ class FingerprintCaptureBiometricsEvent(
 fun FingerprintCaptureBiometricsEvent.fromDomainToCore() = FingerprintCaptureBiometricsEventCore(
     createdAt = startTime,
     result = result.fromDomainToCore(),
-    fingerprint = fingerprint?.fromDomainToCore()
+    fingerprint = fingerprint?.fromDomainToCore(),
+    payloadId = payloadId
 )
 
 fun FingerprintCaptureBiometricsEvent.Fingerprint.fromDomainToCore() =
