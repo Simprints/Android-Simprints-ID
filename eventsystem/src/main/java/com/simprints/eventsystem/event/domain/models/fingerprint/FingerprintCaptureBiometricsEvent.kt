@@ -6,7 +6,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3.Companion.FINGERPRINT_CAPTURE_ID
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 @Keep
@@ -22,7 +21,8 @@ data class FingerprintCaptureBiometricsEvent(
         result: FingerprintCaptureBiometricsPayload.Result,
         fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint?,
         id: String = randomUUID(),
-        labels: EventLabels = EventLabels()
+        labels: EventLabels = EventLabels(),
+        payloadId: String = randomUUID()
     ) : this(
         id = id,
         labels = labels,
@@ -30,7 +30,8 @@ data class FingerprintCaptureBiometricsEvent(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             result = result,
-            fingerprint = fingerprint
+            fingerprint = fingerprint,
+            id = payloadId
         ),
         type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
     )
@@ -41,7 +42,7 @@ data class FingerprintCaptureBiometricsEvent(
         override val eventVersion: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
-        val id: String = FINGERPRINT_CAPTURE_ID,
+        val id: String,
         override val type: EventType = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
         override val endedAt: Long = 0
     ) : EventPayload() {

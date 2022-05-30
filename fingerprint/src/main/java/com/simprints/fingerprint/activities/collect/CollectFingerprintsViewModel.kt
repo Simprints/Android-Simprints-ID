@@ -7,6 +7,7 @@ import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
@@ -314,6 +315,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun addCaptureAndBiometricEventsInSession() {
+        val payloadId = randomUUID()
         with(state().currentFingerState()) {
             val captureEvent = FingerprintCaptureEvent(
                 lastCaptureStartedAt,
@@ -327,7 +329,8 @@ class CollectFingerprintsViewModel(
                         it.qualityScore,
                         FingerprintTemplateFormat.ISO_19794_2
                     )
-                }
+                },
+                payloadId = payloadId
             )
             val biometricsEvent = FingerprintCaptureBiometricsEvent(
                 createdAt = lastCaptureStartedAt,
@@ -338,7 +341,8 @@ class CollectFingerprintsViewModel(
                         quality = it.qualityScore,
                         template = encoder.byteArrayToBase64(it.template)
                     )
-                }
+                },
+                payloadId = payloadId
             )
 
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id

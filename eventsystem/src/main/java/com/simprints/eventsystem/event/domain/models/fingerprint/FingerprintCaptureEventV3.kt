@@ -8,7 +8,6 @@ import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import java.util.UUID
 
 /*The naming here (3 instead of 2) is to keep in line with the backend, which is at V3 of this. See EVENT_VERSION in the companion
 * object, which also needed incrementing*/
@@ -28,11 +27,21 @@ data class FingerprintCaptureEventV3(
         result: FingerprintCapturePayloadV3.Result,
         fingerprint: FingerprintCapturePayloadV3.Fingerprint?,
         id: String = randomUUID(),
-        labels: EventLabels = EventLabels()
+        labels: EventLabels = EventLabels(),
+        payloadId: String = randomUUID()
     ) : this(
         id,
         labels,
-        FingerprintCapturePayloadV3(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint),
+        FingerprintCapturePayloadV3(
+            createdAt = createdAt,
+            eventVersion = EVENT_VERSION,
+            endedAt = endTime,
+            finger = finger,
+            qualityThreshold = qualityThreshold,
+            result = result,
+            fingerprint = fingerprint,
+            id = payloadId
+        ),
         FINGERPRINT_CAPTURE_V3
     )
 
@@ -45,7 +54,7 @@ data class FingerprintCaptureEventV3(
         val qualityThreshold: Int,
         val result: Result,
         val fingerprint: Fingerprint?,
-        val id: String = FINGERPRINT_CAPTURE_ID,
+        val id: String,
         override val type: EventType = FINGERPRINT_CAPTURE_V3
     ) : EventPayload() {
 
@@ -68,6 +77,5 @@ data class FingerprintCaptureEventV3(
 
     companion object {
         const val EVENT_VERSION = 3
-        val FINGERPRINT_CAPTURE_ID = UUID.randomUUID().toString()
     }
 }

@@ -49,7 +49,8 @@ class FingerprintCaptureEventTest {
             finger = FingerIdentifier.LEFT_3RD_FINGER,
             qualityThreshold = 0,
             result = FingerprintCaptureEvent.Result.BAD_QUALITY,
-            fingerprint = null
+            fingerprint = null,
+            payloadId = "someId"
         )
 
         val core = domain.fromDomainToCore()
