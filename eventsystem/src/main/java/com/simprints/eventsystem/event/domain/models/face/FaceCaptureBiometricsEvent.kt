@@ -6,7 +6,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.Companion.FACE_CAPTURE_ID
 
 @Keep
 data class FaceCaptureBiometricsEvent(
@@ -18,30 +17,29 @@ data class FaceCaptureBiometricsEvent(
 
     constructor(
         startTime: Long,
-        qualityThreshold: Float,
         result: FaceCaptureBiometricsPayload.Result,
         face: FaceCaptureBiometricsPayload.Face?,
         labels: EventLabels = EventLabels(),
         id: String = randomUUID(),
+        payloadId: String = randomUUID()
     ) : this(
         id,
         labels,
         FaceCaptureBiometricsPayload(
             createdAt = startTime,
             eventVersion = EVENT_VERSION,
-            qualityThreshold = qualityThreshold,
             result = result,
-            face = face
+            face = face,
+            id = payloadId
         ),
         EventType.FACE_CAPTURE_BIOMETRICS
     )
 
     @Keep
     data class FaceCaptureBiometricsPayload(
-        val id: String = FACE_CAPTURE_ID,
+        val id: String,
         override val createdAt: Long,
         override val eventVersion: Int,
-        val qualityThreshold: Float,
         val result: Result,
         val face: Face?,
         override var endedAt: Long = 0,

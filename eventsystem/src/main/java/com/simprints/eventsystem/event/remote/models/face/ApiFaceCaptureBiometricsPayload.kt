@@ -11,7 +11,6 @@ class ApiFaceCaptureBiometricsPayload(
     override val version: Int,
     override val startTime: Long,
     val id: String,
-    val qualityThreshold: Float,
     val result: ApiResult,
     val face: Face?
 ) : ApiEventPayload(ApiEventPayloadType.FaceCaptureBiometrics, version, startTime) {
@@ -31,7 +30,6 @@ class ApiFaceCaptureBiometricsPayload(
         domainPayload.eventVersion,
         domainPayload.createdAt,
         domainPayload.id,
-        domainPayload.qualityThreshold,
         domainPayload.result.fromDomainToApi(),
         domainPayload.face?.let { Face(it) }
     )

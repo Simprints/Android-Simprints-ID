@@ -21,7 +21,8 @@ class FaceCaptureEvent(
     val qualityThreshold: Float,
     val result: Result,
     val isFallback: Boolean,
-    val eventFace: EventFace?
+    val eventFace: EventFace?,
+    val payloadId: String
 ) : Event(EventType.FACE_CAPTURE, startTime, endTime) {
 
     fun fromDomainToCore(): CoreFaceCaptureEvent = CoreFaceCaptureEvent(
@@ -32,7 +33,7 @@ class FaceCaptureEvent(
         result.fromDomainToCore(),
         isFallback,
         eventFace?.fromDomainToCore(),
-        id = id
+        payloadId = payloadId
     )
 
     @Keep

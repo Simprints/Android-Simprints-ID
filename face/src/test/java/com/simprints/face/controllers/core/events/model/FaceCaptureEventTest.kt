@@ -18,7 +18,8 @@ class FaceCaptureEventTest {
             qualityThreshold = 0.0f,
             result = FaceCaptureEvent.Result.VALID,
             isFallback = false,
-            eventFace = null
+            eventFace = null,
+            payloadId = "someId"
         )
 
         val core = domain.fromDomainToCore()

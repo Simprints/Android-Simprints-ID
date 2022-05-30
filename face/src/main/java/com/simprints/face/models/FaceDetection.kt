@@ -54,7 +54,7 @@ data class FaceDetection(
             face?.format?.fromDomainToModuleApi() ?: IFaceTemplateFormat.RANK_ONE_1_23
         )
 
-    fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float): FaceCaptureEvent =
+    fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float, payloadId: String): FaceCaptureEvent =
         FaceCaptureEvent(
             detectionStartTime,
             detectionEndTime,
@@ -62,15 +62,16 @@ data class FaceDetection(
             qualityThreshold,
             FaceCaptureEvent.Result.fromFaceDetectionStatus(status),
             isFallback,
-            FaceCaptureEvent.EventFace.fromFaceDetectionFace(face)
+            FaceCaptureEvent.EventFace.fromFaceDetectionFace(face),
+            payloadId = payloadId
         )
 
-    fun toFaceCapturBiomericsEvent(qualityThreshold: Float): FaceCaptureBiometricsEvent =
+    fun toFaceCapturBiomericsEvent( payloadId: String): FaceCaptureBiometricsEvent =
         FaceCaptureBiometricsEvent(
             startTime = detectionStartTime,
             result = FaceCaptureBiometricsEvent.Result.fromFaceDetectionStatus(status),
-            qualityThreshold = qualityThreshold,
-            eventFace = FaceCaptureBiometricsEvent.EventFace.fromFaceDetectionFace(face)
+            eventFace = FaceCaptureBiometricsEvent.EventFace.fromFaceDetectionFace(face),
+            payloadId = payloadId
         )
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING

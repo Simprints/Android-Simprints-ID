@@ -15,7 +15,6 @@ class FaceCaptureBiometricsEventTest {
         val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face("template", FaceTemplateFormat.RANK_ONE_1_23)
         val event = FaceCaptureBiometricsEvent(
             startTime = SampleDefaults.CREATED_AT,
-            qualityThreshold = 1.0F,
             result = Result.VALID,
             face = faceArg,
             labels = labels,
@@ -29,7 +28,6 @@ class FaceCaptureBiometricsEventTest {
         with(event.payload) {
             assertThat(id).isNotNull()
             assertThat(type).isEqualTo(EventType.FACE_CAPTURE_BIOMETRICS)
-            assertThat(qualityThreshold).isEqualTo(1.0F)
             assertThat(result).isEqualTo(Result.VALID)
             assertThat(face).isEqualTo(faceArg)
             assertThat(eventVersion).isEqualTo(0)

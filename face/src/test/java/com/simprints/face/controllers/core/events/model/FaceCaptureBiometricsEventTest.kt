@@ -14,8 +14,8 @@ class FaceCaptureBiometricsEventTest {
             startTime = 0,
             endTime = 0,
             result = FaceCaptureBiometricsEvent.Result.VALID,
-            qualityThreshold = 0.0f,
-            eventFace = null
+            eventFace = null,
+            payloadId = "someId"
         )
 
         val core = domain.fromDomainToCore()
@@ -24,7 +24,6 @@ class FaceCaptureBiometricsEventTest {
             assertThat(payload.face).isEqualTo(domain.eventFace)
             assertThat(payload.result).isEqualTo(CoreFaceCaptureBiometricsEventFace.FaceCaptureBiometricsPayload.Result.VALID)
             assertThat(payload.createdAt).isEqualTo(domain.startTime)
-            assertThat(payload.qualityThreshold).isEqualTo(domain.qualityThreshold)
         }
     }
 
