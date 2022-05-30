@@ -230,7 +230,6 @@ class ClientApiEventRepositoryImplTest {
                 id = "",
                 createdAt = 0,
                 eventVersion = 0,
-                qualityThreshold = 0.0f,
                 result = Result.VALID,
                 face = null,
                 endedAt = 0

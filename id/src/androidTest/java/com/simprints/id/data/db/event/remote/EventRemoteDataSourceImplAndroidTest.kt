@@ -171,6 +171,9 @@ class EventRemoteDataSourceImplAndroidTest {
         RemoteTestingManager.create(testDispatcherProvider)
     }
 
+    private val facePayloadId = randomUUID()
+    private val fingerPayloadId = randomUUID()
+
     @MockK
     lateinit var timeHelper: TimeHelper
 
@@ -401,7 +404,8 @@ class EventRemoteDataSourceImplAndroidTest {
                     qualityThreshold = 0,
                     result = result,
                     fingerprint = fingerprint,
-                    labels = eventLabels
+                    labels = eventLabels,
+                    payloadId = fingerPayloadId
                 )
 
                 add(event)
@@ -428,7 +432,8 @@ class EventRemoteDataSourceImplAndroidTest {
                         createdAt = DEFAULT_TIME,
                         result = result,
                         fingerprint = fingerprint,
-                        labels = eventLabels
+                        labels = eventLabels,
+                        payloadId = fingerPayloadId
                     )
 
                     add(event)
@@ -456,7 +461,8 @@ class EventRemoteDataSourceImplAndroidTest {
                 result = result,
                 isFallback = false,
                 face = face,
-                labels = eventLabels
+                labels = eventLabels,
+                payloadId = facePayloadId
             )
 
             add(event)
@@ -478,10 +484,10 @@ class EventRemoteDataSourceImplAndroidTest {
 
                 val event = FaceCaptureBiometricsEvent(
                     startTime = DEFAULT_TIME,
-                    qualityThreshold = 0f,
                     result = result,
                     face = face,
-                    labels = eventLabels
+                    labels = eventLabels,
+                    payloadId = facePayloadId
                 )
 
                 add(event)
