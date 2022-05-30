@@ -720,7 +720,7 @@ fun validateFaceCaptureBiometricsEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(0)
         assertThat(getLong("startTime")).isNotNull()
         assertThat(getString("result")).isIn(listOf("VALID", "INVALID", "OFF_YAW", "OFF_ROLL", "TOO_CLOSE", "TOO_FAR"))
-        assertThat(length()).isEqualTo(7)
+        assertThat(length()).isEqualTo(6)
     }
 }
 
