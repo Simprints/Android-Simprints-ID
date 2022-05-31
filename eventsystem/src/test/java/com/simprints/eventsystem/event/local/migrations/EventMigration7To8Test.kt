@@ -32,7 +32,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = EventSystemApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class EventMigration6To7Test {
+class EventMigration7To8Test {
 
     @get:Rule
     val helper = MigrationTestHelper(
@@ -46,9 +46,9 @@ class EventMigration6To7Test {
     fun validateMigrationForFingerprintCaptureIsSuccessful() {
         val eventId = randomUUID()
 
-        setupV6DbWithFingerprintCaptureEvent(eventId)
+        setupV7DbWithFingerprintCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration6to7())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration7to8())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
@@ -67,9 +67,9 @@ class EventMigration6To7Test {
     fun validateMigrationForFaceCaptureIsSuccessful() {
         val eventId = randomUUID()
 
-        setupV6DbWithFaceCaptureEvent(eventId)
+        setupV7DbWithFaceCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration6to7())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration7to8())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
@@ -83,18 +83,18 @@ class EventMigration6To7Test {
         assertThat(fingerprintObject.has("template")).isFalse()
     }
 
-    private fun setupV6DbWithFaceCaptureEvent(
+    private fun setupV7DbWithFaceCaptureEvent(
         eventId: String, close: Boolean = true
-    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 6).apply {
+    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 7).apply {
         val event = createFaceCaptureEvent(eventId)
         this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
 
         if (close) close()
     }
 
-    private fun setupV6DbWithFingerprintCaptureEvent(
+    private fun setupV7DbWithFingerprintCaptureEvent(
         eventId: String, close: Boolean = true
-    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 6).apply {
+    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 7).apply {
         val event = createFingerprintCaptureEvent(eventId)
         this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
 

@@ -7,14 +7,14 @@ import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.logging.Simber
 import org.json.JSONObject
 
-class EventMigration6to7 : Migration(6, 7) {
+class EventMigration7to8 : Migration(7, 8) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Simber.d("Migrating room db from schema 6 to schema 7.")
+            Simber.d("Migrating room db from schema 7 to schema 8.")
             removeTemplateDataFromOldFaceCapture(database)
             removeTemplateDataFromOldFingerprintCapture(database)
-            Simber.d("Migration from schema 6 to schema 7 done.")
+            Simber.d("Migration from schema 7 to schema 8 done.")
         } catch (t: Throwable) {
             Simber.e(t)
         }
