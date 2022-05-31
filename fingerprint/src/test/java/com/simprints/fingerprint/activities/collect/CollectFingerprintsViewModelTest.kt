@@ -682,7 +682,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 isShowingSplashScreen = false
             )
         )
-        coVerify(exactly = 28) { sessionEventsManager.addEvent(any()) }
+        coVerify(exactly = 16) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 3) { imageManager.save(any(), any(), any()) }
