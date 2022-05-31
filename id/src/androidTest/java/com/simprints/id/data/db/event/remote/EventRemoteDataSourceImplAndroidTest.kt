@@ -570,6 +570,7 @@ class EventRemoteDataSourceImplAndroidTest {
             ENROLMENT_RECORD_CREATION,
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
+            ENROLMENT_RECORD_CREATION,
             ENROLMENT_V1 -> {
             }
         }.safeSealedWhens
