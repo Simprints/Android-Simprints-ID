@@ -332,7 +332,7 @@ class CollectFingerprintsViewModel(
                 },
                 payloadId = payloadId
             )
-            val biometricsEvent = FingerprintCaptureBiometricsEvent(
+            val fingerprintCaptureBiometricsEvent = FingerprintCaptureBiometricsEvent(
                 createdAt = lastCaptureStartedAt,
                 result = FingerprintCaptureBiometricsEvent.buildResult(currentCapture()),
                 fingerprint = (currentCapture() as? CaptureState.Collected)?.scanResult?.let {
@@ -351,7 +351,10 @@ class CollectFingerprintsViewModel(
             //It can not be done in background because then SID won't find the last capture event id
             runBlocking {
                 sessionEventsManager.addEvent(captureEvent)
-                sessionEventsManager.addEvent(biometricsEvent)
+                // Because we don't need biometric data that is not used for matching
+                if (fingerprintCaptureBiometricsEvent.result == FingerprintCaptureBiometricsEvent.Result.GOOD_SCAN) sessionEventsManager.addEvent(
+                    fingerprintCaptureBiometricsEvent
+                )
             }
         }
     }
