@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
 import com.simprints.core.tools.extentions.inBackground
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 import com.simprints.id.tools.ignoreException
