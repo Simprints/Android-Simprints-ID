@@ -48,7 +48,7 @@ class EventMigration7To8Test {
 
         setupV7DbWithFingerprintCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration7to8())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
@@ -69,7 +69,7 @@ class EventMigration7To8Test {
 
         setupV7DbWithFaceCaptureEvent(eventId)
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration7to8())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
         val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
