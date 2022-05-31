@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
 import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
-class FingerprintSessionEventsManagerImpl(private val eventRepository: com.simprints.eventsystem.event.EventRepository) : FingerprintSessionEventsManager {
+class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepository) :
+    FingerprintSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
         inBackground {
-            fromDomainToCore(event)?.let {
+            fromDomainToCore(event).let {
                 eventRepository.addOrUpdateEvent(it)
             }
         }
@@ -21,7 +22,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: com.simpr
 
     override suspend fun addEvent(event: Event) {
         ignoreException {
-            fromDomainToCore(event)?.let {
+            fromDomainToCore(event).let {
                 runBlocking {
                     eventRepository.addOrUpdateEvent(it)
                 }
@@ -39,7 +40,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: com.simpr
         }
     }
 
-    private fun fromDomainToCore(event: Event): CoreEvent? =
+    private fun fromDomainToCore(event: Event): CoreEvent =
         when (event.type) {
             REFUSAL_RESPONSE -> (event as RefusalEvent).fromDomainToCore()
             FINGERPRINT_CAPTURE -> (event as FingerprintCaptureEvent).fromDomainToCore()

@@ -488,15 +488,17 @@ fun validateOneToOneMatchEventApiModel(json: JSONObject) {
     validateCommonParams(json, "OneToOneMatch")
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
         assertThat(getLong("endTime"))
         assertThat(getString("candidateId").isGuid()).isTrue()
         assertThat(getString("matcher")).isAnyOf("SIM_AFIS", "RANK_ONE")
+        assertThat(getString("fingerComparisonStrategy")).isAnyOf(
+            "null", "SAME_FINGER","CROSS_FINGER_USING_MEAN_OF_MAX")
         with(getJSONObject("result")) {
             validateMatchEntryApiModel(this)
         }
-        assertThat(length()).isEqualTo(7)
+        assertThat(length()).isEqualTo(8)
     }
 }
 

@@ -32,8 +32,9 @@ class EventMigration4to5Test {
         EventMigration3to4(),
         EventMigration4to5(),
         EventMigration5to6(),
-        EventMigration6to7()
-    )
+        EventMigration6to7(),
+        EventMigration7to8
+        )
 
     @get:Rule
     val helper = MigrationTestHelper(
@@ -97,7 +98,8 @@ class EventMigration4to5Test {
         }
     }
 
-    private fun createEvent() = ContentValues().apply {
+    private fun
+        createEvent() = ContentValues().apply {
         put("id", EVENT_ID)
         put("type", "some-event-type")
         put("eventJson", "some-event-json")

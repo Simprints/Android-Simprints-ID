@@ -57,7 +57,7 @@ class EventMigrationTest {
             }
             close()
         }
-        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, *ALL_MIGRATIONS)
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, *ALL_MIGRATIONS)
         val cursor = db.query("SELECT * FROM $TABLE_NAME")
 
         while (cursor.moveToNext()) {
@@ -105,7 +105,8 @@ class EventMigrationTest {
             EventMigration2to3(),
             EventMigration3to4(),
             EventMigration4to5(),
-            EventMigration5to6()
+            EventMigration5to6(),
+            EventMigration6to7()
         )
     }
 }
