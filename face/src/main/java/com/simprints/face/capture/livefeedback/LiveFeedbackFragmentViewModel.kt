@@ -9,6 +9,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
@@ -167,12 +168,14 @@ class LiveFeedbackFragmentViewModel(
     private fun sendCaptureEvent(faceDetection: FaceDetection) {
         val payloadId = randomUUID() // The payloads of these two events need to have the same ids
         val faceCaptureEvent =
-            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold,payloadId)
+            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold, payloadId)
 
         val faceCaptureBiometricsEvent = faceDetection.toFaceCapturBiomericsEvent(qualityThreshold, payloadId)
 
         faceSessionEventsManager.addEvent(faceCaptureEvent)
-        faceSessionEventsManager.addEvent(faceCaptureBiometricsEvent)
+        if (faceCaptureBiometricsEvent.result == FaceCaptureBiometricsEvent.Result.VALID) faceSessionEventsManager.addEvent(
+            faceCaptureBiometricsEvent
+        )
 
         faceDetection.id = faceCaptureEvent.id
     }
