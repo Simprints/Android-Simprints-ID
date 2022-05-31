@@ -20,7 +20,8 @@ class OneToOneMatchEvent(
         endTime,
         (query as SubjectQuery).extractVerifyId(),
         matcher.fromDomainToCore(),
-        result?.fromDomainToCore()
+        result?.fromDomainToCore(),
+        null // Finger Comparison strategy is for finger events only not for face events
     )
 
     private fun SubjectQuery.extractVerifyId() =

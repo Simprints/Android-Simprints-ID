@@ -4,11 +4,13 @@ import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrat
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy as IdCaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy as IdSaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration as IdScannerGeneration
 
-class FingerprintPreferencesManagerImpl(private val prefs: IdPreferencesManager) : FingerprintPreferencesManager {
+class FingerprintPreferencesManagerImpl(private val prefs: IdPreferencesManager) :
+    FingerprintPreferencesManager {
 
     override var lastScannerUsed: String = prefs.lastScannerUsed
         set(value) {
@@ -32,6 +34,10 @@ class FingerprintPreferencesManagerImpl(private val prefs: IdPreferencesManager)
             IdCaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI -> CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI
             IdCaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI -> CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI
         }
+    override val isCrossFingerComparisonEnabledInVerification:Boolean
+        get() = prefs.fingerComparisonStrategy == FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+
+
 
     override val saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
         get() = when (prefs.saveFingerprintImagesStrategy) {

@@ -13,4 +13,5 @@ interface FingerprintPreferencesManager {
     val scannerGenerations: List<ScannerGeneration>
     val qualityThreshold: Int
     val liveFeedbackOn: Boolean
+    val isCrossFingerComparisonEnabledInVerification:Boolean
 }

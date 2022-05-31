@@ -356,6 +356,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 randomUUID(),
                 Matcher.SIM_AFIS,
                 MatchEntry(randomUUID(), 0F),
+                FingerComparisonStrategy.SAME_FINGER,
                 eventLabels
             )
         )
@@ -523,7 +524,7 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     // Never invoked, but used to enforce that the implementation of a test for every event class
-    fun MutableList<Event>.addEventFor(type: EventType) {
+    private fun MutableList<Event>.addEventFor(type: EventType) {
 
         when (type) {
             SESSION_CAPTURE -> addSessionCaptureEvent()

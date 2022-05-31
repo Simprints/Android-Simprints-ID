@@ -10,6 +10,7 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
@@ -22,23 +23,23 @@ import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
 import com.simprints.fingerprintmatcher.domain.TemplateFormat
 import com.simprints.logging.Simber
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.util.*
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
 import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 import com.simprints.fingerprintmatcher.domain.MatchResult as MatcherMatchResult
+
 
 class MatchingViewModel(
     private val fingerprintMatcher: FingerprintMatcher,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
-    private val masterFlowManager: MasterFlowManager
+    private val masterFlowManager: MasterFlowManager,
+    private val fingerprintPreferencesManager: FingerprintPreferencesManager
 ) : ViewModel() {
 
     val result = MutableLiveData<FinishResult>()
@@ -48,7 +49,8 @@ class MatchingViewModel(
     val matchBeginningSummary = MutableLiveData<IdentificationBeginningSummary>()
     val matchFinishedSummary = MutableLiveData<IdentificationFinishedSummary>()
     val hasMatchFailed = MutableLiveData<Boolean>()
-
+    private val isCrossFingerMatchingEnabledInVerification:Boolean
+        get() = fingerprintPreferencesManager.isCrossFingerComparisonEnabledInVerification
     private lateinit var matchingRequest: MatchingTaskRequest
 
     @SuppressLint("CheckResult")
@@ -62,31 +64,52 @@ class MatchingViewModel(
                 matchingRequest,
                 sessionEventsManager,
                 timeHelper
-            ))
-            Action.VERIFY -> runMatchTask(VerificationTask(this, matchingRequest, sessionEventsManager, timeHelper))
+            ),false)
+            Action.VERIFY -> runMatchTask(
+                VerificationTask(
+                    this,
+                    matchingRequest,
+                    sessionEventsManager,
+                    timeHelper
+                ),isCrossFingerMatchingEnabledInVerification
+            )
         }
     }
 
-    private fun runMatchTask(matchTask: MatchTask) {
+    private fun runMatchTask(matchTask: MatchTask, isCrossFingerMatchingEnabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                matchTask.onBeginLoadCandidates()
-                val candidates = dbManager.loadPeople(matchingRequest.queryForCandidates)
-                matchTask.onCandidatesLoaded(candidates.count())
+                with(matchTask) {
+                    onBeginLoadCandidates()
 
-                val result = runMatch(candidates, matchingRequest.probeFingerprintSamples)
-                matchTask.handleMatchResult(candidates.count(), result.toList())
+                    val candidates = dbManager.loadPeople(matchingRequest.queryForCandidates)
+                    onCandidatesLoaded(candidates.count())
+
+                    val result = runMatch(
+                        candidates.toList(), matchingRequest.probeFingerprintSamples,
+                        isCrossFingerMatchingEnabled
+                    )
+                    handleMatchResult(
+                        candidates.count(),
+                        result.toList(),
+                        isCrossFingerMatchingEnabled
+                    )
+                }
             } catch (e: Throwable) {
                 handleMatchFailed(e)
             }
         }
     }
 
-    private suspend fun runMatch(candidates: Flow<FingerprintIdentity>, probeFingerprints: List<Fingerprint>): Flow<MatchResult> =
+    private fun runMatch(
+        candidates: List<FingerprintIdentity>,
+        probeFingerprints: List<Fingerprint>,
+        isCrossFingerMatchingEnabled: Boolean
+    ): List<MatchResult> =
         fingerprintMatcher.match(
             probeFingerprints.toFingerprintIdentity().fromDomainToMatcher(),
             candidates.map { it.fromDomainToMatcher() },
-            DEFAULT_MATCHING_ALGORITHM
+            DEFAULT_MATCHING_ALGORITHM, isCrossFingerMatchingEnabled ,
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
