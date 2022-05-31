@@ -182,10 +182,11 @@ fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
         format = FaceTemplateFormat.RANK_ONE_1_23
     )
     return FaceCaptureBiometricsEvent(
-        CREATED_AT,
-        FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.VALID,
-        faceArg,
-        eventLabels
+        startTime = CREATED_AT,
+        result = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.VALID,
+        face = faceArg,
+        labels = eventLabels,
+        qualityThreshold = 1.0f
     )
 }
 
@@ -200,7 +201,8 @@ fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent
         CREATED_AT,
         FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
         fingerprint,
-        labels = eventLabels
+        labels = eventLabels,
+        qualityThreshold = 1
     )
 }
 

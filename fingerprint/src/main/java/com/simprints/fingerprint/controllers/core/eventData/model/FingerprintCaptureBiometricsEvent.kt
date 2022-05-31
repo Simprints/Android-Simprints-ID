@@ -13,6 +13,7 @@ class FingerprintCaptureBiometricsEvent(
     endedAt: Long = 0,
     val result: Result,
     val fingerprint: Fingerprint?,
+    val qualityThreshold: Int,
     val payloadId: String
 ) : Event(
     type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
@@ -55,7 +56,8 @@ fun FingerprintCaptureBiometricsEvent.fromDomainToCore() = FingerprintCaptureBio
     createdAt = startTime,
     result = result.fromDomainToCore(),
     fingerprint = fingerprint?.fromDomainToCore(),
-    payloadId = payloadId
+    payloadId = payloadId,
+    qualityThreshold = qualityThreshold
 )
 
 fun FingerprintCaptureBiometricsEvent.Fingerprint.fromDomainToCore() =

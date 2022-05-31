@@ -20,6 +20,7 @@ data class FingerprintCaptureBiometricsEvent(
         createdAt: Long,
         result: FingerprintCaptureBiometricsPayload.Result,
         fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint?,
+        qualityThreshold: Int,
         id: String = randomUUID(),
         labels: EventLabels = EventLabels(),
         payloadId: String = randomUUID()
@@ -31,7 +32,8 @@ data class FingerprintCaptureBiometricsEvent(
             eventVersion = EVENT_VERSION,
             result = result,
             fingerprint = fingerprint,
-            id = payloadId
+            id = payloadId,
+            qualityThreshold = qualityThreshold
         ),
         type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
     )
@@ -43,6 +45,7 @@ data class FingerprintCaptureBiometricsEvent(
         val result: Result,
         val fingerprint: Fingerprint?,
         val id: String,
+        val qualityThreshold: Int,
         override val type: EventType = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
         override val endedAt: Long = 0
     ) : EventPayload() {

@@ -15,7 +15,8 @@ class FaceCaptureBiometricsEventTest {
             endTime = 0,
             result = FaceCaptureBiometricsEvent.Result.VALID,
             eventFace = null,
-            payloadId = "someId"
+            payloadId = "someId",
+            qualityThreshold = 1.0f
         )
 
         val core = domain.fromDomainToCore()

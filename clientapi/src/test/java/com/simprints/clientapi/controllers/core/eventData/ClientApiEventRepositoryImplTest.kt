@@ -215,7 +215,8 @@ class ClientApiEventRepositoryImplTest {
                 result = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
                 fingerprint = null,
                 id = "",
-                endedAt = 0
+                endedAt = 0,
+                qualityThreshold = 1
             ), type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
         ),
         FaceCaptureBiometricsEvent(
@@ -232,7 +233,8 @@ class ClientApiEventRepositoryImplTest {
                 eventVersion = 0,
                 result = Result.VALID,
                 face = null,
-                endedAt = 0
+                endedAt = 0,
+                qualityThreshold = 1.0f
             ), type = EventType.FACE_CAPTURE_BIOMETRICS
         ),
         ArtificialTerminationEvent(

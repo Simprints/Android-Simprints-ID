@@ -13,6 +13,7 @@ class FaceCaptureBiometricsEvent(
     endTime: Long = 0,
     val result: Result,
     val eventFace: EventFace?,
+    val qualityThreshold: Float,
     val payloadId: String
 ) : Event(EventType.FACE_CAPTURE_BIOMETRICS, startTime, endTime) {
 
@@ -20,7 +21,8 @@ class FaceCaptureBiometricsEvent(
         startTime = startTime,
         result = result.fromDomainToCore(),
         face = eventFace?.fromDomainToCore(),
-        payloadId = payloadId
+        payloadId = payloadId,
+        qualityThreshold = qualityThreshold
     )
 
     @Keep

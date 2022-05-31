@@ -342,8 +342,9 @@ class CollectFingerprintsViewModel(
                         template = encoder.byteArrayToBase64(it.template)
                     )
                 },
-                payloadId = payloadId
-            )
+                payloadId = payloadId,
+                qualityThreshold = fingerprintPreferencesManager.qualityThreshold,
+                )
 
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
 

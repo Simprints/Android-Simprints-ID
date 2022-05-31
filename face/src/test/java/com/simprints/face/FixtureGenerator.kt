@@ -64,7 +64,8 @@ object FixtureGenerator {
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
             format = FaceTemplateFormat.MOCK
         ),
-        payloadId = "someId"
+        payloadId = "someId",
+        qualityThreshold = -1.0f
     )
 
     val faceCaptureEvent2 = FaceCaptureEvent(
@@ -90,7 +91,8 @@ object FixtureGenerator {
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
             format = FaceTemplateFormat.MOCK
         ),
-        payloadId = "someId"
+        payloadId = "someId",
+        qualityThreshold = -1.0f
     )
 
     val faceCaptureEvent3 = FaceCaptureEvent(
@@ -116,6 +118,7 @@ object FixtureGenerator {
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
             format = FaceTemplateFormat.MOCK
         ),
-        payloadId = "someId"
+        payloadId = "someId",
+        qualityThreshold = -1.0f
     )
 }
