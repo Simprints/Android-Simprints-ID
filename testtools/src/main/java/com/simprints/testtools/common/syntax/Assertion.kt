@@ -9,17 +9,6 @@ import org.junit.Assert
 import org.mockito.Mockito
 import org.mockito.verification.VerificationMode
 
-inline fun <reified T : Any> argThat(crossinline assertation: (T) -> Unit): T {
-    return com.nhaarman.mockitokotlin2.argThat {
-        try {
-            assertation(this)
-            true
-        } catch (t: Throwable) {
-            false
-        }
-    }
-}
-
 fun <T> verifyOnce(mock: T, methodCall: T.() -> Any?) =
     verifyExactly(1, mock, methodCall)
 
@@ -38,17 +27,6 @@ fun <T> verifyAtMost(times: Int, mock: T, methodCall: T.() -> Any?) =
 private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, methodCall: T.() -> Any?) =
     Mockito.verify(mock, mode(times)).methodCall()
 
-fun <T> verifyBlockingAtLeast(times: Int, mock: T, methodCall: suspend T.() -> Unit) {
-    verifyBlocking(mock, atLeast(times), methodCall)
-}
-
-fun <T> verifyBlockingNever(mock: T, methodCall: suspend T.() -> Unit) {
-    verifyBlocking(mock, never(), methodCall)
-}
-
-fun <T> verifyBlockingExactly(exactTimes: Int, mock: T, methodCall: suspend T.() -> Unit) {
-    verifyBlocking(mock, times(exactTimes), methodCall)
-}
 
 
 fun <T> verifyOnlyInteraction(mock: T, methodCall: T.() -> Any?) {
