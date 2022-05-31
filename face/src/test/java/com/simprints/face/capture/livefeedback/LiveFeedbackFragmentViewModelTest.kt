@@ -370,7 +370,7 @@ class LiveFeedbackFragmentViewModelTest {
             }
 
             verify(exactly = 1) { faceSessionEventsManager.addEventInBackground(any()) }
-            verify(exactly = 6) { faceSessionEventsManager.addEvent(any()) }
+            verify(exactly = 5) { faceSessionEventsManager.addEvent(any()) }
         }
 
     /**
@@ -433,6 +433,6 @@ class LiveFeedbackFragmentViewModelTest {
         }
 
         verify(exactly = 1) { faceSessionEventsManager.addEventInBackground(any()) }
-        verify(exactly = 6) { faceSessionEventsManager.addEvent(any()) }
+        verify(exactly = 4) { faceSessionEventsManager.addEvent(any()) }
     }
 }

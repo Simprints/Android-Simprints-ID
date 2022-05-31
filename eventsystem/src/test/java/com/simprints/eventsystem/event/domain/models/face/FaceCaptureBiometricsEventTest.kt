@@ -18,7 +18,8 @@ class FaceCaptureBiometricsEventTest {
             result = Result.VALID,
             face = faceArg,
             labels = labels,
-            id = "someId"
+            id = "someId",
+            qualityThreshold = 1.0f
         )
 
         assertThat(event.id).isEqualTo("someId")
