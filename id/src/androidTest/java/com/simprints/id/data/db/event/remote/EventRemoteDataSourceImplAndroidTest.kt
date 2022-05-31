@@ -433,7 +433,8 @@ class EventRemoteDataSourceImplAndroidTest {
                         result = result,
                         fingerprint = fingerprint,
                         labels = eventLabels,
-                        payloadId = fingerPayloadId
+                        payloadId = fingerPayloadId,
+                        qualityThreshold = 1
                     )
 
                     add(event)
@@ -487,7 +488,8 @@ class EventRemoteDataSourceImplAndroidTest {
                     result = result,
                     face = face,
                     labels = eventLabels,
-                    payloadId = facePayloadId
+                    payloadId = facePayloadId,
+                    qualityThreshold = 1.0f
                 )
 
                 add(event)

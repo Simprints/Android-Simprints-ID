@@ -13,8 +13,9 @@ class FingerprintCaptureBiometricsEventTest {
             endedAt = 0,
             result = FingerprintCaptureBiometricsEvent.Result.GOOD_SCAN,
             fingerprint = null,
-            payloadId = "someId"
-        )
+            payloadId = "someId",
+            qualityThreshold = 1
+            )
 
         val coreEvent = domainEvent.fromDomainToCore()
 

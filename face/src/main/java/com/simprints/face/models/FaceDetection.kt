@@ -66,12 +66,13 @@ data class FaceDetection(
             payloadId = payloadId
         )
 
-    fun toFaceCapturBiomericsEvent( payloadId: String): FaceCaptureBiometricsEvent =
+    fun toFaceCapturBiomericsEvent(qualityThreshold: Float, payloadId: String): FaceCaptureBiometricsEvent =
         FaceCaptureBiometricsEvent(
             startTime = detectionStartTime,
             result = FaceCaptureBiometricsEvent.Result.fromFaceDetectionStatus(status),
             eventFace = FaceCaptureBiometricsEvent.EventFace.fromFaceDetectionFace(face),
-            payloadId = payloadId
+            payloadId = payloadId,
+            qualityThreshold = qualityThreshold
         )
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING

@@ -10,7 +10,7 @@ import org.junit.Test
 class FingerprintCaptureBiometricsEventTest {
 
     @Test
-    fun create_FaceCaptureBiometricsEvent() {
+    fun create_FingerprintCaptureBiometricsEvent() {
         val labels = EventLabels(sessionId = SampleDefaults.GUID1)
         val fingerArg =
             FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(IFingerIdentifier.LEFT_3RD_FINGER, "template")
@@ -19,7 +19,8 @@ class FingerprintCaptureBiometricsEventTest {
             result = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
             fingerprint = fingerArg,
             id = "someId",
-            labels = labels
+            labels = labels,
+            qualityThreshold = 1
         )
 
         assertThat(event.id).isEqualTo("someId")
