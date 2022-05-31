@@ -75,6 +75,7 @@ import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_FIRMWARE_
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.eventsystem.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import com.simprints.eventsystem.event.domain.models.FingerComparisonStrategy
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
@@ -583,6 +584,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 candidateId = randomUUID(),
                 matcher = Matcher.SIM_AFIS,
                 result = MatchEntry(randomUUID(), 0F),
+                fingerComparisonStrategy = FingerComparisonStrategy.SAME_FINGER,
                 labels = eventLabels
             )
         )
@@ -827,7 +829,7 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     // Never invoked, but used to enforce that the implementation of a test for every event class
-    fun MutableList<Event>.addEventFor(type: EventType) {
+    private fun MutableList<Event>.addEventFor(type: EventType) {
 
         when (type) {
             SESSION_CAPTURE -> addSessionCaptureEvent()
@@ -877,8 +879,7 @@ class EventRemoteDataSourceImplAndroidTest {
             ENROLMENT_RECORD_MOVE,
             ENROLMENT_V1,
             FINGERPRINT_CAPTURE,
-            FACE_CAPTURE -> {
-            }
+            FACE_CAPTURE -> {}
         }.safeSealedWhens
     }
 }
