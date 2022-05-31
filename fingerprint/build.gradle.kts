@@ -177,6 +177,7 @@ dependencies {
 
     // Koin
     testImplementation(libs.testing.koin)
+    testImplementation(libs.testing.live.data)
 
     // Robolectric
     testImplementation(libs.testing.robolectric.core)

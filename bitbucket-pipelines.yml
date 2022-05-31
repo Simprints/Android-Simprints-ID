@@ -101,8 +101,11 @@ definitions:
                     - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprint:jacocoTestReport
+                    - ./gradlew fingerprintmatcher:jacocoTestReport
+
                 artifacts:
                     - fingerprint/build/reports/**
+                    - fingerprintmatcher/build/reports/**
 
         ######################################################################
         # Run the Fingerprint Scanner unit tests with coverage and upload

@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimi
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.domain.SyncDestinationSetting
@@ -34,6 +35,7 @@ open class SettingsPreferencesManagerImpl(
     moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
     eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
+    fingerComparisonStrategySerializer: Serializer<FingerComparisonStrategy>,
     saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
     scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
     private val fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
@@ -276,7 +278,14 @@ open class SettingsPreferencesManagerImpl(
             CAPTURE_FINGERPRINT_STRATEGY_DEFAULT,
             captureFingerprintStrategySerializer
         )
-
+    override var fingerComparisonStrategy: FingerComparisonStrategy
+        by RemoteConfigComplexPreference(
+            prefs,
+            remoteConfigWrapper,
+            FINGERPRINT_MATCHING_STRATEGY_FOR_VERIFICATION_KEY,
+            FINGERPRINT_COMPARISON_STRATEGY_FOR_VERIFICATION_DEFAULT,
+            fingerComparisonStrategySerializer
+        )
     override var saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy
         by RemoteConfigComplexPreference(
             prefs,
@@ -438,6 +447,11 @@ open class SettingsPreferencesManagerImpl(
         val CAPTURE_FINGERPRINT_STRATEGY_DEFAULT = CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI
         const val CAPTURE_FINGERPRINT_STRATEGY_KEY = "CaptureFingerprintStrategy"
 
+        val FINGERPRINT_COMPARISON_STRATEGY_FOR_VERIFICATION_DEFAULT =
+            FingerComparisonStrategy.SAME_FINGER
+        const val FINGERPRINT_MATCHING_STRATEGY_FOR_VERIFICATION_KEY =
+            "FingerComparisonStrategyForVerification"
+
         val SAVE_FINGERPRINT_IMAGES_STRATEGY_DEFAULT = SaveFingerprintImagesStrategy.NEVER
         const val SAVE_FINGERPRINT_IMAGES_STRATEGY_KEY = "SaveFingerprintImagesStrategy"
 
@@ -455,7 +469,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val API_BASE_URL_KEY = "ApiBaseUrl"
 
-        const val FACE_MAX_RETRIES_DEFAULT = 2
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
 

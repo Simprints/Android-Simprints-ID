@@ -8,24 +8,20 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
+import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchResult
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.coroutines.flow.Flow
+import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -42,38 +38,64 @@ import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFin
 @RunWith(AndroidJUnit4::class)
 class MatchingViewModelTest : KoinTest {
 
+
     @get:Rule
-    val taskExecutorRule = InstantTaskExecutorRule()
+    var unitTestConfigRule = FullUnitTestConfigRule()
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
     private val mockMatcher: FingerprintMatcher = mockk()
+    private val mockPreferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
+    private val mockFingerprintSessionEventsManager: FingerprintSessionEventsManager =
+        mockk(relaxed = true)
 
     private fun mockSuccessfulMatcher() {
-        coEvery { mockMatcher.match(any(), any(), any()) } coAnswers {
+        every { mockMatcher.match(any(), any(), any(), any()) } coAnswers {
             val probe = this.firstArg<MatcherFingerprintIdentity>()
-            this.secondArg<Flow<MatcherFingerprintIdentity>>()
+            this.secondArg<List<MatcherFingerprintIdentity>>()
                 .map {
-                    MatchResult(it.id, if (doFingerprintsMatch(probe, it)) SUCCESSFUL_MATCH_SCORE else NOT_MATCH_SCORE)
+                    MatchResult(
+                        it.id,
+                        if (doFingerprintsMatch(
+                                probe,
+                                it
+                            )
+                        ) SUCCESSFUL_MATCH_SCORE else NOT_MATCH_SCORE
+                    )
                 }
         }
     }
 
     private fun mockMatcherError() {
-        coEvery { mockMatcher.match(any(), any(), any()) } throws Exception("Oops! Match failed")
+        coEvery {
+            mockMatcher.match(
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        } throws Exception("Oops! Match failed")
     }
+
+    private lateinit var viewModel: MatchingViewModel
 
     @Before
     fun setUp() {
-        acquireFingerprintKoinModules()
-        loadKoinModules(module {
+        val mockModule = module {
+            factory { mockk<FingerprintTimeHelper>(relaxed = true) }
             factory { dbManagerMock }
             factory { masterFlowManager }
-            factory<FingerprintPreferencesManager> { mockk(relaxed = true) }
-            factory<FingerprintSessionEventsManager> { mockk(relaxed = true) }
+            factory { mockPreferencesManager }
+            factory { mockFingerprintSessionEventsManager }
             factory { mockMatcher }
-        })
+        }
+        loadKoinModules(mockModule)
+        viewModel = get()
     }
+
 
     @Test
     fun identifyRequest_startedAndAwaitedWithSuccessfulMatch_finishesWithProbeInMatchResult() {
@@ -83,8 +105,9 @@ class MatchingViewModelTest : KoinTest {
 
         val query = mockk<Serializable>()
         val matchingRequest = MatchingTaskRequest(probeFingerprintRecord.fingerprints, query)
-        val viewModel = createViewModelAndStart(matchingRequest)
-        val result = viewModel.result.test().awaitValue().value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
+        viewModel.start(matchingRequest)
+        val result = viewModel.result.test().awaitValue()
+            .value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
 
         assertNotNull(result)
         result?.let { matchingResult ->
@@ -103,8 +126,9 @@ class MatchingViewModelTest : KoinTest {
 
         val query = mockk<Serializable>()
         val matchingRequest = MatchingTaskRequest(probeFingerprintRecord.fingerprints, query)
-        val viewModel = createViewModelAndStart(matchingRequest)
-        val result = viewModel.result.test().awaitValue().value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
+        viewModel.start(matchingRequest)
+        val result = viewModel.result.test().awaitValue()
+            .value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
 
         assertNotNull(result)
         result?.let { matchingResult ->
@@ -114,13 +138,42 @@ class MatchingViewModelTest : KoinTest {
     }
 
     @Test
-    fun verifyRequest_startedAndAwaited_finishesWithCorrectResult() {
+    fun verifyRequest_startedSameFingerComparisonAndAwaited_finishesWithCorrectResult() {
         mockSuccessfulMatcher()
+        every { mockPreferencesManager.isCrossFingerComparisonEnabledInVerification } returns false
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
-        val viewModel = createViewModelAndStart(verifyRequest)
+        viewModel.start(verifyRequest)
         val result = viewModel.result.test().awaitValue().value()
+
+        val savedEvent = CapturingSlot<OneToOneMatchEvent>()
+        verify { mockFingerprintSessionEventsManager.addEventInBackground(capture(savedEvent)) }
+        assertThat(savedEvent.captured.fingerComparisonStrategy).isEqualTo(FingerComparisonStrategy.SAME_FINGER)
+
+        with(result) {
+            assertEquals(ResultCode.OK, resultCode)
+            assertNotNull(
+                data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.let {
+                    assertEquals(probeFingerprintRecord.personId, it.results.first().guid)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun verifyRequest_startedCrossFingerMatchAndAwaited_finishesWithCorrectResult() {
+        mockSuccessfulMatcher()
+        every { mockPreferencesManager.isCrossFingerComparisonEnabledInVerification } returns true
+        every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
+        setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
+
+        viewModel.start(verifyRequest)
+        val result = viewModel.result.test().awaitValue().value()
+
+        val savedEvent = CapturingSlot<OneToOneMatchEvent>()
+        verify { mockFingerprintSessionEventsManager.addEventInBackground(capture(savedEvent)) }
+        assertThat(savedEvent.captured.fingerComparisonStrategy).isEqualTo(FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX)
 
         with(result) {
             assertEquals(ResultCode.OK, resultCode)
@@ -138,16 +191,18 @@ class MatchingViewModelTest : KoinTest {
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
 
-        with(createViewModel()) {
+        with(viewModel) {
             val progressTestObserver = progress.test()
             start(identifyRequest)
-            result.test().awaitValue().assertValue { it.finishDelayMillis == IdentificationTask.matchingEndWaitTimeInMillis }
+            result.test().awaitValue()
+                .assertValue { it.finishDelayMillis == IdentificationTask.matchingEndWaitTimeInMillis }
             hasLoadingBegun.test().assertValue { it }
             matchBeginningSummary.test().assertValue { it.matchSize == CANDIDATE_POOL + 1 }
             assertThat(progressTestObserver.valueHistory())
                 .containsExactlyElementsIn((0..0) + (25..25) + (50..50) + (100..100))
                 .inOrder()
-            matchFinishedSummary.test().assertValue { it.returnSize == DEFAULT_NUMBER_OF_ID_RETURNS }
+            matchFinishedSummary.test()
+                .assertValue { it.returnSize == DEFAULT_NUMBER_OF_ID_RETURNS }
         }
     }
 
@@ -157,7 +212,7 @@ class MatchingViewModelTest : KoinTest {
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
-        with(createViewModel()) {
+        with(viewModel) {
             val progressTestObserver = progress.test()
             start(verifyRequest)
             result.test().awaitValue()
@@ -173,7 +228,7 @@ class MatchingViewModelTest : KoinTest {
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
 
-        val viewModel = createViewModelAndStart(identifyRequest)
+        viewModel.start(identifyRequest)
 
         with(viewModel) {
             result.test().awaitValue()
@@ -187,7 +242,7 @@ class MatchingViewModelTest : KoinTest {
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
-        val viewModel = createViewModelAndStart(verifyRequest)
+        viewModel.start(verifyRequest)
 
         with(viewModel) {
             result.test().awaitValue()
@@ -195,24 +250,21 @@ class MatchingViewModelTest : KoinTest {
         }
     }
 
-    private fun createViewModelAndStart(request: MatchingTaskRequest) =
-        createViewModel().apply { start(request) }
 
-    private fun createViewModel() = get<MatchingViewModel>()
 
     private fun setupDbManagerLoadCandidates(candidates: List<FingerprintIdentity>) {
         coEvery { dbManagerMock.loadPeople(any()) } returns candidates.asFlow()
     }
 
-    private fun doFingerprintsMatch(probe: MatcherFingerprintIdentity, candidate: MatcherFingerprintIdentity) =
+    private fun doFingerprintsMatch(
+        probe: MatcherFingerprintIdentity,
+        candidate: MatcherFingerprintIdentity
+    ) =
         probe.fingerprints.map { it.template }
-            .zip(candidate.fingerprints.map {it.template})
+            .zip(candidate.fingerprints.map { it.template })
             .all { (first, second) -> first.zip(second).all { (a, b) -> a == b } }
 
-    @After
-    fun tearDown() {
-        releaseFingerprintKoinModules()
-    }
+
 
     companion object {
         private const val NOT_MATCH_SCORE = 0f
@@ -222,15 +274,18 @@ class MatchingViewModelTest : KoinTest {
         private const val CANDIDATE_POOL = 49
 
         private val probeFingerprintRecord = FingerprintGenerator.generateRandomFingerprintRecord()
-        private val candidatesWithoutProbe = FingerprintGenerator.generateRandomFingerprintRecords(CANDIDATE_POOL)
+        private val candidatesWithoutProbe =
+            FingerprintGenerator.generateRandomFingerprintRecords(CANDIDATE_POOL)
         private val candidatesWithProbe = candidatesWithoutProbe + probeFingerprintRecord
 
         private val identifyRequest = MatchingTaskRequest(
             probeFingerprintRecord.fingerprints,
-            mockk())
+            mockk()
+        )
 
         private val verifyRequest = MatchingTaskRequest(
             probeFingerprintRecord.fingerprints,
-            mockk())
+            mockk()
+        )
     }
 }
