@@ -11,6 +11,7 @@ data class ApiFingerprintCaptureBiometricsPayload(
     override val startTime: Long,
     val result: ApiResult,
     val fingerprint: Fingerprint?,
+    val qualityThreshold: Int,
     val id: String,
 ) : ApiEventPayload(ApiEventPayloadType.FingerprintCaptureBiometrics, version, startTime) {
 
@@ -32,6 +33,7 @@ data class ApiFingerprintCaptureBiometricsPayload(
         domainPayload.createdAt,
         domainPayload.result.fromDomainToApi(),
         domainPayload.fingerprint?.let { Fingerprint(it) },
+        domainPayload.qualityThreshold,
         domainPayload.id
     )
 
