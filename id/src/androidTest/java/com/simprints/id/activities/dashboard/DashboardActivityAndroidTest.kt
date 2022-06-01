@@ -17,6 +17,7 @@ import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
@@ -91,6 +92,9 @@ class DashboardActivityAndroidTest {
 
         every { mockPreferencesManager.simprintsSyncSetting } returns
             SimprintsSyncSetting.SIM_SYNC_NONE
+
+        every { mockPreferencesManager.eventDownSyncSetting } returns
+            EventDownSyncSetting.OFF
 
         ActivityScenario.launch(DashboardActivity::class.java)
 
