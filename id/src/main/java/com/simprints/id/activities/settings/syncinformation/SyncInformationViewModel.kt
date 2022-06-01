@@ -82,7 +82,7 @@ class SyncInformationViewModel(
             eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
-        if (isDownSyncAllowed() && preferencesManager.canSyncDataToSimprints()) {
+        if (isDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             null
