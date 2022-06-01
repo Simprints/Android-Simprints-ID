@@ -340,16 +340,14 @@ class CollectFingerprintsViewModel(
             val fingerprintCaptureBiometricsEvent =
                 if (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN) FingerprintCaptureBiometricsEvent(
                     createdAt = lastCaptureStartedAt,
-                    result = FingerprintCaptureBiometricsEvent.buildResult(currentCapture()),
-                    fingerprint = (currentCapture() as? CaptureState.Collected)?.scanResult?.let {
+                    fingerprint = (currentCapture() as CaptureState.Collected).scanResult.let {
                         FingerprintCaptureBiometricsEvent.Fingerprint(
                             finger = id,
                             quality = it.qualityScore,
                             template = encoder.byteArrayToBase64(it.template)
                         )
                     },
-                    payloadId = payloadId,
-                    qualityThreshold = fingerprintPreferencesManager.qualityThreshold,
+                    payloadId = payloadId
                 ) else null
 
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id

@@ -13,14 +13,16 @@ class FingerprintCaptureBiometricsEventTest {
     fun create_FingerprintCaptureBiometricsEvent() {
         val labels = EventLabels(sessionId = SampleDefaults.GUID1)
         val fingerArg =
-            FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(IFingerIdentifier.LEFT_3RD_FINGER, "template")
+            FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+                IFingerIdentifier.LEFT_3RD_FINGER,
+                "template",
+                1
+            )
         val event = FingerprintCaptureBiometricsEvent(
             createdAt = SampleDefaults.CREATED_AT,
-            result = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
             fingerprint = fingerArg,
             id = "someId",
-            labels = labels,
-            qualityThreshold = 1
+            labels = labels
         )
 
         assertThat(event.id).isEqualTo("someId")
@@ -30,7 +32,6 @@ class FingerprintCaptureBiometricsEventTest {
         with(event.payload) {
             assertThat(id).isNotNull()
             assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE_BIOMETRICS)
-            assertThat(result).isEqualTo(FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN)
             assertThat(fingerprint).isEqualTo(fingerArg)
             assertThat(eventVersion).isEqualTo(0)
         }
