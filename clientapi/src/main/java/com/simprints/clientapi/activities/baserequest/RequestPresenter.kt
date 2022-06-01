@@ -183,9 +183,7 @@ abstract class RequestPresenter(
      * Delete the events if returning to a cosync app but not Simprints
      */
     override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.canCoSyncData() &&
-            !sharedPreferencesManager.canSyncDataToSimprints()
-        ) {
+        if (!sharedPreferencesManager.canSyncDataToSimprints()) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
     }
