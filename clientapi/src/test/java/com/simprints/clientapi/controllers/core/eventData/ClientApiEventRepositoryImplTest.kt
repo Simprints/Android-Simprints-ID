@@ -21,9 +21,9 @@ import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -212,11 +212,13 @@ class ClientApiEventRepositoryImplTest {
             ), payload = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload(
                 createdAt = 0,
                 eventVersion = 0,
-                result = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
-                fingerprint = null,
+                fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+                    finger = IFingerIdentifier.LEFT_3RD_FINGER,
+                    template = "",
+                    quality = 0
+                ),
                 id = "",
-                endedAt = 0,
-                qualityThreshold = 1
+                endedAt = 0
             ), type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
         ),
         FaceCaptureBiometricsEvent(
@@ -231,10 +233,11 @@ class ClientApiEventRepositoryImplTest {
                 id = "",
                 createdAt = 0,
                 eventVersion = 0,
-                result = Result.VALID,
-                face = null,
-                endedAt = 0,
-                qualityThreshold = 1.0f
+                face = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+                    template = "",
+                    quality = 0.0f
+                ),
+                endedAt = 0
             ), type = EventType.FACE_CAPTURE_BIOMETRICS
         ),
         ArtificialTerminationEvent(
