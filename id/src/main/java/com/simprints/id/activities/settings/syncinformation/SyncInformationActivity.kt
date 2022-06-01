@@ -195,8 +195,6 @@ class SyncInformationActivity : BaseSplitActivity() {
         }
 
         if (!preferencesManager.canSyncDataToSimprints()) {
-            binding.recordsToDownloadCardView.visibility = View.GONE
-            binding.recordsToDeleteCardView.visibility = View.GONE
             binding.recordsToUploadCardView.visibility = View.GONE
             binding.imagesToUploadCardView.visibility = View.GONE
         }
