@@ -24,7 +24,7 @@ class RequestPresenterTest {
     private val metadataField = "{\"key\": \"some_metadata\"}"
     private val extraField = mapOf("extraField" to "someExtraField")
 
-    lateinit var clientApiSessionEventsManagerMock: ClientApiSessionEventsManager
+    private lateinit var clientApiSessionEventsManagerMock: ClientApiSessionEventsManager
 
 
     @Before
