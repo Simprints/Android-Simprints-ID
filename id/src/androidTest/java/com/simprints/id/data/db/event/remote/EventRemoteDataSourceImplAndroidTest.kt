@@ -415,32 +415,28 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addFingerprintBiometricCaptureEvent() {
-        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.values()
-            .forEach { result ->
-                FingerIdentifier.values().forEach { fingerIdentifier ->
-                    val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
-                        SubjectsGeneratorUtils.getRandomFingerprintSample().template
-                    )
+        FingerIdentifier.values().forEach { fingerIdentifier ->
+            val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
+                SubjectsGeneratorUtils.getRandomFingerprintSample().template
+            )
 
-                    val fingerprint =
-                        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-                            finger = fingerIdentifier.fromDomainToModuleApi(),
-                            template = fakeTemplate,
-                            format = FingerprintTemplateFormat.ISO_19794_2
-                        )
+            val fingerprint =
+                FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+                    finger = fingerIdentifier.fromDomainToModuleApi(),
+                    template = fakeTemplate,
+                    quality = 1,
+                    format = FingerprintTemplateFormat.ISO_19794_2
+                )
 
-                    val event = FingerprintCaptureBiometricsEvent(
-                        createdAt = DEFAULT_TIME,
-                        result = result,
-                        fingerprint = fingerprint,
-                        labels = eventLabels,
-                        payloadId = fingerPayloadId,
-                        qualityThreshold = 1
-                    )
+            val event = FingerprintCaptureBiometricsEvent(
+                createdAt = DEFAULT_TIME,
+                fingerprint = fingerprint,
+                labels = eventLabels,
+                payloadId = fingerPayloadId
+            )
 
-                    add(event)
-                }
-            }
+            add(event)
+        }
     }
 
 
@@ -472,29 +468,25 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addFaceCaptureBiometricCaptureEvent() {
-        FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.values()
-            .forEachIndexed { index, result ->
-                val template = EncodingUtilsImpl.byteArrayToBase64(
-                    SubjectsGeneratorUtils.getRandomFaceSample().template
-                )
+        val template = EncodingUtilsImpl.byteArrayToBase64(
+            SubjectsGeneratorUtils.getRandomFaceSample().template
+        )
 
-                val face =
-                    FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
-                        template = template,
-                        format = FaceTemplateFormat.RANK_ONE_1_23
-                    )
+        val face =
+            FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+                template = template,
+                quality = 1.0f,
+                format = FaceTemplateFormat.RANK_ONE_1_23
+            )
 
-                val event = FaceCaptureBiometricsEvent(
-                    startTime = DEFAULT_TIME,
-                    result = result,
-                    face = face,
-                    labels = eventLabels,
-                    payloadId = facePayloadId,
-                    qualityThreshold = 1.0f
-                )
+        val event = FaceCaptureBiometricsEvent(
+            startTime = DEFAULT_TIME,
+            face = face,
+            labels = eventLabels,
+            payloadId = facePayloadId
+        )
 
-                add(event)
-            }
+        add(event)
     }
 
     private fun MutableList<Event>.addFaceCaptureConfirmationEvent() {
@@ -879,7 +871,8 @@ class EventRemoteDataSourceImplAndroidTest {
             ENROLMENT_RECORD_MOVE,
             ENROLMENT_V1,
             FINGERPRINT_CAPTURE,
-            FACE_CAPTURE -> {}
+            FACE_CAPTURE -> {
+            }
         }.safeSealedWhens
     }
 }
