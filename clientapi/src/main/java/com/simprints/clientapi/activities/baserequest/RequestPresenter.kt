@@ -23,6 +23,8 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
 import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
 import com.simprints.clientapi.data.sharedpreferences.canSyncDataToSimprints
 import com.simprints.clientapi.domain.requests.BaseRequest
@@ -159,7 +161,7 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
-        if (!sharedPreferencesManager.canCoSyncData()) return null
+        if (!sharedPreferencesManager.canCoSyncAllData() && !sharedPreferencesManager.canCoSyncBiometricData()) return null
 
         val recordCreationEvent =
             subjectRepository.load(
