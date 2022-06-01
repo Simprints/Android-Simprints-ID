@@ -18,9 +18,7 @@ data class FingerprintCaptureBiometricsEvent(
 
     constructor(
         createdAt: Long,
-        result: FingerprintCaptureBiometricsPayload.Result,
-        fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint?,
-        qualityThreshold: Int,
+        fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint,
         id: String = randomUUID(),
         labels: EventLabels = EventLabels(),
         payloadId: String = randomUUID()
@@ -30,10 +28,8 @@ data class FingerprintCaptureBiometricsEvent(
         payload = FingerprintCaptureBiometricsPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
-            result = result,
             fingerprint = fingerprint,
-            id = payloadId,
-            qualityThreshold = qualityThreshold
+            id = payloadId
         ),
         type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
     )
@@ -42,10 +38,8 @@ data class FingerprintCaptureBiometricsEvent(
     data class FingerprintCaptureBiometricsPayload(
         override val createdAt: Long,
         override val eventVersion: Int,
-        val result: Result,
-        val fingerprint: Fingerprint?,
+        val fingerprint: Fingerprint,
         val id: String,
-        val qualityThreshold: Int,
         override val type: EventType = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
         override val endedAt: Long = 0
     ) : EventPayload() {
@@ -54,17 +48,9 @@ data class FingerprintCaptureBiometricsEvent(
         data class Fingerprint(
             val finger: IFingerIdentifier,
             val template: String,
+            val quality: Int,
             val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2
         )
-
-        @Keep
-        enum class Result {
-            GOOD_SCAN,
-            BAD_QUALITY,
-            NO_FINGER_DETECTED,
-            SKIPPED,
-            FAILURE_TO_ACQUIRE;
-        }
     }
 
     companion object {
