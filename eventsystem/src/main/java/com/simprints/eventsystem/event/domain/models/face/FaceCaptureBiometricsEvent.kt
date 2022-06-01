@@ -49,15 +49,6 @@ data class FaceCaptureBiometricsEvent(
             val quality: Float,
             val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
         )
-
-        enum class Result {
-            VALID,
-            INVALID,
-            OFF_YAW,
-            OFF_ROLL,
-            TOO_CLOSE,
-            TOO_FAR
-        }
     }
 
     companion object {
