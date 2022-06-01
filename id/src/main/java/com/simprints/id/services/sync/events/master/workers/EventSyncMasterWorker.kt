@@ -85,7 +85,7 @@ open class EventSyncMasterWorker(
             try {
                 crashlyticsLog("Start")
 
-                if (!preferenceManager.canSyncDataToSimprints() && preferenceManager.eventDownSyncSetting == OFF) return@withContext success(
+                if (!preferenceManager.canSyncDataToSimprints() && isDownSyncOff()) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
                 )
 
@@ -130,6 +130,8 @@ open class EventSyncMasterWorker(
             }
         }
     }
+
+    private fun isDownSyncOff() = preferenceManager.eventDownSyncSetting == OFF
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
         val downSyncChainRequired = isEventDownSyncAllowed()
