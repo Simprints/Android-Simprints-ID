@@ -66,7 +66,7 @@ data class FaceDetection(
             payloadId = payloadId
         )
 
-    fun toFaceCapturBiomericsEvent( payloadId: String): FaceCaptureBiometricsEvent =
+    fun toFaceCaptureBiometricsEvent(payloadId: String): FaceCaptureBiometricsEvent =
         FaceCaptureBiometricsEvent(
             startTime = detectionStartTime,
             eventFace = FaceCaptureBiometricsEvent.EventFace.fromFaceDetectionFace(face)!!,

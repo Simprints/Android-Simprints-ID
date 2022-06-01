@@ -479,7 +479,7 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRefusalResponse shouldnt delete events - if can sync to simprints`() {
+    fun `handleRefusalResponse should not delete events - if can sync to simprints`() {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
