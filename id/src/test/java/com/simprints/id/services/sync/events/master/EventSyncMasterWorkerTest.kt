@@ -201,6 +201,7 @@ class EventSyncMasterWorkerTest {
         prepareSyncWorkers(uniqueSyncId)
         every { preferencesManager.cosyncSyncSetting } returns CosyncSetting.COSYNC_ALL
         every { preferencesManager.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_NONE
+        every { preferencesManager.eventDownSyncSetting } returns OFF
 
         masterWorker.doWork()
 

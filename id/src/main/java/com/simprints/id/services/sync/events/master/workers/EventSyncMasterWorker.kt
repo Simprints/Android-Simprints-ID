@@ -18,6 +18,7 @@ import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.logging.Simber
@@ -84,7 +85,7 @@ open class EventSyncMasterWorker(
             try {
                 crashlyticsLog("Start")
 
-                if (!preferenceManager.canSyncDataToSimprints()) return@withContext success(
+                if (!preferenceManager.canSyncDataToSimprints() && preferenceManager.eventDownSyncSetting == OFF) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
                 )
 
@@ -93,20 +94,21 @@ open class EventSyncMasterWorker(
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
-                    val startSyncReporterWorker =
-                        eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                    val upSyncWorkers = upSyncWorkersChain(uniqueSyncId).also {
-                        Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
-                    }
+                    val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    val workerChain = mutableListOf<OneTimeWorkRequest>()
+                    if (preferenceManager.canSyncDataToSimprints())
+                        workerChain += upSyncWorkersChain(uniqueSyncId).also {
+                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
+                        }
 
-                    val downSyncWorkers = downSyncWorkersChain(uniqueSyncId).also {
-                        Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
-                    }
+                    if (preferenceManager.eventDownSyncSetting != OFF)
+                        workerChain += downSyncWorkersChain(uniqueSyncId).also {
+                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
+                        }
 
-                    val chain = upSyncWorkers + downSyncWorkers
                     val endSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    wm.beginWith(startSyncReporterWorker).then(chain).then(endSyncReporterWorker)
+                    wm.beginWith(startSyncReporterWorker).then(workerChain).then(endSyncReporterWorker)
                         .enqueue()
 
                     eventSyncCache.clearProgresses()
