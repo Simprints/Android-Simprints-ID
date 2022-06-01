@@ -17,7 +17,6 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.Event
-import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEvent
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
@@ -233,11 +232,8 @@ class LiveFeedbackFragmentViewModelTest {
                     assertThat(startTime).isEqualTo(2)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                    assertThat(result).isEqualTo(FaceCaptureBiometricsEvent.Result.VALID)
                     assertThat(eventFace).isNotNull()
-                    eventFace?.let {
-                        assertThat(it.format).isEqualTo(FaceTemplateFormat.MOCK)
-                    }
+                    assertThat(eventFace.format).isEqualTo(FaceTemplateFormat.MOCK)
                 }
                 true
             })
@@ -263,9 +259,8 @@ class LiveFeedbackFragmentViewModelTest {
                     assertThat(startTime).isEqualTo(4)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                    assertThat(result).isEqualTo(FaceCaptureBiometricsEvent.Result.VALID)
                     assertThat(eventFace).isNotNull()
-                    eventFace?.let {
+                    eventFace.let {
                         assertThat(it.format).isEqualTo(FaceTemplateFormat.MOCK)
                     }
                 }
@@ -293,11 +288,9 @@ class LiveFeedbackFragmentViewModelTest {
                     assertThat(startTime).isEqualTo(0)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
-                    assertThat(result).isEqualTo(FaceCaptureBiometricsEvent.Result.VALID)
                     assertThat(eventFace).isNotNull()
-                    eventFace?.let {
-                        assertThat(it.format).isEqualTo(FaceTemplateFormat.MOCK)
-                    }
+                    assertThat(eventFace.format).isEqualTo(FaceTemplateFormat.MOCK)
+
                 }
                 true
             })

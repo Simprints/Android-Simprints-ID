@@ -172,7 +172,6 @@ class LiveFeedbackFragmentViewModel(
 
         val faceCaptureBiometricsEvent =
             if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCapturBiomericsEvent(
-                qualityThreshold,
                 payloadId
             ) else null
 

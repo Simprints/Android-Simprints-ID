@@ -181,14 +181,13 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
 fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
     val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
         template = "",
+        quality = 1.0f,
         format = FaceTemplateFormat.RANK_ONE_1_23
     )
     return FaceCaptureBiometricsEvent(
         startTime = CREATED_AT,
-        result = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Result.VALID,
         face = faceArg,
-        labels = eventLabels,
-        qualityThreshold = 1.0f
+        labels = eventLabels
     )
 }
 
@@ -197,14 +196,13 @@ fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent
         FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
             LEFT_3RD_FINGER,
             "",
+            1,
             FingerprintTemplateFormat.ISO_19794_2
         )
     return FingerprintCaptureBiometricsEvent(
         CREATED_AT,
-        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Result.GOOD_SCAN,
         fingerprint,
-        labels = eventLabels,
-        qualityThreshold = 1
+        labels = eventLabels
     )
 }
 
@@ -382,7 +380,12 @@ fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventL
 fun createConnectivitySnapshotEvent() =
     ConnectivitySnapshotEvent(
         CREATED_AT,
-        listOf(Connection(SimNetworkUtils.ConnectionType.MOBILE, SimNetworkUtils.ConnectionState.CONNECTED)),
+        listOf(
+            Connection(
+                SimNetworkUtils.ConnectionType.MOBILE,
+                SimNetworkUtils.ConnectionState.CONNECTED
+            )
+        ),
         eventLabels
     )
 
@@ -448,9 +451,15 @@ fun createOneToManyMatchEvent(): OneToManyMatchEvent {
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     val matchEntry = MatchEntry(GUID1, 10F)
-    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, SIM_AFIS, matchEntry
-        ,FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
-        , eventLabels)
+    return OneToOneMatchEvent(
+        CREATED_AT,
+        ENDED_AT,
+        GUID1,
+        SIM_AFIS,
+        matchEntry,
+        FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+        eventLabels
+    )
 }
 
 fun createPersonCreationEvent() =

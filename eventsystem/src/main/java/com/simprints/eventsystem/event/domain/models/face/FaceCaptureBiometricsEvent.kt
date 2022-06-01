@@ -17,10 +17,8 @@ data class FaceCaptureBiometricsEvent(
 
     constructor(
         startTime: Long,
-        result: FaceCaptureBiometricsPayload.Result,
-        face: FaceCaptureBiometricsPayload.Face?,
+        face: FaceCaptureBiometricsPayload.Face,
         labels: EventLabels = EventLabels(),
-        qualityThreshold: Float,
         id: String = randomUUID(),
         payloadId: String = randomUUID()
     ) : this(
@@ -29,8 +27,6 @@ data class FaceCaptureBiometricsEvent(
         FaceCaptureBiometricsPayload(
             createdAt = startTime,
             eventVersion = EVENT_VERSION,
-            result = result,
-            qualityThreshold = qualityThreshold,
             face = face,
             id = payloadId
         ),
@@ -42,9 +38,7 @@ data class FaceCaptureBiometricsEvent(
         val id: String,
         override val createdAt: Long,
         override val eventVersion: Int,
-        val result: Result,
-        val face: Face?,
-        val qualityThreshold: Float,
+        val face: Face,
         override var endedAt: Long = 0,
         override val type: EventType = EventType.FACE_CAPTURE_BIOMETRICS
     ) : EventPayload() {
@@ -52,6 +46,7 @@ data class FaceCaptureBiometricsEvent(
         @Keep
         data class Face(
             val template: String,
+            val quality: Float,
             val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
         )
 

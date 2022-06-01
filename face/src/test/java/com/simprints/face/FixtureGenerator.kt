@@ -59,13 +59,12 @@ object FixtureGenerator {
     val faceCaptureBiometricsEvent1 = FaceCaptureBiometricsEvent(
         startTime = 2,
         endTime = 0,
-        result = FaceCaptureBiometricsEvent.Result.VALID,
         eventFace = FaceCaptureBiometricsEvent.EventFace(
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
+            quality = 1.0f,
             format = FaceTemplateFormat.MOCK
         ),
-        payloadId = "someId",
-        qualityThreshold = -1.0f
+        payloadId = "someId"
     )
 
     val faceCaptureEvent2 = FaceCaptureEvent(
@@ -86,13 +85,12 @@ object FixtureGenerator {
     val faceCaptureBiometricsEvent2 = FaceCaptureBiometricsEvent(
         startTime = 4,
         endTime = 0,
-        result = FaceCaptureBiometricsEvent.Result.VALID,
         eventFace = FaceCaptureBiometricsEvent.EventFace(
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
+            quality = 1.0f,
             format = FaceTemplateFormat.MOCK
         ),
-        payloadId = "someId",
-        qualityThreshold = -1.0f
+        payloadId = "someId"
     )
 
     val faceCaptureEvent3 = FaceCaptureEvent(
@@ -113,12 +111,11 @@ object FixtureGenerator {
     val faceCaptureBiometricsEvent3 = FaceCaptureBiometricsEvent(
         startTime = 0,
         endTime = 0,
-        result = FaceCaptureBiometricsEvent.Result.VALID,
         eventFace = FaceCaptureBiometricsEvent.EventFace(
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
+            quality = 1.0f,
             format = FaceTemplateFormat.MOCK
         ),
-        payloadId = "someId",
-        qualityThreshold = -1.0f
+        payloadId = "someId"
     )
 }
