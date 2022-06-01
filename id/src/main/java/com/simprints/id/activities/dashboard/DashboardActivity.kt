@@ -31,6 +31,7 @@ import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
 import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.logging.Simber
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -146,7 +147,7 @@ class DashboardActivity : BaseSplitActivity() {
         dailyActivityCardDisplayer.initRoot(dailyActivityBinding.dashboardDailyActivityCardRoot)
 
         // init sync-card only when syncing to BFSID is allowed
-        if (settingsPreferencesManager.canSyncDataToSimprints()) {
+        if (settingsPreferencesManager.canSyncDataToSimprints() || settingsPreferencesManager.eventDownSyncSetting != EventDownSyncSetting.OFF) {
             syncCardDisplayer.initRoot(binding.dashboardSyncCard)
         }
     }
@@ -206,7 +207,7 @@ class DashboardActivity : BaseSplitActivity() {
         loadDailyActivity()
 
         // trigger sync ticker only when syncing to BFSID
-        if (settingsPreferencesManager.canSyncDataToSimprints()) {
+        if (settingsPreferencesManager.canSyncDataToSimprints() || settingsPreferencesManager.eventDownSyncSetting != EventDownSyncSetting.OFF) {
             startTickerToCheckIfSyncIsRequired()
         }
     }
