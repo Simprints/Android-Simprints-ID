@@ -106,7 +106,8 @@ class EventMigrationTest {
             EventMigration3to4(),
             EventMigration4to5(),
             EventMigration5to6(),
-            EventMigration6to7()
+            EventMigration6to7(),
+            EventMigration7to8()
         )
     }
 }
