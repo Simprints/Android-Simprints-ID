@@ -152,7 +152,7 @@ class EventMigration7to8 : Migration(7, 8) {
         }\",\"quality\":${faceObject.getDouble("quality")},\"format\":\"RANK_ONE_1_23\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", "$eventId")
+            this.put("id", eventId)
             this.put("type", FACE_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
             this.put("createdAt", createdAt)
