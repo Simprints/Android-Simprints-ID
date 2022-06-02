@@ -6,9 +6,6 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
@@ -31,8 +28,6 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
-import com.simprints.id.data.db.subject.migration.SubjectToEventDbMigrationManagerImpl
-import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.license.local.LicenseLocalDataSource
@@ -41,7 +36,6 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import dagger.Module
@@ -164,23 +158,6 @@ open class DataModule {
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
 
-    @Provides
-    open fun provideSubjectToEventMigrationManager(
-        loginInfoManager: LoginInfoManager,
-        eventLocal: EventLocalDataSource,
-        timeHelper: TimeHelper,
-        preferencesManager: IdPreferencesManager,
-        subjectLocal: SubjectLocalDataSource,
-        encoder: EncodingUtils
-    ): SubjectToEventMigrationManager =
-        SubjectToEventDbMigrationManagerImpl(
-            loginInfoManager,
-            eventLocal,
-            timeHelper,
-            preferencesManager,
-            subjectLocal,
-            encoder
-        )
 
     @Provides
     open fun provideLicenseLocalDataSource(context: Context): LicenseLocalDataSource =

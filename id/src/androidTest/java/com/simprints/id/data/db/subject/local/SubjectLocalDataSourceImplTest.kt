@@ -132,69 +132,6 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         assertThat(count).isEqualTo(1)
     }
 
-    @Test
-    fun insertOrUpdatePerson_shouldSucceed() = runBlocking {
-        val fakePerson = getFakePerson()
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
-
-        realm.executeTransaction {
-            assertThat(realm.where(DbSubject::class.java).count()).isEqualTo(1)
-            assertThat(
-                realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)
-            ).isTrue()
-        }
-    }
-
-    @Test
-    fun insertOrUpdateSamePerson_shouldSaveOnlyAPerson() = runBlocking {
-        val fakePerson = getFakePerson()
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
-
-        realm.executeTransaction {
-            assertThat(realm.where(DbSubject::class.java).count()).isEqualTo(1)
-            assertThat(
-                realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)
-            ).isTrue()
-        }
-    }
-
-    @Test
-    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFingerprintRecords() = runBlocking {
-        val fakePerson1 = getFakePerson()
-        val fakePerson2 = getFakePerson()
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
-
-        val fingerprintIdentityLocalDataSource =
-            (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
-        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(
-            SubjectQuery()
-        ).toList()
-        realm.executeTransaction {
-            with(fingerprintIdentities) {
-                verifyIdentity(fakePerson1, find { it.patientId == fakePerson1.subjectId }!!)
-                verifyIdentity(fakePerson2, find { it.patientId == fakePerson2.subjectId }!!)
-            }
-        }
-    }
-
-    @Test
-    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFaceRecords() = runBlocking {
-        val fakePerson1 = getFakePerson()
-        val fakePerson2 = getFakePerson()
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
-        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
-
-        val faceIdentityDataSource = (subjectLocalDataSource as FaceIdentityLocalDataSource)
-        val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectQuery()).toList()
-        realm.executeTransaction {
-            with(faceRecords) {
-                verifyIdentity(fakePerson1, find { it.personId == fakePerson1.subjectId }!!)
-                verifyIdentity(fakePerson2, find { it.personId == fakePerson2.subjectId }!!)
-            }
-        }
-    }
 
     @Test
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
