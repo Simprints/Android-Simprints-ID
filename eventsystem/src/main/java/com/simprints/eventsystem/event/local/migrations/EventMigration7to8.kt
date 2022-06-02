@@ -1,9 +1,12 @@
 package com.simprints.eventsystem.event.local.migrations
 
+import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.logging.Simber
 import org.json.JSONObject
 
@@ -71,8 +74,10 @@ class EventMigration7to8 : Migration(7, 8) {
 
         faceCaptureQuery.use {
             while (it.moveToNext()) {
+                val payloadId = randomUUID()
                 val id = it.getStringWithColumnName("id")
-                migrateFaceCaptureEventPayloadType(it, database, id)
+                migrateFaceCaptureEventPayloadType(it, database, id, payloadId)
+                createAndInsertFaceCaptureBiometricsEventValues(database, it, payloadId)
             }
         }
     }
@@ -81,11 +86,13 @@ class EventMigration7to8 : Migration(7, 8) {
      * Remove the template field and update the event version
      */
     private fun migrateFaceCaptureEventPayloadType(
-        it: Cursor?,
+        cursor: Cursor?,
         database: SupportSQLiteDatabase,
-        id: String?
+        id: String?,
+        payloadId: String
     ) {
-        val jsonData = it?.getStringWithColumnName(DB_EVENT_JSON_FIELD)
+
+        val jsonData = cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)
 
         jsonData?.let {
             val originalJson = JSONObject(jsonData)
@@ -95,9 +102,10 @@ class EventMigration7to8 : Migration(7, 8) {
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
             newPayload.remove(OLD_FACE_CAPTURE_EVENT)
             newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
+            newPayload.put(DB_ID_FIELD, payloadId)
 
-            val fingerprint = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
-            fingerprint.remove(PAYLOAD_TYPE_NAME)
+            val face = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
+            face.remove(PAYLOAD_TYPE_NAME)
             newPayload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
@@ -105,14 +113,67 @@ class EventMigration7to8 : Migration(7, 8) {
         }
     }
 
+    private fun createAndInsertFaceCaptureBiometricsEventValues(
+        database: SupportSQLiteDatabase,
+        cursor: Cursor?,
+        payloadId: String
+    ) {
+        val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
+        val payload = originalObject.getJSONObject("payload")
+        val faceObject = payload.getJSONObject("face")
+        val labels = originalObject.getJSONObject("labels")
+        val createdAt = payload.getLong("createdAt")
+        val eventId = randomUUID()
+        val evet = """      
+                    {
+                      "type": "FACE_CAPTURE_BIOMETRICS",
+                      "labels": {
+                        "projectId": "${labels.getString("projectId")}",
+                      },
+                      "payload": {
+                        "id": "$payloadId",
+                        "type": "FACE_CAPTURE_BIOMETRICS",
+                        "eventVersion": 0,
+                        "createdAt": $createdAt,
+                        "endedAt": 0,
+                        "face": {
+                          "template": "${faceObject.getString("template")}",
+                          "quality": ${faceObject.getDouble("quality")},
+                          "format" : "RANK_ONE_1_23"
+                        }
+                      }
+                    }
+            """.trimIndent()
+
+        val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"moduleIds\":[],\"mode\":[]},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"template\":\"${
+            faceObject.getString(
+                "template"
+            )
+        }\",\"quality\":${faceObject.getDouble("quality")},\"format\":\"RANK_ONE_1_23\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+
+        val faceCaptureBiometricsEvent = ContentValues().apply {
+            this.put("id", "$eventId")
+            this.put("type", FACE_CAPTURE_BIOMETRICS)
+            this.put("eventJson", event)
+            this.put("createdAt", createdAt)
+            this.put("endedAt", 0)
+            this.put("sessionIsClosed", 0)
+        }
+
+        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
+    }
+
     companion object {
         private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
         private const val NEW_FACE_CAPTURE_EVENT = "FACE_CAPTURE_V3"
         private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
         private const val NEW_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE_V3"
+        private const val FINGERPRINT_CAPTURE_BIOMETRICS = "FINGERPRINT_CAPTURE_BIOMETRICS"
+        private const val FACE_CAPTURE_BIOMETRICS = "FACE_CAPTURE_BIOMETRICS"
         private const val VERSION_PAYLOAD_NAME = "eventVersion"
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val DB_EVENT_TYPE_FIELD = "type"
+        private const val DB_ID_FIELD = "id"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FACE = "face"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT = "fingerprint"

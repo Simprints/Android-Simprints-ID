@@ -14,14 +14,10 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventLabels
-import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.local.EventRoomDatabase
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject
 import org.junit.Rule
@@ -71,16 +67,38 @@ class EventMigration7To8Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        val faceCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
 
-        val event = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
-        val payloadJsonObject = JSONObject(eventJson).getJSONObject("payload")
-        val fingerprintObject = payloadJsonObject.getJSONObject("face")
+        val faceCaptureBiometricsEventJson = db.query(
+            "SELECT * FROM DbEvent WHERE type = ?", arrayOf("FACE_CAPTURE_BIOMETRICS")
+        ).apply { moveToNext() }.getStringWithColumnName("eventJson")!!
 
-        assertThat(event).isInstanceOf(FaceCaptureEventV3::class.java)
-        assertThat(event.payload.eventVersion).isEqualTo(3)
-        assertThat(fingerprintObject.has("template")).isFalse()
+        val faceCaptureEvent =
+            JsonHelper.fromJson(faceCaptureEventJson, object : TypeReference<Event>() {})
+        val faceCaptureBiometricsEvent =
+            JsonHelper.fromJson(faceCaptureBiometricsEventJson, object : TypeReference<Event>() {})
+
+        val fingerprintCapturePayload = JSONObject(faceCaptureEventJson).getJSONObject("payload")
+        val fingerprintCaptureFace = fingerprintCapturePayload.getJSONObject("face")
+        val fingerprintCaptureBiometricsPayload =
+            JSONObject(faceCaptureBiometricsEventJson).getJSONObject("payload")
+        val fingerprintCaptureBiometricsFace =
+            fingerprintCaptureBiometricsPayload.getJSONObject("face")
+
+        assertThat(faceCaptureEvent).isInstanceOf(FaceCaptureEventV3::class.java)
+        assertThat(faceCaptureEvent.payload.eventVersion).isEqualTo(3)
+        assertThat(fingerprintCaptureFace.has("template")).isFalse()
+
+        assertThat(faceCaptureBiometricsEvent).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
+        assertThat(faceCaptureBiometricsEvent.payload.eventVersion).isEqualTo(0)
+        assertThat(fingerprintCaptureBiometricsFace.has("template")).isTrue()
+        assertThat((faceCaptureBiometricsEvent as FaceCaptureBiometricsEvent).payload.face.template).isEqualTo(
+            "some_face_template"
+        )
+        assertThat(faceCaptureBiometricsEvent.payload.id).isEqualTo(
+            (faceCaptureEvent as FaceCaptureEventV3).payload.id
+        )
     }
 
     private fun setupV7DbWithFaceCaptureEvent(
@@ -102,71 +120,84 @@ class EventMigration7To8Test {
     }
 
     private fun createFingerprintCaptureEvent(id: String) = ContentValues().apply {
-        put("id", id)
-        put("type", OLD_FINGERPRINT_CAPTURE_EVENT)
+        this.put("id", id)
+        this.put("type", OLD_FINGERPRINT_CAPTURE_EVENT)
 
-        val event = FingerprintCaptureEvent(
-            id = id, labels = EventLabels(
-                projectId = SOME_PROJECT_ID
-            ), payload = FingerprintCaptureEvent.FingerprintCapturePayload(
-                createdAt = 1611584017198,
-                eventVersion = 2,
-                endedAt = 0,
-                finger = IFingerIdentifier.LEFT_3RD_FINGER,
-                qualityThreshold = 0,
-                result = FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN,
-                fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-                    finger = IFingerIdentifier.LEFT_3RD_FINGER,
-                    quality = 0,
-                    template = SOME_TEMPLATE
-                ),
-                id = id
-            ), type = EventType.FINGERPRINT_CAPTURE
-        )
+        val event =
+            """
+                {
+                "id":"2022ae95-d4c0-469c-85d6-750659598bbd",
+                "labels":{
+                    "projectId":"some_project_id"
+                },
+                "payload":{
+                    "createdAt":1611584017198,
+                    "eventVersion":2,
+                    "endedAt":0,
+                    "finger":"LEFT_3RD_FINGER",
+                    "qualityThreshold":0,
+                    "result":"GOOD_SCAN",
+                    "fingerprint":{
+                        "finger":"LEFT_3RD_FINGER",
+                        "quality":0,
+                        "template":"some_template",
+                        "format":"ISO_19794_2"
+                        },
+                "id":"2022ae95-d4c0-469c-85d6-750659598bbd",
+                "type":"FINGERPRINT_CAPTURE"
+                        },
+                "type":"FINGERPRINT_CAPTURE"}
+                """
+                .trimIndent()
 
-        put("eventJson", JsonHelper.toJson(event))
-        put("createdAt", 1611584017198)
-        put("endedAt", 0)
-        put("sessionIsClosed", 0)
+        this.put("eventJson", event)
+        this.put("createdAt", 1611584017198)
+        this.put("endedAt", 0)
+        this.put("sessionIsClosed", 0)
     }
 
     private fun createFaceCaptureEvent(id: String) = ContentValues().apply {
         put("id", id)
         put("type", OLD_FACE_CAPTURE_EVENT)
 
-        val event = FaceCaptureEvent(
-            id = id, labels = EventLabels(
-                projectId = SOME_PROJECT_ID
-            ), payload = FaceCaptureEvent.FaceCapturePayload(
-                id = id,
-                createdAt = 1611584017198,
-                endedAt = 0,
-                eventVersion = 2,
-                attemptNb = 0,
-                qualityThreshold = 0.0f,
-                result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
-                isFallback = false,
-                face = FaceCaptureEvent.FaceCapturePayload.Face(
-                    yaw = 0.0f,
-                    roll = 0.0f,
-                    quality = 0.0f,
-                    template = SOME_FACE_TEMPLATE
-                )
-            ), type = EventType.FACE_CAPTURE
-        )
+        val event =
+            """
+                {
+                "id":"977f54f6-a1b8-46d0-a1f4-d1e0685926b9",
+                "labels":{
+                    "projectId":"some_project_id"
+                },
+                "payload":{
+                    "id":"977f54f6-a1b8-46d0-a1f4-d1e0685926b9",
+                    "createdAt":1611584017198,
+                    "endedAt":0,
+                    "eventVersion":2,
+                    "attemptNb":0,
+                    "qualityThreshold":0.0,
+                    "result":"VALID",
+                    "isFallback":false,
+                    "face":{
+                        "yaw":0.0,
+                        "roll":0.0,
+                        "quality":0.0,
+                        "template":"some_face_template",
+                        "format":"RANK_ONE_1_23"
+                        },
+                    "type":"FACE_CAPTURE"
+                },
+                "type":"FACE_CAPTURE"
+                }"""
+                .trimIndent()
 
-        put("eventJson", JsonHelper.toJson(event))
+        put("eventJson", event)
         put("createdAt", 1611584017198)
         put("endedAt", 0)
         put("sessionIsClosed", 0)
     }
 
     companion object {
-        private const val SOME_TEMPLATE = "some_template"
         private const val TEST_DB = "some_db"
-        private const val SOME_PROJECT_ID = "some_project_id"
         private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
-        private const val SOME_FACE_TEMPLATE = "some_face_template"
         private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
     }
 }
