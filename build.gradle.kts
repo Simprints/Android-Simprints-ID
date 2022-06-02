@@ -8,7 +8,6 @@ apply {
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://plugins.gradle.org/m2/")
@@ -17,37 +16,32 @@ buildscript {
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:7.1.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.kotlin_version}")
+        classpath("com.android.tools.build:gradle:7.1.3")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
 
         // CI Scanning & Retry
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
-        classpath("org.ow2.asm:asm:9.2")
+        classpath("org.ow2.asm:asm:9.3")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.80.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.3.1")
+        classpath("org.gradle:test-retry-gradle-plugin:1.3.2")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.10")
         classpath("com.google.firebase:perf-plugin:1.4.1")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.1")
 
-        // Dependency Publishing
-        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
-        classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.27.1")
-
         // Realm Database
         classpath("io.realm:realm-gradle-plugin:10.11.0")
 
         // Android X Navigation components
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.androidx_navigation_version}")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.0")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.1")
     }
 
 }
@@ -55,7 +49,6 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven {
             name = "SimMatcherGitHubPackages"
@@ -90,7 +83,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.3.1"
+    id("org.gradle.test-retry") version "1.3.2"
 }
 
 /*

@@ -1,0 +1,30 @@
+{
+  "id": "a9c08491-823f-4324-9a61-c35503262f38",
+  "type": "ONE_TO_MANY_MATCH",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "ONE_TO_MANY_MATCH",
+    "eventVersion": 1,
+    "createdAt": 2213456705,
+    "endedAt": 4145678930,
+    "pool": {
+      "type": "PROJECT",
+      "count": 1040
+    },
+    "matcher":"SIM_AFIS",
+    "result": [
+      {
+        "candidateId": "4ba6d889-1ac5-4067-8dba-3d7c320de03c",
+        "score": 42.24
+      },
+      {
+        "candidateId": "ebdf58be-5e32-4da2-9721-ee73f2d63cfe",
+        "score": 24.42
+      }
+    ]
+  }
+}

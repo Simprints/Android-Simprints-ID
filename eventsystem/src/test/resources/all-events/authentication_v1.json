@@ -1,0 +1,20 @@
+{
+  "id": "67015ae6-7eee-47e0-a2a4-51830bc06ea9",
+  "type": "AUTHENTICATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "AUTHENTICATION",
+    "eventVersion": 1,
+    "createdAt": 2134567076,
+    "endedAt": 3456789308,
+    "result":"AUTHENTICATED",
+    "userInfo": {
+      "projectId": "TEST6Oai41ps1pBNrzBL",
+      "userId": "user1"
+    }
+  }
+}

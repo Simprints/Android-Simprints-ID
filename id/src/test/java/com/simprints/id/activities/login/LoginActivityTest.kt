@@ -75,7 +75,12 @@ class LoginActivityTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule, viewModelModule = viewModelModule).fullSetup()
+        UnitTestConfig(
+            this,
+            module,
+            preferencesModule,
+            viewModelModule = viewModelModule
+        ).fullSetup()
     }
 
     @Test
@@ -280,8 +285,8 @@ class LoginActivityTest {
 
     companion object {
         private const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE =
-            "The systems are currently under maintenance. Please try again after 10 minutes, 00 seconds."
+            "The system is currently offline for maintenance. Please try again after 10 minutes, 00 seconds"
         private const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE =
-            "The systems are currently under maintenance. Please try again later."
+            "The system is currently offline for maintenance. Please try again later."
     }
 }

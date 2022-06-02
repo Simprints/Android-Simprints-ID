@@ -8,7 +8,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintTo
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class OrchestratorActivity : FingerprintActivity() {
 

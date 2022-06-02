@@ -1,0 +1,17 @@
+{
+  "id": "654139a8-a4ba-40e1-a2f1-ff3ac7a04348",
+  "type": "REFUSAL",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "REFUSAL",
+    "eventVersion": 1,
+    "createdAt": 221345670,
+    "endedAt": 9145678930,
+    "reason": "REFUSED_RELIGION",
+    "otherText":"refused"
+  }
+}

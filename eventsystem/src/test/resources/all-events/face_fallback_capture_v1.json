@@ -1,0 +1,15 @@
+{
+  "id": "76f8580d-2f8b-416d-b5b7-4a830349a208",
+  "type": "FACE_FALLBACK_CAPTURE",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "FACE_FALLBACK_CAPTURE",
+    "eventVersion": 1,
+    "createdAt": 6781345670,
+    "endedAt": 12345678930
+  }
+}

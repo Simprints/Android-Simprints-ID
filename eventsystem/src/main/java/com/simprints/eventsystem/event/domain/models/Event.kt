@@ -2,7 +2,6 @@ package com.simprints.eventsystem.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.AUTHENTICATION_KEY

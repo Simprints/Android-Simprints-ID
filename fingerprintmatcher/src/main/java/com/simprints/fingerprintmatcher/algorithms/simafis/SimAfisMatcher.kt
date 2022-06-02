@@ -1,14 +1,10 @@
 package com.simprints.fingerprintmatcher.algorithms.simafis
 
-import com.simprints.fingerprintmatcher.domain.FingerIdentifier.*
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerIdentifier
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerprint
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson
 import com.simprints.fingerprintmatcher.domain.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import com.simprints.fingerprintmatcher.domain.FingerIdentifier.*
 
 /**
  * SimAFIS is Simprints' improvement over SourceAFIS, an open source fingerprint matching algorithm
@@ -19,26 +15,37 @@ import kotlinx.coroutines.flow.toList
  * list. It does not currently support progress indication and matching results are only available
  * when all matching is completed.
  */
-internal class SimAfisMatcher {
+internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface = JNILibAfis) {
 
-    suspend fun match(
+    fun match(
         probe: FingerprintIdentity,
-        candidates: Flow<FingerprintIdentity>
-    ): Flow<MatchResult> {
+        candidates: List<FingerprintIdentity>,
+        crossFingerComparison: Boolean
+    ): List<MatchResult> {
+        return if (crossFingerComparison) {
+            crossFingerMatch(probe, candidates)
+        } else {
+            match(probe, candidates)
+        }
+    }
 
-        val simAfisCandidates = candidates.map { it.toSimAfisPerson() }.toList()
+    private fun match(
+        probe: FingerprintIdentity,
+        candidates: List<FingerprintIdentity>
+    ): List<MatchResult> {
+        val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
-        println("Matching ${simAfisCandidates.size} candidates using all ${JNILibAfis.getNbCores()} cores")
+        println("Matching ${simAfisCandidates.size} candidates using all ${jniLibAfis.getNbCores()} cores")
 
-        val results = JNILibAfis.identify(
+        val results = jniLibAfis.identify(
             probe.toSimAfisPerson(),
             simAfisCandidates,
-            JNILibAfis.getNbCores()
-        ) ?: floatArrayOf()
+            jniLibAfis.getNbCores()
+        )
 
         return results.zip(simAfisCandidates).map { (score, candidate) ->
             MatchResult(candidate.guid, score)
-        }.asFlow()
+        }
     }
 
     private fun FingerprintIdentity.toSimAfisPerson(): SimAfisPerson =
@@ -63,4 +70,10 @@ internal class SimAfisMatcher {
             LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
             LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
         }
+
+    private fun crossFingerMatch(
+        probe: FingerprintIdentity,
+        candidates: List<FingerprintIdentity>
+    ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
+
 }
