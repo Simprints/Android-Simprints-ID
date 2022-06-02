@@ -121,29 +121,8 @@ class EventMigration7to8 : Migration(7, 8) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject("payload")
         val faceObject = payload.getJSONObject("face")
-        val labels = originalObject.getJSONObject("labels")
         val createdAt = payload.getLong("createdAt")
         val eventId = randomUUID()
-        val evet = """      
-                    {
-                      "type": "FACE_CAPTURE_BIOMETRICS",
-                      "labels": {
-                        "projectId": "${labels.getString("projectId")}",
-                      },
-                      "payload": {
-                        "id": "$payloadId",
-                        "type": "FACE_CAPTURE_BIOMETRICS",
-                        "eventVersion": 0,
-                        "createdAt": $createdAt,
-                        "endedAt": 0,
-                        "face": {
-                          "template": "${faceObject.getString("template")}",
-                          "quality": ${faceObject.getDouble("quality")},
-                          "format" : "RANK_ONE_1_23"
-                        }
-                      }
-                    }
-            """.trimIndent()
 
         val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"moduleIds\":[],\"mode\":[]},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"template\":\"${
             faceObject.getString(
