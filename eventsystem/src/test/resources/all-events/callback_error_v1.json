@@ -1,0 +1,16 @@
+{
+  "id": "eabce8b2-7a04-47ee-9aaa-b41d18590985",
+  "type": "CALLBACK_ERROR",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CALLBACK_ERROR",
+    "eventVersion": 1,
+    "createdAt": 9345678901,
+    "endedAt": 0,
+    "reason": "GUID_NOT_FOUND_ONLINE"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "84cc7fc5-ee9b-4434-9ae4-6041de9c28b4",
+  "type": "VERO_2_INFO_SNAPSHOT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "VERO_2_INFO_SNAPSHOT",
+    "eventVersion": 1,
+    "createdAt": 221675670,
+    "endedAt": 9141278930,
+    "version": {
+      "cypressApi": "1.0",
+      "cypressApp": "1.1",
+      "master": "844424930328578",
+      "stmApi": "1.0",
+      "stmApp": "1.1",
+      "un20Api": "1.0",
+      "un20App": "1.0"
+    },
+    "battery": {
+      "charge": "83",
+      "current": "-21",
+      "temperature": "3065",
+      "voltage": "4007"
+    }
+  }
+}

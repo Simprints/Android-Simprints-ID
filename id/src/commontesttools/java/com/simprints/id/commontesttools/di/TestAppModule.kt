@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
@@ -27,8 +26,6 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
-import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.LocationManager
@@ -103,29 +100,13 @@ class TestAppModule(
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
         randomGenerator: RandomGenerator,
-        unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider
     ): SecureLocalDbKeyProvider =
         secureDataManagerRule.resolveDependency {
             super.provideSecureLocalDbKeyProvider(
                 builder,
-                randomGenerator,
-                unsecuredLocalDbKeyProvider
+                randomGenerator
             )
         }
-
-    override fun provideLegacyLocalDbKeyProvider(
-        preferencesManager: PreferencesManager,
-        keystoreManager: KeystoreManager
-    ): LegacyLocalDbKeyProvider =
-        legacyLocalDbKeyProviderRule.resolveDependency {
-            super.provideLegacyLocalDbKeyProvider(
-                preferencesManager,
-                keystoreManager
-            )
-        }
-
-    override fun provideKeystoreManager(): KeystoreManager =
-        keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
     override fun provideEventRepository(
         ctx: Context,

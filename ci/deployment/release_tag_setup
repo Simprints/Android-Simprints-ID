@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Get the branch name after the last '/'. ex release/2020.4.0 = 2020.4.0
+var_branchSuffix=$(echo "$BITBUCKET_BRANCH" | sed 's:.*/::')
+
+# We use force in case we are moving this tag from a previous release.
+git tag --force "v$var_branchSuffix"
+git push --force --tags

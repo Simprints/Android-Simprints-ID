@@ -21,7 +21,7 @@ import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 

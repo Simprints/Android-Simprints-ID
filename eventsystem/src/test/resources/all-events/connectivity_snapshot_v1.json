@@ -1,0 +1,26 @@
+{
+  "id": "f34d32fd-e8de-4f3c-928a-d06902f29fd1",
+  "type": "CONNECTIVITY_SNAPSHOT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CONNECTIVITY_SNAPSHOT",
+    "eventVersion": 1,
+    "createdAt": 2435356702,
+    "endedAt": 0,
+    "networkType": "EDGE",
+    "connections": [
+      {
+        "type": "WIFI",
+        "state": "CONNECTED"
+      },
+      {
+        "type": "BLUETOOTH",
+        "state": "DISCONNECTED"
+      }
+    ]
+  }
+}

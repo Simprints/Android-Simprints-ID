@@ -9,10 +9,10 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.logging.Simber
 
-open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
-                                        private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
-                                        private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider) :
-    SecureLocalDbKeyProvider {
+open class SecureLocalDbKeyProviderImpl(
+    private val encryptedSharedPrefs: SharedPreferences,
+    private val randomGenerator: RandomGenerator = RandomGeneratorImpl()
+) : SecureLocalDbKeyProvider {
 
     companion object {
         const val SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER = "REALM_KEY"
@@ -33,35 +33,18 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
      * BigInteger(1, Base64.decode(key, Base64.DEFAULT)).toString(16)
      */
     override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {
-        try {
-            val key = readRealmKeyFromSharedPrefs(projectId)
-                ?: throw MissingLocalDatabaseKeyException()
-            return LocalDbKey(projectId, decode(key, DEFAULT))
-        } catch (t: Throwable) {
-            if (t is MissingLocalDatabaseKeyException) {
-                migrateFromUnsecuredKey(projectId)?.let {
-                    return it
-                }
-            }
+        val key = readRealmKeyFromSharedPrefs(projectId)
 
-            throw t
-        }
-    }
-
-    private fun migrateFromUnsecuredKey(projectId: String): LocalDbKey? {
-        try {
-            val legacyLocalDbKey = unsecuredLocalDbKeyProvider.getLocalDbKeyOrThrow(projectId)
-            val legacyRealmKey = encodeToString(legacyLocalDbKey.value, DEFAULT)
-            encryptedSharedPrefs.edit().putString(getSharedPrefsKeyForRealm(projectId), legacyRealmKey).apply()
-            return legacyLocalDbKey
-        } catch (t: Throwable) {
-            Simber.e(t)
+        if (key == null) {
+            Simber.e(MissingLocalDatabaseKeyException())
+            throw MissingLocalDatabaseKeyException()
         }
 
-        return null
+        return LocalDbKey(projectId, decode(key, DEFAULT))
     }
 
-    private fun getSharedPrefsKeyForRealm(projectId: String) = "${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_$projectId"
+    private fun getSharedPrefsKeyForRealm(projectId: String) =
+        "${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_$projectId"
 
     private fun readRealmKeyFromSharedPrefs(projectId: String): String? {
         val sharedPrefsKeyForRealm = getSharedPrefsKeyForRealm(projectId)

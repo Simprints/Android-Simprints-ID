@@ -18,7 +18,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentScannerOffBinding
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ScannerOffFragment : FingerprintFragment() {
 

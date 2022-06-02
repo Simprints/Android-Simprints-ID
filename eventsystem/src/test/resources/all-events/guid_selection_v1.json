@@ -1,0 +1,16 @@
+{
+  "id": "7dbb880c-8c18-4cf4-a18c-4df122f796f6",
+  "type": "GUID_SELECTION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "GUID_SELECTION",
+    "eventVersion": 1,
+    "createdAt": 47896789072,
+    "endedAt": 0,
+    "selectedId": "b7b66a40-71c4-4e87-afaa-80a30bd257a6"
+  }
+}
