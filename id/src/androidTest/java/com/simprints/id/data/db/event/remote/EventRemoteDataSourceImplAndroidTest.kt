@@ -54,13 +54,11 @@ import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
@@ -869,9 +867,7 @@ class EventRemoteDataSourceImplAndroidTest {
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_CREATION,
             ENROLMENT_RECORD_MOVE,
-            ENROLMENT_V1,
-            FINGERPRINT_CAPTURE,
-            FACE_CAPTURE -> {
+            ENROLMENT_V1 -> {
             }
         }.safeSealedWhens
     }
