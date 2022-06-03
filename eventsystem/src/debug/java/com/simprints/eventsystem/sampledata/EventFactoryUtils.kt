@@ -411,6 +411,16 @@ fun createFingerprintCaptureEventV3(): FingerprintCaptureEventV3 {
     )
 }
 
+fun fingerprintaCaptureBiometricsEvent() = FingerprintCaptureBiometricsEvent(
+    createdAt = CREATED_AT,
+    fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+        finger = LEFT_THUMB,
+        template = "someTemplate",
+        quality = 8,
+        format = FingerprintTemplateFormat.ISO_19794_2
+    )
+)
+
 fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, GUID1, eventLabels)
 
 fun createIntentParsingEvent() = IntentParsingEvent(CREATED_AT, COMMCARE, eventLabels)

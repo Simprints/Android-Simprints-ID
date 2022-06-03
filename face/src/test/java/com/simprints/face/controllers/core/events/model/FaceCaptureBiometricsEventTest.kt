@@ -9,11 +9,11 @@ class FaceCaptureBiometricsEventTest {
     @Test
     fun `fromDomainToCore maps correctly`() {
         val domain = FaceCaptureBiometricsEvent(
-            startTime = 0,
+            startTime = 234234,
             endTime = 0,
             eventFace = FaceCaptureBiometricsEvent.EventFace(
                 template = "",
-                quality = 0.0f,
+                quality = 2.0f,
                 format = FaceTemplateFormat.RANK_ONE_1_23
             ),
             payloadId = "someId"
@@ -22,7 +22,8 @@ class FaceCaptureBiometricsEventTest {
         val core = domain.fromDomainToCore()
 
         with(core) {
-            assertThat(payload.face).isEqualTo(domain.eventFace)
+            assertThat(payload.id).isEqualTo(domain.payloadId)
+            assertThat(payload.face.quality).isEqualTo(domain.eventFace.quality)
             assertThat(payload.createdAt).isEqualTo(domain.startTime)
         }
     }
