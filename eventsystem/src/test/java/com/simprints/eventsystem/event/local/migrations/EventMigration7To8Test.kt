@@ -54,7 +54,7 @@ class EventMigration7To8Test {
         val fingerprintCaptureBiometricsEventJson =
             MigrationTestingTools.retrieveCursorWithEventByType(
                 db,
-                "FINGERPRINT_CAPTURE_BIOMETRICS"
+                FINGERPRINT_CAPTURE_BIOMETRICS
             ).getStringWithColumnName("eventJson")!!
 
         val fingerprintCaptureEvent =
@@ -72,7 +72,6 @@ class EventMigration7To8Test {
             JSONObject(fingerprintCaptureBiometricsEventJson).getJSONObject("payload")
         val fingerprintBiometricsObject =
             fingerprintCaptureBiometricsPayload.getJSONObject("fingerprint")
-
 
         assertThat(fingerprintCaptureEvent).isInstanceOf(FingerprintCaptureEventV3::class.java)
         assertThat(fingerprintCaptureEvent.payload.eventVersion).isEqualTo(3)
@@ -105,7 +104,7 @@ class EventMigration7To8Test {
             .getStringWithColumnName("eventJson")!!
 
         val faceCaptureBiometricsEventJson =
-            MigrationTestingTools.retrieveCursorWithEventByType(db, "FACE_CAPTURE_BIOMETRICS")
+            MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
 
         val faceCaptureEvent =
@@ -235,6 +234,8 @@ class EventMigration7To8Test {
         private const val TEST_DB = "some_db"
         private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
         private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
+        private const val FINGERPRINT_CAPTURE_BIOMETRICS = "FINGERPRINT_CAPTURE_BIOMETRICS"
+        private const val FACE_CAPTURE_BIOMETRICS = "FACE_CAPTURE_BIOMETRICS"
     }
 }
 

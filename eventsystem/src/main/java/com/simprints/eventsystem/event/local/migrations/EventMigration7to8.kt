@@ -168,7 +168,9 @@ class EventMigration7to8 : Migration(7, 8) {
                 fingerprintObject.getString(
                     "template"
                 )
-            }\",\"quality\":${fingerprintObject.getInt("quality")},\"format\":\"${fingerprintObject.getString("format")}\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
+            }\",\"quality\":${fingerprintObject.getInt("quality")},\"format\":\"${
+                fingerprintObject.getString("format")
+            }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
             this.put("id", eventId)
