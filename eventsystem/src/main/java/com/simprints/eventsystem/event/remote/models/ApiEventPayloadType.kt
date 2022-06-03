@@ -26,7 +26,6 @@ import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
@@ -230,7 +229,6 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ENROLMENT_RECORD_MOVE -> ApiEventPayloadType.EnrolmentRecordMove
     FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
-    FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_V3 -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
     FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics

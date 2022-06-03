@@ -39,7 +39,6 @@ import com.simprints.eventsystem.event.domain.models.callout.IdentificationCallo
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
@@ -54,7 +53,6 @@ import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutPayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureBiometricsPayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceFallbackCapturePayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceOnboardingCompletePayload
@@ -135,7 +133,6 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
         FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
         FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
-        FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
         FACE_CAPTURE_V3 -> ApiFaceCapturePayloadV3(this as FaceCaptureEventV3.FaceCapturePayloadV3)
         FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
         SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
