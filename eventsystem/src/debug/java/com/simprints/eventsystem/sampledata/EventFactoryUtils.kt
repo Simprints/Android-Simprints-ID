@@ -8,6 +8,7 @@ import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
@@ -174,28 +175,13 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
 
 fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
     val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
-        template = "",
+        template = "template",
         quality = 1.0f,
         format = FaceTemplateFormat.RANK_ONE_1_23
     )
     return FaceCaptureBiometricsEvent(
         startTime = CREATED_AT,
         face = faceArg,
-        labels = eventLabels
-    )
-}
-
-fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent {
-    val fingerprint =
-        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-            LEFT_3RD_FINGER,
-            "",
-            1,
-            FingerprintTemplateFormat.ISO_19794_2
-        )
-    return FingerprintCaptureBiometricsEvent(
-        CREATED_AT,
-        fingerprint,
         labels = eventLabels
     )
 }
@@ -393,6 +379,8 @@ fun createEnrolmentEventV2() =
 
 fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
+private val payloadId = randomUUID()
+
 fun createFingerprintCaptureEventV3(): FingerprintCaptureEventV3 {
     val fingerprint = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint(
         LEFT_THUMB,
@@ -407,19 +395,28 @@ fun createFingerprintCaptureEventV3(): FingerprintCaptureEventV3 {
         qualityThreshold = 10,
         result = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.BAD_QUALITY,
         fingerprint = fingerprint,
-        labels = eventLabels
+        labels = eventLabels,
+        payloadId = "payloadId"
     )
 }
 
-fun fingerprintaCaptureBiometricsEvent() = FingerprintCaptureBiometricsEvent(
-    createdAt = CREATED_AT,
-    fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-        finger = LEFT_THUMB,
-        template = "someTemplate",
-        quality = 8,
-        format = FingerprintTemplateFormat.ISO_19794_2
+fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent {
+    val fingerprint =
+        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+            LEFT_THUMB,
+            "sometemplate",
+            10,
+            FingerprintTemplateFormat.ISO_19794_2
+        )
+
+    return FingerprintCaptureBiometricsEvent(
+        createdAt = CREATED_AT,
+
+        fingerprint = fingerprint,
+        labels = eventLabels,
+        payloadId = "payloadId"
     )
-)
+}
 
 fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, GUID1, eventLabels)
 
