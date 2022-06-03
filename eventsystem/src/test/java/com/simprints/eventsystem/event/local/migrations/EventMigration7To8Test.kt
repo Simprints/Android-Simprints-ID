@@ -16,6 +16,7 @@ import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -46,16 +47,49 @@ class EventMigration7To8Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+        val fingerprintCaptureEventJson =
+            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+                .getStringWithColumnName("eventJson")!!
 
-        val event = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
-        val payloadJsonObject = JSONObject(eventJson).getJSONObject("payload")
-        val fingerprintObject = payloadJsonObject.getJSONObject("fingerprint")
+        val fingerprintCaptureBiometricsEventJson =
+            MigrationTestingTools.retrieveCursorWithEventByType(
+                db,
+                "FINGERPRINT_CAPTURE_BIOMETRICS"
+            ).getStringWithColumnName("eventJson")!!
 
-        assertThat(event).isInstanceOf(FingerprintCaptureEventV3::class.java)
-        assertThat(event.payload.eventVersion).isEqualTo(3)
+        val fingerprintCaptureEvent =
+            JsonHelper.fromJson(fingerprintCaptureEventJson, object : TypeReference<Event>() {})
+        val fingerprintCaptureBiometricsEvent =
+            JsonHelper.fromJson(
+                fingerprintCaptureBiometricsEventJson,
+                object : TypeReference<Event>() {})
+
+        val fingerprintCapturePayload =
+            JSONObject(fingerprintCaptureEventJson).getJSONObject("payload")
+        val fingerprintObject = fingerprintCapturePayload.getJSONObject("fingerprint")
+
+        val fingerprintCaptureBiometricsPayload =
+            JSONObject(fingerprintCaptureBiometricsEventJson).getJSONObject("payload")
+        val fingerprintBiometricsObject =
+            fingerprintCaptureBiometricsPayload.getJSONObject("fingerprint")
+
+
+        assertThat(fingerprintCaptureEvent).isInstanceOf(FingerprintCaptureEventV3::class.java)
+        assertThat(fingerprintCaptureEvent.payload.eventVersion).isEqualTo(3)
         assertThat(fingerprintObject.has("template")).isFalse()
+
+        assertThat(fingerprintCaptureBiometricsEvent).isInstanceOf(FingerprintCaptureBiometricsEvent::class.java)
+        assertThat(fingerprintCaptureBiometricsEvent.payload.eventVersion).isEqualTo(0)
+        assertThat(fingerprintBiometricsObject.has("template")).isTrue()
+        assertThat((fingerprintCaptureBiometricsEvent as FingerprintCaptureBiometricsEvent).payload.fingerprint.template).isEqualTo(
+            "some_fingerprint_template"
+        )
+        assertThat(fingerprintCaptureBiometricsEvent.payload.id).isEqualTo(
+            (fingerprintCaptureEvent as FingerprintCaptureEventV3).payload.id
+        )
+        assertThat(fingerprintCaptureEvent.labels.projectId).isEqualTo(
+            fingerprintCaptureBiometricsEvent.labels.projectId
+        )
     }
 
     @Test
@@ -70,35 +104,37 @@ class EventMigration7To8Test {
         val faceCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
 
-        val faceCaptureBiometricsEventJson = db.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf("FACE_CAPTURE_BIOMETRICS")
-        ).apply { moveToNext() }.getStringWithColumnName("eventJson")!!
+        val faceCaptureBiometricsEventJson =
+            MigrationTestingTools.retrieveCursorWithEventByType(db, "FACE_CAPTURE_BIOMETRICS")
+                .getStringWithColumnName("eventJson")!!
 
         val faceCaptureEvent =
             JsonHelper.fromJson(faceCaptureEventJson, object : TypeReference<Event>() {})
         val faceCaptureBiometricsEvent =
             JsonHelper.fromJson(faceCaptureBiometricsEventJson, object : TypeReference<Event>() {})
 
-        val fingerprintCapturePayload = JSONObject(faceCaptureEventJson).getJSONObject("payload")
-        val fingerprintCaptureFace = fingerprintCapturePayload.getJSONObject("face")
-        val fingerprintCaptureBiometricsPayload =
+        val faceCapturePayload = JSONObject(faceCaptureEventJson).getJSONObject("payload")
+        val captureFace = faceCapturePayload.getJSONObject("face")
+        val faceCaptureBiometricsPayload =
             JSONObject(faceCaptureBiometricsEventJson).getJSONObject("payload")
-        val fingerprintCaptureBiometricsFace =
-            fingerprintCaptureBiometricsPayload.getJSONObject("face")
+        val biometricsFace =
+            faceCaptureBiometricsPayload.getJSONObject("face")
+
 
         assertThat(faceCaptureEvent).isInstanceOf(FaceCaptureEventV3::class.java)
         assertThat(faceCaptureEvent.payload.eventVersion).isEqualTo(3)
-        assertThat(fingerprintCaptureFace.has("template")).isFalse()
+        assertThat(captureFace.has("template")).isFalse()
 
         assertThat(faceCaptureBiometricsEvent).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
         assertThat(faceCaptureBiometricsEvent.payload.eventVersion).isEqualTo(0)
-        assertThat(fingerprintCaptureBiometricsFace.has("template")).isTrue()
+        assertThat(biometricsFace.has("template")).isTrue()
         assertThat((faceCaptureBiometricsEvent as FaceCaptureBiometricsEvent).payload.face.template).isEqualTo(
             "some_face_template"
         )
         assertThat(faceCaptureBiometricsEvent.payload.id).isEqualTo(
             (faceCaptureEvent as FaceCaptureEventV3).payload.id
         )
+        assertThat(faceCaptureEvent.labels.projectId).isEqualTo(faceCaptureBiometricsEvent.labels.projectId)
     }
 
     private fun setupV7DbWithFaceCaptureEvent(
@@ -140,7 +176,7 @@ class EventMigration7To8Test {
                     "fingerprint":{
                         "finger":"LEFT_3RD_FINGER",
                         "quality":0,
-                        "template":"some_template",
+                        "template":"some_fingerprint_template",
                         "format":"ISO_19794_2"
                         },
                 "id":"2022ae95-d4c0-469c-85d6-750659598bbd",
