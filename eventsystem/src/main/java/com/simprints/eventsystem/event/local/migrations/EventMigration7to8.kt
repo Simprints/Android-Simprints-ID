@@ -127,7 +127,6 @@ class EventMigration7to8 : Migration(7, 8) {
         val faceObject = payload.getJSONObject("face")
         val labels = originalObject.getJSONObject("labels")
         val createdAt = payload.getLong("createdAt")
-        val eventId = randomUUID()
 
         val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"moduleIds\":[],\"projectId\":\"${
             labels.getString("projectId")
@@ -138,7 +137,7 @@ class EventMigration7to8 : Migration(7, 8) {
         }\",\"quality\":${faceObject.getDouble("quality")},\"format\":\"RANK_ONE_1_23\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", eventId)
+            this.put("id", randomUUID())
             this.put("type", FACE_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
             this.put("createdAt", createdAt)
@@ -159,7 +158,6 @@ class EventMigration7to8 : Migration(7, 8) {
         val fingerprintObject = payload.getJSONObject("fingerprint")
         val createdAt = payload.getLong("createdAt")
         val labels = originalObject.getJSONObject("labels")
-        val eventId = randomUUID()
 
         val event =
             "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
@@ -173,7 +171,7 @@ class EventMigration7to8 : Migration(7, 8) {
             }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", eventId)
+            this.put("id", randomUUID())
             this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
             this.put("createdAt", createdAt)
