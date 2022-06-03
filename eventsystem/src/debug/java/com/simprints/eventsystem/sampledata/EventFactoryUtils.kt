@@ -68,9 +68,6 @@ import com.simprints.eventsystem.event.domain.models.callout.VerificationCallout
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
@@ -205,11 +202,6 @@ fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent
 
 fun createFaceCaptureConfirmationEvent() =
     FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
-
-fun createFaceCaptureEvent(): FaceCaptureEvent {
-    val faceArg = Face(0F, 1F, 2F, "", FaceTemplateFormat.RANK_ONE_1_23)
-    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, eventLabels)
-}
 
 fun createFaceCaptureEventV3(): FaceCaptureEventV3 {
     val faceArg =
