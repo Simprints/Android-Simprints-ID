@@ -20,10 +20,10 @@ import com.simprints.eventsystem.sampledata.createEnrolmentRecordDeletionEvent
 import com.simprints.eventsystem.sampledata.createEnrolmentRecordMoveEvent
 import com.simprints.eventsystem.sampledata.createErrorCallbackEvent
 import com.simprints.eventsystem.sampledata.createFaceCaptureConfirmationEvent
-import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
+import com.simprints.eventsystem.sampledata.createFaceCaptureEventV3
 import com.simprints.eventsystem.sampledata.createFaceFallbackCaptureEvent
 import com.simprints.eventsystem.sampledata.createFaceOnboardingCompleteEvent
-import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEventV3
 import com.simprints.eventsystem.sampledata.createGuidSelectionEvent
 import com.simprints.eventsystem.sampledata.createIdentificationCallbackEvent
 import com.simprints.eventsystem.sampledata.createIdentificationCalloutEvent
@@ -144,7 +144,7 @@ class DbEventTest {
 
     @Test
     fun convert_FaceCaptureEvent() {
-        val original = createFaceCaptureEvent()
+        val original = createFaceCaptureEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -282,7 +282,7 @@ class DbEventTest {
 
     @Test
     fun convert_FingerprintCaptureEvent() {
-        val original = createFingerprintCaptureEvent()
+        val original = createFingerprintCaptureEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
