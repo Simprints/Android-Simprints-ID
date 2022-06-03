@@ -6,8 +6,8 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -64,17 +64,18 @@ class PersonCreationEventHelperImpl(
         faceSamples: List<FaceSample>
     ) {
         val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        val fingerprintCaptureEvents =
+        val fingerprintCaptureBiometricsEvents =
             eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
-                .filterIsInstance<FingerprintCaptureEventV3>().toList()
-        val faceCaptureEvents = eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
-            .filterIsInstance<FaceCaptureEventV3>().toList()
+                .filterIsInstance<FingerprintCaptureBiometricsEvent>().toList()
+        val faceCaptureBiometricsEvents =
+            eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
+                .filterIsInstance<FaceCaptureBiometricsEvent>().toList()
 
         eventRepository.addOrUpdateEvent(
             build(
                 timeHelper,
-                faceCaptureEvents,
-                fingerprintCaptureEvents,
+                faceCaptureBiometricsEvents,
+                fingerprintCaptureBiometricsEvents,
                 faceSamples,
                 fingerprintSamples
             )
@@ -83,44 +84,15 @@ class PersonCreationEventHelperImpl(
 
     fun build(
         timeHelper: TimeHelper,
-        faceCaptureEvents: List<FaceCaptureEventV3>,
-        fingerprintCaptureEvents: List<FingerprintCaptureEventV3>,
+        faceCaptureBiometricsEvents: List<FaceCaptureBiometricsEvent>,
+        fingerprintCaptureBiometricsEvents: List<FingerprintCaptureBiometricsEvent>,
         faceSamplesForPersonCreation: List<FaceSample>?,
         fingerprintSamplesForPersonCreation: List<FingerprintSample>?
     ) = PersonCreationEvent(
         startTime = timeHelper.now(),
-        fingerprintCaptureIds = extractFingerprintCaptureEventIds(
-            fingerprintCaptureEvents
-        ),
+        fingerprintCaptureIds = fingerprintCaptureBiometricsEvents.map { it.payload.id },
         fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
-        faceCaptureIds = extractFaceCaptureEventIds(
-            faceCaptureEvents
-        ),
+        faceCaptureIds = faceCaptureBiometricsEvents.map { it.payload.id },
         faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
     )
-
-    private fun extractFingerprintCaptureEventIds(
-        captureEvents: List<FingerprintCaptureEventV3>
-    ): List<String>? =
-        captureEvents
-            .filter {
-                it.payload.result != FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.SKIPPED
-            }.map { it.payload.id }
-            .nullIfEmpty()
-
-    private fun extractFaceCaptureEventIds(
-        captureEvents: List<FaceCaptureEventV3>
-    ): List<String>? =
-        captureEvents
-            .filter {
-                it.payload.result != FaceCaptureEventV3.FaceCapturePayloadV3.Result.INVALID
-            }.map { it.payload.id }
-            .nullIfEmpty()
-
-    private fun List<String>.nullIfEmpty() =
-        if (this.isNotEmpty()) {
-            this
-        } else {
-            null
-        }
 }
