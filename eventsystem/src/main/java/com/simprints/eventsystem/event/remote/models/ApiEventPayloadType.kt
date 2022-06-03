@@ -32,7 +32,6 @@ import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONF
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
@@ -200,7 +199,6 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ENROLMENT_V1 -> ApiEventPayloadType.Enrolment
     ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
-    FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
     FINGERPRINT_CAPTURE_V3 -> ApiEventPayloadType.FingerprintCapture
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
     ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
