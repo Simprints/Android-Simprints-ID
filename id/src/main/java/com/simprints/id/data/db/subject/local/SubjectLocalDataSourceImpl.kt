@@ -98,7 +98,6 @@ class SubjectLocalDataSourceImpl(
                 }
             }
         }
-
     }
 
     override suspend fun deleteAll() {
@@ -148,6 +147,10 @@ class SubjectLocalDataSourceImpl(
                 }
             }
 
+    /**
+     * Use realm instance in from IO threads
+     *
+     */
     private suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(dispatcher.io()) { Realm.getInstance(config).use(block) }
 
