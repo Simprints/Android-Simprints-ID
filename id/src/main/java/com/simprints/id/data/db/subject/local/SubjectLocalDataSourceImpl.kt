@@ -123,6 +123,9 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun performActions(actions: List<SubjectAction>) {
+        // if there is no actions to perform return to avoid useless realm operations
+        if (actions.isEmpty()) return
+
         withContext(dispatcher.main()) {
             Realm.getInstance(config).use {
                 it.transactAwait { realm ->
@@ -151,7 +154,6 @@ class SubjectLocalDataSourceImpl(
                     query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
                     query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                    query.toSync?.let { this.equalTo(SYNC_FIELD, it) }
                 }
             }
 
