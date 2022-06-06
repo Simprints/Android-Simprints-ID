@@ -21,7 +21,6 @@ import com.simprints.logging.Simber
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.Serializable
 
-@FlowPreview
 class SubjectLocalDataSourceImpl(
     private val appContext: Context,
     val secureDataManager: SecureLocalDbKeyProvider,
@@ -39,10 +37,6 @@ class SubjectLocalDataSourceImpl(
 
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
-
-        @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
-        const val SYNC_FIELD = "toSync"
-
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
@@ -114,15 +108,14 @@ class SubjectLocalDataSourceImpl(
     override suspend fun count(query: SubjectQuery): Int =
         useRealmInstance { realm ->
             realm.buildRealmQueryForSubject(query)
-                .findAll()
-                ?.size ?: 0
+                .count().toInt()
         }
 
 
     override suspend fun performActions(actions: List<SubjectAction>) {
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
-            Simber.d("realm Nothing ")
+            Simber.d("No actions to perform ")
             return
         }
 
