@@ -17,8 +17,7 @@ import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
-import com.simprints.id.tools.extensions.await
-import com.simprints.id.tools.extensions.transactAwait
+import com.simprints.logging.Simber
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
@@ -57,7 +56,7 @@ class SubjectLocalDataSourceImpl(
     private fun getLocalDbKeyAndCreateRealmConfig(): RealmConfiguration =
         loginInfoManager.getSignedInProjectIdOrEmpty().let {
             return if (it.isNotEmpty()) {
-                 createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
+                createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
             } else {
                 throw RealmUninitialisedException("No signed in project id found")
             }
@@ -67,15 +66,14 @@ class SubjectLocalDataSourceImpl(
         SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
     override suspend fun load(query: SubjectQuery?): Flow<Subject> =
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use {
-                it.buildRealmQueryForSubject(query)
-                    .await()
-                    ?.map { dbSubject -> dbSubject.fromDbToDomain() }
-                    ?.asFlow()
-                    ?: flowOf()
-            }
+       useRealmInstance {
+            it.buildRealmQueryForSubject(query)
+                .findAll()
+                ?.map { dbSubject -> dbSubject.fromDbToDomain() }
+                ?.asFlow()
+                ?: flowOf()
         }
+
 
     override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
         if (query is SubjectQuery) {
@@ -96,17 +94,17 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realmInstance ->
-                realmInstance.transactAwait { realm ->
-                    queries.forEach {
-                        realm.buildRealmQueryForSubject(it)
-                            .findAll()
-                            .deleteAllFromRealm()
-                    }
+
+        useRealmInstance { realmInstance ->
+            realmInstance.executeTransaction { realm ->
+                queries.forEach {
+                    realm.buildRealmQueryForSubject(it)
+                        .findAll()
+                        .deleteAllFromRealm()
                 }
             }
         }
+
     }
 
     override suspend fun deleteAll() {
@@ -114,31 +112,31 @@ class SubjectLocalDataSourceImpl(
     }
 
     override suspend fun count(query: SubjectQuery): Int =
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realm ->
-                realm.buildRealmQueryForSubject(query)
-                    .await()
-                    ?.size ?: 0
-            }
+        useRealmInstance { realm ->
+            realm.buildRealmQueryForSubject(query)
+                .findAll()
+                ?.size ?: 0
         }
+
 
     override suspend fun performActions(actions: List<SubjectAction>) {
         // if there is no actions to perform return to avoid useless realm operations
-        if (actions.isEmpty()) return
+        if (actions.isEmpty()) {
+            Simber.d("realm Nothing ")
+            return
+        }
 
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use {
-                it.transactAwait { realm ->
-                    actions.forEach { action ->
-                        when (action) {
-                            is Creation -> {
-                                realm.insertOrUpdate(action.subject.fromDomainToDb())
-                            }
-                            is Deletion -> {
-                                realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
-                                    .findAll()
-                                    .deleteAllFromRealm()
-                            }
+        useRealmInstance {
+            it.executeTransaction { realm ->
+                actions.forEach { action ->
+                    when (action) {
+                        is Creation -> {
+                            realm.insertOrUpdate(action.subject.fromDomainToDb())
+                        }
+                        is Deletion -> {
+                            realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                                .findAll()
+                                .deleteAllFromRealm()
                         }
                     }
                 }
@@ -156,5 +154,8 @@ class SubjectLocalDataSourceImpl(
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
                 }
             }
+
+    private suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
+        withContext(dispatcher.io()) { Realm.getInstance(config).use(block) }
 
 }

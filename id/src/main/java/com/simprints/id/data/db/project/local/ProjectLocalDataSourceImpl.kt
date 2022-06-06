@@ -11,8 +11,6 @@ import com.simprints.id.data.db.project.local.models.fromDbToDomain
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
-import com.simprints.id.tools.extensions.awaitFirst
-import com.simprints.id.tools.extensions.transactAwait
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.FlowPreview
@@ -48,23 +46,23 @@ class ProjectLocalDataSourceImpl(
         SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
     override suspend fun load(projectId: String): Project? =
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realm ->
-                realm.where(DbProject::class.java)
-                    .equalTo(PROJECT_ID_FIELD, projectId)
-                    .awaitFirst()
-                    ?.fromDbToDomain() 
+        useRealmInstance { realm ->
+            realm.where(DbProject::class.java)
+                .equalTo(PROJECT_ID_FIELD, projectId)
+                .findFirst()
+                ?.fromDbToDomain()
+        }
+
+
+    override suspend fun save(project: Project) =
+        useRealmInstance { realm ->
+            realm.executeTransaction {
+                it.insertOrUpdate(project.fromDomainToDb())
             }
         }
 
-    override suspend fun save(project: Project) =
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realm ->
-                realm.transactAwait {
-                    it.insertOrUpdate(project.fromDomainToDb())
-                }
-            }
-        }
+    private suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
+        withContext(dispatcher.io()) { Realm.getInstance(config).use(block) }
 
 }
 
