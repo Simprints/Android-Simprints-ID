@@ -12,6 +12,7 @@ import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -37,7 +38,7 @@ class RequestPresenterTest {
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
-        runBlockingTest {
+        runTest {
             val requestBuilder = mockk<ClientRequestBuilder>(relaxed = true).apply {
                 every { this@apply.build() } returns EnrolRequest(
                     projectIdField,
@@ -65,7 +66,7 @@ class RequestPresenterTest {
 
     @Test
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
-        runBlockingTest {
+        runTest {
             val requestBuilder = mockk<ClientRequestBuilder>().apply {
                 every { this@apply.build() } returns EnrolRequest(
                     projectIdField,
@@ -92,7 +93,7 @@ class RequestPresenterTest {
     }
 
     @Test
-    fun withRootedDevice_shouldShowAlertScreen() = runBlockingTest {
+    fun withRootedDevice_shouldShowAlertScreen() = runTest {
         val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
