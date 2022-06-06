@@ -250,7 +250,7 @@ class CommCareCoSyncPresenterTest {
             val subjectRepository = mockk<SubjectRepository>()
             coEvery { subjectRepository.load(any()) } returns flowOf(subject)
 
-            runTest {
+            runBlocking {
                 getNewPresenter(
                     Enrol,
                     sessionEventsManagerMock,
