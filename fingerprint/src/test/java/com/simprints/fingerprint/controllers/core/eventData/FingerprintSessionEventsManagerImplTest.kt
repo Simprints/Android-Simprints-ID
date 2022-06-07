@@ -25,6 +25,7 @@ class FingerprintSessionEventsManagerImplTest {
     fun addEventInBackground() = runBlocking {
         //Given
         val eventRepository: EventRepository = mockk()
+        coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
         val eventSlot = CapturingSlot<CoreOneToOneMatchEvent>()
         val fingerprintSessionEventsManager = FingerprintSessionEventsManagerImpl(eventRepository)
         val event = OneToOneMatchEvent(
