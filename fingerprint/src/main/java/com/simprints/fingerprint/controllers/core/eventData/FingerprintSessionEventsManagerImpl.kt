@@ -5,7 +5,6 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 import com.simprints.id.tools.ignoreException
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
 import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
