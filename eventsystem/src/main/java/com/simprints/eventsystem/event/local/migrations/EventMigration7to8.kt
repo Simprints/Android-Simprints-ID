@@ -120,28 +120,32 @@ class EventMigration7to8 : Migration(7, 8) {
     ) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject("payload")
-        val faceObject = payload.getJSONObject("face")
-        val labels = originalObject.getJSONObject("labels")
-        val createdAt = payload.getLong("createdAt")
+        val isFaceEventValid = payload.getString("result") == "VALID"
 
-        val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"moduleIds\":[],\"projectId\":\"${
-            labels.getString("projectId")
-        }\",\"mode\":[]},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"template\":\"${
-            faceObject.getString(
-                "template"
-            )
-        }\",\"quality\":${faceObject.getDouble("quality")},\"format\":\"RANK_ONE_1_23\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+        if (isFaceEventValid) {
+            val faceObject = payload.getJSONObject("face")
+            val labels = originalObject.getJSONObject("labels")
+            val createdAt = payload.getLong("createdAt")
 
-        val faceCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", randomUUID())
-            this.put("type", FACE_CAPTURE_BIOMETRICS)
-            this.put("eventJson", event)
-            this.put("createdAt", createdAt)
-            this.put("endedAt", 0)
-            this.put("sessionIsClosed", 0)
+            val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"moduleIds\":[],\"projectId\":\"${
+                labels.getString("projectId")
+            }\",\"mode\":[]},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"template\":\"${
+                faceObject.getString(
+                    "template"
+                )
+            }\",\"quality\":${faceObject.getDouble("quality")},\"format\":\"RANK_ONE_1_23\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+
+            val faceCaptureBiometricsEvent = ContentValues().apply {
+                this.put("id", randomUUID())
+                this.put("type", FACE_CAPTURE_BIOMETRICS)
+                this.put("eventJson", event)
+                this.put("createdAt", createdAt)
+                this.put("endedAt", 0)
+                this.put("sessionIsClosed", 0)
+            }
+
+            database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
         }
-
-        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
     }
 
     private fun createAndInsertFingerprintCaptureBiometricsEventValues(
@@ -151,31 +155,39 @@ class EventMigration7to8 : Migration(7, 8) {
     ) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject("payload")
-        val fingerprintObject = payload.getJSONObject("fingerprint")
-        val createdAt = payload.getLong("createdAt")
-        val labels = originalObject.getJSONObject("labels")
+        val isFingerprintEventGoodScan = payload.getString("result") == "GOOD_SCAN"
 
-        val event =
-            "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                labels.getString("projectId")
-            }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${fingerprintObject.getString("finger")}\",\"template\":\"${
-                fingerprintObject.getString(
-                    "template"
-                )
-            }\",\"quality\":${fingerprintObject.getInt("quality")},\"format\":\"${
-                fingerprintObject.getString("format")
-            }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
+        if (isFingerprintEventGoodScan) {
+            val fingerprintObject = payload.getJSONObject("fingerprint")
+            val createdAt = payload.getLong("createdAt")
+            val labels = originalObject.getJSONObject("labels")
 
-        val fingerprintCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", randomUUID())
-            this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
-            this.put("eventJson", event)
-            this.put("createdAt", createdAt)
-            this.put("endedAt", 0)
-            this.put("sessionIsClosed", 0)
+            val event =
+                "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
+                    labels.getString("projectId")
+                }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
+                    fingerprintObject.getString(
+                        "finger"
+                    )
+                }\",\"template\":\"${
+                    fingerprintObject.getString(
+                        "template"
+                    )
+                }\",\"quality\":${fingerprintObject.getInt("quality")},\"format\":\"${
+                    fingerprintObject.getString("format")
+                }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
+
+            val fingerprintCaptureBiometricsEvent = ContentValues().apply {
+                this.put("id", randomUUID())
+                this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
+                this.put("eventJson", event)
+                this.put("createdAt", createdAt)
+                this.put("endedAt", 0)
+                this.put("sessionIsClosed", 0)
+            }
+
+            database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, fingerprintCaptureBiometricsEvent)
         }
-
-        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, fingerprintCaptureBiometricsEvent)
     }
 
     companion object {

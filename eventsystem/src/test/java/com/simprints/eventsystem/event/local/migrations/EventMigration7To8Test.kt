@@ -1,6 +1,7 @@
 package com.simprints.eventsystem.event.local.migrations
 
 import android.content.ContentValues
+import android.database.CursorIndexOutOfBoundsException
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -19,6 +20,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject
 import org.junit.Rule
@@ -43,7 +45,7 @@ class EventMigration7To8Test {
     fun validateMigrationForFingerprintCaptureIsSuccessful() {
         val eventId = randomUUID()
 
-        setupV7DbWithFingerprintCaptureEvent(eventId)
+        setupV7DbWithFingerprintCaptureEvent(event = createFingerprintCaptureEvent(eventId))
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
@@ -96,7 +98,7 @@ class EventMigration7To8Test {
     fun validateMigrationForFaceCaptureIsSuccessful() {
         val eventId = randomUUID()
 
-        setupV7DbWithFaceCaptureEvent(eventId)
+        setupV7DbWithFaceCaptureEvent(event = createFaceCaptureEvent(eventId))
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
@@ -136,30 +138,85 @@ class EventMigration7To8Test {
         assertThat(faceCaptureEvent.labels.projectId).isEqualTo(faceCaptureBiometricsEvent.labels.projectId)
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun validateMigrationDoesNotSaveFaceBiometricsEventsIfNotValid() {
+        val eventId = randomUUID()
+
+        setupV7DbWithFaceCaptureEvent(
+            event = createFaceCaptureEvent(
+                id = eventId,
+                result = "INVALID"
+            )
+        )
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
+
+        val faceCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .getStringWithColumnName("eventJson")!!
+
+        val faceCaptureEvent =
+            JsonHelper.fromJson(faceCaptureEventJson, object : TypeReference<Event>() {})
+
+        assertThat(faceCaptureEvent).isInstanceOf(FaceCaptureEvent::class.java)
+        assertThat(faceCaptureEvent.payload.eventVersion).isEqualTo(3)
+        assertThrows<CursorIndexOutOfBoundsException> {
+            MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
+                .getStringWithColumnName("eventJson")!!
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun validateMigrationDoesNotSaveFingerprintBiometricsEventsIfNotGoodScan() {
+        val eventId = randomUUID()
+
+        setupV7DbWithFingerprintCaptureEvent(
+            event = createFingerprintCaptureEvent(
+                id = eventId,
+                result = "BAD_QUALITY"
+            )
+        )
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
+
+        val fingerprintCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .getStringWithColumnName("eventJson")!!
+
+        val fingerprintCaptureEvent =
+            JsonHelper.fromJson(fingerprintCaptureEventJson, object : TypeReference<Event>() {})
+
+        assertThat(fingerprintCaptureEvent).isInstanceOf(FingerprintCaptureEvent::class.java)
+        assertThat(fingerprintCaptureEvent.payload.eventVersion).isEqualTo(3)
+        assertThrows<CursorIndexOutOfBoundsException> {
+            MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+                .getStringWithColumnName("eventJson")!!
+        }
+    }
+
     private fun setupV7DbWithFaceCaptureEvent(
-        eventId: String, close: Boolean = true
+        close: Boolean = true, event: ContentValues
     ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 7).apply {
-        val event = createFaceCaptureEvent(eventId)
         this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
 
         if (close) close()
     }
 
     private fun setupV7DbWithFingerprintCaptureEvent(
-        eventId: String, close: Boolean = true
+        close: Boolean = true, event: ContentValues
     ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 7).apply {
-        val event = createFingerprintCaptureEvent(eventId)
         this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
 
         if (close) close()
     }
 
-    private fun createFingerprintCaptureEvent(id: String) = ContentValues().apply {
-        this.put("id", id)
-        this.put("type", OLD_FINGERPRINT_CAPTURE_EVENT)
+    private fun createFingerprintCaptureEvent(id: String, result: String = "GOOD_SCAN") =
+        ContentValues().apply {
+            this.put("id", id)
+            this.put("type", OLD_FINGERPRINT_CAPTURE_EVENT)
 
-        val event =
-            """
+            val event =
+                """
                 {
                 "id":"2022ae95-d4c0-469c-85d6-750659598bbd",
                 "labels":{
@@ -171,7 +228,7 @@ class EventMigration7To8Test {
                     "endedAt":0,
                     "finger":"LEFT_3RD_FINGER",
                     "qualityThreshold":0,
-                    "result":"GOOD_SCAN",
+                    "result":"$result",
                     "fingerprint":{
                         "finger":"LEFT_3RD_FINGER",
                         "quality":0,
@@ -183,20 +240,21 @@ class EventMigration7To8Test {
                         },
                 "type":"FINGERPRINT_CAPTURE"}
                 """
-                .trimIndent()
+                    .trimIndent()
 
-        this.put("eventJson", event)
-        this.put("createdAt", 1611584017198)
-        this.put("endedAt", 0)
-        this.put("sessionIsClosed", 0)
-    }
+            this.put("eventJson", event)
+            this.put("createdAt", 1611584017198)
+            this.put("endedAt", 0)
+            this.put("sessionIsClosed", 0)
+        }
 
-    private fun createFaceCaptureEvent(id: String) = ContentValues().apply {
-        put("id", id)
-        put("type", OLD_FACE_CAPTURE_EVENT)
+    private fun createFaceCaptureEvent(id: String, result: String = "VALID") =
+        ContentValues().apply {
+            put("id", id)
+            put("type", OLD_FACE_CAPTURE_EVENT)
 
-        val event =
-            """
+            val event =
+                """
                 {
                 "id":"977f54f6-a1b8-46d0-a1f4-d1e0685926b9",
                 "labels":{
@@ -209,7 +267,7 @@ class EventMigration7To8Test {
                     "eventVersion":2,
                     "attemptNb":0,
                     "qualityThreshold":0.0,
-                    "result":"VALID",
+                    "result":"$result",
                     "isFallback":false,
                     "face":{
                         "yaw":0.0,
@@ -222,13 +280,13 @@ class EventMigration7To8Test {
                 },
                 "type":"FACE_CAPTURE"
                 }"""
-                .trimIndent()
+                    .trimIndent()
 
-        put("eventJson", event)
-        put("createdAt", 1611584017198)
-        put("endedAt", 0)
-        put("sessionIsClosed", 0)
-    }
+            put("eventJson", event)
+            put("createdAt", 1611584017198)
+            put("endedAt", 0)
+            put("sessionIsClosed", 0)
+        }
 
     companion object {
         private const val TEST_DB = "some_db"
