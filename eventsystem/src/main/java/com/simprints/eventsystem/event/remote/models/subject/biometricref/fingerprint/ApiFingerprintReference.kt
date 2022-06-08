@@ -5,8 +5,7 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemp
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType.FingerprintReference
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat.ISO_19794_2
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ApiFingerprintReference(
