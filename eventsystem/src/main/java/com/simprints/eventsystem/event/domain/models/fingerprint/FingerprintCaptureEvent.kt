@@ -9,13 +9,11 @@ import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
-/*The naming here (3 instead of 2) is to keep in line with the backend, which is at V3 of this. See EVENT_VERSION in the companion
-* object, which also needed incrementing*/
 @Keep
-data class FingerprintCaptureEventV3(
+data class FingerprintCaptureEvent(
     override val id: String = randomUUID(),
     override var labels: EventLabels,
-    override val payload: FingerprintCapturePayloadV3,
+    override val payload: FingerprintCapturePayload,
     override val type: EventType
 ) : Event() {
 
@@ -24,15 +22,15 @@ data class FingerprintCaptureEventV3(
         endTime: Long,
         finger: IFingerIdentifier,
         qualityThreshold: Int,
-        result: FingerprintCapturePayloadV3.Result,
-        fingerprint: FingerprintCapturePayloadV3.Fingerprint?,
+        result: FingerprintCapturePayload.Result,
+        fingerprint: FingerprintCapturePayload.Fingerprint?,
         id: String = randomUUID(),
         labels: EventLabels = EventLabels(),
         payloadId: String = randomUUID()
     ) : this(
         id,
         labels,
-        FingerprintCapturePayloadV3(
+        FingerprintCapturePayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             endedAt = endTime,
@@ -46,7 +44,7 @@ data class FingerprintCaptureEventV3(
     )
 
     @Keep
-    data class FingerprintCapturePayloadV3(
+    data class FingerprintCapturePayload(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,

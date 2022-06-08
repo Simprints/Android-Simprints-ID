@@ -8,12 +8,12 @@ import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
 
-class FingerprintCaptureEventV3Test {
+class FingerprintCaptureEventTest {
 
     @Test
     fun create_FingerprintCaptureEvent() {
         val labels = EventLabels(sessionId = SampleDefaults.GUID1)
-        val fingerprint = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint(
+        val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
             IFingerIdentifier.LEFT_THUMB,
             8,
             FingerprintTemplateFormat.ISO_19794_2
@@ -26,7 +26,7 @@ class FingerprintCaptureEventV3Test {
         with(event.payload) {
             assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)
             assertThat(endedAt).isEqualTo(SampleDefaults.ENDED_AT)
-            assertThat(eventVersion).isEqualTo(FingerprintCaptureEventV3.EVENT_VERSION)
+            assertThat(eventVersion).isEqualTo(FingerprintCaptureEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE_V3)
             assertThat(finger).isEqualTo(IFingerIdentifier.LEFT_THUMB)
             assertThat(qualityThreshold).isEqualTo(10)

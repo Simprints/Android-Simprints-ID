@@ -17,7 +17,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.json.JSONObject
@@ -73,7 +73,7 @@ class EventMigration7To8Test {
         val fingerprintBiometricsObject =
             fingerprintCaptureBiometricsPayload.getJSONObject("fingerprint")
 
-        assertThat(fingerprintCaptureEvent).isInstanceOf(FingerprintCaptureEventV3::class.java)
+        assertThat(fingerprintCaptureEvent).isInstanceOf(FingerprintCaptureEvent::class.java)
         assertThat(fingerprintCaptureEvent.payload.eventVersion).isEqualTo(3)
         assertThat(fingerprintObject.has("template")).isFalse()
 
@@ -84,7 +84,7 @@ class EventMigration7To8Test {
             "some_fingerprint_template"
         )
         assertThat(fingerprintCaptureBiometricsEvent.payload.id).isEqualTo(
-            (fingerprintCaptureEvent as FingerprintCaptureEventV3).payload.id
+            (fingerprintCaptureEvent as FingerprintCaptureEvent).payload.id
         )
         assertThat(fingerprintCaptureEvent.labels.projectId).isEqualTo(
             fingerprintCaptureBiometricsEvent.labels.projectId
