@@ -10,9 +10,9 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import kotlin.Int
 import kotlin.Long
 import kotlin.String
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3 as FingerprintCaptureEventCore
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint as FingerprintCore
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result as ResultCore
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
 import com.simprints.id.data.db.subject.domain.FingerIdentifier as FingerIdentifierCore
 
 @Keep

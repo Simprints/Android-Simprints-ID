@@ -6,7 +6,7 @@ import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Companion.buildResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import org.junit.Test
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3 as FingerprintCaptureEventCore
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.id.data.db.subject.domain.FingerIdentifier as FingerIdentifierCore
 
 class FingerprintCaptureEventTest {
@@ -57,7 +57,7 @@ class FingerprintCaptureEventTest {
 
         assertThat(domain.fingerprint).isNull()
         assertThat(domain.fingerprint).isEqualTo(core.payload.fingerprint)
-        assertThat(core.payload.result).isInstanceOf(FingerprintCaptureEventCore.FingerprintCapturePayloadV3.Result.BAD_QUALITY::class.java)
+        assertThat(core.payload.result).isInstanceOf(FingerprintCaptureEventCore.FingerprintCapturePayload.Result.BAD_QUALITY::class.java)
     }
 
     @Test

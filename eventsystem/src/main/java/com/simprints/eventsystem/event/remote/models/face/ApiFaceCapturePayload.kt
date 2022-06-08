@@ -7,17 +7,17 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceC
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.FaceCapture
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiFace
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiResult.INVALID
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiResult.OFF_ROLL
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiResult.OFF_YAW
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiResult.TOO_CLOSE
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiResult.TOO_FAR
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayloadV3.ApiResult.VALID
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiFace
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.INVALID
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_ROLL
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_YAW
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.TOO_CLOSE
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.TOO_FAR
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.VALID
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiFaceCapturePayloadV3(
+data class ApiFaceCapturePayload(
     val id: String,
     override val startTime: Long,
     val endTime: Long,

@@ -74,7 +74,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEve
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
@@ -381,19 +381,19 @@ fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
 private val payloadId = randomUUID()
 
-fun createFingerprintCaptureEventV3(): FingerprintCaptureEventV3 {
-    val fingerprint = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Fingerprint(
+fun createFingerprintCaptureEventV3(): FingerprintCaptureEvent {
+    val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
         LEFT_THUMB,
         8,
         FingerprintTemplateFormat.ISO_19794_2
     )
 
-    return FingerprintCaptureEventV3(
+    return FingerprintCaptureEvent(
         createdAt = CREATED_AT,
         endTime = ENDED_AT,
         finger = LEFT_THUMB,
         qualityThreshold = 10,
-        result = FingerprintCaptureEventV3.FingerprintCapturePayloadV3.Result.BAD_QUALITY,
+        result = FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
         fingerprint = fingerprint,
         labels = eventLabels,
         payloadId = "payloadId"
