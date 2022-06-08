@@ -51,11 +51,9 @@ class EventMigration7to8 : Migration(7, 8) {
 
         jsonData?.let {
             val originalJson = JSONObject(it)
-            originalJson.remove(OLD_FINGERPRINT_CAPTURE_EVENT)
             originalJson.put(DB_EVENT_TYPE_FIELD, NEW_FINGERPRINT_CAPTURE_EVENT)
 
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            newPayload.remove(OLD_FINGERPRINT_CAPTURE_EVENT)
             newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FINGERPRINT_CAPTURE_EVENT)
             newPayload.put(DB_ID_FIELD, payloadId)
 
@@ -100,11 +98,9 @@ class EventMigration7to8 : Migration(7, 8) {
 
         jsonData?.let {
             val originalJson = JSONObject(jsonData)
-            originalJson.remove(OLD_FACE_CAPTURE_EVENT)
             originalJson.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
 
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            newPayload.remove(OLD_FACE_CAPTURE_EVENT)
             newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
             newPayload.put(DB_ID_FIELD, payloadId)
 
