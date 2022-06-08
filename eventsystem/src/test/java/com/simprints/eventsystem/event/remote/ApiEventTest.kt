@@ -59,11 +59,11 @@ import com.simprints.eventsystem.sampledata.createEnrolmentRecordDeletionEvent
 import com.simprints.eventsystem.sampledata.createEnrolmentRecordMoveEvent
 import com.simprints.eventsystem.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.eventsystem.sampledata.createFaceCaptureConfirmationEvent
-import com.simprints.eventsystem.sampledata.createFaceCaptureEventV3
+import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
 import com.simprints.eventsystem.sampledata.createFaceFallbackCaptureEvent
 import com.simprints.eventsystem.sampledata.createFaceOnboardingCompleteEvent
 import com.simprints.eventsystem.sampledata.createFingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.sampledata.createFingerprintCaptureEventV3
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
 import com.simprints.eventsystem.sampledata.createGuidSelectionEvent
 import com.simprints.eventsystem.sampledata.createIdentificationCallbackEvent
 import com.simprints.eventsystem.sampledata.createIdentificationCalloutEvent
@@ -357,7 +357,7 @@ class ApiEventTest {
 
     @Test
     fun validate_fingerprintCaptureEventApiModel() {
-        val event = createFingerprintCaptureEventV3()
+        val event = createFingerprintCaptureEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
@@ -483,7 +483,7 @@ class ApiEventTest {
 
     @Test
     fun validate_FaceCaptureEventApiModel() {
-        val event = createFaceCaptureEventV3()
+        val event = createFaceCaptureEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
