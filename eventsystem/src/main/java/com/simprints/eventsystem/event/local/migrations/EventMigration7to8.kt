@@ -60,7 +60,7 @@ class EventMigration7to8 : Migration(7, 8) {
             newPayload.put(DB_ID_FIELD, payloadId)
 
             val fingerprint = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT)
-            fingerprint.remove(PAYLOAD_TYPE_NAME)
+            fingerprint.remove(TEMPLATE_FIELD)
             newPayload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
@@ -109,7 +109,7 @@ class EventMigration7to8 : Migration(7, 8) {
             newPayload.put(DB_ID_FIELD, payloadId)
 
             val face = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
-            face.remove(PAYLOAD_TYPE_NAME)
+            face.remove(TEMPLATE_FIELD)
             newPayload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
@@ -196,7 +196,7 @@ class EventMigration7to8 : Migration(7, 8) {
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FACE = "face"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT = "fingerprint"
-        private const val PAYLOAD_TYPE_NAME = "template"
+        private const val TEMPLATE_FIELD = "template"
         private const val NEW_EVENT_VERSION_VALUE = 3
     }
 }
