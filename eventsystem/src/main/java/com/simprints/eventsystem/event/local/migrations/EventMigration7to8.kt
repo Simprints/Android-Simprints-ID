@@ -15,15 +15,15 @@ class EventMigration7to8 : Migration(7, 8) {
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
             Simber.d("Migrating room db from schema 7 to schema 8.")
-            removeTemplateDataFromOldFaceCapture(database)
-            removeTemplateDataFromOldFingerprintCapture(database)
+            removeTemplateDataFromOldFaceCaptureAndSaveFaceBiometricsEvent(database)
+            removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database)
             Simber.d("Migration from schema 7 to schema 8 done.")
         } catch (t: Throwable) {
             Simber.e(t)
         }
     }
 
-    private fun removeTemplateDataFromOldFingerprintCapture(database: SupportSQLiteDatabase) {
+    private fun removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database: SupportSQLiteDatabase) {
         val fingerPrintCaptureQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ?", arrayOf(OLD_FINGERPRINT_CAPTURE_EVENT)
         )
@@ -71,7 +71,7 @@ class EventMigration7to8 : Migration(7, 8) {
     /**
      * Remove the template field and update the event version
      */
-    private fun removeTemplateDataFromOldFaceCapture(database: SupportSQLiteDatabase) {
+    private fun removeTemplateDataFromOldFaceCaptureAndSaveFaceBiometricsEvent(database: SupportSQLiteDatabase) {
         val faceCaptureQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ?", arrayOf(OLD_FACE_CAPTURE_EVENT)
         )
