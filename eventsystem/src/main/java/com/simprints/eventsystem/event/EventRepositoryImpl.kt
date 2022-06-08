@@ -61,10 +61,8 @@ open class EventRepositoryImpl(
     private val validators = validatorsFactory.build()
 
     private val currentProject: String
-        get() = if (loginInfoManager.getSignedInProjectIdOrEmpty().isEmpty()) {
+        get() = loginInfoManager.getSignedInProjectIdOrEmpty().ifEmpty {
             PROJECT_ID_FOR_NOT_SIGNED_IN
-        } else {
-            loginInfoManager.getSignedInProjectIdOrEmpty()
         }
 
     override suspend fun createSession(): SessionCaptureEvent {
