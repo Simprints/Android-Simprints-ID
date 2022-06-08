@@ -236,7 +236,7 @@ open class EventRepositoryImpl(
                 }
             }
             uploadEvents(filteredEvents, projectId)
-            deleteEventsFromDb(filteredEvents.map { it.id })
+            deleteEventsFromDb(events.map { it.id })
         } catch (t: Throwable) {
             Simber.w(t)
             // We don't need to report http exceptions as cloud logs all of them.
