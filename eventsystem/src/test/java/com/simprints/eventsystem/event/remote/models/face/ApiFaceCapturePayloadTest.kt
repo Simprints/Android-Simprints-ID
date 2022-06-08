@@ -2,11 +2,11 @@ package com.simprints.eventsystem.event.remote.models.face
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import org.junit.Test
 
-class ApiFaceCapturePayloadV3Test {
+class ApiFaceCapturePayloadTest {
 
     @Test
     fun `creating face capture payload returns correct values`() {
@@ -42,43 +42,43 @@ class ApiFaceCapturePayloadV3Test {
 
     @Test
     fun `should map VALID correctly`() {
-        val result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.VALID.fromDomainToApi()
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.VALID.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFaceCapturePayloadV3.ApiResult.VALID::class.java)
     }
 
     @Test
     fun `should map INVALID correctly`() {
-        val result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.INVALID.fromDomainToApi()
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.INVALID.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFaceCapturePayloadV3.ApiResult.INVALID::class.java)
     }
 
     @Test
     fun `should map OFF YAW correctly`() {
-        val result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.OFF_YAW.fromDomainToApi()
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.OFF_YAW.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFaceCapturePayloadV3.ApiResult.OFF_YAW::class.java)
     }
 
     @Test
     fun `should map OFF ROLL correctly`() {
-        val result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.OFF_ROLL.fromDomainToApi()
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.OFF_ROLL.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFaceCapturePayloadV3.ApiResult.OFF_ROLL::class.java)
     }
 
     @Test
     fun `should map TOO CLOSE correctly`() {
-        val result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.TOO_CLOSE.fromDomainToApi()
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.TOO_CLOSE.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFaceCapturePayloadV3.ApiResult.TOO_CLOSE::class.java)
     }
 
     @Test
     fun `should map TOO FAR correctly`() {
-        val result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.TOO_FAR.fromDomainToApi()
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.TOO_FAR.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFaceCapturePayloadV3.ApiResult.TOO_FAR::class.java)
     }
 
     @Test
     fun `should map api face correctly`() {
-        val face = FaceCaptureEventV3.FaceCapturePayloadV3.Face(
+        val face = FaceCaptureEvent.FaceCapturePayload.Face(
             yaw = 2.0f,
             roll = 1.0f,
             quality = 3.0f,

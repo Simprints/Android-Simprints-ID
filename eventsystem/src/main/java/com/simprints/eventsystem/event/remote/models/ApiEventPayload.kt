@@ -39,7 +39,7 @@ import com.simprints.eventsystem.event.domain.models.callout.IdentificationCallo
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
@@ -133,7 +133,7 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
         FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
         FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
-        FACE_CAPTURE_V3 -> ApiFaceCapturePayloadV3(this as FaceCaptureEventV3.FaceCapturePayloadV3)
+        FACE_CAPTURE_V3 -> ApiFaceCapturePayloadV3(this as FaceCaptureEvent.FaceCapturePayload)
         FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
         SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
         CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)

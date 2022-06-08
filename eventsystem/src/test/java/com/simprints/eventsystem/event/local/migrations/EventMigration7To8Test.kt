@@ -15,7 +15,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEventV3
 import com.simprints.eventsystem.event.local.EventRoomDatabase
@@ -120,7 +120,7 @@ class EventMigration7To8Test {
             faceCaptureBiometricsPayload.getJSONObject("face")
 
 
-        assertThat(faceCaptureEvent).isInstanceOf(FaceCaptureEventV3::class.java)
+        assertThat(faceCaptureEvent).isInstanceOf(FaceCaptureEvent::class.java)
         assertThat(faceCaptureEvent.payload.eventVersion).isEqualTo(3)
         assertThat(captureFace.has("template")).isFalse()
 
@@ -131,7 +131,7 @@ class EventMigration7To8Test {
             "some_face_template"
         )
         assertThat(faceCaptureBiometricsEvent.payload.id).isEqualTo(
-            (faceCaptureEvent as FaceCaptureEventV3).payload.id
+            (faceCaptureEvent as FaceCaptureEvent).payload.id
         )
         assertThat(faceCaptureEvent.labels.projectId).isEqualTo(faceCaptureBiometricsEvent.labels.projectId)
     }
