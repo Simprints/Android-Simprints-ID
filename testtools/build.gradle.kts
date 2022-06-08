@@ -22,30 +22,30 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":logging"))
 
-    api(Dependencies.AndroidX.multidex)
-    implementation(Dependencies.Testing.AndroidX.monitor)
-    implementation(Dependencies.Testing.AndroidX.core)
-    api(Dependencies.Testing.Espresso.core)
-    implementation(Dependencies.Testing.Espresso.barista) {
+    api(libs.androidX.multidex)
+    implementation(libs.testing.androidX.monitor)
+    implementation(libs.testing.androidX.core)
+    api(libs.testing.espresso.core)
+    implementation(libs.testing.espresso.barista) {
         exclude("com.android.support")
         exclude("com.google.code.findbugs")
         exclude("org.jetbrains.kotlin")
         exclude("com.google.guava")
     }
 
-    annotationProcessor(Dependencies.Dagger.compiler)
-    implementation(Dependencies.Kotlin.reflect)
+    annotationProcessor(libs.dagger.compiler)
+    implementation(libs.kotlin.reflect)
 
-    implementation(Dependencies.Testing.Mockito.inline)
-    implementation(Dependencies.Testing.Mockito.kotlin)
+    implementation(libs.testing.mockito.inline)
+    implementation(libs.testing.mockito.kotlin)
 
-    implementation(Dependencies.Testing.Robolectric.core)
-    implementation(Dependencies.Testing.Robolectric.multidex)
-    api(Dependencies.Testing.mockwebserver)
-    implementation(Dependencies.RxJava2.android)
-    api(Dependencies.RxJava2.core)
-    api(Dependencies.Testing.retrofit)
-    implementation(Dependencies.Retrofit.core)
-    api(Dependencies.Testing.coroutines_test)
-    implementation(Dependencies.Testing.Mockk.core)
+    implementation(libs.testing.robolectric.core)
+    implementation(libs.testing.robolectric.multidex)
+    api(libs.testing.mockwebserver)
+    implementation(libs.rxJava2.android)
+    api(libs.rxJava2.core)
+    api(libs.testing.retrofit)
+    implementation(libs.retrofit.core)
+    api(libs.testing.coroutines.test)
+    implementation(libs.testing.mockk.core)
 }

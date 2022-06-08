@@ -18,11 +18,12 @@ data class OneToOneMatchEvent(
         candidateId: String,
         matcher: Matcher,
         result: MatchEntry?,
+        fingerComparisonStrategy: FingerComparisonStrategy?,
         labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        OneToOneMatchPayload(createdAt, EVENT_VERSION, endTime, candidateId, matcher, result),
+        OneToOneMatchPayload(createdAt, EVENT_VERSION, endTime, candidateId, matcher, result, fingerComparisonStrategy),
         ONE_TO_ONE_MATCH)
 
     @Keep
@@ -33,10 +34,11 @@ data class OneToOneMatchEvent(
         val candidateId: String,
         val matcher: Matcher,
         val result: MatchEntry?,
+        val fingerComparisonStrategy: FingerComparisonStrategy?,
         override val type: EventType = ONE_TO_ONE_MATCH
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

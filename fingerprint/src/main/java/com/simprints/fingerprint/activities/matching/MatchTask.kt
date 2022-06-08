@@ -10,5 +10,9 @@ interface MatchTask {
 
     fun onCandidatesLoaded(numberOfCandidates: Int)
 
-    fun handleMatchResult(numberOfCandidates: Int, matchResults: List<MatchResult>)
+    fun handleMatchResult(
+        numberOfCandidates: Int,
+        matchResults: List<MatchResult>,
+        isCrossFingerMatchingEnabled: Boolean
+    )
 }

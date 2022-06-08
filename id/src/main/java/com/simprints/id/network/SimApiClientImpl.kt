@@ -6,6 +6,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimRemoteInterface
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.coroutines.retryIO
+import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.extentions.isCloudRecoverableIssue
 import com.simprints.core.tools.json.JsonHelper
 import kotlinx.coroutines.withContext
@@ -58,15 +59,16 @@ open class SimApiClientImpl<T : SimRemoteInterface>(
                         networkBlock(api)
                     }
 
-                } catch (throwable: Throwable) {
-                    throw if (!throwable.isCloudRecoverableIssue()) {
+                } catch (t: Throwable) {
+                    val throwable = Throwable(t)
+                    throw if (!t.isCloudRecoverableIssue()) {
                         SyncCloudIntegrationException("Http status code not worth to retry", throwable)
                     } else {
                         throwable
                     }
                 }
             },
-            retryIf = { it !is SyncCloudIntegrationException })
+            retryIf = { it !is SyncCloudIntegrationException && !it.isBackendMaintenanceException() })
     }
 
 }

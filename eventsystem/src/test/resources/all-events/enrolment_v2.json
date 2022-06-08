@@ -1,0 +1,20 @@
+{
+  "id": "f14f8cd0-a57b-4cfa-8731-2a295ebeb0e8",
+  "type": "ENROLMENT_V2",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "ENROLMENT_V2",
+    "eventVersion": 2,
+    "createdAt": 178967890,
+    "endedAt": 0,
+    "subjectId": "9aa64aff-46b5-4ab4-90b5-82c0e6d9725f",
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "moduleId": "module1",
+    "attendantId": "user1",
+    "personCreationEventId": "94828488-47ce-4c76-8ace-33d69b2a6d75"
+  }
+}

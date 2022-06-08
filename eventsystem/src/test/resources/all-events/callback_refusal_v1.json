@@ -1,0 +1,17 @@
+{
+  "id": "319299d8-1e02-416a-93c6-89cd3536224d",
+  "type": "CALLBACK_REFUSAL",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CALLBACK_REFUSAL",
+    "eventVersion": 1,
+    "createdAt": 76345678901,
+    "endedAt": 0,
+    "reason": "REFUSED_RELIGION",
+    "extra": "refused"
+  }
+}

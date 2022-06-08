@@ -17,8 +17,8 @@ import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.Size
 import com.simprints.logging.Simber
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 /**

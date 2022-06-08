@@ -17,7 +17,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.databinding.FragmentOtaRecoveryBinding
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * This fragment is show when an Over The Air update fails, and a reset is required

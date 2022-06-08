@@ -23,7 +23,7 @@ import com.simprints.fingerprint.databinding.FragmentBluetoothOffBinding
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class BluetoothOffFragment : FingerprintFragment() {
 

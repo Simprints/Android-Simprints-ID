@@ -10,6 +10,16 @@ apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
 }
 
+configurations {
+
+    androidTestImplementation {
+        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
+        // https://github.com/android/android-test/issues/861
+        // and https://github.com/android/android-test/issues/999
+        exclude("org.checkerframework", "checker")
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
+}
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -91,40 +101,47 @@ dependencies {
     implementation(project(":logging"))
 
     // Kotlin
-    implementation(Dependencies.Kotlin.reflect)
+    implementation(libs.kotlin.reflect)
 
     // Android X
-    implementation(Dependencies.AndroidX.core)
-    implementation(Dependencies.AndroidX.multidex)
-    implementation(Dependencies.AndroidX.appcompat)
-    implementation(Dependencies.AndroidX.legacy)
-    implementation(Dependencies.AndroidX.Room.core)
-    implementation(Dependencies.AndroidX.Lifecycle.viewmodel)
-    implementation(Dependencies.AndroidX.Lifecycle.livedata)
-    implementation(Dependencies.AndroidX.UI.constraintlayout)
-    implementation(Dependencies.AndroidX.UI.cardview)
-    implementation(Dependencies.AndroidX.UI.preference)
-    implementation(Dependencies.AndroidX.UI.fragment)
-    implementation(Dependencies.AndroidX.UI.viewpager2)
-    implementation(Dependencies.AndroidX.Navigation.fragment)
-    implementation(Dependencies.AndroidX.Navigation.ui)
-    implementation(Dependencies.WorkManager.work)
+    implementation(libs.androidX.core)
+    implementation(libs.androidX.multidex)
+    implementation(libs.androidX.appcompat)
+    implementation(libs.androidX.legacy)
+    implementation(libs.androidX.room.core)
+    implementation(libs.androidX.lifecycle.viewmodel)
+    implementation(libs.androidX.lifecycle.livedata)
+    implementation(libs.androidX.lifecycle.ext)
+    implementation(libs.androidX.ui.constraintlayout)
+    implementation(libs.androidX.ui.cardview)
+    implementation(libs.androidX.ui.preference)
+    implementation(libs.androidX.ui.fragment)
+    implementation(libs.androidX.ui.viewpager2)
+    implementation(libs.androidX.navigation.fragment)
+    implementation(libs.androidX.navigation.ui)
+    implementation(libs.workManager.work)
 
     // RxJava
-    implementation(Dependencies.RxJava2.permissions)
-    implementation(Dependencies.RxJava2.location)
-    implementation(Dependencies.RxJava2.android)
-    implementation(Dependencies.RxJava2.core)
-    implementation(Dependencies.RxJava2.kotlin)
+    implementation(libs.rxJava2.permissions)
+    implementation(libs.rxJava2.location)
+    implementation(libs.rxJava2.android)
+    implementation(libs.rxJava2.core)
+    implementation(libs.rxJava2.kotlin)
 
     // Play Services
-    implementation(Dependencies.PlayServices.location)
+    implementation(libs.playServices.location)
 
     // Retrofit
-    implementation(Dependencies.Retrofit.core)
-    implementation(Dependencies.Retrofit.adapter)
-    implementation(Dependencies.Retrofit.logging)
-    implementation(Dependencies.Retrofit.okhttp)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.adapter)
+    implementation(libs.retrofit.logging)
+    implementation(libs.retrofit.okhttp)
+    // Splitties
+    implementation(libs.splitties.core)
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+
 
     // ######################################################
     //                      Unit test
@@ -132,38 +149,39 @@ dependencies {
 
     // Simprints
     testImplementation(project(":testtools"))
-    testImplementation(Dependencies.Testing.junit) {
+    testImplementation(libs.testing.junit) {
         exclude("com.android.support")
     }
 
     // Android X
-    testImplementation(Dependencies.Testing.AndroidX.ext_junit)
-    testImplementation(Dependencies.Testing.AndroidX.core)
-    testImplementation(Dependencies.Testing.AndroidX.core_testing)
-    testImplementation(Dependencies.Testing.AndroidX.runner)
-    testImplementation(Dependencies.Testing.AndroidX.room)
-    testImplementation(Dependencies.Testing.AndroidX.rules)
+    testImplementation(libs.testing.androidX.ext.junit)
+    testImplementation(libs.testing.androidX.core)
+    testImplementation(libs.testing.androidX.core.testing)
+    testImplementation(libs.testing.androidX.runner)
+    testImplementation(libs.testing.androidX.room)
+    testImplementation(libs.testing.androidX.rules)
 
     // Espresso
-    testImplementation(Dependencies.Testing.Espresso.core)
-    testImplementation(Dependencies.Testing.Espresso.intents)
-    testImplementation(Dependencies.Testing.Espresso.contrib)
+    testImplementation(libs.testing.espresso.core)
+    testImplementation(libs.testing.espresso.intents)
+    testImplementation(libs.testing.espresso.contrib)
 
     // Kotlin
-    testImplementation(Dependencies.Testing.KoTest.kotlin)
-    testImplementation(Dependencies.Testing.coroutines_test)
+    testImplementation(libs.testing.koTest.kotlin)
+    testImplementation(libs.testing.coroutines.test)
 
     // Mocking and assertion frameworks
-    testImplementation(Dependencies.Testing.Mockito.kotlin)
-    testImplementation(Dependencies.Testing.truth)
-    testImplementation(Dependencies.Testing.Mockk.core)
+    testImplementation(libs.testing.mockito.kotlin)
+    testImplementation(libs.testing.truth)
+    testImplementation(libs.testing.mockk.core)
 
     // Koin
-    testImplementation(Dependencies.Testing.koin)
+    testImplementation(libs.testing.koin)
+    testImplementation(libs.testing.live.data)
 
     // Robolectric
-    testImplementation(Dependencies.Testing.Robolectric.core)
-    testImplementation(Dependencies.Testing.Robolectric.multidex)
+    testImplementation(libs.testing.robolectric.core)
+    testImplementation(libs.testing.robolectric.multidex)
 
     // ######################################################
     //                      Android test
@@ -179,35 +197,34 @@ dependencies {
     }
 
     // Koin
-    androidTestImplementation(Dependencies.Koin.core_ext)
-    androidTestImplementation(Dependencies.Testing.koin)
+    androidTestImplementation(libs.testing.koin)
 
     // Android X
-    androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
-    androidTestImplementation(Dependencies.Testing.AndroidX.monitor)
-    androidTestImplementation(Dependencies.Testing.AndroidX.core)
-    androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
-    androidTestImplementation(Dependencies.Testing.AndroidX.runner)
-    androidTestImplementation(Dependencies.Testing.AndroidX.rules)
-    androidTestUtil(Dependencies.Testing.AndroidX.orchestrator)
-    androidTestImplementation(Dependencies.Testing.live_data)
-    androidTestImplementation(Dependencies.AndroidX.CameraX.core)
+    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.monitor)
+    androidTestImplementation(libs.testing.androidX.core)
+    androidTestImplementation(libs.testing.androidX.ext.junit)
+    androidTestImplementation(libs.testing.androidX.runner)
+    androidTestImplementation(libs.testing.androidX.rules)
+    androidTestUtil(libs.testing.androidX.orchestrator)
+    androidTestImplementation(libs.testing.live.data)
+    androidTestImplementation(libs.androidX.cameraX.core)
 
     // Android X navigation components
-    androidTestImplementation(Dependencies.Testing.AndroidX.navigation)
+    androidTestImplementation(libs.testing.androidX.navigation)
 
     // Mocking and assertion frameworks
-    androidTestImplementation(Dependencies.Testing.Mockito.core)
-    androidTestImplementation(Dependencies.Testing.Mockito.android)
-    androidTestImplementation(Dependencies.Testing.Mockito.kotlin)
-    androidTestImplementation(Dependencies.Testing.truth)
-    androidTestImplementation(Dependencies.Testing.Mockk.core)
-    androidTestImplementation(Dependencies.Testing.Mockk.android)
+    androidTestImplementation(libs.testing.mockito.core)
+    androidTestImplementation(libs.testing.mockito.android)
+    androidTestImplementation(libs.testing.mockito.kotlin)
+    androidTestImplementation(libs.testing.truth)
+    androidTestImplementation(libs.testing.mockk.core)
+    androidTestImplementation(libs.testing.mockk.android)
 
     // Espresso
-    androidTestImplementation(Dependencies.Testing.Espresso.core)
-    androidTestImplementation(Dependencies.Testing.Espresso.intents)
-    androidTestImplementation(Dependencies.Testing.Espresso.barista) {
+    androidTestImplementation(libs.testing.espresso.core)
+    androidTestImplementation(libs.testing.espresso.intents)
+    androidTestImplementation(libs.testing.espresso.barista) {
         exclude("com.android.support")
         exclude("com.google.code.findbugs")
         exclude("org.jetbrains.kotlin")
@@ -215,9 +232,9 @@ dependencies {
     }
 
     // Truth
-    androidTestImplementation(Dependencies.Testing.truth)
+    androidTestImplementation(libs.testing.truth)
 
-    androidTestImplementation(Dependencies.Testing.rx2_idler)
+    androidTestImplementation(libs.testing.rx2.idler)
 
     // Trust me I hate this fix more than you
     // This is to solve multiple imports of guava https://stackoverflow.com/a/60492942/4072335

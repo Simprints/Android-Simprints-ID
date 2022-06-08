@@ -45,8 +45,8 @@ dependencies {
     // We specifically don't include Crashlytics, Analytics, Performance monitoring and Timber in
     // the central buildSrc module because we do not want or expect these dependencies to be used in
     // multiple modules
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.8")
-    implementation("com.google.firebase:firebase-analytics-ktx:20.1.0")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.10")
+    implementation("com.google.firebase:firebase-analytics-ktx:20.1.2")
     implementation("com.google.firebase:firebase-perf:20.0.5")
 
     //4.7.1 breaks realm:
@@ -57,8 +57,8 @@ dependencies {
     }
 
     // Unit Tests
-    testImplementation(Dependencies.Testing.junit)
-    testImplementation(Dependencies.Testing.Mockk.core)
-    testImplementation(Dependencies.Testing.Robolectric.core)
+    testImplementation(libs.testing.junit)
+    testImplementation(libs.testing.mockk.core)
+    testImplementation(libs.testing.robolectric.core)
 
 }

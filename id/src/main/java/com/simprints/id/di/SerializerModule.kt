@@ -5,6 +5,7 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
@@ -108,6 +109,11 @@ class SerializerModule {
     @Singleton
     @Named("CaptureFingerprintStrategySerializer")
     fun provideCaptureFingerprintStrategySerializer(): Serializer<CaptureFingerprintStrategy> = EnumSerializer(CaptureFingerprintStrategy::class.java)
+
+    @Provides
+    @Singleton
+    @Named("FingerprintMatchingStrategySerializer")
+    fun provideFingerprintMatchingStrategySerializer(): Serializer<FingerComparisonStrategy> = EnumSerializer(FingerComparisonStrategy::class.java)
 
     @Provides
     @Singleton

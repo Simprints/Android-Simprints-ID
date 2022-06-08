@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "major": {
+    "dependencyDashboardApproval": "false"
+  },
+  "extends": [
+    "github>TWiStErRob/renovate-config"
+  ],
+  "regexManagers": [
+    {
+      "description": "Detect template under buildSrc",
+      "fileMatch": [
+        "(^|/)buildSrc/.*"
+      ],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)\n([a-z A-Z]*)Version = \"(?<currentValue>.*?)\"\n"
+      ]
+    }
+  ]
+}

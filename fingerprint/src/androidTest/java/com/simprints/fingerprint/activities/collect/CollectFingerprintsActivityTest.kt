@@ -29,21 +29,31 @@ import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenA
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
+import com.simprints.fingerprint.commontesttools.time.MockTimer
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.Application
-import io.mockk.every
-import io.mockk.mockk
+
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
+import io.mockk.*
+import io.reactivex.Completable
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -63,7 +73,33 @@ class CollectFingerprintsActivityTest : KoinTest {
     private val launchReconnect = MutableLiveData<LiveDataEvent>()
     private val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
 
-    private val vm: CollectFingerprintsViewModel = mockk(relaxUnitFun = true) {
+    private val mockTimer = MockTimer()
+    private val timeHelper: FingerprintTimeHelper = mockk(relaxed = true) {
+        every { newTimer() } returns mockTimer
+    }
+    private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
+    private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
+        every { qualityThreshold } returns 60
+        every { liveFeedbackOn } returns false
+    }
+    private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
+        every { isLiveFeedbackAvailable() } returns false
+        every { disconnect() } returns Completable.complete()
+    }
+    private val scannerManager: ScannerManager =
+        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
+            every { checkBluetoothStatus() } returns Completable.complete()
+        }
+
+    private val imageManager: FingerprintImageManager = mockk(relaxed = true)
+
+    private val vm: CollectFingerprintsViewModel = spyk(
+        CollectFingerprintsViewModel(
+            scannerManager, preferencesManager, imageManager,
+            timeHelper, sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests
+        )
+    ) {
+        every { start(any()) } just Runs
         every { state } returns this@CollectFingerprintsActivityTest.state
         every { vibrate } returns this@CollectFingerprintsActivityTest.vibrate
         every { noFingersScannedToast } returns this@CollectFingerprintsActivityTest.noFingersScannedToast
@@ -92,7 +128,8 @@ class CollectFingerprintsActivityTest : KoinTest {
 
     @Before
     fun setUp() {
-        loadKoinModules(module(override = true) {
+        scannerManager.scanner = scanner
+        loadKoinModules(module() {
             factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
             viewModel { vm }
         })
