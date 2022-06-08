@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent.Result.Companion.fromFaceDetectionStatus
 import com.simprints.face.models.FaceDetection
 import org.junit.Test
@@ -27,7 +27,7 @@ class FaceCaptureEventTest {
         assertThat(domain.eventFace).isEqualTo(core.payload.face)
         assertThat(core.payload.createdAt).isEqualTo(0)
         assertThat(core.payload.qualityThreshold).isEqualTo(0.0f)
-        assertThat(core.payload.result).isEqualTo(FaceCaptureEvent.FaceCapturePayload.Result.VALID)
+        assertThat(core.payload.result).isEqualTo(CoreFaceCaptureEvent.FaceCapturePayload.Result.VALID)
     }
 
     @Test
