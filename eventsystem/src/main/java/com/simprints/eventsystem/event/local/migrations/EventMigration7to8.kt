@@ -170,7 +170,7 @@ class EventMigration7to8 : Migration(7, 8) {
                 fingerprintObject.getString("format")
             }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
-        val faceCaptureBiometricsEvent = ContentValues().apply {
+        val fingerprintCaptureBiometricsEvent = ContentValues().apply {
             this.put("id", randomUUID())
             this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
@@ -179,7 +179,7 @@ class EventMigration7to8 : Migration(7, 8) {
             this.put("sessionIsClosed", 0)
         }
 
-        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
+        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, fingerprintCaptureBiometricsEvent)
     }
 
     companion object {
