@@ -472,6 +472,8 @@ class EventRemoteDataSourceImplAndroidTest {
 
         val face =
             FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+                roll = 0.0f,
+                yaw = 0.0f,
                 template = template,
                 quality = 1.0f,
                 format = FaceTemplateFormat.RANK_ONE_1_23

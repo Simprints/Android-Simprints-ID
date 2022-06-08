@@ -19,7 +19,9 @@
     "qualityThreshold": 1.0,
     "result": "VALID",
     "face": {
-      "template": "template",
+      "yaw": 0.0,
+      "roll": 0.0,
+      "quality": 0.0,
       "format": "RANK_ONE_1_23"
     },
     "endedAt": 0,

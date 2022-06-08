@@ -60,6 +60,8 @@ object FixtureGenerator {
         startTime = 2,
         endTime = 0,
         eventFace = FaceCaptureBiometricsEvent.EventFace(
+            roll = 0.0f,
+            yaw = 0.0f,
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
             quality = 1.0f,
             format = FaceTemplateFormat.MOCK
@@ -86,6 +88,8 @@ object FixtureGenerator {
         startTime = 4,
         endTime = 0,
         eventFace = FaceCaptureBiometricsEvent.EventFace(
+            roll = 0.0f,
+            yaw = 0.0f,
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
             quality = 1.0f,
             format = FaceTemplateFormat.MOCK
@@ -112,6 +116,8 @@ object FixtureGenerator {
         startTime = 0,
         endTime = 0,
         eventFace = FaceCaptureBiometricsEvent.EventFace(
+            roll = 0.0f,
+            yaw = 0.0f,
             template = "rR/uPLRKPI0yWzd9eQLM1/ST6DQ=",
             quality = 1.0f,
             format = FaceTemplateFormat.MOCK

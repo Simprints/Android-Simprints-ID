@@ -45,6 +45,8 @@ data class FaceCaptureBiometricsEvent(
 
         @Keep
         data class Face(
+            val yaw: Float,
+            var roll: Float,
             val template: String,
             val quality: Float,
             val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
