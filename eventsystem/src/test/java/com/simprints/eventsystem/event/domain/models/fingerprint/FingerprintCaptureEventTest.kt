@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.domain.models.fingerprint
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.sampledata.FingerprintCaptureEventV3Sample
+import com.simprints.eventsystem.sampledata.FingerprintCaptureEventSample
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
@@ -18,7 +18,7 @@ class FingerprintCaptureEventTest {
             8,
             FingerprintTemplateFormat.ISO_19794_2
         )
-        val event = FingerprintCaptureEventV3Sample.getEvent(labels)
+        val event = FingerprintCaptureEventSample.getEvent(labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

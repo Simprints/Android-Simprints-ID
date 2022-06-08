@@ -386,7 +386,7 @@ class EventRemoteDataSourceImplAndroidTest {
         )
     }
 
-    private fun MutableList<Event>.addFingerprintCaptureEventV3() {
+    private fun MutableList<Event>.addFingerprintCaptureEvent() {
         FingerprintCaptureEvent.FingerprintCapturePayload.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
 
@@ -438,7 +438,7 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
 
-    private fun MutableList<Event>.addFaceCaptureEventV3() {
+    private fun MutableList<Event>.addFaceCaptureEvent() {
         FaceCaptureEvent.FaceCapturePayload.Result.values().forEachIndexed { index, result ->
 
             val face =
@@ -828,7 +828,7 @@ class EventRemoteDataSourceImplAndroidTest {
             CONSENT -> addConsentEvent()
             ENROLMENT_V2 -> addEnrolmentEvent()
             AUTHORIZATION -> addAuthorizationEvent()
-            FINGERPRINT_CAPTURE -> addFingerprintCaptureEventV3()
+            FINGERPRINT_CAPTURE -> addFingerprintCaptureEvent()
             FINGERPRINT_CAPTURE_BIOMETRICS -> addFingerprintBiometricCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
@@ -861,7 +861,7 @@ class EventRemoteDataSourceImplAndroidTest {
             COMPLETION_CHECK -> addCompletionCheckEvent()
             FACE_ONBOARDING_COMPLETE -> addFaceOnboardingCompleteEvent()
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
-            FACE_CAPTURE -> addFaceCaptureEventV3()
+            FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_BIOMETRICS -> addFaceCaptureBiometricCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             ENROLMENT_RECORD_DELETION,

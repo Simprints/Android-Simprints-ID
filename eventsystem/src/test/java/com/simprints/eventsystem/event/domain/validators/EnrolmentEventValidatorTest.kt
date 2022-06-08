@@ -2,8 +2,8 @@ package com.simprints.eventsystem.event.domain.validators
 
 import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.eventsystem.sampledata.createEnrolmentEventV2
-import com.simprints.eventsystem.sampledata.createFaceCaptureEventV3
-import com.simprints.eventsystem.sampledata.createFingerprintCaptureEventV3
+import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import io.kotest.assertions.throwables.shouldThrow
@@ -21,7 +21,7 @@ class EnrolmentEventValidatorTest {
 
     @Test
     fun validate_shouldValidateIfBiometricCaptureAndPersonCreationIsPresent() {
-        val currentEvents = listOf(createFaceCaptureEventV3(), createPersonCreationEvent())
+        val currentEvents = listOf(createFaceCaptureEvent(), createPersonCreationEvent())
         validator.validate(currentEvents, createEnrolmentEventV2())
     }
 
@@ -36,7 +36,7 @@ class EnrolmentEventValidatorTest {
     @Test
     fun validate_shouldThrowIfPersonCreationIsNotPresent() {
         shouldThrow<EnrolmentEventValidatorException> {
-            val currentEvents = listOf(createFingerprintCaptureEventV3())
+            val currentEvents = listOf(createFingerprintCaptureEvent())
             validator.validate(currentEvents, createEnrolmentEventV2())
         }
     }

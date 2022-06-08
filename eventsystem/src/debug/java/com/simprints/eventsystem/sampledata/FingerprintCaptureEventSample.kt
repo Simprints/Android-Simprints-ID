@@ -8,7 +8,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
-object FingerprintCaptureEventV3Sample : SampleEvent() {
+object FingerprintCaptureEventSample : SampleEvent() {
 
     override fun getEvent(
         labels: EventLabels,

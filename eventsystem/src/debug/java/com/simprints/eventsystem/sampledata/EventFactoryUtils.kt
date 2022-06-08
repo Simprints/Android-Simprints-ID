@@ -189,7 +189,7 @@ fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
 fun createFaceCaptureConfirmationEvent() =
     FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 
-fun createFaceCaptureEventV3(): FaceCaptureEvent {
+fun createFaceCaptureEvent(): FaceCaptureEvent {
     val faceArg =
         FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
     return FaceCaptureEvent(
@@ -381,7 +381,7 @@ fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
 private val payloadId = randomUUID()
 
-fun createFingerprintCaptureEventV3(): FingerprintCaptureEvent {
+fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
         LEFT_THUMB,
         8,

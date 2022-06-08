@@ -27,7 +27,7 @@
       "quality": 0.0,
       "format": "RANK_ONE_1_23"
     },
-    "type": "FACE_CAPTURE_V3"
+    "type": "FACE_CAPTURE"
   },
-  "type": "FACE_CAPTURE_V3"
+  "type": "FACE_CAPTURE"
 }
