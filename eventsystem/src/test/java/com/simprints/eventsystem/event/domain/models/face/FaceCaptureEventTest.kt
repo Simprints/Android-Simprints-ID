@@ -8,15 +8,15 @@ import com.simprints.eventsystem.sampledata.SampleDefaults
 import org.junit.Test
 
 @Keep
-class FaceCaptureEventV3Test {
+class FaceCaptureEventTest {
     @Test
     fun create_FaceCaptureEvent() {
         val labels = EventLabels(sessionId = SampleDefaults.GUID1)
-        val faceArg = FaceCaptureEventV3.FaceCapturePayloadV3.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
-        val event = FaceCaptureEventV3(
+        val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
+        val event = FaceCaptureEvent(
             SampleDefaults.CREATED_AT,
             SampleDefaults.ENDED_AT, 0, 1F,
-            FaceCaptureEventV3.FaceCapturePayloadV3.Result.VALID, true, faceArg, labels
+            FaceCaptureEvent.FaceCapturePayload.Result.VALID, true, faceArg, labels
         )
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
@@ -24,11 +24,11 @@ class FaceCaptureEventV3Test {
         with(event.payload) {
             assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)
             assertThat(endedAt).isEqualTo(SampleDefaults.ENDED_AT)
-            assertThat(eventVersion).isEqualTo(FaceCaptureEventV3.EVENT_VERSION)
+            assertThat(eventVersion).isEqualTo(FaceCaptureEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(EventType.FACE_CAPTURE_V3)
             assertThat(attemptNb).isEqualTo(0)
             assertThat(qualityThreshold).isEqualTo(1F)
-            assertThat(result).isEqualTo(FaceCaptureEventV3.FaceCapturePayloadV3.Result.VALID)
+            assertThat(result).isEqualTo(FaceCaptureEvent.FaceCapturePayload.Result.VALID)
             assertThat(isFallback).isEqualTo(true)
             assertThat(face).isEqualTo(faceArg)
         }

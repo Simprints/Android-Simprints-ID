@@ -69,7 +69,7 @@ import com.simprints.eventsystem.event.domain.models.callout.VerificationCallout
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
@@ -189,15 +189,15 @@ fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
 fun createFaceCaptureConfirmationEvent() =
     FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 
-fun createFaceCaptureEventV3(): FaceCaptureEventV3 {
+fun createFaceCaptureEventV3(): FaceCaptureEvent {
     val faceArg =
-        FaceCaptureEventV3.FaceCapturePayloadV3.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
-    return FaceCaptureEventV3(
+        FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
+    return FaceCaptureEvent(
         startTime = CREATED_AT,
         endTime = ENDED_AT,
         attemptNb = 0,
         qualityThreshold = 1F,
-        result = FaceCaptureEventV3.FaceCapturePayloadV3.Result.VALID,
+        result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
         isFallback = true,
         face = faceArg,
         labels = eventLabels

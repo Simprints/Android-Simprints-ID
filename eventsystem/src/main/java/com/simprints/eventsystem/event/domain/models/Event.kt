@@ -49,7 +49,7 @@ import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
@@ -88,7 +88,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
         value = FaceCaptureConfirmationEvent::class,
         name = FACE_CAPTURE_CONFIRMATION_KEY
     ),
-    JsonSubTypes.Type(value = FaceCaptureEventV3::class, name = FACE_CAPTURE_V3_KEY),
+    JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_V3_KEY),
     JsonSubTypes.Type(value = FaceCaptureBiometricsEvent::class, name = FACE_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(

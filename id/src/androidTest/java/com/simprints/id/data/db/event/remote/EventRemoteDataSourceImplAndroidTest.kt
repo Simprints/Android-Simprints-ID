@@ -109,7 +109,7 @@ import com.simprints.eventsystem.event.domain.models.callout.VerificationCallout
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
@@ -439,17 +439,17 @@ class EventRemoteDataSourceImplAndroidTest {
 
 
     private fun MutableList<Event>.addFaceCaptureEventV3() {
-        FaceCaptureEventV3.FaceCapturePayloadV3.Result.values().forEachIndexed { index, result ->
+        FaceCaptureEvent.FaceCapturePayload.Result.values().forEachIndexed { index, result ->
 
             val face =
-                FaceCaptureEventV3.FaceCapturePayloadV3.Face(
+                FaceCaptureEvent.FaceCapturePayload.Face(
                     yaw = 30f,
                     roll = 40f,
                     quality = 100f,
                     format = FaceTemplateFormat.RANK_ONE_1_23
                 )
 
-            val event = FaceCaptureEventV3(
+            val event = FaceCaptureEvent(
                 startTime = DEFAULT_TIME,
                 endTime = DEFAULT_TIME + 100,
                 attemptNb = index + 1,
@@ -582,7 +582,7 @@ class EventRemoteDataSourceImplAndroidTest {
 
     private fun MutableList<Event>.addPersonCreationEvent(
         fingerprintCaptureEvent: FingerprintCaptureEventV3?,
-        faceCaptureEvent: FaceCaptureEventV3?
+        faceCaptureEvent: FaceCaptureEvent?
     ) {
         add(
             PersonCreationEvent(
@@ -834,7 +834,7 @@ class EventRemoteDataSourceImplAndroidTest {
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
             PERSON_CREATION -> addPersonCreationEvent(
                 this.filterIsInstance<FingerprintCaptureEventV3>().firstOrNull(),
-                this.filterIsInstance<FaceCaptureEventV3>().firstOrNull()
+                this.filterIsInstance<FaceCaptureEvent>().firstOrNull()
             )
             ALERT_SCREEN -> addAlertScreenEvents()
             GUID_SELECTION -> addGuidSelectionEvent()

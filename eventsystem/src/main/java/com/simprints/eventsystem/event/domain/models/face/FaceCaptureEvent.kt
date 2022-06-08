@@ -7,14 +7,13 @@ import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.FaceCapturePayloadV3.Face
-import java.util.UUID
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 
 @Keep
-data class FaceCaptureEventV3(
+data class FaceCaptureEvent(
     override val id: String = randomUUID(),
     override var labels: EventLabels,
-    override val payload: FaceCapturePayloadV3,
+    override val payload: FaceCapturePayload,
     override val type: EventType
 ) : Event() {
 
@@ -23,7 +22,7 @@ data class FaceCaptureEventV3(
         endTime: Long,
         attemptNb: Int,
         qualityThreshold: Float,
-        result: FaceCapturePayloadV3.Result,
+        result: FaceCapturePayload.Result,
         isFallback: Boolean,
         face: Face?,
         labels: EventLabels = EventLabels(),
@@ -32,7 +31,7 @@ data class FaceCaptureEventV3(
     ) : this(
         id,
         labels,
-        FaceCapturePayloadV3(
+        FaceCapturePayload(
             createdAt = startTime,
             endedAt = endTime,
             eventVersion = EVENT_VERSION,
@@ -47,7 +46,7 @@ data class FaceCaptureEventV3(
     )
 
     @Keep
-    data class FaceCapturePayloadV3(
+    data class FaceCapturePayload(
         val id: String,
         override val createdAt: Long,
         override var endedAt: Long,

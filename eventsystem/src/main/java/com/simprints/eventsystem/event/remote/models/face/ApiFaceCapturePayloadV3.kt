@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.remote.models.face
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEventV3.FaceCapturePayloadV3
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.FaceCapture
@@ -29,7 +29,7 @@ data class ApiFaceCapturePayloadV3(
     val face: ApiFace?
 ) : ApiEventPayload(FaceCapture, version, startTime) {
 
-    constructor(domainPayload: FaceCapturePayloadV3) : this(
+    constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
         domainPayload.createdAt,
         domainPayload.endedAt,
@@ -60,13 +60,13 @@ data class ApiFaceCapturePayloadV3(
     }
 }
 
-fun FaceCapturePayloadV3.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)
+fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)
 
-fun FaceCapturePayloadV3.Result.fromDomainToApi() = when (this) {
-    FaceCapturePayloadV3.Result.VALID -> VALID
-    FaceCapturePayloadV3.Result.INVALID -> INVALID
-    FaceCapturePayloadV3.Result.OFF_YAW -> OFF_YAW
-    FaceCapturePayloadV3.Result.OFF_ROLL -> OFF_ROLL
-    FaceCapturePayloadV3.Result.TOO_CLOSE -> TOO_CLOSE
-    FaceCapturePayloadV3.Result.TOO_FAR -> TOO_FAR
+fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
+    FaceCapturePayload.Result.VALID -> VALID
+    FaceCapturePayload.Result.INVALID -> INVALID
+    FaceCapturePayload.Result.OFF_YAW -> OFF_YAW
+    FaceCapturePayload.Result.OFF_ROLL -> OFF_ROLL
+    FaceCapturePayload.Result.TOO_CLOSE -> TOO_CLOSE
+    FaceCapturePayload.Result.TOO_FAR -> TOO_FAR
 }
