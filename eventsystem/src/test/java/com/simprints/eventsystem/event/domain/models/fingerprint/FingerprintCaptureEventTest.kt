@@ -22,12 +22,12 @@ class FingerprintCaptureEventTest {
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
-        assertThat(event.type).isEqualTo(EventType.FINGERPRINT_CAPTURE_V3)
+        assertThat(event.type).isEqualTo(EventType.FINGERPRINT_CAPTURE)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)
             assertThat(endedAt).isEqualTo(SampleDefaults.ENDED_AT)
             assertThat(eventVersion).isEqualTo(FingerprintCaptureEvent.EVENT_VERSION)
-            assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE_V3)
+            assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE)
             assertThat(finger).isEqualTo(IFingerIdentifier.LEFT_THUMB)
             assertThat(qualityThreshold).isEqualTo(10)
             assertThat(fingerprint).isEqualTo(fingerprint)

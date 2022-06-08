@@ -6,7 +6,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 @Keep
@@ -40,7 +40,7 @@ data class FingerprintCaptureEvent(
             fingerprint = fingerprint,
             id = payloadId
         ),
-        FINGERPRINT_CAPTURE_V3
+        FINGERPRINT_CAPTURE
     )
 
     @Keep
@@ -53,7 +53,7 @@ data class FingerprintCaptureEvent(
         val result: Result,
         val fingerprint: Fingerprint?,
         val id: String,
-        override val type: EventType = FINGERPRINT_CAPTURE_V3
+        override val type: EventType = FINGERPRINT_CAPTURE
     ) : EventPayload() {
 
         @Keep
