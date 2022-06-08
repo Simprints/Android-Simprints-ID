@@ -16,7 +16,15 @@ sonarqube {
     }
 }
 
-
+configurations {
+    androidTestImplementation {
+        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
+        // https://github.com/android/android-test/issues/861
+        // and https://github.com/android/android-test/issues/999
+        exclude("org.checkerframework", "checker")
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
+}
 android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -60,42 +68,46 @@ dependencies {
     implementation(project(":id"))
     implementation(project(":logging"))
 
-    implementation(Dependencies.cameraView)
-    implementation(Dependencies.circleImageView)
+    implementation(libs.cameraView)
+    implementation(libs.circleImageView)
 
     // Retrofit
-    implementation(Dependencies.Retrofit.core)
-    implementation(Dependencies.Retrofit.logging)
-    implementation(Dependencies.Retrofit.okhttp)
-    implementation(Dependencies.Retrofit.converterScalars)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.logging)
+    implementation(libs.retrofit.okhttp)
+    implementation(libs.retrofit.converterScalars)
 
     // Fragment
-    implementation(Dependencies.AndroidX.UI.fragment)
+    implementation(libs.androidX.ui.fragment)
+
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
 
     // Android X
-    implementation(Dependencies.AndroidX.UI.constraintlayout)
-    implementation(Dependencies.AndroidX.CameraX.core)
-    implementation(Dependencies.AndroidX.multidex)
+    implementation(libs.androidX.ui.constraintlayout)
+    implementation(libs.androidX.cameraX.core)
+    implementation(libs.androidX.multidex)
 
     // Android X
-    androidTestImplementation(Dependencies.Testing.AndroidX.core_testing)
-    androidTestImplementation(Dependencies.Testing.AndroidX.monitor)
-    androidTestImplementation(Dependencies.Testing.AndroidX.core)
-    androidTestImplementation(Dependencies.Testing.AndroidX.ext_junit)
-    androidTestImplementation(Dependencies.Testing.AndroidX.runner)
-    androidTestImplementation(Dependencies.Testing.AndroidX.rules)
-    androidTestUtil(Dependencies.Testing.AndroidX.orchestrator)
+    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.monitor)
+    androidTestImplementation(libs.testing.androidX.core)
+    androidTestImplementation(libs.testing.androidX.ext.junit)
+    androidTestImplementation(libs.testing.androidX.runner)
+    androidTestImplementation(libs.testing.androidX.rules)
+    androidTestUtil(libs.testing.androidX.orchestrator)
 
-    androidTestImplementation(Dependencies.Testing.Mockk.core)
-    androidTestImplementation(Dependencies.Testing.Mockk.android)
-    androidTestImplementation(Dependencies.Testing.Objenesis.core)
-    androidTestImplementation(Dependencies.Testing.truth)
+    androidTestImplementation(libs.testing.mockk.core)
+    androidTestImplementation(libs.testing.mockk.android)
+    androidTestImplementation(libs.testing.objenesis.core)
+    androidTestImplementation(libs.testing.truth)
 
     // Espresso
-    androidTestImplementation(Dependencies.Testing.AndroidX.uiAutomator)
-    androidTestImplementation(Dependencies.Testing.Espresso.core)
-    androidTestImplementation(Dependencies.Testing.Espresso.intents)
-    androidTestImplementation(Dependencies.Testing.Espresso.barista) {
+    androidTestImplementation(libs.testing.androidX.uiAutomator)
+    androidTestImplementation(libs.testing.espresso.core)
+    androidTestImplementation(libs.testing.espresso.intents)
+    androidTestImplementation(libs.testing.espresso.barista) {
         exclude("com.android.support")
         exclude("com.google.code.findbugs")
         exclude("org.jetbrains.kotlin")
@@ -103,8 +115,7 @@ dependencies {
     }
 
     // Koin
-    androidTestImplementation(Dependencies.Koin.core_ext)
-    androidTestImplementation(Dependencies.Testing.koin)
+    androidTestImplementation(libs.testing.koin)
 
     // ######################################################
     //                      Unit test
@@ -112,29 +123,29 @@ dependencies {
 
     // Simprints
     testImplementation(project(":testtools"))
-    testImplementation(Dependencies.Testing.junit) {
+    testImplementation(libs.testing.junit) {
         exclude("com.android.support")
     }
 
     // Android X
-    testImplementation(Dependencies.Testing.AndroidX.ext_junit)
-    testImplementation(Dependencies.Testing.AndroidX.core)
-    testImplementation(Dependencies.Testing.AndroidX.core_testing)
-    testImplementation(Dependencies.Testing.AndroidX.runner)
+    testImplementation(libs.testing.androidX.ext.junit)
+    testImplementation(libs.testing.androidX.core)
+    testImplementation(libs.testing.androidX.core.testing)
+    testImplementation(libs.testing.androidX.runner)
 
     // Kotlin
-    testImplementation(Dependencies.Testing.coroutines_test)
+    testImplementation(libs.testing.coroutines.test)
 
     // Navigation
-    androidTestImplementation(Dependencies.Testing.navigation_testing)
-    debugImplementation(Dependencies.Testing.fragment_testing){
+    androidTestImplementation(libs.testing.navigation.testing)
+    debugImplementation(libs.testing.fragment.testing){
         exclude( "androidx.test",  "core")
     }
 
     // Mockk
-    testImplementation(Dependencies.Testing.Mockk.core)
-    testImplementation(Dependencies.Testing.truth)
-    testImplementation(Dependencies.Testing.Robolectric.core)
+    testImplementation(libs.testing.mockk.core)
+    testImplementation(libs.testing.truth)
+    testImplementation(libs.testing.robolectric.core)
 }
 
 configurations {

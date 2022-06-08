@@ -25,8 +25,8 @@ import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SerialEntryPairFragment : FingerprintFragment() {
 

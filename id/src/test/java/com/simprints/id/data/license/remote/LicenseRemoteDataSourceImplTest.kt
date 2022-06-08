@@ -52,6 +52,13 @@ class LicenseRemoteDataSourceImplTest {
                 )
             )
         )
+        coEvery { remoteInterface.getLicense("invalidProjectUnknownErrorCode", any(), any()) } throws SyncCloudIntegrationException(
+            cause = HttpException(
+                Response.error<ApiLicense>(
+                    403, "{\"error\":\"000\"}".toResponseBody("application/json".toMediaType())
+                )
+            )
+        )
         coEvery { remoteInterface.getLicense("backendMaintenanceErrorProject", any(), any()) } throws
             createBackendMaintenanceException()
 
@@ -83,6 +90,14 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense("invalidProject", "deviceId", LicenseVendor.RANK_ONE_FACE)
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("001"))
+    }
+
+    @Test
+    fun `Get no license if is an authroization issue`() = runBlockingTest {
+        val newLicense =
+            licenseRemoteDataSourceImpl.getLicense("invalidProjectUnknownErrorCode", "deviceId", LicenseVendor.RANK_ONE_FACE)
+
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
     }
 
     @Test

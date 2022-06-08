@@ -2,8 +2,13 @@ package com.simprints.id.activities.settings.fragments.moduleselection
 
 import androidx.core.content.res.ResourcesCompat
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.pressImeActionButton
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.BaseUnitTest
@@ -42,6 +47,16 @@ class ModuleSelectionFragmentTest : BaseUnitTest() {
     }
 
     @Test
+    fun onLaunchModuleSelectionFragmentSearchDoneRecyclerViewGetsFocus() {
+        createAndStartActivity<ModuleSelectionActivity>()
+        onView(withId(androidx.appcompat.R.id.search_src_text))
+            .perform(typeText("any text"))
+            .perform(pressImeActionButton())
+        onView(withId(R.id.rvModules)).check(
+            matches(ViewMatchers.hasFocus())
+        )
+    }
+    @Test
     fun onlaunchFragmentAssertGetFontIsCalled() {
         mockkStatic(ResourcesCompat::class)
         createAndStartActivity<ModuleSelectionActivity>()
@@ -56,8 +71,8 @@ class ModuleSelectionFragmentTest : BaseUnitTest() {
     }
 
     private fun verifyConfirmationUIVisibility(id: Int, expectedVisibility: ViewMatchers.Visibility) {
-        Espresso.onView(ViewMatchers.withId(id)).check(
-            ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(expectedVisibility))
+        onView(withId(id)).check(
+            matches(ViewMatchers.withEffectiveVisibility(expectedVisibility))
         )
     }
 }

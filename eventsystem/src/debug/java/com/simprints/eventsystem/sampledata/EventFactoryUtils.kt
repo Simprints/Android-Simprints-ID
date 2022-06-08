@@ -21,6 +21,7 @@ import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
 import com.simprints.eventsystem.event.domain.models.Matcher.RANK_ONE
+import com.simprints.eventsystem.event.domain.models.Matcher.SIM_AFIS
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
 import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
@@ -336,7 +337,9 @@ fun createOneToManyMatchEvent(): OneToManyMatchEvent {
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     val matchEntry = MatchEntry(GUID1, 10F)
-    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, RANK_ONE, matchEntry, eventLabels)
+    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, SIM_AFIS, matchEntry
+        ,FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+        , eventLabels)
 }
 
 fun createPersonCreationEvent() =

@@ -19,9 +19,9 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    compileOnly(Dependencies.AndroidX.Annotation.annotation)
+    compileOnly(libs.androidX.annotation.annotation)
 
-    testImplementation(Dependencies.Testing.junit)
-    androidTestImplementation(Dependencies.Testing.AndroidX.runner)
-    androidTestImplementation(Dependencies.Testing.Espresso.core)
+    testImplementation(libs.testing.junit)
+    androidTestImplementation(libs.testing.androidX.runner)
+    androidTestImplementation(libs.testing.espresso.core)
 }

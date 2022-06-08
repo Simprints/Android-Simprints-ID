@@ -1,0 +1,26 @@
+{
+  "id": "b7a51df6-8d40-4a4e-bbb7-3e90f1d464cc",
+  "type": "FACE_CAPTURE",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "FACE_CAPTURE",
+    "eventVersion": 1,
+    "createdAt": 341378170,
+    "endedAt": 9778178930,
+    "id": "98112fc2-b2a7-4a84-a5e3-7711cb89dcf2",
+    "attemptNb": 10,
+    "qualityThreshold": 60,
+    "result": "VALID",
+    "isFallback": false,
+    "face": {
+      "yaw": 24.24,
+      "roll": 12.3,
+      "quality": 42.42,
+      "template": "template"
+    }
+  }
+}

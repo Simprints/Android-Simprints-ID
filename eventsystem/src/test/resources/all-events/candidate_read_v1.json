@@ -1,0 +1,18 @@
+{
+  "id": "c99ad411-e85a-4dcd-8267-db7d058e1906",
+  "type": "CANDIDATE_READ",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CANDIDATE_READ",
+    "eventVersion": 1,
+    "createdAt": 1494567076,
+    "endedAt": 2468965109,
+    "candidateId": "a9af7863-1a27-41c1-b3df-3376ceee9cfa",
+    "localResult": "NOT_FOUND",
+    "remoteResult": "FOUND"
+  }
+}

@@ -49,7 +49,7 @@ class AlertActivityTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        loadKoinModules(module(override = true) {
+        loadKoinModules(module {
             factory { sessionEventManagerMock }
         })
         Intents.init()

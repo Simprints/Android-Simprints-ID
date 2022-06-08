@@ -356,6 +356,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 randomUUID(),
                 Matcher.SIM_AFIS,
                 MatchEntry(randomUUID(), 0F),
+                FingerComparisonStrategy.SAME_FINGER,
                 eventLabels
             )
         )
@@ -368,9 +369,9 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             PersonCreationEvent(
                 DEFAULT_TIME, listOf(
-                    fingerprintCaptureEvent?.id
-                        ?: ""
-                ), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels
+                fingerprintCaptureEvent?.id
+                    ?: ""
+            ), randomUUID(), listOf(faceCaptureEvent?.id ?: ""), randomUUID(), eventLabels
             )
         )
     }
@@ -451,8 +452,6 @@ class EventRemoteDataSourceImplAndroidTest {
 
         add(event)
     }
-
-
 
     private fun MutableList<Event>.addCallbackErrorEvent() {
         ErrorCallbackPayload.Reason.values().forEach {
@@ -568,6 +567,7 @@ class EventRemoteDataSourceImplAndroidTest {
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
             FACE_CAPTURE -> addFaceCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
+            ENROLMENT_RECORD_CREATION,
             ENROLMENT_RECORD_DELETION,
             ENROLMENT_RECORD_MOVE,
             ENROLMENT_RECORD_CREATION,

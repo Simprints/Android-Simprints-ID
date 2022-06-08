@@ -21,7 +21,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.databinding.FragmentFingerBinding
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FingerFragment : FingerprintFragment() {
 

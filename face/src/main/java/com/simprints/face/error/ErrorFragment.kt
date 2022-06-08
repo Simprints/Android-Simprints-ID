@@ -16,7 +16,7 @@ import com.simprints.face.databinding.FragmentErrorBinding
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ErrorFragment : Fragment(R.layout.fragment_error) {
     private val args: ErrorFragmentArgs by navArgs()
