@@ -22,6 +22,7 @@
       "yaw": 0.0,
       "roll": 0.0,
       "quality": 0.0,
+      "template": "template",
       "format": "RANK_ONE_1_23"
     },
     "endedAt": 0,
