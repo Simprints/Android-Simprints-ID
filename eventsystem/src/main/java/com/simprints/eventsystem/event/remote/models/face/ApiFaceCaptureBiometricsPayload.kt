@@ -16,14 +16,18 @@ class ApiFaceCaptureBiometricsPayload(
 
     @Keep
     data class Face(
+        val yaw: Float,
+        val roll: Float,
         val template: String,
         val quality: Float,
         val format: FaceTemplateFormat
     ) {
         constructor(face: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face) : this(
-            face.template,
-            face.quality,
-            face.format
+            yaw = face.yaw,
+            roll = face.roll,
+            template = face.template,
+            quality = face.quality,
+            format = face.format
         )
     }
 

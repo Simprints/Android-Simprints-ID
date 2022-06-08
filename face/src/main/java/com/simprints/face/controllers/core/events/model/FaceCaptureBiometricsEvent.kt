@@ -22,24 +22,30 @@ class FaceCaptureBiometricsEvent(
 
     @Keep
     class EventFace(
+        val yaw: Float,
+        var roll: Float,
         val template: String,
         val quality: Float,
         val format: FaceTemplateFormat
     ) {
         fun fromDomainToCore() =
             CoreFaceCaptureBiometricsEventFace.FaceCaptureBiometricsPayload.Face(
-                template,
-                quality,
-                format
+                yaw = yaw,
+                roll = roll,
+                template = template,
+                quality = quality,
+                format = format
             )
 
         companion object {
             fun fromFaceDetectionFace(face: Face?): EventFace? =
                 face?.let {
                     EventFace(
-                        EncodingUtilsImpl.byteArrayToBase64(it.template),
-                        it.quality,
-                        it.format.fromDomainToCore()
+                        yaw = it.yaw,
+                        roll = it.roll,
+                        template = EncodingUtilsImpl.byteArrayToBase64(it.template),
+                        quality = it.quality,
+                        format = it.format.fromDomainToCore()
                     )
                 }
         }

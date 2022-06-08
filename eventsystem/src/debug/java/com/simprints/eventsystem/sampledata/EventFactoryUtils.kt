@@ -175,6 +175,8 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
 
 fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
     val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+        yaw = 1.0f ,
+        roll = 0.0f,
         template = "template",
         quality = 1.0f,
         format = FaceTemplateFormat.RANK_ONE_1_23

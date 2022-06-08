@@ -12,6 +12,8 @@ class FaceCaptureBiometricsEventTest {
             startTime = 234234,
             endTime = 0,
             eventFace = FaceCaptureBiometricsEvent.EventFace(
+                roll = 0.0f,
+                yaw = 0.0f,
                 template = "",
                 quality = 2.0f,
                 format = FaceTemplateFormat.RANK_ONE_1_23

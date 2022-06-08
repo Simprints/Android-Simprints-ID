@@ -234,6 +234,8 @@ class ClientApiEventRepositoryImplTest {
                 createdAt = 0,
                 eventVersion = 0,
                 face = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+                    roll = 0.0f,
+                    yaw = 0.0f,
                     template = "",
                     quality = 0.0f
                 ),

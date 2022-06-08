@@ -12,9 +12,11 @@ class FaceCaptureBiometricsEventTest {
     fun create_FaceCaptureBiometricsEvent() {
         val labels = EventLabels(sessionId = SampleDefaults.GUID1)
         val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
-            "template",
-            1.0f,
-            FaceTemplateFormat.RANK_ONE_1_23
+            0.0f,
+            roll = 1.0f,
+            template = "template",
+            quality = 1.0f,
+            format = FaceTemplateFormat.RANK_ONE_1_23
         )
         val event = FaceCaptureBiometricsEvent(
             startTime = SampleDefaults.CREATED_AT,
