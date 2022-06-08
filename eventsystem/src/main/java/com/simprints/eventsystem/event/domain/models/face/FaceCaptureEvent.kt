@@ -6,7 +6,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
 
 @Keep
@@ -42,7 +42,7 @@ data class FaceCaptureEvent(
             face = face,
             id = payloadId
         ),
-        FACE_CAPTURE_V3
+        FACE_CAPTURE
     )
 
     @Keep
@@ -56,7 +56,7 @@ data class FaceCaptureEvent(
         val result: Result,
         val isFallback: Boolean,
         val face: Face?,
-        override val type: EventType = FACE_CAPTURE_V3
+        override val type: EventType = FACE_CAPTURE
     ) : EventPayload() {
 
         @Keep

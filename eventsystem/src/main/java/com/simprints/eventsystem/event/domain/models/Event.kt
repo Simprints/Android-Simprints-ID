@@ -28,11 +28,11 @@ import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLME
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
-import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_V3_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_FALLBACK_CAPTURE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_ONBOARDING_COMPLETE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_BIOMETRICS_KEY
-import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_V3_KEY
+import com.simprints.eventsystem.event.domain.models.EventType.Companion.FINGERPRINT_CAPTURE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.GUID_SELECTION_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.INTENT_PARSING_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.INVALID_INTENT_KEY
@@ -88,7 +88,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
         value = FaceCaptureConfirmationEvent::class,
         name = FACE_CAPTURE_CONFIRMATION_KEY
     ),
-    JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_V3_KEY),
+    JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceCaptureBiometricsEvent::class, name = FACE_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(
@@ -115,7 +115,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = ConsentEvent::class, name = CONSENT_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
-    JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_V3_KEY),
+    JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureBiometricsEvent::class, name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),

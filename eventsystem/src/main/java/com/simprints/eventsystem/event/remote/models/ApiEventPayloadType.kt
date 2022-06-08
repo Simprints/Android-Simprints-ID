@@ -28,11 +28,11 @@ import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.eventsystem.event.domain.models.EventType.INVALID_INTENT
@@ -198,7 +198,7 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ENROLMENT_V1 -> ApiEventPayloadType.Enrolment
     ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
-    FINGERPRINT_CAPTURE_V3 -> ApiEventPayloadType.FingerprintCapture
+    FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
     ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
     PERSON_CREATION -> ApiEventPayloadType.PersonCreation
@@ -229,7 +229,7 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ENROLMENT_RECORD_MOVE -> ApiEventPayloadType.EnrolmentRecordMove
     FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
-    FACE_CAPTURE_V3 -> ApiEventPayloadType.FaceCapture
+    FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
     FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
@@ -244,7 +244,7 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.Consent -> CONSENT
     ApiEventPayloadType.Enrolment -> ENROLMENT_V2
     ApiEventPayloadType.Authorization -> AUTHORIZATION
-    ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE_V3
+    ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE
     ApiEventPayloadType.OneToOneMatch -> ONE_TO_MANY_MATCH
     ApiEventPayloadType.OneToManyMatch -> ONE_TO_MANY_MATCH
     ApiEventPayloadType.PersonCreation -> PERSON_CREATION
@@ -264,7 +264,7 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.EnrolmentRecordMove -> ENROLMENT_RECORD_MOVE
     ApiEventPayloadType.FaceOnboardingComplete -> FACE_ONBOARDING_COMPLETE
     ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
-    ApiEventPayloadType.FaceCapture -> FACE_CAPTURE_V3
+    ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
     ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
     ApiEventPayloadType.FingerprintCaptureBiometrics -> FINGERPRINT_CAPTURE_BIOMETRICS
     ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS

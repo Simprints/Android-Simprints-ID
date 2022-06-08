@@ -25,7 +25,7 @@ class EventMigration7to8 : Migration(7, 8) {
 
     private fun removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database: SupportSQLiteDatabase) {
         val fingerPrintCaptureQuery = database.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(OLD_FINGERPRINT_CAPTURE_EVENT)
+            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(FINGERPRINT_CAPTURE_EVENT)
         )
 
         fingerPrintCaptureQuery.use {
@@ -51,10 +51,8 @@ class EventMigration7to8 : Migration(7, 8) {
 
         jsonData?.let {
             val originalJson = JSONObject(it)
-            originalJson.put(DB_EVENT_TYPE_FIELD, NEW_FINGERPRINT_CAPTURE_EVENT)
 
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FINGERPRINT_CAPTURE_EVENT)
             newPayload.put(DB_ID_FIELD, payloadId)
 
             val fingerprint = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT)
@@ -71,7 +69,7 @@ class EventMigration7to8 : Migration(7, 8) {
      */
     private fun removeTemplateDataFromOldFaceCaptureAndSaveFaceBiometricsEvent(database: SupportSQLiteDatabase) {
         val faceCaptureQuery = database.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(OLD_FACE_CAPTURE_EVENT)
+            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(FACE_CAPTURE_EVENT)
         )
 
         faceCaptureQuery.use {
@@ -98,10 +96,8 @@ class EventMigration7to8 : Migration(7, 8) {
 
         jsonData?.let {
             val originalJson = JSONObject(jsonData)
-            originalJson.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
 
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            newPayload.put(DB_EVENT_TYPE_FIELD, NEW_FACE_CAPTURE_EVENT)
             newPayload.put(DB_ID_FIELD, payloadId)
 
             val face = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
@@ -191,15 +187,12 @@ class EventMigration7to8 : Migration(7, 8) {
     }
 
     companion object {
-        private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
-        private const val NEW_FACE_CAPTURE_EVENT = "FACE_CAPTURE_V3"
-        private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
-        private const val NEW_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE_V3"
+        private const val FACE_CAPTURE_EVENT = "FACE_CAPTURE"
+        private const val FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
         private const val FINGERPRINT_CAPTURE_BIOMETRICS = "FINGERPRINT_CAPTURE_BIOMETRICS"
         private const val FACE_CAPTURE_BIOMETRICS = "FACE_CAPTURE_BIOMETRICS"
         private const val VERSION_PAYLOAD_NAME = "eventVersion"
         private const val DB_EVENT_JSON_FIELD = "eventJson"
-        private const val DB_EVENT_TYPE_FIELD = "type"
         private const val DB_ID_FIELD = "id"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD = "payload"
         private const val DB_EVENT_JSON_EVENT_PAYLOAD_FACE = "face"

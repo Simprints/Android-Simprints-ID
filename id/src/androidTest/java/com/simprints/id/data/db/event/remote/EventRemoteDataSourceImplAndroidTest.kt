@@ -56,11 +56,11 @@ import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_V3
+import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.eventsystem.event.domain.models.EventType.INVALID_INTENT
@@ -828,7 +828,7 @@ class EventRemoteDataSourceImplAndroidTest {
             CONSENT -> addConsentEvent()
             ENROLMENT_V2 -> addEnrolmentEvent()
             AUTHORIZATION -> addAuthorizationEvent()
-            FINGERPRINT_CAPTURE_V3 -> addFingerprintCaptureEventV3()
+            FINGERPRINT_CAPTURE -> addFingerprintCaptureEventV3()
             FINGERPRINT_CAPTURE_BIOMETRICS -> addFingerprintBiometricCaptureEvent()
             ONE_TO_ONE_MATCH -> addOneToOneMatchEvent()
             ONE_TO_MANY_MATCH -> addOneToManyMatchEvent()
@@ -861,7 +861,7 @@ class EventRemoteDataSourceImplAndroidTest {
             COMPLETION_CHECK -> addCompletionCheckEvent()
             FACE_ONBOARDING_COMPLETE -> addFaceOnboardingCompleteEvent()
             FACE_FALLBACK_CAPTURE -> addFaceFallbackCaptureEvent()
-            FACE_CAPTURE_V3 -> addFaceCaptureEventV3()
+            FACE_CAPTURE -> addFaceCaptureEventV3()
             FACE_CAPTURE_BIOMETRICS -> addFaceCaptureBiometricCaptureEvent()
             FACE_CAPTURE_CONFIRMATION -> addFaceCaptureConfirmationEvent()
             ENROLMENT_RECORD_DELETION,
