@@ -8,6 +8,9 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
 import com.simprints.clientapi.domain.responses.ConfirmationResponse
 import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -46,6 +49,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -88,6 +92,7 @@ class CommCareCoSyncPresenterTest {
     @Before
     fun setup() {
         Dispatchers.setMain(mainThreadSurrogate)
+        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @After
@@ -183,9 +188,31 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRegistration should return valid registration with events`() {
+    fun `handleRegistration should return valid registration with no events`() = runTest {
         val registerId = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
+
+        val subject =
+            Subject(
+                registerId,
+                "projectId",
+                "thales",
+                "mod1",
+                Date(),
+                null,
+                emptyList(),
+                emptyList()
+            )
+        val subjectRepository = mockk<SubjectRepository>()
+        coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+        val prefs = mockk<SharedPreferencesManager>().apply {
+            coEvery { this@apply.peekSessionId() } returns sessionId
+            coEvery { this@apply.popSessionId() } returns sessionId
+            every { this@apply.canCoSyncAllData() } returns false
+            every { this@apply.canCoSyncData() } returns true
+            every { this@apply.canCoSyncBiometricData() } returns false
+        }
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
@@ -193,15 +220,13 @@ class CommCareCoSyncPresenterTest {
             sessionCaptureEvent
         )
 
-        val subjectRepository = mockk<SubjectRepository>()
-        coEvery { subjectRepository.load(any()) } returns flowOf()
-
-        runTest {
+        runBlocking {
             getNewPresenter(
                 Enrol,
                 sessionEventsManagerMock,
                 subjectRepository = subjectRepository,
-                coroutineScope = this
+                coroutineScope = this,
+                sharedPreferencesManager = prefs
             )
                 .handleEnrolResponse(EnrolResponse(registerId))
         }
@@ -250,12 +275,20 @@ class CommCareCoSyncPresenterTest {
             val subjectRepository = mockk<SubjectRepository>()
             coEvery { subjectRepository.load(any()) } returns flowOf(subject)
 
+            val prefs = mockk<SharedPreferencesManager>().apply {
+                coEvery { this@apply.peekSessionId() } returns "sessionId"
+                coEvery { this@apply.popSessionId() } returns "sessionId"
+                every { this@apply.canCoSyncAllData() } returns false
+                every { this@apply.canCoSyncBiometricData() } returns true
+            }
+
             runBlocking {
                 getNewPresenter(
                     Enrol,
                     sessionEventsManagerMock,
                     subjectRepository = subjectRepository,
-                    coroutineScope = this
+                    coroutineScope = this,
+                    sharedPreferencesManager = prefs
                 ).handleEnrolResponse(EnrolResponse(registerId))
             }
 
