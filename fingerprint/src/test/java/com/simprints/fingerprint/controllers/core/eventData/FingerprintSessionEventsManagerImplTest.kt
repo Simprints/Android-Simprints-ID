@@ -8,7 +8,10 @@ import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import io.mockk.CapturingSlot
+import io.mockk.Runs
+import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
