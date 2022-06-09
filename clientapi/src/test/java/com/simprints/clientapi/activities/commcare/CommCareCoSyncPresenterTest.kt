@@ -448,6 +448,37 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
+    fun `handleResponseError should return error to client with no events`() {
+        val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
+        val sessionId = UUID.randomUUID().toString()
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
+        val prefs = mockk<SharedPreferencesManager>().apply {
+            every { this@apply.canCoSyncData() } returns false
+        }
+
+        runTest {
+            getNewPresenter(
+                Invalid,
+                sessionEventsManagerMock,
+                coroutineScope = this,
+                sharedPreferencesManager = prefs
+            ).handleResponseError(error)
+        }
+
+        verify(exactly = 1) {
+            view.returnErrorToClient(
+                error,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                sessionId,
+                null
+            )
+        }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+    }
+
+    @Test
     fun `handleRefusalResponse should return valid refusal with events`() {
         val sessionId = UUID.randomUUID().toString()
 
