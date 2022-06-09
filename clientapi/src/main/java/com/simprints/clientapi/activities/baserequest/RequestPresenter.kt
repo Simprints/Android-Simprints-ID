@@ -161,7 +161,11 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
-        if (!sharedPreferencesManager.canCoSyncAllData() && !sharedPreferencesManager.canCoSyncBiometricData()) return null
+
+        val canCosyncData = sharedPreferencesManager.canCoSyncAllData()
+        val canCosyncBiometricData = sharedPreferencesManager.canCoSyncBiometricData()
+
+        if (!canCosyncData && !canCosyncBiometricData) return null
 
         val recordCreationEvent =
             subjectRepository.load(
