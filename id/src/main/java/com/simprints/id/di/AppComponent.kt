@@ -38,7 +38,6 @@ import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.subject.migration.SubjectToEventMigrationManager
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
@@ -151,6 +150,5 @@ interface AppComponent {
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getImageRepository(): ImageRepository
     fun getSimClientFactory(): SimApiClientFactory
-    fun getSubjectToEventMigrationManager(): SubjectToEventMigrationManager
     fun getLicenseRepository(): LicenseRepository
 }
