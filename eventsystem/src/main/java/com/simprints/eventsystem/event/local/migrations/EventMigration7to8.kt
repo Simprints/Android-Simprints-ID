@@ -31,9 +31,8 @@ class EventMigration7to8 : Migration(7, 8) {
         fingerPrintCaptureQuery.use {
             while (it.moveToNext()) {
                 val id = it.getStringWithColumnName("id")
-                val payloadId = randomUUID()
-                migrateFingerprintCaptureEventPayloadType(it, database, id, payloadId)
-                createAndInsertFingerprintCaptureBiometricsEventValues(database, it, payloadId)
+                migrateFingerprintCaptureEventPayloadType(it, database, id)
+                createAndInsertFingerprintCaptureBiometricsEventValues(database, it)
             }
         }
     }
@@ -44,16 +43,16 @@ class EventMigration7to8 : Migration(7, 8) {
     private fun migrateFingerprintCaptureEventPayloadType(
         it: Cursor?,
         database: SupportSQLiteDatabase,
-        id: String?,
-        payloadId: String
+        id: String?
     ) {
         val jsonData = it?.getStringWithColumnName(DB_EVENT_JSON_FIELD)
 
         jsonData?.let {
             val originalJson = JSONObject(it)
+            // In the previous system, the event and the payload have matching ids, which is not what we want here
+            originalJson.put(DB_ID_FIELD, randomUUID())
 
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            newPayload.put(DB_ID_FIELD, payloadId)
 
             val fingerprint = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FINGERPRINT)
             fingerprint.remove(TEMPLATE_FIELD)
@@ -74,10 +73,9 @@ class EventMigration7to8 : Migration(7, 8) {
 
         faceCaptureQuery.use {
             while (it.moveToNext()) {
-                val payloadId = randomUUID()
                 val id = it.getStringWithColumnName("id")
-                migrateFaceCaptureEventPayloadType(it, database, id, payloadId)
-                createAndInsertFaceCaptureBiometricsEventValues(database, it, payloadId)
+                migrateFaceCaptureEventPayloadType(it, database, id)
+                createAndInsertFaceCaptureBiometricsEventValues(database, it)
             }
         }
     }
@@ -88,17 +86,17 @@ class EventMigration7to8 : Migration(7, 8) {
     private fun migrateFaceCaptureEventPayloadType(
         cursor: Cursor?,
         database: SupportSQLiteDatabase,
-        id: String?,
-        payloadId: String
+        id: String?
     ) {
 
         val jsonData = cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)
 
         jsonData?.let {
             val originalJson = JSONObject(jsonData)
+            // In the previous system, the event and the payload have matching ids, which is not what we want here
+            originalJson.put(DB_ID_FIELD, randomUUID())
 
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-            newPayload.put(DB_ID_FIELD, payloadId)
 
             val face = newPayload.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD_FACE)
             face.remove(TEMPLATE_FIELD)
@@ -111,11 +109,12 @@ class EventMigration7to8 : Migration(7, 8) {
 
     private fun createAndInsertFaceCaptureBiometricsEventValues(
         database: SupportSQLiteDatabase,
-        cursor: Cursor?,
-        payloadId: String
+        cursor: Cursor?
     ) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject("payload")
+        val payloadId = payload.getString("id")
+
         val isFaceEventValid = payload.getString("result") == "VALID"
 
         if (isFaceEventValid) {
@@ -146,11 +145,11 @@ class EventMigration7to8 : Migration(7, 8) {
 
     private fun createAndInsertFingerprintCaptureBiometricsEventValues(
         database: SupportSQLiteDatabase,
-        cursor: Cursor?,
-        payloadId: String
+        cursor: Cursor?
     ) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject("payload")
+        val payloadId = payload.getString("id")
         val isFingerprintEventGoodScan = payload.getString("result") == "GOOD_SCAN"
 
         if (isFingerprintEventGoodScan) {

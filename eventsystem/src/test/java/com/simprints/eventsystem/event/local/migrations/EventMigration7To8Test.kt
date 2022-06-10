@@ -91,6 +91,7 @@ class EventMigration7To8Test {
         assertThat(fingerprintCaptureEvent.labels.projectId).isEqualTo(
             fingerprintCaptureBiometricsEvent.labels.projectId
         )
+        assertThat(fingerprintCaptureEvent.id).isNotEqualTo(fingerprintCaptureBiometricsEvent.id)
     }
 
     @Test
@@ -136,6 +137,7 @@ class EventMigration7To8Test {
             (faceCaptureEvent as FaceCaptureEvent).payload.id
         )
         assertThat(faceCaptureEvent.labels.projectId).isEqualTo(faceCaptureBiometricsEvent.labels.projectId)
+        assertThat(faceCaptureEvent.id).isNotEqualTo(faceCaptureBiometricsEvent.id)
     }
 
     @Test
