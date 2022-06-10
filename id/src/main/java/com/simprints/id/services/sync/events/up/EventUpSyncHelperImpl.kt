@@ -1,6 +1,8 @@
 package com.simprints.id.services.sync.events.up
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.FAILED
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
@@ -12,12 +14,11 @@ import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 
 class EventUpSyncHelperImpl(
-    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
-    private val eventUpSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+    private val eventRepository: EventRepository,
+    private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val timerHelper: TimeHelper,
     private val settingsPreferencesManager: SettingsPreferencesManager
 ) : EventUpSyncHelper {
@@ -29,7 +30,7 @@ class EventUpSyncHelperImpl(
         scope: CoroutineScope,
         operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
     ) =
-        flow<EventUpSyncProgress> {
+        flow {
             var lastOperation = operation.copy()
             var count = 0
             try {
