@@ -2,7 +2,7 @@ package com.simprints.id.data.db.subject.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
+
 import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -19,7 +19,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import io.mockk.mockk
 import io.realm.Realm
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -33,31 +32,22 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
     private lateinit var realm: Realm
     private lateinit var subjectLocalDataSource: SubjectLocalDataSource
 
-    private val loginInfoManagerMock = mockk<LoginInfoManager>()
-    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
-
     private val testDispatcherProvider = DefaultDispatcherProvider()
 
     @Before
-    @FlowPreview
     fun setup() {
         realm = Realm.getInstance(config)
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
-            newDatabaseName,
-            newDatabaseKey
-        )
 
         subjectLocalDataSource = SubjectLocalDataSourceImpl(
-            testContext,
-            secureLocalDbKeyProviderMock,
-            loginInfoManagerMock,
-            testDispatcherProvider
+            RealmWrapperImpl(
+                testContext,
+                LocalDbKey(newDatabaseName, newDatabaseKey),
+                testDispatcherProvider
+            )
         )
     }
 
     @Test
-    @FlowPreview
     fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
         saveFakePerson(realm, getFakePerson())
         val countNewRealm = runBlocking { subjectLocalDataSource.count() }
@@ -65,16 +55,13 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
-        val differentSecureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>()
-        every { differentSecureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
-            differentNewDatabaseName,
-            differentDatabaseKey
-        )
+
         val differentLocalDataSource = SubjectLocalDataSourceImpl(
-            testContext,
-            differentSecureLocalDbKeyProviderMock,
-            loginInfoManagerMock,
-            testDispatcherProvider
+            RealmWrapperImpl(
+                testContext,
+                LocalDbKey(differentNewDatabaseName, differentDatabaseKey),
+                testDispatcherProvider
+            )
         )
 
         val count = runBlocking { differentLocalDataSource.count() }
@@ -132,6 +119,69 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         assertThat(count).isEqualTo(1)
     }
 
+    @Test
+    fun insertOrUpdatePerson_shouldSucceed() = runBlocking {
+        val fakePerson = getFakePerson()
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
+
+        realm.executeTransaction {
+            assertThat(realm.where(DbSubject::class.java).count()).isEqualTo(1)
+            assertThat(
+                realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)
+            ).isTrue()
+        }
+    }
+
+    @Test
+    fun insertOrUpdateSamePerson_shouldSaveOnlyAPerson() = runBlocking {
+        val fakePerson = getFakePerson()
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
+
+        realm.executeTransaction {
+            assertThat(realm.where(DbSubject::class.java).count()).isEqualTo(1)
+            assertThat(
+                realm.where(DbSubject::class.java).findFirst()!!.deepEquals(fakePerson)
+            ).isTrue()
+        }
+    }
+
+    @Test
+    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFingerprintRecords() = runBlocking {
+        val fakePerson1 = getFakePerson()
+        val fakePerson2 = getFakePerson()
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
+
+        val fingerprintIdentityLocalDataSource =
+            (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
+        val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(
+            SubjectQuery()
+        ).toList()
+        realm.executeTransaction {
+            with(fingerprintIdentities) {
+                verifyIdentity(fakePerson1, find { it.patientId == fakePerson1.subjectId }!!)
+                verifyIdentity(fakePerson2, find { it.patientId == fakePerson2.subjectId }!!)
+            }
+        }
+    }
+
+    @Test
+    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFaceRecords() = runBlocking {
+        val fakePerson1 = getFakePerson()
+        val fakePerson2 = getFakePerson()
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
+        subjectLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
+
+        val faceIdentityDataSource = (subjectLocalDataSource as FaceIdentityLocalDataSource)
+        val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectQuery()).toList()
+        realm.executeTransaction {
+            with(faceRecords) {
+                verifyIdentity(fakePerson1, find { it.personId == fakePerson1.subjectId }!!)
+                verifyIdentity(fakePerson2, find { it.personId == fakePerson2.subjectId }!!)
+            }
+        }
+    }
 
     @Test
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {

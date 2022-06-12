@@ -1,10 +1,5 @@
 package com.simprints.id.data.db.subject.local
 
-import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -14,25 +9,18 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
-import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.logging.Simber
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import java.io.Serializable
 
 class SubjectLocalDataSourceImpl(
-    private val appContext: Context,
-    val secureDataManager: SecureLocalDbKeyProvider,
-    val loginInfoManager: LoginInfoManager,
-    private val dispatcher: DispatcherProvider
+    private val realmWrapper: RealmWrapper
 ) : SubjectLocalDataSource {
 
     companion object {
@@ -42,25 +30,8 @@ class SubjectLocalDataSourceImpl(
         const val MODULE_ID_FIELD = "moduleId"
     }
 
-    val config: RealmConfiguration by lazy {
-        Realm.init(appContext)
-        getLocalDbKeyAndCreateRealmConfig()
-    }
-
-    private fun getLocalDbKeyAndCreateRealmConfig(): RealmConfiguration =
-        loginInfoManager.getSignedInProjectIdOrEmpty().let {
-            return if (it.isNotEmpty()) {
-                createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
-            } else {
-                throw RealmUninitialisedException("No signed in project id found")
-            }
-        }
-
-    private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
-        SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
-
-    override suspend fun load(query: SubjectQuery?): Flow<Subject> =
-       useRealmInstance {
+    override suspend fun load(query: SubjectQuery): Flow<Subject> =
+        realmWrapper.useRealmInstance {
             it.buildRealmQueryForSubject(query)
                 .findAll()
                 ?.map { dbSubject -> dbSubject.fromDbToDomain() }
@@ -89,7 +60,7 @@ class SubjectLocalDataSourceImpl(
 
     override suspend fun delete(queries: List<SubjectQuery>) {
 
-        useRealmInstance { realmInstance ->
+        realmWrapper.useRealmInstance { realmInstance ->
             realmInstance.executeTransaction { realm ->
                 queries.forEach {
                     realm.buildRealmQueryForSubject(it)
@@ -105,7 +76,7 @@ class SubjectLocalDataSourceImpl(
     }
 
     override suspend fun count(query: SubjectQuery): Int =
-        useRealmInstance { realm ->
+        realmWrapper.useRealmInstance { realm ->
             realm.buildRealmQueryForSubject(query)
                 .count().toInt()
         }
@@ -118,7 +89,7 @@ class SubjectLocalDataSourceImpl(
             return
         }
 
-        useRealmInstance {
+        realmWrapper.useRealmInstance {
             it.executeTransaction { realm ->
                 actions.forEach { action ->
                     when (action) {
@@ -136,22 +107,12 @@ class SubjectLocalDataSourceImpl(
         }
     }
 
-    private fun Realm.buildRealmQueryForSubject(query: SubjectQuery?): RealmQuery<DbSubject> =
+    private fun Realm.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> =
         where(DbSubject::class.java)
             .apply {
-                query?.let { query ->
-                    query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                    query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
-                    query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
-                    query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                }
+                query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
+                query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
+                query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
+                query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
             }
-
-    /**
-     * Use realm instance in from IO threads
-     *
-     */
-    private suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
-        withContext(dispatcher.io()) { Realm.getInstance(config).use(block) }
-
 }
