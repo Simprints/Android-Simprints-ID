@@ -13,10 +13,8 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
-import io.mockk.every
-import io.mockk.mockk
+import com.simprints.id.data.db.subject.local.RealmWrapperImpl
 import io.realm.Realm
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -39,18 +37,8 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
         "some_image_bucket"
     )
 
-    private val loginInfoManagerMock = mockk<LoginInfoManager>().apply {
-        every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-    }
-
-    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>().apply {
-        every {
-            getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
-        } returns LocalDbKey(newDatabaseName, newDatabaseKey)
-    }
 
     @Before
-    @FlowPreview
     fun setup() {
         realm = Realm.getInstance(config).apply {
             executeTransaction {
@@ -59,10 +47,11 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
         }
 
         projectLocalDataSource = ProjectLocalDataSourceImpl(
-            testContext,
-            secureLocalDbKeyProviderMock,
-            loginInfoManagerMock,
-            testDispatcherProvider
+            RealmWrapperImpl(
+                testContext,
+                LocalDbKey(newDatabaseName, newDatabaseKey),
+                testDispatcherProvider
+            )
         )
     }
 
