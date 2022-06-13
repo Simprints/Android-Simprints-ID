@@ -21,7 +21,7 @@ class RealmWrapperImpl(
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(dispatcher.io()) { Realm.getInstance(config).use(block) }
 
-    val config: RealmConfiguration by lazy {
+    private val config: RealmConfiguration by lazy {
         Realm.init(appContext)
         createAndSaveRealmConfig(localKey)
     }
