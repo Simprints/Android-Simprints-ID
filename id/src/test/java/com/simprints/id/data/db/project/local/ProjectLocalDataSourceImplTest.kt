@@ -10,7 +10,6 @@ import io.realm.RealmQuery
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 
 class ProjectLocalDataSourceImplTest {
     private lateinit var realm: Realm
@@ -40,9 +39,10 @@ class ProjectLocalDataSourceImplTest {
             }
         }
 
+        val captureProjectId = slot<String>()
         val query: RealmQuery<DbProject> = mockk() {
             every {
-                equalTo(eq(ProjectLocalDataSourceImpl.PROJECT_ID_FIELD), anyString())
+                equalTo(eq(ProjectLocalDataSourceImpl.PROJECT_ID_FIELD), capture(captureProjectId))
             } answers {
                 this@mockk
             }

@@ -16,7 +16,6 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.RealmWrapper
-import com.simprints.id.data.db.subject.local.RealmWrapperImpl
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -24,6 +23,7 @@ import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.testtools.common.di.DependencyRule
 import dagger.Provides
+import io.mockk.mockk
 
 class TestDataModule(
     private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
@@ -41,7 +41,7 @@ class TestDataModule(
     ): ProjectLocalDataSource =
         projectLocalDataSourceRule.resolveDependency {
             super.provideProjectLocalDataSource(
-             realmWrapper
+                realmWrapper
             )
         }
 
@@ -104,11 +104,27 @@ class TestDataModule(
         }
 
     override fun providePersonLocalDataSource(
-     realmWrapper: RealmWrapper
+        realmWrapper: RealmWrapper
     ): SubjectLocalDataSource =
         personLocalDataSourceRule.resolveDependency {
             super.providePersonLocalDataSource(
-              realmWrapper
+                realmWrapper
             )
         }
-   }
+
+    override fun provideRealmWrapper(
+        ctx: Context,
+        localDbKey: LocalDbKey,
+        dispatcher: DispatcherProvider
+    ): RealmWrapper {
+        return mockk(relaxed = true)
+    }
+
+    override fun provideLocalDbKey(
+        loginInfoManager: LoginInfoManager,
+        secureDataManager: SecureLocalDbKeyProvider
+    ): LocalDbKey {
+        return LocalDbKey("","".toByteArray())
+    }
+ }
+
