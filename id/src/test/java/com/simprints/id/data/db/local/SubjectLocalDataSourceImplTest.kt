@@ -5,8 +5,10 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.local.*
 import com.simprints.id.data.db.subject.local.models.DbSubject
+import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.testtools.TestApplication
@@ -29,7 +31,8 @@ open class SubjectLocalDataSourceImplTest {
     private lateinit var subjectLocalDataSource: SubjectLocalDataSource
     private lateinit var realm: Realm
     private lateinit var realmWrapperMock: RealmWrapper
-    lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
+    private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
+    private var localSubjects: MutableList<Subject> = mutableListOf()
 
     companion object {
         const val DEFAULT_PROJECT_ID = "DVXF1mu4CAa5FmiPWHXr"
@@ -37,13 +40,53 @@ open class SubjectLocalDataSourceImplTest {
 
     @Before
     fun setup() {
-        realm = mockk()
+        localSubjects = mutableListOf()
+        realm = mockk() {
+            val transaction = slot<Realm.Transaction>()
+            every { executeTransaction(capture(transaction)) } answers {
+                transaction.captured.execute(realm)
+            }
+            val insertedSubject = slot<DbSubject>()
+            every { insertOrUpdate(capture(insertedSubject)) } answers {
+                localSubjects.add(insertedSubject.captured.fromDbToDomain())
+            }
+        }
+
         realmWrapperMock = mockk()
         subjectLocalDataSource = SubjectLocalDataSourceImpl(realmWrapperMock)
         blockCapture = slot()
         coEvery {
             realmWrapperMock.useRealmInstance(capture(blockCapture))
         } answers { blockCapture.captured.invoke(realm) }
+
+
+        val realmResults: RealmResults<DbSubject> = mockk() {
+            every { iterator() } answers {
+                localSubjects.map { it.fromDomainToDb() }.iterator() as MutableIterator<DbSubject>
+            }
+            every { deleteAllFromRealm() } answers {
+                localSubjects.clear()
+                true
+            }
+        }
+        val captureUserId = slot<String>()
+        val query: RealmQuery<DbSubject> = mockk() {
+            every {
+                equalTo(eq(SubjectLocalDataSourceImpl.USER_ID_FIELD), capture(captureUserId))
+            } answers {
+                if (localSubjects.none { it.attendantId == captureUserId.captured }) {
+                    null
+                } else this@mockk
+            }
+            every { count() } answers {
+                localSubjects.size.toLong()
+            }
+            every { findAll() } answers {
+
+                realmResults
+            }
+        }
+        every { realm.where(DbSubject::class.java) } returns query
     }
 
 
@@ -119,20 +162,35 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun shouldDeleteSubject() = runBlocking {
-        val subject1 = getFakePerson()
-        val subject2 = getFakePerson()
-        saveFakePerson(subject1)
-        saveFakePerson(subject2)
-
-        subjectLocalDataSource.delete(
-            listOf(SubjectQuery(subjectId = subject1.subjectId))
+    fun performSubjectCreationAction() = runBlocking {
+        val subject = getFakePerson()
+        subjectLocalDataSource.performActions(
+            listOf(SubjectAction.Creation(subject.fromDbToDomain()))
         )
-
         val peopleCount = subjectLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
     }
 
+    @Test
+    fun performSubjectDeletionAction() = runBlocking {
+        val subject = getFakePerson()
+        saveFakePerson(subject)
+        subjectLocalDataSource.performActions(
+            listOf(SubjectAction.Deletion(subject.subjectId))
+        )
+        val peopleCount = subjectLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(0)
+    }
+    @Test
+    fun performNoAction() = runBlocking {
+        val subject = getFakePerson()
+        saveFakePerson(subject)
+        subjectLocalDataSource.performActions(
+            listOf()
+        )
+        val peopleCount = subjectLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+    }
     @Test
     fun shouldDeleteAllSubjects() = runBlocking {
         saveFakePeople(getRandomPeople(5))
@@ -148,45 +206,10 @@ open class SubjectLocalDataSourceImplTest {
         SubjectsGeneratorUtils.getRandomSubject().fromDomainToDb()
 
     private fun saveFakePerson(fakeSubject: DbSubject): DbSubject =
-        fakeSubject.also { subject ->
-            val query: RealmQuery<DbSubject> = mockk() {
-                every {
-                    equalTo(SubjectLocalDataSourceImpl.USER_ID_FIELD, subject.attendantId)
-                } returns this
-                every { findFirst() } returns subject
-                every { count() } returns 1
-            }
-            every { realm.where(DbSubject::class.java) } returns query
-        }
+        fakeSubject.also { localSubjects.add(it.fromDbToDomain()) }
 
     private fun saveFakePeople(subjects: List<Subject>): List<Subject> =
-        subjects.toMutableList().also { allSubjects ->
-            val results: RealmResults<DbSubject> = mockk() {
-                every { iterator() } answers {
-                    allSubjects.map { it.fromDomainToDb() }.iterator() as MutableIterator<DbSubject>
-                }
-                every { deleteAllFromRealm() } answers {
-                    allSubjects.clear()
-                    true
-                }
-            }
-            val captureUserId = slot<String>()
-            val query: RealmQuery<DbSubject> = mockk() {
-                every {
-                    equalTo(eq(SubjectLocalDataSourceImpl.USER_ID_FIELD), capture(captureUserId))
-                } answers {
-                    if (subjects.none { it.attendantId == captureUserId.captured }) {
-                        null
-                    } else this@mockk
-                }
-                every { count() } answers {
-                    allSubjects.size.toLong()
-                }
-                every { findAll() } returns results
-            }
-            every { realm.where(DbSubject::class.java) } returns query
-
-        }
+        subjects.toMutableList().also { localSubjects.addAll(it) }
 
     private fun DbSubject.deepEquals(other: DbSubject): Boolean = when {
         this.subjectId != other.subjectId -> false
