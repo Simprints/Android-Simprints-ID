@@ -7,9 +7,9 @@ import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -22,7 +22,6 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.testtools.common.di.DependencyRule
-import dagger.Provides
 import io.mockk.mockk
 
 class TestDataModule(
