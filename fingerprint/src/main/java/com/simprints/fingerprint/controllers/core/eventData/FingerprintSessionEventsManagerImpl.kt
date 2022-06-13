@@ -5,16 +5,20 @@ import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.tools.ignoreException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
 import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
-class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepository) :
+class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepository,
+                                          private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) :
     FingerprintSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        inBackground {
+        inBackground(dispatcher) {
             fromDomainToCore(event).let {
                 eventRepository.addOrUpdateEvent(it)
             }
