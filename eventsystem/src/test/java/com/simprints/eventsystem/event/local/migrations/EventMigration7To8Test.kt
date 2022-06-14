@@ -82,9 +82,7 @@ class EventMigration7To8Test {
         assertThat(fingerprintCaptureBiometricsEvent).isInstanceOf(FingerprintCaptureBiometricsEvent::class.java)
         assertThat(fingerprintCaptureBiometricsEvent.payload.eventVersion).isEqualTo(0)
         assertThat(fingerprintBiometricsObject.has("template")).isTrue()
-        assertThat((fingerprintCaptureBiometricsEvent as FingerprintCaptureBiometricsEvent).payload.fingerprint.template).isEqualTo(
-            "some_fingerprint_template"
-        )
+        assertThat((fingerprintCaptureBiometricsEvent as FingerprintCaptureBiometricsEvent).payload.fingerprint.template).isNotNull()
         assertThat(fingerprintCaptureBiometricsEvent.payload.id).isEqualTo(
             (fingerprintCaptureEvent as FingerprintCaptureEvent).payload.id
         )
@@ -248,7 +246,9 @@ class EventMigration7To8Test {
                     "fingerprint":{
                         "finger":"LEFT_3RD_FINGER",
                         "quality":0,
-                        "template":"some_fingerprint_template",
+                        "template":"Rk1SACAyMAAAAAD8AAABLAGQAMUAxQEAABBjJUAkABuiAEA5ADAeAECAAGmbAICtAHcUAIDEAIMO
+                                                                                                    AEC2AISYAECeAIWbAEDOAIeUAIDbAJUJAEBLAJYeAICzAJoUAECDAKIbAEBkAMmiAEDwANL7AEBx
+                                                                                                    AOMfAICxAOUXAEDpAOeGAEBQAOoiAECSAOugAEDsAPL7AEEHAPPoAEA7APWkAEAfAQEmAEB",
                         "format":"ISO_19794_2"
                         },
                 "id":"2022ae95-d4c0-469c-85d6-750659598bbd",

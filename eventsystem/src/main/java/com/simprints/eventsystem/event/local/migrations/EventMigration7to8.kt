@@ -129,12 +129,12 @@ class EventMigration7to8 : Migration(7, 8) {
             },\"roll\":${
                 faceObject.getDouble("roll")
             },\"template\":\"${
-                faceObject.getString("template")
+                faceObject.getString("template").replace("\\s".toRegex(), "")
             }\",\"quality\":${
                 faceObject.getDouble("quality")
             },\"format\":\"${
                 faceObject.getString("format")
-            }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+            }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}".trimIndent()
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
             this.put("id", randomUUID())
@@ -173,7 +173,7 @@ class EventMigration7to8 : Migration(7, 8) {
             "{\"id\":\"${randomUUID()}\",\"labels\":$labelsObject,\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
                 fingerprintObject.getString("finger")
             }\",\"template\":\"${
-                fingerprintObject.getString("template")
+                fingerprintObject.getString("template").replace("\\s".toRegex(), "")
             }\",\"quality\":${
                 fingerprintObject.getInt("quality")
             },\"format\":\"${
