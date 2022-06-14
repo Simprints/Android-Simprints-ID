@@ -88,6 +88,11 @@ class EventMigration7To8Test {
         assertThat(fingerprintCaptureBiometricsEvent.payload.id).isEqualTo(
             (fingerprintCaptureEvent as FingerprintCaptureEvent).payload.id
         )
+        assertThat(fingerprintCaptureBiometricsEvent.labels.moduleIds).isEqualTo(fingerprintCaptureEvent.labels.moduleIds)
+        assertThat(fingerprintCaptureBiometricsEvent.labels.attendantId).isEqualTo(fingerprintCaptureEvent.labels.attendantId)
+        assertThat(fingerprintCaptureBiometricsEvent.labels.sessionId).isEqualTo(fingerprintCaptureEvent.labels.sessionId)
+        assertThat(fingerprintCaptureBiometricsEvent.labels.deviceId).isEqualTo(fingerprintCaptureEvent.labels.deviceId)
+        assertThat(fingerprintCaptureBiometricsEvent.labels.mode).isEqualTo(fingerprintCaptureEvent.labels.mode)
         assertThat(fingerprintCaptureEvent.labels.projectId).isEqualTo(
             fingerprintCaptureBiometricsEvent.labels.projectId
         )
@@ -122,7 +127,6 @@ class EventMigration7To8Test {
         val biometricsFace =
             faceCaptureBiometricsPayload.getJSONObject("face")
 
-
         assertThat(faceCaptureEvent).isInstanceOf(FaceCaptureEvent::class.java)
         assertThat(faceCaptureEvent.payload.eventVersion).isEqualTo(3)
         assertThat(captureFace.has("template")).isFalse()
@@ -136,6 +140,11 @@ class EventMigration7To8Test {
         assertThat(faceCaptureBiometricsEvent.payload.id).isEqualTo(
             (faceCaptureEvent as FaceCaptureEvent).payload.id
         )
+        assertThat(faceCaptureBiometricsEvent.labels.moduleIds).isEqualTo(faceCaptureEvent.labels.moduleIds)
+        assertThat(faceCaptureBiometricsEvent.labels.attendantId).isEqualTo(faceCaptureEvent.labels.attendantId)
+        assertThat(faceCaptureBiometricsEvent.labels.sessionId).isEqualTo(faceCaptureEvent.labels.sessionId)
+        assertThat(faceCaptureBiometricsEvent.labels.deviceId).isEqualTo(faceCaptureEvent.labels.deviceId)
+        assertThat(faceCaptureBiometricsEvent.labels.mode).isEqualTo(faceCaptureEvent.labels.mode)
         assertThat(faceCaptureEvent.labels.projectId).isEqualTo(faceCaptureBiometricsEvent.labels.projectId)
         assertThat(faceCaptureEvent.id).isNotEqualTo(faceCaptureBiometricsEvent.id)
     }
@@ -222,7 +231,12 @@ class EventMigration7To8Test {
                 {
                 "id":"2022ae95-d4c0-469c-85d6-750659598bbd",
                 "labels":{
-                    "projectId":"some_project_id"
+                    "projectId":"some_project_id",
+                    "attendantId": "SomeAttendantId",
+                    "moduleIds": ["module1","module2"],
+                    "mode": ["FINGERPRINT"],
+                    "sessionId": "SomeSessionId",
+                    "deviceId": "SomeDeviceId"
                 },
                 "payload":{
                     "createdAt":1611584017198,
@@ -260,7 +274,12 @@ class EventMigration7To8Test {
                 {
                 "id":"977f54f6-a1b8-46d0-a1f4-d1e0685926b9",
                 "labels":{
-                    "projectId":"some_project_id"
+                    "projectId":"some_project_id",
+                    "attendantId": "SomeAttendantId",
+                    "moduleIds": ["module1","module2"],
+                    "mode": ["FACE"],
+                    "sessionId": "SomeSessionId",
+                    "deviceId": "SomeDeviceId"
                 },
                 "payload":{
                     "id":"977f54f6-a1b8-46d0-a1f4-d1e0685926b9",
