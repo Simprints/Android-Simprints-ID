@@ -35,7 +35,6 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.network.BaseUrlProvider
 import dagger.Module
 import dagger.Provides
@@ -88,7 +87,7 @@ open class DataModule {
     @Provides
     open fun provideRealmWrapper(
         ctx: Context,
-        localDbKey: LocalDbKey,
+        localDbKey: LocalDbKey?,
         dispatcher: DispatcherProvider,
     ): RealmWrapper = RealmWrapperImpl(
         ctx,
@@ -100,11 +99,11 @@ open class DataModule {
     open fun provideLocalDbKey(
         loginInfoManager: LoginInfoManager,
         secureDataManager: SecureLocalDbKeyProvider,
-    ): LocalDbKey = loginInfoManager.getSignedInProjectIdOrEmpty().let {
+    ): LocalDbKey? = loginInfoManager.getSignedInProjectIdOrEmpty().let {
         if (it.isNotEmpty()) {
             secureDataManager.getLocalDbKeyOrThrow(it)
         } else {
-            throw RealmUninitialisedException("No signed in project id found")
+           null
         }
     }
 
