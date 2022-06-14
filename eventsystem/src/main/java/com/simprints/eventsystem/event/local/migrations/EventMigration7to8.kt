@@ -123,17 +123,17 @@ class EventMigration7to8 : Migration(7, 8) {
             val createdAt = payload.getLong("createdAt")
 
             val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                labels.getString("projectId")
+                labels.optString("projectId")
             }\",\"attendantId\":\"${
-                labels.getString("attendantId")
+                labels.optString("attendantId")
             }\",\"moduleIds\":${
-                labels.getJSONArray("moduleIds")
+                labels.optJSONArray("moduleIds")
             },\"mode\":${
-                labels.getJSONArray("mode")
+                labels.optJSONArray("mode")
             },\"sessionId\":\"${
-                labels.getString("sessionId")
+                labels.optString("sessionId")
             }\",\"deviceId\":\"${
-                labels.getString("deviceId")
+                labels.optString("deviceId")
             }\"},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
                 faceObject.getDouble("yaw")
             },\"roll\":${
@@ -176,15 +176,15 @@ class EventMigration7to8 : Migration(7, 8) {
             val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
                 labels.getString("projectId")
             }\",\"attendantId\":\"${
-                labels.getString("attendantId")
+                labels.optString("attendantId")
             }\",\"moduleIds\":${
-                labels.getJSONArray("moduleIds")
+                labels.optJSONArray("moduleIds")
             },\"mode\":${
-                labels.getJSONArray("mode")
+                labels.optJSONArray("mode")
             },\"sessionId\":\"${
-                labels.getString("sessionId")
+                labels.optString("sessionId")
             }\",\"deviceId\":\"${
-                labels.getString("deviceId")
+                labels.optString("deviceId")
             }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
                 fingerprintObject.getString("finger")
             }\",\"template\":\"${
