@@ -117,24 +117,14 @@ class EventMigration7to8 : Migration(7, 8) {
 
         val isFaceEventValid = payload.getString("result") == "VALID"
 
-        if (isFaceEventValid) {
-            val faceObject = payload.getJSONObject("face")
-            val labelsObject = originalObject.getJSONObject("labels")
-            val createdAt = payload.getLong("createdAt")
+        if (!isFaceEventValid) return
 
-            val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                labelsObject.optString("projectId")
-            }\",\"attendantId\":\"${
-                labelsObject.optString("attendantId")
-            }\",\"moduleIds\":${
-                labelsObject.optJSONArray("moduleIds")
-            },\"mode\":${
-                labelsObject.optJSONArray("mode")
-            },\"sessionId\":\"${
-                labelsObject.optString("sessionId")
-            }\",\"deviceId\":\"${
-                labelsObject.optString("deviceId")
-            }\"},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
+        val faceObject = payload.getJSONObject("face")
+        val labelsObject = originalObject.getJSONObject("labels")
+        val createdAt = payload.getLong("createdAt")
+
+        val event =
+            "{\"id\":\"${randomUUID()}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
                 faceObject.getDouble("yaw")
             },\"roll\":${
                 faceObject.getDouble("roll")
@@ -146,32 +136,22 @@ class EventMigration7to8 : Migration(7, 8) {
                 faceObject.getString("format")
             }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
 
-            val labels = "{\"projectId\":\"${
-                labelsObject.optString("projectId")
-            }\",\"attendantId\":\"${
-                labelsObject.optString("attendantId")
-            }\",\"moduleIds\":${
-                labelsObject.optJSONArray("moduleIds")
-            },\"mode\":${
-                labelsObject.optJSONArray("mode")
-            },\"sessionId\":\"${
-                labelsObject.optString("sessionId")
-            }\",\"deviceId\":\"${
-                labelsObject.optString("deviceId")
-            }\"}"
-
-            val faceCaptureBiometricsEvent = ContentValues().apply {
-                this.put("id", randomUUID())
-                this.put("labels", labels)
-                this.put("type", FACE_CAPTURE_BIOMETRICS)
-                this.put("eventJson", event)
-                this.put("createdAt", createdAt)
-                this.put("endedAt", 0)
-                this.put("sessionIsClosed", 0)
-            }
-
-            database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
+        val faceCaptureBiometricsEvent = ContentValues().apply {
+            this.put("id", randomUUID())
+            this.put("projectId", labelsObject.optString("projectId"))
+            this.put("sessionId", labelsObject.optString("sessionId"))
+            this.put("deviceId", labelsObject.optString("deviceId"))
+            this.put("attendantId", labelsObject.optString("attendantId"))
+            this.put("moduleIds", labelsObject.optJSONArray("moduleIds")?.toString() ?: "[]")
+            this.put("mode", labelsObject.optJSONArray("mode")?.toString() ?: "[]")
+            this.put("type", FACE_CAPTURE_BIOMETRICS)
+            this.put("eventJson", event)
+            this.put("createdAt", createdAt)
+            this.put("endedAt", 0)
+            this.put("sessionIsClosed", 0)
         }
+
+        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
     }
 
     private fun createAndInsertFingerprintCaptureBiometricsEventValues(
@@ -183,24 +163,14 @@ class EventMigration7to8 : Migration(7, 8) {
         val payloadId = payload.getString("id")
         val isFingerprintEventGoodScan = payload.getString("result") == "GOOD_SCAN"
 
-        if (isFingerprintEventGoodScan) {
-            val fingerprintObject = payload.getJSONObject("fingerprint")
-            val createdAt = payload.getLong("createdAt")
-            val labelsObject = originalObject.getJSONObject("labels")
+        if (!isFingerprintEventGoodScan) return
 
-            val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                labelsObject.getString("projectId")
-            }\",\"attendantId\":\"${
-                labelsObject.optString("attendantId")
-            }\",\"moduleIds\":${
-                labelsObject.optJSONArray("moduleIds")
-            },\"mode\":${
-                labelsObject.optJSONArray("mode")
-            },\"sessionId\":\"${
-                labelsObject.optString("sessionId")
-            }\",\"deviceId\":\"${
-                labelsObject.optString("deviceId")
-            }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
+        val fingerprintObject = payload.getJSONObject("fingerprint")
+        val createdAt = payload.getLong("createdAt")
+        val labelsObject = originalObject.getJSONObject("labels")
+
+        val event =
+            "{\"id\":\"${randomUUID()}\",\"labels\":$labelsObject,\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
                 fingerprintObject.getString("finger")
             }\",\"template\":\"${
                 fingerprintObject.getString("template")
@@ -210,36 +180,26 @@ class EventMigration7to8 : Migration(7, 8) {
                 fingerprintObject.getString("format")
             }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
-            val labels = "{\"projectId\":\"${
-                labelsObject.optString("projectId")
-            }\",\"attendantId\":\"${
-                labelsObject.optString("attendantId")
-            }\",\"moduleIds\":${
-                labelsObject.optJSONArray("moduleIds")
-            },\"mode\":${
-                labelsObject.optJSONArray("mode")
-            },\"sessionId\":\"${
-                labelsObject.optString("sessionId")
-            }\",\"deviceId\":\"${
-                labelsObject.optString("deviceId")
-            }\"}"
-
-            val fingerprintCaptureBiometricsEvent = ContentValues().apply {
-                this.put("id", randomUUID())
-                this.put("labels", labels)
-                this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
-                this.put("eventJson", event)
-                this.put("createdAt", createdAt)
-                this.put("endedAt", 0)
-                this.put("sessionIsClosed", 0)
-            }
-
-            database.insert(
-                "DbEvent",
-                SQLiteDatabase.CONFLICT_NONE,
-                fingerprintCaptureBiometricsEvent
-            )
+        val fingerprintCaptureBiometricsEvent = ContentValues().apply {
+            this.put("id", randomUUID())
+            this.put("projectId", labelsObject.optString("projectId"))
+            this.put("sessionId", labelsObject.optString("sessionId"))
+            this.put("deviceId", labelsObject.optString("deviceId"))
+            this.put("attendantId", labelsObject.optString("attendantId"))
+            this.put("moduleIds", labelsObject.optJSONArray("moduleIds")?.toString() ?: "[]")
+            this.put("mode", labelsObject.optJSONArray("mode")?.toString() ?: "[]")
+            this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
+            this.put("eventJson", event)
+            this.put("createdAt", createdAt)
+            this.put("endedAt", 0)
+            this.put("sessionIsClosed", 0)
         }
+
+        database.insert(
+            "DbEvent",
+            SQLiteDatabase.CONFLICT_NONE,
+            fingerprintCaptureBiometricsEvent
+        )
     }
 
     companion object {
