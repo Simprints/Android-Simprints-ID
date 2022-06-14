@@ -3,7 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
@@ -87,25 +86,15 @@ open class DataModule {
     @Provides
     open fun provideRealmWrapper(
         ctx: Context,
-        localDbKey: LocalDbKey?,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager,
         dispatcher: DispatcherProvider,
     ): RealmWrapper = RealmWrapperImpl(
         ctx,
-        localDbKey,
+        secureLocalDbKeyProvider,
+        loginInfoManager,
         dispatcher
     )
-
-    @Provides
-    open fun provideLocalDbKey(
-        loginInfoManager: LoginInfoManager,
-        secureDataManager: SecureLocalDbKeyProvider,
-    ): LocalDbKey? = loginInfoManager.getSignedInProjectIdOrEmpty().let {
-        if (it.isNotEmpty()) {
-            secureDataManager.getLocalDbKeyOrThrow(it)
-        } else {
-           null
-        }
-    }
 
     @Provides
     @Singleton

@@ -1,7 +1,9 @@
 package com.simprints.id.data.db.subject.local
 
 import android.content.Context
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.security.LocalDbKey
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
@@ -11,25 +13,32 @@ import kotlinx.coroutines.withContext
 
 class RealmWrapperImpl(
     private val appContext: Context,
-    private val localKey: LocalDbKey?,
+    private val secureDataManager: SecureLocalDbKeyProvider,
+    private val loginInfoManager: LoginInfoManager,
     private val dispatcher: DispatcherProvider,
 ) :
     RealmWrapper {
     /**
      * Use realm instance in from IO threads
-     *
+     * throws RealmUninitialisedException
      */
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(dispatcher.io()) { Realm.getInstance(config).use(block) }
 
     private val config: RealmConfiguration by lazy {
-        if (localKey == null) {
-            throw RealmUninitialisedException("No signed in project id found")
-        }
         Realm.init(appContext)
-        createAndSaveRealmConfig(localKey)
+        createAndSaveRealmConfig(getLocalDbKey())
     }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
         SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+
+    private fun getLocalDbKey(): LocalDbKey =
+        loginInfoManager.getSignedInProjectIdOrEmpty().let {
+            return if (it.isNotEmpty()) {
+                secureDataManager.getLocalDbKeyOrThrow(it)
+            } else {
+                throw RealmUninitialisedException("No signed in project id found")
+            }
+        }
 }
