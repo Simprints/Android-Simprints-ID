@@ -119,21 +119,21 @@ class EventMigration7to8 : Migration(7, 8) {
 
         if (isFaceEventValid) {
             val faceObject = payload.getJSONObject("face")
-            val labels = originalObject.getJSONObject("labels")
+            val labelsObject = originalObject.getJSONObject("labels")
             val createdAt = payload.getLong("createdAt")
 
             val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                labels.optString("projectId")
+                labelsObject.optString("projectId")
             }\",\"attendantId\":\"${
-                labels.optString("attendantId")
+                labelsObject.optString("attendantId")
             }\",\"moduleIds\":${
-                labels.optJSONArray("moduleIds")
+                labelsObject.optJSONArray("moduleIds")
             },\"mode\":${
-                labels.optJSONArray("mode")
+                labelsObject.optJSONArray("mode")
             },\"sessionId\":\"${
-                labels.optString("sessionId")
+                labelsObject.optString("sessionId")
             }\",\"deviceId\":\"${
-                labels.optString("deviceId")
+                labelsObject.optString("deviceId")
             }\"},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
                 faceObject.getDouble("yaw")
             },\"roll\":${
@@ -146,8 +146,23 @@ class EventMigration7to8 : Migration(7, 8) {
                 faceObject.getString("format")
             }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
 
+            val labels = "{\"projectId\":\"${
+                labelsObject.optString("projectId")
+            }\",\"attendantId\":\"${
+                labelsObject.optString("attendantId")
+            }\",\"moduleIds\":${
+                labelsObject.optJSONArray("moduleIds")
+            },\"mode\":${
+                labelsObject.optJSONArray("mode")
+            },\"sessionId\":\"${
+                labelsObject.optString("sessionId")
+            }\",\"deviceId\":\"${
+                labelsObject.optString("deviceId")
+            }\"}"
+
             val faceCaptureBiometricsEvent = ContentValues().apply {
                 this.put("id", randomUUID())
+                this.put("labels", labels)
                 this.put("type", FACE_CAPTURE_BIOMETRICS)
                 this.put("eventJson", event)
                 this.put("createdAt", createdAt)
@@ -171,20 +186,20 @@ class EventMigration7to8 : Migration(7, 8) {
         if (isFingerprintEventGoodScan) {
             val fingerprintObject = payload.getJSONObject("fingerprint")
             val createdAt = payload.getLong("createdAt")
-            val labels = originalObject.getJSONObject("labels")
+            val labelsObject = originalObject.getJSONObject("labels")
 
             val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                labels.getString("projectId")
+                labelsObject.getString("projectId")
             }\",\"attendantId\":\"${
-                labels.optString("attendantId")
+                labelsObject.optString("attendantId")
             }\",\"moduleIds\":${
-                labels.optJSONArray("moduleIds")
+                labelsObject.optJSONArray("moduleIds")
             },\"mode\":${
-                labels.optJSONArray("mode")
+                labelsObject.optJSONArray("mode")
             },\"sessionId\":\"${
-                labels.optString("sessionId")
+                labelsObject.optString("sessionId")
             }\",\"deviceId\":\"${
-                labels.optString("deviceId")
+                labelsObject.optString("deviceId")
             }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
                 fingerprintObject.getString("finger")
             }\",\"template\":\"${
@@ -195,8 +210,23 @@ class EventMigration7to8 : Migration(7, 8) {
                 fingerprintObject.getString("format")
             }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
+            val labels = "{\"projectId\":\"${
+                labelsObject.optString("projectId")
+            }\",\"attendantId\":\"${
+                labelsObject.optString("attendantId")
+            }\",\"moduleIds\":${
+                labelsObject.optJSONArray("moduleIds")
+            },\"mode\":${
+                labelsObject.optJSONArray("mode")
+            },\"sessionId\":\"${
+                labelsObject.optString("sessionId")
+            }\",\"deviceId\":\"${
+                labelsObject.optString("deviceId")
+            }\"}"
+
             val fingerprintCaptureBiometricsEvent = ContentValues().apply {
                 this.put("id", randomUUID())
+                this.put("labels", labels)
                 this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
                 this.put("eventJson", event)
                 this.put("createdAt", createdAt)
