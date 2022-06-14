@@ -122,13 +122,29 @@ class EventMigration7to8 : Migration(7, 8) {
             val labels = originalObject.getJSONObject("labels")
             val createdAt = payload.getLong("createdAt")
 
-            val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"moduleIds\":[],\"projectId\":\"${
+            val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
                 labels.getString("projectId")
-            }\",\"mode\":[]},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"template\":\"${
-                faceObject.getString(
-                    "template"
-                )
-            }\",\"quality\":${faceObject.getDouble("quality")},\"format\":\"RANK_ONE_1_23\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+            }\",\"attendantId\":\"${
+                labels.getString("attendantId")
+            }\",\"moduleIds\":${
+                labels.getJSONArray("moduleIds")
+            },\"mode\":${
+                labels.getJSONArray("mode")
+            },\"sessionId\":\"${
+                labels.getString("sessionId")
+            }\",\"deviceId\":\"${
+                labels.getString("deviceId")
+            }\"},\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
+                faceObject.getDouble("yaw")
+            },\"roll\":${
+                faceObject.getDouble("roll")
+            },\"template\":\"${
+                faceObject.getString("template")
+            }\",\"quality\":${
+                faceObject.getDouble("quality")
+            },\"format\":\"${
+                faceObject.getString("format")
+            }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
 
             val faceCaptureBiometricsEvent = ContentValues().apply {
                 this.put("id", randomUUID())
@@ -157,20 +173,27 @@ class EventMigration7to8 : Migration(7, 8) {
             val createdAt = payload.getLong("createdAt")
             val labels = originalObject.getJSONObject("labels")
 
-            val event =
-                "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
-                    labels.getString("projectId")
-                }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
-                    fingerprintObject.getString(
-                        "finger"
-                    )
-                }\",\"template\":\"${
-                    fingerprintObject.getString(
-                        "template"
-                    )
-                }\",\"quality\":${fingerprintObject.getInt("quality")},\"format\":\"${
-                    fingerprintObject.getString("format")
-                }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
+            val event = "{\"id\":\"${randomUUID()}\",\"labels\":{\"projectId\":\"${
+                labels.getString("projectId")
+            }\",\"attendantId\":\"${
+                labels.getString("attendantId")
+            }\",\"moduleIds\":${
+                labels.getJSONArray("moduleIds")
+            },\"mode\":${
+                labels.getJSONArray("mode")
+            },\"sessionId\":\"${
+                labels.getString("sessionId")
+            }\",\"deviceId\":\"${
+                labels.getString("deviceId")
+            }\"},\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
+                fingerprintObject.getString("finger")
+            }\",\"template\":\"${
+                fingerprintObject.getString("template")
+            }\",\"quality\":${
+                fingerprintObject.getInt("quality")
+            },\"format\":\"${
+                fingerprintObject.getString("format")
+            }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
             val fingerprintCaptureBiometricsEvent = ContentValues().apply {
                 this.put("id", randomUUID())
@@ -181,7 +204,11 @@ class EventMigration7to8 : Migration(7, 8) {
                 this.put("sessionIsClosed", 0)
             }
 
-            database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, fingerprintCaptureBiometricsEvent)
+            database.insert(
+                "DbEvent",
+                SQLiteDatabase.CONFLICT_NONE,
+                fingerprintCaptureBiometricsEvent
+            )
         }
     }
 
