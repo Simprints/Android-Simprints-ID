@@ -3,6 +3,9 @@ package com.simprints.id.data.db.subject.local
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.simprints.core.login.LoginInfoManager
+import com.simprints.core.security.LocalDbKey
+import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.testtools.TestApplication
@@ -14,6 +17,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.internal.RealmCore
 import kotlinx.coroutines.runBlocking
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +32,16 @@ class RealmWrapperImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
     private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+    private val loginInfoManagerMock = mockk<LoginInfoManager>() {
+        every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+    }
 
+    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>() {
+        every { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
+            "DatabaseName",
+            "DatabaseKey".toByteArray()
+        )
+    }
     private lateinit var realmWrapper: RealmWrapperImpl
 
     @Before
@@ -48,7 +61,8 @@ class RealmWrapperImplTest {
 
         realmWrapper = RealmWrapperImpl(
             ApplicationProvider.getApplicationContext(),
-            mockk(),
+            secureLocalDbKeyProviderMock,
+            loginInfoManagerMock,
             testDispatcherProvider
         )
     }
@@ -62,14 +76,9 @@ class RealmWrapperImplTest {
     }
 
     @Test(expected = RealmUninitialisedException::class)
-    fun `test useRealmInstance creates realm instance should throw if localdbkey is null`() =
+    fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
         runBlocking {
-            realmWrapper = RealmWrapperImpl(
-                ApplicationProvider.getApplicationContext(),
-                null,
-                testDispatcherProvider
-            )
-
+            every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns ""
             val anyNumber = realmWrapper.useRealmInstance { 10 }
             // Then should throw RealmUninitialisedException
         }

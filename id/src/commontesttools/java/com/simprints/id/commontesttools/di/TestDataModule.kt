@@ -3,9 +3,6 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
@@ -107,23 +104,8 @@ class TestDataModule(
     ): SubjectLocalDataSource =
         personLocalDataSourceRule.resolveDependency {
             super.providePersonLocalDataSource(
-                realmWrapper
+                mockk()
             )
         }
-
-    override fun provideRealmWrapper(
-        ctx: Context,
-        localDbKey: LocalDbKey?,
-        dispatcher: DispatcherProvider
-    ): RealmWrapper {
-        return mockk(relaxed = true)
-    }
-
-    override fun provideLocalDbKey(
-        loginInfoManager: LoginInfoManager,
-        secureDataManager: SecureLocalDbKeyProvider
-    ): LocalDbKey {
-        return LocalDbKey("","".toByteArray())
-    }
  }
 
