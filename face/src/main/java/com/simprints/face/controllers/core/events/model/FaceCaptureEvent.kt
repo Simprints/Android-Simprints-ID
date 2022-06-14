@@ -3,10 +3,6 @@ package com.simprints.face.controllers.core.events.model
 import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.models.FaceDetection
-import kotlin.Boolean
-import kotlin.Float
-import kotlin.Int
-import kotlin.Long
 import kotlin.let
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
