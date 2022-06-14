@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
+import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
@@ -13,8 +14,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.internal.RealmCore
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,7 +43,7 @@ class RealmWrapperImplTest {
         every { Realm.getInstance(any()) } returns mockk()
 
         mockkObject(SubjectsRealmConfig)
-        every { SubjectsRealmConfig.get(any(),any(),any()) } returns mockk()
+        every { SubjectsRealmConfig.get(any(), any(), any()) } returns mockk()
 
 
         realmWrapper = RealmWrapperImpl(
@@ -61,4 +60,17 @@ class RealmWrapperImplTest {
         verify { Realm.getInstance(any()) }
         Truth.assertThat(anyNumber).isEqualTo(10)
     }
+
+    @Test(expected = RealmUninitialisedException::class)
+    fun `test useRealmInstance creates realm instance should throw if localdbkey is null`() =
+        runBlocking {
+            realmWrapper = RealmWrapperImpl(
+                ApplicationProvider.getApplicationContext(),
+                null,
+                testDispatcherProvider
+            )
+
+            val anyNumber = realmWrapper.useRealmInstance { 10 }
+            // Then should throw RealmUninitialisedException
+        }
 }

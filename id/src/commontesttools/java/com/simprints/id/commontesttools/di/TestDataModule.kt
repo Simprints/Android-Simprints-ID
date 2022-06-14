@@ -113,7 +113,7 @@ class TestDataModule(
 
     override fun provideRealmWrapper(
         ctx: Context,
-        localDbKey: LocalDbKey,
+        localDbKey: LocalDbKey?,
         dispatcher: DispatcherProvider
     ): RealmWrapper {
         return mockk(relaxed = true)
