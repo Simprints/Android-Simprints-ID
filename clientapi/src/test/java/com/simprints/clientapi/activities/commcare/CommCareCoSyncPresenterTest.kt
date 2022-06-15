@@ -379,6 +379,71 @@ class CommCareCoSyncPresenterTest {
             }
             coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
         }
+    @Test
+    fun `handleRegistration should return valid registration with events and actions when cosync biometrics and all is true`() =
+        runTest {
+            val projectId = UUID.randomUUID().toString()
+            val registerId = UUID.randomUUID().toString()
+            val sessionId = UUID.randomUUID().toString()
+
+            val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+            coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+            coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+                sessionCaptureEvent
+            )
+
+            val subject =
+                Subject(
+                    registerId,
+                    projectId,
+                    "thales",
+                    "mod1",
+                    Date(),
+                    null,
+                    emptyList(),
+                    emptyList()
+                )
+            val subjectRepository = mockk<SubjectRepository>()
+            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+            val prefs = mockk<SharedPreferencesManager>().apply {
+                coEvery { this@apply.peekSessionId() } returns "sessionId"
+                coEvery { this@apply.popSessionId() } returns "sessionId"
+                every { this@apply.canCoSyncAllData() } returns true
+                every { this@apply.canCoSyncBiometricData() } returns true
+            }
+
+            runBlocking {
+                getNewPresenter(
+                    Enrol,
+                    sessionEventsManagerMock,
+                    subjectRepository = subjectRepository,
+                    coroutineScope = this,
+                    sharedPreferencesManager = prefs
+                ).handleEnrolResponse(EnrolResponse(registerId))
+            }
+
+            verify(exactly = 1) {
+                view.returnRegistration(
+                    registerId,
+                    sessionId,
+                    RETURN_FOR_FLOW_COMPLETED_CHECK,
+                    "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
+                    match {
+                        it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
+                        it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
+                        it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
+                        it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                    }
+                )
+            }
+            coVerify(exactly = 1) {
+                sessionEventsManagerMock.addCompletionCheckEvent(
+                    RETURN_FOR_FLOW_COMPLETED_CHECK
+                )
+            }
+            coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+        }
 
     @Test
     fun `handleIdentification should return valid identification with events`() {
