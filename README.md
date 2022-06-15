@@ -165,7 +165,9 @@ To install [bundletool](https://github.com/google/bundletool) you can download t
 ## Deploying to a connected device
 
 After creating the universal apk from app bundle, run command to install apk on connected device.
-`bundletool install-apks --apks=/MyApp/my_app.apks` </br>
+`bundletool install-apks --apks=/MyApp/my_app.apks` 
+
+<br>
 
 ## Deploying to the Google Play Store
 
