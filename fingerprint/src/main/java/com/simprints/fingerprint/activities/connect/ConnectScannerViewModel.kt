@@ -186,8 +186,10 @@ class ConnectScannerViewModel(
                         it
                     )
                 }
-            is OtaAvailableException ->
+            is OtaAvailableException -> {
+                setLastConnectedScannerInfo()
                 connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
+            }
             is BluetoothNotSupportedException ->
                 launchAlert.postEvent(BLUETOOTH_NOT_SUPPORTED)
             is ScannerLowBatteryException ->
