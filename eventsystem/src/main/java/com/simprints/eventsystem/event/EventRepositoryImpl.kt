@@ -152,7 +152,7 @@ open class EventRepositoryImpl(
      * upload, and how critical this system is, we are happy to trade off speed for reliability
      * (through simplicity and low resource usage)
      */
-    override suspend fun uploadEvents(
+    override fun uploadEvents(
         projectId: String,
         canSyncAllDataToSimprints: Boolean,
         canSyncBiometricDataToSimprints: Boolean,
