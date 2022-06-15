@@ -60,7 +60,7 @@ class EventMigration7to8 : Migration(7, 8) {
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
 
-            Simber.d("Migrated FingerorintCapture event: $newJson")
+            Simber.d("Migrated FingerprintCapture event: $newJson")
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
     }
