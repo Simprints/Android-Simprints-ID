@@ -30,7 +30,7 @@ interface EventRepository {
 
     suspend fun addOrUpdateEvent(event: Event)
 
-    suspend fun uploadEvents(
+    fun uploadEvents(
         projectId: String,
         canSyncAllDataToSimprints: Boolean,
         canSyncBiometricDataToSimprints: Boolean,
