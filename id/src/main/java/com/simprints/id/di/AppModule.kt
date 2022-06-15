@@ -317,9 +317,10 @@ open class AppModule {
     @Provides
     fun providePersonCreationEventHelper(
         eventRepository: EventRepository,
-        timeHelper: TimeHelper
+        timeHelper: TimeHelper,
+        encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =
-        PersonCreationEventHelperImpl(eventRepository, timeHelper)
+        PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()

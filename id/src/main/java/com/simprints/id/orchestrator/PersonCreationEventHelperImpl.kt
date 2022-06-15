@@ -5,6 +5,7 @@ import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
@@ -17,7 +18,8 @@ import kotlinx.coroutines.flow.toList
 
 class PersonCreationEventHelperImpl(
     val eventRepository: com.simprints.eventsystem.event.EventRepository,
-    val timeHelper: TimeHelper
+    val timeHelper: TimeHelper,
+    private val encodingUtils: EncodingUtils
 ) : PersonCreationEventHelper {
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
@@ -90,9 +92,36 @@ class PersonCreationEventHelperImpl(
         fingerprintSamplesForPersonCreation: List<FingerprintSample>?
     ) = PersonCreationEvent(
         startTime = timeHelper.now(),
-        fingerprintCaptureIds = fingerprintCaptureBiometricsEvents.map { it.payload.id },
+        fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
+            fingerprintCaptureBiometricsEvents,
+            fingerprintSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }
+        ),
         fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
-        faceCaptureIds = faceCaptureBiometricsEvents.map { it.payload.id },
+        faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
+            faceCaptureBiometricsEvents,
+            faceSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }
+        ),
         faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
     )
+
+    private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
+        captureEvents: List<FingerprintCaptureBiometricsEvent>,
+        personTemplates: List<String>?
+    ): List<String>? =
+        captureEvents
+            .filter {
+                personTemplates?.contains(it.payload.fingerprint.template) ?: false
+            }.map { it.payload.id }
+            .ifEmpty { null }
+
+    private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
+        captureEvents: List<FaceCaptureBiometricsEvent>,
+        personTemplates: List<String>?
+    ): List<String>? =
+        captureEvents
+            .filter {
+                personTemplates?.contains(it.payload.face.template) ?: false
+            }.map { it.payload.id }
+            .ifEmpty { null }
+
 }
