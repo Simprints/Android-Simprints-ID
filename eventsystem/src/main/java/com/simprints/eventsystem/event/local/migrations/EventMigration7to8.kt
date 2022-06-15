@@ -141,7 +141,7 @@ class EventMigration7to8 : Migration(7, 8) {
             }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}".trimIndent()
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", event)
+            this.put("id", eventId)
             this.put("projectId", labelsObject.optString("projectId"))
             this.put("sessionId", labelsObject.optString("sessionId"))
             this.put("deviceId", labelsObject.optString("deviceId"))
@@ -184,7 +184,7 @@ class EventMigration7to8 : Migration(7, 8) {
             }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
         val fingerprintCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", event)
+            this.put("id", eventId)
             this.put("projectId", labelsObject.optString("projectId"))
             this.put("sessionId", labelsObject.optString("sessionId"))
             this.put("deviceId", labelsObject.optString("deviceId"))
