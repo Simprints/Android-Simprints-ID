@@ -87,7 +87,7 @@ class PersonCreationEventHelperImplTest {
         coEvery { timeHelper.now() } returns CREATED_AT
 
 
-        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper)
+        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsImplForTests)
     }
 
     @Test
