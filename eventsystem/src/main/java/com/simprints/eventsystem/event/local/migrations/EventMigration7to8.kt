@@ -125,9 +125,10 @@ class EventMigration7to8 : Migration(7, 8) {
         val faceObject = payload.getJSONObject("face")
         val labelsObject = originalObject.getJSONObject("labels")
         val createdAt = payload.getLong("createdAt")
+        val eventId = randomUUID()
 
         val event =
-            "{\"id\":\"${randomUUID()}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
+            "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
                 faceObject.getDouble("yaw")
             },\"roll\":${
                 faceObject.getDouble("roll")
@@ -140,13 +141,10 @@ class EventMigration7to8 : Migration(7, 8) {
             }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}".trimIndent()
 
         val faceCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", randomUUID())
+            this.put("id", event)
             this.put("projectId", labelsObject.optString("projectId"))
             this.put("sessionId", labelsObject.optString("sessionId"))
             this.put("deviceId", labelsObject.optString("deviceId"))
-            this.put("attendantId", labelsObject.optString("attendantId"))
-            this.put("moduleIds", labelsObject.optJSONArray("moduleIds")?.toString() ?: "[]")
-            this.put("mode", labelsObject.optJSONArray("mode")?.toString() ?: "[]")
             this.put("type", FACE_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
             this.put("createdAt", createdAt)
@@ -172,9 +170,10 @@ class EventMigration7to8 : Migration(7, 8) {
         val fingerprintObject = payload.getJSONObject("fingerprint")
         val createdAt = payload.getLong("createdAt")
         val labelsObject = originalObject.getJSONObject("labels")
+        val eventId = randomUUID()
 
         val event =
-            "{\"id\":\"${randomUUID()}\",\"labels\":$labelsObject,\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
+            "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
                 fingerprintObject.getString("finger")
             }\",\"template\":\"${
                 fingerprintObject.getString("template").replace("\\s".toRegex(), "")
@@ -185,13 +184,10 @@ class EventMigration7to8 : Migration(7, 8) {
             }\"},\"id\":\"$payloadId\",\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\",\"endedAt\":0},\"type\":\"FINGERPRINT_CAPTURE_BIOMETRICS\"}"
 
         val fingerprintCaptureBiometricsEvent = ContentValues().apply {
-            this.put("id", randomUUID())
+            this.put("id", event)
             this.put("projectId", labelsObject.optString("projectId"))
             this.put("sessionId", labelsObject.optString("sessionId"))
             this.put("deviceId", labelsObject.optString("deviceId"))
-            this.put("attendantId", labelsObject.optString("attendantId"))
-            this.put("moduleIds", labelsObject.optJSONArray("moduleIds")?.toString() ?: "[]")
-            this.put("mode", labelsObject.optJSONArray("mode")?.toString() ?: "[]")
             this.put("type", FINGERPRINT_CAPTURE_BIOMETRICS)
             this.put("eventJson", event)
             this.put("createdAt", createdAt)
