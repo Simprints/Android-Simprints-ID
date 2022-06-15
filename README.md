@@ -65,6 +65,8 @@ Following the guidelines above the end goal of SID should look roughly like:
 
 *Note: There is no longer a core module. There should be no "catch all" module, because it will just become a graveyard / completely overused, like the previous ID module. Every module should have a clear singular purpose.* </br>
 
+<br>
+
 ## Cloning
 
 `git clone  git@bitbucket.org:simprints/android-simprints-id.git`  
