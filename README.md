@@ -63,16 +63,13 @@ Following the guidelines above the end goal of SID should look roughly like:
 - infra_network
 - infra_security
 
-*Note: There is no longer a core module. There should be no "catch all" module, because it will just become a graveyard / completely overused, like the previous ID module. Every module should have a clear singular purpose.*
-
-</br>
+*Note: There is no longer a core module. There should be no "catch all" module, because it will just become a graveyard / completely overused, like the previous ID module. Every module should have a clear singular purpose.* </br>
 
 ## Cloning
 
-`git clone  git@bitbucket.org:simprints/android-simprints-id.git`
+`git clone  git@bitbucket.org:simprints/android-simprints-id.git`  
 
-
-</br>
+<br>
 
 ## Full CI Workflow
 
@@ -80,10 +77,9 @@ The aim of the `ci` workflow is to run all tests in all modules, assemble produc
 When run, it immediately triggers all the other relevant workflows such that all tests are run.
 In the mean-time, the `ci` build waits for the other workflows to finish and, if they pass, continue to the assemble and deploy steps.
 
-It is triggered upon pull requests and serves as validation of the integrity of the branch for any pull requests into `main`.
+It is triggered upon pull requests and serves as validation of the integrity of the branch for any pull requests into `main`. 
 
-
-</br>
+<br>
 
 ## Testing
 
@@ -126,10 +122,9 @@ To use Mockito in DF modules for android tests, a different dexer is required: c
 ### Technical documentation on features
 
 A high level documentation on how each module works can be found in the [project's wiki](https://bitbucket.org/simprints/android-simprints-id/wiki/Home) on bitbucket.
-More details about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
+More details about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md). 
 
-
-</br>
+<br>
 
 ## Build types
 
@@ -147,10 +142,9 @@ To create apks, use the `assemble` command instead of `bundle`.
 |---------------------------|-----------------|----------------|-------------|-------------------------------------|----------------------------------------|
 | `bundleDebug`             |       ✓         |      x          |     ✓      |                ✓                    |  development  						    |
 | `bundleStaging`           |       ✓         |      x          |     ✓       |               ✓                    |  staging    						     |
-| `bundleRelease`           |       x         |      ✓          |     x       |                x                    |  production (CI only) |
+| `bundleRelease`           |       x         |      ✓          |     x       |                x                    |  production (CI only) | 
 
-
-</br>
+<br>
 
 ## Creation of universal apk
 
@@ -162,18 +156,14 @@ To create an universal apk that can be shared you need to:
 2. Create a universal apk that can be installed in any device (warning: this is a big app)
 `bundletool build-apks --bundle=id/build/outputs/bundle/debug/id-debug.aab --output=id-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
 
-To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).
+To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS). 
 
-
-</br>
+<br>
 
 ## Deploying to a connected device
 
 After creating the universal apk from app bundle, run command to install apk on connected device.
-`bundletool install-apks --apks=/MyApp/my_app.apks`
-
-
-</br>
+`bundletool install-apks --apks=/MyApp/my_app.apks` </br>
 
 ## Deploying to the Google Play Store
 
