@@ -26,7 +26,7 @@ class EventUpSyncHelperImpl(
     override suspend fun countForUpSync(operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation): Int =
         eventRepository.localCount(operation.projectId)
 
-    override suspend fun upSync(
+    override fun upSync(
         scope: CoroutineScope,
         operation: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
     ) =
