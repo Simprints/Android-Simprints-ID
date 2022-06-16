@@ -13,7 +13,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import kotlinx.coroutines.runBlocking
+import org.junit.Rule
 import org.junit.Test
 import com.simprints.eventsystem.event.domain.models.FingerComparisonStrategy as CoreFingerComparisonStrategy
 import com.simprints.eventsystem.event.domain.models.Matcher as CoreMatcher
@@ -21,13 +23,20 @@ import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent as CoreO
 
 class FingerprintSessionEventsManagerImplTest {
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+
     @Test
     fun addEventInBackground() = runBlocking {
         //Given
         val eventRepository: EventRepository = mockk()
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
         val eventSlot = CapturingSlot<CoreOneToOneMatchEvent>()
-        val fingerprintSessionEventsManager = FingerprintSessionEventsManagerImpl(eventRepository)
+        val fingerprintSessionEventsManager = FingerprintSessionEventsManagerImpl(
+            eventRepository,
+             testCoroutineRule.testCoroutineDispatcher
+        )
         val event = OneToOneMatchEvent(
             1L,
             1L,
