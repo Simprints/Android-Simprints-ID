@@ -24,10 +24,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.SubjectRepositoryImpl
-import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
-import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
+import com.simprints.id.data.db.subject.local.*
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.license.local.LicenseLocalDataSource
@@ -40,7 +37,6 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.BaseUrlProvider
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.FlowPreview
 import java.net.URL
 import javax.inject.Singleton
 
@@ -54,17 +50,10 @@ open class DataModule {
     ): EventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, jsonHelper)
 
     @Provides
-    @FlowPreview
     open fun provideProjectLocalDataSource(
-        ctx: Context,
-        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager,
-        dispatcher: DispatcherProvider
+        realmWrapper: RealmWrapper
     ): ProjectLocalDataSource = ProjectLocalDataSourceImpl(
-        ctx,
-        secureLocalDbKeyProvider,
-        loginInfoManager,
-        dispatcher
+        realmWrapper
     )
 
     @Provides
@@ -95,18 +84,24 @@ open class DataModule {
     )
 
     @Provides
-    @Singleton
-    @FlowPreview
-    open fun providePersonLocalDataSource(
+    open fun provideRealmWrapper(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
         loginInfoManager: LoginInfoManager,
-        dispatcher: DispatcherProvider
-    ): SubjectLocalDataSource = SubjectLocalDataSourceImpl(
+        dispatcher: DispatcherProvider,
+    ): RealmWrapper = RealmWrapperImpl(
         ctx,
         secureLocalDbKeyProvider,
         loginInfoManager,
         dispatcher
+    )
+
+    @Provides
+    @Singleton
+    open fun providePersonLocalDataSource(
+        realmWrapper: RealmWrapper
+    ): SubjectLocalDataSource = SubjectLocalDataSourceImpl(
+        realmWrapper
     )
 
     @Provides
