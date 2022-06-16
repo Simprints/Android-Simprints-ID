@@ -3,24 +3,23 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.id.data.db.subject.local.RealmWrapper
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.testtools.common.di.DependencyRule
-import kotlinx.coroutines.FlowPreview
+import io.mockk.mockk
 
 class TestDataModule(
     private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
@@ -33,19 +32,12 @@ class TestDataModule(
     private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
 
-    @FlowPreview
     override fun provideProjectLocalDataSource(
-        ctx: Context,
-        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager,
-        dispatcher: DispatcherProvider
+        realmWrapper: RealmWrapper
     ): ProjectLocalDataSource =
         projectLocalDataSourceRule.resolveDependency {
             super.provideProjectLocalDataSource(
-                ctx,
-                secureLocalDbKeyProvider,
-                loginInfoManager,
-                dispatcher
+                realmWrapper
             )
         }
 
@@ -107,20 +99,13 @@ class TestDataModule(
             )
         }
 
-    @FlowPreview
     override fun providePersonLocalDataSource(
-        ctx: Context,
-        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager,
-        dispatcher: DispatcherProvider,
+        realmWrapper: RealmWrapper
     ): SubjectLocalDataSource =
         personLocalDataSourceRule.resolveDependency {
             super.providePersonLocalDataSource(
-                ctx,
-                secureLocalDbKeyProvider,
-                loginInfoManager,
-                dispatcher
+                mockk()
             )
         }
+ }
 
-}
