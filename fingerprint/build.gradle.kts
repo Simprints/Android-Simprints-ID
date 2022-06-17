@@ -107,11 +107,9 @@ dependencies {
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.legacy)
     implementation(libs.androidX.room.core)
     implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.androidX.lifecycle.livedata)
-    implementation(libs.androidX.lifecycle.ext)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.ui.cardview)
     implementation(libs.androidX.ui.preference)
@@ -233,8 +231,6 @@ dependencies {
 
     // Truth
     androidTestImplementation(libs.testing.truth)
-
-    androidTestImplementation(libs.testing.rx2.idler)
 
     // Trust me I hate this fix more than you
     // This is to solve multiple imports of guava https://stackoverflow.com/a/60492942/4072335
