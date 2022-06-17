@@ -22,7 +22,7 @@ class SyncInformationViewModelFactory(
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(SyncInformationViewModel::class.java)) {
             SyncInformationViewModel(
                 downySyncHelper,

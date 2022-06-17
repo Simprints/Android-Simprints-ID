@@ -13,6 +13,6 @@ class OrchestratorViewModelFactory(private val orchestratorManager: Orchestrator
                                    private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
 ) : ViewModelProvider.Factory {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
         OrchestratorViewModel(orchestratorManager, orchestratorEventsHelper, modalities, eventRepository, domainToModuleApiConverter) as T
 }

@@ -13,7 +13,7 @@ class PrivacyNoticeViewModelFactory(
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(PrivacyNoticeViewModel::class.java)) {
             PrivacyNoticeViewModel(longConsentRepository, preferencesManager.language, dispatcherProvider) as T
         } else {
