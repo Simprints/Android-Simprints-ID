@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 class SettingsPreferenceViewModelFactory : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(SettingsPreferenceViewModel::class.java))
             SettingsPreferenceViewModel() as T
         else

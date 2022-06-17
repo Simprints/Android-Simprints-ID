@@ -12,7 +12,7 @@ class EnrolLastBiometricsViewModelFactory(
     val preferencesManager: IdPreferencesManager
 ) : ViewModelProvider.Factory {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
         EnrolLastBiometricsViewModel(
             enrolmentHelper,
             timeHelper,

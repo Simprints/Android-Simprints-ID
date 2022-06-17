@@ -14,7 +14,7 @@ class FetchGuidViewModelFactory(private val fetchGuidHelper: FetchGuidHelper,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(FetchGuidViewModel::class.java)) {
             FetchGuidViewModel(fetchGuidHelper, deviceManager, eventRepository, timeHelper, dispatcher) as T
         } else {

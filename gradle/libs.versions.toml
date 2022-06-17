@@ -16,15 +16,15 @@ location_services_version = "18.0.0"
 safetynet_services_version = "17.0.1"
 retrofit_version = "2.9.0"
 okttp_version = "4.9.3"
-fuzzywuzzy_version = "1.2.0"
+fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.11.4"
 koin_version = "3.2.0"
-rootbeer_version = "0.0.7"
+rootbeer_version = "0.1.0"
 mockito_version = "4.5.1"
 objenesis_version = "3.2"
 robolectric_version = "4.8.1"
-commons_io_version = "2.6"
-kronos_version = "0.0.1-alpha09"
+commons_io_version = "2.11.0"
+kronos_version = "0.0.1-alpha11"
 fragment_version = "1.4.1"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
@@ -40,7 +40,6 @@ kotlin-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serializati
 androidX-core = "androidx.core:core-ktx:1.8.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
 androidX-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "app_compat_version" }
-androidX-legacy = "androidx.legacy:legacy-support-v4:1.0.0"
 androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "androidx_room_version" }
 androidX-Room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx_room_version" }
 androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx_room_version" }
@@ -49,7 +48,6 @@ androidX-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata"
 androidX-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
-androidX-lifecycle-ext = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
@@ -84,7 +82,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 dagger-javax = "javax.inject:javax.inject:1"
 
 #SqlCipher
-sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.4.0"
+sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.1"
 
 #Support
 support-material = "com.google.android.material:material:1.4.0"
@@ -166,7 +164,6 @@ testing-dagger_kotlin = "com.github.fabioCollini.daggermock:daggermock-kotlin:0.
 testing-work = { module = "androidx.work:work-testing", version.ref = "work_version" }
 testing-retrofit = { module = "com.squareup.retrofit2:retrofit-mock", version.ref = "retrofit_version" }
 testing-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okttp_version" }
-testing-rx2_idler = "com.squareup.rx.idler:rx2-idler:0.9.1"
 testing-coroutines_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin_coroutine_version" }
 
 testing-koin = { module = "io.insert-koin:koin-test", version.ref = "koin_version" }
