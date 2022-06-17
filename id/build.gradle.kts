@@ -261,7 +261,6 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
     androidTestImplementation(libs.testing.truth)
-    androidTestImplementation(libs.testing.rx2.idler)
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
 
