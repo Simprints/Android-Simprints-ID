@@ -261,7 +261,6 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
     androidTestImplementation(libs.testing.truth)
-    androidTestImplementation(libs.testing.rx2.idler)
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
 
@@ -270,9 +269,6 @@ dependencies {
     androidTestImplementation(libs.testing.androidX.room)
     androidTestImplementation(libs.rxJava2.kotlin)
 
-    androidTestImplementation(libs.testing.awaitility) {
-        exclude("org.hamcrest")
-    }
 
     androidTestImplementation(libs.testing.espresso.barista) {
         exclude("com.android.support")
