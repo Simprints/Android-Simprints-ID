@@ -108,7 +108,7 @@ class EventRepositoryImplIntegrationTest {
 
         eventRepo.uploadEvents(
             DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
+            canSyncAllDataToSimprints = true,
             canSyncBiometricDataToSimprints = false,
             canSyncAnalyticsDataToSimprints = false
         ).toList()
