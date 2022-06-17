@@ -8,7 +8,7 @@ import io.reactivex.flowables.ConnectableFlowable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 
-fun <T> single(function: () -> T): Single<T> = Single.create { emitter ->
+fun <T : Any> single(function: () -> T): Single<T> = Single.create { emitter ->
     try {
         val result = function.invoke()
         emitter.onSuccess(result)
@@ -33,7 +33,7 @@ fun Single<*>.completeOnceReceived(): Completable =
 fun <T> Flowable<T>.subscribeOnIoAndPublish(): ConnectableFlowable<T> =
     this.subscribeOn(Schedulers.io()).publish()
 
-fun <T> Completable.doSimultaneously(single: Single<T>): Single<T> =
+fun <T:Any> Completable.doSimultaneously(single: Single<T>): Single<T> =
     Singles.zip(single, this.toSingleDefault(Unit)) { value, _ -> value }
 
 fun <T, R> Single<T>.mapToMaybeEmptyIfNull(block: (T) -> R?): Maybe<R> =

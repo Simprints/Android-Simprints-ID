@@ -27,12 +27,15 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -240,7 +243,12 @@ class EventRepositoryImplTest {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE, GUID1, GUID2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID1) }
             coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID2) }
@@ -252,7 +260,12 @@ class EventRepositoryImplTest {
         runBlocking {
             mockDbToLoadInvalidSessions(2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = true,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID1) }
         }
@@ -264,7 +277,12 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadOpenSession(GUID3)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             verifySessionHasNotGotUploaded(GUID3)
         }
@@ -274,7 +292,12 @@ class EventRepositoryImplTest {
     fun upload_shouldNotUploadSessionsForNotSignedProject() {
         runBlocking {
             shouldThrow<TryToUploadEventsForNotSignedProject> {
-                eventRepo.uploadEvents(randomUUID()).toList()
+                eventRepo.uploadEvents(
+                    randomUUID(),
+                    canSyncAllDataToSimprints = false,
+                    canSyncBiometricDataToSimprints = false,
+                    canSyncAnalyticsDataToSimprints = false
+                ).toList()
             }
         }
     }
@@ -286,7 +309,12 @@ class EventRepositoryImplTest {
                 mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = true,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             coVerify {
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
@@ -303,7 +331,12 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            val progress = eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            val progress = eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
@@ -318,7 +351,12 @@ class EventRepositoryImplTest {
                 mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
                     mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = true,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             coVerify {
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
@@ -335,7 +373,12 @@ class EventRepositoryImplTest {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             coVerify(exactly = 0) { eventLocalDataSource.delete(any()) }
         }
@@ -354,7 +397,12 @@ class EventRepositoryImplTest {
             val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
-            eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
 
             coVerify(exactly = 0) {
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID1 }
@@ -432,7 +480,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun `should close current session correctly`() = runBlockingTest {
+    fun `should close current session correctly`() = runBlocking {
         val session = mockDbToHaveOneOpenSession(GUID1)
         eventRepo.closeCurrentSession(null)
 

@@ -62,8 +62,6 @@ dependencies {
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.coroutines.test)
     testImplementation(libs.testing.koTest.kotlin.assert)
-    testImplementation(libs.testing.mockk.core)
     testImplementation(project(":testtools"))
     testImplementation(libs.testing.mockk.core)
-
 }

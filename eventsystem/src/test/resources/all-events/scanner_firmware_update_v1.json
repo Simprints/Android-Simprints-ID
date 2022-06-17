@@ -1,0 +1,17 @@
+{
+  "id": "9937828d-531d-4dd5-8b0a-30a222021fe1",
+  "type": "SCANNER_FIRMWARE_UPDATE",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "SCANNER_FIRMWARE_UPDATE",
+    "eventVersion": 1,
+    "createdAt": 221675670,
+    "endedAt": 9141278930,
+    "chip": "stm",
+    "targetAppVersion":"1.E-1.1"
+  }
+}

@@ -5,8 +5,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReferenceType.FaceReference
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat.RANK_ONE_1_23
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ApiFaceReference(

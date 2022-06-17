@@ -4,7 +4,6 @@ import com.simprints.fingerprintmatcher.algorithms.simafis.SimAfisMatcher
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity
 import com.simprints.fingerprintmatcher.domain.MatchResult
 import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
-import kotlinx.coroutines.flow.Flow
 
 interface FingerprintMatcher {
 
@@ -16,11 +15,12 @@ interface FingerprintMatcher {
      * @throws IllegalArgumentException if the TemplateFormats of the supplied [probe] or
      * [candidates] is not compatible with the desired [matchingAlgorithm].
      */
-    suspend fun match(
+    fun match(
         probe: FingerprintIdentity,
-        candidates: Flow<FingerprintIdentity>,
-        matchingAlgorithm: MatchingAlgorithm
-    ) : Flow<MatchResult>
+        candidates: List<FingerprintIdentity>,
+        matchingAlgorithm: MatchingAlgorithm,
+        crossFingerComparison: Boolean
+    ) : List<MatchResult>
 
     companion object {
         fun create(): FingerprintMatcher =

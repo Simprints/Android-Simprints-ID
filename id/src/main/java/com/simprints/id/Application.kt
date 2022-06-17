@@ -41,12 +41,6 @@ open class Application : CoreApplication() {
             .viewModelModule(ViewModelModule())
             .build()
 
-        // Create events for the subjects that are stored in the subjects (old architecture)
-        // and they still need to be uploaded. The new architecture uploads only events.
-        // The operation is not trivial for SID usage, so it can be performed in background.
-        inBackground {
-            component.getSubjectToEventMigrationManager().migrateSubjectToSyncToEventsDb()
-        }
     }
 
     open fun createOrchestratorComponent() {

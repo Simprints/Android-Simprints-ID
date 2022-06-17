@@ -9,6 +9,8 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.domain.SimprintsSyncSetting
+import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
@@ -94,6 +96,37 @@ class SettingsPreferencesManagerTest {
     }
 
     @Test
+    fun fetchingSimprintsSyncReturnsall() {
+        val simprintsSyncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(simprintsSyncSetting).isEqualTo(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT)
+
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ALL"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ALL)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsOnlyBiometrics() {
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ONLY_BIOMETRICS"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsEmptyList() {
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns null
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_NONE)
+    }
+
+    @Test
     fun fetchingRemoteConfigEnum_revertsToDefaultIfSetToWrongType() {
         every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) } returns "1"
 
@@ -105,7 +138,9 @@ class SettingsPreferencesManagerTest {
     @Test
     fun fetchingOverridableRemoteConfigFingersToCollect_worksAndBecomesOverridden() {
         val oldFingersToCollect = settingsPreferencesManager.fingerprintsToCollect
-        assertThat(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT).isEqualTo(oldFingersToCollect)
+        assertThat(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_DEFAULT).isEqualTo(
+            oldFingersToCollect
+        )
 
         settingsPreferencesManager.fingerprintsToCollect = NON_DEFAULT_FINGERS_TO_COLLECT
 
@@ -114,6 +149,28 @@ class SettingsPreferencesManagerTest {
         assertThat(NON_DEFAULT_FINGERS_TO_COLLECT).isEqualTo(newFingerStatus)
 
         verify(exactly = 1) { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_KEY) }
+    }
+
+
+    @Test
+    fun fetchingDefaultFingerComparisonStrategy() {
+        val oldStrategy = settingsPreferencesManager.fingerComparisonStrategy
+        assertThat(SettingsPreferencesManagerImpl.FINGERPRINT_COMPARISON_STRATEGY_FOR_VERIFICATION_DEFAULT).isEqualTo(
+            oldStrategy
+        )
+        settingsPreferencesManager.fingerComparisonStrategy =
+            NON_DEFAULT_FINGERS_COMPARISON_STRATEGY
+
+    }
+
+    @Test
+    fun fetchingOverridableFingerComparisonStrategy() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINT_MATCHING_STRATEGY_FOR_VERIFICATION_KEY)
+        } returns NON_DEFAULT_FINGERS_COMPARISON_STRATEGY_SERIALIZED
+
+        val newStrategy = settingsPreferencesManager.fingerComparisonStrategy
+        assertThat(NON_DEFAULT_FINGERS_COMPARISON_STRATEGY).isEqualTo(newStrategy)
     }
 
     @Test
@@ -135,5 +192,9 @@ class SettingsPreferencesManagerTest {
             FingerIdentifier.LEFT_THUMB,
             FingerIdentifier.LEFT_5TH_FINGER
         )
+        private const val NON_DEFAULT_FINGERS_COMPARISON_STRATEGY_SERIALIZED =
+            "CROSS_FINGER_USING_MEAN_OF_MAX"
+        private val NON_DEFAULT_FINGERS_COMPARISON_STRATEGY =
+            FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
     }
 }

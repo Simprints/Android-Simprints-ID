@@ -20,6 +20,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.config.RemoteConfigSchedulerImpl
@@ -178,9 +179,10 @@ open class SyncModule {
     open fun provideEventUpSyncHelper(
         eventRepository: com.simprints.eventsystem.event.EventRepository,
         eventUpSyncScopeRepo: EventUpSyncScopeRepository,
-        timerHelper: TimeHelper
+        timerHelper: TimeHelper,
+        settingsPreferencesManager: SettingsPreferencesManager
     ): EventUpSyncHelper =
-        EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper)
+        EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper, settingsPreferencesManager)
 
     @Provides
     open fun providePeopleSyncSubMasterWorkersBuilder(): EventSyncSubMasterWorkersBuilder =

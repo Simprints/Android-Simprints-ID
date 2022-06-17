@@ -7,12 +7,18 @@ import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.*
+import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
+import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
+import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -162,7 +168,8 @@ class CollectFingerprintsViewModel(
             logScannerMessageForCrashReport("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.dispose()
-            scannerManager.scanner { stopLiveFeedback() }.doOnSubscribe { stopLiveFeedbackTask = it }
+            scannerManager.scanner { stopLiveFeedback() }
+                .doOnSubscribe { stopLiveFeedbackTask = it }
         } else {
             Completable.complete()
         }
@@ -278,7 +285,11 @@ class CollectFingerprintsViewModel(
     private fun proceedToImageTransfer() {
         imageTransferTask?.dispose()
         imageTransferTask =
-            scannerManager.scanner<AcquireImageResponse> { acquireImage(fingerprintPreferencesManager.saveFingerprintImagesStrategy) }
+            scannerManager.scanner<AcquireImageResponse> {
+                acquireImage(
+                    fingerprintPreferencesManager.saveFingerprintImagesStrategy
+                )
+            }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -296,7 +307,7 @@ class CollectFingerprintsViewModel(
     private fun handleCaptureFinished() {
         with(state()) {
             logUiMessageForCrashReport("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
-            addCaptureEventInSession()
+            addCaptureAndBiometricEventsInSession()
             saveCurrentImageIfEager()
             if (captureHasSatisfiedTerminalCondition(state().currentCaptureState())) {
                 if (fingerHasSatisfiedTerminalCondition(state().currentFingerState())) {
@@ -308,7 +319,8 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun addCaptureEventInSession() {
+    private fun addCaptureAndBiometricEventsInSession() {
+        val payloadId = randomUUID()
         with(state().currentFingerState()) {
             val captureEvent = FingerprintCaptureEvent(
                 lastCaptureStartedAt,
@@ -320,16 +332,31 @@ class CollectFingerprintsViewModel(
                     FingerprintCaptureEvent.Fingerprint(
                         id,
                         it.qualityScore,
-                        encoder.byteArrayToBase64(it.template),
                         FingerprintTemplateFormat.ISO_19794_2
                     )
-                }
+                },
+                payloadId = payloadId
             )
+            val fingerprintCaptureBiometricsEvent =
+                if (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN) FingerprintCaptureBiometricsEvent(
+                    createdAt = lastCaptureStartedAt,
+                    fingerprint = (currentCapture() as CaptureState.Collected).scanResult.let {
+                        FingerprintCaptureBiometricsEvent.Fingerprint(
+                            finger = id,
+                            quality = it.qualityScore,
+                            template = encoder.byteArrayToBase64(it.template)
+                        )
+                    },
+                    payloadId = payloadId
+                ) else null
+
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
 
-            //It can not be done in background because then id won't find the last capture event id
+            //It can not be done in background because then SID won't find the last capture event id
             runBlocking {
                 sessionEventsManager.addEvent(captureEvent)
+                // Because we don't need biometric data that is not used for matching
+                fingerprintCaptureBiometricsEvent?.let { sessionEventsManager.addEvent(it) }
             }
         }
     }
@@ -386,10 +413,16 @@ class CollectFingerprintsViewModel(
 
     private fun handleAutoAddFinger() {
         updateState {
-            val nextPriorityFingerId = fingerPriorityDeterminer.determineNextPriorityFinger(fingerStates.map { it.id })
+            val nextPriorityFingerId =
+                fingerPriorityDeterminer.determineNextPriorityFinger(fingerStates.map { it.id })
             if (nextPriorityFingerId != null) {
                 fingerStates =
-                    fingerStates + listOf(FingerState(nextPriorityFingerId, listOf(CaptureState.NotCollected)))
+                    fingerStates + listOf(
+                        FingerState(
+                            nextPriorityFingerId,
+                            listOf(CaptureState.NotCollected)
+                        )
+                    )
             }
         }
     }
@@ -415,14 +448,14 @@ class CollectFingerprintsViewModel(
     private fun handleNoFingerDetected() {
         vibrate.postEvent()
         updateCaptureState { toNotDetected() }
-        addCaptureEventInSession()
+        addCaptureAndBiometricEventsInSession()
     }
 
     fun handleMissingFingerButtonPressed() {
         if (!state().isShowingSplashScreen) {
             updateCaptureState { toSkipped() }
             lastCaptureStartedAt = timeHelper.now()
-            addCaptureEventInSession()
+            addCaptureAndBiometricEventsInSession()
             resolveFingerTerminalConditionTriggered()
         }
     }
@@ -466,7 +499,10 @@ class CollectFingerprintsViewModel(
 
     private fun captureHasSatisfiedTerminalCondition(captureState: CaptureState) =
         captureState is CaptureState.Collected &&
-            (tooManyBadScans(captureState, plusBadScan = false) || captureState.scanResult.isGoodScan())
+            (tooManyBadScans(
+                captureState,
+                plusBadScan = false
+            ) || captureState.scanResult.isGoodScan())
             || captureState is CaptureState.Skipped
 
     private fun fingerHasSatisfiedTerminalCondition(fingerState: FingerState) =
@@ -476,7 +512,10 @@ class CollectFingerprintsViewModel(
         val collectedFingers = state().fingerStates
             .flatMap {
                 it.captures.mapIndexedNotNull { index, capture ->
-                    if (capture is CaptureState.Collected) Pair(CaptureId(it.id, index), capture) else null
+                    if (capture is CaptureState.Collected) Pair(
+                        CaptureId(it.id, index),
+                        capture
+                    ) else null
                 }
             }
 
@@ -501,7 +540,9 @@ class CollectFingerprintsViewModel(
 
     private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
         val domainFingerprints = collectedFingers.map { (id, collectedFinger) ->
-            Fingerprint(id.finger, collectedFinger.scanResult.template).also { it.imageRef = imageRefs[id] }
+            Fingerprint(id.finger, collectedFinger.scanResult.template).also {
+                it.imageRef = imageRefs[id]
+            }
         }
         finishWithFingerprints.postEvent(domainFingerprints)
     }
