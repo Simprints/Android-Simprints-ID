@@ -171,7 +171,6 @@ testing-coroutines_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 testing-koin = { module = "io.insert-koin:koin-test", version.ref = "koin_version" }
 testing-koin_junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin_version" }
 testing-live_data = "com.jraska.livedata:testing-ktx:1.2.0"
-testing-awaitility = "org.awaitility:awaitility-kotlin:4.0.1"
 testing-fragment_testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragment_version" }
 testing-navigation_testing = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
 
