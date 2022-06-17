@@ -43,7 +43,6 @@ class TestAppModule(
     private val remoteDbManagerRule: DependencyRule = RealRule,
     private val dbManagerRule: DependencyRule = RealRule,
     private val secureDataManagerRule: DependencyRule = RealRule,
-    private val legacyLocalDbKeyProviderRule: DependencyRule = RealRule,
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
@@ -86,13 +85,13 @@ class TestAppModule(
 
     override fun provideRemoteDbManager(
         loginInfoManager: LoginInfoManager,
-        ctx: Context,
+        context: Context,
         dispatcher: DispatcherProvider
     ): RemoteDbManager =
         remoteDbManagerRule.resolveDependency {
             super.provideRemoteDbManager(
                 loginInfoManager,
-                ctx,
+                context,
                 dispatcher
             )
         }
@@ -112,7 +111,7 @@ class TestAppModule(
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        IdPreferencesManager: IdPreferencesManager,
+        idPreferencesManager: IdPreferencesManager,
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
@@ -122,7 +121,7 @@ class TestAppModule(
             ctx,
             eventLocalDataSource,
             eventRemoteDataSource,
-            IdPreferencesManager,
+            idPreferencesManager,
             loginInfoManager,
             timeHelper,
             validatorFactory,

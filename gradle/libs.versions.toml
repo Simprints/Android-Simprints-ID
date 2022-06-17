@@ -1,15 +1,15 @@
 [versions]
 kotlin_version = "1.6.21"
 kotlin_serialization_json_version = "1.2.1"
-androidx_navigation_version = "2.4.2"
+androidx_navigation_version = "2.3.5"
 kotlin_coroutine_version = "1.6.1"
 app_compat_version = "1.2.0"
 androidx_version = "1.4.0"
 espresso_version = "3.4.0"
-uiAutomator_version = "2.2.0-alpha3"
+uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.2.0"
 androidx_room_version = "2.4.2"
-androidx_camerax_version = "1.0.2"
+androidx_camerax_version = "1.2.0-alpha02"
 dagger_version = "2.22"
 work_version = "2.7.1"
 location_services_version = "18.0.0"
@@ -53,7 +53,7 @@ androidX-lifecycle-ext = { module = "androidx.lifecycle:lifecycle-extensions", v
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
-androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
+androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.4"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
 androidX-uI-preference = "androidx.preference:preference:1.1.1"
@@ -65,7 +65,7 @@ androidX-security = "androidx.security:security-crypto:1.0.0"
 androidX-cameraX-core = { module = "androidx.camera:camera-core", version.ref = "androidx_camerax_version" }
 androidX-cameraX-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx_camerax_version" }
 androidX-cameraX-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx_camerax_version" }
-androidX-cameraX-view = "androidx.camera:camera-view:1.0.0-alpha08"
+androidX-cameraX-view = { module =  "androidx.camera:camera-view", version.ref = "androidx_camerax_version" }
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
@@ -122,10 +122,10 @@ chuck-release = { module = "com.github.chuckerteam.chucker:library-no-op", versi
 jackson-core = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson_version" }
 
 #RxJava2
-rxJava2-core = "io.reactivex.rxjava2:rxjava:2.2.6"
-rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.1.0"
-rxJava2-kotlin = "io.reactivex.rxjava2:rxkotlin:2.3.0"
-rxJava2-permissions = "com.github.tbruyelle:rxpermissions:2.x.v0.9.3"
+rxJava2-core = "io.reactivex.rxjava2:rxjava:2.2.21"
+rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.1.1"
+rxJava2-kotlin = "io.reactivex.rxjava2:rxkotlin:2.4.0"
+rxJava2-permissions = "com.github.tbruyelle:rxpermissions:0.12"
 rxJava2-location = "pl.charmas.android:android-reactive-location2:2.1"
 rxJava2-tasks = "io.ashdavies.rx:rx-tasks:2.2.0"
 

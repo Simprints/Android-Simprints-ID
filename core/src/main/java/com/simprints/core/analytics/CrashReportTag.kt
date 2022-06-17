@@ -15,5 +15,6 @@ enum class CrashReportTag {
     ALERT,
     REFUSAL,
     SAFE_EXCEPTION,
-    ID_SETUP
+    ID_SETUP,
+    REALM_DB
 }
