@@ -44,9 +44,4 @@ interface EventRepository {
     ): ReceiveChannel<Event>
 
     suspend fun deleteSessionEvents(sessionId: String)
-
-    companion object {
-//        fun build(app: Application): EventRepository =
-//            app.component.getSessionEventsManager()
-    }
 }

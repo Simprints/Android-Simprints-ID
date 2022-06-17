@@ -2,6 +2,8 @@ package com.simprints.eventsystem.event
 
 import android.os.Build
 import android.os.Build.VERSION
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.login.LoginInfoManager
@@ -28,7 +30,10 @@ import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventVa
 import com.simprints.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.*
 
@@ -54,10 +59,8 @@ open class EventRepositoryImpl(
     private val validators = validatorsFactory.build()
 
     private val currentProject: String
-        get() = if (loginInfoManager.getSignedInProjectIdOrEmpty().isEmpty()) {
+        get() = loginInfoManager.getSignedInProjectIdOrEmpty().ifEmpty {
             PROJECT_ID_FOR_NOT_SIGNED_IN
-        } else {
-            loginInfoManager.getSignedInProjectIdOrEmpty()
         }
 
     override suspend fun createSession(): SessionCaptureEvent {
@@ -165,8 +168,14 @@ open class EventRepositoryImpl(
                     this.emit(it.size)
                 }
             } catch (ex: Exception) {
-                Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
-                Simber.e(ex)
+                if (ex is JsonParseException || ex is JsonMappingException) {
+                    attemptInvalidEventUpload(projectId, sessionId)?.let {
+                        this.emit(it)
+                    }
+                } else {
+                    Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
+                    Simber.e(ex)
+                }
             }
         }
 
@@ -206,6 +215,23 @@ open class EventRepositoryImpl(
         }
         eventRemoteDataSource.post(projectId, events)
     }
+
+    private suspend fun attemptInvalidEventUpload(projectId: String,sessionId: String): Int? =
+        try {
+            Simber.tag("SYNC").i("Uploading invalid events for session $sessionId")
+            eventLocalDataSource.loadAllEventJsonFromSession(sessionId).let {
+                eventRemoteDataSource.dumpInvalidEvents(projectId, events = it)
+                deleteSessionEvents(sessionId)
+                it.size
+            }
+        } catch (t: Throwable) {
+            Simber.w(t)
+            // We don't need to report http exceptions as cloud logs all of them.
+            if (t !is HttpException) {
+                Simber.e(t)
+            }
+            null
+        }
 
     private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
         Simber.tag("SYNC").d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
