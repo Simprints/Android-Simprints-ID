@@ -6,12 +6,6 @@ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 echo "org.gradle.caching=true" >>gradle.properties
 
-#########################################################################################
-# We turn of the daemon because gradle recommends it when using containerized CI.
-# The daemon is used to speed up subsequant builds, and since we don't run builds twice
-# on the same machine, the daemon is an un-needed long life background process.
-#########################################################################################
-echo "org.gradle.daemon=false" >>gradle.properties
 
 #########################################################################################
 # https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
