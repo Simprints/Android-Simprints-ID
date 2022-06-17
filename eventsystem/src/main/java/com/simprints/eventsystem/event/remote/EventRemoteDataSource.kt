@@ -9,6 +9,8 @@ interface EventRemoteDataSource {
 
     suspend fun count(query: ApiRemoteEventQuery): List<EventCount>
 
+    suspend fun dumpInvalidEvents(projectId: String, events: List<String>)
+
     suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<Event>
 
     suspend fun post(projectId: String, events: List<Event>)

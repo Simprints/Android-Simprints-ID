@@ -41,6 +41,12 @@ class EventRemoteDataSourceImpl(
             }
         }
 
+    override suspend fun dumpInvalidEvents(projectId: String, events: List<String>) {
+        executeCall("InvalidEventUpload") { remoteInterface ->
+            remoteInterface.dumpInvalidEvents(projectId = projectId, events = events)
+        }
+    }
+
     override suspend fun getEvents(
         query: ApiRemoteEventQuery,
         scope: CoroutineScope
