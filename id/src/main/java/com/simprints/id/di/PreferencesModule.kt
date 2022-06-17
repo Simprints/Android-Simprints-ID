@@ -22,7 +22,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -69,7 +70,8 @@ open class PreferencesModule {
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-        @Named("SyncDestinationSerializer") syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
+        @Named("SimprintsSyncSerializer") simprintsSyncSerializer: Serializer<SimprintsSyncSetting>,
+        @Named("CosyncSerializer") cosyncSerializer: Serializer<CosyncSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         @Named("FingerprintMatchingStrategySerializer") fingerComparisonStrategySerializer: Serializer<FingerComparisonStrategy>,
@@ -93,7 +95,8 @@ open class PreferencesModule {
         fingerprintsToCollectSerializer,
         fingerprintConfidenceThresholdsSerializer,
         faceConfidenceThresholdsSerializer,
-        syncDestinationSerializer
+        simprintsSyncSerializer,
+        cosyncSerializer
     )
 
     @Provides

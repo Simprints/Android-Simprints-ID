@@ -7,9 +7,8 @@ import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -53,7 +52,6 @@ class PersonCreationEventHelperImpl(
             }
         }.flatten()
 
-
     private fun extractFaceSamples(responses: List<FaceCaptureResponse>) =
         responses.map {
             it.capturingResult.mapNotNull { captureResult ->
@@ -68,17 +66,18 @@ class PersonCreationEventHelperImpl(
         faceSamples: List<FaceSample>
     ) {
         val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        val fingerprintCaptureEvents =
+        val fingerprintCaptureBiometricsEvents =
             eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
-                .filterIsInstance<FingerprintCaptureEvent>().toList()
-        val faceCaptureEvents = eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
-            .filterIsInstance<FaceCaptureEvent>().toList()
+                .filterIsInstance<FingerprintCaptureBiometricsEvent>().toList()
+        val faceCaptureBiometricsEvents =
+            eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
+                .filterIsInstance<FaceCaptureBiometricsEvent>().toList()
 
         eventRepository.addOrUpdateEvent(
             build(
                 timeHelper,
-                faceCaptureEvents,
-                fingerprintCaptureEvents,
+                faceCaptureBiometricsEvents,
+                fingerprintCaptureBiometricsEvents,
                 faceSamples,
                 fingerprintSamples
             )
@@ -87,49 +86,42 @@ class PersonCreationEventHelperImpl(
 
     fun build(
         timeHelper: TimeHelper,
-        faceCaptureEvents: List<FaceCaptureEvent>,
-        fingerprintCaptureEvents: List<FingerprintCaptureEvent>,
+        faceCaptureBiometricsEvents: List<FaceCaptureBiometricsEvent>,
+        fingerprintCaptureBiometricsEvents: List<FingerprintCaptureBiometricsEvent>,
         faceSamplesForPersonCreation: List<FaceSample>?,
         fingerprintSamplesForPersonCreation: List<FingerprintSample>?
     ) = PersonCreationEvent(
         startTime = timeHelper.now(),
         fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-            fingerprintCaptureEvents,
+            fingerprintCaptureBiometricsEvents,
             fingerprintSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }
         ),
         fingerprintReferenceId = fingerprintSamplesForPersonCreation?.uniqueId(),
         faceCaptureIds = extractFaceCaptureEventIdsBasedOnPersonTemplate(
-            faceCaptureEvents,
+            faceCaptureBiometricsEvents,
             faceSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }
         ),
         faceReferenceId = faceSamplesForPersonCreation?.uniqueId()
     )
 
     private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
-        captureEvents: List<FingerprintCaptureEvent>,
+        captureEvents: List<FingerprintCaptureBiometricsEvent>,
         personTemplates: List<String>?
     ): List<String>? =
         captureEvents
             .filter {
-                personTemplates?.contains(it.payload.fingerprint?.template) ?: false
-                    && it.payload.result != SKIPPED
-            }.map { it.id }
-            .nullIfEmpty()
+                personTemplates?.contains(it.payload.fingerprint.template) ?: false
+            }.map { it.payload.id }
+            .ifEmpty { null }
 
     private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
-        captureEvents: List<FaceCaptureEvent>,
+        captureEvents: List<FaceCaptureBiometricsEvent>,
         personTemplates: List<String>?
     ): List<String>? =
         captureEvents
             .filter {
-                personTemplates?.contains(it.payload.face?.template) ?: false
-            }.map { it.id }
-            .nullIfEmpty()
+                personTemplates?.contains(it.payload.face.template) ?: false
+            }.map { it.payload.id }
+            .ifEmpty { null }
 
-    private fun List<String>.nullIfEmpty() =
-        if (this.isNotEmpty()) {
-            this
-        } else {
-            null
-        }
 }

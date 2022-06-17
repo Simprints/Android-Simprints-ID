@@ -7,7 +7,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprin
 import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -39,7 +40,8 @@ interface SettingsPreferencesManager {
 
     var modalities: List<Modality>
     var eventDownSyncSetting: EventDownSyncSetting
-    var syncDestinationSettings: List<SyncDestinationSetting>
+    var simprintsSyncSetting: SimprintsSyncSetting
+    var cosyncSyncSetting: CosyncSetting
 
     var fingerprintsToCollect: List<FingerIdentifier>
     var fingerImagesExist: Boolean
@@ -65,5 +67,14 @@ interface SettingsPreferencesManager {
 
 }
 
-fun SettingsPreferencesManager.canSyncToSimprints(): Boolean =
-    syncDestinationSettings.contains(SyncDestinationSetting.SIMPRINTS)
+fun SettingsPreferencesManager.canSyncDataToSimprints(): Boolean =
+    simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
+
+fun SettingsPreferencesManager.canSyncAllDataToSimprints() =
+    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ALL.name
+
+fun SettingsPreferencesManager.canSyncBiometricDataToSimprints() =
+    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS.name
+
+fun SettingsPreferencesManager.canSyncAnalyticsDataToSimprints() =
+    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ONLY_ANALYTICS.name

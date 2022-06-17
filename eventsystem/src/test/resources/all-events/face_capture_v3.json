@@ -1,0 +1,33 @@
+{
+  "id": "7394b46b-69e7-49c8-9829-c3dec6acd1a9",
+  "labels": {
+    "projectId": "projectId",
+    "attendantId": "attendantId",
+    "moduleIds": [
+      "module1"
+    ],
+    "mode": [
+      "FACE"
+    ],
+    "sessionId": "sessioniD",
+    "deviceId": "deviceId"
+  },
+  "payload": {
+    "id": "someId",
+    "createdAt": 0,
+    "endedAt": 0,
+    "eventVersion": 0,
+    "attemptNb": 0,
+    "qualityThreshold": 0.0,
+    "result": "VALID",
+    "isFallback": false,
+    "face": {
+      "yaw": 0.0,
+      "roll": 0.0,
+      "quality": 0.0,
+      "format": "RANK_ONE_1_23"
+    },
+    "type": "FACE_CAPTURE"
+  },
+  "type": "FACE_CAPTURE"
+}

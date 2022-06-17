@@ -1,11 +1,22 @@
 package com.simprints.clientapi.activities.commcare
 
-import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
+import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
+import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
+import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
@@ -29,20 +40,32 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.libsimprints.Constants
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import io.kotlintest.shouldThrow
-import io.mockk.*
-import kotlinx.coroutines.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
@@ -69,6 +92,7 @@ class CommCareCoSyncPresenterTest {
     @Before
     fun setup() {
         Dispatchers.setMain(mainThreadSurrogate)
+        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @After
@@ -164,9 +188,31 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRegistration should return valid registration with events`() {
+    fun `handleRegistration should return valid registration with no events`() = runTest {
         val registerId = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
+
+        val subject =
+            Subject(
+                registerId,
+                "projectId",
+                "thales",
+                "mod1",
+                Date(),
+                null,
+                emptyList(),
+                emptyList()
+            )
+        val subjectRepository = mockk<SubjectRepository>()
+        coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+        val prefs = mockk<SharedPreferencesManager>().apply {
+            coEvery { this@apply.peekSessionId() } returns sessionId
+            coEvery { this@apply.popSessionId() } returns sessionId
+            every { this@apply.canCoSyncAllData() } returns false
+            every { this@apply.canCoSyncData() } returns true
+            every { this@apply.canCoSyncBiometricData() } returns false
+        }
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
@@ -174,15 +220,13 @@ class CommCareCoSyncPresenterTest {
             sessionCaptureEvent
         )
 
-        val subjectRepository = mockk<SubjectRepository>()
-        coEvery { subjectRepository.load(any()) } returns flowOf()
-
-        runBlockingTest {
+        runBlocking {
             getNewPresenter(
                 Enrol,
                 sessionEventsManagerMock,
                 subjectRepository = subjectRepository,
-                coroutineScope = this
+                coroutineScope = this,
+                sharedPreferencesManager = prefs
             )
                 .handleEnrolResponse(EnrolResponse(registerId))
         }
@@ -205,8 +249,8 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRegistration should return valid registration with events and actions`() =
-        runBlockingTest {
+    fun `handleRegistration should return valid registration with events and actions when cosync biometrics is true`() =
+        runTest {
             val projectId = UUID.randomUUID().toString()
             val registerId = UUID.randomUUID().toString()
             val sessionId = UUID.randomUUID().toString()
@@ -231,12 +275,151 @@ class CommCareCoSyncPresenterTest {
             val subjectRepository = mockk<SubjectRepository>()
             coEvery { subjectRepository.load(any()) } returns flowOf(subject)
 
-            runBlockingTest {
+            val prefs = mockk<SharedPreferencesManager>().apply {
+                coEvery { this@apply.peekSessionId() } returns "sessionId"
+                coEvery { this@apply.popSessionId() } returns "sessionId"
+                every { this@apply.canCoSyncAllData() } returns false
+                every { this@apply.canCoSyncBiometricData() } returns true
+            }
+
+            runBlocking {
                 getNewPresenter(
                     Enrol,
                     sessionEventsManagerMock,
                     subjectRepository = subjectRepository,
-                    coroutineScope = this
+                    coroutineScope = this,
+                    sharedPreferencesManager = prefs
+                ).handleEnrolResponse(EnrolResponse(registerId))
+            }
+
+            verify(exactly = 1) {
+                view.returnRegistration(
+                    registerId,
+                    sessionId,
+                    RETURN_FOR_FLOW_COMPLETED_CHECK,
+                    "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
+                    match {
+                        it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
+                        it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
+                        it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
+                        it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                    }
+                )
+            }
+            coVerify(exactly = 1) {
+                sessionEventsManagerMock.addCompletionCheckEvent(
+                    RETURN_FOR_FLOW_COMPLETED_CHECK
+                )
+            }
+            coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+        }
+
+    @Test
+    fun `handleRegistration should return valid registration with events and actions when cosync all data is true`() =
+        runTest {
+            val projectId = UUID.randomUUID().toString()
+            val registerId = UUID.randomUUID().toString()
+            val sessionId = UUID.randomUUID().toString()
+
+            val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+            coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+            coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+                sessionCaptureEvent
+            )
+
+            val subject =
+                Subject(
+                    registerId,
+                    projectId,
+                    "thales",
+                    "mod1",
+                    Date(),
+                    null,
+                    emptyList(),
+                    emptyList()
+                )
+            val subjectRepository = mockk<SubjectRepository>()
+            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+            val prefs = mockk<SharedPreferencesManager>().apply {
+                coEvery { this@apply.peekSessionId() } returns "sessionId"
+                coEvery { this@apply.popSessionId() } returns "sessionId"
+                every { this@apply.canCoSyncAllData() } returns true
+                every { this@apply.canCoSyncBiometricData() } returns false
+            }
+
+            runBlocking {
+                getNewPresenter(
+                    Enrol,
+                    sessionEventsManagerMock,
+                    subjectRepository = subjectRepository,
+                    coroutineScope = this,
+                    sharedPreferencesManager = prefs
+                ).handleEnrolResponse(EnrolResponse(registerId))
+            }
+
+            verify(exactly = 1) {
+                view.returnRegistration(
+                    registerId,
+                    sessionId,
+                    RETURN_FOR_FLOW_COMPLETED_CHECK,
+                    "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
+                    match {
+                        it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
+                        it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
+                        it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
+                        it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                    }
+                )
+            }
+            coVerify(exactly = 1) {
+                sessionEventsManagerMock.addCompletionCheckEvent(
+                    RETURN_FOR_FLOW_COMPLETED_CHECK
+                )
+            }
+            coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+        }
+    @Test
+    fun `handleRegistration should return valid registration with events and actions when cosync biometrics and all is true`() =
+        runTest {
+            val projectId = UUID.randomUUID().toString()
+            val registerId = UUID.randomUUID().toString()
+            val sessionId = UUID.randomUUID().toString()
+
+            val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+            coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+            coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+                sessionCaptureEvent
+            )
+
+            val subject =
+                Subject(
+                    registerId,
+                    projectId,
+                    "thales",
+                    "mod1",
+                    Date(),
+                    null,
+                    emptyList(),
+                    emptyList()
+                )
+            val subjectRepository = mockk<SubjectRepository>()
+            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+            val prefs = mockk<SharedPreferencesManager>().apply {
+                coEvery { this@apply.peekSessionId() } returns "sessionId"
+                coEvery { this@apply.popSessionId() } returns "sessionId"
+                every { this@apply.canCoSyncAllData() } returns true
+                every { this@apply.canCoSyncBiometricData() } returns true
+            }
+
+            runBlocking {
+                getNewPresenter(
+                    Enrol,
+                    sessionEventsManagerMock,
+                    subjectRepository = subjectRepository,
+                    coroutineScope = this,
+                    sharedPreferencesManager = prefs
                 ).handleEnrolResponse(EnrolResponse(registerId))
             }
 
@@ -277,7 +460,7 @@ class CommCareCoSyncPresenterTest {
             identificationCallbackEvent
         )
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(Identify, sessionEventsManagerMock, coroutineScope = this)
                 .handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
         }
@@ -308,7 +491,7 @@ class CommCareCoSyncPresenterTest {
             guidSelectionEvent
         )
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
                 .handleConfirmationResponse(ConfirmationResponse(true))
         }
@@ -347,7 +530,7 @@ class CommCareCoSyncPresenterTest {
             verificationCallbackEvent
         )
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(
                 Verify,
                 sessionEventsManagerMock,
@@ -376,7 +559,7 @@ class CommCareCoSyncPresenterTest {
         coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
         coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(
                 Invalid,
                 sessionEventsManagerMock,
@@ -396,6 +579,37 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
+    fun `handleResponseError should return error to client with no events`() {
+        val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
+        val sessionId = UUID.randomUUID().toString()
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf()
+        val prefs = mockk<SharedPreferencesManager>().apply {
+            every { this@apply.canCoSyncData() } returns false
+        }
+
+        runTest {
+            getNewPresenter(
+                Invalid,
+                sessionEventsManagerMock,
+                coroutineScope = this,
+                sharedPreferencesManager = prefs
+            ).handleResponseError(error)
+        }
+
+        verify(exactly = 1) {
+            view.returnErrorToClient(
+                error,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                sessionId,
+                null
+            )
+        }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+    }
+
+    @Test
     fun `handleRefusalResponse should return valid refusal with events`() {
         val sessionId = UUID.randomUUID().toString()
 
@@ -405,7 +619,7 @@ class CommCareCoSyncPresenterTest {
             refusalEvent
         )
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
                 .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
         }
@@ -428,7 +642,7 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRefusalResponse should delete events - if only sync to commcare`() {
+    fun `handleRefusalResponse should delete events - if can sync to commcare`() {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -437,7 +651,7 @@ class CommCareCoSyncPresenterTest {
             refusalEvent
         )
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(Enrol, sessionEventsManagerMock, coroutineScope = this)
                 .handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
         }
@@ -460,7 +674,7 @@ class CommCareCoSyncPresenterTest {
     }
 
     @Test
-    fun `handleRefusalResponse shouldnt delete events - if sync has simprints`() {
+    fun `handleRefusalResponse should not delete events - if can sync to simprints`() {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
@@ -469,13 +683,11 @@ class CommCareCoSyncPresenterTest {
             refusalEvent
         )
         val sharedPreferences = mockSharedPrefs().apply {
-            every { this@apply.syncDestinationSettings } returns listOf(
-                SyncDestinationSetting.COMMCARE,
-                SyncDestinationSetting.SIMPRINTS
-            )
+            every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_ALL
+            every { this@apply.cosyncSyncSettings } returns CosyncSetting.COSYNC_ALL
         }
 
-        runBlockingTest {
+        runTest {
             getNewPresenter(
                 Enrol,
                 sessionEventsManagerMock,
@@ -502,6 +714,47 @@ class CommCareCoSyncPresenterTest {
         coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
     }
 
+    @Test
+    fun `handleRefusalResponse should delete events - if cannot sync to simprints`() {
+        val sessionId = UUID.randomUUID().toString()
+
+        val sessionEventsManagerMock = mockk<ClientApiSessionEventsManager>()
+        coEvery { sessionEventsManagerMock.getCurrentSessionId() } returns sessionId
+        coEvery { sessionEventsManagerMock.getAllEventsForSession(sessionId) } returns flowOf(
+            refusalEvent
+        )
+        val sharedPreferences = mockSharedPrefs().apply {
+            every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_NONE
+            every { this@apply.cosyncSyncSettings } returns CosyncSetting.COSYNC_ALL
+        }
+
+        runTest {
+            getNewPresenter(
+                Enrol,
+                sessionEventsManagerMock,
+                sharedPreferences,
+                coroutineScope = this
+            ).handleRefusalResponse(RefusalFormResponse("APP_NOT_WORKING", ""))
+        }
+
+        verify(exactly = 1) {
+            view.returnExitForms(
+                "APP_NOT_WORKING",
+                "",
+                sessionId,
+                RETURN_FOR_FLOW_COMPLETED_CHECK,
+                "{\"events\":[${jsonHelper.toJson(refusalEvent)}]}"
+            )
+        }
+        coVerify(exactly = 1) {
+            sessionEventsManagerMock.addCompletionCheckEvent(
+                RETURN_FOR_FLOW_COMPLETED_CHECK
+            )
+        }
+        coVerify(exactly = 1) { sessionEventsManagerMock.deleteSessionEvents(sessionId) }
+        coVerify { sessionEventsManagerMock.closeCurrentSessionNormally() }
+    }
+
     private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
         coEvery { this@apply.getCurrentSessionId() } returns "session_id"
         coEvery { this@apply.createSession(any()) } returns "session_id"
@@ -510,7 +763,8 @@ class CommCareCoSyncPresenterTest {
     private fun mockSharedPrefs() = mockk<SharedPreferencesManager>().apply {
         coEvery { this@apply.peekSessionId() } returns "sessionId"
         coEvery { this@apply.popSessionId() } returns "sessionId"
-        every { this@apply.syncDestinationSettings } returns listOf(SyncDestinationSetting.COMMCARE)
+        every { this@apply.cosyncSyncSettings } returns CosyncSetting.COSYNC_ALL
+        every { this@apply.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_NONE
         every { this@apply.modalities } returns listOf(Modality.FACE)
     }
 

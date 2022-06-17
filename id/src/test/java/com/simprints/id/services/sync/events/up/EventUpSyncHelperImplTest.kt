@@ -6,6 +6,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -13,19 +14,27 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
 class EventUpSyncHelperImplTest {
 
-    private val op = SampleDefaults.projectUpSyncScope.operation
+    private val operation = SampleDefaults.projectUpSyncScope.operation
     private lateinit var uploadEventsChannel: Channel<Event>
 
     private lateinit var eventUpSyncHelper: EventUpSyncHelper
-    @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-    @MockK private lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
-    @MockK private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+
+    @MockK
+    private lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
+
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     @Before
     fun setup() {
@@ -34,29 +43,35 @@ class EventUpSyncHelperImplTest {
         eventUpSyncHelper = EventUpSyncHelperImpl(
             eventRepository,
             eventUpSyncScopeRepository,
-            timeHelper
+            timeHelper,
+            settingsPreferencesManager
         )
 
-        runBlockingTest {
+        runBlocking {
             mockProgressEmission(emptyFlow())
         }
     }
 
     @Test
     fun countForUpSync_shouldInvokeTheEventRepo() {
-        runBlockingTest {
-            eventUpSyncHelper.countForUpSync(op)
+        runBlocking {
+            eventUpSyncHelper.countForUpSync(operation)
 
-            coVerify { eventRepository.localCount(op.projectId) }
+            coVerify { eventRepository.localCount(operation.projectId) }
         }
     }
 
     @Test
     fun upSync_shouldConsumeRepoEventChannel() {
         runBlocking {
-            eventUpSyncHelper.upSync(this, op).toList()
+            eventUpSyncHelper.upSync(this, operation).toList()
 
-            coVerify { eventRepository.uploadEvents(op.projectId) }
+            coVerify {
+                eventRepository.uploadEvents(
+                    operation.projectId,
+                    any(), any(), any()
+                )
+            }
         }
     }
 
@@ -68,7 +83,7 @@ class EventUpSyncHelperImplTest {
             val sequenceOfProgress = flowOf(1, 1, 1)
             mockProgressEmission(sequenceOfProgress)
 
-            val channel = eventUpSyncHelper.upSync(this, op)
+            val channel = eventUpSyncHelper.upSync(this, operation)
 
             val progress = channel.toList()
             sequenceOfProgress.onEach {
@@ -84,9 +99,16 @@ class EventUpSyncHelperImplTest {
     @Test
     fun upSync_shouldEmitAFailureIfUploadFails() {
         runBlocking {
-            coEvery { eventRepository.uploadEvents(any()) } throws Throwable("IO Exception")
+            coEvery {
+                eventRepository.uploadEvents(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } throws Throwable("IO Exception")
 
-            val channel = eventUpSyncHelper.upSync(this, op)
+            val channel = eventUpSyncHelper.upSync(this, operation)
 
             val progress = channel.toList()
             assertThat(progress.first().operation.lastState).isEqualTo(FAILED)
@@ -96,6 +118,6 @@ class EventUpSyncHelperImplTest {
 
     private suspend fun mockProgressEmission(sequence: Flow<Int>) {
         uploadEventsChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { eventRepository.uploadEvents(any()) } returns sequence
+        coEvery { eventRepository.uploadEvents(any(), any(), any(), any()) } returns sequence
     }
 }

@@ -5,13 +5,21 @@ import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.exceptions.RootedDeviceException
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.mockk.*
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -24,7 +32,7 @@ class RequestPresenterTest {
     private val metadataField = "{\"key\": \"some_metadata\"}"
     private val extraField = mapOf("extraField" to "someExtraField")
 
-    lateinit var clientApiSessionEventsManagerMock: ClientApiSessionEventsManager
+    private lateinit var clientApiSessionEventsManagerMock: ClientApiSessionEventsManager
 
 
     @Before
@@ -37,7 +45,7 @@ class RequestPresenterTest {
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
-        runBlockingTest {
+        runTest {
             val requestBuilder = mockk<ClientRequestBuilder>(relaxed = true).apply {
                 every { this@apply.build() } returns EnrolRequest(
                     projectIdField,
@@ -65,7 +73,7 @@ class RequestPresenterTest {
 
     @Test
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
-        runBlockingTest {
+        runTest {
             val requestBuilder = mockk<ClientRequestBuilder>().apply {
                 every { this@apply.build() } returns EnrolRequest(
                     projectIdField,
@@ -92,7 +100,7 @@ class RequestPresenterTest {
     }
 
     @Test
-    fun withRootedDevice_shouldShowAlertScreen() = runBlockingTest {
+    fun withRootedDevice_shouldShowAlertScreen() = runTest {
         val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
