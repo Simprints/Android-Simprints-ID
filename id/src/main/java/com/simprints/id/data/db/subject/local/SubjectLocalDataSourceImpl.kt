@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.subject.local
 
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -85,7 +86,8 @@ class SubjectLocalDataSourceImpl(
     override suspend fun performActions(actions: List<SubjectAction>) {
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
-            Simber.d("No actions to perform ")
+            Simber.tag(CrashReportTag.REALM_DB.name)
+                .d("[SubjectLocalDataSourceImpl] No realm actions to perform ")
             return
         }
 
