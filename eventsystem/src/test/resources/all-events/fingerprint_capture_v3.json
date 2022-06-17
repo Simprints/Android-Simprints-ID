@@ -1,0 +1,32 @@
+{
+  "id": "someId",
+  "labels": {
+    "projectId": "projectId",
+    "attendantId": "attendantId",
+    "moduleIds": [
+      "moduleId",
+      "moduleId2"
+    ],
+    "mode": [
+      "FINGERPRINT"
+    ],
+    "sessionId": "sessionId",
+    "deviceId": "deviceId"
+  },
+  "payload": {
+    "createdAt": 0,
+    "eventVersion": 0,
+    "endedAt": 0,
+    "finger": "LEFT_3RD_FINGER",
+    "qualityThreshold": 0,
+    "result": "GOOD_SCAN",
+    "fingerprint": {
+      "finger": "LEFT_3RD_FINGER",
+      "quality": 0,
+      "format": "ISO_19794_2"
+    },
+    "id": "someId",
+    "type": "FINGERPRINT_CAPTURE"
+  },
+  "type": "FINGERPRINT_CAPTURE"
+}

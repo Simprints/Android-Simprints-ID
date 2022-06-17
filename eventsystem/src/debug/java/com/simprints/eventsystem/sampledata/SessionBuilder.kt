@@ -20,7 +20,6 @@ object SessionBuilder {
             ConnectivitySnapshotEventSample.getEvent(labels, isClosed),
             EnrolmentCallbackEventSample.getEvent(labels, isClosed),
             EnrolmentCalloutEventSample.getEvent(labels, isClosed),
-            FingerprintCaptureEventSample.getEvent(labels, isClosed),
             IntentParsingEventSample.getEvent(labels, isClosed),
             PersonCreationEventSample.getEvent(labels, isClosed),
             ScannerConnectionEventSample.getEvent(labels, isClosed),

@@ -1,10 +1,6 @@
 package com.simprints.id.data.db.subject.local
 
-import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.analytics.CrashReportTag
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -14,79 +10,36 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
-import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
-import com.simprints.id.tools.extensions.await
-import com.simprints.id.tools.extensions.transactAwait
+import com.simprints.logging.Simber
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.RealmQuery
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import java.io.Serializable
 
-@FlowPreview
 class SubjectLocalDataSourceImpl(
-    private val appContext: Context,
-    val secureDataManager: SecureLocalDbKeyProvider,
-    val loginInfoManager: LoginInfoManager,
-    private val dispatcher: DispatcherProvider
+    private val realmWrapper: RealmWrapper
 ) : SubjectLocalDataSource {
 
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
-
-        @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
-        const val SYNC_FIELD = "toSync"
-
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
     }
 
-    val config: RealmConfiguration by lazy {
-        Realm.init(appContext)
-        getLocalDbKeyAndCreateRealmConfig()
-    }
-
-    private fun getLocalDbKeyAndCreateRealmConfig(): RealmConfiguration =
-        loginInfoManager.getSignedInProjectIdOrEmpty().let {
-            return if (it.isNotEmpty()) {
-                createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
-            } else {
-                throw RealmUninitialisedException("No signed in project id found")
-            }
+    override suspend fun load(query: SubjectQuery): Flow<Subject> =
+        realmWrapper.useRealmInstance {
+            it.buildRealmQueryForSubject(query)
+                .findAll()
+                ?.map { dbSubject -> dbSubject.fromDbToDomain() }
+                ?.asFlow()
+                ?: flowOf()
         }
 
-    private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
-        SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
-
-
-    override suspend fun insertOrUpdate(subjects: List<Subject>) {
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realm ->
-                realm.transactAwait {
-                    it.insertOrUpdate(subjects.map(Subject::fromDomainToDb))
-                }
-            }
-        }
-    }
-
-    override suspend fun load(query: SubjectQuery?): Flow<Subject> =
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use {
-                it.buildRealmQueryForSubject(query)
-                    .await()
-                    ?.map { dbSubject -> dbSubject.fromDbToDomain() }
-                    ?.asFlow()
-                    ?: flowOf()
-            }
-        }
 
     override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
         if (query is SubjectQuery) {
@@ -107,14 +60,13 @@ class SubjectLocalDataSourceImpl(
         }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realmInstance ->
-                realmInstance.transactAwait { realm ->
-                    queries.forEach {
-                        realm.buildRealmQueryForSubject(it)
-                            .findAll()
-                            .deleteAllFromRealm()
-                    }
+
+        realmWrapper.useRealmInstance { realmInstance ->
+            realmInstance.executeTransaction { realm ->
+                queries.forEach {
+                    realm.buildRealmQueryForSubject(it)
+                        .findAll()
+                        .deleteAllFromRealm()
                 }
             }
         }
@@ -125,28 +77,31 @@ class SubjectLocalDataSourceImpl(
     }
 
     override suspend fun count(query: SubjectQuery): Int =
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use { realm ->
-                realm.buildRealmQueryForSubject(query)
-                    .await()
-                    ?.size ?: 0
-            }
+        realmWrapper.useRealmInstance { realm ->
+            realm.buildRealmQueryForSubject(query)
+                .count().toInt()
         }
 
+
     override suspend fun performActions(actions: List<SubjectAction>) {
-        withContext(dispatcher.main()) {
-            Realm.getInstance(config).use {
-                it.transactAwait { realm ->
-                    actions.forEach { action ->
-                        when (action) {
-                            is Creation -> {
-                                realm.insertOrUpdate(action.subject.fromDomainToDb())
-                            }
-                            is Deletion -> {
-                                realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
-                                    .findAll()
-                                    .deleteAllFromRealm()
-                            }
+        // if there is no actions to perform return to avoid useless realm operations
+        if (actions.isEmpty()) {
+            Simber.tag(CrashReportTag.REALM_DB.name)
+                .d("[SubjectLocalDataSourceImpl] No realm actions to perform ")
+            return
+        }
+
+        realmWrapper.useRealmInstance {
+            it.executeTransaction { realm ->
+                actions.forEach { action ->
+                    when (action) {
+                        is Creation -> {
+                            realm.insertOrUpdate(action.subject.fromDomainToDb())
+                        }
+                        is Deletion -> {
+                            realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                                .findAll()
+                                .deleteAllFromRealm()
                         }
                     }
                 }
@@ -154,16 +109,12 @@ class SubjectLocalDataSourceImpl(
         }
     }
 
-    private fun Realm.buildRealmQueryForSubject(query: SubjectQuery?): RealmQuery<DbSubject> =
+    private fun Realm.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> =
         where(DbSubject::class.java)
             .apply {
-                query?.let { query ->
-                    query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                    query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
-                    query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
-                    query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                    query.toSync?.let { this.equalTo(SYNC_FIELD, it) }
-                }
+                query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
+                query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
+                query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
+                query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
             }
-
 }

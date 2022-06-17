@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.extentions.concurrentMap
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.MatchEntry
 import com.simprints.face.controllers.core.events.model.Matcher
@@ -25,6 +23,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -34,9 +33,7 @@ class FaceMatchViewModel(
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
     private val faceSessionEventsManager: FaceSessionEventsManager,
-    private val faceTimeHelper: FaceTimeHelper,
-    private val dispatcherProvider: DispatcherProvider
-) : ViewModel() {
+    private val faceTimeHelper: FaceTimeHelper) : ViewModel() {
     companion object {
         const val returnCount = 10
         const val veryGoodMatchThreshold = 50.0
@@ -86,13 +83,11 @@ class FaceMatchViewModel(
         return getConcurrentMatchResultsForCandidates(probeFaceSamples, candidates)
     }
 
-    /**
-     * Run in a concurrent map, making the processing much faster
-     */
+
     private suspend fun getConcurrentMatchResultsForCandidates(
         probeFaceSamples: List<FaceSample>,
         candidates: Flow<FaceIdentity>
-    ) = candidates.concurrentMap(dispatcherProvider.default()) { candidate ->
+    ) = candidates.map() { candidate ->
         FaceMatchResult(
             candidate.faceId,
             faceMatcher.getHighestComparisonScoreForCandidate(probeFaceSamples, candidate)

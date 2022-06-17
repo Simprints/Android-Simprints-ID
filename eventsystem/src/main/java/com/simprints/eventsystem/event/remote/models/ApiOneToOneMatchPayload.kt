@@ -9,19 +9,26 @@ import com.simprints.eventsystem.event.remote.models.face.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiOneToOneMatchPayload(override val startTime: Long,
-                                   override val version: Int,
-                                   val endTime: Long,
-                                   val candidateId: String,
-                                   val matcher: ApiMatcher,
-                                   val result: ApiMatchEntry?) : ApiEventPayload(ApiEventPayloadType.OneToOneMatch, version, startTime) {
+data class ApiOneToOneMatchPayload(
+    override val startTime: Long,
+    override val version: Int,
+    val endTime: Long,
+    val candidateId: String,
+    val matcher: ApiMatcher,
+    val result: ApiMatchEntry?,
+    val fingerComparisonStrategy: ApiFingerComparisonStrategy?
+) :
+    ApiEventPayload(ApiEventPayloadType.OneToOneMatch, version, startTime) {
 
     constructor(domainPayload: OneToOneMatchPayload) :
-        this(domainPayload.createdAt,
+        this(
+            domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.endedAt,
             domainPayload.candidateId,
             domainPayload.matcher.fromDomainToApi(),
-            domainPayload.result?.let { ApiMatchEntry(it) })
+            domainPayload.result?.let { ApiMatchEntry(it) },
+            domainPayload.fingerComparisonStrategy?.fromDomainToApi()
+        )
 }
 

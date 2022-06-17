@@ -1,19 +1,17 @@
 package com.simprints.eventsystem.event.domain.models.face
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
-
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
-import com.simprints.eventsystem.event.local.models.DbEvent.Companion.DEFAULT_EVENT_VERSION
-import java.util.*
 
 @Keep
 data class FaceCaptureEvent(
-    override val id: String = UUID.randomUUID().toString(),
+    override val id: String = randomUUID(),
     override var labels: EventLabels,
     override val payload: FaceCapturePayload,
     override val type: EventType
@@ -28,13 +26,24 @@ data class FaceCaptureEvent(
         isFallback: Boolean,
         face: Face?,
         labels: EventLabels = EventLabels(),
-        id: String = UUID.randomUUID().toString()
+        id: String = randomUUID(),
+        payloadId: String = randomUUID()
     ) : this(
         id,
         labels,
-        FaceCapturePayload(id, startTime, endTime, EVENT_VERSION, attemptNb, qualityThreshold, result, isFallback, face),
-        FACE_CAPTURE)
-
+        FaceCapturePayload(
+            createdAt = startTime,
+            endedAt = endTime,
+            eventVersion = EVENT_VERSION,
+            attemptNb = attemptNb,
+            qualityThreshold = qualityThreshold,
+            result = result,
+            isFallback = isFallback,
+            face = face,
+            id = payloadId
+        ),
+        FACE_CAPTURE
+    )
 
     @Keep
     data class FaceCapturePayload(
@@ -55,7 +64,6 @@ data class FaceCaptureEvent(
             val yaw: Float,
             var roll: Float,
             val quality: Float,
-            val template: String,
             val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
         )
 
@@ -70,6 +78,6 @@ data class FaceCaptureEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }

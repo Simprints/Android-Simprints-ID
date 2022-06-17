@@ -27,6 +27,20 @@ dependencyAnalysis {
                 )
             }
         }
+        project(':eventsystem') {
+            onAny {
+                exclude(
+                    'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+                )
+            }
+        }
+        project(':core') {
+            onAny {
+                exclude(
+                    ':testtools'
+                )
+            }
+        }
         project(':fingerprintscanner') {
             onAny {
                 exclude(

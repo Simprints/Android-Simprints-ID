@@ -1,0 +1,16 @@
+{
+  "id": "049694bb-9cb7-402f-a6de-6e15b8b741cb",
+  "type": "FACE_CAPTURE_CONFIRMATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "FACE_CAPTURE_CONFIRMATION",
+    "eventVersion": 1,
+    "createdAt": 341345670,
+    "endedAt": 9745678930,
+    "result":"CONTINUE"
+  }
+}

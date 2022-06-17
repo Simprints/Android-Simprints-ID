@@ -1,7 +1,6 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.models.FaceDetection
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
@@ -17,7 +16,8 @@ class FaceCaptureEvent(
     val qualityThreshold: Float,
     val result: Result,
     val isFallback: Boolean,
-    val eventFace: EventFace?
+    val eventFace: EventFace?,
+    val payloadId: String
 ) : Event(EventType.FACE_CAPTURE, startTime, endTime) {
 
     fun fromDomainToCore(): CoreFaceCaptureEvent = CoreFaceCaptureEvent(
@@ -28,7 +28,7 @@ class FaceCaptureEvent(
         result.fromDomainToCore(),
         isFallback,
         eventFace?.fromDomainToCore(),
-        id =id
+        payloadId = payloadId
     )
 
     @Keep
@@ -36,11 +36,10 @@ class FaceCaptureEvent(
         val yaw: Float,
         var roll: Float,
         val quality: Float,
-        val template: String,
         val format: FaceTemplateFormat
     ) {
         fun fromDomainToCore(): CoreFaceCaptureEventFace =
-            CoreFaceCaptureEventFace(yaw, roll, quality, template, format)
+            CoreFaceCaptureEventFace(yaw, roll, quality, format)
 
         companion object {
             fun fromFaceDetectionFace(face: DetectionFace?): EventFace? =
@@ -49,7 +48,6 @@ class FaceCaptureEvent(
                         it.yaw,
                         it.roll,
                         it.quality,
-                        EncodingUtilsImpl.byteArrayToBase64(it.template),
                         it.format.fromDomainToCore()
                     )
                 }

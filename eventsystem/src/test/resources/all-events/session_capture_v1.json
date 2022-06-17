@@ -1,0 +1,38 @@
+{
+  "id": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+  "type": "SESSION_CAPTURE",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "SESSION_CAPTURE",
+    "eventVersion": 1,
+    "createdAt": 31213401430,
+    "endedAt": 21401438930,
+    "uploadedAt": 567829455,
+    "id": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "modalities": [
+      "FINGERPRINT",
+      "FACE"
+    ],
+    "appVersionName": "2022.2.0+1084",
+    "libVersionName": "2022.2.0",
+    "language": "en",
+    "device": {
+      "deviceId": "f2fd8393c0a0be67",
+      "androidSdkVersion": "31",
+      "deviceModel": "Samsung"
+    },
+    "databaseInfo": {
+      "sessionCount": 102,
+      "recordCount": 10
+    },
+    "location": {
+      "latitude": 42.24,
+      "longitude": 24.42
+    }
+  }
+}

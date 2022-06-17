@@ -1,0 +1,19 @@
+{
+  "id": "ea622e1a-a314-4889-a2b3-37885f0ce3c5\n\n",
+  "type": "SUSPICIOUS_INTENT",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "SUSPICIOUS_INTENT",
+    "eventVersion": 1,
+    "createdAt": 3178967890,
+    "endedAt": 0,
+    "action": "action",
+    "unexpectedExtras": {
+      "key": "value"
+    }
+  }
+}

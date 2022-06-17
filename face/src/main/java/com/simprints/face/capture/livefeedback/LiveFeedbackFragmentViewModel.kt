@@ -5,14 +5,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
+import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
-import com.simprints.face.models.*
+import com.simprints.face.models.FaceDetection
+import com.simprints.face.models.FaceTarget
+import com.simprints.face.models.FloatRange
+import com.simprints.face.models.PreviewFrame
+import com.simprints.face.models.Size
+import com.simprints.face.models.SymmetricTarget
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -159,10 +166,17 @@ class LiveFeedbackFragmentViewModel(
     }
 
     private fun sendCaptureEvent(faceDetection: FaceDetection) {
+        val payloadId = randomUUID() // The payloads of these two events need to have the same ids
         val faceCaptureEvent =
-            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
+            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold, payloadId)
+
+        val faceCaptureBiometricsEvent =
+            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent(
+                payloadId
+            ) else null
 
         faceSessionEventsManager.addEvent(faceCaptureEvent)
+        faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
 
         faceDetection.id = faceCaptureEvent.id
     }

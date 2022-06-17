@@ -19,14 +19,14 @@ class FingerprintCaptureEvent(
     val finger: FingerIdentifier,
     val qualityThreshold: Int,
     val result: Result,
-    val fingerprint: Fingerprint?
+    val fingerprint: Fingerprint?,
+    val payloadId: String
 ) : Event(EventType.FINGERPRINT_CAPTURE, startTime, endTime) {
 
     @Keep
     class Fingerprint(
         val finger: FingerIdentifier,
         val quality: Int,
-        val template: String,
         val format: FingerprintTemplateFormat
     )
 
@@ -60,13 +60,12 @@ fun FingerprintCaptureEvent.fromDomainToCore() = FingerprintCaptureEventCore(
     qualityThreshold,
     result.fromDomainToCore(),
     fingerprint?.fromDomainToCore(),
-    id
+    payloadId = payloadId
 )
 
 fun FingerprintCaptureEvent.Fingerprint.fromDomainToCore() = FingerprintCore(
     finger.fromDomainToModuleApi(),
     quality,
-    template,
     format
 )
 

@@ -428,7 +428,7 @@ fun validateIntentParsingEventApiModel(json: JSONObject) {
 fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FingerprintCapture")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(2)
+        assertThat(getInt("version")).isEqualTo(3)
         assertThat(getLong("startTime"))
         assertThat(getLong("endTime"))
         assertThat(getString("id"))
@@ -439,9 +439,8 @@ fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
         with(getJSONObject("fingerprint")) {
             assertThat(getString("finger")).isIn(fingerIdentifiers)
             assertThat(getInt("quality"))
-            assertThat(getString("template")).isNotEmpty()
             assertThat(getString("format")).isIn(listOf("ISO_19794_2", "NEC"))
-            assertThat(length()).isEqualTo(4)
+            assertThat(length()).isEqualTo(3)
         }
         assertThat(length()).isEqualTo(9)
     }
@@ -488,15 +487,17 @@ fun validateOneToOneMatchEventApiModel(json: JSONObject) {
     validateCommonParams(json, "OneToOneMatch")
 
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(1)
+        assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
         assertThat(getLong("endTime"))
         assertThat(getString("candidateId").isGuid()).isTrue()
         assertThat(getString("matcher")).isAnyOf("SIM_AFIS", "RANK_ONE")
+        assertThat(getString("fingerComparisonStrategy")).isAnyOf(
+            "null", "SAME_FINGER","CROSS_FINGER_USING_MEAN_OF_MAX")
         with(getJSONObject("result")) {
             validateMatchEntryApiModel(this)
         }
-        assertThat(length()).isEqualTo(7)
+        assertThat(length()).isEqualTo(8)
     }
 }
 
@@ -681,7 +682,7 @@ fun validateFaceFallbackCaptureEventApiModel(json: JSONObject) {
 fun validateFaceCaptureEventApiModel(json: JSONObject) {
     validateCommonParams(json, "FaceCapture")
     with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(2)
+        assertThat(getInt("version")).isEqualTo(3)
         assertThat(getString("id")).isNotNull()
         assertThat(getLong("startTime")).isNotNull()
         assertThat(getLong("endTime")).isNotNull()
@@ -694,9 +695,8 @@ fun validateFaceCaptureEventApiModel(json: JSONObject) {
             assertThat(getDouble("yaw")).isNotNull()
             assertThat(getDouble("roll")).isNotNull()
             assertThat(getDouble("quality")).isNotNull()
-            assertThat(getString("template")).isNotNull()
             assertThat(getString("format")).isIn(listOf("RANK_ONE_1_23"))
-            assertThat(length()).isEqualTo(5)
+            assertThat(length()).isEqualTo(4)
         }
 
         assertThat(length()).isEqualTo(10)
@@ -714,4 +714,21 @@ fun validateFaceCaptureConfirmationEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateFaceCaptureBiometricsEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "FaceCaptureBiometrics")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(0)
+        assertThat(getLong("startTime")).isNotNull()
+        assertThat(length()).isEqualTo(5)
+    }
+}
+
+fun validateFingerprintCaptureBiometricsEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "FingerprintCaptureBiometrics")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(0)
+        assertThat(getLong("startTime")).isNotNull()
+        assertThat(length()).isEqualTo(5)
+    }
+}
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }
