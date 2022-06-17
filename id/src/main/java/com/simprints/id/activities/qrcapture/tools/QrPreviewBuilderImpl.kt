@@ -8,7 +8,7 @@ class QrPreviewBuilderImpl : QrPreviewBuilder {
 
     override fun buildPreview(previewView: PreviewView): Preview {
         return Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build().apply {
-            setSurfaceProvider(previewView.previewSurfaceProvider)
+            setSurfaceProvider(previewView.surfaceProvider)
         }
     }
 
