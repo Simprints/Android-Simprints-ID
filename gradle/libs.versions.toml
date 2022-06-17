@@ -5,6 +5,7 @@ androidx_navigation_version = "2.4.2"
 kotlin_coroutine_version = "1.6.1"
 app_compat_version = "1.4.2"
 androidx_version = "1.4.0"
+androidx_test_orchestrator_version = "1.4.1"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.4.1"
@@ -200,7 +201,7 @@ testing-AndroidX-monitor = { module = "androidx.test:monitor", version.ref = "an
 testing-AndroidX-ext_junit = "androidx.test.ext:junit:1.1.3"
 testing-AndroidX-core = { module = "androidx.test:core", version.ref = "androidx_version" }
 testing-AndroidX-core_testing = { module = "android.arch.core:core-testing", version.ref = "androidx_version" }
-testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx_version" }
+testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx_test_orchestrator_version" }
 testing-AndroidX-runner = { module = "androidx.test:runner", version.ref = "androidx_version" }
 testing-AndroidX-rules = { module = "androidx.test:rules", version.ref = "androidx_version" }
 testing-AndroidX-room = { module = "androidx.room:room-testing", version.ref = "androidx_room_version" }
