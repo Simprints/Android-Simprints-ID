@@ -60,7 +60,6 @@ class EventMigration7to8 : Migration(7, 8) {
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
 
-            Simber.d("Migrated FingerprintCapture event: $newJson")
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
     }
@@ -105,7 +104,6 @@ class EventMigration7to8 : Migration(7, 8) {
             newPayload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
 
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
-            Simber.d("Migrated FaceCapture event: $newJson")
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
     }
@@ -152,7 +150,6 @@ class EventMigration7to8 : Migration(7, 8) {
             this.put("sessionIsClosed", 0)
         }
 
-        Simber.d("Migrated FaceCaptureBiometrics event: $faceCaptureBiometricsEvent")
         database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
     }
 
@@ -195,7 +192,6 @@ class EventMigration7to8 : Migration(7, 8) {
             this.put("sessionIsClosed", 0)
         }
 
-        Simber.d("Migrated FaceCaptureBiometrics event: $fingerprintCaptureBiometricsEvent")
         database.insert(
             "DbEvent",
             SQLiteDatabase.CONFLICT_NONE,
