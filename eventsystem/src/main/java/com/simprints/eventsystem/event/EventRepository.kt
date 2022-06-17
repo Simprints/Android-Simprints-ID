@@ -30,7 +30,12 @@ interface EventRepository {
 
     suspend fun addOrUpdateEvent(event: Event)
 
-    suspend fun uploadEvents(projectId: String): Flow<Int>
+    fun uploadEvents(
+        projectId: String,
+        canSyncAllDataToSimprints: Boolean,
+        canSyncBiometricDataToSimprints: Boolean,
+        canSyncAnalyticsDataToSimprints: Boolean
+    ): Flow<Int>
 
     suspend fun localCount(projectId: String): Int
 

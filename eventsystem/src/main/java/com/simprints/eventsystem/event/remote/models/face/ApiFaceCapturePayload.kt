@@ -46,7 +46,6 @@ data class ApiFaceCapturePayload(
         val yaw: Float,
         var roll: Float,
         val quality: Float,
-        val template: String,
         val format: FaceTemplateFormat
     )
 
@@ -61,8 +60,7 @@ data class ApiFaceCapturePayload(
     }
 }
 
-
-fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, template, format)
+fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)
 
 fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.VALID -> VALID

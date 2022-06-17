@@ -2,8 +2,13 @@ package com.simprints.eventsystem.event.remote.events.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
-import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback
-import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.*
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.BACKEND_MAINTENANCE_ERROR
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.DIFFERENT_USER_ID_SIGNED_IN
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.GUID_NOT_FOUND_ONLINE
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE
+import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
 import com.simprints.eventsystem.event.remote.models.callback.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.callback.fromDomainToApi
 import org.junit.Test

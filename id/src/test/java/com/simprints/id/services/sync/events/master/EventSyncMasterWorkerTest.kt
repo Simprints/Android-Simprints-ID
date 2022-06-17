@@ -2,25 +2,44 @@ package com.simprints.id.services.sync.events.master
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.BLOCKED
 import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.WorkManager
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.domain.SyncDestinationSetting
-import com.simprints.id.domain.SyncDestinationSetting.COMMCARE
-import com.simprints.id.domain.SyncDestinationSetting.SIMPRINTS
-import com.simprints.id.services.sync.events.common.*
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
+import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
+import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_UP_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.common.addCommonTagForAllSyncWorkers
+import com.simprints.id.services.sync.events.common.addTagForEndSyncReporter
+import com.simprints.id.services.sync.events.common.addTagForMasterSyncId
+import com.simprints.id.services.sync.events.common.addTagForScheduledAtNow
+import com.simprints.id.services.sync.events.common.addTagForStartSyncReporter
+import com.simprints.id.services.sync.events.common.filterByTags
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.END_SYNC_REPORTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.START_SYNC_REPORTER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
@@ -34,7 +53,11 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -62,7 +85,7 @@ class EventSyncMasterWorkerTest {
     private lateinit var masterWorker: EventSyncMasterWorker
     private val preferencesManager = mockk<IdPreferencesManager>(relaxed = true) {
         every { eventDownSyncSetting } returns ON
-        every { syncDestinationSettings } returns listOf(SIMPRINTS)
+        every { simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_ALL
     }
 
     @Before
@@ -163,7 +186,9 @@ class EventSyncMasterWorkerTest {
 
     @Test
     fun doWork_errorOccurs_shouldWorkerFail() = runBlocking {
-        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
+        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } throws Throwable(
+            "IO Error"
+        )
 
         masterWorker.doWork()
 
@@ -174,7 +199,9 @@ class EventSyncMasterWorkerTest {
     fun doWork_cantSyncSimprints() = runBlocking {
         val uniqueSyncId = masterWorker.uniqueSyncId
         prepareSyncWorkers(uniqueSyncId)
-        mockSyncDestinationSetting(COMMCARE)
+        every { preferencesManager.cosyncSyncSetting } returns CosyncSetting.COSYNC_ALL
+        every { preferencesManager.simprintsSyncSetting } returns SimprintsSyncSetting.SIM_SYNC_NONE
+        every { preferencesManager.eventDownSyncSetting } returns OFF
 
         masterWorker.doWork()
 
@@ -216,7 +243,8 @@ class EventSyncMasterWorkerTest {
     ) {
 
         val allWorkers = wm.getWorkInfosByTag("${TAG_MASTER_SYNC_ID}$uniqueSyncId").get()
-        val specificWorkers = specificType?.let { allWorkers.filterByTags(tagForType(specificType)) } ?: allWorkers
+        val specificWorkers =
+            specificType?.let { allWorkers.filterByTags(tagForType(specificType)) } ?: allWorkers
 
         assertThat(specificWorkers.size).isEqualTo(1)
         assertThat(specificWorkers.all { it.state == state }).isTrue()
@@ -309,10 +337,6 @@ class EventSyncMasterWorkerTest {
 
     private fun mockSubjectsDownSyncSetting(eventDownSyncSetting: EventDownSyncSetting) {
         every { preferencesManager.eventDownSyncSetting } returns eventDownSyncSetting
-    }
-
-    private fun mockSyncDestinationSetting(syncDestinationSetting: SyncDestinationSetting) {
-        every { preferencesManager.syncDestinationSettings } returns listOf(syncDestinationSetting)
     }
 
     private fun buildOneTimeMasterWorker() {

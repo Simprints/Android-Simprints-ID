@@ -1,17 +1,17 @@
 package com.simprints.eventsystem.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import java.util.*
 
 @Keep
 data class FingerprintCaptureEvent(
-    override val id: String = UUID.randomUUID().toString(),
+    override val id: String = randomUUID(),
     override var labels: EventLabels,
     override val payload: FingerprintCapturePayload,
     override val type: EventType
@@ -24,12 +24,22 @@ data class FingerprintCaptureEvent(
         qualityThreshold: Int,
         result: FingerprintCapturePayload.Result,
         fingerprint: FingerprintCapturePayload.Fingerprint?,
-        id: String = UUID.randomUUID().toString(),
-        labels: EventLabels = EventLabels()
+        id: String = randomUUID(),
+        labels: EventLabels = EventLabels(),
+        payloadId: String = randomUUID()
     ) : this(
         id,
         labels,
-        FingerprintCapturePayload(createdAt, EVENT_VERSION, endTime, finger, qualityThreshold, result, fingerprint, id),
+        FingerprintCapturePayload(
+            createdAt = createdAt,
+            eventVersion = EVENT_VERSION,
+            endedAt = endTime,
+            finger = finger,
+            qualityThreshold = qualityThreshold,
+            result = result,
+            fingerprint = fingerprint,
+            id = payloadId
+        ),
         FINGERPRINT_CAPTURE
     )
 
@@ -50,7 +60,6 @@ data class FingerprintCaptureEvent(
         data class Fingerprint(
             val finger: IFingerIdentifier,
             val quality: Int,
-            val template: String,
             val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2
         )
 
@@ -65,6 +74,6 @@ data class FingerprintCaptureEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }

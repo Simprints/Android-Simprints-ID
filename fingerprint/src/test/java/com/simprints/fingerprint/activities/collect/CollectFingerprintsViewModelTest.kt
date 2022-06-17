@@ -450,7 +450,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 isShowingSplashScreen = false
             )
         )
-        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
+        coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 2) { imageManager.save(any(), any(), any()) }
@@ -493,7 +493,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 isShowingSplashScreen = false
             )
         )
-        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
+        coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 0) { imageManager.save(any(), any(), any()) }
@@ -540,7 +540,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
             )
         )
 
-        coVerify(exactly = 2) { sessionEventsManager.addEvent(any()) }
+        coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
     }
 
     @Test
@@ -682,7 +682,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 isShowingSplashScreen = false
             )
         )
-        coVerify(exactly = 14) { sessionEventsManager.addEvent(any()) }
+        coVerify(exactly = 16) { sessionEventsManager.addEvent(any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 3) { imageManager.save(any(), any(), any()) }
@@ -778,7 +778,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
                 isShowingSplashScreen = false
             )
         )
-        coVerify(exactly = 14) { sessionEventsManager.addEvent(any()) }
+        coVerify(exactly = 16) { sessionEventsManager.addEvent(any()) }
 
         // If eager, expect that images were saved before confirm was pressed, including bad scans
         coVerify(exactly = 8) { imageManager.save(any(), any(), any()) }

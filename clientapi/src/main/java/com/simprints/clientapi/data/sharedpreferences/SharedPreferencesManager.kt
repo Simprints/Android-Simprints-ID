@@ -1,11 +1,15 @@
 package com.simprints.clientapi.data.sharedpreferences
 
 import com.simprints.core.domain.modality.Modality
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 
 
 interface SharedPreferencesManager {
-    val syncDestinationSettings: List<SyncDestinationSetting>
+
+    val simprintsSyncSetting: SimprintsSyncSetting
+
+    val cosyncSyncSettings: CosyncSetting
 
     val modalities: List<Modality>
 

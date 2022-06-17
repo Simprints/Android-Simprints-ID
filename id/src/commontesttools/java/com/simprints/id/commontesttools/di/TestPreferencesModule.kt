@@ -11,7 +11,8 @@ import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonS
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.di.PreferencesModule
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -39,7 +40,8 @@ class TestPreferencesModule(
         languagesStringArraySerializer: Serializer<Array<String>>,
         moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-        syncDestinationSettingSerializer: Serializer<List<SyncDestinationSetting>>,
+        simprintsSyncSerializer: Serializer<SimprintsSyncSetting>,
+        cosyncSerializer: Serializer<CosyncSetting>,
         modalitiesSerializer: Serializer<List<Modality>>,
         captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
         fingerComparisonStrategySerializer: Serializer<FingerComparisonStrategy>,
@@ -56,7 +58,8 @@ class TestPreferencesModule(
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             eventDownSyncSettingSerializer,
-            syncDestinationSettingSerializer,
+            simprintsSyncSerializer,
+            cosyncSerializer,
             modalitiesSerializer,
             captureFingerprintStrategySerializer,
             fingerComparisonStrategySerializer,
