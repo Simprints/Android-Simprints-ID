@@ -53,7 +53,6 @@ dependencies {
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.jackson.core)
     implementation(libs.retrofit.core)
-    api(libs.dagger.javax)
     implementation(libs.firebase.storage)
 
     implementation(libs.playcore.core)
