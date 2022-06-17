@@ -6,9 +6,6 @@ import com.simprints.id.commontesttools.di.*
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
 import com.simprints.testtools.common.di.injectClassFromComponent
-import com.squareup.rx2.idler.Rx2Idler
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.plugins.RxJavaPlugins
 import io.realm.Realm
 
 class AndroidTestConfig<T : Any>(
@@ -25,7 +22,6 @@ class AndroidTestConfig<T : Any>(
     private lateinit var testAppComponent: AppComponentForAndroidTests
 
     fun fullSetup() = initAndInjectComponent()
-        .initRxIdler()
         .initRealm()
         .initModules()
 
@@ -39,14 +35,6 @@ class AndroidTestConfig<T : Any>(
         .syncModule(syncModule ?: TestSyncModule())
         .securityModule(securityModule ?: TestSecurityModule())
         .viewModelModule(viewModelModule ?: TestViewModelModule())
-
-    private fun initRxIdler() = also {
-        RxJavaPlugins.setInitComputationSchedulerHandler(Rx2Idler.create("RxJava 2.x Computation Scheduler"))
-        RxJavaPlugins.setInitIoSchedulerHandler(Rx2Idler.create("RxJava 2.x Io Scheduler"))
-        RxJavaPlugins.setInitNewThreadSchedulerHandler(Rx2Idler.create("RxJava 2.x New Thread Scheduler"))
-        RxJavaPlugins.setInitSingleSchedulerHandler(Rx2Idler.create("RxJava 2.x Single Scheduler"))
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler(Rx2Idler.create("RxJava 2.x Main Scheduler"))
-    }
 
     private fun initRealm() = also {
         Realm.init(app)
