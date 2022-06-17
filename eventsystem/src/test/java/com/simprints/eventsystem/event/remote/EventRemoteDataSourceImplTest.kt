@@ -7,13 +7,9 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
+import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.remote.models.ApiEventCount
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.EnrolmentRecordCreation
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.EnrolmentRecordDeletion
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.EnrolmentRecordMove
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -30,17 +26,23 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 typealias CountInvocation<T, V> = suspend (T) -> V
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
 class EventRemoteDataSourceImplTest {
 
-    @MockK lateinit var simApiClientFactory: SimApiClientFactory
-    @MockK lateinit var simApiClient: SimApiClient<EventRemoteInterface>
-    @MockK lateinit var eventRemoteInterface: EventRemoteInterface
+    @MockK
+    lateinit var simApiClientFactory: SimApiClientFactory
+
+    @MockK
+    lateinit var simApiClient: SimApiClient<EventRemoteInterface>
+
+    @MockK
+    lateinit var eventRemoteInterface: EventRemoteInterface
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private val query = ApiRemoteEventQuery(
@@ -170,8 +172,8 @@ class EventRemoteDataSourceImplTest {
             coVerify(exactly = 1) {
                 eventRemoteInterface.uploadEvents(
                     DEFAULT_PROJECT_ID,
-                    match {
-                        assertThat(it.events).containsExactlyElementsIn(events.map { it.fromDomainToApi() })
+                    match { body ->
+                        assertThat(body.events).containsExactlyElementsIn(events.map { it.fromDomainToApi() })
                         true
                     }
                 )
@@ -187,6 +189,18 @@ class EventRemoteDataSourceImplTest {
             shouldThrow<Throwable> {
                 eventRemoteDataSource.post(DEFAULT_PROJECT_ID, listOf(createSessionCaptureEvent()))
             }
+        }
+    }
+
+    @Test
+    fun dumpInvalidEvents_shouldDumpEvents() = runTest {
+        coEvery { eventRemoteInterface.dumpInvalidEvents(any(), any(), any()) } returns mockk()
+
+        val events = listOf("anEventJson")
+        eventRemoteDataSource.dumpInvalidEvents(DEFAULT_PROJECT_ID, events)
+
+        coVerify(exactly = 1) {
+            eventRemoteInterface.dumpInvalidEvents(DEFAULT_PROJECT_ID, events = events)
         }
     }
 }

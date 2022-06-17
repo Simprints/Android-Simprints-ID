@@ -38,6 +38,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import java.lang.IllegalArgumentException
 
 @ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
@@ -383,14 +384,9 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_fails_shouldNotDeleteSessionEventsAfterIntegrationIssues() {
+    fun upload_fails_shouldNotDeleteSessionEventsAfterError() {
         runBlocking {
-            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
-                Response.error<String>(
-                    404,
-                    "".toResponseBody(null)
-                )
-            )
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws IllegalArgumentException()
 
             val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
