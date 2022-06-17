@@ -1,9 +1,7 @@
 package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT

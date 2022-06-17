@@ -6,6 +6,7 @@ import androidx.annotation.Keep
 enum class EventType {
     REFUSAL_RESPONSE,
     FINGERPRINT_CAPTURE,
+    FINGERPRINT_CAPTURE_BIOMETRICS,
     ONE_TO_ONE_MATCH,
     ONE_TO_MANY_MATCH,
     REFUSAL,

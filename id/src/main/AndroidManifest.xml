@@ -36,9 +36,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
-            android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,9 +51,9 @@
             android:theme="@style/AppTheme.Launcher" />
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
-            android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.simprints.clientapp.REGISTER_LAST_BIOMETRICS" />
                 <action android:name="com.simprints.clientapp.REGISTER" />

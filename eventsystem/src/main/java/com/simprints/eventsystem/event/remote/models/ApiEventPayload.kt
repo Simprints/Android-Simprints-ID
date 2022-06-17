@@ -37,11 +37,13 @@ import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEve
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
@@ -49,6 +51,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutPayload
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureBiometricsPayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureConfirmationPayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceFallbackCapturePayload
@@ -62,6 +65,7 @@ import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordM
 @JsonSubTypes(
     JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiFaceCaptureBiometricsPayload::class, name = Companion.FACE_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
     JsonSubTypes.Type(value = ApiSessionCapturePayload::class, name = Companion.SESSION_CAPTURE_KEY),
@@ -78,6 +82,7 @@ import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordM
     JsonSubTypes.Type(value = ApiConsentPayload::class, name = Companion.CONSENT_KEY),
     JsonSubTypes.Type(value = ApiEnrolmentPayloadV2::class, name = Companion.ENROLMENT_KEY),
     JsonSubTypes.Type(value = ApiFingerprintCapturePayload::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
+    JsonSubTypes.Type(value = ApiFingerprintCaptureBiometricsPayload::class, name = Companion.FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = ApiGuidSelectionPayload::class, name = Companion.GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = ApiIntentParsingPayload::class, name = Companion.INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = ApiInvalidIntentPayload::class, name = Companion.INVALID_INTENT_KEY),
@@ -110,7 +115,7 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         ENROLMENT_V1 -> ApiEnrolmentPayloadV1(this as EnrolmentEventV1.EnrolmentPayload)
         ENROLMENT_V2 -> ApiEnrolmentPayloadV2(this as EnrolmentEventV2.EnrolmentPayload)
         AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
-        FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCapturePayload)
+        FINGERPRINT_CAPTURE ->ApiFingerprintCapturePayload(this as FingerprintCaptureEvent.FingerprintCapturePayload)
         ONE_TO_ONE_MATCH -> ApiOneToOneMatchPayload(this as OneToOneMatchPayload)
         ONE_TO_MANY_MATCH -> ApiOneToManyMatchPayload(this as OneToManyMatchPayload)
         PERSON_CREATION -> ApiPersonCreationPayload(this as PersonCreationPayload)
@@ -128,7 +133,7 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
         FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
         FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
-        FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCapturePayload)
+        FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCaptureEvent.FaceCapturePayload)
         FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
         SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
         CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
@@ -142,4 +147,6 @@ fun EventPayload.fromDomainToApi(): ApiEventPayload =
         CALLBACK_VERIFICATION -> ApiCallbackPayload(this as VerificationCallbackPayload)
         CALLBACK_ERROR -> ApiCallbackPayload(this as ErrorCallbackPayload)
         CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
+        FINGERPRINT_CAPTURE_BIOMETRICS -> ApiFingerprintCaptureBiometricsPayload(this as FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload)
+        FACE_CAPTURE_BIOMETRICS -> ApiFaceCaptureBiometricsPayload(this as FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload)
     }

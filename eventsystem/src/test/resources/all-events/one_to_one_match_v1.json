@@ -1,0 +1,21 @@
+{
+  "id": "1b4edf07-5349-418f-95ed-afe9479fa4b9",
+  "type": "ONE_TO_ONE_MATCH",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "ONE_TO_ONE_MATCH",
+    "eventVersion": 1,
+    "createdAt": 2213412301,
+    "endedAt": 4145612330,
+    "candidateId": "22f3ba17-f1d8-4de2-b57a-59e5be358e00",
+    "matcher": "SIM_AFIS",
+    "result": {
+      "candidateId": "22f3ba17-f1d8-4de2-b57a-59e5be358e00",
+      "score": 42.24
+    }
+  }
+}

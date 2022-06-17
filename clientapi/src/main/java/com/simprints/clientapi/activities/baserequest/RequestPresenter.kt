@@ -23,6 +23,10 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
+import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
+import com.simprints.clientapi.data.sharedpreferences.canSyncDataToSimprints
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.InvalidMetadataException
 import com.simprints.clientapi.exceptions.InvalidModuleIdException
@@ -43,8 +47,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.domain.containsCommcare
-import com.simprints.id.domain.containsSimprints
 import com.simprints.libsimprints.Constants
 import com.simprints.logging.Simber
 import kotlinx.coroutines.flow.firstOrNull
@@ -146,7 +148,7 @@ abstract class RequestPresenter(
         sessionId: String,
         jsonHelper: JsonHelper
     ): String? =
-        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare()) {
+        if (sharedPreferencesManager.canCoSyncData()) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CoSyncEvents(events))
         } else {
@@ -159,7 +161,11 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
-        if (!sharedPreferencesManager.syncDestinationSettings.containsCommcare()) return null
+
+        val canCosyncData = sharedPreferencesManager.canCoSyncAllData()
+        val canCosyncBiometricData = sharedPreferencesManager.canCoSyncBiometricData()
+
+        if (!canCosyncData && !canCosyncBiometricData) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -180,12 +186,10 @@ abstract class RequestPresenter(
     }
 
     /**
-     * Delete the events if returning to CommCare but not Simprints
+     * Delete the events if returning to a cosync app but not Simprints
      */
     override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (sharedPreferencesManager.syncDestinationSettings.containsCommcare() &&
-            !sharedPreferencesManager.syncDestinationSettings.containsSimprints()
-        ) {
+        if (!sharedPreferencesManager.canSyncDataToSimprints()) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
     }

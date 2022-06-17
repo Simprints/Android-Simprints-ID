@@ -33,7 +33,11 @@ class IdentificationTask(
         viewModel.progress.postValue(50)
     }
 
-    override fun handleMatchResult(numberOfCandidates: Int, matchResults: List<MatchResult>) {
+    override fun handleMatchResult(
+        numberOfCandidates: Int,
+        matchResults: List<MatchResult>,
+        isCrossFingerMatchingEnabled: Boolean
+    ) {
         val topCandidates = extractTopCandidates(matchResults)
 
         saveOneToManyMatchEvent(numberOfCandidates, topCandidates)

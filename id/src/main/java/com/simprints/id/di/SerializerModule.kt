@@ -5,15 +5,26 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.FingerprintsToCollectSerializer
 import com.simprints.id.data.prefs.settings.fingerprint.serializers.ScannerGenerationsSerializer
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.tools.serializers.*
+import com.simprints.id.tools.serializers.BooleanSerializer
+import com.simprints.id.tools.serializers.CosyncSerializer
+import com.simprints.id.tools.serializers.EnumSerializer
+import com.simprints.id.tools.serializers.IntegerSerializer
+import com.simprints.id.tools.serializers.LanguagesStringArraySerializer
+import com.simprints.id.tools.serializers.MapSerializer
+import com.simprints.id.tools.serializers.ModalitiesListSerializer
+import com.simprints.id.tools.serializers.ModuleIdOptionsStringSetSerializer
+import com.simprints.id.tools.serializers.Serializer
+import com.simprints.id.tools.serializers.SimprintsSyncSerializer
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -38,7 +49,8 @@ class SerializerModule {
     @Singleton
     @Named("FingerIdentifierSerializer")
     fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(
-        FingerIdentifier::class.java)
+        FingerIdentifier::class.java
+    )
 
     @Provides
     @Singleton
@@ -48,12 +60,18 @@ class SerializerModule {
     @Provides
     @Singleton
     @Named("PeopleDownSyncSettingSerializer")
-    fun providePeopleDownSyncSettingSerializer(): Serializer<EventDownSyncSetting> = EnumSerializer(EventDownSyncSetting::class.java)
+    fun providePeopleDownSyncSettingSerializer(): Serializer<EventDownSyncSetting> =
+        EnumSerializer(EventDownSyncSetting::class.java)
 
     @Provides
     @Singleton
-    @Named("SyncDestinationSerializer")
-    fun provideSyncDestinationSettingSerializer(): Serializer<List<SyncDestinationSetting>> = SyncDestinationListSerializer()
+    @Named("SimprintsSyncSerializer")
+    fun provideSimprintsSyncSerializer(): Serializer<SimprintsSyncSetting> = SimprintsSyncSerializer()
+
+    @Provides
+    @Singleton
+    @Named("CosyncSerializer")
+    fun provideCosyncSerializer(): Serializer<CosyncSetting> = CosyncSerializer()
 
     @Provides
     @Singleton
@@ -83,7 +101,8 @@ class SerializerModule {
         @Named("FingerprintConfidenceSerializer") fingerprintConfidenceSerializer: Serializer<FingerprintConfidenceThresholds>,
         @Named("IntSerializer") intSerializer: Serializer<Int>,
         jsonHelper: JsonHelper
-    ): Serializer<Map<FingerprintConfidenceThresholds, Int>> = MapSerializer(fingerprintConfidenceSerializer, intSerializer, jsonHelper)
+    ): Serializer<Map<FingerprintConfidenceThresholds, Int>> =
+        MapSerializer(fingerprintConfidenceSerializer, intSerializer, jsonHelper)
 
     @Provides
     @Singleton
@@ -92,35 +111,47 @@ class SerializerModule {
         @Named("FaceConfidenceSerializer") faceConfidenceThresholdsSerializer: Serializer<FaceConfidenceThresholds>,
         @Named("IntSerializer") intSerializer: Serializer<Int>,
         jsonHelper: JsonHelper
-    ): Serializer<Map<FaceConfidenceThresholds, Int>> = MapSerializer(faceConfidenceThresholdsSerializer, intSerializer, jsonHelper)
+    ): Serializer<Map<FaceConfidenceThresholds, Int>> =
+        MapSerializer(faceConfidenceThresholdsSerializer, intSerializer, jsonHelper)
 
     @Provides
     @Singleton
     @Named("LanguagesStringArraySerializer")
-    fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
+    fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> =
+        LanguagesStringArraySerializer()
 
     @Provides
     @Singleton
     @Named("ModuleIdOptionsStringSetSerializer")
-    fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> = ModuleIdOptionsStringSetSerializer()
+    fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> =
+        ModuleIdOptionsStringSetSerializer()
 
     @Provides
     @Singleton
     @Named("CaptureFingerprintStrategySerializer")
-    fun provideCaptureFingerprintStrategySerializer(): Serializer<CaptureFingerprintStrategy> = EnumSerializer(CaptureFingerprintStrategy::class.java)
+    fun provideCaptureFingerprintStrategySerializer(): Serializer<CaptureFingerprintStrategy> =
+        EnumSerializer(CaptureFingerprintStrategy::class.java)
+
+    @Provides
+    @Singleton
+    @Named("FingerprintMatchingStrategySerializer")
+    fun provideFingerprintMatchingStrategySerializer(): Serializer<FingerComparisonStrategy> = EnumSerializer(FingerComparisonStrategy::class.java)
 
     @Provides
     @Singleton
     @Named("SaveFingerprintImagesStrategySerializer")
-    fun provideSaveFingerprintImagesStrategySerializer(): Serializer<SaveFingerprintImagesStrategy> = EnumSerializer(SaveFingerprintImagesStrategy::class.java)
+    fun provideSaveFingerprintImagesStrategySerializer(): Serializer<SaveFingerprintImagesStrategy> =
+        EnumSerializer(SaveFingerprintImagesStrategy::class.java)
 
     @Provides
     @Singleton
     @Named("ScannerGenerationsSerializer")
-    fun provideScannerGenerationsSerializer(): Serializer<List<ScannerGeneration>> = ScannerGenerationsSerializer()
+    fun provideScannerGenerationsSerializer(): Serializer<List<ScannerGeneration>> =
+        ScannerGenerationsSerializer()
 
     @Provides
     @Singleton
     @Named("FingerprintsToCollectSerializer")
-    fun provideFingerprintsToCollectSerializer(): Serializer<List<FingerIdentifier>> = FingerprintsToCollectSerializer()
+    fun provideFingerprintsToCollectSerializer(): Serializer<List<FingerIdentifier>> =
+        FingerprintsToCollectSerializer()
 }
