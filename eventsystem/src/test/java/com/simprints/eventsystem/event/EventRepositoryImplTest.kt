@@ -28,7 +28,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -418,7 +417,12 @@ class EventRepositoryImplTest {
     fun `upload should dump invalid events, emit the progress and delete the events`() = runTest {
         val sessions = mockDbToLoadTwoSessionsWithInvalidEvent(GUID1, GUID2)
 
-        val progress = eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+        val progress = eventRepo.uploadEvents(
+            DEFAULT_PROJECT_ID,
+            canSyncAllDataToSimprints = true,
+            canSyncBiometricDataToSimprints = false,
+            canSyncAnalyticsDataToSimprints = false
+        ).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
@@ -444,7 +448,12 @@ class EventRepositoryImplTest {
         )
         mockDbToLoadTwoSessionsWithInvalidEvent(GUID1, GUID2)
 
-        eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+        eventRepo.uploadEvents(
+            DEFAULT_PROJECT_ID,
+            canSyncAllDataToSimprints = true,
+            canSyncBiometricDataToSimprints = false,
+            canSyncAnalyticsDataToSimprints = false
+        ).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
