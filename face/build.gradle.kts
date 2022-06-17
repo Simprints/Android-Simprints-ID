@@ -26,6 +26,7 @@ configurations {
     }
 }
 android {
+    // Set your ndk version below to run SID on M1 Macs
     // ndkVersion = "25.0.8221429"
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
