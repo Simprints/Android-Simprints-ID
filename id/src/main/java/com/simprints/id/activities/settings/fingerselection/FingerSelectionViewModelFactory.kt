@@ -8,7 +8,7 @@ class FingerSelectionViewModelFactory(private val preferencesManager: IdPreferen
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(FingerSelectionViewModel::class.java)) {
             FingerSelectionViewModel(preferencesManager) as T
         } else {

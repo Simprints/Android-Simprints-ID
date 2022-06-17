@@ -91,7 +91,6 @@ class ModuleQueryFilterTest {
             Module("Legama", false),
             Module("Achura Mazegaja", false),
             Module("Hajo Salata", false),
-            Module("Madagascar", false),
             Module("Wakanda", false)
         )
         val actual = filter.getFilteredList(items, query)

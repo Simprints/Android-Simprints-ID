@@ -50,7 +50,6 @@ dependencies {
 
     implementation(libs.androidX.core)
     implementation(libs.kotlin.coroutinesAndroid)
-    implementation(libs.kotlin.serializationJson)
     implementation(libs.jackson.core)
 
     api(libs.retrofit.okhttp)
