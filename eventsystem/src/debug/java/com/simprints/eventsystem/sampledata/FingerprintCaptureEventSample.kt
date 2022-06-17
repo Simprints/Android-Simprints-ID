@@ -17,7 +17,6 @@ object FingerprintCaptureEventSample : SampleEvent() {
         val fingerprint = Fingerprint(
             IFingerIdentifier.LEFT_THUMB,
             8,
-            "template",
             FingerprintTemplateFormat.ISO_19794_2
         )
 

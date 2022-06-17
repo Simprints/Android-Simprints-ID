@@ -1,0 +1,20 @@
+{
+  "id": "e1dbff1a-e800-41c8-b943-ba50c3f8d701",
+  "type": "AUTHORIZATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "AUTHORIZATION",
+    "eventVersion": 1,
+    "createdAt": 1434567034,
+    "endedAt": 0,
+    "result":"AUTHORIZED",
+    "userInfo": {
+      "projectId": "TEST6Oai41ps1pBNrzBL",
+      "userId": "user1"
+    }
+  }
+}

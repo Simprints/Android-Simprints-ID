@@ -16,7 +16,6 @@ import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.tools.utils.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
@@ -27,7 +26,6 @@ import java.io.Serializable
 class FaceMatchViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -214,7 +212,6 @@ class FaceMatchViewModelTest {
             faceMatcher,
             faceSessionEventsManager,
             faceTimeHelper,
-            testDispatcherProvider
         )
     }
 }

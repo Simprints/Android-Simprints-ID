@@ -2,34 +2,33 @@ package com.simprints.eventsystem.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.EventLabels
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.Companion.EVENT_VERSION
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
+import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.sampledata.FingerprintCaptureEventSample
-import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
+import com.simprints.eventsystem.sampledata.SampleDefaults
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class FingerprintCaptureEventTest {
 
     @Test
     fun create_FingerprintCaptureEvent() {
-        val labels = EventLabels(sessionId = GUID1)
-        val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
+        val labels = EventLabels(sessionId = SampleDefaults.GUID1)
+        val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
+            IFingerIdentifier.LEFT_THUMB,
+            8,
+            FingerprintTemplateFormat.ISO_19794_2
+        )
         val event = FingerprintCaptureEventSample.getEvent(labels)
 
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
-        assertThat(event.type).isEqualTo(FINGERPRINT_CAPTURE)
-        with(event.payload as FingerprintCapturePayload) {
-            assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(ENDED_AT)
-            assertThat(eventVersion).isEqualTo(EVENT_VERSION)
-            assertThat(type).isEqualTo(FINGERPRINT_CAPTURE)
-            assertThat(finger).isEqualTo(LEFT_THUMB)
+        assertThat(event.type).isEqualTo(EventType.FINGERPRINT_CAPTURE)
+        with(event.payload) {
+            assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)
+            assertThat(endedAt).isEqualTo(SampleDefaults.ENDED_AT)
+            assertThat(eventVersion).isEqualTo(FingerprintCaptureEvent.EVENT_VERSION)
+            assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE)
+            assertThat(finger).isEqualTo(IFingerIdentifier.LEFT_THUMB)
             assertThat(qualityThreshold).isEqualTo(10)
             assertThat(fingerprint).isEqualTo(fingerprint)
         }

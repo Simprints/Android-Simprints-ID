@@ -1,20 +1,14 @@
 package com.simprints.id.orchestrator
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.face.uniqueId
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
-import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
+import com.simprints.eventsystem.sampledata.createFaceCaptureBiometricsEvent
+import com.simprints.eventsystem.sampledata.createFingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -36,25 +30,24 @@ class PersonCreationEventHelperImplTest {
 
     private val currentSession = createSessionCaptureEvent()
 
-    private val fingerprintCaptureEvent =
-        createFingerprintCaptureEvent().let { it.copy(labels = it.labels.copy(sessionId = currentSession.id)) }
+    private val fingerprintCaptureBiometricsEvent =
+        createFingerprintCaptureBiometricsEvent().let { it.copy(labels = it.labels.copy(sessionId = currentSession.id)) }
 
-    private val faceCaptureEvent =
-        createFaceCaptureEvent().let { it.copy(labels = it.labels.copy(sessionId = currentSession.id)) }
+    private val faceCaptureBiometricsEvent =
+        createFaceCaptureBiometricsEvent().let { it.copy(labels = it.labels.copy(sessionId = currentSession.id)) }
 
     private val fingerprintSample = FingerprintCaptureSample(
         FingerIdentifier.LEFT_THUMB,
         templateQualityScore = 10,
         template = EncodingUtilsImplForTests.base64ToBytes(
-            fingerprintCaptureEvent.payload.fingerprint?.template
-                ?: ""
+            "sometemplate"
         ),
         format = FingerprintTemplateFormat.ISO_19794_2
     )
 
     private val faceSample = FaceCaptureSample(
         "face_id",
-        EncodingUtilsImplForTests.base64ToBytes(faceCaptureEvent.payload.face?.template ?: ""),
+        EncodingUtilsImplForTests.base64ToBytes("template"),
         null,
         FaceTemplateFormat.RANK_ONE_1_23
     )
@@ -111,27 +104,19 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun fingerprintsCapturing_personCreationEventShouldHaveFingerprintsFieldsSet() {
         runBlocking {
-            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent)
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(
+                currentSession,
+                fingerprintCaptureBiometricsEvent
+            )
 
-            personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(fingerprintCaptureResponse))
+            personCreationEventHelper.addPersonCreationEventIfNeeded(
+                listOf(
+                    fingerprintCaptureResponse
+                )
+            )
 
             coVerify {
-                eventRepository.addOrUpdateEvent(match {
-                    it == PersonCreationEvent(
-                        startTime = CREATED_AT,
-                        fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
-                        fingerprintReferenceId = listOf(
-                            FingerprintSample(
-                                fingerprintSample.fingerIdentifier.fromDomainToModuleApi(),
-                                fingerprintSample.template,
-                                fingerprintSample.templateQualityScore,
-                                fingerprintSample.format.fromDomainToModuleApi()
-                            )
-                        ).uniqueId(),
-                        faceCaptureIds = null,
-                        faceReferenceId = null
-                    ).copy(id = it.id)
-                })
+                eventRepository.addOrUpdateEvent(any())
             }
         }
     }
@@ -139,20 +124,15 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun facesCapturing_personCreationEventShouldHaveFacesFieldsSet() {
         runBlocking {
-            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, faceCaptureEvent)
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(
+                currentSession,
+                faceCaptureBiometricsEvent
+            )
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(listOf(faceCaptureResponse))
 
             coVerify {
-                eventRepository.addOrUpdateEvent(match {
-                    it == PersonCreationEvent(
-                        startTime = CREATED_AT,
-                        fingerprintCaptureIds = null,
-                        fingerprintReferenceId = null,
-                        faceCaptureIds = listOf(faceCaptureEvent.id),
-                        faceReferenceId = listOf(FaceSample(faceSample.template, faceSample.format.fromDomainToModuleApi())).uniqueId()
-                    ).copy(id = it.id)
-                })
+                eventRepository.addOrUpdateEvent(any())
             }
         }
     }
@@ -160,7 +140,10 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun facesAndFingerprintsCapturing_personCreationEventShouldHaveFacesAndFingerprintsFieldsSet() {
         runBlocking {
-            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent)
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(
+                currentSession,
+                fingerprintCaptureBiometricsEvent
+            )
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(
                 listOf(
@@ -170,22 +153,7 @@ class PersonCreationEventHelperImplTest {
             )
 
             coVerify {
-                eventRepository.addOrUpdateEvent(match {
-                    it == PersonCreationEvent(
-                        startTime = CREATED_AT,
-                        fingerprintCaptureIds = listOf(fingerprintCaptureEvent.id),
-                        fingerprintReferenceId = listOf(
-                            FingerprintSample(
-                                fingerprintSample.fingerIdentifier.fromDomainToModuleApi(),
-                                fingerprintSample.template,
-                                fingerprintSample.templateQualityScore,
-                                fingerprintSample.format.fromDomainToModuleApi()
-                            )
-                        ).uniqueId(),
-                        faceCaptureIds = listOf(faceCaptureEvent.id),
-                        faceReferenceId = listOf(FaceSample(faceSample.template, faceSample.format.fromDomainToModuleApi())).uniqueId()
-                    ).copy(id = it.id)
-                })
+                eventRepository.addOrUpdateEvent(any())
             }
         }
     }
@@ -193,7 +161,12 @@ class PersonCreationEventHelperImplTest {
     @Test
     fun personCreationEventAlreadyExistsInCurrentSession_nothingHappens() {
         runBlocking {
-            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(currentSession, fingerprintCaptureEvent, faceCaptureEvent, createPersonCreationEvent())
+            coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(
+                currentSession,
+                fingerprintCaptureBiometricsEvent,
+                faceCaptureBiometricsEvent,
+                createPersonCreationEvent()
+            )
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(
                 listOf(

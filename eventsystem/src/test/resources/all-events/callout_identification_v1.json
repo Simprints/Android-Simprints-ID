@@ -1,0 +1,19 @@
+{
+  "id": "b3eb5909-63f7-4a21-9769-df7003742301",
+  "type": "CALLOUT_IDENTIFICATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CALLOUT_IDENTIFICATION",
+    "eventVersion": 1,
+    "createdAt": 65142378901,
+    "endedAt": 0,
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "userId": "user1",
+    "moduleId": "module1",
+    "metadata": "test"
+  }
+}

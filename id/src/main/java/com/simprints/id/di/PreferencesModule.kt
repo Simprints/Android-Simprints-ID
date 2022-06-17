@@ -19,9 +19,11 @@ import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttribu
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy
+import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration
-import com.simprints.id.domain.SyncDestinationSetting
+import com.simprints.id.domain.CosyncSetting
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
@@ -68,9 +70,11 @@ open class PreferencesModule {
         @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
         @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
         @Named("PeopleDownSyncSettingSerializer") eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
-        @Named("SyncDestinationSerializer") syncDestinationSerializer: Serializer<List<SyncDestinationSetting>>,
+        @Named("SimprintsSyncSerializer") simprintsSyncSerializer: Serializer<SimprintsSyncSetting>,
+        @Named("CosyncSerializer") cosyncSerializer: Serializer<CosyncSetting>,
         @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
         @Named("CaptureFingerprintStrategySerializer") captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
+        @Named("FingerprintMatchingStrategySerializer") fingerComparisonStrategySerializer: Serializer<FingerComparisonStrategy>,
         @Named("SaveFingerprintImagesStrategySerializer") saveFingerprintImagesStrategySerializer: Serializer<SaveFingerprintImagesStrategy>,
         @Named("ScannerGenerationsSerializer") scannerGenerationsSerializer: Serializer<List<ScannerGeneration>>,
         @Named("FingerprintsToCollectSerializer") fingerprintsToCollectSerializer: Serializer<List<FingerIdentifier>>,
@@ -85,12 +89,14 @@ open class PreferencesModule {
         moduleIdOptionsStringSetSerializer,
         eventDownSyncSettingSerializer,
         captureFingerprintStrategySerializer,
+        fingerComparisonStrategySerializer,
         saveFingerprintImagesStrategySerializer,
         scannerGenerationsSerializer,
         fingerprintsToCollectSerializer,
         fingerprintConfidenceThresholdsSerializer,
         faceConfidenceThresholdsSerializer,
-        syncDestinationSerializer
+        simprintsSyncSerializer,
+        cosyncSerializer
     )
 
     @Provides
