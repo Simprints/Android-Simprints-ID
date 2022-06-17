@@ -58,28 +58,6 @@ class EventRoomDaoTest {
     }
 
     @Test
-    fun test() {
-        runBlocking {
-            val eventJson = "{\"id\":\"5b28d790-929d-455e-a7c9-7c6cc929275c\",\"labels\":{\"projectId\":\"ffbEEooqVfzaWmqXbsnc\",\"sessionId\":\"d273b0cb-7c88-4a8a-89bf-a5cb5961b876\",\"deviceId\":\"06156a59428859d7\"},\"payload\":{\"id\":\"5b28d790-929d-455e-a7c9-7c6cc929275c\",\"createdAt\":1647511734063,\"endedAt\":1647511734257,\"eventVersion\":2,\"attemptNb\":0,\"qualityThr\":-1.0,\"result\":\"VALID\",\"isFallback\":false,\"fac\u0000e\":{\"yaw\":1.2824339,\"roll\":11.53936,\"quality\":-0.060480837,\"template\":\"Aixz7/1MkPMDOw1Po+AZIxEjAl8Q8e8gLyBhE98sAiT8FDQmGz/CDhPG8\"}}"
-            val event = DbEvent(
-                GUID1,
-                EventLabels(
-                    projectId = DEFAULT_PROJECT_ID,
-                    attendantId = DEFAULT_USER_ID,
-                    moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                    mode = listOf(Modes.FACE, Modes.FINGERPRINT),
-                    sessionId = GUID1,
-                    deviceId = GUID1
-                ),
-                SESSION_CAPTURE, eventJson, CREATED_AT, ENDED_AT, false
-            )
-            eventDao.insertOrUpdate(event)
-            val events = eventDao.loadFromSession(GUID1)
-            println(events[0].fromDbToDomain())
-        }
-    }
-
-    @Test
     fun loadByProjectId() {
         runBlocking {
             val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
