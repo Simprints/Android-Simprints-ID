@@ -106,7 +106,12 @@ class EventRepositoryImplIntegrationTest {
         // Adding two sessions one with an invalid event + session capture and one with only a session capture.
         addIntoDb(invalidDbEvent, sessionCaptureForInvalidEvent, sessionCapture2)
 
-        eventRepo.uploadEvents(DEFAULT_PROJECT_ID).toList()
+        eventRepo.uploadEvents(
+            DEFAULT_PROJECT_ID,
+            canSyncAllDataToSimprints = false,
+            canSyncBiometricDataToSimprints = false,
+            canSyncAnalyticsDataToSimprints = false
+        ).toList()
 
         coVerify(exactly = 1) {
             eventRemoteDataSource.dumpInvalidEvents(DEFAULT_PROJECT_ID, listOf(invalidEventJson, sessionCaptureForInvalidEvent.eventJson))
