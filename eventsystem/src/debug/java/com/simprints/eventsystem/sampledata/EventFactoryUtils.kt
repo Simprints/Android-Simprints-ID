@@ -8,45 +8,88 @@ import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
-import com.simprints.eventsystem.event.domain.models.*
+import com.simprints.core.tools.utils.randomUUID
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
+import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
+import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent
+import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
+import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV1
+import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
+import com.simprints.eventsystem.event.domain.models.EventLabels
+import com.simprints.eventsystem.event.domain.models.FingerComparisonStrategy
+import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
+import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
+import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
+import com.simprints.eventsystem.event.domain.models.MatchEntry
 import com.simprints.eventsystem.event.domain.models.Matcher.RANK_ONE
 import com.simprints.eventsystem.event.domain.models.Matcher.SIM_AFIS
+import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
+import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent
+import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
+import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
+import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent
+import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
-import com.simprints.eventsystem.event.domain.models.callback.*
+import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
-import com.simprints.eventsystem.event.domain.models.callout.*
-import com.simprints.eventsystem.event.domain.models.face.*
+import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.RefusalCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.VerificationCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result.VALID
+import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
+import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.domain.models.subject.*
+import com.simprints.eventsystem.event.domain.models.subject.BiometricReference
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
+import com.simprints.eventsystem.event.domain.models.subject.FaceReference
+import com.simprints.eventsystem.event.domain.models.subject.FaceTemplate
+import com.simprints.eventsystem.event.domain.models.subject.FingerprintReference
+import com.simprints.eventsystem.event.domain.models.subject.FingerprintTemplate
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -130,12 +173,37 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
     eventLabels
 )
 
+fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
+    val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
+        yaw = 1.0f ,
+        roll = 0.0f,
+        template = "template",
+        quality = 1.0f,
+        format = FaceTemplateFormat.RANK_ONE_1_23
+    )
+    return FaceCaptureBiometricsEvent(
+        startTime = CREATED_AT,
+        face = faceArg,
+        labels = eventLabels
+    )
+}
+
 fun createFaceCaptureConfirmationEvent() =
     FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE, eventLabels)
 
 fun createFaceCaptureEvent(): FaceCaptureEvent {
-    val faceArg = Face(0F, 1F, 2F, "", FaceTemplateFormat.RANK_ONE_1_23)
-    return FaceCaptureEvent(CREATED_AT, ENDED_AT, 0, 1F, VALID, true, faceArg, eventLabels)
+    val faceArg =
+        FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
+    return FaceCaptureEvent(
+        startTime = CREATED_AT,
+        endTime = ENDED_AT,
+        attemptNb = 0,
+        qualityThreshold = 1F,
+        result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+        isFallback = true,
+        face = faceArg,
+        labels = eventLabels
+    )
 }
 
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT, eventLabels)
@@ -289,7 +357,12 @@ fun createCompletionCheckEvent() = CompletionCheckEvent(CREATED_AT, true, eventL
 fun createConnectivitySnapshotEvent() =
     ConnectivitySnapshotEvent(
         CREATED_AT,
-        listOf(Connection(SimNetworkUtils.ConnectionType.MOBILE, SimNetworkUtils.ConnectionState.CONNECTED)),
+        listOf(
+            Connection(
+                SimNetworkUtils.ConnectionType.MOBILE,
+                SimNetworkUtils.ConnectionState.CONNECTED
+            )
+        ),
         eventLabels
     )
 
@@ -308,17 +381,42 @@ fun createEnrolmentEventV2() =
 
 fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
 
+private val payloadId = randomUUID()
+
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
-    val fingerprint = Fingerprint(LEFT_THUMB, 8, "template", FingerprintTemplateFormat.ISO_19794_2)
-    return FingerprintCaptureEvent(
-        CREATED_AT,
-        ENDED_AT,
+    val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
         LEFT_THUMB,
-        10,
-        BAD_QUALITY,
-        fingerprint,
-        GUID1,
-        eventLabels
+        8,
+        FingerprintTemplateFormat.ISO_19794_2
+    )
+
+    return FingerprintCaptureEvent(
+        createdAt = CREATED_AT,
+        endTime = ENDED_AT,
+        finger = LEFT_THUMB,
+        qualityThreshold = 10,
+        result = FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
+        fingerprint = fingerprint,
+        labels = eventLabels,
+        payloadId = "payloadId"
+    )
+}
+
+fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent {
+    val fingerprint =
+        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+            LEFT_THUMB,
+            "sometemplate",
+            10,
+            FingerprintTemplateFormat.ISO_19794_2
+        )
+
+    return FingerprintCaptureBiometricsEvent(
+        createdAt = CREATED_AT,
+
+        fingerprint = fingerprint,
+        labels = eventLabels,
+        payloadId = "payloadId"
     )
 }
 
@@ -337,9 +435,15 @@ fun createOneToManyMatchEvent(): OneToManyMatchEvent {
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
     val matchEntry = MatchEntry(GUID1, 10F)
-    return OneToOneMatchEvent(CREATED_AT, ENDED_AT, GUID1, SIM_AFIS, matchEntry
-        ,FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
-        , eventLabels)
+    return OneToOneMatchEvent(
+        CREATED_AT,
+        ENDED_AT,
+        GUID1,
+        SIM_AFIS,
+        matchEntry,
+        FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+        eventLabels
+    )
 }
 
 fun createPersonCreationEvent() =

@@ -32,5 +32,6 @@ fun ApiEvent.fromApiToDomain() =
         ScannerFirmwareUpdate, InvalidIntent, SuspiciousIntent,
         IntentParsing, CompletionCheck, SessionCapture,
         FaceOnboardingComplete, FaceFallbackCapture, FaceCapture,
+        FingerprintCaptureBiometrics, FaceCaptureBiometrics ,
         FaceCaptureConfirmation -> throw UnsupportedOperationException("Impossible to convert ${payload.type} fromApiToDomain. ${payload.type} is never down-synced")
     }

@@ -9,6 +9,7 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -92,6 +93,37 @@ class SettingsPreferencesManagerTest {
         val matchGroup = settingsPreferencesManager.matchGroup
 
         assertThat(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT).isEqualTo(matchGroup)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsall() {
+        val simprintsSyncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(simprintsSyncSetting).isEqualTo(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT)
+
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ALL"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ALL)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsOnlyBiometrics() {
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ONLY_BIOMETRICS"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsEmptyList() {
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns null
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_NONE)
     }
 
     @Test
