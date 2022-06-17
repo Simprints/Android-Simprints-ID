@@ -75,7 +75,7 @@ object KoinInjector {
             EncryptedSharedPreferencesBuilderImpl(androidContext()).buildEncryptedSharedPreferences()
         }
         factory<HotCache> { HotCacheImpl(get() , get()) }
-        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get(),get()) }
+        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get(),get(),get()) }
     }
 
     private fun Module.defineBuildersForPresenters() {

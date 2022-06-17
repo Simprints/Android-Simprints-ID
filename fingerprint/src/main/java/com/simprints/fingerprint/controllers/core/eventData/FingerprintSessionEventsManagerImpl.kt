@@ -48,6 +48,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         when (event.type) {
             REFUSAL_RESPONSE -> (event as RefusalEvent).fromDomainToCore()
             FINGERPRINT_CAPTURE -> (event as FingerprintCaptureEvent).fromDomainToCore()
+            FINGERPRINT_CAPTURE_BIOMETRICS -> (event as FingerprintCaptureBiometricsEvent).fromDomainToCore()
             ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
             REFUSAL -> (event as RefusalEvent).fromDomainToCore()
