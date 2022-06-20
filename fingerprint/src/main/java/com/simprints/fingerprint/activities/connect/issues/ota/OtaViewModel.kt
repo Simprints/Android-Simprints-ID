@@ -14,7 +14,6 @@ import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwar
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.HARD_RESET
@@ -63,7 +62,6 @@ class OtaViewModel(
             )
     }
     private fun targetVersions(availableOta: AvailableOta): String {
-        // Todo check if the hardware version is acquired
         val scannerVersion = fingerprintPreferenceManager.lastScannerVersion
         val availableFirmwareVersions = fingerprintPreferenceManager.scannerHardwareRevisions
         return when (availableOta) {

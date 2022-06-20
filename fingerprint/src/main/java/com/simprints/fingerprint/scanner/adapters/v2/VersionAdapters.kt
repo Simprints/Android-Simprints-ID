@@ -1,10 +1,8 @@
 package com.simprints.fingerprint.scanner.adapters.v2
 
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion

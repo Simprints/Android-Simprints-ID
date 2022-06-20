@@ -2,7 +2,6 @@ package com.simprints.fingerprintscanner.v2.domain.main.message.vero.responses
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.VeroResponse
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.VeroMessageType
 
 data class GetStmExtendedFirmwareVersionResponse(val stmFirmwareVersion: StmExtendedFirmwareVersion) :
