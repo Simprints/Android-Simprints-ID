@@ -6,7 +6,6 @@ import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*

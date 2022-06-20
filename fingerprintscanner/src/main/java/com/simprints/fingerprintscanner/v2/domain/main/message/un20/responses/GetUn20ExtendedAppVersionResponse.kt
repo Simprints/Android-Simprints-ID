@@ -1,7 +1,6 @@
 package com.simprints.fingerprintscanner.v2.domain.main.message.un20.responses
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20Response
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20MessageType
 
