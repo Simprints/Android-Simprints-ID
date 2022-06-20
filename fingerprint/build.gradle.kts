@@ -102,7 +102,7 @@ dependencies {
 
     // Kotlin
     implementation(libs.kotlin.reflect)
-    implementation(libs.kotlin.coroutine_rx2_adapter)
+    implementation(libs.kotlin.coroutine.rx2.adapter)
 
     // Android X
     implementation(libs.androidX.core)

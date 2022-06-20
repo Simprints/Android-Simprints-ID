@@ -51,8 +51,8 @@ import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.Scan
 import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent
 import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
 import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent
@@ -106,8 +106,7 @@ import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import kotlin.random.Random
 
-val CREATED_AT_RANGE = LongRange(CREATED_AT - 10, CREATED_AT + 10)
-val ENDED_AT_RANGE = LongRange(ENDED_AT - 10, ENDED_AT + 10)
+
 
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
 
