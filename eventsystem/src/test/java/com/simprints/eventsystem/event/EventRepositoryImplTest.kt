@@ -1,5 +1,3 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
-
 package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
@@ -27,21 +25,22 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import java.lang.IllegalArgumentException
 
+@ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
 
     private lateinit var eventRepo: EventRepository
@@ -131,7 +130,7 @@ class EventRepositoryImplTest {
             coEvery {
                 eventLocalDataSource.insertOrUpdate(any())
             } throws DuplicateGuidSelectEventValidatorException("oops...")
-            val session = eventRepo.createSession()
+            eventRepo.createSession()
         }
     }
 
@@ -174,7 +173,7 @@ class EventRepositoryImplTest {
     @Test
     fun addEventIntoASession_shouldStoreItIntoTheDbWithRightLabels() {
         runBlocking {
-            val session = mockDbToHaveOneOpenSession()
+            mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
 
             eventRepo.addOrUpdateEvent(newEvent)
@@ -196,7 +195,7 @@ class EventRepositoryImplTest {
     @Test
     fun addEvent_shouldStoreItIntoTheDbWithRightLabels() {
         runBlocking {
-            val session = mockDbToHaveOneOpenSession()
+            mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
             newEvent.labels = EventLabels()
 
@@ -385,14 +384,9 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun upload_fails_shouldNotDeleteSessionEventsAfterIntegrationIssues() {
+    fun upload_fails_shouldNotDeleteSessionEventsAfterError() {
         runBlocking {
-            coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
-                Response.error<String>(
-                    404,
-                    "".toResponseBody(null)
-                )
-            )
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws IllegalArgumentException()
 
             val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
             val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
@@ -414,6 +408,59 @@ class EventRepositoryImplTest {
             coVerify(exactly = 0) { eventLocalDataSource.delete(subjectEvents.map { it.id }) }
         }
     }
+
+    @Test
+    fun `upload should dump invalid events, emit the progress and delete the events`() = runTest {
+        val sessions = mockDbToLoadTwoSessionsWithInvalidEvent(GUID1, GUID2)
+
+        val progress = eventRepo.uploadEvents(
+            DEFAULT_PROJECT_ID,
+            canSyncAllDataToSimprints = true,
+            canSyncBiometricDataToSimprints = false,
+            canSyncAnalyticsDataToSimprints = false
+        ).toList()
+
+        coVerify(exactly = 0) {
+            eventRemoteDataSource.post(any(), any())
+        }
+
+        coVerify {
+            eventRemoteDataSource.dumpInvalidEvents(DEFAULT_PROJECT_ID, sessions[GUID1]!!)
+            eventRemoteDataSource.dumpInvalidEvents(DEFAULT_PROJECT_ID, sessions[GUID2]!!)
+            eventLocalDataSource.deleteAllFromSession(GUID1)
+            eventLocalDataSource.deleteAllFromSession(GUID2)
+        }
+        assertThat(progress[0]).isEqualTo(sessions[GUID1]!!.size)
+        assertThat(progress[1]).isEqualTo(sessions[GUID2]!!.size)
+    }
+
+    @Test
+    fun `fail dump of invalid events should not delete the events`() = runTest {
+        coEvery { eventRemoteDataSource.dumpInvalidEvents(any(), any()) } throws HttpException(
+            Response.error<String>(
+                503,
+                "".toResponseBody(null)
+            )
+        )
+        mockDbToLoadTwoSessionsWithInvalidEvent(GUID1, GUID2)
+
+        eventRepo.uploadEvents(
+            DEFAULT_PROJECT_ID,
+            canSyncAllDataToSimprints = true,
+            canSyncBiometricDataToSimprints = false,
+            canSyncAnalyticsDataToSimprints = false
+        ).toList()
+
+        coVerify(exactly = 0) {
+            eventRemoteDataSource.post(any(), any())
+        }
+
+        coVerify(exactly = 0) {
+            eventLocalDataSource.deleteAllFromSession(GUID1)
+            eventLocalDataSource.deleteAllFromSession(GUID2)
+        }
+    }
+
 
     @Test
     fun createSession_shouldAddArtificialTerminationEventToThePreviousOne() {
@@ -480,7 +527,7 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun `should close current session correctly`() = runBlocking {
+    fun `should close current session correctly`() = runTest(StandardTestDispatcher()) {
         val session = mockDbToHaveOneOpenSession(GUID1)
         eventRepo.closeCurrentSession(null)
 

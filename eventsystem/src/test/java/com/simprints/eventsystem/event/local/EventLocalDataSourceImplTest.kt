@@ -5,19 +5,23 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class EventLocalDataSourceImplTest {
 
@@ -49,6 +53,16 @@ class EventLocalDataSourceImplTest {
             coVerify {
                 eventDao.loadAll()
             }
+        }
+    }
+
+    @Test
+    fun dumpInvalidEvents() = runTest {
+        val sessionId = GUID1
+        eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
+
+        coVerify {
+            eventDao.loadEventJsonFromSession(sessionId)
         }
     }
 

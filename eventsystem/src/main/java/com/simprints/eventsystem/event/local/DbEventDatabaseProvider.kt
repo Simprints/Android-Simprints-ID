@@ -10,7 +10,6 @@ interface EventDatabaseFactory {
     fun build(): EventRoomDatabase
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
     private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider

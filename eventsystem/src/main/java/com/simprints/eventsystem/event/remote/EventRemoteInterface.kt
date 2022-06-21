@@ -33,4 +33,11 @@ interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?): ResponseBody
 
+    @POST("projects/{projectId}/dump")
+    suspend fun dumpInvalidEvents(
+        @Path("projectId") projectId: String,
+        @Query("type") type: String = "CORRUPTED_EVENTS",
+        @Body events: List<String>,
+    )
+
 }
