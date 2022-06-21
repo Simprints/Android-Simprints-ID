@@ -6,8 +6,6 @@ import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
-import com.simprints.fingerprint.scanner.domain.versions.ScannerApiVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
@@ -26,13 +24,13 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
     override fun versionInformation(): ScannerVersion =
         ScannerVersion(
-            ScannerGeneration.VERO_1,
-            ScannerFirmwareVersions(
-                cypress = ChipFirmwareVersion.UNKNOWN,
-                stm = ChipFirmwareVersion(scannerV1.ucVersion.toInt(), 0),
-                un20 = ChipFirmwareVersion(scannerV1.unVersion.toInt(), 0)
-            ),
-            ScannerApiVersions.UNKNOWN
+            hardwareVersion = "",
+            generation = ScannerGeneration.VERO_1,
+            firmware = ScannerFirmwareVersions(
+                cypress = ScannerFirmwareVersions.UNKNOWN_VERSION,
+                stm = scannerV1.ucVersion.toInt().toString(),
+                un20 = scannerV1.unVersion.toInt().toString()
+            )
         )
 
     override fun batteryInformation(): BatteryInfo = BatteryInfo.UNKNOWN
@@ -166,13 +164,13 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }
     }
 
-    override fun performCypressOta(): Observable<CypressOtaStep> =
+    override fun performCypressOta(firmwareVersion: String): Observable<CypressOtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
-    override fun performStmOta(): Observable<StmOtaStep> =
+    override fun performStmOta(firmwareVersion: String): Observable<StmOtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
-    override fun performUn20Ota(): Observable<Un20OtaStep> =
+    override fun performUn20Ota(firmwareVersion: String): Observable<Un20OtaStep> =
         Observable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.OTA))
 
     private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {

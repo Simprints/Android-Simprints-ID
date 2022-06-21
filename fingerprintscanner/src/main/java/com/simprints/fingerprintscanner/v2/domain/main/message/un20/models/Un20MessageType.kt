@@ -7,7 +7,7 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
 
     // 0x1_ : Versioning & OTA
-    object GetUn20AppVersion : Un20MessageType(Un20MessageMajorType.GET_UN20_APP_VERSION.majorByte, IGNORED)
+    object GetUn20ExtendedAppVersion : Un20MessageType(Un20MessageMajorType.GET_UN20_EXTENDED_APP_VERSION.majorByte, 0X01)
 
     object StartOta : Un20MessageType(Un20MessageMajorType.START_OTA.majorByte, IGNORED)
 

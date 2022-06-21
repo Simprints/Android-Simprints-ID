@@ -1,9 +1,11 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
@@ -20,10 +22,13 @@ import java.util.concurrent.TimeUnit
  * For handling the initial setup to the scanner upon connection, such as retrieving and checking
  * the firmware version and battery level, and determining whether OTA is necessary.
  */
-class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLocalDataSource,
-                                private val connectionHelper: ConnectionHelper,
-                                private val batteryLevelChecker: BatteryLevelChecker,
-                                private val timeScheduler: Scheduler = Schedulers.io()) {
+class ScannerInitialSetupHelper(
+    private val connectionHelper: ConnectionHelper,
+    private val batteryLevelChecker: BatteryLevelChecker,
+    private val fingerprintPreferenceManager: FingerprintPreferencesManager,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource,
+    private val timeScheduler: Scheduler = Schedulers.io()
+) {
 
     private lateinit var scannerVersion: ScannerVersion
 
@@ -38,8 +43,8 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
     ): Completable =
         Completable.complete()
             .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
-            .andThen(scanner.getVersionInformation().doOnSuccess { unifiedVersion ->
-                unifiedVersion.toScannerVersion().also {
+            .andThen(scanner.getVersionInformation().doOnSuccess { scannerVersionInfo ->
+                scannerVersionInfo.toScannerVersion().also {
                     withScannerVersion(it)
                     scannerVersion = it
                 }
@@ -47,7 +52,7 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
             .flatMapCompletable { scanner.enterMainMode() }
             .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
             .andThen(getBatteryInfo(scanner, withBatteryInfo))
-            .flatMapCompletable { ifAvailableOtasPrepareScannerThenThrow(scanner, macAddress, it) }
+            .flatMapCompletable { ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, it) }
 
     private fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): Single<BatteryInfo> =
         Singles.zip(
@@ -59,8 +64,8 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
             BatteryInfo(charge, voltage, current, temperature).also { withBatteryInfo(it) }
         }
 
-    private fun ifAvailableOtasPrepareScannerThenThrow(scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
-        val availableVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+    private fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
+        val availableVersions = fingerprintPreferenceManager.scannerHardwareRevisions[hardwareVersion]
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
         return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
             Completable.complete()
@@ -70,10 +75,25 @@ class ScannerInitialSetupHelper(private val firmwareLocalDataSource: FirmwareLoc
         }
     }
 
-    private fun determineAvailableOtas(current: ScannerFirmwareVersions, available: ScannerFirmwareVersions): List<AvailableOta> =
-        listOfNotNull(
-            if (current.cypress < available.cypress) AvailableOta.CYPRESS else null,
-            if (current.stm < available.stm) AvailableOta.STM else null,
-            if (current.un20 < available.un20) AvailableOta.UN20 else null
+    private fun determineAvailableOtas(
+        current: ScannerFirmwareVersions,
+        available: ScannerFirmwareVersions?
+    ): List<AvailableOta> {
+        if (available == null) {
+            return emptyList()
+        }
+        val localFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+        return listOfNotNull(
+            if (
+                localFiles[Chip.CYPRESS]?.contains(available.cypress) == true
+                && current.cypress != available.cypress
+            ) AvailableOta.CYPRESS else null,
+            if (localFiles[Chip.STM]?.contains(available.stm) == true &&
+                current.stm != available.stm
+            ) AvailableOta.STM else null,
+            if (localFiles[Chip.UN20]?.contains(available.un20) == true &&
+                current.un20 != available.un20
+            ) AvailableOta.UN20 else null
         )
+    }
 }

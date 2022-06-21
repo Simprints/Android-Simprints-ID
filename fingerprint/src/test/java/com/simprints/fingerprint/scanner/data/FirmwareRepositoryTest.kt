@@ -1,14 +1,15 @@
 package com.simprints.fingerprint.scanner.data
 
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
-import com.simprints.fingerprint.scanner.data.remote.ApiDownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
-import com.simprints.fingerprint.scanner.data.remote.toDomain
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -16,74 +17,197 @@ class FirmwareRepositoryTest {
 
     private val firmwareLocalDataSourceMock: FirmwareLocalDataSource = mockk(relaxUnitFun = true)
     private val firmwareRemoteDataSourceMock: FirmwareRemoteDataSource = mockk()
+    private val fingerprintPreferencesMock: FingerprintPreferencesManager = mockk()
 
-    private val firmwareFileUpdater = FirmwareRepository(firmwareRemoteDataSourceMock, firmwareLocalDataSourceMock)
+    private val firmwareFileUpdater =
+        FirmwareRepository(
+            firmwareRemoteDataSourceMock, firmwareLocalDataSourceMock,
+            fingerprintPreferencesMock
+        )
+
+    @Before
+    fun setup() {
+        every { fingerprintPreferencesMock.scannerHardwareRevisions } returns RESPONSE_MAP
+    }
 
     @Test
-    fun updateStoredFirmwareFilesWithLatest_versionsAvailable_downloadsAndSavesFiles() = runBlockingTest {
-        every { firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSIONS_LOW
-        coEvery { firmwareRemoteDataSourceMock.getDownloadableFirmwares(any()) } returns RESPONSE_MAP
-        coEvery { firmwareRemoteDataSourceMock.downloadFile(eq(CYPRESS_URL)) } returns CYPRESS_BIN
-        coEvery { firmwareRemoteDataSourceMock.downloadFile(eq(STM_URL)) } returns STM_BIN
-        coEvery { firmwareRemoteDataSourceMock.downloadFile(eq(UN20_URL)) } returns UN20_BIN
+    fun updateStoredFirmwareFilesWithLatest_versionsAvailable_downloadsAndSavesFiles() =
+        runBlockingTest {
+            coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+            } returns SCANNER_VERSIONS_LOW
+            val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
+                HARDWARE_VERSION,
+                emptyMap()
+            )
+            coEvery {
+                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
+                    any(),
+                    any()
+                )
+            } returns availableForDownload
 
-        firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
 
-        coVerify(Ordering.ORDERED) {
-            firmwareRemoteDataSourceMock.downloadFile(eq(CYPRESS_URL))
-            firmwareRemoteDataSourceMock.downloadFile(eq(STM_URL))
-            firmwareRemoteDataSourceMock.downloadFile(eq(UN20_URL))
+            coVerify(exactly = 3) {
+                firmwareRemoteDataSourceMock.downloadFirmware(any())
+            }
+            coVerify(Ordering.ORDERED) {
+                firmwareLocalDataSourceMock.saveCypressFirmwareBytes(
+                    any(), any()
+                )
+                firmwareLocalDataSourceMock.saveStmFirmwareBytes(
+                    any(), any()
+                )
+                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
+                    any(), any()
+                )
+            }
         }
-        coVerify(Ordering.ORDERED) {
-            firmwareLocalDataSourceMock.saveCypressFirmwareBytes(eq(CYPRESS_VERSION_HIGH), eq(CYPRESS_BIN))
-            firmwareLocalDataSourceMock.saveStmFirmwareBytes(eq(STM_VERSION_HIGH), eq(STM_BIN))
-            firmwareLocalDataSourceMock.saveUn20FirmwareBytes(eq(UN20_VERSION_HIGH), eq(UN20_BIN))
+
+    @Test
+    fun updateStoredFirmwareFilesWithLatest_noVersionsAvailable_downloadsNoFiles() =
+        runBlockingTest {
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+            } returns SCANNER_VERSIONS_LOW
+            coEvery {
+                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
+                    any(),
+                    any()
+                )
+            } returns emptyList()
+
+            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+
+            coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
+            coVerify(exactly = 0) {
+                firmwareLocalDataSourceMock.saveCypressFirmwareBytes(
+                    any(),
+                    any()
+                )
+            }
+            coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveStmFirmwareBytes(any(), any()) }
+            coVerify(exactly = 0) {
+                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
+                    any(),
+                    any()
+                )
+            }
+        }
+
+    @Test
+    fun updateStoredFirmwareFilesWithLatest_onlyOneVersionsAvailable_downloadsOtherFiles() =
+        runBlockingTest {
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+            } returns SCANNER_VERSIONS_LOW_UN20_HIGH
+            val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
+                HARDWARE_VERSION,
+                SCANNER_VERSIONS_HIGH
+            )
+            coEvery {
+                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
+                    any(),
+                    any()
+                )
+            } returns availableForDownload
+
+            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+
+            coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
+
+            coVerify(exactly = 0) {
+                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
+                    any(),
+                    any()
+                )
+            }
+        }
+
+    @Test
+    fun `test cleanUpOldFirmwareFiles should remove all low version firmwares`() {
+        //Given
+        every {
+            firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+        } returns SCANNER_VERSIONS_LOW_AND_HIGH
+        firmwareLocalDataSourceMock.apply{
+            every { deleteCypressFirmware(any()) } returns true
+            every { deleteStmFirmware(any()) } returns true
+            every { deleteUn20Firmware(any()) } returns true
+        }
+        // When
+        firmwareFileUpdater.cleanUpOldFirmwareFiles()
+        // Then
+        verify {
+            firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteStmFirmware(STM_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteUn20Firmware(UN20_VERSION_LOW)
         }
     }
 
     @Test
-    fun updateStoredFirmwareFilesWithLatest_noVersionsAvailable_downloadsNoFiles() = runBlockingTest {
-        every { firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions() } returns SCANNER_VERSIONS_LOW
-        coEvery { firmwareRemoteDataSourceMock.getDownloadableFirmwares(any()) } returns emptyList()
+    fun `test cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() {
+        //Given
+        every {
+            firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+        } returns SCANNER_VERSIONS_HIGH
 
-        firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
-
-        coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFile(any()) }
-        coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveCypressFirmwareBytes(any(), any()) }
-        coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveStmFirmwareBytes(any(), any()) }
-        coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveUn20FirmwareBytes(any(), any()) }
+        // When
+        firmwareFileUpdater.cleanUpOldFirmwareFiles()
+        // Then
+        verify (exactly = 0){
+            firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteStmFirmware(CYPRESS_VERSION_LOW)
+            firmwareLocalDataSourceMock.deleteUn20Firmware(CYPRESS_VERSION_LOW)
+        }
     }
-
     companion object {
-        private const val CYPRESS_NAME = "cypress"
-        private val CYPRESS_VERSION_LOW = ChipFirmwareVersion(1, 0)
-        private val CYPRESS_VERSION_HIGH = ChipFirmwareVersion(1, 1)
-        private const val CYPRESS_URL = "cypress_url.com"
+        private const val HARDWARE_VERSION = "E-1"
+        private const val CYPRESS_VERSION_LOW = "1.E-1.0"
+        private const val CYPRESS_VERSION_HIGH = "1.E-1.1"
+        private const val STM_VERSION_LOW = "1.E-1.1"
+        private const val STM_VERSION_HIGH = "1.E-1.2"
+        private const val UN20_VERSION_LOW = "1.E-1.2"
+        private const val UN20_VERSION_HIGH = "1.E-1.3"
 
-        private const val STM_NAME = "stm"
-        private val STM_VERSION_LOW = ChipFirmwareVersion(1, 1)
-        private val STM_VERSION_HIGH = ChipFirmwareVersion(1, 2)
-        private const val STM_URL = "stm_url.com"
 
-        private const val UN20_NAME = "un20"
-        private val UN20_VERSION_LOW = ChipFirmwareVersion(1, 2)
-        private val UN20_VERSION_HIGH = ChipFirmwareVersion(1, 3)
-        private const val UN20_URL = "un20_url.com"
+        private val scannerFirmwareVersions =
+            ScannerFirmwareVersions(
+                cypress = CYPRESS_VERSION_HIGH,
+                stm = STM_VERSION_HIGH,
+                un20 = UN20_VERSION_HIGH,
+            )
+        private val RESPONSE_MAP = ScannerHardwareRevisions().apply {
+            put(HARDWARE_VERSION, scannerFirmwareVersions)
+        }
 
-        private val CYPRESS_API_RESPONSE = ApiDownloadableFirmwareVersion(CYPRESS_NAME, CYPRESS_VERSION_HIGH.toString(), CYPRESS_URL)
-        private val STM_API_RESPONSE = ApiDownloadableFirmwareVersion(STM_NAME, STM_VERSION_HIGH.toString(), STM_URL)
-        private val UN20_API_RESPONSE = ApiDownloadableFirmwareVersion(UN20_NAME, UN20_VERSION_HIGH.toString(), UN20_URL)
 
-        private val RESPONSE_MAP = mapOf(
-            CYPRESS_NAME to CYPRESS_API_RESPONSE,
-            STM_NAME to STM_API_RESPONSE,
-            UN20_NAME to UN20_API_RESPONSE
-        ).values.map { it.toDomain() }
-
-        private val SCANNER_VERSIONS_LOW = ScannerFirmwareVersions(CYPRESS_VERSION_LOW, STM_VERSION_LOW, UN20_VERSION_LOW)
+        private val SCANNER_VERSIONS_LOW = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_LOW),
+        )
+        private val SCANNER_VERSIONS_LOW_AND_HIGH = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(
+                CYPRESS_VERSION_LOW,
+                CYPRESS_VERSION_HIGH
+            ),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW, STM_VERSION_HIGH),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_LOW, UN20_VERSION_HIGH),
+        )
+        private val SCANNER_VERSIONS_HIGH = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_HIGH),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_HIGH),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_HIGH),
+        )
+        private val SCANNER_VERSIONS_LOW_UN20_HIGH = mapOf(
+            DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_HIGH),
+        )
 
         private val CYPRESS_BIN = byteArrayOf(0x00, 0x01, 0x02)
-        private val STM_BIN = byteArrayOf(0x03, 0x04)
-        private val UN20_BIN = byteArrayOf(0x05, 0x06, 0x07, 0x08)
     }
 }

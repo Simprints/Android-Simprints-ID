@@ -4,8 +4,8 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.domain.BatteryInfo as BatteryInfoDomain
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent as Vero2InfoSnapshotEventCore
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.BatteryInfo as BatteryInfoCore
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2Version as Vero2VersionCore
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo as BatteryInfoCore
+import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version as Vero2VersionCore
 
 @Keep
 class Vero2InfoSnapshotEvent(startTime: Long,
@@ -14,25 +14,19 @@ class Vero2InfoSnapshotEvent(startTime: Long,
 
     @Keep
     class Vero2Version(
-        val master: Long,
         val cypressApp: String,
-        val cypressApi: String,
         val stmApp: String,
-        val stmApi: String,
         val un20App: String,
-        val un20Api: String
+        val hardwareVersion: String
     ) {
         companion object {
             fun get(scannerVersion: ScannerVersion) =
                 with(scannerVersion) {
                     Vero2Version(
-                        master = computeMasterVersion(),
-                        cypressApp = firmware.cypress.toString(),
-                        cypressApi = api.cypress.toString(),
-                        stmApp = firmware.stm.toString(),
-                        stmApi = api.stm.toString(),
-                        un20App = firmware.un20.toString(),
-                        un20Api = api.un20.toString()
+                        cypressApp = firmware.cypress,
+                        stmApp = firmware.stm,
+                        un20App = firmware.un20,
+                        hardwareVersion = hardwareVersion
                     )
                 }
         }
@@ -57,8 +51,8 @@ class Vero2InfoSnapshotEvent(startTime: Long,
 fun Vero2InfoSnapshotEvent.fromDomainToCore(): Vero2InfoSnapshotEventCore =
     Vero2InfoSnapshotEventCore(startTime, version.fromDomainToCore(), battery.fromDomainToCore())
 
-fun Vero2InfoSnapshotEvent.Vero2Version.fromDomainToCore(): Vero2VersionCore =
-    Vero2VersionCore(master, cypressApp, cypressApi, stmApp, stmApi, un20App, un20Api)
+fun Vero2InfoSnapshotEvent.Vero2Version.fromDomainToCore(): Vero2VersionCore.Vero2NewApiVersion =
+    Vero2VersionCore.Vero2NewApiVersion(hardwareVersion, cypressApp, stmApp, un20App)
 
 fun Vero2InfoSnapshotEvent.BatteryInfo.fromDomainToCore(): BatteryInfoCore =
     BatteryInfoCore(charge, voltage, current, temperature)
