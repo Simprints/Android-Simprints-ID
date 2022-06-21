@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
@@ -151,4 +152,5 @@ interface AppComponent {
     fun getImageRepository(): ImageRepository
     fun getSimClientFactory(): SimApiClientFactory
     fun getLicenseRepository(): LicenseRepository
+    fun getLoginInfoManager(): LoginInfoManager
 }

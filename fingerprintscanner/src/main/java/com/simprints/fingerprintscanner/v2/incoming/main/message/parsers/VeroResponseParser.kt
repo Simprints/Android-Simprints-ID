@@ -13,7 +13,6 @@ class VeroResponseParser : MessageParser<VeroResponse> {
         try {
             VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
                 when (val type = VeroMessageProtocol.getMessageType(messageBytes)) {
-                    GET_STM_FIRMWARE_VERSION -> GetStmFirmwareVersionResponse.fromBytes(data)
                     GET_UN20_ON -> GetUn20OnResponse.fromBytes(data)
                     SET_UN20_ON -> SetUn20OnResponse.fromBytes(data)
                     GET_TRIGGER_BUTTON_ACTIVE -> GetTriggerButtonActiveResponse.fromBytes(data)
@@ -26,6 +25,11 @@ class VeroResponseParser : MessageParser<VeroResponse> {
                     GET_BATTERY_VOLTAGE -> GetBatteryVoltageResponse.fromBytes(data)
                     GET_BATTERY_CURRENT -> GetBatteryCurrentResponse.fromBytes(data)
                     GET_BATTERY_TEMPERATURE -> GetBatteryTemperatureResponse.fromBytes(data)
+
+                    // extension api
+                    GET_STM_EXTENDED_FIRMWARE_VERSION -> GetStmExtendedFirmwareVersionResponse.fromBytes(data)
+
+
                     UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED ->
                         throw InvalidMessageException("Illegal message $type received in Vero events route")
                 }

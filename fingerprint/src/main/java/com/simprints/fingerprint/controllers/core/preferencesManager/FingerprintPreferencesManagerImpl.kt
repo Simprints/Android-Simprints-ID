@@ -3,14 +3,18 @@ package com.simprints.fingerprint.controllers.core.preferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisionsSerializer
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.CaptureFingerprintStrategy as IdCaptureFingerprintStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.SaveFingerprintImagesStrategy as IdSaveFingerprintImagesStrategy
 import com.simprints.id.data.prefs.settings.fingerprint.models.ScannerGeneration as IdScannerGeneration
 
-class FingerprintPreferencesManagerImpl(private val prefs: IdPreferencesManager) :
-    FingerprintPreferencesManager {
+class FingerprintPreferencesManagerImpl(
+    private val prefs: IdPreferencesManager,
+    private val scannerHardwareRevisionsSerializer: ScannerHardwareRevisionsSerializer
+) : FingerprintPreferencesManager {
 
     override var lastScannerUsed: String = prefs.lastScannerUsed
         set(value) {
@@ -59,4 +63,11 @@ class FingerprintPreferencesManagerImpl(private val prefs: IdPreferencesManager)
 
     override val liveFeedbackOn: Boolean
         get() = prefs.fingerprintLiveFeedbackOn
+
+    /**
+     * Scanner revisions map contains the available for download firmware versions
+     * for every hardware revision
+     */
+    override val scannerHardwareRevisions:ScannerHardwareRevisions
+        get() = scannerHardwareRevisionsSerializer.build(prefs.firmwareDownloadableVersionsJson)
 }

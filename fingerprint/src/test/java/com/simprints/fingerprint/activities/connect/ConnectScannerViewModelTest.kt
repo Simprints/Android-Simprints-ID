@@ -339,19 +339,23 @@ class ConnectScannerViewModelTest : KoinTest {
 
     companion object {
         val VERO_1_VERSION = ScannerVersion(
-            VERO_1,
-            ScannerFirmwareVersions(
-                cypress = ChipFirmwareVersion.UNKNOWN,
-                stm = ChipFirmwareVersion(6, 0),
-                un20 = ChipFirmwareVersion(1, 0)
+            hardwareVersion = "E-1",
+            generation = VERO_1,
+            firmware = ScannerFirmwareVersions(
+                cypress = ScannerFirmwareVersions.UNKNOWN_VERSION,
+                stm = "6.E-1.0",
+                un20 = "1.E-1.0"
             ),
-            ScannerApiVersions.UNKNOWN
         )
 
         val VERO_2_VERSION = ScannerVersion(
-            VERO_2,
-            ScannerFirmwareVersions(ChipFirmwareVersion(1, 2), ChipFirmwareVersion(3, 4), ChipFirmwareVersion(5, 6)),
-            ScannerApiVersions(ChipApiVersion(7, 8), ChipApiVersion(9, 10), ChipApiVersion(11, 12))
+            hardwareVersion = "E-1",
+            generation = VERO_2,
+            ScannerFirmwareVersions(
+                cypress = "1.E-1.2",
+                stm = "3.E-1.4",
+                un20 = "5. E-1.6"
+            ),
         )
     }
 }
