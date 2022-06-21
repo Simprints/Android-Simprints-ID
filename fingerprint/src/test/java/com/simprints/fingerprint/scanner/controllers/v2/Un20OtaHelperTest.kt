@@ -2,14 +2,13 @@ package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
+import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
+import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
+import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerVersionInfo
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -42,12 +41,11 @@ class Un20OtaHelperTest {
         every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
         every { scannerMock.startUn20Ota(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
         every { scannerMock.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
-        every { scannerMock.getVersionInformation() } returns Single.just(OLD_SCANNER_VERSION)
+        every { scannerMock.getVersionInformation() } returns Single.just(OLD_SCANNER_INFORMATION)
         every { scannerMock.setVersionInformation(any()) } returns Completable.complete()
         every { scannerMock.getUn20AppVersion() } returns Single.just(NEW_UN20_VERSION)
 
-        every { firmwareFileManagerMock.getAvailableScannerFirmwareVersions() } returns NEW_SCANNER_VERSION.toScannerFirmwareVersions()
-        every { firmwareFileManagerMock.loadUn20FirmwareBytes() } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        every { firmwareFileManagerMock.loadUn20FirmwareBytes(NEW_UN20_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
@@ -57,7 +55,7 @@ class Un20OtaHelperTest {
             listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
                 Un20OtaStep.ValidatingNewFirmwareVersion, Un20OtaStep.ReconnectingAfterValidating, Un20OtaStep.UpdatingUnifiedVersionInformation)
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitAndAssertSuccess()
@@ -67,10 +65,9 @@ class Un20OtaHelperTest {
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
 
-        val sentUnifiedVersion = CapturingSlot<UnifiedVersionInformation>()
+        val sentUnifiedVersion = CapturingSlot<ExtendedVersionInformation>()
         verify { scannerMock.setVersionInformation(capture(sentUnifiedVersion)) }
-        assertThat(sentUnifiedVersion.captured.toScannerVersion()).isEqualTo(NEW_SCANNER_VERSION.toScannerVersion())
-        assertThat(sentUnifiedVersion.captured.masterFirmwareVersion).isEqualTo(NEW_SCANNER_VERSION.masterFirmwareVersion)
+        assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions()).isEqualTo(NEW_SCANNER_VERSION.toScannerFirmwareVersions())
     }
 
     @Test
@@ -83,7 +80,7 @@ class Un20OtaHelperTest {
         every { scannerMock.startUn20Ota(any()) } returns
             Observable.fromIterable(progressValues).concatWith(Observable.error(error))
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -104,7 +101,7 @@ class Un20OtaHelperTest {
 
         every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returnsMany listOf(Completable.complete(), Completable.error(error))
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -125,7 +122,7 @@ class Un20OtaHelperTest {
 
         every { scannerMock.getUn20AppVersion() } returns Single.just(OLD_UN20_VERSION)
 
-        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address").test()
+        val testObserver = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).test()
         testScheduler.advanceTime()
 
         testObserver.awaitTerminalEvent()
@@ -138,14 +135,27 @@ class Un20OtaHelperTest {
     }
 
     companion object {
+        private const val HARDWARE_VERSION = "E-1"
         private val OTA_PROGRESS_VALUES = listOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
-        private val OLD_UN20_VERSION = Un20AppVersion(12, 13, 14, 15)
-        private val NEW_UN20_VERSION = Un20AppVersion(18, 3, 14, 16)
+        private val OLD_UN20_VERSION = Un20ExtendedAppVersion( "14.E-1.15")
+        private const val NEW_UN20_VERSION_STRING = "14.E-1.16"
+        private val NEW_UN20_VERSION = Un20ExtendedAppVersion( NEW_UN20_VERSION_STRING)
 
-        private val STM_VERSION = StmFirmwareVersion(1, 2, 3, 4)
-        private val CYPRESS_VERSION = CypressFirmwareVersion(5, 6, 7, 8)
-
-        private val OLD_SCANNER_VERSION = UnifiedVersionInformation(5066639776677915L, CYPRESS_VERSION, STM_VERSION, OLD_UN20_VERSION)
-        private val NEW_SCANNER_VERSION = UnifiedVersionInformation(6755446687268892L, CYPRESS_VERSION, STM_VERSION, NEW_UN20_VERSION)
+        private val OLD_SCANNER_INFORMATION =
+            ScannerInformation(
+                hardwareVersion = HARDWARE_VERSION,
+                firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(
+                    versionInfo = ExtendedVersionInformation(
+                        mockk(relaxed = true),
+                        mockk(relaxed = true),
+                        OLD_UN20_VERSION
+                    )
+                )
+            )
+        private val NEW_SCANNER_VERSION = ExtendedVersionInformation(
+            mockk(relaxed = true),
+            mockk(relaxed = true),
+            NEW_UN20_VERSION
+        )
     }
 }

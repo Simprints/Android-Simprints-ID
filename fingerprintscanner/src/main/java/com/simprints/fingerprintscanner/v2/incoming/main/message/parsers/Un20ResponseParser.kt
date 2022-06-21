@@ -15,7 +15,7 @@ class Un20ResponseParser : MessageParser<Un20Response> {
                 Un20MessageProtocol.getDataBytes(messageBytes)
             ).let { (minorTypeByte, data) ->
                 when (Un20MessageProtocol.getMessageType(messageBytes)) {
-                    Un20MessageType.GetUn20AppVersion -> GetUn20AppVersionResponse.fromBytes(data)
+                    Un20MessageType.GetUn20ExtendedAppVersion -> GetUn20ExtendedAppVersionResponse.fromBytes(data)
                     Un20MessageType.CaptureFingerprint -> CaptureFingerprintResponse.fromBytes(data)
                     Un20MessageType.GetImageQualityPreview -> GetImageQualityPreviewResponse.fromBytes(data)
                     Un20MessageType.SetScanLedState -> SetScanLedStateResponse.fromBytes(data)

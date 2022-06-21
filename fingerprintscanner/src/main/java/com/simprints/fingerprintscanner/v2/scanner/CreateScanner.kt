@@ -41,33 +41,45 @@ import com.simprints.fingerprintscanner.v2.tools.crc.Crc32Calculator
 /**
  * Helper function to build a new [Scanner] instance with manual dependency injection
  */
-fun Scanner.Companion.create() =
-    Scanner(
-        MainMessageChannel(
-            MainMessageInputStream(
-                PacketRouter(
-                    listOf(Route.Remote.VeroServer, Route.Remote.VeroEvent, Route.Remote.Un20Server),
-                    { source },
-                    ByteArrayToPacketAccumulator(PacketParser())
-                ),
-                VeroResponseAccumulator(VeroResponseParser()),
-                VeroEventAccumulator(VeroEventParser()),
-                Un20ResponseAccumulator(Un20ResponseParser())
+fun Scanner.Companion.create(): Scanner {
+    val mainMessageChannel = MainMessageChannel(
+        MainMessageInputStream(
+            PacketRouter(
+                listOf(Route.Remote.VeroServer, Route.Remote.VeroEvent, Route.Remote.Un20Server),
+                { source },
+                ByteArrayToPacketAccumulator(PacketParser())
             ),
-            MainMessageOutputStream(
-                MainMessageSerializer(),
-                OutputStreamDispatcher()
-            )
+            VeroResponseAccumulator(VeroResponseParser()),
+            VeroEventAccumulator(VeroEventParser()),
+            Un20ResponseAccumulator(Un20ResponseParser())
         ),
-        RootMessageChannel(
-            RootMessageInputStream(
-                RootResponseAccumulator(RootResponseParser())
-            ),
-            RootMessageOutputStream(
-                RootMessageSerializer(),
-                OutputStreamDispatcher()
-            )
+        MainMessageOutputStream(
+            MainMessageSerializer(),
+            OutputStreamDispatcher()
+        )
+    )
+
+    val rootMessageChannel = RootMessageChannel(
+        RootMessageInputStream(
+            RootResponseAccumulator(RootResponseParser())
         ),
+        RootMessageOutputStream(
+            RootMessageSerializer(),
+            OutputStreamDispatcher()
+        )
+    )
+
+    val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
+    val scannerInfoReaderHelper = ScannerExtendedInfoReaderHelper(
+        mainMessageChannel,
+        rootMessageChannel,
+        responseErrorHandler
+    )
+
+    return Scanner(
+        mainMessageChannel,
+        rootMessageChannel,
+        scannerInfoReaderHelper,
         CypressOtaMessageChannel(
             CypressOtaMessageInputStream(
                 CypressOtaResponseParser()
@@ -89,5 +101,7 @@ fun Scanner.Companion.create() =
         CypressOtaController(Crc32Calculator()),
         StmOtaController(),
         Un20OtaController(Crc32Calculator()),
-        ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
+        responseErrorHandler
     )
+
+}

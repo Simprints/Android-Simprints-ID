@@ -154,6 +154,7 @@ import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -244,7 +245,12 @@ class EventRemoteDataSourceImplAndroidTest {
         every { timeHelper.now() } returns 100
     }
 
-    @Test
+    /**
+     * This test case makes calls to BFSID, and its a way for us to validate that, changes to any of
+     * the [Event] subtypes, is accepted by BFSID. Thus ensuring that at development time, we catch
+     * any issues that might arise as a result of updating the captured events' data structures.
+     */
+    @Test(expected = Test.None::class)
     fun aSessionWithAllEvents_shouldGetUploaded() {
         runBlocking {
             val events = mutableListOf<Event>()
@@ -632,11 +638,11 @@ class EventRemoteDataSourceImplAndroidTest {
         add(
             Vero2InfoSnapshotEvent(
                 createdAt = DEFAULT_TIME,
-                version = Vero2InfoSnapshotPayload.Vero2Version(
-                    Int.MAX_VALUE.toLong() + 1, "1.23",
-                    "api", "stmApp", "stmApi", "un20App", "un20Api"
+                version = Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
+                    "E-1", "1.23",
+                    "api", "stmApp"
                 ),
-                battery = Vero2InfoSnapshotPayload.BatteryInfo(70, 15, 1, 37),
+                battery = Vero2InfoSnapshotEvent.BatteryInfo(70, 15, 1, 37),
                 labels = eventLabels
             )
         )

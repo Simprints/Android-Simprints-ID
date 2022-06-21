@@ -3,6 +3,8 @@ package com.simprints.id.data.consent.longconsent.remote
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
+import com.simprints.id.data.file.FileUrl
+import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.logging.Simber
 
 class LongConsentRemoteDataSourceImpl(
@@ -18,14 +20,14 @@ class LongConsentRemoteDataSourceImpl(
     override suspend fun downloadLongConsent(language: String): LongConsentRemoteDataSource.File {
         val fileId = "${LONG_CONSENT_FILE}_${language}"
         val longConsentRemoteApi = getLongConsentRemoteApi().api
-        val fileUrl = longConsentRemoteApi.getLongConsentDownloadUrl(projectId, fileId)
+        val fileUrl = longConsentRemoteApi.getFileUrl(projectId, fileId)
         Simber.d("Downloading long consent file at %s", fileUrl.url)
         val fileBytes = consentDownloader(fileUrl)
         return LongConsentRemoteDataSource.File(fileBytes)
     }
 
-    private suspend fun getLongConsentRemoteApi(): SimApiClient<LongConsentRemoteInterface> {
-        return simApiClientFactory.buildClient(LongConsentRemoteInterface::class)
+    private suspend fun getLongConsentRemoteApi(): SimApiClient<FileUrlRemoteInterface> {
+        return simApiClientFactory.buildClient(FileUrlRemoteInterface::class)
     }
 
     companion object {
