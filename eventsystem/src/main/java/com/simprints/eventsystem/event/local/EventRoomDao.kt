@@ -16,6 +16,9 @@ interface EventRoomDao {
     @Query("select * from DbEvent where sessionId = :sessionId order by createdAt desc")
     suspend fun loadFromSession(sessionId: String): List<DbEvent>
 
+    @Query("select eventJson from DbEvent where sessionId = :sessionId order by createdAt desc")
+    suspend fun loadEventJsonFromSession(sessionId: String): List<String>
+
     @Query("select * from DbEvent where projectId = :projectId order by createdAt desc")
     suspend fun loadFromProject(projectId: String): List<DbEvent>
 

@@ -26,6 +26,11 @@ open class EventLocalDataSourceImpl(
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
+    override suspend fun loadAllEventJsonFromSession(sessionId: String): List<String> =
+        withContext(readingDispatcher) {
+            eventDao.loadEventJsonFromSession(sessionId)
+        }
+
     override suspend fun loadAllFromSession(sessionId: String): List<Event> =
         withContext(readingDispatcher) {
             eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
