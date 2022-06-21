@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.google.common.truth.Truth
 import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
@@ -357,4 +358,8 @@ class ScannerWrapperV2Test {
         assertEquals(un20TestObserver.values(), un20OtaSteps)
     }
 
+    @Test
+    fun `test imageTransfer should be supported in v2 scanners`() {
+        Truth.assertThat(scannerWrapper.isImageTransferSupported()).isTrue()
+    }
 }
