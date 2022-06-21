@@ -18,6 +18,10 @@ class RootResponseParser : MessageParser<RootResponse> {
                     GET_CYPRESS_VERSION -> GetCypressVersionResponse.fromBytes(data)
                     GET_VERSION -> GetVersionResponse.fromBytes(data)
                     SET_VERSION -> SetVersionResponse.fromBytes(data)
+                    GET_HARDWARE_VERSION -> GetHardwareVersionResponse.fromBytes(data)
+                    GET_EXTENDED_VERSION -> GetExtendedVersionResponse.fromBytes(data)
+                    GET_CYPRESS_EXTENDED_VERSION -> GetCypressExtendedVersionResponse.fromBytes(data)
+                    SET_EXTENDED_VERSION -> SetVersionResponse.fromBytes(data)
                 }
             }
         } catch (e: Exception) {

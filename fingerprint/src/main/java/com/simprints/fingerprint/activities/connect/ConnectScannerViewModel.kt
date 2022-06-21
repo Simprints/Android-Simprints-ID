@@ -115,15 +115,21 @@ class ConnectScannerViewModel(
             scannerManager.initScanner()
         )
 
-    private fun connectToVero() =
-        veroTask(computeProgress(4),
-            R.string.connect_scanner_bt_connect,
-            "ScannerManager: connectToVero",
-            scannerManager.scanner { connect() }) { addBluetoothConnectivityEvent() }
+    private fun connectToVero() = veroTask(computeProgress(4),
+        R.string.connect_scanner_bt_connect,
+        "ScannerManager: connectToVero",
+        scannerManager.scanner { connect() }) {
+            addBluetoothConnectivityEvent()
+        }
 
-    private fun setupVero() =
-        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: setupVero",
-            scannerManager.scanner { setup() }) { addInfoSnapshotEventIfNecessary() }
+    private fun setupVero() = veroTask(
+        computeProgress(5),
+        R.string.connect_scanner_setup,
+        "ScannerManager: setupVero",
+        scannerManager.scanner { setup() }) {
+            setLastConnectedScannerInfo()
+            addInfoSnapshotEventIfNecessary()
+        }
 
     private fun resetVeroUI() =
         veroTask(computeProgress(6), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
@@ -139,7 +145,7 @@ class ConnectScannerViewModel(
         scannerManager.scanner?.run {
             if (versionInformation().generation == ScannerGeneration.VERO_1) {
                 sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                    versionInformation().computeMasterVersion().toString()
+                    versionInformation().firmware.stm
                 )
             }
         } ?: retryConnect()
@@ -180,8 +186,10 @@ class ConnectScannerViewModel(
                         it
                     )
                 }
-            is OtaAvailableException ->
+            is OtaAvailableException -> {
+                setLastConnectedScannerInfo()
                 connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
+            }
             is BluetoothNotSupportedException ->
                 launchAlert.postEvent(BLUETOOTH_NOT_SUPPORTED)
             is ScannerLowBatteryException ->
@@ -206,12 +214,15 @@ class ConnectScannerViewModel(
         }
     }
 
+    private fun setLastConnectedScannerInfo() {
+        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
+        preferencesManager.lastScannerVersion =
+            scannerManager.scanner?.versionInformation()?.hardwareVersion ?: ""
+    }
+
     private fun handleSetupFinished() {
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
-        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
-        preferencesManager.lastScannerVersion =
-            scannerManager.scanner?.versionInformation()?.computeMasterVersion().toString()
 
         Simber.tag(MAC_ADDRESS, true).i(scannerManager.currentMacAddress ?: "")
         Simber.tag(SCANNER_ID, true).i(scannerManager.currentScannerId ?: "")

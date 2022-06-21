@@ -11,9 +11,9 @@ import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecove
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.HARD_RESET
@@ -30,9 +30,9 @@ import kotlin.concurrent.schedule
 
 class OtaViewModel(
     private val scannerManager: ScannerManager,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val timeHelper: FingerprintTimeHelper
+    private val timeHelper: FingerprintTimeHelper,
+    private val fingerprintPreferenceManager: FingerprintPreferencesManager
 ) : ViewModel() {
 
     val progress = MutableLiveData(0f)
@@ -61,13 +61,27 @@ class OtaViewModel(
                 onError = { handleScannerError(it, currentRetryAttempt) }
             )
     }
-
+    private fun targetVersions(availableOta: AvailableOta): String {
+        val scannerVersion = fingerprintPreferenceManager.lastScannerVersion
+        val availableFirmwareVersions = fingerprintPreferenceManager.scannerHardwareRevisions
+        return when (availableOta) {
+            AvailableOta.CYPRESS -> availableFirmwareVersions[scannerVersion]?.cypress ?: ""
+            AvailableOta.STM -> availableFirmwareVersions[scannerVersion]?.stm ?: ""
+            AvailableOta.UN20 -> availableFirmwareVersions[scannerVersion]?.un20 ?: ""
+        }
+    }
     private fun AvailableOta.toScannerObservable(): Observable<out OtaStep> = Observable.defer {
         val otaStartedTime = timeHelper.now()
         when (this) {
-            AvailableOta.CYPRESS -> scannerManager.scannerObservable { performCypressOta() }
-            AvailableOta.STM -> scannerManager.scannerObservable { performStmOta() }
-            AvailableOta.UN20 -> scannerManager.scannerObservable { performUn20Ota() }
+            AvailableOta.CYPRESS -> scannerManager.scannerObservable {
+                performCypressOta(targetVersions(AvailableOta.CYPRESS))
+            }
+            AvailableOta.STM -> scannerManager.scannerObservable {
+                performStmOta(targetVersions(AvailableOta.STM))
+            }
+            AvailableOta.UN20 -> scannerManager.scannerObservable {
+                performUn20Ota(targetVersions(AvailableOta.UN20))
+            }
         }.doOnComplete { saveOtaEventInSession(this, otaStartedTime) }
             .doOnError { saveOtaEventInSession(this, otaStartedTime, it) }
     }
@@ -97,13 +111,6 @@ class OtaViewModel(
             AvailableOta.STM -> "stm"
             AvailableOta.UN20 -> "un20"
         }
-
-        val targetVersion = when (availableOta) {
-            AvailableOta.CYPRESS -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().cypress.toString()
-            AvailableOta.STM -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().stm.toString()
-            AvailableOta.UN20 -> firmwareLocalDataSource.getAvailableScannerFirmwareVersions().un20.toString()
-        }
-
         val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
 
         sessionEventsManager.addEventInBackground(
@@ -111,7 +118,7 @@ class OtaViewModel(
                 startTime,
                 timeHelper.now(),
                 chipName,
-                targetVersion,
+                targetVersions(availableOta),
                 failureReason
             )
         )

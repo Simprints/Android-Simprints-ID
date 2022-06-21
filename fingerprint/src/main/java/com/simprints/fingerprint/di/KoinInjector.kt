@@ -2,6 +2,9 @@ package com.simprints.fingerprint.di
 
 import android.bluetooth.BluetoothAdapter
 import android.nfc.NfcAdapter
+import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
+import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.fingerprint.activities.alert.AlertContract
@@ -41,15 +44,12 @@ import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
-import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
-import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
-import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
-import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisionsSerializer
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -62,6 +62,8 @@ import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.id.Application
+import com.simprints.id.di.AppComponent
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
@@ -123,7 +125,8 @@ object KoinInjector {
      * These are classes that are wrappers of ones that appear in the main app module
      */
     private fun Module.defineBuildersForFingerprintManagers() {
-        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
+        single { ScannerHardwareRevisionsSerializer(JsonHelper) }
+        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get(), get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
@@ -135,18 +138,23 @@ object KoinInjector {
     private fun Module.defineBuildersForDomainClasses() {
         factory { SerialNumberConverter() }
         factory { ScannerGenerationDeterminer() }
-        factory { FingerprintFileDownloader() }
 
         factory { BatteryLevelChecker(androidContext()) }
         factory { FirmwareLocalDataSource(androidContext()) }
+        factory { androidContext().applicationContext as Application }
+
+        factory { get<Application>().component }
+        factory { get<AppComponent>().getLoginInfoManager() }
+        factory<DispatcherProvider> { DefaultDispatcherProvider() }
+        factory { FingerprintFileDownloader(get(), get(), get()) }
         factory { FirmwareRemoteDataSource(get(), get()) }
-        factory { FirmwareRepository(get(), get()) }
+        factory { FirmwareRepository(get(), get(), get()) }
         factory { FirmwareFileUpdateScheduler(androidContext(), get()) }
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
         single { ScannerPairingManager(get(), get(), get(), get()) }
-        single { ScannerInitialSetupHelper(get(), get(), get()) }
+        single { ScannerInitialSetupHelper(get(), get(), get(), get()) }
         single { ConnectionHelper(get()) }
         single { CypressOtaHelper(get(), get()) }
         single { StmOtaHelper(get(), get()) }
