@@ -35,6 +35,9 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
     override fun batteryInformation(): BatteryInfo = BatteryInfo.UNKNOWN
 
+    //Vero 1 scanners doesn't support image transfer
+    override fun isImageTransferSupported(): Boolean = false
+
     override fun connect(): Completable = Completable.create { result ->
         scannerV1.connect(ScannerCallbackWrapper({
             result.onComplete()
