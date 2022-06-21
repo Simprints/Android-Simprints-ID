@@ -182,6 +182,7 @@ class CollectFingerprintsViewModel(
 
     fun isImageTransferRequired(): Boolean =
         fingerprintPreferencesManager.saveFingerprintImagesStrategy.isImageTransferRequired()
+            && scannerManager.scanner?.isImageTransferSupported() ?: false
 
     fun updateSelectedFinger(index: Int) {
         scannerManager.scanner { setUiIdle() }.doInBackground()

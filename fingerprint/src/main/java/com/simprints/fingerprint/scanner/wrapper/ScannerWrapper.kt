@@ -22,6 +22,8 @@ import io.reactivex.Single
  */
 interface ScannerWrapper {
 
+    fun  isImageTransferSupported(): Boolean
+
     fun connect(): Completable
     fun disconnect(): Completable
 
