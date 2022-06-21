@@ -25,14 +25,6 @@ fun waitUntilCollectFingerprintsIsDisplayed() {
     }
 }
 
-fun takeScansAndConfirm(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
-    log("CollectFingerprints::takeScansAndConfirm")
-
-    repeat(numberOfScans) { pressScan() }
-
-    checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
-}
-
 /** Work around for reconnecting dialog that pops up sometimes when using SimulatedScannerManager */
 fun pressScanUntilDialogIsDisplayedAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
     log("CollectFingerprints::pressScanUntilDialogIsDisplayedAndClickConfirm")

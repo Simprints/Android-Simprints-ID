@@ -78,6 +78,7 @@ class CollectFingerprintsViewModelTest : KoinTest {
     }
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
         every { isLiveFeedbackAvailable() } returns false
+        every { isImageTransferSupported() } returns true
     }
     private val scannerManager: ScannerManager =
         ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())
@@ -147,6 +148,21 @@ class CollectFingerprintsViewModelTest : KoinTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Scanning())
+    }
+
+    @Test
+    fun `test scanner supports imagetransfer then isImageTransferRequired should be true`(){
+        withImageTransfer()
+        every { scanner.isImageTransferSupported()  } returns true
+
+        assertThat(vm.isImageTransferRequired()).isTrue()
+    }
+    @Test
+    fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`(){
+        withImageTransfer()
+        every { scanner.isImageTransferSupported()  } returns false
+
+        assertThat(vm.isImageTransferRequired()).isFalse()
     }
 
     @Test

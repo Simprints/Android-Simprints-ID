@@ -63,6 +63,8 @@ class ScannerWrapperV2(
 
     override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
 
+    override fun isImageTransferSupported(): Boolean= true
+
     override fun connect(): Completable =
         connectionHelper.connectScanner(scannerV2, macAddress)
             .wrapErrorsFromScanner()

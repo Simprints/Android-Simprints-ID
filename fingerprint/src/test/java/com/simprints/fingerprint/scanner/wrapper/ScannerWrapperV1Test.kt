@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.scanner.wrapper
 
 
+import com.google.common.truth.Truth
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
@@ -41,6 +42,11 @@ class ScannerWrapperV1Test {
         testObserver.assertNoErrors()
         testObserver.assertComplete()
 
+    }
+
+    @Test
+    fun `test imageTransfer shouldn't  be supported in v1  scanners`() {
+        Truth.assertThat(scannerWrapper.isImageTransferSupported()).isFalse()
     }
     @Test
     fun `test captureFingerprint ScannerOperationInterruptedException`() {
