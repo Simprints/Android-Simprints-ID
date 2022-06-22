@@ -135,7 +135,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     api(project(":eventsystem"))
-    implementation(project(":logging"))
+    implementation(project(":infralogging"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
@@ -232,7 +232,7 @@ dependencies {
     testImplementation(libs.testing.work)
     testImplementation(libs.testing.coroutines.test)
     kaptTest(libs.dagger.compiler)
-    testImplementation(project(":logging"))
+    testImplementation(project(":infralogging"))
     testImplementation(project(":testtools")) {
         exclude("org.mockito:mockito-android")
     }
