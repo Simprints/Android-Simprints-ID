@@ -25,6 +25,8 @@ android {
             versionNameSuffix "-$VERSION_SUFFIX+$VERSION_CODE"
             buildConfigField("Boolean", "DEBUG_MODE", "true")
             buildConfigField("Boolean", "DB_ENCRYPTION", "$DB_ENCRYPTION")
+            // If libs can't compile with a custom build types fallback to debug
+            matchingFallbacks = ['debug']
         }
         debug {
             debuggable = DEBUGGABLE
