@@ -1,9 +1,9 @@
-package com.simprints.logging.trees
+package com.simprints.infra.logging.trees
 
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
-import com.simprints.logging.Simber
-import com.simprints.logging.trees.AnalyticsTree.Companion.defaultTag
+import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.logging.trees.AnalyticsTree.Companion.defaultTag
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify

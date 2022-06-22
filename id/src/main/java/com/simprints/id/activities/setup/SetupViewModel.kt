@@ -12,10 +12,9 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.simprints.core.analytics.CrashReportTag.ID_SETUP
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.logging.PerformanceMonitor
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.PerformanceMonitor
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi

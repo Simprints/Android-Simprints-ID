@@ -11,7 +11,7 @@ import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.realm.Realm
 import io.realm.RealmQuery
 import kotlinx.coroutines.flow.Flow

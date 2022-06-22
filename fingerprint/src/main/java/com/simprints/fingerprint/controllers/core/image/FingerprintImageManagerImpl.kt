@@ -4,7 +4,7 @@ import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,

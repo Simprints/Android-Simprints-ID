@@ -11,7 +11,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatch
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class IdentificationTask(
     private val viewModel: MatchingViewModel,

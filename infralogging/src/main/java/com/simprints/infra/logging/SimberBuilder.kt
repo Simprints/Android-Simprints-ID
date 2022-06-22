@@ -1,10 +1,10 @@
-package com.simprints.logging
+package com.simprints.infra.logging
 
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.simprints.logging.trees.AnalyticsTree
-import com.simprints.logging.trees.CrashReportingTree
+import com.simprints.infra.logging.trees.AnalyticsTree
+import com.simprints.infra.logging.trees.CrashReportingTree
 import timber.log.Timber
 
 object SimberBuilder {
