@@ -3,7 +3,7 @@ package com.simprints.id.services.config
 import android.content.Context
 import androidx.work.*
 import com.simprints.id.BuildConfig
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.util.concurrent.TimeUnit
 
 class RemoteConfigSchedulerImpl(context: Context) : RemoteConfigScheduler {

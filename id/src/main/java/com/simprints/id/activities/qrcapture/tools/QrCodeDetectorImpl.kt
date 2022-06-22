@@ -8,7 +8,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.id.tools.extensions.awaitTask
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class QrCodeDetectorImpl : QrCodeDetector {
 

@@ -15,7 +15,7 @@ import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseBu
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.util.concurrent.atomic.AtomicBoolean
 
 class AlertPresenter(

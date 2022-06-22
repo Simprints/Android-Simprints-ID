@@ -1,10 +1,10 @@
-package com.simprints.logging.trees
+package com.simprints.infra.logging.trees
 
 import android.os.Bundle
 import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
+import com.simprints.infra.logging.Simber
 import timber.log.Timber
 
 

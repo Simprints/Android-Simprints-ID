@@ -5,7 +5,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class LongConsentRemoteDataSourceImpl(
     private val loginInfoManager: LoginInfoManager,

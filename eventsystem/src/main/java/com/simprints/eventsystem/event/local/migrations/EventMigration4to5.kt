@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 /**
  * This migration updates EventLabels payload, removing the parameter subjectId, as it is no longer

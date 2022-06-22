@@ -19,7 +19,7 @@ import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequ
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 class EnrolLastBiometricsActivity : BaseSplitActivity() {

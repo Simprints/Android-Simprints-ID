@@ -1,6 +1,6 @@
-package com.simprints.logging
+package com.simprints.infra.logging
 
-import com.simprints.logging.LoggingTestUtils.setDebugBuildConfig
+import com.simprints.infra.logging.LoggingTestUtils.setDebugBuildConfig
 import io.mockk.mockk
 import org.junit.Test
 import timber.log.Timber

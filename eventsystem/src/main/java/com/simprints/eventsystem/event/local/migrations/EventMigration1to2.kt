@@ -6,7 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
 /**

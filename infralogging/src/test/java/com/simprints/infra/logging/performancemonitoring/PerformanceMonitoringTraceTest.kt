@@ -1,9 +1,9 @@
-package com.simprints.logging.performancemonitoring
+package com.simprints.infra.logging.performancemonitoring
 
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.logging.LoggingTestUtils.setDebugBuildConfig
-import com.simprints.logging.PerformanceMonitor
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingTestUtils.setDebugBuildConfig
+import com.simprints.infra.logging.PerformanceMonitor
+import com.simprints.infra.logging.Simber
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
