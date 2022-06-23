@@ -63,7 +63,7 @@ android {
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
         getByName("debug") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             withGroovyBuilder {
                 "FirebasePerformance" {
