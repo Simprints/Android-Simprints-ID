@@ -48,8 +48,8 @@ definitions:
                     - id/build/reports/**
 
         ######################################################################
-        # Run the Core, Event system and Logging unit tests with coverage and
-        # upload report to artifacts.
+        # Run the Core, Event system, Login, and Logging unit tests with
+        # coverage and upload report to artifacts.
         ######################################################################
         -   step: &run-module-unit-tests
                 name: "Run the Core, Event system and Logging unit tests"
@@ -64,10 +64,12 @@ definitions:
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew eventsystem:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
+                    - ./gradlew infralogin:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
                     - infralogging/build/reports/**
+                    - infralogin/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
