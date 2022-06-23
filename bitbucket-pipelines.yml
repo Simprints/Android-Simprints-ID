@@ -166,6 +166,7 @@ definitions:
                     - ./gradlew :fingerprintscannermock:projectHealth
                     - ./gradlew :moduleapi:projectHealth
                     - ./gradlew :infralogging:projectHealth
+                    - ./gradlew :infralogin:projectHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
