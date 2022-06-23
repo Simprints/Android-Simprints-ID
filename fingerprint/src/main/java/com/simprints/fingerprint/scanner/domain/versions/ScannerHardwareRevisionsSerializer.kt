@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class ScannerHardwareRevisionsSerializer(
     private val jsonHelper: JsonHelper

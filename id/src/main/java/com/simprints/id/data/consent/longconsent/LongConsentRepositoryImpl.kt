@@ -8,7 +8,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.InProgre
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult.Succeed
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow

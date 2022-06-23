@@ -36,7 +36,7 @@ import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWor
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.*

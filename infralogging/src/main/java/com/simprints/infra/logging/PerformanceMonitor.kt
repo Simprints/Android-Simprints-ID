@@ -1,7 +1,7 @@
-package com.simprints.logging
+package com.simprints.infra.logging
 
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.logging.performancemonitoring.PerformanceMonitoringTrace
+import com.simprints.infra.logging.performancemonitoring.PerformanceMonitoringTrace
 
 object PerformanceMonitor {
 

@@ -1,7 +1,7 @@
-package com.simprints.logging.trees
+package com.simprints.infra.logging.trees
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify

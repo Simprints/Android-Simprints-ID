@@ -15,7 +15,7 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.io.IOException
 
 class AuthenticationHelperImpl(

@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import okhttp3.logging.HttpLoggingInterceptor
 
 object SimberLogger: HttpLoggingInterceptor.Logger {

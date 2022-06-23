@@ -1,4 +1,4 @@
-package com.simprints.logging
+package com.simprints.infra.logging
 
 object LoggingConstants {
 

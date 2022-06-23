@@ -7,7 +7,7 @@ import com.simprints.id.R
 import com.simprints.id.data.consent.shortconsent.GeneralConsentOptions
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 data class GeneralConsentTextHelper(
     val generalConsentOptionsJson: String,

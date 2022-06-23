@@ -8,7 +8,7 @@ import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(
     private val mainVM: FaceCaptureViewModel
