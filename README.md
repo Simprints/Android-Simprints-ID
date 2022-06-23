@@ -9,9 +9,9 @@ The goal of Simprints Architecture is to keep the app maintainable, scalable, ea
 There are 2 types of modules we can use, a Feature Module and a Infrastructure Module, with a 3rd type which is the App Module of which there will only ever be 1 of (the ID module). This design has been adopted in several places, and there is even a guide you can check out [here](https://dev.to/noureldinshobier/building-scalable-flutter-apps-architecture-styling-conventions-state-management-40c9) that loosely breaks down a similar architecture. But keep in mind it’s not identical. Following this breakdown a very simple application comprised of a login screen could look like this:
 
 - App (app module)
-- feature_login (login UI/UX)
-- inf_login (login infrastructure code)
-- inf_networking (networking infrastructure code)
+- featureclogin (login UI/UX)
+- infra login (login infrastructure code)
+- infra networking (networking infrastructure code)
 
 ### Feature Modules
 
@@ -43,25 +43,25 @@ Rules:
 
 Following the guidelines above the end goal of SID should look roughly like: 
 
-- feature_about
-- feature_clientapi
-- feature_dashboard
-- feature_eventsystem
-- feature_face
-- feature_fingerprint
-- feature_login
-- feature_syncinfo
+- featureabout (com.simprints.feature.about)
+- featureclientapi (com.simprints.feature.clientapi)
+- featuredashboard (com.simprints.feature.dashboard)
+- featureeventsystem (com.simprints.feature.eventsystem)
+- featureface (com.simprints.feature.face)
+- featurefingerprint (com.simprints.feature.fingerprint)
+- featurelogin (com.simprints.feature.login)
+- featuresyncinfo (com.simprints.feature.syncinfo)
 - id
-- infra_eventsystem
-- infra_facematcher_roc
-- infra_fingerprintmatcher
-- infra_fingerprintscanner
-- infra_fingerprintscannermock
-- infra_logging
-- infra_login
-- infra_remoteconfig
-- infra_network
-- infra_security
+- infraeventsystem (com.simprints.infra.eventsystem)
+- infrafacematcher_roc (com.simprints.infra.facematcher)
+- infrafingerprintmatcher (com.simprints.infra.fingerprintmatcher)
+- infrafingerprintscanner (com.simprints.infra.fingerprintscanner)
+- infrafingerprintscannermock (com.simprints.infra.fingerprintscannermock)
+- infralogging (com.simprints.infra.logging)
+- infralogin (com.simprints.infra.login)
+- infraconfig (com.simprints.infra.config)
+- infranetwork (com.simprints.infra.networking)
+- infrasecurity (com.simprints.infra.security)
 
 *Note: There is no longer a core module. There should be no "catch all" module, because it will just become a graveyard / completely overused, like the previous ID module. Every module should have a clear singular purpose.* </br>
 
