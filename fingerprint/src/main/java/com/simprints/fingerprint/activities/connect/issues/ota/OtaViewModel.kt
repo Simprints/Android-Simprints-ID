@@ -21,7 +21,7 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RES
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY
 import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy

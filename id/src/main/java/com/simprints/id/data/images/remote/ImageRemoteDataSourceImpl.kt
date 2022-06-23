@@ -4,7 +4,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 

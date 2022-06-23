@@ -10,4 +10,4 @@ include ':id',
     ':clientapi',
     ':moduleapi',
     ':eventsystem',
-    ':logging'
+        ':infralogging'

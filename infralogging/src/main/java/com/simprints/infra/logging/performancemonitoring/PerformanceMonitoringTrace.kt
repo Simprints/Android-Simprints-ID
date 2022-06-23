@@ -1,8 +1,8 @@
-package com.simprints.logging.performancemonitoring
+package com.simprints.infra.logging.performancemonitoring
 
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.logging.BuildConfig
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.BuildConfig
+import com.simprints.infra.logging.Simber
 
 
 class PerformanceMonitoringTrace(

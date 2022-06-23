@@ -1,8 +1,8 @@
-package com.simprints.logging.trees
+package com.simprints.infra.logging.trees
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.simprints.logging.Simber.USER_PROPERTY_TAG
+import com.simprints.infra.logging.Simber.USER_PROPERTY_TAG
 import timber.log.Timber
 
 internal class CrashReportingTree(private val crashlytics: FirebaseCrashlytics) : Timber.Tree() {

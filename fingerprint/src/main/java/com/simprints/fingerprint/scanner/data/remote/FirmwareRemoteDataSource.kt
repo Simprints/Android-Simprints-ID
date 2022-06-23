@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.data.remote
 import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class FirmwareRemoteDataSource(
     private val fingerprintFileDownloader: FingerprintFileDownloader,

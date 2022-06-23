@@ -9,7 +9,7 @@ import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class AttestationManagerImpl : AttestationManager {
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy

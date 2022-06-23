@@ -7,7 +7,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedExcepti
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single

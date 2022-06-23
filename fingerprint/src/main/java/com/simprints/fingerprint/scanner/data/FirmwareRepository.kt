@@ -5,7 +5,7 @@ import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 
 class FirmwareRepository(

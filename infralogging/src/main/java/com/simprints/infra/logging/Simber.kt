@@ -1,4 +1,4 @@
-package com.simprints.logging
+package com.simprints.infra.logging
 
 import timber.log.Timber
 

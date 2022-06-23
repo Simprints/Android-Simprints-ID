@@ -7,7 +7,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.models.*
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 

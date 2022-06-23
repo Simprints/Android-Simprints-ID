@@ -30,7 +30,7 @@ import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 class LoginActivity : BaseSplitActivity() {
