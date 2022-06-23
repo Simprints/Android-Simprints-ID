@@ -63,6 +63,7 @@ definitions:
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew eventsystem:jacocoTestReport
+                    - ./gradlew infraconfig:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
                     - ./gradlew infralogin:jacocoTestReport
                 artifacts:
@@ -165,6 +166,7 @@ definitions:
                     - ./gradlew :fingerprintmatcher:projectHealth
                     - ./gradlew :fingerprintscannermock:projectHealth
                     - ./gradlew :moduleapi:projectHealth
+                    - ./gradlew infraconfig:projectHealth
                     - ./gradlew :infralogging:projectHealth
                     - ./gradlew :infralogin:projectHealth
 
