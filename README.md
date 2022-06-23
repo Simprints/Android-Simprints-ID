@@ -9,7 +9,7 @@ The goal of Simprints Architecture is to keep the app maintainable, scalable, ea
 There are 2 types of modules we can use, a Feature Module and a Infrastructure Module, with a 3rd type which is the App Module of which there will only ever be 1 of (the ID module). This design has been adopted in several places, and there is even a guide you can check out [here](https://dev.to/noureldinshobier/building-scalable-flutter-apps-architecture-styling-conventions-state-management-40c9) that loosely breaks down a similar architecture. But keep in mind it’s not identical. Following this breakdown a very simple application comprised of a login screen could look like this:
 
 - App (app module)
-- featureclogin (login UI/UX)
+- feature login (login UI/UX)
 - infra login (login infrastructure code)
 - infra networking (networking infrastructure code)
 
