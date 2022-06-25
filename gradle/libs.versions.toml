@@ -52,7 +52,7 @@ androidX-lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx",
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
-androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.3"
+androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
 androidX-uI-preference = "androidx.preference:preference:1.2.0"
