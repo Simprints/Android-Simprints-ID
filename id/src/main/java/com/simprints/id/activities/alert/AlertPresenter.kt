@@ -14,7 +14,7 @@ import com.simprints.id.domain.alert.AlertActivityViewModel.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.exitformhandler.ExitFormHelper
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 class AlertPresenter(

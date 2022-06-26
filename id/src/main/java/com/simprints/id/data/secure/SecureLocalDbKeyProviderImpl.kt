@@ -7,7 +7,7 @@ import com.simprints.core.security.LocalDbKey
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 open class SecureLocalDbKeyProviderImpl(
     private val encryptedSharedPrefs: SharedPreferences,

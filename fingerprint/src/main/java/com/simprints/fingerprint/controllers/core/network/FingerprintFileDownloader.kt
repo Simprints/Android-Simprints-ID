@@ -3,7 +3,7 @@ package com.simprints.fingerprint.controllers.core.network
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.file.FileUrlRemoteInterface
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL

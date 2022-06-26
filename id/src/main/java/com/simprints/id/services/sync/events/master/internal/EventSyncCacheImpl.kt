@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.master.internal
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.util.*
 
 @SuppressLint("ApplySharedPref")

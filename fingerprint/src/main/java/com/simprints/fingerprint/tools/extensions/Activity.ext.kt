@@ -9,7 +9,7 @@ import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 fun Activity.launchRefusalActivity(requestCode: Int = RequestCode.REFUSAL.value) {
     val intent = Intent(this, RefusalActivity::class.java)

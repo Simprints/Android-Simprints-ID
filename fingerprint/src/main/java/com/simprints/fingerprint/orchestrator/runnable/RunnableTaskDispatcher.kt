@@ -5,7 +5,7 @@ import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTas
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class RunnableTaskDispatcher(
     private val configurationController: ConfigurationController

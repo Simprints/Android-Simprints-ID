@@ -50,7 +50,7 @@ dependencyAnalysis {
                 )
             }
         }
-        project(':logging') {
+        project(':infralogging') {
             onAny {
                 exclude(
                     // We don't want the logging module the expose these via api, even if other

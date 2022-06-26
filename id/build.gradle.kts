@@ -41,11 +41,6 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$RELEASE_SAFETYNET_KEY\"")
-            buildConfigField(
-                "String",
-                "LONG_CONSENT_BUCKET",
-                "\"gs://simprints-152315-firebase-storage\""
-            )
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
@@ -53,11 +48,6 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$STAGING_SAFETYNET_KEY\"")
-            buildConfigField(
-                "String",
-                "LONG_CONSENT_BUCKET",
-                "\"gs://simprints-firebase-staging.appspot.com\""
-            )
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
@@ -70,11 +60,6 @@ android {
                 }
             }
             buildConfigField("String", "SAFETYNET_API_KEY", "\"$DEV_SAFETYNET_KEY\"")
-            buildConfigField(
-                "String",
-                "LONG_CONSENT_BUCKET",
-                "\"gs://simprints-dev-firebase-storage\""
-            )
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
@@ -134,7 +119,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     api(project(":eventsystem"))
-    implementation(project(":logging"))
+    implementation(project(":infralogging"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
@@ -231,7 +216,7 @@ dependencies {
     testImplementation(libs.testing.work)
     testImplementation(libs.testing.coroutines.test)
     kaptTest(libs.dagger.compiler)
-    testImplementation(project(":logging"))
+    testImplementation(project(":infralogging"))
     testImplementation(project(":testtools")) {
         exclude("org.mockito:mockito-android")
     }

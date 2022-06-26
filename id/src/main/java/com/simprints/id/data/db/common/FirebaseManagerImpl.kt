@@ -12,7 +12,7 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.secure.models.Token
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
