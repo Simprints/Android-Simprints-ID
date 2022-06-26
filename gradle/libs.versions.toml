@@ -13,8 +13,8 @@ androidx_room_version = "2.4.2"
 androidx_camerax_version = "1.2.0-alpha02"
 dagger_version = "2.22"
 work_version = "2.7.1"
-location_services_version = "18.0.0"
-safetynet_services_version = "17.0.1"
+location_services_version = "20.0.0"
+safetynet_services_version = "18.0.1"
 retrofit_version = "2.9.0"
 okttp_version = "4.9.3"
 fuzzywuzzy_version = "1.4.0"
@@ -100,10 +100,9 @@ playcore-core = "com.google.android.play:core:1.8.0"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth:19.2.0"
-firebase-storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
-firebase-mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
-firebase-mlkit_barcode = "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
+firebase-auth = "com.google.firebase:firebase-auth:21.0.6"
+firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
+firebase-mlkit = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
