@@ -29,8 +29,8 @@ configurations {
 }
 android {
 
-    ndkVersion = gradleLocalProperties(rootDir).getProperty("ndk.Version")
-
+    ndkVersion =   gradleLocalProperties(rootDir).getProperty("ndk.Version")
+        ?: System.getenv("ndk.Version")
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
