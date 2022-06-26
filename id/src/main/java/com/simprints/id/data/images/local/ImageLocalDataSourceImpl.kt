@@ -7,7 +7,7 @@ import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.simprints.id.data.images.model.Path
 import com.simprints.id.data.images.model.SecuredImageRef
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

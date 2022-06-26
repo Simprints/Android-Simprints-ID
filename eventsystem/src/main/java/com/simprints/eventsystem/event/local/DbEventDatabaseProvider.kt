@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event.local
 
 import android.content.Context
 import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 

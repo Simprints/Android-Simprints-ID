@@ -8,9 +8,8 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.tools.LocationManager
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext

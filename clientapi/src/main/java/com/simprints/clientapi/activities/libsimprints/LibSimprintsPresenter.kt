@@ -29,8 +29,8 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

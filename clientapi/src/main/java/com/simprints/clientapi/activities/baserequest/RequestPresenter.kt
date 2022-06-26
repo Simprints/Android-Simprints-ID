@@ -48,7 +48,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.libsimprints.Constants
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 

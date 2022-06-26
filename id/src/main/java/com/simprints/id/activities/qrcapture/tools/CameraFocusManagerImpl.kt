@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.camera.core.*
 import androidx.camera.view.PreviewView
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.util.concurrent.TimeUnit
 
 class CameraFocusManagerImpl : CameraFocusManager {

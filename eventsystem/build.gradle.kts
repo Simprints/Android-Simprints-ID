@@ -41,8 +41,7 @@ android {
 dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
-
-    implementation(project(":logging"))
+    implementation(project(":infralogging"))
 
     api(libs.androidX.room.core)
     implementation(libs.androidX.room.ktx)

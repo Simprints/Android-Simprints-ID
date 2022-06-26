@@ -4,7 +4,7 @@ import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import com.simprints.id.data.images.model.Path as CorePath
 
 class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,

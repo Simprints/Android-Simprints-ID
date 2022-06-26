@@ -17,7 +17,7 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 
