@@ -518,8 +518,7 @@ open class SettingsPreferencesManagerImpl(
         )
 
         const val VERO2_FIRMWARE_VERSIONS_KEY = "Vero2FirmwareVersions"
-        const val VERO2_FIRMWARE_VERSIONS_DEFAULT =
-            "{\"E-1\":{\"cypress\":\"1.E-1.1\",\"stm\":\"1.E-1.1\",\"un20\":\"1.E-1.0\"}}"
+        const val VERO2_FIRMWARE_VERSIONS_DEFAULT = ""
 
     }
 

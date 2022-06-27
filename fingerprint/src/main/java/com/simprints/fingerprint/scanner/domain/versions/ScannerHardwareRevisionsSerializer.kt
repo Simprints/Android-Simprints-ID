@@ -14,6 +14,7 @@ class ScannerHardwareRevisionsSerializer(
     fun build(firmwareDownloadableVersionsJson: String) = try {
         jsonHelper.fromJson(firmwareDownloadableVersionsJson)
     } catch (e: Throwable) {
+        // in case of empty or malformed json we should create empty ota map
         Simber.e(Exception("Malformed json", e))
         ScannerHardwareRevisions()
     }
