@@ -159,7 +159,7 @@ dependencies {
     // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
-    implementation(libs.firebase.mlkit)
+    implementation(libs.firebase.barcode)
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
