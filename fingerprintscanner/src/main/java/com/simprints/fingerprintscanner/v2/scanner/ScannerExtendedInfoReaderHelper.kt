@@ -76,23 +76,60 @@ class ScannerExtendedInfoReaderHelper(
             GetVersionCommand()
         ).await()
 
+        val extendedVersionInfo = legacyUnifiedVersion.version.toExtendedVersionInfo()
+
         return ScannerInformation(
             hardwareVersion = DEFAULT_HARDWARE_VERSION,
-            firmwareVersions = ScannerVersionInfo.LegacyVersionInfo(
-                legacyUnifiedVersion.version
-            )
+            firmwareVersions = extendedVersionInfo
         )
     }
 
 
     private suspend fun getScannerInformationWithNewApi(): ScannerInformation {
         val (unifiedVersion, hardwareVersion) = getExtendedVersionInfoAndHardwareVersionInfo()
+        val mergedUnifiedVersion = validateUnifiedVersionOrMergeWithOldVersion(unifiedVersion.version)
+
         return ScannerInformation(
             hardwareVersion = hardwareVersion.version.versionIdentifier,
-            firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(
-                unifiedVersion.version
-            )
+            firmwareVersions = mergedUnifiedVersion
         )
+    }
+
+    private suspend fun validateUnifiedVersionOrMergeWithOldVersion(
+        unifiedVersion: ExtendedVersionInformation
+    ): ExtendedVersionInformation {
+        val requiresOldApiValues = listOf(
+            unifiedVersion.cypressFirmwareVersion.versionAsString,
+            unifiedVersion.stmFirmwareVersion.versionAsString,
+            unifiedVersion.un20AppVersion.versionAsString
+        ).any { it.isEmpty() }
+
+        var mergedScannerInfo = unifiedVersion
+
+        if (requiresOldApiValues) {
+            val oldUnifiedVersionInformation =
+                getScannerInformationWithLegacyApi().firmwareVersions
+
+            if (unifiedVersion.cypressFirmwareVersion.versionAsString.isEmpty()) {
+                mergedScannerInfo = mergedScannerInfo.copy(
+                    cypressFirmwareVersion = oldUnifiedVersionInformation.cypressFirmwareVersion
+                )
+            }
+
+            if (unifiedVersion.stmFirmwareVersion.versionAsString.isEmpty()) {
+                mergedScannerInfo = mergedScannerInfo.copy(
+                    stmFirmwareVersion = oldUnifiedVersionInformation.stmFirmwareVersion
+                )
+            }
+
+            if (unifiedVersion.un20AppVersion.versionAsString.isEmpty()) {
+                mergedScannerInfo = mergedScannerInfo.copy(
+                    un20AppVersion = oldUnifiedVersionInformation.un20AppVersion
+                )
+            }
+        }
+
+        return mergedScannerInfo
     }
 
     private suspend fun getExtendedVersionInfoAndHardwareVersionInfo(): Pair<GetExtendedVersionResponse, GetHardwareVersionResponse> {
