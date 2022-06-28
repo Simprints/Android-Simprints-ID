@@ -102,7 +102,7 @@ playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 #Firebase
 firebase-auth = "com.google.firebase:firebase-auth:21.0.6"
 firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
-firebase-mlkit = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
+firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }

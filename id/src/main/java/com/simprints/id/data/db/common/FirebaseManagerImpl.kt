@@ -57,8 +57,8 @@ open class FirebaseManagerImpl(
             // Projects that were signed in and then updated to 2021.2.0 need to check the
             // previous Firebase project until they login again.
             val result: GetTokenResult? = try {
-                (FirebaseAuth.getInstance(getLegacyAppFallback())
-                    .getAccessToken(false) as? Task<GetTokenResult>)?.await()
+                FirebaseAuth.getInstance(getLegacyAppFallback())
+                    .getAccessToken(false).await() as GetTokenResult
             } catch (ex: FirebaseNoSignedInUserException) {
                 Simber.d(ex)
                 null
