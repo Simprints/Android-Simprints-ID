@@ -8,25 +8,12 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmEx
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
-import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerVersionInfo
 
 fun ScannerInformation.toScannerVersion() = ScannerVersion(
     hardwareVersion = hardwareVersion,
     generation = ScannerGeneration.VERO_2,
-    firmware = toScannerFirmwareVersions()
+    firmware = this.firmwareVersions.toScannerFirmwareVersions()
 )
-
-
-fun ScannerInformation.toScannerFirmwareVersions(): ScannerFirmwareVersions {
-    val extendedVersionInfo = when (val firmwareVersions = firmwareVersions) {
-        is ScannerVersionInfo.LegacyVersionInfo ->
-            ExtendedVersionInformation.UNKNOWN
-        is ScannerVersionInfo.ExtendedVersionInfo ->
-            firmwareVersions.versionInfo
-    }
-
-    return extendedVersionInfo.toScannerFirmwareVersions()
-}
 
 fun ExtendedVersionInformation.toScannerFirmwareVersions() =
     ScannerFirmwareVersions(
