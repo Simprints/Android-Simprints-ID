@@ -1,6 +1,8 @@
 package com.simprints.fingerprintscanner.v2.domain.root.models
 
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
+import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
+import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
@@ -21,6 +23,19 @@ class UnifiedVersionInformation(
             un20AppVersion.getBytes()
         )
     }
+
+    fun toExtendedVersionInfo() = ExtendedVersionInformation(
+        cypressFirmwareVersion = CypressExtendedFirmwareVersion(
+            versionAsString = cypressFirmwareVersion.toNewVersionNamingScheme()
+        ),
+        stmFirmwareVersion = StmExtendedFirmwareVersion(
+            versionAsString = stmFirmwareVersion.toNewVersionNamingScheme()
+        ),
+        un20AppVersion = Un20ExtendedAppVersion(
+            versionAsString = un20AppVersion.toNewVersionNamingScheme()
+        )
+    )
+
 
     companion object {
         fun fromBytes(bytes: ByteArray) = with(RootMessageProtocol) {
