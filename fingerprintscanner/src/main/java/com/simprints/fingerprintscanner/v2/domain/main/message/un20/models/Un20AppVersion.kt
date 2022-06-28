@@ -1,14 +1,20 @@
 package com.simprints.fingerprintscanner.v2.domain.main.message.un20.models
 
+import com.simprints.fingerprintscanner.v2.domain.FirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.Un20MessageProtocol
 import com.simprints.fingerprintscanner.v2.tools.primitives.toByteArray
 
 @Deprecated(message = "Use new extension api: [Un20ExtendedAppVersion]")
 class Un20AppVersion(
-    val apiMajorVersion: Short,
-    val apiMinorVersion: Short,
-    val firmwareMajorVersion: Short,
-    val firmwareMinorVersion: Short
+    apiMajorVersion: Short,
+    apiMinorVersion: Short,
+    firmwareMajorVersion: Short,
+    firmwareMinorVersion: Short
+): FirmwareVersion(
+    apiMajorVersion,
+    apiMinorVersion,
+    firmwareMajorVersion,
+    firmwareMinorVersion
 ) {
 
     fun getBytes() = with(Un20MessageProtocol) {

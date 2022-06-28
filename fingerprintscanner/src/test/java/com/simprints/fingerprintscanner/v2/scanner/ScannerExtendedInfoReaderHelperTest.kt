@@ -73,9 +73,8 @@ class ScannerExtendedInfoReaderHelperTest {
         testObserver.assertValueCount(1)
         val scannerInformation = testObserver.values().first() as ScannerInformation
         assertThat(scannerInformation.hardwareVersion).isEqualTo("E-1")
-        assertThat(scannerInformation.firmwareVersions).isInstanceOf(ScannerVersionInfo.LegacyVersionInfo::class.java)
-        assertThat((scannerInformation.firmwareVersions as ScannerVersionInfo.LegacyVersionInfo).versionInfo).isEqualTo(
-            expectedUnifiedVersion
+        assertThat(scannerInformation.firmwareVersions).isEqualTo(
+            expectedUnifiedVersion.toExtendedVersionInfo()
         )
     }
 
@@ -106,10 +105,7 @@ class ScannerExtendedInfoReaderHelperTest {
         testObserver.assertValueCount(1)
         val scannerInformation = testObserver.values().first() as ScannerInformation
         assertThat(scannerInformation.hardwareVersion).isEqualTo(expectedHardware)
-        assertThat(scannerInformation.firmwareVersions).isInstanceOf(ScannerVersionInfo.ExtendedVersionInfo::class.java)
-        assertThat((scannerInformation.firmwareVersions as ScannerVersionInfo.ExtendedVersionInfo).versionInfo).isEqualTo(
-            expectedFirmwareVersions
-        )
+        assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
 
 
