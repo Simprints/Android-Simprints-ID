@@ -26,12 +26,12 @@ buildscript {
 
         classpath("org.ow2.asm:asm:9.3")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:0.80.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.3.2")
+        classpath("org.gradle:test-retry-gradle-plugin:1.4.0")
 
         // Firebase
-        classpath("com.google.gms:google-services:4.3.10")
+        classpath("com.google.gms:google-services:4.3.12")
         classpath("com.google.firebase:perf-plugin:1.4.1")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.1")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.1")
 
         // Realm Database
         classpath("io.realm:realm-gradle-plugin:10.11.0")
