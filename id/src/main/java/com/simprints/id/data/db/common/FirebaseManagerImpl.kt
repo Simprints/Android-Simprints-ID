@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
@@ -56,7 +57,7 @@ open class FirebaseManagerImpl(
             // previous Firebase project until they login again.
             val result = try {
                 FirebaseAuth.getInstance(getLegacyAppFallback())
-                    .getAccessToken(false).await()
+                    .getAccessToken(false).await() as GetTokenResult
             } catch (ex: FirebaseNoSignedInUserException) {
                 Simber.d(ex)
                 null
