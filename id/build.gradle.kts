@@ -22,7 +22,6 @@ val STAGING_SAFETYNET_KEY: String by extra
 val DEV_SAFETYNET_KEY: String by extra
 
 android {
-    ndkVersion = "25.0.8221429"
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
