@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("com.android.dynamic-feature")
     id("kotlin-android")
@@ -26,8 +28,9 @@ configurations {
     }
 }
 android {
-    // Set your ndk version below to run SID on M1 Macs
-    // ndkVersion = "25.0.8221429"
+
+    ndkVersion =   gradleLocalProperties(rootDir).getProperty("ndk.Version")
+        ?: System.getenv("ndk.Version")
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
