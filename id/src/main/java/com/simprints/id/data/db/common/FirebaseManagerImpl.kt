@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.common
 
 import android.content.Context
-import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -56,7 +55,7 @@ open class FirebaseManagerImpl(
         withContext(dispatcher.io()) {
             // Projects that were signed in and then updated to 2021.2.0 need to check the
             // previous Firebase project until they login again.
-            val result: GetTokenResult? = try {
+            val result = try {
                 FirebaseAuth.getInstance(getLegacyAppFallback())
                     .getAccessToken(false).await() as GetTokenResult
             } catch (ex: FirebaseNoSignedInUserException) {
