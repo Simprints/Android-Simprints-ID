@@ -10,7 +10,6 @@ import com.simprints.id.commontesttools.di.*
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.di.injectClassFromComponent
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -46,7 +45,7 @@ class UnitTestConfig<T : Any>(
             .coroutinesMainThread()
             .setupFirebase()
             .setupWorkManager()
-            .initAndInjectComponent() as AppComponentForTests
+            .initComponent()
 
     @ExperimentalCoroutinesApi
     override fun rescheduleRxMainThread() = also {
@@ -70,8 +69,6 @@ class UnitTestConfig<T : Any>(
         }
     }
 
-    fun initAndInjectComponent() =
-        initComponent()
 
     private fun initComponent():  AppComponentForTests   {
         testAppComponent = DaggerAppComponentForTests.builder()
