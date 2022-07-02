@@ -2,10 +2,10 @@ package com.simprints.id.testtools
 
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.id.Application
+import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.commontesttools.di.*
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
-import com.simprints.testtools.common.di.injectClassFromComponent
 import io.realm.Realm
 
 class AndroidTestConfig<T : Any>(
@@ -25,7 +25,7 @@ class AndroidTestConfig<T : Any>(
         .initRealm()
         .initModules()
 
-    fun initAndInjectComponent() = initComponent().inject()
+    fun initAndInjectComponent() = initComponent()
 
     fun componentBuilder() = DaggerAppComponentForAndroidTests.builder()
         .application(app)
@@ -45,12 +45,13 @@ class AndroidTestConfig<T : Any>(
         app.component = testAppComponent
     }
 
-    private fun inject() = also {
-        injectClassFromComponent(testAppComponent, test)
-    }
+
 
     private fun initModules() = also {
         app.handleUndeliverableExceptionInRxJava()
     }
 
+    fun inject(test: ModuleSelectionActivityAndroidTest) {
+        testAppComponent.inject(test)
+    }
 }
