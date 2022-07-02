@@ -41,7 +41,7 @@ class SettingsPreferencesManagerTest {
 
     @Before
     fun setup() {
-        UnitTestConfig(this, preferencesModule = preferencesModule).fullSetup()
+        UnitTestConfig(this, preferencesModule = preferencesModule).fullSetup().inject(this)
     }
 
     @Test

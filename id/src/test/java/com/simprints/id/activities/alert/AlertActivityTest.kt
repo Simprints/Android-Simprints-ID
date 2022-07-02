@@ -68,7 +68,7 @@ class AlertActivityTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule).fullSetup()
+        UnitTestConfig(this, module, preferencesModule).fullSetup().inject(this)
         Intents.init()
     }
 
