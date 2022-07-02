@@ -19,13 +19,12 @@ class AndroidTestConfig<T : Any>(
 ) {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-    private lateinit var testAppComponent: AppComponentForAndroidTests
+    lateinit var testAppComponent: AppComponentForAndroidTests
 
-    fun fullSetup() = initAndInjectComponent()
+    fun fullSetup() = initComponent()
         .initRealm()
         .initModules()
 
-    fun initAndInjectComponent() = initComponent()
 
     fun componentBuilder() = DaggerAppComponentForAndroidTests.builder()
         .application(app)
@@ -40,7 +39,7 @@ class AndroidTestConfig<T : Any>(
         Realm.init(app)
     }
 
-    private fun initComponent() = also {
+    fun initComponent() = also {
         testAppComponent = componentBuilder().build()
         app.component = testAppComponent
     }
