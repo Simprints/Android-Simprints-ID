@@ -46,7 +46,7 @@ class UnitTestConfig<T : Any>(
             .coroutinesMainThread()
             .setupFirebase()
             .setupWorkManager()
-            .initAndInjectComponent()
+            .initAndInjectComponent() as AppComponentForTests
 
     @ExperimentalCoroutinesApi
     override fun rescheduleRxMainThread() = also {
@@ -71,9 +71,9 @@ class UnitTestConfig<T : Any>(
     }
 
     fun initAndInjectComponent() =
-        initComponent().inject()
+        initComponent()
 
-    private fun initComponent() = also {
+    private fun initComponent():  AppComponentForTests   {
         testAppComponent = DaggerAppComponentForTests.builder()
             .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
@@ -85,9 +85,6 @@ class UnitTestConfig<T : Any>(
             .build()
 
         app.component = testAppComponent
-    }
-
-    private fun inject() = also {
-        injectClassFromComponent(testAppComponent, test)
+        return testAppComponent
     }
 }

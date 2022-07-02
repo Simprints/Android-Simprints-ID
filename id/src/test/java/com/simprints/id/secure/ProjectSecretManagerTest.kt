@@ -32,7 +32,7 @@ class ProjectSecretManagerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup()
+        UnitTestConfig(this, module).fullSetup().inject(this)
     }
 
     @Test
