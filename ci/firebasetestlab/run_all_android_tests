@@ -20,7 +20,7 @@ clear
 ######################################################################
         
 single_runner="run_firebase_test_lab"
-device="blueline,version=30,locale=en,orientation=portrait"
+device="redfin,version=30,locale=en,orientation=portrait"
 n_attemps_per_module="1"
 root_path="test-reports"
 template_module_log_file="$root_path/@/logs/firebase_logs"
