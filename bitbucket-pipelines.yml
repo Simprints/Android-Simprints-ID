@@ -314,7 +314,6 @@ flows:
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-module-unit-tests
-                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -341,6 +340,8 @@ flows:
             -   step: *sign-and-deploy-to-internal
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
+    -   flow: &dependency-health-check-flow
+            -   step: *dependency-health-check
 
 
 ######################################################################
@@ -354,3 +355,4 @@ pipelines:
     custom:
         ci-test-pipeline: *ci-test # For CI testing purposes only
         renovate: *update-dependencies-flow
+        health-check: *dependency-health-check-flow
