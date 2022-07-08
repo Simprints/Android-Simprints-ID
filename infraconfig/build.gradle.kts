@@ -18,9 +18,6 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation(project(mapOf("path" to ":core")))
-
     // Unit Tests
     testImplementation(libs.testing.junit)
 }
