@@ -10,5 +10,6 @@ include ':id',
     ':clientapi',
     ':moduleapi',
     ':eventsystem',
+    ':infraconfig',
     ':infralogging',
     ':infralogin'
