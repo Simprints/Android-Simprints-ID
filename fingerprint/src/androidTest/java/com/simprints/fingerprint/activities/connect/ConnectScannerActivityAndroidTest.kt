@@ -89,7 +89,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
                 scannerManager, timeHelper, sessionEventsManager, preferencesManager, nfcManager
             )
         ){
-            every { start(any()) } just Runs
+            every { start() } just Runs
+            every { init(any()) } just Runs
              connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
         }
         loadKoinModules(module {
