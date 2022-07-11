@@ -333,6 +333,7 @@ flows:
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
     -   flow: &ci-test # For CI testing purposes only
+            -   step: *run-fingerprint-unit-tests
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
