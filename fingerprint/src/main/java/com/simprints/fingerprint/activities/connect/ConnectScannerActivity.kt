@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.activities.connect
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.WindowManager
 import com.simprints.fingerprint.R
@@ -16,10 +18,13 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
+import com.simprints.id.tools.extensions.requestPermissionsIfRequired
+import com.simprints.logging.Simber
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 
+    private val permissionCode = 0
     private val viewModel: ConnectScannerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +40,31 @@ class ConnectScannerActivity : FingerprintActivity() {
         viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
         viewModel.finishAfterError.activityObserveEventWith { finishWithError() }
-        viewModel.start(connectScannerRequest.connectMode)
+        viewModel.init(connectScannerRequest.connectMode)
+
+        if (!requestPermissionsIfRequired(
+                listOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ), permissionCode
+            )
+        )
+            viewModel.start()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == permissionCode && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+            Simber.i("Bluetooth permission was accepted")
+            viewModel.start()
+        } else {
+            Simber.w("Bluetooth permission was denied")
+            finishWithError()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -54,7 +54,11 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @get:Rule
     var permissionRule: GrantPermissionRule =
-        GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        GrantPermissionRule.grant(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.BLUETOOTH_CONNECT,
+            android.Manifest.permission.BLUETOOTH_SCAN
+        )
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
@@ -75,7 +79,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         every { isLiveFeedbackAvailable() } returns false
     }
     private val scannerManager: ScannerManager =
-        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())){
+        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
             every { checkBluetoothStatus() } returns Completable.complete()
         }
     private val nfcManager: NfcManager = mockk()
@@ -88,9 +92,10 @@ class ConnectScannerActivityAndroidTest : KoinTest {
             ConnectScannerViewModel(
                 scannerManager, timeHelper, sessionEventsManager, preferencesManager, nfcManager
             )
-        ){
-            every { start(any()) } just Runs
-             connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
+        ) {
+            every { start() } just Runs
+            every { init(any()) } just Runs
+            connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
         }
         loadKoinModules(module {
             viewModel { viewModelMock }
@@ -133,7 +138,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @Test
     fun pressBack_launchesRefusalActivity() {
-        val backButtonBehaviourLiveData = MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
+        val backButtonBehaviourLiveData =
+            MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
 
         Intents.init()
