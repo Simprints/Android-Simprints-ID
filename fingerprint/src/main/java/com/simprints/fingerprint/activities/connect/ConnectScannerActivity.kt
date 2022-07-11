@@ -24,7 +24,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 
-    private val requestCode = 0
+    private val permissionCode = 0
     private val viewModel: ConnectScannerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +46,7 @@ class ConnectScannerActivity : FingerprintActivity() {
                 listOf(
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT
-                ), requestCode
+                ), permissionCode
             )
         )
             viewModel.start()
@@ -58,7 +58,7 @@ class ConnectScannerActivity : FingerprintActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == requestCode && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+        if (requestCode == permissionCode && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
             Simber.i("Bluetooth permission was accepted")
             viewModel.start()
         } else {
