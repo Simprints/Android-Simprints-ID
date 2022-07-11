@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.connect
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import com.simprints.fingerprint.R
@@ -42,7 +43,9 @@ class ConnectScannerActivity : FingerprintActivity() {
         viewModel.finishAfterError.activityObserveEventWith { finishWithError() }
         viewModel.init(connectScannerRequest.connectMode)
 
-        if (!requestPermissionsIfRequired(
+        if (Build.VERSION.SDK_INT < 31)
+            viewModel.start()
+        else if (!requestPermissionsIfRequired(
                 listOf(
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT
