@@ -56,8 +56,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     var permissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(
             android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.BLUETOOTH_CONNECT,
-            android.Manifest.permission.BLUETOOTH_SCAN
+            android.Manifest.permission.BLUETOOTH_CONNECT
         )
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
