@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.connect
 
 import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
@@ -127,7 +128,13 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         launchAlertLiveData.postEvent(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED)
 
-        intended(hasComponent(AlertActivity::class.java.name))
+        /**
+         * If the API is above 31 the back button will exit the permissions dialog
+         */
+        if (Build.VERSION.SDK_INT < 31)
+            intended(hasComponent(RefusalActivity::class.java.name))
+        else
+            intended(hasComponent(AlertActivity::class.java.name))
 
         Intents.release()
     }
