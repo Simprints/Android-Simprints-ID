@@ -128,19 +128,13 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         launchAlertLiveData.postEvent(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED)
 
-        /**
-         * If the API is above 31 the back button will exit the permissions dialog
-         */
-        if (Build.VERSION.SDK_INT < 31)
-            intended(hasComponent(RefusalActivity::class.java.name))
-        else
-            intended(hasComponent(AlertActivity::class.java.name))
+        intended(hasComponent(AlertActivity::class.java.name))
 
         Intents.release()
     }
 
     @Test
-    fun pressBack_launchesErrorActivity() {
+    fun pressBack_handlesAPILevel() {
         val backButtonBehaviourLiveData =
             MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
@@ -151,7 +145,13 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         onView(isRoot()).perform(ViewActions.pressBack())
 
-        intended(hasComponent(AlertActivity::class.java.name))
+        /**
+         * If the API is above 31 the back button will exit the permissions dialog
+         */
+        if (Build.VERSION.SDK_INT < 31)
+            intended(hasComponent(RefusalActivity::class.java.name))
+        else
+            intended(hasComponent(AlertActivity::class.java.name))
 
         Intents.release()
     }
