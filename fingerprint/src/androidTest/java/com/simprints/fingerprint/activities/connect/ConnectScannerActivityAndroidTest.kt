@@ -54,10 +54,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @get:Rule
     var permissionRule: GrantPermissionRule =
-        GrantPermissionRule.grant(
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.BLUETOOTH_CONNECT
-        )
+        GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
@@ -136,7 +133,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun pressBack_launchesRefusalActivity() {
+    fun pressBack_launchesErrorActivity() {
         val backButtonBehaviourLiveData =
             MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
@@ -147,7 +144,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         onView(isRoot()).perform(ViewActions.pressBack())
 
-        intended(hasComponent(RefusalActivity::class.java.name))
+        intended(hasComponent(AlertActivity::class.java.name))
 
         Intents.release()
     }
