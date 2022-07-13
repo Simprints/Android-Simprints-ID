@@ -8,7 +8,7 @@ import com.simprints.core.analytics.CrashReportTag
 import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CancellationException
 import java.io.IOException
 

@@ -13,7 +13,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchE
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class VerificationTask(
     private val viewModel: MatchingViewModel,

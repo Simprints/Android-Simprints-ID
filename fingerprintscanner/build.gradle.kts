@@ -31,9 +31,9 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.androidX.annotation.annotation)
     implementation(libs.kotlin.coroutine.rx2.adapter)
+    implementation(project(":infralogging"))
 
     // Logging
-    implementation(project(":logging"))
 
     // RxJava
     api(libs.rxJava2.core)

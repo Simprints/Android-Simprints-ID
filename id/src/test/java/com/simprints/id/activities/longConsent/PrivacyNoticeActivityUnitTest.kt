@@ -75,7 +75,12 @@ class PrivacyNoticeActivityUnitTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule, viewModelModule = viewModelModule).fullSetup()
+        UnitTestConfig(
+            this,
+            module,
+            preferencesModule,
+            viewModelModule = viewModelModule
+        ).fullSetup().inject(this)
     }
 
     @Test

@@ -48,11 +48,11 @@ definitions:
                     - id/build/reports/**
 
         ######################################################################
-        # Run the Core, Event system and Logging unit tests with coverage and
-        # upload report to artifacts.
+        # Run the infrastructure unit tests with coverage and upload report to
+        # artifacts.
         ######################################################################
         -   step: &run-module-unit-tests
-                name: "Run the Core, Event system and Logging unit tests"
+                name: "Run the infrastructure unit tests"
                 size: 2x
                 max-time: 30
                 caches:
@@ -63,11 +63,14 @@ definitions:
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew eventsystem:jacocoTestReport
-                    - ./gradlew logging:jacocoTestReport
+                    - ./gradlew infraconfig:jacocoTestReport
+                    - ./gradlew infralogging:jacocoTestReport
+                    - ./gradlew infralogin:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
-                    - logging/build/reports/**
+                    - infralogging/build/reports/**
+                    - infralogin/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -163,7 +166,9 @@ definitions:
                     - ./gradlew :fingerprintmatcher:projectHealth
                     - ./gradlew :fingerprintscannermock:projectHealth
                     - ./gradlew :moduleapi:projectHealth
-                    - ./gradlew :logging:projectHealth
+                    - ./gradlew infraconfig:projectHealth
+                    - ./gradlew :infralogging:projectHealth
+                    - ./gradlew :infralogin:projectHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
