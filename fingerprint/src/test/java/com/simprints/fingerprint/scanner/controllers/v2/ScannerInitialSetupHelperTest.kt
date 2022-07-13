@@ -282,14 +282,12 @@ class ScannerInitialSetupHelperTest {
 
         val SCANNER_VERSION_LOW = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
-            firmwareVersions = ScannerVersionInfo.LegacyVersionInfo(
-                versionInfo = UnifiedVersionInformation(
-                    10L,
-                    CypressFirmwareVersion(12, 13, 14, 15),
-                    StmFirmwareVersion(1, 2, 3, 4),
-                    Un20AppVersion(5, 6, 7, 8)
-                )
-            )
+            firmwareVersions = UnifiedVersionInformation(
+                10L,
+                CypressFirmwareVersion(12, 13, 14, 15),
+                StmFirmwareVersion(1, 2, 3, 2),
+                Un20AppVersion(5, 6, 7, 2)
+            ).toExtendedVersionInfo()
         )
 
 
@@ -300,12 +298,10 @@ class ScannerInitialSetupHelperTest {
         )
         val SCANNER_VERSION_HIGH = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
-            firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(
-                ExtendedVersionInformation(
-                    CYPRESS_VERSION,
-                    STM_VERSION,
-                    UN20_VERSION
-                )
+            firmwareVersions = ExtendedVersionInformation(
+                CYPRESS_VERSION,
+                STM_VERSION,
+                UN20_VERSION
             )
         )
     }

@@ -1,13 +1,19 @@
 package com.simprints.fingerprintscanner.v2.domain.root.models
 
+import com.simprints.fingerprintscanner.v2.domain.FirmwareVersion
 import com.simprints.fingerprintscanner.v2.domain.root.RootMessageProtocol
 import com.simprints.fingerprintscanner.v2.tools.primitives.toByteArray
 
 class CypressFirmwareVersion(
-    val apiMajorVersion: Short,
-    val apiMinorVersion: Short,
-    val firmwareMajorVersion: Short,
-    val firmwareMinorVersion: Short
+    apiMajorVersion: Short,
+    apiMinorVersion: Short,
+    firmwareMajorVersion: Short,
+    firmwareMinorVersion: Short
+): FirmwareVersion(
+    apiMajorVersion,
+    apiMinorVersion,
+    firmwareMajorVersion,
+    firmwareMinorVersion
 ) {
 
     fun getBytes() = with(RootMessageProtocol) {

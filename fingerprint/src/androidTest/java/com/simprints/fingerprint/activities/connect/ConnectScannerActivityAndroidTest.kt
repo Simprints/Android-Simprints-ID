@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.connect
 
 import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
@@ -75,7 +76,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         every { isLiveFeedbackAvailable() } returns false
     }
     private val scannerManager: ScannerManager =
-        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())){
+        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
             every { checkBluetoothStatus() } returns Completable.complete()
         }
     private val nfcManager: NfcManager = mockk()
@@ -88,9 +89,10 @@ class ConnectScannerActivityAndroidTest : KoinTest {
             ConnectScannerViewModel(
                 scannerManager, timeHelper, sessionEventsManager, preferencesManager, nfcManager
             )
-        ){
-            every { start(any()) } just Runs
-             connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
+        ) {
+            every { start() } just Runs
+            every { init(any()) } just Runs
+            connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
         }
         loadKoinModules(module {
             viewModel { viewModelMock }
@@ -132,8 +134,9 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun pressBack_launchesRefusalActivity() {
-        val backButtonBehaviourLiveData = MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
+    fun pressBack_handlesAPILevel() {
+        val backButtonBehaviourLiveData =
+            MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
 
         Intents.init()
@@ -142,7 +145,13 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         onView(isRoot()).perform(ViewActions.pressBack())
 
-        intended(hasComponent(RefusalActivity::class.java.name))
+        /**
+         * If the API is above 31 the back button will exit the permissions dialog
+         */
+        if (Build.VERSION.SDK_INT < 31)
+            intended(hasComponent(RefusalActivity::class.java.name))
+        else
+            intended(hasComponent(AlertActivity::class.java.name))
 
         Intents.release()
     }
