@@ -2,13 +2,12 @@ package com.simprints.id.data.license.remote
 
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
-import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 
@@ -24,19 +23,23 @@ class LicenseRemoteDataSourceImpl(
         deviceId: String,
         licenseVendor: LicenseVendor
     ): ApiLicenseResult = try {
-        executeCall("DownloadLicense") {
+        getProjectApiClient().executeCall {
             val apiLicense = it.getLicense(projectId, deviceId, licenseVendor.name)
 
             ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(licenseVendor))
         }
     } catch (t: Throwable) {
         Simber.e(t)
-        if (t.isBackendMaintenanceException()) {
-            ApiLicenseResult.BackendMaintenanceError(t.getEstimatedOutage())
-        } else if (t is SyncCloudIntegrationException) {
-            handleCloudException(t)
-        } else {
-            ApiLicenseResult.Error(unknownErrorCode)
+        when (t) {
+            is BackendMaintenanceException -> {
+                ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
+            }
+            is SyncCloudIntegrationException -> {
+                handleCloudException(t)
+            }
+            else -> {
+                ApiLicenseResult.Error(unknownErrorCode)
+            }
         }
     }
 
@@ -53,23 +56,14 @@ class LicenseRemoteDataSourceImpl(
     }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
-        val errorCode = exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
+        val errorCode =
+            exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
         return ApiLicenseResult.Error(errorCode)
     }
 
     private fun getLicenseErrorCode(errorBody: ResponseBody): String {
         return jsonHelper.fromJson<ApiLicenseError>(errorBody.string()).error
     }
-
-    private suspend fun <T> executeCall(
-        nameCall: String,
-        block: suspend (LicenseRemoteInterface) -> T
-    ): T =
-        with(getProjectApiClient()) {
-            executeCall(nameCall) {
-                block(it)
-            }
-        }
 
     private suspend fun getProjectApiClient(): SimApiClient<LicenseRemoteInterface> =
         simApiClientFactory.buildClient(LicenseRemoteInterface::class)

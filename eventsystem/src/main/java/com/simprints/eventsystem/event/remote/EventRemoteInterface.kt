@@ -1,6 +1,6 @@
 package com.simprints.eventsystem.event.remote
 
-import com.simprints.core.network.SimRemoteInterface
+import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.eventsystem.event.remote.models.ApiEventCount
 import okhttp3.ResponseBody
 import retrofit2.http.*
