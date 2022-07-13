@@ -54,17 +54,34 @@ class ScannerExtendedInfoReaderHelperTest {
 
     @Test
     fun shouldReturn_scannerInformation_withLegacyFirmwareInfo_whenCypressVersion_isOldApi() {
+        val stmMajorFirmwareVersion: Short = 1
+        val stmMinorFirmwareVersion: Short = 2
+        val un20MajorFirmwareVersion: Short = 1
+        val un20MinorFirmwareVersion: Short = 1
+
+
         val expectedCypressVersion = CypressFirmwareVersion(1, 0, 1, 0)
         expectedCypressVersionResponse = GetCypressVersionResponse(expectedCypressVersion)
 
         val expectedUnifiedVersion = UnifiedVersionInformation(
             masterFirmwareVersion = 1202022L,
             cypressFirmwareVersion = expectedCypressVersion,
-            stmFirmwareVersion = StmFirmwareVersion(1, 1, 1, 2),
-            un20AppVersion = Un20AppVersion(1, 1, 1, 1)
+            stmFirmwareVersion = StmFirmwareVersion(1, 1,
+                stmMajorFirmwareVersion, stmMinorFirmwareVersion),
+            un20AppVersion = Un20AppVersion(1, 1,
+                un20MajorFirmwareVersion, un20MinorFirmwareVersion)
         )
         expectedVersionResponse = GetVersionResponse(expectedUnifiedVersion)
 
+        val expectedHardware = "E-1"
+        val expectedFirmwareVersions = ExtendedVersionInformation(
+            cypressFirmwareVersion = CypressExtendedFirmwareVersion(
+                "${expectedCypressVersion.firmwareMajorVersion}.$expectedHardware.${expectedCypressVersion.firmwareMinorVersion}"),
+            stmFirmwareVersion = StmExtendedFirmwareVersion(
+                "$stmMajorFirmwareVersion.$expectedHardware.$stmMinorFirmwareVersion"),
+            un20AppVersion = Un20ExtendedAppVersion(
+                "$un20MajorFirmwareVersion.$expectedHardware.$un20MinorFirmwareVersion")
+        )
 
         val testObserver = scannerInfoReader.readScannerInfo().test()
         testObserver.awaitAndAssertSuccess()
@@ -73,9 +90,8 @@ class ScannerExtendedInfoReaderHelperTest {
         testObserver.assertValueCount(1)
         val scannerInformation = testObserver.values().first() as ScannerInformation
         assertThat(scannerInformation.hardwareVersion).isEqualTo("E-1")
-        assertThat(scannerInformation.firmwareVersions).isInstanceOf(ScannerVersionInfo.LegacyVersionInfo::class.java)
-        assertThat((scannerInformation.firmwareVersions as ScannerVersionInfo.LegacyVersionInfo).versionInfo).isEqualTo(
-            expectedUnifiedVersion
+        assertThat(scannerInformation.firmwareVersions).isEqualTo(
+            expectedFirmwareVersions
         )
     }
 
@@ -106,10 +122,54 @@ class ScannerExtendedInfoReaderHelperTest {
         testObserver.assertValueCount(1)
         val scannerInformation = testObserver.values().first() as ScannerInformation
         assertThat(scannerInformation.hardwareVersion).isEqualTo(expectedHardware)
-        assertThat(scannerInformation.firmwareVersions).isInstanceOf(ScannerVersionInfo.ExtendedVersionInfo::class.java)
-        assertThat((scannerInformation.firmwareVersions as ScannerVersionInfo.ExtendedVersionInfo).versionInfo).isEqualTo(
-            expectedFirmwareVersions
+        assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
+    }
+
+    @Test
+    fun shouldReturn_scannerInformation_containingOld_firmwareVersion_wheneverPartial_otaUpdateOccurs() {
+        val expectedCypressVersion = CypressFirmwareVersion(1, 3, 1, 3)
+        expectedCypressVersionResponse = GetCypressVersionResponse(expectedCypressVersion)
+
+        val expectedHardware = "F-1"
+        expectedHardwareResponse = GetHardwareVersionResponse(
+            ExtendedHardwareVersion(expectedHardware)
         )
+
+        val firmwareVersions = ExtendedVersionInformation(
+            cypressFirmwareVersion = CypressExtendedFirmwareVersion("1.$expectedHardware.3"),
+            stmFirmwareVersion = StmExtendedFirmwareVersion(""),
+            un20AppVersion = Un20ExtendedAppVersion("")
+        )
+        expectedExtendedVersionResponse = GetExtendedVersionResponse(firmwareVersions)
+
+
+        val expectedUnifiedVersion = UnifiedVersionInformation(
+            masterFirmwareVersion = 1202022L,
+            cypressFirmwareVersion = expectedCypressVersion,
+            stmFirmwareVersion = StmFirmwareVersion(1, 1, 1, 2),
+            un20AppVersion = Un20AppVersion(1, 1, 1, 1)
+        )
+        expectedVersionResponse = GetVersionResponse(expectedUnifiedVersion)
+
+
+        // merge extended version-info, with old-api's unified version-info
+        // for missing version values.
+        val expectedFirmwareVersions = firmwareVersions.copy(
+            stmFirmwareVersion = StmExtendedFirmwareVersion(
+                expectedUnifiedVersion.stmFirmwareVersion.toNewVersionNamingScheme()),
+
+            un20AppVersion = Un20ExtendedAppVersion(
+                expectedUnifiedVersion.un20AppVersion.toNewVersionNamingScheme())
+        )
+
+
+        val testObserver = scannerInfoReader.readScannerInfo().test()
+        testObserver.awaitAndAssertSuccess()
+
+        testObserver.assertValueCount(1)
+        val scannerInformation = testObserver.values().first() as ScannerInformation
+        assertThat(scannerInformation.hardwareVersion).isEqualTo(expectedHardware)
+        assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
 
 
