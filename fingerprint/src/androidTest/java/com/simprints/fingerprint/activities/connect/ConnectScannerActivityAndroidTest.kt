@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.connect
 
 import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
@@ -54,11 +55,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @get:Rule
     var permissionRule: GrantPermissionRule =
-        GrantPermissionRule.grant(
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.BLUETOOTH_CONNECT,
-            android.Manifest.permission.BLUETOOTH_SCAN
-        )
+        GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
@@ -137,7 +134,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun pressBack_launchesRefusalActivity() {
+    fun pressBack_handlesAPILevel() {
         val backButtonBehaviourLiveData =
             MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
@@ -148,7 +145,13 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         onView(isRoot()).perform(ViewActions.pressBack())
 
-        intended(hasComponent(RefusalActivity::class.java.name))
+        /**
+         * If the API is above 31 the back button will exit the permissions dialog
+         */
+        if (Build.VERSION.SDK_INT < 31)
+            intended(hasComponent(RefusalActivity::class.java.name))
+        else
+            intended(hasComponent(AlertActivity::class.java.name))
 
         Intents.release()
     }
