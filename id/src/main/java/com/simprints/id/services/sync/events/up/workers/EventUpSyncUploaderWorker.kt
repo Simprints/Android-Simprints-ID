@@ -7,8 +7,6 @@ import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -24,6 +22,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
@@ -88,13 +87,13 @@ class EventUpSyncUploaderWorker(
     }
 
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
-        return if (t.isBackendMaintenanceException()) {
+        return if (t is BackendMaintenanceException) {
             fail(
                 t,
                 t.message,
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.getEstimatedOutage()
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
                 )
             )
         } else if (t is SyncCloudIntegrationException) {

@@ -143,17 +143,12 @@ open class AppModule {
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
-        jsonHelper: JsonHelper,
-        dispatcher: DispatcherProvider,
-        @Named("ChuckerInterceptor") interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
+        ctx,
         ctx.packageVersionName,
         remoteDbManager,
-        jsonHelper,
-        dispatcher,
-        interceptor
     )
 
     @Provides

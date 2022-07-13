@@ -120,6 +120,7 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     implementation(project(":infralogging"))
+    implementation(project(":infranetwork"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)

@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -16,12 +14,11 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.HARD_RESET
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY
+import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
 import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -47,20 +44,26 @@ class OtaViewModel(
     fun startOta(availableOtas: List<AvailableOta>, currentRetryAttempt: Int) {
         remainingOtas.addAll(availableOtas)
         Observable.concat(availableOtas.map {
-                it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
-            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                onNext = { otaStep ->
-                    Simber.d(otaStep.toString())
-                    currentStep = otaStep
-                    progress.postValue(otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size))
-                },
-                onComplete = {
-                    progress.postValue(1f)
-                    otaComplete.postEvent()
-                },
-                onError = { handleScannerError(it, currentRetryAttempt) }
-            )
+            it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+            onNext = { otaStep ->
+                Simber.d(otaStep.toString())
+                currentStep = otaStep
+                progress.postValue(
+                    otaStep.totalProgress.mapToTotalProgress(
+                        remainingOtas.size,
+                        availableOtas.size
+                    )
+                )
+            },
+            onComplete = {
+                progress.postValue(1f)
+                otaComplete.postEvent()
+            },
+            onError = { handleScannerError(it, currentRetryAttempt) }
+        )
     }
+
     private fun targetVersions(availableOta: AvailableOta): String {
         val scannerVersion = fingerprintPreferenceManager.lastScannerVersion
         val availableFirmwareVersions = fingerprintPreferenceManager.scannerHardwareRevisions
@@ -70,6 +73,7 @@ class OtaViewModel(
             AvailableOta.UN20 -> availableFirmwareVersions[scannerVersion]?.un20 ?: ""
         }
     }
+
     private fun AvailableOta.toScannerObservable(): Observable<out OtaStep> = Observable.defer {
         val otaStartedTime = timeHelper.now()
         when (this) {
@@ -88,24 +92,45 @@ class OtaViewModel(
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
         Simber.e(e)
-        if (e.isBackendMaintenanceException()) {
-            otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = true, estimatedOutage = e.getEstimatedOutage()))
+        if (e is BackendMaintenanceException) {
+            otaFailed.postEvent(
+                FetchOtaResult(
+                    isMaintenanceMode = true,
+                    estimatedOutage = e.estimatedOutage
+                )
+            )
         } else if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = false))
         } else {
             when (val strategy = currentStep?.recoveryStrategy) {
                 HARD_RESET, SOFT_RESET ->
-                    otaRecovery.postEvent(OtaRecoveryFragmentRequest(strategy, remainingOtas, currentRetryAttempt))
+                    otaRecovery.postEvent(
+                        OtaRecoveryFragmentRequest(
+                            strategy,
+                            remainingOtas,
+                            currentRetryAttempt
+                        )
+                    )
                 SOFT_RESET_AFTER_DELAY ->
                     timeHelper.newTimer().schedule(OtaRecoveryStrategy.DELAY_TIME_MS) {
-                        otaRecovery.postEvent(OtaRecoveryFragmentRequest(SOFT_RESET, remainingOtas, currentRetryAttempt))
+                        otaRecovery.postEvent(
+                            OtaRecoveryFragmentRequest(
+                                SOFT_RESET,
+                                remainingOtas,
+                                currentRetryAttempt
+                            )
+                        )
                     }
                 null -> otaFailed.postEvent(FetchOtaResult(isMaintenanceMode = false))
             }
         }
     }
 
-    private fun saveOtaEventInSession(availableOta: AvailableOta, startTime: Long, e: Throwable? = null) {
+    private fun saveOtaEventInSession(
+        availableOta: AvailableOta,
+        startTime: Long,
+        e: Throwable? = null
+    ) {
         val chipName = when (availableOta) {
             AvailableOta.CYPRESS -> "cypress"
             AvailableOta.STM -> "stm"

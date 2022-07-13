@@ -6,8 +6,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.extentions.getEstimatedOutage
-import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -20,6 +18,7 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MA
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -98,19 +97,23 @@ class EventDownSyncDownloaderWorker(
     }
 
     private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
-        return if (t.isBackendMaintenanceException()) {
-            fail(
-                t,
-                t.message,
-                workDataOf(
-                    OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.getEstimatedOutage()
+        return when (t) {
+            is BackendMaintenanceException -> {
+                fail(
+                    t,
+                    t.message,
+                    workDataOf(
+                        OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                        OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
+                    )
                 )
-            )
-        } else if (t is SyncCloudIntegrationException) {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-        } else {
-            retry(t)
+            }
+            is SyncCloudIntegrationException -> {
+                fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+            }
+            else -> {
+                retry(t)
+            }
         }
     }
 
@@ -121,7 +124,7 @@ class EventDownSyncDownloaderWorker(
     }
 }
 
-fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int? {
+fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 

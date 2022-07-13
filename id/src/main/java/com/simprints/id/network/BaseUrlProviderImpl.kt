@@ -6,6 +6,7 @@ import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 
+// TODO move this into infraconfig
 class BaseUrlProviderImpl(
     private val settingsPreferencesManager: SettingsPreferencesManager,
     private val projectLocalDataSource: ProjectLocalDataSource,

@@ -1,20 +1,24 @@
 package com.simprints.id.testtools.testingapi.remote
 
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import android.content.Context
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.testtools.testingapi.models.*
 
 interface RemoteTestingManager {
 
     companion object {
-        fun create(dispatcher: DispatcherProvider) = RemoteTestingManagerImpl(dispatcher)
+        fun create(ctx: Context) = RemoteTestingManagerImpl(ctx)
     }
 
-    fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()): TestProject
-    fun deleteTestProject(projectId: String)
+    suspend fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()): TestProject
+    suspend fun deleteTestProject(projectId: String)
 
-    fun generateFirebaseToken(projectId: String, userId: String = DEFAULT_USER_ID): TestFirebaseToken
-    fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken
+    suspend fun generateFirebaseToken(
+        projectId: String,
+        userId: String = DEFAULT_USER_ID
+    ): TestFirebaseToken
 
-    fun getEventCount(projectId: String): TestEventCount
+    suspend fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken
+
+    suspend fun getEventCount(projectId: String): TestEventCount
 }

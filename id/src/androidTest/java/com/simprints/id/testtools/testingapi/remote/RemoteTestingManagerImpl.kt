@@ -1,11 +1,11 @@
 package com.simprints.id.testtools.testingapi.remote
 
-import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.json.JsonHelper
+import android.content.Context
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
 import com.simprints.id.testtools.testingapi.models.*
+import com.simprints.infra.network.SimApiClientImpl
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -13,40 +13,43 @@ import io.reactivex.schedulers.Schedulers
 /**
  * This class wraps [RemoteTestingApi] and makes all the calls to the cloud blocking.
  */
-class RemoteTestingManagerImpl(private val dispatcher: DispatcherProvider) : RemoteTestingManager {
+class RemoteTestingManagerImpl(ctx: Context) : RemoteTestingManager {
 
-    companion object {
-        private const val RETRY_ATTEMPTS = 3L
-    }
-
-    private val remoteTestingApi = TestingApiClient(
+    private val remoteTestingApi = SimApiClientImpl(
         RemoteTestingApi::class,
+        ctx,
         RemoteTestingApi.baseUrl,
-        dispatcher,
-        JsonHelper).api
+        "",
+        "Test",
+        null,
+    )
 
-    override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
-        remoteTestingApi.createProject(testProjectCreationParameters)
-            .retry(RETRY_ATTEMPTS)
+    override suspend fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
+        remoteTestingApi.executeCall { it.createProject(testProjectCreationParameters) }
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to create project", it) }
 
-    override fun deleteTestProject(projectId: String) {
-        remoteTestingApi.deleteProject(projectId)
-            .retry(RETRY_ATTEMPTS)
+    override suspend fun deleteTestProject(projectId: String) {
+        remoteTestingApi.executeCall { it.deleteProject(projectId) }
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to delete project", it) }
     }
 
-    override fun generateFirebaseToken(projectId: String, userId: String): TestFirebaseToken =
+    override suspend fun generateFirebaseToken(
+        projectId: String,
+        userId: String
+    ): TestFirebaseToken =
         generateFirebaseToken(TestFirebaseTokenParameters(projectId = projectId, userId = userId))
 
-    override fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
-        remoteTestingApi.generateFirebaseToken(testFirebaseTokenParameters)
-            .retry(RETRY_ATTEMPTS)
-            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build firebase token", it) }
+    override suspend fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
+        remoteTestingApi.executeCall { it.generateFirebaseToken(testFirebaseTokenParameters) }
+            .blockingGetOnDifferentThread {
+                TestingRemoteApiError(
+                    "Failed to build firebase token",
+                    it
+                )
+            }
 
-    override fun getEventCount(projectId: String): TestEventCount =
-        remoteTestingApi.getEventCount(projectId)
-            .retry(RETRY_ATTEMPTS)
+    override suspend fun getEventCount(projectId: String): TestEventCount =
+        remoteTestingApi.executeCall { it.getEventCount(projectId) }
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to build session count") }
 
     private inline fun <reified T> Single<T>.blockingGetOnDifferentThread(wrapError: (Throwable) -> Throwable): T =
