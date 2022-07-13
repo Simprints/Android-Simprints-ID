@@ -3,7 +3,7 @@ package com.simprints.id.services.sync
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class SyncSchedulerImpl(private val eventSyncManager: EventSyncManager,
                         private val imageUpSyncScheduler: ImageUpSyncScheduler,

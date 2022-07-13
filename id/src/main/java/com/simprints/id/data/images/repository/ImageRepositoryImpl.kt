@@ -9,7 +9,7 @@ import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.data.images.remote.ImageRemoteDataSource
 import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class ImageRepositoryImpl internal constructor(
     private val localDataSource: ImageLocalDataSource,

@@ -21,7 +21,7 @@ import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDL
 import com.simprints.id.tools.extensions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 

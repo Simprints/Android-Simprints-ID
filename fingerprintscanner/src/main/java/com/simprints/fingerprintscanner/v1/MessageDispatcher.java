@@ -5,7 +5,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_STATUS;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_TYPE;
-import com.simprints.logging.Simber;
+import com.simprints.infra.logging.Simber;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

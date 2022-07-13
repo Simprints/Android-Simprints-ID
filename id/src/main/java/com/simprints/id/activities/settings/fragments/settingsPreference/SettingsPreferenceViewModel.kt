@@ -2,7 +2,7 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 
 import androidx.lifecycle.ViewModel
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class SettingsPreferenceViewModel : ViewModel() {
 

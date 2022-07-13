@@ -7,7 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
 class EventMigration7to8 : Migration(7, 8) {

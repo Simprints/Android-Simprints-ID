@@ -1,7 +1,7 @@
 [versions]
 kotlin_version = "1.6.21"
 androidx_navigation_version = "2.4.2"
-kotlin_coroutine_version = "1.6.1"
+kotlin_coroutine_version = "1.6.3"
 app_compat_version = "1.4.2"
 androidx_version = "1.4.0"
 androidx_test_orchestrator_version = "1.4.1"
@@ -10,13 +10,13 @@ espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.4.1"
 androidx_room_version = "2.4.2"
-androidx_camerax_version = "1.2.0-alpha02"
-dagger_version = "2.22"
+androidx_camerax_version = "1.2.0-alpha03"
+dagger_version = "2.42"
 work_version = "2.7.1"
-location_services_version = "18.0.0"
-safetynet_services_version = "17.0.1"
+location_services_version = "20.0.0"
+safetynet_services_version = "18.0.1"
 retrofit_version = "2.9.0"
-okttp_version = "4.9.3"
+okttp_version = "4.10.0"
 fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.13.3"
 koin_version = "3.2.0"
@@ -36,7 +36,7 @@ simmatcher_version = "1.0.0"
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin_version" }
 kotlin-coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin_coroutine_version" }
 kotlin-coroutinesPlayServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlin_coroutine_version" }
-kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.5.0"
+kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.3"
 #AndroidX
 androidX-core = "androidx.core:core-ktx:1.8.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
@@ -52,7 +52,7 @@ androidX-lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx",
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
-androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.3"
+androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
 androidX-uI-preference = "androidx.preference:preference:1.2.0"
@@ -86,7 +86,7 @@ dagger-javax = "javax.inject:javax.inject:1"
 sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.1"
 
 #Support
-support-material = "com.google.android.material:material:1.4.0"
+support-material = "com.google.android.material:material:1.6.1"
 
 #WorkManager
 workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "work_version" }
@@ -96,14 +96,13 @@ playServices-location = { module = "com.google.android.gms:play-services-locatio
 playServices-safetynet = { module = "com.google.android.gms:play-services-safetynet", version.ref = "safetynet_services_version" }
 
 #Playcore
-playcore-core = "com.google.android.play:core:1.8.0"
+playcore-core = "com.google.android.play:core:1.10.3"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth:19.2.0"
-firebase-storage = "com.google.firebase:firebase-storage-ktx:19.1.1"
-firebase-mlkit = "com.google.firebase:firebase-ml-vision:24.0.1"
-firebase-mlkit_barcode = "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
+firebase-auth = "com.google.firebase:firebase-auth:21.0.6"
+firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
+firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
@@ -174,7 +173,7 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 
 #Testing-KoTest
 testing-KoTest-kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
-testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.3.0"
+testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.3.2"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"

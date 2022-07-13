@@ -8,7 +8,7 @@ import com.simprints.core.tools.extentions.getEstimatedOutage
 import com.simprints.core.tools.extentions.isBackendMaintenanceException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 

@@ -21,7 +21,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.C
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

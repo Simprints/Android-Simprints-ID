@@ -80,7 +80,7 @@ class LoginActivityTest {
             module,
             preferencesModule,
             viewModelModule = viewModelModule
-        ).fullSetup()
+        ).fullSetup().inject(this)
     }
 
     @Test

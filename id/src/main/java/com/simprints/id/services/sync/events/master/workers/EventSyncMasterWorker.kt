@@ -21,7 +21,7 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
