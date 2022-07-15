@@ -152,12 +152,10 @@ class StmOtaHelperTest {
         private val OLD_SCANNER_VERSION =
             ScannerInformation(
                 hardwareVersion = HARDWARE_VERSION,
-                firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(
-                    versionInfo = ExtendedVersionInformation(
+                firmwareVersions = ExtendedVersionInformation(
                         CYPRESS_VERSION,
                         OLD_STM_VERSION,
                         UN20_VERSION
-                    )
                 )
             )
         private val NEW_SCANNER_VERSION = ExtendedVersionInformation(CYPRESS_VERSION, NEW_STM_VERSION, UN20_VERSION)
