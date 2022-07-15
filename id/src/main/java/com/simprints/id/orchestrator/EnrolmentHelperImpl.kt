@@ -11,7 +11,7 @@ import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import java.util.*

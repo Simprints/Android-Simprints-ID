@@ -3,7 +3,7 @@ package com.simprints.id
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import com.simprints.testtools.android.waitOnSystem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

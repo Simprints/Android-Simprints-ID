@@ -92,7 +92,6 @@ import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.Scan
 import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent
 import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
 import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent
@@ -138,7 +137,7 @@ import com.simprints.id.network.SimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
@@ -154,7 +153,6 @@ import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

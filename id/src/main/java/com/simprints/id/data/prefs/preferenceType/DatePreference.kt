@@ -2,7 +2,7 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import java.util.*
 import kotlin.reflect.KProperty
 
