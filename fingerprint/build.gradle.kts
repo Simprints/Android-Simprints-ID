@@ -122,13 +122,12 @@ dependencies {
 
     // RxJava
     implementation(libs.rxJava2.permissions)
-    implementation(libs.rxJava2.location)
+
     implementation(libs.rxJava2.android)
     implementation(libs.rxJava2.core)
     implementation(libs.rxJava2.kotlin)
 
-    // Play Services
-    implementation(libs.playServices.location)
+
 
     // Retrofit
     implementation(libs.retrofit.core)

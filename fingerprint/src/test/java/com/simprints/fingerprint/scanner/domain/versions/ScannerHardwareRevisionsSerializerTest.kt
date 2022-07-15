@@ -41,8 +41,7 @@ class ScannerHardwareRevisionsSerializerTest {
     fun `test build ScannerHardwareRevisions failure`() {
         //Given
         every { jsonHelper.fromJson<ScannerHardwareRevisions>(any()) } throws Exception("Malformed json")
-        val jsonString =
-            "invalid json"
+        val jsonString =""
         // When
         val scannerHardwareRevisions = serializer.build(jsonString)
         // Then
