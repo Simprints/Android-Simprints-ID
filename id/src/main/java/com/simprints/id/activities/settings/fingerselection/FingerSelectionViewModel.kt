@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
+import com.simprints.infra.logging.Simber
 
 class FingerSelectionViewModel(private val preferencesManager: IdPreferencesManager) : ViewModel() {
 

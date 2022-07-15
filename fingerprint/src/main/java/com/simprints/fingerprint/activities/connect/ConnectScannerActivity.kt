@@ -20,7 +20,7 @@ import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {

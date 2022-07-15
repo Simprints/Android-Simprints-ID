@@ -24,7 +24,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.C
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class EventSyncStateProcessorImpl(val ctx: Context,
                                   private val eventSyncCache: EventSyncCache,

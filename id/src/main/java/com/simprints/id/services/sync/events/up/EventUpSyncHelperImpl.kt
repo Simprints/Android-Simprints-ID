@@ -11,7 +11,7 @@ import com.simprints.id.data.prefs.settings.canSyncAllDataToSimprints
 import com.simprints.id.data.prefs.settings.canSyncAnalyticsDataToSimprints
 import com.simprints.id.data.prefs.settings.canSyncBiometricDataToSimprints
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow

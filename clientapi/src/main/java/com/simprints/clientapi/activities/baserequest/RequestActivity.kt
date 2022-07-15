@@ -16,7 +16,7 @@ import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.coroutines.launch
 
