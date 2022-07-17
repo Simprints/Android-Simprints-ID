@@ -14,8 +14,9 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxSingle
 import java.util.concurrent.TimeUnit
 
 /**
@@ -54,15 +55,16 @@ class ScannerInitialSetupHelper(
             .andThen(getBatteryInfo(scanner, withBatteryInfo))
             .flatMapCompletable { ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, it) }
 
-    private fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): Single<BatteryInfo> =
-        Singles.zip(
-            scanner.getBatteryPercentCharge(),
-            scanner.getBatteryVoltageMilliVolts(),
-            scanner.getBatteryCurrentMilliAmps(),
-            scanner.getBatteryTemperatureDeciKelvin()
-        ) { charge, voltage, current, temperature ->
+    private fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): Single<BatteryInfo> {
+        return rxSingle {
+            val charge = scanner.getBatteryPercentCharge().await()
+            val voltage = scanner.getBatteryVoltageMilliVolts().await()
+            val current = scanner.getBatteryCurrentMilliAmps().await()
+            val temperature = scanner.getBatteryTemperatureDeciKelvin().await()
+
             BatteryInfo(charge, voltage, current, temperature).also { withBatteryInfo(it) }
         }
+    }
 
     private fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
         val availableVersions = fingerprintPreferenceManager.scannerHardwareRevisions[hardwareVersion]
