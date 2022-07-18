@@ -27,8 +27,8 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

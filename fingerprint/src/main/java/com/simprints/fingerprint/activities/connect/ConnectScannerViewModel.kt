@@ -25,9 +25,9 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
-import com.simprints.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
+import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
+import com.simprints.infra.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -83,9 +83,9 @@ class ConnectScannerViewModel(
     }
 
     fun stopConnectingAndResetState() {
-        progress.value = 0
-        message.value = R.string.connect_scanner_bt_connect
-        backButtonBehaviour.value = BackButtonBehaviour.EXIT_FORM
+        progress.postValue(0)
+        message.postValue(R.string.connect_scanner_bt_connect)
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
         setupFlow?.dispose()
     }
 
@@ -246,11 +246,11 @@ class ConnectScannerViewModel(
     }
 
     fun disableBackButton() {
-        backButtonBehaviour.value = BackButtonBehaviour.DISABLED
+        backButtonBehaviour.postValue(BackButtonBehaviour.DISABLED)
     }
 
     fun setBackButtonToExitWithError() {
-        backButtonBehaviour.value = BackButtonBehaviour.EXIT_WITH_ERROR
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_WITH_ERROR)
     }
 
     private fun addBluetoothConnectivityEvent() {

@@ -42,7 +42,7 @@ class CheckLoginFromMainLauncherActivityTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup()
+        UnitTestConfig(this, module).fullSetup().inject(this)
 
         val sharedPrefs = getSharedPreferences(PREF_FILE_NAME)
         editor = sharedPrefs.edit()

@@ -4,7 +4,7 @@ import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlin.reflect.KProperty
 
 /**

@@ -8,7 +8,7 @@ import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.withContext

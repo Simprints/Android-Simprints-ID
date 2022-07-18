@@ -50,7 +50,7 @@ class QrCaptureActivityAndroidTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(this, appModule).initAndInjectComponent()
+        AndroidTestConfig(this, appModule).initComponent().testAppComponent.inject(this)
     }
 
     @Test

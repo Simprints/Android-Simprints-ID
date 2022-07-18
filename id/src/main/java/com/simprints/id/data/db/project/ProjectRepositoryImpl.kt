@@ -4,7 +4,7 @@ import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.logging.PerformanceMonitor
+import com.simprints.infra.logging.PerformanceMonitor
 
 class ProjectRepositoryImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,

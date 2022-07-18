@@ -19,7 +19,7 @@ import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThres
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
                                    val timeHelper: TimeHelper,

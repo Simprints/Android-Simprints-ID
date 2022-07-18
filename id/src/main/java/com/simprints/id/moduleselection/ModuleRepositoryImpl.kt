@@ -5,8 +5,8 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
+import com.simprints.infra.logging.Simber
 
 class ModuleRepositoryImpl(
     val preferencesManager: IdPreferencesManager,

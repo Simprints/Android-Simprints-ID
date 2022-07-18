@@ -7,7 +7,7 @@ import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.tools.ignoreException
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 class GuidSelectionManagerImpl(val deviceId: String,
                                val loginInfoManager: LoginInfoManager,

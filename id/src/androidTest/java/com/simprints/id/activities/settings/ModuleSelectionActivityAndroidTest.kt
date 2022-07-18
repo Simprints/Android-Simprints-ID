@@ -30,7 +30,8 @@ class ModuleSelectionActivityAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, null, preferencesModule = preferencesModule).fullSetup()
+        AndroidTestConfig(this, null, preferencesModule = preferencesModule).
+        fullSetup().inject(this)
         preferencesManagerSpy = app.component.getIdPreferencesManager()
     }
 
