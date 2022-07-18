@@ -289,7 +289,7 @@ definitions:
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
         ######################################################################
-          # Promote the Alpha track build to the Internal Track
+          # Promote the Alpha track build to the Production Track
           #
           # Signing vars are only available on a deployment step.
         ######################################################################
