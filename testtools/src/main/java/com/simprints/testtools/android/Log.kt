@@ -3,7 +3,7 @@ package com.simprints.testtools.android
 import android.app.Instrumentation
 import android.os.Bundle
 import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 
 fun log(message: String) {
     Simber.d(String.format("SimprintsAndroidTests: %s", message))

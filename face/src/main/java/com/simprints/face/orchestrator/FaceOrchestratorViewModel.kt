@@ -15,7 +15,7 @@ import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.error.ErrorType
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 

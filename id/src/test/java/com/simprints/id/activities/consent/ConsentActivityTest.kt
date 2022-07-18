@@ -60,7 +60,7 @@ class ConsentActivityTest {
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule).fullSetup()
+        UnitTestConfig(this, module, preferencesModule).fullSetup().inject(this)
     }
 
     @Test

@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
@@ -12,7 +13,7 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.secure.models.Token
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -56,7 +57,7 @@ open class FirebaseManagerImpl(
             // previous Firebase project until they login again.
             val result = try {
                 FirebaseAuth.getInstance(getLegacyAppFallback())
-                    .getAccessToken(false).await()
+                    .getAccessToken(false).await() as GetTokenResult
             } catch (ex: FirebaseNoSignedInUserException) {
                 Simber.d(ex)
                 null

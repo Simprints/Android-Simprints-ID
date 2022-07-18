@@ -21,7 +21,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Captu
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
 import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Observer

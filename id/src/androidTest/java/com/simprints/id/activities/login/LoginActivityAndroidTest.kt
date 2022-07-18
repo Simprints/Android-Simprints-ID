@@ -64,7 +64,9 @@ class LoginActivityAndroidTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         AndroidTestConfig(this, appModule = appModule, securityModule = securityModule, viewModelModule = viewModelModule)
-            .initAndInjectComponent()
+            .initComponent().testAppComponent.inject(this)
+
+
         Intents.init()
     }
 

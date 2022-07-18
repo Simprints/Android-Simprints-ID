@@ -24,16 +24,15 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
-import com.simprints.logging.LoggingConstants.AnalyticsUserProperties
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.PROJECT_ID
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS
-import com.simprints.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.PROJECT_ID
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent

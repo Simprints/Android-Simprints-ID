@@ -16,7 +16,7 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_R
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_YOUNG
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.SCANNER_NOT_WORKING
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.runBlocking
 
 class RefusalPresenter(

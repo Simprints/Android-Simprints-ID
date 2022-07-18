@@ -3,7 +3,7 @@ package com.simprints.face.initializers
 import android.app.Activity
 import android.content.Context
 import com.google.android.play.core.splitinstall.SplitInstallHelper
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
 

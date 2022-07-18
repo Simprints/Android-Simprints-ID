@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import android.util.Base64
-import com.simprints.logging.Simber
+import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
 class JwtTokenHelper {

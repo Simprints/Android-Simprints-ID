@@ -3,11 +3,10 @@ package com.simprints.id
 import android.content.Context
 import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
-import com.simprints.logging.Simber
-import com.simprints.logging.SimberBuilder
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.logging.SimberBuilder
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
