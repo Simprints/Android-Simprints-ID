@@ -284,9 +284,25 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/deployment/build_properties_setup
-                    - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
+
+        ######################################################################
+          # Promote the Internal track build to the Alpha Track
+          #
+          # Signing vars are only available on a deployment step.
+        ######################################################################
+        -   step: &promote-alpha-to-production
+                name: "Promote Alpha Track to Production Track"
+                deployment: Production
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - ./gradlew promoteArtifact --from-track alpha --promote-track production
 
 
         ######################################################################
@@ -332,10 +348,13 @@ flows:
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
+            -   step: *promote-alpha-to-production
     -   flow: &ci-test # For CI testing purposes only
-            -   step: *run-fingerprint-unit-tests
+            -   step: *build-and-sign-universal-apk
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
+            -   step: *promote-internal-to-alpha
+            -   step: *promote-alpha-to-production
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
 
