@@ -284,10 +284,12 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
         ######################################################################
-          # Promote the Internal track build to the Alpha Track
+          # Promote the Alpha track build to the Internal Track
           #
           # Signing vars are only available on a deployment step.
         ######################################################################
@@ -302,6 +304,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track alpha --promote-track production
 
 
