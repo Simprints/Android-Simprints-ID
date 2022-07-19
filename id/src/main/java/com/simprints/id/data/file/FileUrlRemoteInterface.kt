@@ -1,6 +1,6 @@
 package com.simprints.id.data.file
 
-import com.simprints.core.network.SimRemoteInterface
+import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET
 import retrofit2.http.Path
 

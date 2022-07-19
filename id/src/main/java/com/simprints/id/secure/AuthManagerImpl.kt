@@ -1,49 +1,29 @@
 package com.simprints.id.secure
 
-import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.id.exceptions.safe.BackendMaintenanceException
-import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.Token
-import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.id.tools.extensions.isBackendMaitenanceException
+import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import retrofit2.HttpException
-import retrofit2.Response
 
 class AuthManagerImpl(private val simApiClientFactory: SimApiClientFactory) : AuthManager {
 
-    override suspend fun requestAuthToken(authRequest: AuthRequest): Token {
-        val response = executeCall("requestAuthToken") {
-            it.requestCustomTokens(
-                authRequest.projectId,
-                authRequest.userId,
-                authRequest.authRequestBody
-            )
-        }
-
-        response.body()?.let {
-            return it.toDomainToken()
-        } ?: handleResponseError(response)
-    }
-
-    private fun handleResponseError(response: Response<ApiToken>): Nothing =
-        when (response.code()) {
-            401, 404 -> throw AuthRequestInvalidCredentialsException()
-            in 500..599 -> throw if (response.isBackendMaitenanceException()) {
-                BackendMaintenanceException()
-            } else {
-                SimprintsInternalServerException()
-            }
-            else -> throw HttpException(response)
-        }
-
-    private suspend fun <T> executeCall(nameCall: String, block: suspend (SecureApiInterface) -> T): T =
-        with(getSecureApiClient()) {
-            executeCall(nameCall) {
-                block(it)
-            }
+    override suspend fun requestAuthToken(authRequest: AuthRequest): Token =
+        try {
+            getSecureApiClient().executeCall {
+                it.requestCustomTokens(
+                    authRequest.projectId,
+                    authRequest.userId,
+                    authRequest.authRequestBody
+                )
+            }.toDomainToken()
+        } catch (e: Exception) {
+            if (e is SyncCloudIntegrationException && (e.cause is HttpException) && (e.cause as HttpException).code() == 401)
+                throw AuthRequestInvalidCredentialsException()
+            else
+                throw e
         }
 
     private fun getSecureApiClient(): SimApiClient<SecureApiInterface> =

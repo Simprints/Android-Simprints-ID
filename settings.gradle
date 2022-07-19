@@ -12,4 +12,5 @@ include ':id',
     ':eventsystem',
     ':infraconfig',
     ':infralogging',
-    ':infralogin'
+    ':infralogin',
+    ':infranetwork'

@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent.longconsent.remote
 
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClient
+import com.simprints.infra.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface

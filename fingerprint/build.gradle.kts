@@ -99,6 +99,7 @@ dependencies {
     implementation(project(":fingerprintscanner"))
     implementation(project(":fingerprintscannermock"))
     implementation(project(":infralogging"))
+    implementation(project(":infranetwork"))
 
     // Kotlin
     implementation(libs.kotlin.reflect)
