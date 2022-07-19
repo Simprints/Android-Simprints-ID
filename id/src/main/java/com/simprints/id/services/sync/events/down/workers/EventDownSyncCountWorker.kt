@@ -16,11 +16,15 @@ import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
+import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -41,16 +45,22 @@ class EventDownSyncCountWorker(
         WorkManager.getInstance(context)
     }
 
-    @Inject lateinit var eventDownSyncHelper: EventDownSyncHelper
-    @Inject lateinit var jsonHelper: JsonHelper
-    @Inject lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-    @Inject lateinit var dispatcher: DispatcherProvider
+    @Inject
+    lateinit var eventDownSyncHelper: EventDownSyncHelper
+    @Inject
+    lateinit var jsonHelper: JsonHelper
+    @Inject
+    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    @Inject
+    lateinit var dispatcher: DispatcherProvider
 
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
             ?: throw IllegalArgumentException("input required")
         Simber.d("Received $jsonInput")
-        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope>(jsonInput)
+        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope>(
+            jsonInput
+        )
     }
 
     override suspend fun doWork(): Result {
@@ -81,7 +91,15 @@ class EventDownSyncCountWorker(
 
             when {
                 t is SyncCloudIntegrationException -> {
-                    fail(t)
+                    fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+                }
+                t is BackendMaintenanceException -> {
+                    fail(
+                        t, t.message, workDataOf(
+                            OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                            OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
+                        )
+                    )
                 }
                 isSyncStillRunning() -> {
                     retry(t)
