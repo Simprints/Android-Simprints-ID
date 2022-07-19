@@ -42,7 +42,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     implementation(project(":infralogging"))
-    implementation(project(":infranetwork"))
+    api(project(":infranetwork"))
 
     api(libs.androidX.room.core)
     implementation(libs.androidX.room.ktx)
