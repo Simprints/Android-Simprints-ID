@@ -1,10 +1,12 @@
 package com.simprints.id.testtools.testingapi.remote
 
-import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.id.testtools.testingapi.models.*
+import com.simprints.infra.network.SimRemoteInterface
 import io.reactivex.Single
-import retrofit2.adapter.rxjava2.Result
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface RemoteTestingApi : SimRemoteInterface {
 
@@ -14,9 +16,6 @@ interface RemoteTestingApi : SimRemoteInterface {
 
     @POST("projects")
     fun createProject(@Body testProjectCreationParameters: TestProjectCreationParameters): Single<TestProject>
-
-    @DELETE("projects/{projectId}")
-    fun deleteProject(@Path("projectId") projectId: String): Single<Result<Void?>>
 
     @POST("tokens")
     fun generateFirebaseToken(@Body testFirebaseTokenParameters: TestFirebaseTokenParameters): Single<TestFirebaseToken>
