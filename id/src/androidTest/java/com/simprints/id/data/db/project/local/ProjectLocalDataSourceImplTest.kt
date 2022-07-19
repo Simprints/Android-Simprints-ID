@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.project.local
+package com.simprints.id.data.db.project.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -80,7 +80,7 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
     @Test
     fun load_shouldLoadAProjectFromTheDb() = runBlocking {
         realm.executeTransaction {
-            assertThat(it.insertOrUpdate(project.fromDomainToDb()))
+            it.insertOrUpdate(project.fromDomainToDb())
         }
 
         val projectFromDb = projectLocalDataSource.load(DEFAULT_PROJECT_ID)

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.simprints.core.network.SimApiClient
-import com.simprints.core.network.SimRemoteInterface
+import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimRemoteInterface
 
 class FingerprintApiClientImpl<T : SimRemoteInterface>(
     private val simApiClient: SimApiClient<T>
@@ -9,6 +9,6 @@ class FingerprintApiClientImpl<T : SimRemoteInterface>(
 
     override val api: T = simApiClient.api
 
-    override suspend fun <V> executeCall(traceName: String?, networkBlock: suspend (T) -> V): V =
-        simApiClient.executeCall(traceName, networkBlock)
+    override suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V =
+        simApiClient.executeCall(networkBlock)
 }

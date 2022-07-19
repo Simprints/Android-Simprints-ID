@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.SimApiClient
+import com.simprints.infra.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
@@ -60,9 +60,9 @@ class EventRemoteDataSourceImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { simApiClient.executeCall<Int>(any(), any()) } coAnswers {
+        coEvery { simApiClient.executeCall<Int>(any()) } coAnswers {
             val args = this.args
-            (args[1] as CountInvocation<EventRemoteInterface, Int>).invoke(eventRemoteInterface)
+            (args[0] as CountInvocation<EventRemoteInterface, Int>).invoke(eventRemoteInterface)
         }
 
         coEvery { simApiClientFactory.buildClient(EventRemoteInterface::class) } returns simApiClient

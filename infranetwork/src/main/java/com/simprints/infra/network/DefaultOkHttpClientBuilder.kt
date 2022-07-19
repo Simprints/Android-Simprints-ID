@@ -1,12 +1,13 @@
-package com.simprints.id.network
+package com.simprints.infra.network
 
-import com.simprints.core.BuildConfig
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
-open class DefaultOkHttpClientBuilder {
+class DefaultOkHttpClientBuilder {
 
     companion object {
         const val DEVICE_ID_HEADER = "X-Device-ID"
@@ -14,11 +15,11 @@ open class DefaultOkHttpClientBuilder {
         const val USER_AGENT_HEADER = "User-Agent"
     }
 
-    open fun get(
+    fun get(
+        ctx: Context,
         authToken: String? = null,
         deviceId: String,
         versionName: String,
-        interceptor: Interceptor =HttpLoggingInterceptor()
     ): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
@@ -32,12 +33,13 @@ open class DefaultOkHttpClientBuilder {
             }
             .apply {
                 if (BuildConfig.DEBUG_MODE) {
-                    addInterceptor(buildSimperLoggingInterceptor())
-                    addInterceptor(interceptor)
+                    addInterceptor(buildSimberLoggingInterceptor())
                 }
             }
+            .addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
             .addInterceptor(buildDeviceIdInterceptor(deviceId))
             .addInterceptor(buildVersionInterceptor(versionName))
+
 
     private fun buildAuthenticationInterceptor(authToken: String): Interceptor =
         Interceptor { chain ->
@@ -55,7 +57,7 @@ open class DefaultOkHttpClientBuilder {
             return@Interceptor chain.proceed(newRequest)
         }
 
-    private fun buildSimperLoggingInterceptor(): Interceptor {
+    private fun buildSimberLoggingInterceptor(): Interceptor {
         val logger = SimberLogger
         return HttpLoggingInterceptor(logger).apply {
             level = HttpLoggingInterceptor.Level.HEADERS

@@ -2,6 +2,7 @@ package com.simprints.id.data.db.event.remote
 
 import android.os.Build
 import android.os.Build.VERSION
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
@@ -12,106 +13,24 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
+import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
-import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload
-import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent
-import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
-import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventLabels
-import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.ALERT_SCREEN
-import com.simprints.eventsystem.event.domain.models.EventType.ARTIFICIAL_TERMINATION
-import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
-import com.simprints.eventsystem.event.domain.models.EventType.AUTHORIZATION
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_CONFIRMATION
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ENROLMENT
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_ERROR
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_IDENTIFICATION
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_REFUSAL
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_VERIFICATION
-import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_CONFIRMATION
-import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_ENROLMENT
-import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_IDENTIFICATION
-import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
-import com.simprints.eventsystem.event.domain.models.EventType.CALLOUT_VERIFICATION
-import com.simprints.eventsystem.event.domain.models.EventType.CANDIDATE_READ
-import com.simprints.eventsystem.event.domain.models.EventType.COMPLETION_CHECK
-import com.simprints.eventsystem.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
-import com.simprints.eventsystem.event.domain.models.EventType.CONSENT
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_MOVE
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V1
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
-import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
-import com.simprints.eventsystem.event.domain.models.EventType.FINGERPRINT_CAPTURE
-import com.simprints.eventsystem.event.domain.models.EventType.GUID_SELECTION
-import com.simprints.eventsystem.event.domain.models.EventType.INTENT_PARSING
-import com.simprints.eventsystem.event.domain.models.EventType.INVALID_INTENT
-import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_MANY_MATCH
-import com.simprints.eventsystem.event.domain.models.EventType.ONE_TO_ONE_MATCH
-import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
-import com.simprints.eventsystem.event.domain.models.EventType.REFUSAL
-import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_CONNECTION
-import com.simprints.eventsystem.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
-import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.eventsystem.event.domain.models.EventType.SUSPICIOUS_INTENT
-import com.simprints.eventsystem.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
-import com.simprints.eventsystem.event.domain.models.FingerComparisonStrategy
-import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
-import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
+import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
-import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
-import com.simprints.eventsystem.event.domain.models.MatchEntry
-import com.simprints.eventsystem.event.domain.models.Matcher
-import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
-import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload
-import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
-import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent
-import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
-import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
-import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.RefusalCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
+import com.simprints.eventsystem.event.domain.models.callout.*
+import com.simprints.eventsystem.event.domain.models.face.*
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -126,32 +45,25 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
+import com.simprints.id.Application
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.DefaultOkHttpClientBuilder
 import com.simprints.id.network.SimApiClientFactoryImpl
-import com.simprints.id.network.SimberLogger
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import okhttp3.HttpUrl
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
-import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -165,8 +77,10 @@ class EventRemoteDataSourceImplAndroidTest {
         const val DEFAULT_TIME = 1000L
     }
 
+    private val app = ApplicationProvider.getApplicationContext<Application>()
+
     private val remoteTestingManager: RemoteTestingManager by lazy {
-        RemoteTestingManager.create(testDispatcherProvider)
+        RemoteTestingManager.create(app)
     }
 
     private val facePayloadId = randomUUID()
@@ -178,11 +92,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private lateinit var testProject: TestProject
 
     @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-
-    @get:Rule
-    val testProjectRule = TestProjectRule(testDispatcherProvider)
+    val testProjectRule = TestProjectRule(app)
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private lateinit var eventLabels: EventLabels
@@ -190,52 +100,28 @@ class EventRemoteDataSourceImplAndroidTest {
     @MockK
     var remoteDbManager = mockk<RemoteDbManager>()
 
-    private val okHttpClientBuilder = object : DefaultOkHttpClientBuilder() {
-        override fun get(
-            authToken: String?,
-            deviceId: String,
-            versionName: String,
-            interceptor: Interceptor
-        ): OkHttpClient.Builder =
-            super.get(authToken, deviceId, versionName, interceptor).apply {
-                addInterceptor(HttpLoggingInterceptor(SimberLogger).apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                })
-                addNetworkInterceptor {
-                    var request = it.request()
-                    val url: HttpUrl =
-                        request.url.newBuilder().addQueryParameter("acceptInvalidEvents", "false")
-                            .build()
-                    request = request.newBuilder().url(url).build()
-                    return@addNetworkInterceptor it.proceed(request)
-                }
-            }
-    }
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         testProject = testProjectRule.testProject
         eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 
-        val firebaseTestToken =
+        val firebaseTestToken = runBlocking {
             remoteTestingManager.generateFirebaseToken(
                 projectId = testProject.id,
                 userId = SIGNED_ID_USER
             )
+        }
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
         every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
             SimApiClientFactoryImpl(
+                ctx = app,
                 baseUrlProvider = mockBaseUrlProvider,
                 deviceId = "some_device",
-                versionName = "some_version",
+                versionName = "Test",
                 remoteDbManager = remoteDbManager,
-                jsonHelper = JsonHelper,
-                dispatcher = testDispatcherProvider,
-                interceptor = HttpLoggingInterceptor(),
-                okHttpClientBuilder = okHttpClientBuilder
             ),
             JsonHelper
         )

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
-import com.simprints.core.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
@@ -14,6 +13,7 @@ import com.simprints.eventsystem.event.remote.models.ApiEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.SimApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
@@ -29,7 +29,7 @@ class EventRemoteDataSourceImpl(
 
     override suspend fun count(query: ApiRemoteEventQuery): List<EventCount> =
         with(query) {
-            executeCall("EventCount") { eventsRemoteInterface ->
+            executeCall { eventsRemoteInterface ->
                 eventsRemoteInterface.countEvents(
                     projectId = projectId,
                     moduleIds = moduleIds,
@@ -42,7 +42,7 @@ class EventRemoteDataSourceImpl(
         }
 
     override suspend fun dumpInvalidEvents(projectId: String, events: List<String>) {
-        executeCall("InvalidEventUpload") { remoteInterface ->
+        executeCall { remoteInterface ->
             remoteInterface.dumpInvalidEvents(projectId = projectId, events = events)
         }
     }
@@ -89,7 +89,7 @@ class EventRemoteDataSourceImpl(
 
     private suspend fun takeStreaming(query: ApiRemoteEventQuery) =
         with(query) {
-            executeCall("EventDownload") { eventsRemoteInterface ->
+            executeCall { eventsRemoteInterface ->
                 eventsRemoteInterface.downloadEvents(
                     projectId = projectId,
                     moduleIds = moduleIds,
@@ -102,19 +102,16 @@ class EventRemoteDataSourceImpl(
         }.byteStream()
 
     override suspend fun post(projectId: String, events: List<Event>) {
-        executeCall("EventUpload") { remoteInterface ->
+        executeCall { remoteInterface ->
             remoteInterface.uploadEvents(projectId, ApiUploadEventsBody(events.map {
                 it.fromDomainToApi()
             }))
         }
     }
 
-    private suspend fun <T> executeCall(
-        nameCall: String,
-        block: suspend (EventRemoteInterface) -> T
-    ): T =
+    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
         with(getEventsApiClient()) {
-            executeCall(nameCall) {
+            executeCall {
                 block(it)
             }
         }

@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
@@ -13,10 +12,10 @@ import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.EventRepositoryImpl
@@ -37,7 +36,9 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.*
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
+import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
@@ -67,11 +68,9 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
-import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import okhttp3.Interceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -143,17 +142,12 @@ open class AppModule {
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider,
-        jsonHelper: JsonHelper,
-        dispatcher: DispatcherProvider,
-        @Named("ChuckerInterceptor") interceptor: Interceptor
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
+        ctx,
         ctx.packageVersionName,
         remoteDbManager,
-        jsonHelper,
-        dispatcher,
-        interceptor
     )
 
     @Provides
@@ -172,11 +166,6 @@ open class AppModule {
     @Provides
     open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
         SessionEventValidatorsFactoryImpl()
-
-    @Provides
-    @Named("ChuckerInterceptor")
-    open fun provideChuckerInterceptor(ctx: Context): Interceptor =
-        ChuckerInterceptor.Builder(ctx).build()
 
     @Provides
     open fun provideDbEventDatabaseFactory(
