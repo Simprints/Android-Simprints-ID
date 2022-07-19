@@ -1,12 +1,12 @@
 package com.simprints.id.data.license.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.coEvery
 import io.mockk.mockk

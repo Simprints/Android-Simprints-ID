@@ -1,6 +1,5 @@
 package com.simprints.id.data.license.remote
 
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
@@ -8,6 +7,7 @@ import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 
