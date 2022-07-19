@@ -20,8 +20,8 @@ dependencies {
 
     implementation(project(":infralogging"))
 
+    implementation(libs.chuck.release)
     debugImplementation(libs.chuck.debug)
-    releaseImplementation(libs.chuck.release)
 
     implementation(libs.androidX.core)
 
@@ -40,11 +40,19 @@ dependencies {
     testImplementation(project(":testtools"))
 
     testImplementation(libs.chuck.release)
-    
+
     testImplementation(libs.testing.coroutines.test)
 
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.mockwebserver)
     testImplementation(libs.testing.truth)
+}
+
+configurations {
+    debugImplementation {
+        // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
+        // And a full feature version that should be added in debug build types
+        exclude("com.github.chuckerteam.chucker", "library-no-op")
+    }
 }
