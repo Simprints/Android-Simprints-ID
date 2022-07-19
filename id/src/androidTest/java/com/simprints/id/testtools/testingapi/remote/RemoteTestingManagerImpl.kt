@@ -28,11 +28,6 @@ class RemoteTestingManagerImpl(ctx: Context) : RemoteTestingManager {
         remoteTestingApi.executeCall { it.createProject(testProjectCreationParameters) }
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to create project", it) }
 
-    override suspend fun deleteTestProject(projectId: String) {
-        remoteTestingApi.executeCall { it.deleteProject(projectId) }
-            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to delete project", it) }
-    }
-
     override suspend fun generateFirebaseToken(
         projectId: String,
         userId: String

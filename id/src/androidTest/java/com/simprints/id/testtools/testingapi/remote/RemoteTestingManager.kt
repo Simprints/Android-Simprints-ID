@@ -11,7 +11,6 @@ interface RemoteTestingManager {
     }
 
     suspend fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()): TestProject
-    suspend fun deleteTestProject(projectId: String)
 
     suspend fun generateFirebaseToken(
         projectId: String,

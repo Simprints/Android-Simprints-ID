@@ -34,8 +34,4 @@ class TestProjectRule(
             DEFAULT_REALM_KEY
         )
     }
-
-    override fun finished(description: Description?) = runBlocking {
-        RemoteTestingManager.create(ctx).deleteTestProject(testProject.id)
-    }
 }
