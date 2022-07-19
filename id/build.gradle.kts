@@ -139,12 +139,6 @@ dependencies {
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
     implementation(libs.playServices.safetynet)
-    implementation(libs.retrofit.core)
-    implementation(libs.retrofit.adapter)
-    implementation(libs.retrofit.jackson)
-    implementation(libs.retrofit.logging)
-    implementation(libs.retrofit.okhttp)
-    implementation(libs.retrofit.converterScalars)
     implementation(libs.rxJava2.core)
     kapt(libs.androidX.room.compiler)
     kapt(libs.dagger.compiler)
@@ -179,9 +173,6 @@ dependencies {
     implementation(libs.playcore.core.ktx)
     implementation(libs.androidX.sqlite)
     implementation(libs.sqlCipher.core)
-
-    implementation(libs.chuck.release)
-    debugImplementation(libs.chuck.debug)
 
     // ######################################################
     //                      Unit test
@@ -273,11 +264,6 @@ dependencies {
     }
 }
 configurations {
-    debugImplementation {
-        // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
-        // And a full feature version that should be added in debug build types
-        exclude("com.github.chuckerteam.chucker", "library-no-op")
-    }
     androidTestImplementation {
         // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
         // the issue is reported here https://github.com/mockk/mockk/issues/722
