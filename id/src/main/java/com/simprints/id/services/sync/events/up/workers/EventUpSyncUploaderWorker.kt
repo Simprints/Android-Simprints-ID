@@ -5,7 +5,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
@@ -23,6 +22,7 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
@@ -87,19 +87,23 @@ class EventUpSyncUploaderWorker(
     }
 
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
-        return if (t is BackendMaintenanceException) {
-            fail(
-                t,
-                t.message,
-                workDataOf(
-                    OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
+        return when (t) {
+            is BackendMaintenanceException -> {
+                fail(
+                    t,
+                    t.message,
+                    workDataOf(
+                        OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                        OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
+                    )
                 )
-            )
-        } else if (t is SyncCloudIntegrationException) {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-        } else {
-            retry(t)
+            }
+            is SyncCloudIntegrationException -> {
+                fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+            }
+            else -> {
+                retry(t)
+            }
         }
     }
 

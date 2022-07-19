@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
@@ -19,6 +18,7 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

@@ -8,7 +8,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
@@ -22,6 +21,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.D
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
