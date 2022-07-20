@@ -2,6 +2,7 @@ package com.simprints.clientapi.clientrequests.validators
 
 import com.simprints.clientapi.exceptions.InvalidSelectedIdException
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
+import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
@@ -30,6 +31,15 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
 
         assertThrows<InvalidSelectedIdException> {
             ConfirmIdentityFactory.getValidator(extractor).validateClientRequest()
+        }
+    }
+
+    @Test
+    fun without_enrollmentOrIdentification_shouldThrowException() {
+        val extractor = ConfirmIdentityFactory.getMockExtractor()
+        val validator =ConfirmIdentityValidator(extractor,false)
+        assertThrows<InvalidStateForIntentAction> {
+            validator.validateClientRequest()
         }
     }
 }
