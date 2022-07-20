@@ -76,7 +76,10 @@ abstract class RequestPresenter(
     override suspend fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
             view.confirmIdentityExtractor,
-            ConfirmIdentityValidator(view.confirmIdentityExtractor)
+            ConfirmIdentityValidator(
+                view.confirmIdentityExtractor,
+                eventsManager.isCurrentSessionAnIdentificationOrEnrolment()
+            )
         )
     )
 
