@@ -161,11 +161,11 @@ class CommCareCoSyncPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
         every { view.extras } returns mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
+        val sessionEventsManager =mockSessionManagerToCreateSession().also {
+            coEvery { it.isSessionHasIdentificationCallback(any()) } returns true
+        }
 
-        getNewPresenter(
-            ConfirmIdentity,
-            mockSessionManagerToCreateSession()
-        ).apply { runBlocking { start() } }
+        getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runBlocking { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(

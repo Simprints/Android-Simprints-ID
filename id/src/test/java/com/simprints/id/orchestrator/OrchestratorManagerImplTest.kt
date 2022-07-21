@@ -35,7 +35,7 @@ import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -96,14 +96,14 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun orchestratorStarts_shouldGetFirstStepFromModalityFlow() = runBlocking {
+    fun orchestratorStarts_shouldGetFirstStepFromModalityFlow() = runTest {
         orchestrator.startFlowForEnrol(modalities)
 
         verifyOrchestratorGotNextStepFromModalityFlow()
     }
 
     @Test
-    fun initialise_shouldStoreAppRequestInHotCache() = runBlocking {
+    fun initialise_shouldStoreAppRequestInHotCache() = runTest {
         with(orchestrator) {
             startFlowForEnrol(modalities)
             progressWitFaceCapture()
@@ -114,7 +114,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     fun modalityFlowReceivesAWrongResult_orchestratorShouldNotGoAhead() {
-        runBlocking {
+        runTest {
             with(orchestrator) {
                 startFlowForEnrol(modalities)
                 progressWitFaceCapture(WRONG_REQUEST_CODE, null)
@@ -125,7 +125,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun orchestratorReceivesAResult_itShouldBeForwardedToModalityFlowAndMoveOn() = runBlocking {
+    fun orchestratorReceivesAResult_itShouldBeForwardedToModalityFlowAndMoveOn() = runTest {
         with(orchestrator) {
             startFlowForEnrol(modalities)
             progressWitFaceCapture()
@@ -137,7 +137,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     @DisplayName("Fingerprint only - Person Creation Event should be added after fingerprint capture")
-    fun fingerprintCapture_orchestratorShouldAddPersonCreation() = runBlocking {
+    fun fingerprintCapture_orchestratorShouldAddPersonCreation() = runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted()
 
@@ -149,7 +149,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     @DisplayName("Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return")
-    fun fingerprintRefusal_orchestratorShouldNotAddPersonCreation() = runBlocking {
+    fun fingerprintRefusal_orchestratorShouldNotAddPersonCreation() = runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted(null)
 
@@ -160,7 +160,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `test person creation event should not be added for followup requests`() = runBlocking {
+    fun `test person creation event should not be added for followup requests`() = runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted(null)
 
@@ -171,8 +171,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Face only - Person Creation Event should be added after face capture")
-    fun faceCapture_orchestratorShouldAddPersonCreation() = runBlocking {
+    fun faceCapture_orchestratorShouldAddPersonCreation() = runTest {
         with(orchestrator) {
             mockFaceWithCaptureCompleted()
 
@@ -184,7 +183,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     @DisplayName("Face only - Person Creation Event should not be added if face capture didn't return")
-    fun faceRefusal_orchestratorShouldNotAddPersonCreation() = runBlocking {
+    fun faceRefusal_orchestratorShouldNotAddPersonCreation() = runTest {
         with(orchestrator) {
             mockFaceWithCaptureCompleted(null)
 
@@ -196,7 +195,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     @DisplayName("Face and Fingerprint - Person Creation Event should be if both captures are completed")
-    fun faceAndFingerprintCapture_orchestratorShouldAddPersonCreation() = runBlocking {
+    fun faceAndFingerprintCapture_orchestratorShouldAddPersonCreation() = runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted()
 
@@ -208,7 +207,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     @DisplayName("Face and Fingerprint - Person Creation Event should not be added if face capture didn't return")
-    fun faceAndFingerprintCapture_orchestratorShouldNotAddPersonCreationWhenFaceDoesntComplete() = runBlocking {
+    fun faceAndFingerprintCapture_orchestratorShouldNotAddPersonCreationWhenFaceDoesntComplete() = runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted(faceResult = null)
 
@@ -220,7 +219,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     @DisplayName("Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return")
-    fun faceAndFingerprintCapture_orchestratorShouldNotAddPersonCreationWhenFingerprintDoesntComplete() = runBlocking {
+    fun faceAndFingerprintCapture_orchestratorShouldNotAddPersonCreationWhenFingerprintDoesntComplete() = runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted(fingerprintResult = null)
 
@@ -307,7 +306,7 @@ class OrchestratorManagerImplTest {
 
     private fun OrchestratorManager.startFlowForEnrol(
         modalities: List<Modality>,
-        sessionId: String = "") = runBlocking {
+        sessionId: String = "") = runTest {
         initialise(modalities, appEnrolRequest, sessionId)
     }
 
