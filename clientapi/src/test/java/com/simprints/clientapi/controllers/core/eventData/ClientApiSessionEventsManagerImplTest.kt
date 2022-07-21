@@ -39,7 +39,7 @@ class ClientApiSessionEventsManagerImplTest {
         Truth.assertThat(result).isTrue()
     }
     @Test
-    fun `test isSessionHasIdentificationCallback return fasle if session doesn't hav IdentificationCallbackEvent`() = runTest {
+    fun `test isSessionHasIdentificationCallback return false if session doesn't have IdentificationCallbackEvent`() = runTest {
         // Given
         coEvery { coreEventRepository.getEventsFromSession(sessionId) } returns flowOf(
             mockk(), mockk(), mockk()
@@ -50,7 +50,7 @@ class ClientApiSessionEventsManagerImplTest {
         Truth.assertThat(result).isFalse()
     }
     @Test
-    fun `test isSessionHasIdentificationCallback return fasle if session events is empty`() = runTest {
+    fun `test isSessionHasIdentificationCallback return false if session events is empty`() = runTest {
         // Given
         coEvery { coreEventRepository.getEventsFromSession(sessionId) } returns emptyFlow()
         // When
