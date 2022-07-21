@@ -27,7 +27,7 @@ android {
             assets.srcDirs("$projectDir/schemas")
         }
         getByName("test") {
-            java.srcDirs("$projectDir/src/debug/java")
+            java.srcDirs("$projectDir/src/debug")
         }
     }
 
