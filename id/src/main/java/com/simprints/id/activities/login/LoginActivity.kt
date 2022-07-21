@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -25,12 +24,12 @@ import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.url.BaseUrlProvider
 import javax.inject.Inject
 
 class LoginActivity : BaseSplitActivity() {
@@ -61,7 +60,7 @@ class LoginActivity : BaseSplitActivity() {
         setContentView(binding.root)
 
         baseUrlProvider.resetApiBaseUrl()
-        viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
         observeSignInResult()
     }
@@ -97,9 +96,9 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private fun observeSignInResult() {
-        viewModel.getSignInResult().observe(this, Observer {
+        viewModel.getSignInResult().observe(this) {
             handleSignInResult(it)
-        })
+        }
     }
 
     private fun handleSignInResult(result: Result) {
