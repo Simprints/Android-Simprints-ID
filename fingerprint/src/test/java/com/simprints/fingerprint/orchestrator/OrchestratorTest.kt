@@ -9,7 +9,6 @@ import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTa
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTaskResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.matching.MatchResult
@@ -20,6 +19,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
+import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.syntax.failTest
 import io.mockk.mockk

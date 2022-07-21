@@ -1,6 +1,4 @@
-@file:Suppress("DEPRECATION")
-
-package com.simprints.id.commontesttools.di
+package com.simprints.id.testtools.di
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -20,7 +18,6 @@ import com.simprints.eventsystem.event.local.SessionDataCacheImpl
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
@@ -59,9 +56,7 @@ class TestAppModule(
     private val locationManagerRule: DependencyRule = RealRule,
     private val baseUrlProviderRule: DependencyRule = RealRule,
     private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
-        setupFakeEncryptedSharedPreferences(
-            app
-        )
+        app.getSharedPreferences("test", 0)
     },
     private val cameraHelperRule: DependencyRule = RealRule,
     private val qrPreviewBuilderRule: DependencyRule = RealRule,
@@ -116,18 +111,19 @@ class TestAppModule(
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): com.simprints.eventsystem.event.EventRepository = sessionEventsManagerRule.resolveDependency {
-        super.provideEventRepository(
-            ctx,
-            eventLocalDataSource,
-            eventRemoteDataSource,
-            idPreferencesManager,
-            loginInfoManager,
-            timeHelper,
-            validatorFactory,
-            sessionDataCache
-        )
-    }
+    ): com.simprints.eventsystem.event.EventRepository =
+        sessionEventsManagerRule.resolveDependency {
+            super.provideEventRepository(
+                ctx,
+                eventLocalDataSource,
+                eventRemoteDataSource,
+                idPreferencesManager,
+                loginInfoManager,
+                timeHelper,
+                validatorFactory,
+                sessionDataCache
+            )
+        }
 
     override fun provideSessionEventsLocalDbManager(
         factory: EventDatabaseFactory

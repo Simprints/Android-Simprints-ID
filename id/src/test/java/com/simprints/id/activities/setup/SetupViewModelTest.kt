@@ -32,7 +32,7 @@ class SetupViewModelTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).coroutinesMainThread()
+        UnitTestConfig().coroutinesMainThread()
         MockKAnnotations.init(this)
         isConnectedUpdates = MutableLiveData()
         every { deviceManagerMock.isConnectedLiveData } returns isConnectedUpdates

@@ -109,8 +109,8 @@ class CoreExitFormActivityTest {
         with(response) {
             assertThat(this).isInstanceOf(CoreExitFormActivityResult::class.java)
             assertThat(action).isEqualTo(action)
-            assertThat(this?.answer?.reason).isEqualTo(coreExitReason)
-            assertThat(this?.answer?.optionalText).isEqualTo(exitFormText)
+            assertThat(this.answer.reason).isEqualTo(coreExitReason)
+            assertThat(this.answer.optionalText).isEqualTo(exitFormText)
         }
     }
 

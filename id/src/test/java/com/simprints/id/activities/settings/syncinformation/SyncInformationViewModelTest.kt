@@ -73,7 +73,7 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig(this).coroutinesMainThread()
+        UnitTestConfig().coroutinesMainThread()
         mockkStatic("com.simprints.id.data.prefs.settings.SettingsPreferencesManagerKt")
         viewModel = SyncInformationViewModel(
             downySyncHelper,

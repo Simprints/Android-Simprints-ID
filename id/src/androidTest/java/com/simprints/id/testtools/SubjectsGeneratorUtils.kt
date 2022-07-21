@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools
+package com.simprints.id.testtools
 
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
