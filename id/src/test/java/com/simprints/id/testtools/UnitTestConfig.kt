@@ -6,27 +6,24 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
-import com.simprints.id.commontesttools.di.*
-import com.simprints.id.testtools.di.AppComponentForTests
-import com.simprints.id.testtools.di.DaggerAppComponentForTests
+import com.simprints.id.testtools.di.*
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-class UnitTestConfig<T : Any>(
-    private val test: T,
+class UnitTestConfig(
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
     private val dataModule: TestDataModule? = null,
-    private val syncModule: TestSyncModule? = null,
-    private val loginModule: TestSecurityModule? = null,
     private val viewModelModule: TestViewModelModule? = null
 ) : BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
-        TestAppModule(app,
-            sessionEventsLocalDbManagerRule = DependencyRule.MockRule)
+        TestAppModule(
+            app,
+            sessionEventsLocalDbManagerRule = DependencyRule.MockRule
+        )
     }
 
     private val app by lazy {
@@ -63,21 +60,22 @@ class UnitTestConfig<T : Any>(
 
     fun setupWorkManager() = also {
         try {
-            WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
+            WorkManagerTestInitHelper.initializeTestWorkManager(
+                ctx,
+                Configuration.Builder().build()
+            )
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
     }
 
 
-    private fun initComponent():  AppComponentForTests   {
+    private fun initComponent(): AppComponentForTests {
         testAppComponent = DaggerAppComponentForTests.builder()
             .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .dataModule(dataModule ?: TestDataModule())
-            .syncModule(syncModule ?: TestSyncModule())
-            .securityModule(loginModule ?: TestSecurityModule())
             .viewModelModule(viewModelModule ?: TestViewModelModule())
             .build()
 

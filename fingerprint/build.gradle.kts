@@ -42,17 +42,6 @@ android {
         }
     }
 
-
-    sourceSets {
-        val sharedTestDir = "src/commontesttools/java"
-        named("test") {
-            java.srcDir(sharedTestDir)
-        }
-        named("androidTest") {
-            java.srcDir(sharedTestDir)
-        }
-    }
-
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true

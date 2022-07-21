@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
-import com.simprints.fingerprint.commontesttools.time.MockTimer
+import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager

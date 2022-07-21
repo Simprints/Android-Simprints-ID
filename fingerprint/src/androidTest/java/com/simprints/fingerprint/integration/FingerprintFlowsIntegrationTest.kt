@@ -8,7 +8,6 @@ import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.activities.collect.pressScanUntilDialogIsDisplayedAndClickConfirm
 import com.simprints.fingerprint.activities.collect.waitUntilCollectFingerprintsIsDisplayed
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
-import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -18,6 +17,7 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
+import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.SimulationMode
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter

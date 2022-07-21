@@ -67,15 +67,9 @@ android {
     }
 
     sourceSets {
-        val sharedTestDir = "src/commontesttools/java"
         val eventCreators = "src/debug/java"
         named("test") {
-            java.srcDir(sharedTestDir)
             java.srcDir(eventCreators)
-        }
-        named("androidTest") {
-            java.srcDir(sharedTestDir)
-            java.srcDir("src/androidTest/java")
         }
     }
 

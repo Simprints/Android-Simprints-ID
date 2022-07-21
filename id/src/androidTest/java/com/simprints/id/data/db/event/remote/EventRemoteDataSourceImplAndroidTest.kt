@@ -46,12 +46,12 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactoryImpl
+import com.simprints.id.testtools.SubjectsGeneratorUtils
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager

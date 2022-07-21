@@ -6,7 +6,7 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
-import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse

@@ -25,7 +25,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.S
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
-import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Before
