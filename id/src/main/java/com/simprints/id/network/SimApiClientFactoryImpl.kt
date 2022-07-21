@@ -6,6 +6,7 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.SimApiClientImpl
 import com.simprints.infra.network.SimRemoteInterface
+import com.simprints.infra.network.url.BaseUrlProvider
 import kotlin.reflect.KClass
 
 // TODO move this into the infralogin

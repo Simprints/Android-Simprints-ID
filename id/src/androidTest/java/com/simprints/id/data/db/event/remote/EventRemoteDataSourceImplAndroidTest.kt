@@ -6,7 +6,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.core.network.NetworkConstants.Companion.DEFAULT_BASE_URL
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -50,12 +49,12 @@ import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
-import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -73,6 +72,7 @@ import org.junit.runner.RunWith
 class EventRemoteDataSourceImplAndroidTest {
 
     companion object {
+        const val URL = "https://dev.simprints-apis.com/androidapi/v2/"
         const val SIGNED_ID_USER = "some_signed_user"
         const val DEFAULT_TIME = 1000L
     }
@@ -114,7 +114,7 @@ class EventRemoteDataSourceImplAndroidTest {
         }
         coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
         val mockBaseUrlProvider = mockk<BaseUrlProvider>()
-        every { mockBaseUrlProvider.getApiBaseUrl() } returns DEFAULT_BASE_URL
+        every { mockBaseUrlProvider.getApiBaseUrl() } returns URL
         eventRemoteDataSource = EventRemoteDataSourceImpl(
             SimApiClientFactoryImpl(
                 ctx = app,
