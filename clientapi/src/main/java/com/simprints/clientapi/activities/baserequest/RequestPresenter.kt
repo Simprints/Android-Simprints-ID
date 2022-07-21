@@ -78,7 +78,7 @@ abstract class RequestPresenter(
             view.confirmIdentityExtractor,
             ConfirmIdentityValidator(
                 view.confirmIdentityExtractor,
-                eventsManager.isCurrentSessionAnIdentificationOrEnrolment()
+                eventsManager.isSessionHasIdentificationCallback(view.confirmIdentityExtractor.getSessionId())
             )
         )
     )

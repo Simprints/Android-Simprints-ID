@@ -35,7 +35,7 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
     }
 
     @Test
-    fun without_enrollmentOrIdentification_shouldThrowException() {
+    fun session_without_identificationCallback_shouldThrowException() {
         val extractor = ConfirmIdentityFactory.getMockExtractor()
         val validator =ConfirmIdentityValidator(extractor,false)
         assertThrows<InvalidStateForIntentAction> {

@@ -7,20 +7,20 @@ import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 
 
 class ConfirmIdentityValidator(val extractor: ConfirmIdentityExtractor,
-                               val isCurrentSessionAnEnrolmentOrIdentification: Boolean)
+                               private val isSessionHasIdentificationCallback: Boolean)
     : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {
         validateProjectId()
         validateSessionId(extractor.getSessionId())
         validateSelectedGuid(extractor.getSelectedGuid())
-        validateSessionType()
+        validateSessionEvents()
     }
 
-    private fun validateSessionType() {
-        if(!isCurrentSessionAnEnrolmentOrIdentification) {
+    private fun validateSessionEvents() {
+        if(!isSessionHasIdentificationCallback) {
             throw InvalidStateForIntentAction(
-                "Calling app wants to confirm identity, but last flow was not an identification.")
+                "Calling app wants to confirm identity, but the session doesn't have an identification callback event.")
         }
     }
 
