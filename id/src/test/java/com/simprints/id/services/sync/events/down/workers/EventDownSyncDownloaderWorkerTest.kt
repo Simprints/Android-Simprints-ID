@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.subjects.down.workers
+package com.simprints.id.services.sync.events.down.workers
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,16 +10,12 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -30,7 +26,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -39,7 +34,6 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.util.*
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventDownSyncDownloaderWorkerTest {
@@ -157,6 +151,30 @@ class EventDownSyncDownloaderWorkerTest {
                         OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                         OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L
                     )
+                )
+            }
+        }
+    }
+
+    @Test
+    fun worker_failForTooManyRequestsError_shouldFail() = runBlocking {
+        with(eventDownSyncDownloaderWorker) {
+            coEvery {
+                eventDownSyncDownloaderTask.execute(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } throws TooManyRequestsException()
+
+            doWork()
+
+            verify {
+                resultSetter.failure(
+                    workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true)
                 )
             }
         }

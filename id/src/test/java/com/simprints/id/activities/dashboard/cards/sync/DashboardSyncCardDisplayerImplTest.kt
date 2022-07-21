@@ -16,15 +16,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncComplete
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncDefault
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailed
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailedBackendMaintenance
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncHasNoModules
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -32,7 +24,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.Calendar
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -73,25 +65,49 @@ class DashboardSyncCardDisplayerImplTest {
     @Test
     fun syncCardDisplayer_backendFailedSyncState_shouldDisplayTheCorrectUIWithTime() {
         syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime, estimatedOutage))
-        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(
+            SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE
+        )
     }
 
     @Test
     fun syncCardDisplayer_backendFailedSyncState_shouldDisplayTheCorrectUI() {
         syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime))
-        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(
+            SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
+        )
     }
 
     @Test
     fun syncCardDisplayer_backendFailedSyncStateWithNullTime_shouldDisplayTheCorrectUI() {
-        syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime, estimatedOutage = null))
-        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+        syncCardDisplayer.displayState(
+            SyncFailedBackendMaintenance(
+                lastSyncTime,
+                estimatedOutage = null
+            )
+        )
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(
+            SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
+        )
     }
 
     @Test
     fun syncCardDisplayer_backendFailedSyncStateWith0Time_shouldDisplayTheCorrectUI() {
-        syncCardDisplayer.displayState(SyncFailedBackendMaintenance(lastSyncTime, estimatedOutage = 0L))
-        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+        syncCardDisplayer.displayState(
+            SyncFailedBackendMaintenance(
+                lastSyncTime,
+                estimatedOutage = 0L
+            )
+        )
+        syncCardRootLayout.assessSyncFailedBackendMaintenanceSyncUI(
+            SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
+        )
+    }
+
+    @Test
+    fun syncCardDisplayer_tooManyRequestFailed_shouldDisplayTheCorrectUI() {
+        syncCardDisplayer.displayState(SyncTooManyRequests(lastSyncTime))
+        syncCardRootLayout.assessSyncTooManyRequestSyncUI()
     }
 
     @Test
@@ -178,6 +194,19 @@ class DashboardSyncCardDisplayerImplTest {
         }
     }
 
+    private fun LinearLayout.assessSyncTooManyRequestSyncUI() {
+        assertThat(childCount).isEqualTo(1)
+        val card = this.children.first() as CardView
+        val cardContent = card.children.first() as ConstraintLayout
+        with(cardContent) {
+            assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
+            assertThat(failedMessage()).isEqualTo(SYNC_CARD_TOO_MANY_REQUEST_MESSAGE)
+            assertThat(failedIcon().visibility).isEqualTo(VISIBLE)
+            assessLastSyncTime()
+            assertThat(cardContent.childCount).isEqualTo(4)
+        }
+    }
+
     private fun LinearLayout.assessTryAgainStateSyncUI() {
         assertThat(childCount).isEqualTo(1)
         val card = this.children.first() as CardView
@@ -225,7 +254,8 @@ class DashboardSyncCardDisplayerImplTest {
         val card = this.children.first() as CardView
         val cardContent = card.children.first() as ConstraintLayout
         with(cardContent) {
-            val percentage = (100 * (progressState.progress.toFloat() / (progressState.total ?: 0))).toInt()
+            val percentage =
+                (100 * (progressState.progress.toFloat() / (progressState.total ?: 0))).toInt()
             assertThat(cardTitle()).isEqualTo(SYNC_CARD_TITLE)
             assertThat(progressMessage()).isEqualTo("$SYNC_CARD_PROGRESS_STATE_STATE_MESSAGE ${percentage}%")
             assertThat(progressConnectingProgressBar().visibility).isEqualTo(GONE)
@@ -267,31 +297,52 @@ class DashboardSyncCardDisplayerImplTest {
         }
     }
 
-    private fun View.cardTitle() = this.findViewById<TextView>(R.id.dashboard_sync_card_title).text.toString()
-    private fun View.lastSyncTimeTextView() = this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
+    private fun View.cardTitle() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_title).text.toString()
+
+    private fun View.lastSyncTimeTextView() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_last_sync)
+
     private fun View.lastSyncTime() = lastSyncTimeTextView().text.toString()
 
     private fun View.defaultSyncButton() =
         this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_default_state_sync_button).text.toString()
 
-    private fun View.failedMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message).text.toString()
-    private fun View.failedIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_failed_icon)
+    private fun View.failedMessage() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_failed_message).text.toString()
 
-    private fun View.tryAgainMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_try_again_message).text.toString()
-    private fun View.tryAgainSyncButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_try_again_sync_button)
+    private fun View.failedIcon() =
+        this.findViewById<ImageView>(R.id.dashboard_sync_card_failed_icon)
 
-    private fun View.noModulesMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_message).text.toString()
-    private fun View.noModulesModulesButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_select_no_modules_button)
+    private fun View.tryAgainMessage() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_try_again_message).text.toString()
 
-    private fun View.offlineMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_offline_message).text.toString()
-    private fun View.offlineIcon() = this.findViewById<ImageView>(R.id.dashboard_sync_card_offline_icon)
-    private fun View.offlineSettingsButton() = this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_offline_button)
+    private fun View.tryAgainSyncButton() =
+        this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_try_again_sync_button)
 
-    private fun View.progressMessage() = this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message).text.toString()
+    private fun View.noModulesMessage() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_select_no_modules_message).text.toString()
+
+    private fun View.noModulesModulesButton() =
+        this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_select_no_modules_button)
+
+    private fun View.offlineMessage() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_offline_message).text.toString()
+
+    private fun View.offlineIcon() =
+        this.findViewById<ImageView>(R.id.dashboard_sync_card_offline_icon)
+
+    private fun View.offlineSettingsButton() =
+        this.findViewById<AppCompatButton>(R.id.dashboard_sync_card_offline_button)
+
+    private fun View.progressMessage() =
+        this.findViewById<TextView>(R.id.dashboard_sync_card_progress_message).text.toString()
+
     private fun View.progressConnectingProgressBar() =
         this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)
 
-    private fun View.progressSyncProgressBar() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
+    private fun View.progressSyncProgressBar() =
+        this.findViewById<ProgressBar>(R.id.dashboard_sync_card_progress_sync_progress_bar)
 
     private fun View.assessLastSyncTime() {
         assertThat(lastSyncTimeTextView().visibility).isEqualTo(VISIBLE)
@@ -308,6 +359,7 @@ class DashboardSyncCardDisplayerImplTest {
         const val SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE =
             "The system is currently offline for maintenance. Please try again later."
         const val SYNC_CARD_TRY_AGAIN_STATE_MESSAGE = "Sync incomplete"
+        const val SYNC_CARD_TOO_MANY_REQUEST_MESSAGE = "Too many modules have been downloaded."
         const val SYNC_CARD_TRY_AGAIN_STATE_SYNC_BUTTON = "Try again"
         const val SYNC_CARD_NO_MODULES_STATE_BUTTON = "Modules"
         const val SYNC_CARD_NO_MODULES_STATE_MESSAGE = "Please select modules to sync"
