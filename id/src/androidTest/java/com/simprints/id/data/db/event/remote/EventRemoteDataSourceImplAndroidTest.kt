@@ -150,7 +150,11 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private suspend fun executeUpload(events: List<Event>) {
-        eventRemoteDataSource.post(projectId = testProject.id, events = events.toImmutableList())
+        eventRemoteDataSource.post(
+            projectId = testProject.id,
+            acceptInvalidEvents = false,
+            events = events.toImmutableList()
+        )
     }
 
     private fun MutableList<Event>.addAlertScreenEvents() {
