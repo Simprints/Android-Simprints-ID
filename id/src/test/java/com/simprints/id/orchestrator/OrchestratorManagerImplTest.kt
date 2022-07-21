@@ -40,7 +40,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.DisplayName
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
@@ -136,8 +135,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Fingerprint only - Person Creation Event should be added after fingerprint capture")
-    fun fingerprintCapture_orchestratorShouldAddPersonCreation() = runTest {
+    fun `Fingerprint only - Person Creation Event should be added after fingerprint capture`() = runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted()
 
@@ -148,8 +146,8 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return")
-    fun fingerprintRefusal_orchestratorShouldNotAddPersonCreation() = runTest {
+    fun `Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return`() =
+        runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted(null)
 
@@ -182,8 +180,8 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Face only - Person Creation Event should not be added if face capture didn't return")
-    fun faceRefusal_orchestratorShouldNotAddPersonCreation() = runTest {
+    fun `Face only - Person Creation Event should not be added if face capture didn't return`() =
+        runTest {
         with(orchestrator) {
             mockFaceWithCaptureCompleted(null)
 
@@ -194,8 +192,8 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Face and Fingerprint - Person Creation Event should be if both captures are completed")
-    fun faceAndFingerprintCapture_orchestratorShouldAddPersonCreation() = runTest {
+    fun `Face and Fingerprint - Person Creation Event should be if both captures are completed`() =
+        runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted()
 
@@ -206,8 +204,8 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Face and Fingerprint - Person Creation Event should not be added if face capture didn't return")
-    fun faceAndFingerprintCapture_orchestratorShouldNotAddPersonCreationWhenFaceDoesntComplete() = runTest {
+    fun `Face and Fingerprint - Person Creation Event should not be added if face capture didn't return`() =
+        runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted(faceResult = null)
 
@@ -218,8 +216,8 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    @DisplayName("Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return")
-    fun faceAndFingerprintCapture_orchestratorShouldNotAddPersonCreationWhenFingerprintDoesntComplete() = runTest {
+    fun `Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return`() =
+        runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted(fingerprintResult = null)
 
