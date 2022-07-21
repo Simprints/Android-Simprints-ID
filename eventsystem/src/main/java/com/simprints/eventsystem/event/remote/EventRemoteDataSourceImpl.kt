@@ -9,19 +9,20 @@ import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.event.remote.models.ApiEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
+import retrofit2.HttpException
 import java.io.InputStream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class EventRemoteDataSourceImpl(
     private val simApiClientFactory: SimApiClientFactory,
     private val jsonHelper: JsonHelper
@@ -59,8 +60,11 @@ class EventRemoteDataSourceImpl(
                 parseStreamAndEmitEvents(streaming, this)
             }
         } catch (t: Throwable) {
-            val throwable = Throwable(t)
-            throw throwable.cause!!
+            if (t is SyncCloudIntegrationException && (t.cause is HttpException) && (t.cause as HttpException).code() == TOO_MANY_REQUEST_STATUS)
+                throw TooManyRequestsException()
+            else
+                throw t
+
         }
     }
 
@@ -121,5 +125,6 @@ class EventRemoteDataSourceImpl(
 
     companion object {
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000
+        private const val TOO_MANY_REQUEST_STATUS = 429
     }
 }
