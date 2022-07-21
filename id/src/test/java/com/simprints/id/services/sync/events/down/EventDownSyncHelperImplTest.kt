@@ -27,6 +27,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -91,7 +92,7 @@ class EventDownSyncHelperImplTest {
 
     @Test
     fun downSync_shouldConsumeRepoEventChannel() {
-        runTest(StandardTestDispatcher()) {
+        runTest(UnconfinedTestDispatcher()) {
             eventDownSyncHelper.downSync(this, projectOp)
 
             coVerify { eventRepository.downloadEvents(this@runTest, projectOp.queryEvent) }
