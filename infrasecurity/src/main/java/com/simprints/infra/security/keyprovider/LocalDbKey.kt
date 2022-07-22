@@ -11,10 +11,10 @@ data class LocalDbKey(val projectId: String, val value: ByteArray) {
 
         other as LocalDbKey
 
-        if (!value.contentEquals(other.value)) return false
+        if (!value.contentEquals(other.value) || projectId != other.projectId) return false
 
         return true
     }
 
-    override fun hashCode() = value.contentHashCode()
+    override fun hashCode() = value.contentHashCode() + projectId.hashCode()
 }
