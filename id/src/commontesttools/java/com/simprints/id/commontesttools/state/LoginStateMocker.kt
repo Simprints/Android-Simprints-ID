@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools.state
 
 import android.content.SharedPreferences
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.LocalDbKey
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.testtools.common.syntax.anyNotNull

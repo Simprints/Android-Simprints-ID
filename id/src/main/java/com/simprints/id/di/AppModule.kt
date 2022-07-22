@@ -6,8 +6,8 @@ import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.security.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -36,9 +36,9 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
-import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
@@ -59,8 +59,8 @@ import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.RandomGeneratorImpl
+import com.simprints.infra.security.random.RandomGenerator
+import com.simprints.infra.security.random.RandomGeneratorImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
