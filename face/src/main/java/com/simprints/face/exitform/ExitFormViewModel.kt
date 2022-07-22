@@ -6,14 +6,18 @@ import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
+import com.simprints.face.controllers.core.events.model.RefusalEvent
 import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(
-    private val mainVM: FaceCaptureViewModel
+    private val mainVM: FaceCaptureViewModel,
+    private val faceSessionEventsManager: FaceSessionEventsManager
 ) : ViewModel() {
     private var reason: RefusalAnswer? = null
+    private var exitFormData: Pair<RefusalAnswer, String>? = null
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -58,7 +62,7 @@ class ExitFormViewModel(
 
     fun submitExitForm(exitFormText: String) {
         reason?.let {
-            logExitFormEvent()
+            exitFormData = Pair(it, exitFormText)
             mainVM.submitExitForm(it, exitFormText)
         }
     }
@@ -71,8 +75,17 @@ class ExitFormViewModel(
         Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 
-    private fun logExitFormEvent() {
-        // TODO: log correct refusal event
+    fun logExitFormEvent(startTime: Long, endTime: Long) {
+        exitFormData?.let {
+            faceSessionEventsManager.addEventInBackground(
+                RefusalEvent(
+                    startTime = startTime,
+                    endTime = endTime,
+                    reason = it.first,
+                    otherText = it.second
+                )
+            )
+        }
     }
 
     fun handleBackButton() {

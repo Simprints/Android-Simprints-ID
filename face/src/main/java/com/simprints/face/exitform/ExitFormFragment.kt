@@ -9,11 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.extentions.showToast
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentExitFormBinding
 import com.simprints.id.tools.textWatcherOnChange
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -24,6 +26,9 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
     private val mainVm: FaceCaptureViewModel by sharedViewModel()
     private val vm: ExitFormViewModel by viewModel { parametersOf(mainVm) }
     private val binding by viewBinding(FragmentExitFormBinding::bind)
+    private val timeHelper: TimeHelper by inject()
+
+    private var exitFormStartTime: Long = 0
 
     private val textWatcher = textWatcherOnChange {
         handleTextChangedInExitForm(it)
@@ -31,6 +36,7 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        exitFormStartTime = timeHelper.now()
         setTextInLayout()
         setButtonListeners()
         setRadioGroupListener()
@@ -72,6 +78,7 @@ class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         }
         binding.btSubmitExitForm.setOnClickListener {
             vm.submitExitForm(getExitFormText())
+            vm.logExitFormEvent(exitFormStartTime, timeHelper.now())
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             vm.handleBackButton()
