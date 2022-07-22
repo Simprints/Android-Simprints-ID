@@ -21,9 +21,17 @@ class LocalDbKeyTest {
     }
 
     @Test
-    fun `equal should return false if the objects don't have the same value`() {
+    fun `equal should return false if the objects don't have the same project id`() {
         val key1 = LocalDbKey("project1", "byte".toByteArray())
         val key2 = LocalDbKey("project2", "byte".toByteArray())
+
+        assertThat(key1 == key2).isFalse()
+    }
+
+    @Test
+    fun `equal should return false if the objects don't have the same value`() {
+        val key1 = LocalDbKey("project1", "other byte".toByteArray())
+        val key2 = LocalDbKey("project1", "byte".toByteArray())
 
         assertThat(key1 == key2).isFalse()
     }
