@@ -1,7 +1,7 @@
 package com.simprints.eventsystem
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.core.security.LocalDbKey
+import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.id.commontesttools.SubjectsGeneratorUtils
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.DbSubject

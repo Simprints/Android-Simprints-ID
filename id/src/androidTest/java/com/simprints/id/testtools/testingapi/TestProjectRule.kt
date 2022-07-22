@@ -1,7 +1,7 @@
 package com.simprints.id.testtools.testingapi
 
 import android.content.Context
-import com.simprints.core.security.LocalDbKey
+import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.models.TestProjectCreationParameters

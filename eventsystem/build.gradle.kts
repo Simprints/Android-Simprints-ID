@@ -27,7 +27,7 @@ android {
             assets.srcDirs("$projectDir/schemas")
         }
         getByName("test") {
-            java.srcDirs("$projectDir/src/debug/java")
+            java.srcDirs("$projectDir/src/debug")
         }
     }
 
@@ -43,6 +43,7 @@ dependencies {
     api(project(":moduleapi"))
     implementation(project(":infralogging"))
     api(project(":infranetwork"))
+    implementation(project(":infrasecurity"))
 
     api(libs.androidX.room.core)
     implementation(libs.androidX.room.ktx)

@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools
 
 import android.util.Base64
-import com.simprints.core.security.LocalDbKey
+import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.eventsystem.sampledata.SampleDefaults
 
 object AndroidDefaultTestConstants {
