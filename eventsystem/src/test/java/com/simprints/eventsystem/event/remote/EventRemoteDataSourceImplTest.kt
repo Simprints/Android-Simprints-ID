@@ -259,6 +259,7 @@ class EventRemoteDataSourceImplTest {
             coEvery {
                 eventRemoteInterface.uploadEvents(
                     any(),
+                    any(),
                     any()
                 )
             } throws Throwable("Request issue")
