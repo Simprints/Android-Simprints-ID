@@ -8,5 +8,5 @@ interface PreferencesManager :
 
     fun setSharedPreference(key: String, value: Any)
 
-    fun clearAllSharedPreferencesExceptRealmKeys()
+    fun clearAllSharedPreferences()
 }

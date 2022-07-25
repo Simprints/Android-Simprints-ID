@@ -115,6 +115,7 @@ dependencies {
     api(project(":eventsystem"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
+    implementation(project(":infrasecurity"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
