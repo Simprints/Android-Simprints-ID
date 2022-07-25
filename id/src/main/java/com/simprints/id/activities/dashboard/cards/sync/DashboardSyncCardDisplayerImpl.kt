@@ -219,27 +219,33 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
 
     private fun prepareSyncFailedBecauseBackendMaintenanceView(syncCardState: SyncFailedBackendMaintenance): View =
         withVisible(viewForSyncFailedState) {
-            titleCardFailed().text =
-                if (syncCardState.estimatedOutage != null && syncCardState.estimatedOutage != 0L) {
-                    context.getString(
-                        R.string.error_backend_maintenance_with_time_message,
-                        getFormattedEstimatedOutage(syncCardState.estimatedOutage)
-                    )
-                } else {
-                    context.getString(R.string.error_backend_maintenance_message)
-                }
+            titleCardFailed().apply {
+                text =
+                    if (syncCardState.estimatedOutage != null && syncCardState.estimatedOutage != 0L) {
+                        context.getString(
+                            R.string.error_backend_maintenance_with_time_message,
+                            getFormattedEstimatedOutage(syncCardState.estimatedOutage)
+                        )
+                    } else {
+                        context.getString(R.string.error_backend_maintenance_message)
+                    }
+            }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
     private fun prepareSyncTooManyRequestsView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForSyncFailedState) {
-            titleCardFailed().text = context.getString(R.string.dashboard_sync_card_too_many_modules_message)
+            titleCardFailed().apply {
+                text = context.getString(R.string.dashboard_sync_card_too_many_modules_message)
+            }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 
     private fun prepareSyncFailedStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForSyncFailedState) {
-            titleCardFailed().text = context.getString(R.string.dashboard_sync_card_failed_message)
+            titleCardFailed().apply {
+                text = context.getString(R.string.dashboard_sync_card_failed_message)
+            }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
 

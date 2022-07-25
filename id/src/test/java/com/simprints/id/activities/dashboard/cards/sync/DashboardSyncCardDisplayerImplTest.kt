@@ -17,8 +17,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.commontesttools.TestTimeHelperImpl
 import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Before
 import org.junit.Test
