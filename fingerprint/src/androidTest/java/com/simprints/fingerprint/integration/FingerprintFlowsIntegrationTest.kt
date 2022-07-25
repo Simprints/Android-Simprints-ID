@@ -27,24 +27,19 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
 import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.wheneverOnSuspend
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.flow.asFlow
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.mockito.stubbing.Answer
-import java.util.UUID
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -103,8 +98,8 @@ class FingerprintFlowsIntegrationTest : KoinTest {
 
     private fun setupDbManagerMock() {
         with(dbManagerMock) {
-            wheneverOnSuspend(this) { loadPeople(anyNotNull()) } thenOnBlockingAnswer Answer {
-                val query = it.arguments[0] as SubjectQuery
+            coEvery { loadPeople(anyNotNull()) } answers  {
+                val query = args[0] as SubjectQuery
                 val numberOfPeopleToLoad = if (query.subjectId == null) NUMBER_OF_PEOPLE_IN_DB else 1
                 FingerprintGenerator.generateRandomFingerprintRecords(numberOfPeopleToLoad).asFlow()
             }

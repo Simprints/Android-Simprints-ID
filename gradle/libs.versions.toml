@@ -191,7 +191,6 @@ testing-Mockk-android = "io.mockk:mockk-android:1.12.3"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
-testing-Espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.2.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX
 testing-AndroidX-monitor = { module = "androidx.test:monitor", version.ref = "androidx_test_monitor_version" }
