@@ -19,16 +19,14 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.di.AppModule
-import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import io.mockk.every
@@ -201,15 +199,9 @@ class TestAppModule(
     }
 
     override fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager,
-        projectLocalDataSource: ProjectLocalDataSource,
-        loginInfoManager: LoginInfoManager
+        ctx: Context
     ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
-        super.provideBaseUrlProvider(
-            settingsPreferencesManager,
-            projectLocalDataSource,
-            loginInfoManager
-        )
+        super.provideBaseUrlProvider(ctx)
     }
 
 }
