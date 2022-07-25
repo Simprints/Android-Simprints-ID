@@ -24,13 +24,13 @@ import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.TestAppModule
+import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -51,8 +51,10 @@ class AlertActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Inject lateinit var eventEventManagerMock: com.simprints.eventsystem.event.EventRepository
-    @Inject lateinit var preferencesManagerSpy: IdPreferencesManager
+    @Inject
+    lateinit var eventEventManagerMock: com.simprints.eventsystem.event.EventRepository
+    @Inject
+    lateinit var preferencesManagerSpy: IdPreferencesManager
 
     private val preferencesModule by lazy {
         TestPreferencesModule(
@@ -63,12 +65,13 @@ class AlertActivityTest {
     private val module by lazy {
         TestAppModule(
             app,
-            sessionEventsManagerRule = DependencyRule.MockkRule)
+            sessionEventsManagerRule = DependencyRule.MockkRule
+        )
     }
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule).fullSetup().inject(this)
+        UnitTestConfig(module, preferencesModule).fullSetup().inject(this)
         Intents.init()
     }
 
@@ -152,7 +155,11 @@ class AlertActivityTest {
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
-        verifyIntentReturned(scenario.result, AlertType.GUID_NOT_FOUND_OFFLINE, ButtonAction.TRY_AGAIN)
+        verifyIntentReturned(
+            scenario.result,
+            AlertType.GUID_NOT_FOUND_OFFLINE,
+            ButtonAction.TRY_AGAIN
+        )
     }
 
     @Test
@@ -170,7 +177,10 @@ class AlertActivityTest {
 
     private fun launchAlertActivity(request: AlertActRequest? = null): ActivityScenario<AlertActivity> =
         ActivityScenario.launch(Intent().apply {
-            setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, AlertActivity::class.qualifiedName!!)
+            setClassName(
+                ApplicationProvider.getApplicationContext<Application>().packageName,
+                AlertActivity::class.qualifiedName!!
+            )
             request?.let {
                 putExtra(AlertActRequest.BUNDLE_KEY, request)
             }
@@ -187,13 +197,16 @@ class AlertActivityTest {
         onView(withId(R.id.alertImage)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
     }
 
-    private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
-                                     alert: AlertType,
-                                     buttonAction: ButtonAction) {
+    private fun verifyIntentReturned(
+        result: Instrumentation.ActivityResult,
+        alert: AlertType,
+        buttonAction: ButtonAction
+    ) {
         Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
 
         result.resultData.setExtrasClassLoader(AlertActResponse::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)
+        val response =
+            result.resultData.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)
         Truth.assertThat(response).isEqualTo(AlertActResponse(alert, buttonAction))
     }
 

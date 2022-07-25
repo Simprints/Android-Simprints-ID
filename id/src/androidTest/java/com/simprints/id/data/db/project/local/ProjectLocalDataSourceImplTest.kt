@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.eventsystem.RealmTestsBase
+import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.models.DbProject

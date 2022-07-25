@@ -67,15 +67,9 @@ android {
     }
 
     sourceSets {
-        val sharedTestDir = "src/commontesttools/java"
         val eventCreators = "src/debug/java"
         named("test") {
-            java.srcDir(sharedTestDir)
             java.srcDir(eventCreators)
-        }
-        named("androidTest") {
-            java.srcDir(sharedTestDir)
-            java.srcDir("src/androidTest/java")
         }
     }
 
@@ -196,7 +190,6 @@ dependencies {
     testImplementation(libs.testing.androidX.rules)
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
-    testImplementation(libs.testing.espresso.contrib)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.koTest.kotlin)
 
@@ -218,7 +211,6 @@ dependencies {
     // ######################################################
 
     androidTestImplementation(project(":fingerprintscannermock")) {
-        exclude("org.apache.maven")
         exclude("org.mockito")
         exclude("org.robolectric")
     }
@@ -254,7 +246,6 @@ dependencies {
     }
     kaptAndroidTest(libs.dagger.compiler)
     androidTestImplementation(project(":testtools")) {
-        exclude("org.apache.maven")
         exclude("org.mockito")
         exclude("org.robolectric")
         exclude("org.jetbrains.kotlinx")

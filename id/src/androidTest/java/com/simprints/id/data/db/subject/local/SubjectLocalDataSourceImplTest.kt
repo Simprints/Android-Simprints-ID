@@ -6,9 +6,8 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.eventsystem.RealmTestsBase
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.SubjectAction
@@ -16,6 +15,7 @@ import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import io.mockk.mockk
@@ -32,11 +32,11 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var subjectLocalDataSource: SubjectLocalDataSource
-    private val loginInfoManagerMock = mockk<LoginInfoManager>() {
+    private val loginInfoManagerMock = mockk<LoginInfoManager> {
         every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
-    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>() {
+    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider> {
         every { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
             newDatabaseName,
             newDatabaseKey

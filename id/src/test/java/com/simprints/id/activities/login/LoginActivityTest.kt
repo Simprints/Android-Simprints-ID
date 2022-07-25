@@ -14,12 +14,12 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.TestAppModule
+import com.simprints.id.testtools.di.TestPreferencesModule
+import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.di.DependencyRule
@@ -76,7 +76,6 @@ class LoginActivityTest {
     @Before
     fun setUp() {
         UnitTestConfig(
-            this,
             module,
             preferencesModule,
             viewModelModule = viewModelModule

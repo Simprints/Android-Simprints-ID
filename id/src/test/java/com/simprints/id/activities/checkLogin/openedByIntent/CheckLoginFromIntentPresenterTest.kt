@@ -87,7 +87,7 @@ class CheckLoginFromIntentPresenterTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig(this).coroutinesMainThread()
+        UnitTestConfig().coroutinesMainThread()
 
         presenter = CheckLoginFromIntentPresenter(
             view,

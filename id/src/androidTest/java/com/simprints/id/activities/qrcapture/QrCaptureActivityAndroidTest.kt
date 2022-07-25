@@ -7,8 +7,8 @@ import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -21,12 +21,17 @@ import org.junit.Test
 
 class QrCaptureActivityAndroidTest {
 
-    @get:Rule var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
+    @get:Rule
+    var grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(CAMERA)
 
-    @MockK lateinit var mockCameraHelper: CameraHelper
-    @MockK lateinit var mockQrPreviewBuilder: QrPreviewBuilder
-    @MockK lateinit var mockQrCodeProducer: QrCodeProducer
-    @MockK lateinit var mockChannel: Channel<String>
+    @MockK
+    lateinit var mockCameraHelper: CameraHelper
+    @MockK
+    lateinit var mockQrPreviewBuilder: QrPreviewBuilder
+    @MockK
+    lateinit var mockQrCodeProducer: QrCodeProducer
+    @MockK
+    lateinit var mockChannel: Channel<String>
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -50,7 +55,7 @@ class QrCaptureActivityAndroidTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(this, appModule).initComponent().testAppComponent.inject(this)
+        AndroidTestConfig(appModule).initComponent().testAppComponent.inject(this)
     }
 
     @Test

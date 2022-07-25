@@ -8,7 +8,7 @@ import com.simprints.id.data.images.model.Path
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.data.images.remote.ImageRemoteDataSource
 import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
-import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.ImageUrlProvider
 import com.simprints.infra.logging.Simber
 
 class ImageRepositoryImpl internal constructor(
@@ -18,11 +18,11 @@ class ImageRepositoryImpl internal constructor(
 
     constructor(
         context: Context,
-        baseUrlProvider: BaseUrlProvider,
+        imageUrlProvider: ImageUrlProvider,
         remoteDbManager: RemoteDbManager
     ) : this(
         ImageLocalDataSourceImpl(context),
-        ImageRemoteDataSourceImpl(baseUrlProvider, remoteDbManager)
+        ImageRemoteDataSourceImpl(imageUrlProvider, remoteDbManager)
     )
 
     override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {

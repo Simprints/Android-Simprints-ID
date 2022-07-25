@@ -39,7 +39,7 @@ class EventStartSyncReporterWorkerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager()
+        UnitTestConfig().setupWorkManager()
         app.component = mockk(relaxed = true)
     }
 
@@ -58,7 +58,7 @@ class EventStartSyncReporterWorkerTest {
         (TestListenableWorkerBuilder<EventStartSyncReporterWorker>(app)
             .setTags(listOf(tagForMasterSyncId))
             .setInputData(inputData)
-            .build() as EventStartSyncReporterWorker)
+            .build())
             .apply {
                 resultSetter = mockk(relaxed = true)
                 dispatcher = testDispatcherProvider

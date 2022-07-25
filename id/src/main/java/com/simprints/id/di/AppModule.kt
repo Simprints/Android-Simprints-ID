@@ -43,8 +43,8 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.BaseUrlProviderImpl
+import com.simprints.id.network.ImageUrlProvider
+import com.simprints.id.network.ImageUrlProviderImpl
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
@@ -74,6 +74,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
+import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.url.BaseUrlProviderImpl
 
 @Module
 open class AppModule {
@@ -127,21 +129,23 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager,
+    open fun provideImageUrlProvider(
         projectLocalDataSource: ProjectLocalDataSource,
         loginInfoManager: LoginInfoManager
-    ): BaseUrlProvider = BaseUrlProviderImpl(
-        settingsPreferencesManager,
+    ): ImageUrlProvider = ImageUrlProviderImpl(
         projectLocalDataSource,
         loginInfoManager
     )
 
     @Provides
+    open fun provideBaseUrlProvider(ctx: Context): BaseUrlProvider =
+        BaseUrlProviderImpl(ctx)
+
+    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider,
+        baseUrlProvider: BaseUrlProvider
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,

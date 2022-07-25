@@ -1,6 +1,5 @@
 package com.simprints.testtools.common.syntax
 
-import com.nhaarman.mockitokotlin2.stub
 import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -17,7 +16,6 @@ fun <T> spy(t: T): T =
 
 inline fun <reified T> mock(setup: (T) -> Unit): T = mock<T>().apply(setup)
 inline fun <reified T> spy(setup: (T) -> Unit): T = spy<T>().apply(setup)
-inline fun <T> spy(t: T, setup: (T) -> Unit): T = spy(t).apply(setup)
 
 inline fun <reified T> setupMock(setup: T.() -> Unit): T = mock<T>().apply(setup)
 
@@ -36,29 +34,6 @@ fun <T, R> whenever(mock: T, methodCall: T.() -> R): InfixStubber<T, R> =
 fun <T, R> T.whenThis(methodCall: T.() -> R): InfixStubber<T, R> =
     InfixStubber(this, methodCall)
 
-fun <T : Any, R> wheneverOnSuspend(mock: T, methodCall: suspend T.() -> R): InfixStubberOnSuspend<T, R> =
-    InfixStubberOnSuspend(mock, methodCall)
-
-
-class InfixStubberOnSuspend<T : Any, R>(private val obj: T, private val methodCall: suspend T.() -> R) {
-
-    infix fun thenOnBlockingReturn(value: R) =
-        obj.stub {
-            this.onBlocking(methodCall).thenReturn(value)
-        }
-
-    infix fun <T : Exception> thenOnBlockingThrow(e: Class<T>) =
-        obj.stub {
-            this.onBlocking(methodCall).thenThrow(e)
-        }
-
-    infix fun thenOnBlockingAnswer(answer: Answer<*>) =
-        obj.stub {
-            this.onBlocking(methodCall).thenAnswer(answer)
-        }
-
-}
-
 /**
  * This class is for re-arranging and infix-ing the "doReturn ... when ..." family of methods
  */
@@ -67,16 +42,10 @@ class InfixStubber<T, R>(private val obj: T, private val methodCall: T.() -> R) 
     infix fun thenReturn(value: R) =
         Mockito.doReturn(value).`when`(obj).methodCall()
 
-    infix fun thenThrow(e: Throwable) =
-        Mockito.doThrow(e).`when`(obj).methodCall()
-
-    infix fun thenThrow(throwableType: Class<out Throwable>) =
-        Mockito.doThrow(throwableType).`when`(obj).methodCall()
-
-    infix fun thenAnswer(answer: Answer<*>) =
+    private infix fun thenAnswer(answer: Answer<*>) =
         Mockito.doAnswer(answer).`when`(obj).methodCall()
 
-    infix fun thenAnswer(answer: (InvocationOnMock) -> Any?) =
+    private infix fun thenAnswer(answer: (InvocationOnMock) -> Any?) =
         Mockito.doAnswer(answer).`when`(obj).methodCall()
 
     infix fun then(answer: Answer<*>) =
@@ -84,9 +53,6 @@ class InfixStubber<T, R>(private val obj: T, private val methodCall: T.() -> R) 
 
     infix fun then(answer: (InvocationOnMock) -> Any?) =
         thenAnswer(answer)
-
-    fun thenDoNothing() =
-        Mockito.doNothing().`when`(obj).methodCall()
 
     infix fun thenDoNothing(@Suppress("UNUSED_PARAMETER") ignored: () -> Unit) =
         Mockito.doNothing().`when`(obj).methodCall()
@@ -101,9 +67,6 @@ class InfixOngoingStubbing<T>(private val ongoingStubbing: OngoingStubbing<T>)
     override infix fun thenReturn(value: T) =
         InfixOngoingStubbing(ongoingStubbing.thenReturn(value))
 
-    infix fun thenThrow(e: Throwable) =
-        InfixOngoingStubbing(ongoingStubbing.thenThrow(e))
-
     override infix fun thenThrow(throwableType: Class<out Throwable>) =
         InfixOngoingStubbing(ongoingStubbing.thenThrow(throwableType))
 
@@ -114,10 +77,6 @@ class InfixOngoingStubbing<T>(private val ongoingStubbing: OngoingStubbing<T>)
         InfixOngoingStubbing(ongoingStubbing.thenAnswer(answer))
 }
 
-/**
- * An explicit [Mockito.any] that allows null values
- */
-fun <T> anyOrNull(): T? = Mockito.any<T>()
 
 /**
  * A complement to [Mockito.any] that appropriately ensures non-null values

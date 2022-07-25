@@ -10,6 +10,7 @@ import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
@@ -20,7 +21,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.network.BaseUrlProvider
+import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
@@ -54,7 +55,7 @@ open class SecurityModule {
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventRepository: EventRepository,
         baseUrlProvider: BaseUrlProvider,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
@@ -128,7 +129,7 @@ open class SecurityModule {
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        eventRepository: com.simprints.eventsystem.event.EventRepository
+        eventRepository: EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
             loginInfoManager,
