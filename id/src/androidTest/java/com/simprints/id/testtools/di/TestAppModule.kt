@@ -23,10 +23,9 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilder
 import com.simprints.id.di.AppModule
-import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.ImageUrlProvider
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.device.ConnectivityHelper
@@ -202,13 +201,11 @@ class TestAppModule(
         super.provideQrCodeDetector()
     }
 
-    override fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager,
+    override fun provideImageUrlProvider(
         projectLocalDataSource: ProjectLocalDataSource,
         loginInfoManager: LoginInfoManager
-    ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
-        super.provideBaseUrlProvider(
-            settingsPreferencesManager,
+    ): ImageUrlProvider = baseUrlProviderRule.resolveDependency {
+        super.provideImageUrlProvider(
             projectLocalDataSource,
             loginInfoManager
         )
