@@ -235,7 +235,7 @@ class EventRemoteDataSourceImplTest {
     @Test
     fun postEvent_shouldUploadEvents() {
         runBlocking {
-            coEvery { eventRemoteInterface.uploadEvents(any(), any()) } returns mockk()
+            coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns mockk()
 
             val events = listOf(createSessionCaptureEvent())
             eventRemoteDataSource.post(DEFAULT_PROJECT_ID, events)
@@ -243,6 +243,7 @@ class EventRemoteDataSourceImplTest {
             coVerify(exactly = 1) {
                 eventRemoteInterface.uploadEvents(
                     DEFAULT_PROJECT_ID,
+                    true,
                     match { body ->
                         assertThat(body.events).containsExactlyElementsIn(events.map { it.fromDomainToApi() })
                         true

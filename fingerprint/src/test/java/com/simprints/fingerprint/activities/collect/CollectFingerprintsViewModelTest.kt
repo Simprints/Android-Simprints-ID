@@ -17,8 +17,7 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
-import com.simprints.fingerprint.commontesttools.time.MockTimer
+import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -35,10 +34,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedExce
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
-import com.simprints.fingerprint.testtools.assertEventReceived
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
+import com.simprints.fingerprint.testtools.*
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.coEvery

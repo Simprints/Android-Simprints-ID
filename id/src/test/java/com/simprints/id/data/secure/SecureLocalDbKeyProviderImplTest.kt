@@ -2,6 +2,7 @@ package com.simprints.id.data.secure
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 import android.util.Base64.DEFAULT
 import android.util.Base64.encodeToString
 import androidx.test.core.app.ApplicationProvider
@@ -10,7 +11,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.core.security.SecureLocalDbKeyProvider
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -28,6 +28,10 @@ import org.robolectric.annotation.Config
 class SecureLocalDbKeyProviderImplTest {
 
     companion object {
+        private const val DEFAULT_REALM_KEY_STRING =
+            "Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ=="
+        private val DEFAULT_REALM_KEY: ByteArray =
+            Base64.decode(DEFAULT_REALM_KEY_STRING, Base64.NO_WRAP)
         const val SHARED_PREFS_FOR_TEST = "test"
         private const val SHARED_PREFS_KEY_FOR_REALM = "REALM_KEY_${DEFAULT_PROJECT_ID}"
     }
@@ -71,7 +75,9 @@ class SecureLocalDbKeyProviderImplTest {
 
     @Test
     fun getLocalDbKeyOrThrow_shouldReturnLocalKeyIfPresent() {
-        sharedPrefs.edit().putString(SHARED_PREFS_KEY_FOR_REALM, encodeToString(DEFAULT_REALM_KEY, DEFAULT)).apply()
+        sharedPrefs.edit()
+            .putString(SHARED_PREFS_KEY_FOR_REALM, encodeToString(DEFAULT_REALM_KEY, DEFAULT))
+            .apply()
 
         val localDbKey = secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
 

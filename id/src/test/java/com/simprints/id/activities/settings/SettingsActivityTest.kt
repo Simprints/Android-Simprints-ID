@@ -5,9 +5,9 @@ import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
@@ -35,7 +35,7 @@ class SettingsActivityTest {
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup().inject(this)
+        UnitTestConfig(module).fullSetup().inject(this)
     }
 
     @Test
