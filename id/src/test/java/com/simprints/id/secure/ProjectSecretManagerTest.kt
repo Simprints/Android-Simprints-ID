@@ -3,10 +3,10 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert.assertEquals
@@ -23,27 +23,32 @@ class ProjectSecretManagerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
 
     private val module by lazy {
-        TestAppModule(app,
-            remoteDbManagerRule = MockRule)
+        TestAppModule(
+            app,
+            remoteDbManagerRule = MockRule
+        )
     }
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup().inject(this)
+        UnitTestConfig(module).fullSetup().inject(this)
     }
 
     @Test
     fun validPublicKeyAndProjectSecret_shouldEncryptAndStoreIt() {
-       assertEquals(loginInfoManager.getEncryptedProjectSecretOrEmpty(), "")
+        assertEquals(loginInfoManager.getEncryptedProjectSecretOrEmpty(), "")
 
-       val projectSecretManager = ProjectSecretManager(loginInfoManager)
-       val projectSecret = "project_secret"
-       val publicKey = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
+        val projectSecretManager = ProjectSecretManager(loginInfoManager)
+        val projectSecret = "project_secret"
+        val publicKey =
+            PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
 
-       val projectSecretEncrypted = projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)
-       assertTrue(projectSecretEncrypted.isNotEmpty())
-   }
+        val projectSecretEncrypted =
+            projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)
+        assertTrue(projectSecretEncrypted.isNotEmpty())
+    }
 }

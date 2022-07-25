@@ -6,7 +6,7 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.network.BaseUrlProvider
+import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager

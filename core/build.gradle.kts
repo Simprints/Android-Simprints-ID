@@ -22,18 +22,6 @@ android {
         animationsDisabled = true
     }
 
-    buildTypes {
-        getByName("release") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
-        }
-        getByName("staging") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
-        }
-        getByName("debug") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
-        }
-    }
-
     buildFeatures {
         viewBinding = true
     }

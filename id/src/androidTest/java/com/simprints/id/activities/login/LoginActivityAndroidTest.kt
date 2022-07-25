@@ -14,11 +14,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestSecurityModule
-import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.di.TestAppModule
+import com.simprints.id.testtools.di.TestSecurityModule
+import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -63,7 +63,11 @@ class LoginActivityAndroidTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(this, appModule = appModule, securityModule = securityModule, viewModelModule = viewModelModule)
+        AndroidTestConfig(
+            appModule = appModule,
+            securityModule = securityModule,
+            viewModelModule = viewModelModule
+        )
             .initComponent().testAppComponent.inject(this)
 
 
@@ -142,8 +146,13 @@ class LoginActivityAndroidTest {
             typeProjectSecret(VALID_PROJECT_SECRET)
             withSecurityStatusRunning()
         } clickSignIn {
-            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(
-                SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
+            onView(withId(R.id.errorTextView)).check(
+                matches(
+                    ViewMatchers.withText(
+                        SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
+                    )
+                )
+            )
             onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
             onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
@@ -160,7 +169,13 @@ class LoginActivityAndroidTest {
             typeProjectSecret(VALID_PROJECT_SECRET)
             withSecurityStatusRunning()
         } clickSignIn {
-            onView(withId(R.id.errorTextView)).check(matches(ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)))
+            onView(withId(R.id.errorTextView)).check(
+                matches(
+                    ViewMatchers.withText(
+                        SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
+                    )
+                )
+            )
             onView(withId(R.id.errorTextView)).check(matches(isDisplayed()))
             onView(withId(R.id.errorCard)).check(matches(isDisplayed()))
         }
