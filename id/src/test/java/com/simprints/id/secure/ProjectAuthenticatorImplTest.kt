@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
@@ -121,7 +121,7 @@ class ProjectAuthenticatorImplTest {
 
         authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
-        coVerify(exactly = 1) { secureDataManager.setLocalDatabaseKey(PROJECT_ID) }
+        coVerify(exactly = 1) { secureDataManager.createLocalDatabaseKeyIfMissing(PROJECT_ID) }
     }
 
 

@@ -21,14 +21,14 @@ import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
-import com.simprints.clientapi.tools.DeviceManager
-import com.simprints.clientapi.tools.DeviceManagerImpl
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.secure.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
+import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.root.RootManagerImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -55,11 +55,11 @@ object KoinInjector {
     }
 
     private fun buildKoinModule() =
-        module(override = true) {
+        module {
             defineBuildersForDomainManagers()
             defineBuildersForPresenters()
             defineBuildersForGuidSelectionNotifiers()
-            defineBuilderForDeviceManager()
+            defineBuilderForRootManager()
             factory { JsonHelper }
         }
 
@@ -74,8 +74,15 @@ object KoinInjector {
         factory<SharedPreferences> {
             EncryptedSharedPreferencesBuilderImpl(androidContext()).buildEncryptedSharedPreferences()
         }
-        factory<HotCache> { HotCacheImpl(get() , get()) }
-        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get(),get(),get()) }
+        factory<HotCache> { HotCacheImpl(get(), get()) }
+        factory<ClientApiSessionEventsManager> {
+            ClientApiSessionEventsManagerImpl(
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
     }
 
     private fun Module.defineBuildersForPresenters() {
@@ -107,8 +114,8 @@ object KoinInjector {
         factory { (context: Context) -> CommCareGuidSelectionNotifier(context) }
     }
 
-    private fun Module.defineBuilderForDeviceManager() {
-        factory<DeviceManager> { DeviceManagerImpl(androidContext()) }
+    private fun Module.defineBuilderForRootManager() {
+        factory<RootManager> { RootManagerImpl(androidContext()) }
     }
 
 }

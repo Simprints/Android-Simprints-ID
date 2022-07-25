@@ -41,7 +41,7 @@ open class SignerManagerImpl(
         remote.signOut()
         syncManager.cancelBackgroundSyncs()
         eventSyncManager.deleteSyncInfo()
-        preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
+        preferencesManager.clearAllSharedPreferences()
         longConsentRepository.deleteLongConsents()
         baseUrlProvider.resetApiBaseUrl()
         remoteConfigWrapper.clearRemoteConfig()
