@@ -1,11 +1,10 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
-import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ScannerFirmwareVersions(
-    @JsonProperty val cypress: String,
-    @JsonProperty val stm: String,
-    @JsonProperty val un20: String
+    val cypress: String,
+    val stm: String,
+    val un20: String
 ) {
 
     companion object {

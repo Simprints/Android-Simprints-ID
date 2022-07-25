@@ -195,7 +195,6 @@ dependencies {
     testImplementation(libs.testing.androidX.rules)
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
-    testImplementation(libs.testing.espresso.contrib)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.koTest.kotlin)
 
@@ -217,7 +216,6 @@ dependencies {
     // ######################################################
 
     androidTestImplementation(project(":fingerprintscannermock")) {
-        exclude("org.apache.maven")
         exclude("org.mockito")
         exclude("org.robolectric")
     }
@@ -253,7 +251,6 @@ dependencies {
     }
     kaptAndroidTest(libs.dagger.compiler)
     androidTestImplementation(project(":testtools")) {
-        exclude("org.apache.maven")
         exclude("org.mockito")
         exclude("org.robolectric")
         exclude("org.jetbrains.kotlinx")
