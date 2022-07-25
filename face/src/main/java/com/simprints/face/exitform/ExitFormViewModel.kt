@@ -14,10 +14,10 @@ import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(
     private val mainVM: FaceCaptureViewModel,
-    private val faceSessionEventsManager: FaceSessionEventsManager
+    val faceSessionEventsManager: FaceSessionEventsManager
 ) : ViewModel() {
     private var reason: RefusalAnswer? = null
-    private var exitFormData: Pair<RefusalAnswer, String>? = null
+    var exitFormData: Pair<RefusalAnswer, String>? = null
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -76,13 +76,13 @@ class ExitFormViewModel(
     }
 
     fun logExitFormEvent(startTime: Long, endTime: Long) {
-        exitFormData?.let {
+        if (exitFormData != null) {
             faceSessionEventsManager.addEventInBackground(
                 RefusalEvent(
                     startTime = startTime,
                     endTime = endTime,
-                    reason = it.first,
-                    otherText = it.second
+                    reason = exitFormData!!.first,
+                    otherText = exitFormData!!.second
                 )
             )
         }
