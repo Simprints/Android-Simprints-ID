@@ -7,6 +7,9 @@ import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
 import javax.crypto.Cipher
 
+@Deprecated(message = """We should remove this class because we should not store the project secret 
+    |anymore which means that we don't need to encrypt the secret as it will only transit through
+    |https.""")
 class ProjectSecretEncrypter(
     publicKey: String,
     private val cipher: Cipher = Cipher.getInstance(RSA_TRANSFORMATION)
