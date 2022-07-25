@@ -1,12 +1,7 @@
 package com.simprints.core.network
 
-import com.simprints.core.BuildConfig
-
 class NetworkConstants {
     companion object {
-        private const val API_VERSION = "v2"
-        const val BASE_URL_SUFFIX = "/androidapi/$API_VERSION/"
-        const val DEFAULT_BASE_URL = "https://${BuildConfig.BASE_URL_PREFIX}.simprints-apis.com$BASE_URL_SUFFIX"
         const val AUTHORIZATION_ERROR = 403
     }
 }

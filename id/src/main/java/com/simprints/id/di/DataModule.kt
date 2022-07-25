@@ -34,7 +34,7 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.ImageUrlProvider
 import dagger.Module
 import dagger.Provides
 import java.net.URL
@@ -117,9 +117,9 @@ open class DataModule {
     @Provides
     open fun provideImageRepository(
         context: Context,
-        baseUrlProvider: BaseUrlProvider,
+        imageUrlProvider: ImageUrlProvider,
         remoteDbManager: RemoteDbManager
-    ): ImageRepository = ImageRepositoryImpl(context, baseUrlProvider, remoteDbManager)
+    ): ImageRepository = ImageRepositoryImpl(context, imageUrlProvider, remoteDbManager)
 
     @Provides
     open fun provideLongConsentLocalDataSource(

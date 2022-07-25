@@ -36,10 +36,14 @@ import org.robolectric.annotation.Config
 class EventSyncManagerImplTest {
 
     private lateinit var subjectsSyncManager: EventSyncManagerImpl
-    @MockK lateinit var eventSyncStateProcessor: EventSyncStateProcessor
-    @MockK lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
-    @MockK lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-    @MockK lateinit var eventSyncCache: EventSyncCache
+    @MockK
+    lateinit var eventSyncStateProcessor: EventSyncStateProcessor
+    @MockK
+    lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
+    @MockK
+    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    @MockK
+    lateinit var eventSyncCache: EventSyncCache
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -57,9 +61,16 @@ class EventSyncManagerImplTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager()
+        UnitTestConfig().setupWorkManager()
         MockKAnnotations.init(this, relaxed = true)
-        subjectsSyncManager = EventSyncManagerImpl(ctx, eventSyncStateProcessor, eventDownSyncScopeRepository, eventUpSyncScopeRepository, eventSyncCache, testDispatcherProvider)
+        subjectsSyncManager = EventSyncManagerImpl(
+            ctx,
+            eventSyncStateProcessor,
+            eventDownSyncScopeRepository,
+            eventUpSyncScopeRepository,
+            eventSyncCache,
+            testDispatcherProvider
+        )
     }
 
     @Test

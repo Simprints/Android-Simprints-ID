@@ -49,7 +49,7 @@ class OrchestratorViewModelTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this)
+        UnitTestConfig()
             .rescheduleRxMainThread()
             .coroutinesMainThread()
 

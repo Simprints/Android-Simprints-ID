@@ -5,14 +5,14 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
-import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
+import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
@@ -41,7 +41,7 @@ class SettingsPreferencesManagerTest {
 
     @Before
     fun setup() {
-        UnitTestConfig(this, preferencesModule = preferencesModule).fullSetup().inject(this)
+        UnitTestConfig(preferencesModule = preferencesModule).fullSetup().inject(this)
     }
 
     @Test

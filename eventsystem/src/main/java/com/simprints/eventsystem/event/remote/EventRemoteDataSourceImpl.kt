@@ -101,11 +101,19 @@ class EventRemoteDataSourceImpl(
             }
         }.byteStream()
 
-    override suspend fun post(projectId: String, events: List<Event>) {
+    override suspend fun post(
+        projectId: String,
+        events: List<Event>,
+        acceptInvalidEvents: Boolean
+    ) {
         executeCall { remoteInterface ->
-            remoteInterface.uploadEvents(projectId, ApiUploadEventsBody(events.map {
-                it.fromDomainToApi()
-            }))
+            remoteInterface.uploadEvents(
+                projectId,
+                acceptInvalidEvents,
+                ApiUploadEventsBody(events.map {
+                    it.fromDomainToApi()
+                })
+            )
         }
     }
 

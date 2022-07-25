@@ -8,9 +8,9 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaListInteractions.clickListItem
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.every
 import org.junit.Before
@@ -30,21 +30,20 @@ class ModuleSelectionActivityAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, null, preferencesModule = preferencesModule).
-        fullSetup().inject(this)
+        AndroidTestConfig(preferencesModule = preferencesModule).fullSetup().inject(this)
         preferencesManagerSpy = app.component.getIdPreferencesManager()
     }
 
     @Test
     fun shouldLoadOnlyUnselectedModules() {
         launchWithModulesSelected()
-        assertRecyclerViewItemCount(R.id.rvModules,4)
+        assertRecyclerViewItemCount(R.id.rvModules, 4)
     }
 
     @Test
     fun whenSelectingModules_noModulesSelectedTextShouldNotBeVisible() {
         launchWithModulesSelected()
-        clickListItem(R.id.rvModules,FIRST_MODULE_INDEX)
+        clickListItem(R.id.rvModules, FIRST_MODULE_INDEX)
         assertNotDisplayed(R.id.txtNoModulesSelected)
 
     }
@@ -52,8 +51,8 @@ class ModuleSelectionActivityAndroidTest {
     @Test
     fun whenSelectingAModule_shouldBeRemovedFromList() {
         launchWithModulesSelected()
-        clickListItem(R.id.rvModules,0)
-        assertRecyclerViewItemCount(R.id.rvModules,3)
+        clickListItem(R.id.rvModules, 0)
+        assertRecyclerViewItemCount(R.id.rvModules, 3)
     }
 
     @Test
@@ -86,7 +85,7 @@ class ModuleSelectionActivityAndroidTest {
     private fun launchWithModulesSelected() {
         every {
             preferencesManagerSpy.moduleIdOptions
-        } returns  moduleOptions
+        } returns moduleOptions
 
         every {
             preferencesManagerSpy.selectedModules

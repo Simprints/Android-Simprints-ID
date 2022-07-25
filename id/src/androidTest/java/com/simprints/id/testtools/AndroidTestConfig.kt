@@ -3,17 +3,13 @@ package com.simprints.id.testtools
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.id.Application
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
-import com.simprints.id.commontesttools.di.*
-import com.simprints.id.testtools.di.AppComponentForAndroidTests
-import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
+import com.simprints.id.testtools.di.*
 import io.realm.Realm
 
-class AndroidTestConfig<T : Any>(
-    private val test: T,
+class AndroidTestConfig(
     private val appModule: TestAppModule? = null,
     private val dataModule: TestDataModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
-    private val syncModule: TestSyncModule? = null,
     private val securityModule: TestSecurityModule? = null,
     private val viewModelModule: TestViewModelModule? = null
 ) {
@@ -31,7 +27,6 @@ class AndroidTestConfig<T : Any>(
         .appModule(appModule ?: TestAppModule(app))
         .dataModule(dataModule ?: TestDataModule())
         .preferencesModule(preferencesModule ?: TestPreferencesModule())
-        .syncModule(syncModule ?: TestSyncModule())
         .securityModule(securityModule ?: TestSecurityModule())
         .viewModelModule(viewModelModule ?: TestViewModelModule())
 
@@ -43,7 +38,6 @@ class AndroidTestConfig<T : Any>(
         testAppComponent = componentBuilder().build()
         app.component = testAppComponent
     }
-
 
 
     private fun initModules() = also {
