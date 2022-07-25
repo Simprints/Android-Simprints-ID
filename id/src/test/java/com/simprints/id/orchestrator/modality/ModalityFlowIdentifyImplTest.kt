@@ -6,7 +6,7 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER

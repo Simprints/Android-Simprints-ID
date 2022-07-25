@@ -4,8 +4,8 @@
 //import androidx.test.ext.junit.runners.AndroidJUnit4
 //import com.simprints.id.R
 //import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
-//import com.simprints.id.commontesttools.di.TestAppModule
-//import com.simprints.id.commontesttools.di.TestDataModule
+//import com.simprints.id.testtools.di.TestAppModule
+//import com.simprints.id.testtools.di.TestDataModule
 //import com.simprints.id.data.db.common.RemoteDbManager
 //import com.simprints.eventsystem.person.PersonRepository
 //import com.simprints.eventsystem.common.models.PeopleCount

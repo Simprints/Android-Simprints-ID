@@ -1,14 +1,8 @@
-package com.simprints.id.commontesttools.moduleApi
+package com.simprints.id.testtools.moduleApi
 
 import com.simprints.moduleapi.app.requests.*
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.parcelize.Parcelize
-
-@Parcelize
-internal data class AppConfirmationResponse(
-    override val identificationOutcome: Boolean,
-    override val type: IAppResponseType = IAppResponseType.CONFIRMATION
-) : IAppConfirmationResponse
 
 @Parcelize
 internal data class AppEnrolResponse(
@@ -29,13 +23,6 @@ internal data class AppMatchResult(
     override val tier: IAppResponseTier,
     override val matchConfidence: IAppMatchConfidence
 ) : IAppMatchResult
-
-@Parcelize
-internal data class AppRefusalResponse(
-    override val reason: String,
-    override val extra: String,
-    override val type: IAppResponseType = IAppResponseType.REFUSAL
-) : IAppRefusalFormResponse
 
 @Parcelize
 internal data class AppIdentifyResponse(
@@ -77,7 +64,7 @@ internal data class AppVerifyRequestModuleApi(
 ) : IAppVerifyRequest
 
 @Parcelize
-internal data class AppConfirmaConfirmIdentityRequestModuleApi(
+internal data class AppConfirmationConfirmIdentityRequestModuleApi(
     override val projectId: String,
     override val userId: String,
     override val sessionId: String,
@@ -93,5 +80,3 @@ internal data class AppEnrolLastBiometricsRequestApi(
     override val sessionId: String
 ) : IAppEnrolLastBiometricsRequest
 
-fun Pair<String, String>.key() = first
-fun Pair<String, String>.value() = second

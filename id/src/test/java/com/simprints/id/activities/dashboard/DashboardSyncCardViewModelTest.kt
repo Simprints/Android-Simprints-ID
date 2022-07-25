@@ -11,9 +11,9 @@
 //import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_MODULE_ID
 //import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_PROJECT_ID
 //import com.simprints.id.sampledata.DefaultTestConstants.DEFAULT_USER_ID
-//import com.simprints.id.commontesttools.di.TestAppModule
-//import com.simprints.id.commontesttools.di.TestDataModule
-//import com.simprints.id.commontesttools.di.TestPreferencesModule
+//import com.simprints.id.testtools.di.TestAppModule
+//import com.simprints.id.testtools.di.TestDataModule
+//import com.simprints.id.testtools.di.TestPreferencesModule
 //import com.simprints.id.data.db.common.RemoteDbManager
 //import com.simprints.eventsystem.person.PersonRepository
 //import com.simprints.eventsystem.common.models.PeopleCount

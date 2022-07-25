@@ -13,11 +13,11 @@ import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.common.truth.Truth
 import com.simprints.core.domain.modality.Modality
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.di.TestAppModule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -58,7 +58,7 @@ class SetupActivityTest {
         every { SplitInstallManagerFactory.create(any()) } returns mockSplitInstallManager
 
 
-        app.component = AndroidTestConfig(this, appModule = appModule)
+        app.component = AndroidTestConfig(appModule = appModule)
             .componentBuilder()
             .build()
     }

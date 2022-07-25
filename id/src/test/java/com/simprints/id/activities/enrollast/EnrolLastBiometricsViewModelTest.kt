@@ -9,7 +9,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Failed
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Success
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils
+import com.simprints.id.testtools.SubjectsGeneratorUtils
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse

@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.commontesttools.time
+package com.simprints.testtools.common.mock
 
 import java.util.*
 

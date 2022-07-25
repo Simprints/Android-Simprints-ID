@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools
+package com.simprints.id.testtools
 
 import android.text.format.DateUtils.*
 import com.simprints.core.tools.time.TimeHelper
