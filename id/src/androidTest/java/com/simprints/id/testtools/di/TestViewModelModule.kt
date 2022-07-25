@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools.di
+package com.simprints.id.testtools.di
 
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.activities.dashboard.DashboardViewModelFactory

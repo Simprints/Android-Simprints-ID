@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools.di
+package com.simprints.id.testtools.di
 
 import android.content.Context
 import com.simprints.core.login.LoginInfoManager

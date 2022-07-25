@@ -72,7 +72,7 @@ class EventSyncStateProcessorImplTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager()
+        UnitTestConfig().setupWorkManager()
         MockKAnnotations.init(this)
         eventSyncStateProcessor = EventSyncStateProcessorImpl(ctx, eventSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
