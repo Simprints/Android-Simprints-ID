@@ -277,5 +277,5 @@ class SignerManagerImplTest {
     private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() =
-        verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
+        verify { mockPreferencesManager.clearAllSharedPreferences() }
 }

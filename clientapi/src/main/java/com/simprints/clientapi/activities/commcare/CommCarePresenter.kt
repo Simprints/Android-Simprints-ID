@@ -2,35 +2,24 @@ package com.simprints.clientapi.activities.commcare
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction
+import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
-import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
-import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
-import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
-import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.ConfirmationResponse
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.root.RootManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
-import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
-import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,13 +32,12 @@ class CommCarePresenter(
     private val jsonHelper: JsonHelper,
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
-    deviceManager: DeviceManager,
+    rootManager: RootManager,
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val encoder: EncodingUtils = EncodingUtilsImpl
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
-    deviceManager = deviceManager,
+    rootManager = rootManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ), CommCareContract.Presenter {

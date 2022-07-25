@@ -56,7 +56,7 @@ open class BaseClientApiTest : KoinTest {
         Intents.init()
 
         KoinInjector.loadClientApiKoinModules()
-        loadKoinModules(module(override = true) {
+        loadKoinModules(module {
             factory { buildDummySessionEventsManagerMock() }
         })
     }

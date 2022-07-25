@@ -27,7 +27,7 @@ class OdkActivityTest : BaseClientApiTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        loadKoinModules(module(override = true) {
+        loadKoinModules(module {
             factory { (_: Context) -> mockk<OdkGuidSelectionNotifier>(relaxed = true) }
         })
         rule.launchActivity(buildIntent())
