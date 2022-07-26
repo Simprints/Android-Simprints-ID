@@ -133,7 +133,9 @@ dependencies {
     implementation(libs.support.material)
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
+    //TODO remove
     implementation(libs.playServices.safetynet)
+
     implementation(libs.rxJava2.core)
     kapt(libs.androidX.room.compiler)
     kapt(libs.dagger.compiler)
@@ -141,9 +143,6 @@ dependencies {
     implementation(libs.fuzzywuzzy.core)
     implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
-
-    // RootBeer (root detection)
-    implementation(libs.rootbeer.core)
 
     // Firebase
     implementation(libs.firebase.auth)
