@@ -2,9 +2,7 @@ package com.simprints.infra.network
 
 import android.content.Context
 import com.simprints.infra.network.coroutines.retryIO
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.network.exceptions.RetryableCloudException
-import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.network.exceptions.*
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -66,10 +64,11 @@ class SimApiClientImpl<T : SimRemoteInterface>(
                 },
                 retryIf = { it is RetryableCloudException })
         } catch (e: Exception) {
-            if (e is RetryableCloudException)
-                throw SyncCloudIntegrationException(cause = e.cause!!)
-            else
-                throw e
+            throw when {
+                e.isNetworkConnectionException() -> NetworkConnectionException(cause = e)
+                e is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
+                else -> e
+            }
         }
 
     private fun handleException(e: Exception): Exception {
