@@ -3,6 +3,7 @@ package com.simprints.id.services.sync.events.down
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType.*
@@ -11,6 +12,8 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDele
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectAction
@@ -21,27 +24,25 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class EventDownSyncHelperImpl(
     val subjectRepository: SubjectRepository,
-    val eventRepository: com.simprints.eventsystem.event.EventRepository,
-    private val eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+    val eventRepository: EventRepository,
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
     private val preferencesManager: IdPreferencesManager,
     private val timeHelper: TimeHelper,
     private val dispatcher: DispatcherProvider
 ) : EventDownSyncHelper {
 
-    override suspend fun countForDownSync(operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation): List<EventCount> =
+    override suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
         eventRepository.countEventsToDownload(operation.queryEvent)
 
     override suspend fun downSync(
         scope: CoroutineScope,
-        operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
+        operation: EventDownSyncOperation
     ): ReceiveChannel<EventDownSyncProgress> =
 
         scope.produce(capacity = Channel.UNLIMITED) {
@@ -73,9 +74,7 @@ class EventDownSyncHelperImpl(
                 close()
 
             } catch (t: Throwable) {
-                val error = Throwable(t)
-                val throwable = error.cause!!
-                Simber.d(throwable)
+                Simber.d(t)
 
                 lastOperation =
                     processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
@@ -83,16 +82,16 @@ class EventDownSyncHelperImpl(
 
                 lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
-                close(throwable.cause)
+                close(t)
             }
 
         }
 
     private suspend fun processBatchedEvents(
-        operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
+        operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<Event>,
-        lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
-    ): com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation {
+        lastOperation: EventDownSyncOperation
+    ): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
             return@map when (event.type) {
@@ -128,7 +127,7 @@ class EventDownSyncHelperImpl(
 
 
     private suspend fun ProducerScope<EventDownSyncProgress>.emitProgress(
-        lastOperation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
+        lastOperation: EventDownSyncOperation,
         count: Int
     ) {
         Simber.d("[DOWN_SYNC_HELPER] Emit progress")
@@ -152,7 +151,7 @@ class EventDownSyncHelperImpl(
     }
 
     fun handleSubjectMoveEvent(
-        operation: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation,
+        operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent
     ): List<SubjectAction> {
         val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
@@ -187,7 +186,11 @@ class EventDownSyncHelperImpl(
                 }
 
                 if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
-                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
+                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
+                        actions.add(
+                            it
+                        )
+                    }
                 }
             }
             attendantUnderSyncing != null -> {
@@ -196,12 +199,20 @@ class EventDownSyncHelperImpl(
                 }
 
                 if (attendantUnderSyncing == enrolmentRecordCreation.attendantId) {
-                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
+                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
+                        actions.add(
+                            it
+                        )
+                    }
                 }
             }
             else -> {
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
-                createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let { actions.add(it) }
+                createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
+                    actions.add(
+                        it
+                    )
+                }
             }
         }
 
@@ -219,10 +230,10 @@ class EventDownSyncHelperImpl(
         }
 
 
-    private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation) =
+    private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
         op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
 
-    private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation) =
+    private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
         op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
 
     private fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =

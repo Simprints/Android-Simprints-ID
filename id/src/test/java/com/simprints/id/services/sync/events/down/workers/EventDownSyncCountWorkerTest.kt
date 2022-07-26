@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.subjects.down.workers
+package com.simprints.id.services.sync.events.down.workers
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -12,7 +12,6 @@ import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
@@ -48,7 +47,7 @@ class EventDownSyncCountWorkerTest {
         countWorker = TestListenableWorkerBuilder<EventDownSyncCountWorker>(app)
             .setTags(listOf(tagForMasterSyncId))
             .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(projectDownSyncScope)))
-            .build() as EventDownSyncCountWorker
+            .build()
 
         app.component = mockk(relaxed = true)
         with(countWorker) {
