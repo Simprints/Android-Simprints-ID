@@ -2,6 +2,7 @@ package com.simprints.id.data.db.common
 
 import android.content.Context
 import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -14,6 +15,7 @@ import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.secure.models.Token
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -26,8 +28,11 @@ open class FirebaseManagerImpl(
     override suspend fun signIn(token: Token) {
         cacheTokenClaims(token.value)
         cacheFirebaseOptions(token)
-        val result =
+        val result = try {
             FirebaseAuth.getInstance(getCoreApp()).signInWithCustomToken(token.value).await()
+        } catch (e: Exception) {
+            throw transformFirebaseExceptionIfNeeded(e)
+        }
         Simber.d("Signed in with: ${result.user?.uid}")
     }
 
@@ -35,7 +40,11 @@ open class FirebaseManagerImpl(
         clearCachedTokenClaims()
         // On legacy projects they may not have a separate Core Firebase Project, so we try to
         // log out on both just in case.
-        FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
+        try {
+            FirebaseAuth.getInstance(getLegacyAppFallback()).signOut()
+        } catch (e: Exception) {
+            throw transformFirebaseExceptionIfNeeded(e)
+        }
         tryToDeleteCoreApp()
     }
 
@@ -61,6 +70,8 @@ open class FirebaseManagerImpl(
             } catch (ex: FirebaseNoSignedInUserException) {
                 Simber.d(ex)
                 null
+            } catch (ex: FirebaseNetworkException) {
+                throw transformFirebaseExceptionIfNeeded(ex)
             }
 
             result?.token?.let {
@@ -157,6 +168,14 @@ open class FirebaseManagerImpl(
     } catch (ex: IllegalStateException) {
         // CORE_BACKEND_PROJECT doesn't exist
         FirebaseApp.getInstance()
+    }
+
+    private fun transformFirebaseExceptionIfNeeded(e: Exception): Exception {
+        return when (e) {
+            // Rethrow as NetworkConnectionException so we handle it properly as connectivity issue
+            is FirebaseNetworkException -> NetworkConnectionException(cause = e)
+            else -> e
+        }
     }
 
     companion object {

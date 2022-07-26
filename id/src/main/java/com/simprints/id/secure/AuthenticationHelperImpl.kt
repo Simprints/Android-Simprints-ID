@@ -63,6 +63,7 @@ class AuthenticationHelperImpl(
     private fun extractResultFromException(t: Throwable): Result {
         return when (t) {
             is IOException -> OFFLINE
+            is NetworkConnectionException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
             is SyncCloudIntegrationException -> TECHNICAL_FAILURE
             is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR
