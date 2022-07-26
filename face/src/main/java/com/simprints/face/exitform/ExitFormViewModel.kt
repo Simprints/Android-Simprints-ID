@@ -10,18 +10,25 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 import com.simprints.face.controllers.core.events.model.RefusalEvent
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(
     private val mainVM: FaceCaptureViewModel,
-    val faceSessionEventsManager: FaceSessionEventsManager
+    val faceSessionEventsManager: FaceSessionEventsManager,
+    private val timeHelper: FaceTimeHelper
 ) : ViewModel() {
-    private var reason: RefusalAnswer? = null
+    var reason: RefusalAnswer? = null
     var exitFormData: Pair<RefusalAnswer, String>? = null
+    var exitFormStartTime: Long = 0
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestFormSubmitEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+
+    init {
+        exitFormStartTime = timeHelper.now()
+    }
 
     fun handleReligiousConcernsRadioClick() {
         reason = REFUSED_RELIGION
@@ -65,6 +72,7 @@ class ExitFormViewModel(
             exitFormData = Pair(it, exitFormText)
             mainVM.submitExitForm(it, exitFormText)
         }
+        logExitFormEvent()
     }
 
     private fun logRadioOptionForCrashReport(option: String) {
@@ -75,12 +83,12 @@ class ExitFormViewModel(
         Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 
-    fun logExitFormEvent(startTime: Long, endTime: Long) {
+    fun logExitFormEvent() {
         if (exitFormData != null) {
             faceSessionEventsManager.addEventInBackground(
                 RefusalEvent(
-                    startTime = startTime,
-                    endTime = endTime,
+                    startTime = exitFormStartTime,
+                    endTime = timeHelper.now(),
                     reason = exitFormData!!.first,
                     otherText = exitFormData!!.second
                 )
