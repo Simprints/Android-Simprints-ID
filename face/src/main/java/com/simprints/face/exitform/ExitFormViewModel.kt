@@ -15,11 +15,10 @@ import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(
     private val mainVM: FaceCaptureViewModel,
-    val faceSessionEventsManager: FaceSessionEventsManager,
-    private val timeHelper: FaceTimeHelper
+    private val faceSessionEventsManager: FaceSessionEventsManager,
+   private val timeHelper: FaceTimeHelper
 ) : ViewModel() {
     var reason: RefusalAnswer? = null
-    var exitFormData: Pair<RefusalAnswer, String>? = null
     var exitFormStartTime: Long = 0
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
@@ -69,10 +68,9 @@ class ExitFormViewModel(
 
     fun submitExitForm(exitFormText: String) {
         reason?.let {
-            exitFormData = Pair(it, exitFormText)
             mainVM.submitExitForm(it, exitFormText)
+            logExitFormEvent(reason = it, exitFormText = exitFormText)
         }
-        logExitFormEvent()
     }
 
     private fun logRadioOptionForCrashReport(option: String) {
@@ -83,17 +81,15 @@ class ExitFormViewModel(
         Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 
-    fun logExitFormEvent() {
-        if (exitFormData != null) {
+    private fun logExitFormEvent(reason: RefusalAnswer, exitFormText: String) {
             faceSessionEventsManager.addEventInBackground(
                 RefusalEvent(
                     startTime = exitFormStartTime,
                     endTime = timeHelper.now(),
-                    reason = exitFormData!!.first,
-                    otherText = exitFormData!!.second
+                    reason = reason,
+                    otherText = exitFormText
                 )
             )
-        }
     }
 
     fun handleBackButton() {
