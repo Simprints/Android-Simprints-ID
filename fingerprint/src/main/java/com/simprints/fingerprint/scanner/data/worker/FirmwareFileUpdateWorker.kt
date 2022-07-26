@@ -7,7 +7,7 @@ import com.simprints.fingerprint.di.KoinInjector
 import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
-import com.simprints.infra.network.exceptions.isNetworkConnectionException
+import com.simprints.infra.network.exceptions.isCausedFromBadNetworkConnection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -33,7 +33,7 @@ class FirmwareFileUpdateWorker(context: Context, params: WorkerParameters)
             Result.success()
         } catch (e: Throwable) {
             when {
-                e.isNetworkConnectionException() ->
+                e.isCausedFromBadNetworkConnection() ->
                     Simber.i(NetworkConnectionException(cause = e))
                 else ->
                     Simber.e(e, "FirmwareFileUpdateWorker failed")
