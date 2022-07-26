@@ -5,26 +5,29 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalEvent
-import io.mockk.mockk
-import io.mockk.verify
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
+import io.mockk.*
 import org.junit.Before
 import org.junit.Test
 
 class ExitFormViewModelTest {
 
     private val faceSessionEventsMgr = mockk<FaceSessionEventsManagerImpl>(relaxed = true)
-    private val mainVm = mockk<FaceCaptureViewModel>(relaxed = true)
+    private val faceCaptureViewModel = mockk<FaceCaptureViewModel>(relaxed = true)
     private lateinit var viewModel: ExitFormViewModel
+    private val faceTimeHelper = mockk<FaceTimeHelperImpl>(relaxed = true)
 
     @Before
     fun setUp() {
-        viewModel = ExitFormViewModel(mainVm, faceSessionEventsMgr)
+        viewModel = ExitFormViewModel(faceCaptureViewModel, faceSessionEventsMgr, faceTimeHelper)
     }
 
     @Test
     fun `calling save form data assert event is saved to the repo`() {
+        every { faceTimeHelper.now() } returns 5L
         viewModel.exitFormData = Pair(RefusalAnswer.OTHER, "Some other reason")
-        viewModel.logExitFormEvent(1L, 5L)
+        viewModel.exitFormStartTime = 1L
+        viewModel.logExitFormEvent()
 
         verify(exactly = 1) {
             faceSessionEventsMgr.addEventInBackground(match {
@@ -42,7 +45,7 @@ class ExitFormViewModelTest {
     @Test
     fun `calling save form data assert event is not saved with null exit data`() {
         viewModel.exitFormData = null
-        viewModel.logExitFormEvent(0L, 2L)
+        viewModel.logExitFormEvent()
 
         verify(exactly = 0) { faceSessionEventsMgr.addEventInBackground(any()) }
     }
