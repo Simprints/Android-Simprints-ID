@@ -1,9 +1,8 @@
-package com.simprints.id.services.sync.subjects.down.controllers
+package com.simprints.id.services.sync.events.down
 
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
@@ -12,8 +11,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.*
-import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
-import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -25,22 +22,17 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class EventDownSyncWorkersBuilderImplTest {
 
     private lateinit var eventDownSyncWorkersFactory: EventDownSyncWorkersBuilder
 
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
-
-    @MockK
-    lateinit var mockLoginInfoManager: LoginInfoManager
 
     @MockK
     lateinit var mockPreferencesManager: IdPreferencesManager
@@ -57,26 +49,27 @@ class EventDownSyncWorkersBuilderImplTest {
     }
 
     @Test
-    fun builder_forProjectDownSync_shouldReturnTheRightWorkers() = runBlocking {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns projectDownSyncScope
+    fun builder_forProjectDownSync_shouldReturnTheRightWorkers() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns projectDownSyncScope
 
-        val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
+            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
 
-        chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
-        chain.assertDownSyncDownloaderWorkerInput(projectDownSyncScope)
-        chain.assertDownSyncCountWorkerInput(projectDownSyncScope)
-        assertThat(chain.size).isEqualTo(2)
-    }
+            chain.assertNumberOfDownSyncDownloaderWorker(1)
+            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            chain.assertDownSyncDownloaderWorkerInput(projectDownSyncScope)
+            chain.assertDownSyncCountWorkerInput(projectDownSyncScope)
+            assertThat(chain.size).isEqualTo(2)
+        }
 
     @Test
-    fun builder_forUserDownSync_shouldReturnTheRightWorkers() = runBlocking {
+    fun builder_forUserDownSync_shouldReturnTheRightWorkers() = runTest(StandardTestDispatcher()) {
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 any(),
@@ -94,75 +87,79 @@ class EventDownSyncWorkersBuilderImplTest {
     }
 
     @Test
-    fun builder_forModuleDownSync_shouldReturnTheRightWorkers() = runBlocking {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns modulesDownSyncScope
+    fun builder_forModuleDownSync_shouldReturnTheRightWorkers() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns modulesDownSyncScope
 
-        val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
-        chain.assertNumberOfDownSyncDownloaderWorker(2)
-        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
-        chain.assertDownSyncDownloaderWorkerInput(modulesDownSyncScope)
-        chain.assertDownSyncCountWorkerInput(modulesDownSyncScope)
-        assertThat(chain.size).isEqualTo(3)
-    }
-
-    @Test
-    fun builder_forModuleDownSync_shouldOnlySyncSelectedModules() = runBlockingTest {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns modulesDownSyncScope
-
-        eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
-        verify(exactly = 1) { mockPreferencesManager.selectedModules }
-        verify(exactly = 0) { mockPreferencesManager.moduleIdOptions }
-    }
+            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
+            chain.assertNumberOfDownSyncDownloaderWorker(2)
+            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            chain.assertDownSyncDownloaderWorkerInput(modulesDownSyncScope)
+            chain.assertDownSyncCountWorkerInput(modulesDownSyncScope)
+            assertThat(chain.size).isEqualTo(3)
+        }
 
     @Test
-    fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() = runBlocking {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns projectDownSyncScope
-        val uniqueSyncId = "uniqueSyncId"
-        val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(uniqueSyncId)
-        chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
-        chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
-            .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
-        chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
-            .assertSubjectsDownSyncCountWorkerTagsForPeriodic()
-    }
+    fun builder_forModuleDownSync_shouldOnlySyncSelectedModules() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns modulesDownSyncScope
+
+            eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
+            verify(exactly = 1) { mockPreferencesManager.selectedModules }
+            verify(exactly = 0) { mockPreferencesManager.moduleIdOptions }
+        }
 
     @Test
-    fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runBlocking {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns projectDownSyncScope
+    fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns projectDownSyncScope
+            val uniqueSyncId = "uniqueSyncId"
+            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(uniqueSyncId)
+            chain.assertNumberOfDownSyncDownloaderWorker(1)
+            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+                .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
+            chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
+                .assertSubjectsDownSyncCountWorkerTagsForPeriodic()
+        }
 
-        val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(null)
-        chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
-        chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
-            .assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
-        chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
-            .assertSubjectsDownSyncCountWorkerTagsForOneTime()
-    }
+    @Test
+    fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns projectDownSyncScope
+
+            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(null)
+            chain.assertNumberOfDownSyncDownloaderWorker(1)
+            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+                .assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
+            chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
+                .assertSubjectsDownSyncCountWorkerTagsForOneTime()
+        }
 }
 
 private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic() {
