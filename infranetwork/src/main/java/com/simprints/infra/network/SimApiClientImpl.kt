@@ -65,7 +65,7 @@ class SimApiClientImpl<T : SimRemoteInterface>(
                 retryIf = { it is RetryableCloudException })
         } catch (e: Exception) {
             throw when {
-                e.isNetworkConnectionException() -> NetworkConnectionException(cause = e)
+                e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
                 e is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
                 else -> e
             }

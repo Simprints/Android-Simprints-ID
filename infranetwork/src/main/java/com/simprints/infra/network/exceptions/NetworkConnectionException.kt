@@ -6,16 +6,16 @@ import java.io.IOException
 class NetworkConnectionException(message: String = "NetworkConnectionException", cause: Throwable) :
     RuntimeException(message, cause)
 
-fun Throwable.isNetworkConnectionException(): Boolean {
+fun Throwable.isCausedFromBadNetworkConnection(): Boolean {
     return when {
-        isNetworkConnectionException(this) -> true
+        isCausedFromBadNetworkConnection(this) -> true
         // Check the cause in case exception was rethrown
-        isNetworkConnectionException(this.cause) -> true
+        isCausedFromBadNetworkConnection(this.cause) -> true
         else -> false
     }
 }
 
-fun Throwable.isNetworkConnectionException(throwable: Throwable?): Boolean {
+fun Throwable.isCausedFromBadNetworkConnection(throwable: Throwable?): Boolean {
     return when (throwable) {
         is IOException, is ConnectionShutdownException -> true
         else -> false
