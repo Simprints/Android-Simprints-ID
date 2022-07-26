@@ -60,7 +60,7 @@ class EventRemoteDataSourceImpl(
                 parseStreamAndEmitEvents(streaming, this)
             }
         } catch (t: Throwable) {
-            if (t is SyncCloudIntegrationException && (t.cause is HttpException) && (t.cause as HttpException).code() == TOO_MANY_REQUEST_STATUS)
+            if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS)
                 throw TooManyRequestsException()
             else
                 throw t
