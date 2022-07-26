@@ -5,6 +5,8 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.infra.logging.PerformanceMonitor
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 
 class ProjectRepositoryImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,
@@ -38,7 +40,11 @@ class ProjectRepositoryImpl(
             projectLocalDataSource.save(it)
         }
     } catch (t: Throwable) {
-        t.printStackTrace()
+        when (t) {
+            is NetworkConnectionException -> Simber.i(t)
+            //TODO: should we ignore all other exceptions here
+            else -> Simber.d(t)
+        }
         null
     }
 

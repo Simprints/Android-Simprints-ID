@@ -9,6 +9,7 @@ import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CancellationException
 import java.io.IOException
 
@@ -61,10 +62,11 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) :
 
     private fun logExceptionIfRequired(t: Throwable?) {
         t?.let {
-            Simber.d(t)
-            // IOExceptions are about network issues, so they are not worth to report
-            if (it !is IOException || it !is CancellationException) {
-                Simber.e(t)
+            when (t) {
+                is CancellationException -> Simber.d(t)
+                // Record network issues only in Analytics
+                is NetworkConnectionException -> Simber.i(t)
+                else -> Simber.e(t)
             }
         }
     }

@@ -7,6 +7,7 @@ import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import okhttp3.ResponseBody
 import retrofit2.HttpException
@@ -29,15 +30,21 @@ class LicenseRemoteDataSourceImpl(
             ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(licenseVendor))
         }
     } catch (t: Throwable) {
-        Simber.e(t)
         when (t) {
+            is NetworkConnectionException -> {
+                Simber.i(t)
+                ApiLicenseResult.Error(unknownErrorCode)
+            }
             is BackendMaintenanceException -> {
+                Simber.i(t)
                 ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
             }
             is SyncCloudIntegrationException -> {
+                Simber.e(t)
                 handleCloudException(t)
             }
             else -> {
+                Simber.e(t)
                 ApiLicenseResult.Error(unknownErrorCode)
             }
         }
