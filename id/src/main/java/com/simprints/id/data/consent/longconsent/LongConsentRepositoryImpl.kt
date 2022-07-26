@@ -5,6 +5,7 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.isNetworkConnectionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
@@ -45,7 +46,12 @@ class LongConsentRepositoryImpl(
 
             flowCollector.emit(Succeed(language, file.readText()))
         } catch (t: Throwable) {
-            Simber.e(t)
+            when {
+                t is BackendMaintenanceException -> Simber.i(t)
+                t.isNetworkConnectionException() -> Simber.i(t)
+                else -> Simber.e(t)
+            }
+
             flowCollector.emit(
                 if (t is BackendMaintenanceException) {
                     FailedBecauseBackendMaintenance(language, t, t.estimatedOutage)
