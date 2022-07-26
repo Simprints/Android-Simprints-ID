@@ -11,7 +11,6 @@ import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CancellationException
-import java.io.IOException
 
 const val SYNC_LOG_TAG = "SYNC"
 
