@@ -22,7 +22,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infralogging"))
 
-    implementation(libs.testing.androidX.monitor)
     implementation(libs.testing.androidX.core)
     api(libs.testing.espresso.core)
     implementation(libs.testing.espresso.barista) {
