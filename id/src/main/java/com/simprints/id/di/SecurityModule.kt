@@ -5,7 +5,7 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper

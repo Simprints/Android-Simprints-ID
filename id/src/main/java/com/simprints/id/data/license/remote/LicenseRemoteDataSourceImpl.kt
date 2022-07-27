@@ -1,6 +1,5 @@
 package com.simprints.id.data.license.remote
 
-import com.simprints.core.network.NetworkConstants.Companion.AUTHORIZATION_ERROR
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
@@ -17,7 +16,10 @@ class LicenseRemoteDataSourceImpl(
     private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
 
-    private val unknownErrorCode = "000"
+    companion object {
+        private const val AUTHORIZATION_ERROR = 403
+        private const val UNKNOWN_ERROR_CODE = "000"
+    }
 
     override suspend fun getLicense(
         projectId: String,
@@ -33,7 +35,7 @@ class LicenseRemoteDataSourceImpl(
         when (t) {
             is NetworkConnectionException -> {
                 Simber.i(t)
-                ApiLicenseResult.Error(unknownErrorCode)
+                ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
             is BackendMaintenanceException -> {
                 Simber.i(t)
@@ -45,7 +47,7 @@ class LicenseRemoteDataSourceImpl(
             }
             else -> {
                 Simber.e(t)
-                ApiLicenseResult.Error(unknownErrorCode)
+                ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
         }
     }
@@ -56,15 +58,15 @@ class LicenseRemoteDataSourceImpl(
      * Anything else we can't really recover.
      */
     private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult {
-        return if (exception.cause is HttpException && (exception.cause as HttpException).code() == AUTHORIZATION_ERROR)
+        return if (exception.httpStatusCode() == AUTHORIZATION_ERROR)
             handleRetrofitException(exception.cause as HttpException)
         else
-            ApiLicenseResult.Error(unknownErrorCode)
+            ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
     }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
         val errorCode =
-            exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: unknownErrorCode
+            exception.response()?.errorBody()?.let { getLicenseErrorCode(it) } ?: UNKNOWN_ERROR_CODE
         return ApiLicenseResult.Error(errorCode)
     }
 

@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.local
 
 import android.content.Context
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.logging.Simber
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
@@ -36,7 +36,7 @@ class DbEventDatabaseFactoryImpl(
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         } catch (t: Throwable) {
             t.message?.let { Simber.d(it) }
-            secureLocalDbKeyProvider.setLocalDatabaseKey(dbName)
+            secureLocalDbKeyProvider.createLocalDatabaseKeyIfMissing(dbName)
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
         }.value.decodeToString().toCharArray()
     }

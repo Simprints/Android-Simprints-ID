@@ -2,33 +2,21 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.odk.OdkAction.Enrol
-import com.simprints.clientapi.activities.odk.OdkAction.Identify
-import com.simprints.clientapi.activities.odk.OdkAction.Invalid
-import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
+import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
-import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.ConfirmationResponse
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.MEDIUM
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.NONE
+import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
-import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.root.RootManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,12 +25,12 @@ class OdkPresenter(
     private val view: OdkContract.View,
     private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    deviceManager: DeviceManager,
+    rootManager: RootManager,
     sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
-    deviceManager = deviceManager,
+    rootManager = rootManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ), OdkContract.Presenter {
@@ -136,7 +124,12 @@ class OdkPresenter(
             addCompletionCheckEvent(flowCompletedCheck)
             sessionEventsManager.closeCurrentSessionNormally()
 
-            view.returnExitForm(refusalForm.reason, refusalForm.extra, currentSessionId, flowCompletedCheck)
+            view.returnExitForm(
+                refusalForm.reason,
+                refusalForm.extra,
+                currentSessionId,
+                flowCompletedCheck
+            )
         }
     }
 
