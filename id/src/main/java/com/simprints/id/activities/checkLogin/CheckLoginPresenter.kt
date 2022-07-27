@@ -1,7 +1,7 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.db.common.RemoteDbManager

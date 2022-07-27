@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
-import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
@@ -17,6 +16,7 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchResult
@@ -251,7 +251,6 @@ class MatchingViewModelTest : KoinTest {
     }
 
 
-
     private fun setupDbManagerLoadCandidates(candidates: List<FingerprintIdentity>) {
         coEvery { dbManagerMock.loadPeople(any()) } returns candidates.asFlow()
     }
@@ -263,7 +262,6 @@ class MatchingViewModelTest : KoinTest {
         probe.fingerprints.map { it.template }
             .zip(candidate.fingerprints.map { it.template })
             .all { (first, second) -> first.zip(second).all { (a, b) -> a == b } }
-
 
 
     companion object {

@@ -1,120 +1,104 @@
 package com.simprints.id.secure.securitystate.remote
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.google.firebase.FirebaseApp
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.exceptions.safe.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClientImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
-import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
-import io.mockk.*
-import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
-import okhttp3.logging.HttpLoggingInterceptor
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import org.junit.*
-import org.junit.runner.RunWith
-import retrofit2.HttpException
+import com.simprints.id.secure.models.remote.ApiSecurityState
+import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.testtools.common.alias.InterfaceInvocation
+import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Test
 
-@RunWith(AndroidJUnit4::class)
+@ExperimentalCoroutinesApi
 class SecurityStateRemoteDataSourceImplTest {
 
-    @MockK lateinit var mockLoginInfoManager: LoginInfoManager
+    companion object {
+        private const val PROJECT_ID = "projectId"
+        private const val DEVICE_ID = "deviceId"
+    }
 
-    private lateinit var remoteDataSource: SecurityStateRemoteDataSourceImpl
+    private val loginInfoManager = mockk<LoginInfoManager>()
+    private val remoteInterface = mockk<SecureApiInterface>()
+    private val simApiClient = mockk<SimApiClient<SecureApiInterface>>()
+    private val simApiClientFactory = mockk<SimApiClientFactory>()
+    private val securityStateRemoteDataSource =
+        SecurityStateRemoteDataSourceImpl(simApiClientFactory, loginInfoManager, DEVICE_ID)
 
-    private val mockWebServer = MockWebServer()
-
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
+        coEvery { simApiClient.executeCall<ApiSecurityState>(any()) } coAnswers {
+            val args = this.args
+            @Suppress("UNCHECKED_CAST")
+            (args[0] as InterfaceInvocation<SecureApiInterface, ApiSecurityState>).invoke(
+                remoteInterface
+            )
+        }
+        coEvery { simApiClientFactory.buildClient(SecureApiInterface::class) } returns simApiClient
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+    }
 
-        FirebaseApp.initializeApp(InstrumentationRegistry.getInstrumentation().targetContext)
-        mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
-
-        val mockFactory = mockk<SimApiClientFactory>()
+    @Test
+    fun `Get successful security state`() = runTest(StandardTestDispatcher()) {
         coEvery {
-            mockFactory.buildClient(SecureApiInterface::class)
-        } returns SimApiClientImpl(
-            SecureApiInterface::class,
-            mockWebServer.url("/").toString(),
-            DEVICE_ID,
-            VERSION_NAME,
-            randomUUID(),
-            JsonHelper,
-            testDispatcherProvider,
-            HttpLoggingInterceptor()
-        )
+            remoteInterface.requestSecurityState(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
+        } returns ApiSecurityState(DEVICE_ID, ApiSecurityState.Status.PROJECT_ENDED)
 
-        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        val securityState = securityStateRemoteDataSource.getSecurityState()
 
-        remoteDataSource = SecurityStateRemoteDataSourceImpl(
-            mockFactory,
-            mockLoginInfoManager,
-            DEVICE_ID
+        assertThat(securityState).isEqualTo(
+            SecurityState(
+                DEVICE_ID,
+                SecurityState.Status.PROJECT_ENDED
+            )
         )
     }
 
     @Test
-    @Ignore("API call is commented out until backend implements security state endpoint")
-    fun withSuccessfulResponse_shouldGetSecurityState() = runBlocking {
-        mockSuccessfulResponse()
+    fun `Get no security state if backend maintenance exception`() =
+        runTest(StandardTestDispatcher()) {
+            val exception = BackendMaintenanceException(estimatedOutage = 100)
+            coEvery {
+                remoteInterface.requestSecurityState(
+                    PROJECT_ID,
+                    DEVICE_ID,
+                )
+            } throws exception
 
-        val response = remoteDataSource.getSecurityState()
-        val expected = SecurityState(DEVICE_ID, SecurityState.Status.COMPROMISED)
-
-        assertThat(response).isEqualTo(expected)
-    }
-
-    @Test(expected = SimprintsInternalServerException::class)
-    @Ignore("API call is commented out until backend implements security state endpoint")
-    fun withErrorResponseCodeBetween500And599_shouldThrowInternalServerException() {
-        mockErrorResponse(501)
-
-        runBlocking {
-            remoteDataSource.getSecurityState()
+            val receivedException = assertThrows<BackendMaintenanceException> {
+                securityStateRemoteDataSource.getSecurityState()
+            }
+            assertThat(receivedException).isEqualTo(exception)
         }
-    }
 
-    @Test(expected = HttpException::class)
-    @Ignore("API call is commented out until backend implements security state endpoint")
-    fun withErrorResponseCode_shouldThrowHttpException() {
-        mockErrorResponse(404)
+    @Test
+    fun `Get no security state if sync cloud integration exception`() =
+        runTest(StandardTestDispatcher()) {
+            val exception = SyncCloudIntegrationException(cause = Exception())
+            coEvery {
+                remoteInterface.requestSecurityState(
+                    PROJECT_ID,
+                    DEVICE_ID,
+                )
+            } throws exception
 
-        runBlocking {
-            remoteDataSource.getSecurityState()
+            val receivedException = assertThrows<SyncCloudIntegrationException> {
+                securityStateRemoteDataSource.getSecurityState()
+            }
+            assertThat(receivedException).isEqualTo(exception)
         }
-    }
-
-    private fun mockSuccessfulResponse() {
-        val json = "{ \"deviceId\": \"$DEVICE_ID\", \"status\": \"COMPROMISED\" }"
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(json))
-    }
-
-    private fun mockErrorResponse(code: Int) {
-        mockWebServer.enqueue(MockResponse().setResponseCode(code))
-    }
-
-    private companion object {
-        const val PROJECT_ID = "mock-project-id"
-        const val DEVICE_ID = "mock-device-id"
-        const val VERSION_NAME = "mock-version-name"
-    }
-
-    @After
-    fun tearDown() {
-        unmockkAll()
-    }
 }

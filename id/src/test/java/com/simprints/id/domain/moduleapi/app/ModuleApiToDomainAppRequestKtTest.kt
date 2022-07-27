@@ -5,10 +5,10 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
-import com.simprints.id.commontesttools.moduleApi.AppEnrolRequestModuleApi
-import com.simprints.id.commontesttools.moduleApi.AppIdentifyRequestModuleApi
-import com.simprints.id.commontesttools.moduleApi.AppVerifyRequestModuleApi
+import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
+import com.simprints.id.testtools.moduleApi.AppEnrolRequestModuleApi
+import com.simprints.id.testtools.moduleApi.AppIdentifyRequestModuleApi
+import com.simprints.id.testtools.moduleApi.AppVerifyRequestModuleApi
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import org.junit.Test
@@ -58,7 +58,7 @@ class ModuleApiToDomainAppRequestKtTest {
     fun fromIAppConfirmIdentityRequestToAppConfirmIdentityRequest() {
         val selectedGuid = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
-        val iAppRequest = AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, sessionId, selectedGuid)
+        val iAppRequest = AppConfirmationConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, sessionId, selectedGuid)
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppConfirmIdentityRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

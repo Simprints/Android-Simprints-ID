@@ -66,11 +66,16 @@ definitions:
                     - ./gradlew infraconfig:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
                     - ./gradlew infralogin:jacocoTestReport
+                    - ./gradlew infranetwork:jacocoTestReport
+                    - ./gradlew infrasecurity:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
+                    - infraconfig/build/reports/**
                     - infralogging/build/reports/**
                     - infralogin/build/reports/**
+                    - infranetwork/build/reports/**
+                    - infrasecurity/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -169,6 +174,8 @@ definitions:
                     - ./gradlew infraconfig:projectHealth
                     - ./gradlew :infralogging:projectHealth
                     - ./gradlew :infralogin:projectHealth
+                    - ./gradlew :infranetwork:projectHealth
+                    - ./gradlew :infrasecurity:projectHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download

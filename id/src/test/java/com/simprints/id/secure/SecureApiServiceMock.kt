@@ -3,10 +3,9 @@ package com.simprints.id.secure
 import com.simprints.id.secure.models.AuthRequestBody
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
+import com.simprints.id.secure.models.remote.ApiSecurityState
 import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import retrofit2.Response
-import retrofit2.Retrofit
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
 
@@ -20,7 +19,7 @@ class SecureApiServiceMock(
         projectId: String,
         userId: String,
         deviceId: String
-    ): Response<ApiAuthenticationData> = delegate.returning(
+    ): ApiAuthenticationData = delegate.returning(
         buildSuccessResponseWith(getApiAuthenticationData())
     ).requestAuthenticationData(projectId, userId, deviceId)
 
@@ -28,14 +27,14 @@ class SecureApiServiceMock(
         projectId: String,
         userId: String,
         credentials: AuthRequestBody
-    ): Response<ApiToken> = delegate.returning(
+    ): ApiToken = delegate.returning(
         buildSuccessResponseWith(getApiToken())
     ).requestCustomTokens(projectId, userId, credentials)
 
     override suspend fun requestSecurityState(
         projectId: String,
         deviceId: String
-    ): Response<SecurityState> {
+    ): ApiSecurityState {
         return delegate.returning(
             buildSuccessResponseWith(getSecurityState())
         ).requestSecurityState(projectId, deviceId)
@@ -57,10 +56,4 @@ class SecureApiServiceMock(
         "mock-device-id", SecurityState.Status.RUNNING
     )
 }
-
-fun createMockServiceToFailRequests(
-    retrofit: Retrofit
-): SecureApiInterface = SecureApiServiceMock(
-    createMockBehaviorService(retrofit, 100, SecureApiInterface::class.java)
-)
 

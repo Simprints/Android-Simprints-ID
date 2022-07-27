@@ -5,11 +5,11 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.id.exceptions.safe.BackendMaintenanceException
-import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -28,12 +28,17 @@ class AuthenticationHelperImplTest {
     @Before
     fun setUp() {
         authenticationHelperImpl =
-            AuthenticationHelperImpl(loginInfoManager, timeHelper, projectAuthenticator, eventRepository)
+            AuthenticationHelperImpl(
+                loginInfoManager,
+                timeHelper,
+                projectAuthenticator,
+                eventRepository
+            )
     }
 
     @Test
     fun shouldSetBackendErrorIfBackendMaintenanceException() = runBlocking {
-        val result = mockException(BackendMaintenanceException())
+        val result = mockException(BackendMaintenanceException(estimatedOutage = 100))
 
         assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
     }
@@ -47,14 +52,16 @@ class AuthenticationHelperImplTest {
 
     @Test
     fun shouldSetSafetyNetUnavailableIfServiceUnavailableException() = runBlocking {
-        val result = mockException(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
+        val result =
+            mockException(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
         assertThat(result).isInstanceOf(Result.SAFETYNET_UNAVAILABLE::class.java)
     }
 
     @Test
     fun shouldSetSafetyNetInvalidIfSafetyNextInvalidException() = runBlocking {
-        val result = mockException(SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS))
+        val result =
+            mockException(SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS))
 
         assertThat(result).isInstanceOf(Result.SAFETYNET_INVALID_CLAIM::class.java)
     }
@@ -67,8 +74,8 @@ class AuthenticationHelperImplTest {
     }
 
     @Test
-    fun shouldTechnicalFailureIfSimprintsInternalServerException() = runBlocking {
-        val result = mockException(SimprintsInternalServerException())
+    fun shouldTechnicalFailureIfSyncCloudIntegrationException() = runBlocking {
+        val result = mockException(SyncCloudIntegrationException(cause = Exception()))
 
         assertThat(result).isInstanceOf(Result.TECHNICAL_FAILURE::class.java)
     }

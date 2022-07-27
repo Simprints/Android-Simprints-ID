@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote
 
-import com.simprints.core.network.SimRemoteInterface
 import com.simprints.eventsystem.event.remote.models.ApiEventCount
+import com.simprints.infra.network.SimRemoteInterface
 import okhttp3.ResponseBody
 import retrofit2.http.*
 
@@ -16,11 +16,13 @@ interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
         @Query("l_mode") modes: List<ApiModes>,
-        @Query("lastEventId") lastEventId: String?): List<ApiEventCount>
+        @Query("lastEventId") lastEventId: String?
+    ): List<ApiEventCount>
 
     @POST("projects/{projectId}/events")
     suspend fun uploadEvents(
         @Path("projectId") projectId: String,
+        @Query("acceptInvalidEvents") acceptInvalidEvents: Boolean = true,
         @Body events: ApiUploadEventsBody
     )
 
@@ -31,7 +33,8 @@ interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
         @Query("l_mode") modes: List<ApiModes>,
-        @Query("lastEventId") lastEventId: String?): ResponseBody
+        @Query("lastEventId") lastEventId: String?
+    ): ResponseBody
 
     @POST("projects/{projectId}/dump")
     suspend fun dumpInvalidEvents(

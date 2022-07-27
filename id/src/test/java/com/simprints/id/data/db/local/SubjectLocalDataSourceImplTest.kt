@@ -2,8 +2,8 @@ package com.simprints.id.data.db.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils
-import com.simprints.id.commontesttools.SubjectsGeneratorUtils.getRandomPeople
+import com.simprints.id.testtools.SubjectsGeneratorUtils
+import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.local.*

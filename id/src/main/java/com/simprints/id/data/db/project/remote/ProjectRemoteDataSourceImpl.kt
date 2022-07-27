@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.project.remote
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.simprints.core.network.SimApiClient
+import com.simprints.infra.network.SimApiClient
 import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.db.project.domain.Project
 
@@ -10,18 +10,18 @@ open class ProjectRemoteDataSourceImpl(
 ) : ProjectRemoteDataSource {
 
     override suspend fun loadProjectFromRemote(projectId: String): Project =
-        executeCall("requestProject") {
+        executeCall {
             it.requestProject(projectId)
         }
 
     override suspend fun loadProjectRemoteConfigSettingsJsonString(projectId: String): JsonNode =
-        executeCall("requestProjectConfig") {
+        executeCall {
             it.requestProjectConfig(projectId)
         }
 
-    private suspend fun <T> executeCall(nameCall: String, block: suspend (ProjectRemoteInterface) -> T): T =
+    private suspend fun <T> executeCall(block: suspend (ProjectRemoteInterface) -> T): T =
         with(getProjectApiClient()) {
-            executeCall(nameCall) {
+            executeCall {
                 block(it)
             }
         }

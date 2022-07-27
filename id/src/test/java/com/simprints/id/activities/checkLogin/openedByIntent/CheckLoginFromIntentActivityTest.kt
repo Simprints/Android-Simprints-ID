@@ -15,8 +15,8 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.R
 import com.simprints.id.activities.BaseUnitTest
-import com.simprints.id.commontesttools.moduleApi.AppConfirmaConfirmIdentityRequestModuleApi
-import com.simprints.id.commontesttools.moduleApi.AppEnrolRequestModuleApi
+import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
+import com.simprints.id.testtools.moduleApi.AppEnrolRequestModuleApi
 import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -59,7 +59,7 @@ class CheckLoginFromIntentActivityTest : BaseUnitTest() {
 
     private fun bundleForAppConfirmIdentityRequest() = Bundle().apply {
         putParcelable(IAppRequest.BUNDLE_KEY,
-            AppConfirmaConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2))
+            AppConfirmationConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2))
     }
     private fun bundleForAppEnrolRequest() = Bundle().apply {
         putParcelable(IAppRequest.BUNDLE_KEY,

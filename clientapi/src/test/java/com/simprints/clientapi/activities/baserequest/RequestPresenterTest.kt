@@ -5,14 +5,9 @@ import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
-import com.simprints.clientapi.domain.responses.ConfirmationResponse
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.RootedDeviceException
-import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.infra.security.root.RootManager
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coVerify
 import io.mockk.every
@@ -101,7 +96,7 @@ class RequestPresenterTest {
 
     @Test
     fun withRootedDevice_shouldShowAlertScreen() = runTest {
-        val mockDeviceManager = mockk<DeviceManager>(relaxed = true)
+        val mockDeviceManager = mockk<RootManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
         val presenter = ImplRequestPresenter(
@@ -122,13 +117,13 @@ class RequestPresenterTest {
 class ImplRequestPresenter(
     view: RequestContract.RequestView,
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
-    deviceManager: DeviceManager,
+    rootManager: RootManager,
     sharedPreferencesManager: SharedPreferencesManager,
     sessionEventsManager: ClientApiSessionEventsManager
 ) : RequestPresenter(
     view = view,
     eventsManager = clientApiSessionEventsManager,
-    deviceManager = deviceManager,
+    rootManager = rootManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ) {

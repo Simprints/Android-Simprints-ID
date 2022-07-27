@@ -6,7 +6,6 @@ import androidx.work.Data
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.exceptions.SyncCloudIntegrationException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
@@ -16,26 +15,22 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.up.EventUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import okhttp3.Headers
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import retrofit2.HttpException
-import retrofit2.Response
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -83,17 +78,10 @@ class EventUpSyncUploaderWorkerTest {
     @Test
     fun worker_shouldSetFailCorrectlyIfBackendError() {
         runBlocking {
-            val errorResponse =
-                "{\"error\":\"002\"}"
-            val errorResponseBody =
-                errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
-            val mockResponse = Response.error<Any>(503, errorResponseBody)
-            val exception = HttpException(mockResponse)
-
             with(eventUpSyncUploaderWorker) {
                 coEvery {
                     upSyncHelper.upSync(any(), any())
-                } throws exception
+                } throws BackendMaintenanceException(estimatedOutage = null)
 
                 doWork()
 
@@ -112,26 +100,10 @@ class EventUpSyncUploaderWorkerTest {
     @Test
     fun worker_shouldSetFailCorrectlyIfTimedBackendError() {
         runBlocking {
-            val exception: HttpException = mockk()
-
-            every {
-                exception.response()?.errorBody()?.string()
-            } returns "{\"error\":\"002\"}"
-
-            every {
-                exception.response()?.code()
-            } returns 503
-
-            every {
-                exception.response()?.headers()
-            } returns Headers.Builder()
-                .add("Retry-After", "600")
-                .build()
-
             with(eventUpSyncUploaderWorker) {
                 coEvery {
                     upSyncHelper.upSync(any(), any())
-                } throws exception
+                } throws BackendMaintenanceException(estimatedOutage = 600)
 
                 doWork()
 
