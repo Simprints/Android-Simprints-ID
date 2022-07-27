@@ -3,8 +3,8 @@ package com.simprints.id.data.db.subject.local
 import android.content.Context
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.LocalDbKey
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException

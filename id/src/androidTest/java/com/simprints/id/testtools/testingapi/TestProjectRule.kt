@@ -1,8 +1,8 @@
 package com.simprints.id.testtools.testingapi
 
 import android.content.Context
+import com.simprints.infra.security.keyprovider.LocalDbKey
 import android.util.Base64
-import com.simprints.core.security.LocalDbKey
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.models.TestProjectCreationParameters
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager

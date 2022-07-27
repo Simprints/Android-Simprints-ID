@@ -17,7 +17,7 @@ import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
-import com.simprints.id.network.BaseUrlProvider
+import com.simprints.id.network.ImageUrlProvider
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.mockk
 
@@ -71,10 +71,10 @@ class TestDataModule(
 
     override fun provideImageRepository(
         context: Context,
-        baseUrlProvider: BaseUrlProvider,
+        imageUrlProvider: ImageUrlProvider,
         remoteDbManager: RemoteDbManager
     ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, baseUrlProvider, remoteDbManager)
+        super.provideImageRepository(context, imageUrlProvider, remoteDbManager)
     }
 
     override fun provideLongConsentLocalDataSource(
@@ -107,5 +107,5 @@ class TestDataModule(
                 mockk()
             )
         }
- }
+}
 

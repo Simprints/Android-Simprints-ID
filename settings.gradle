@@ -13,4 +13,5 @@ include ':id',
     ':infraconfig',
     ':infralogging',
     ':infralogin',
-    ':infranetwork'
+    ':infranetwork',
+    ':infrasecurity'
