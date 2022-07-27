@@ -205,7 +205,9 @@ dependencies {
     //                      Android test
     // ######################################################
 
-    androidTestImplementation(project(":fingerprintscannermock"))
+    androidTestImplementation(project(":fingerprintscannermock")) {
+        exclude("org.robolectric")
+    }
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.core)
@@ -232,7 +234,9 @@ dependencies {
         exclude("com.google.guava")
     }
     kaptAndroidTest(libs.dagger.compiler)
-    androidTestImplementation(project(":testtools"))
+    androidTestImplementation(project(":testtools")) {
+        exclude("org.robolectric")
+    }
 
     debugImplementation(libs.testing.fragment.testing) {
         exclude("androidx.test", "core")
