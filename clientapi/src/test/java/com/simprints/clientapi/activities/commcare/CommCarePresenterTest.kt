@@ -127,6 +127,7 @@ class CommCarePresenterTest {
         every { view.extras } returns mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
         val sessionEventsManager =mockSessionManagerToCreateSession().also {
             coEvery { it.isSessionHasIdentificationCallback(any()) } returns true
+            coEvery { it.getCurrentSessionId() } returns  MOCK_SESSION_ID
         }
 
         getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runBlocking { start() } }
