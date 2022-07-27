@@ -4,6 +4,7 @@ import com.simprints.clientapi.exceptions.InvalidSelectedIdException
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.clientapi.requestFactories.RequestFactory
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import org.junit.Test
@@ -37,8 +38,17 @@ class ConfirmIdentityValidatorTest : AppRequestValidatorTest(ConfirmIdentityFact
     @Test
     fun session_without_identificationCallback_shouldThrowException() {
         val extractor = ConfirmIdentityFactory.getMockExtractor()
-        val validator =ConfirmIdentityValidator(extractor,false)
+        val validator =ConfirmIdentityValidator(extractor, RequestFactory.MOCK_SESSION_ID,false)
         assertThrows<InvalidStateForIntentAction> {
+            validator.validateClientRequest()
+        }
+    }
+
+    @Test
+    fun session_with_differentSessionId_shouldThrowException() {
+        val extractor = ConfirmIdentityFactory.getMockExtractor()
+        val validator =ConfirmIdentityValidator(extractor, "anotherSessionID",false)
+        assertThrows<InvalidSessionIdException> {
             validator.validateClientRequest()
         }
     }
