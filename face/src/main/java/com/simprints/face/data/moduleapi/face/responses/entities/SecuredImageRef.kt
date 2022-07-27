@@ -6,4 +6,3 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class SecuredImageRef(override val path: Path) : ISecuredImageRef
 
-fun ISecuredImageRef.fromModuleApiToDomain() = SecuredImageRef(path.fromModuleApiToDomain())

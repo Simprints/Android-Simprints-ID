@@ -90,18 +90,6 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
         }
     }
 
-    private fun renderDebugInfo(face: Face?) {
-        if (face == null) {
-            binding.captureFeedbackTxtDebug.text = null
-        } else {
-            binding.captureFeedbackTxtDebug.text = getString(
-                R.string.capture_debug_features,
-                face.yaw.toString(),
-                face.roll.toString()
-            )
-        }
-    }
-
     private fun renderCurrentDetection(faceDetection: FaceDetection) {
         when (faceDetection.status) {
             FaceDetection.Status.NOFACE -> renderNoFace()
