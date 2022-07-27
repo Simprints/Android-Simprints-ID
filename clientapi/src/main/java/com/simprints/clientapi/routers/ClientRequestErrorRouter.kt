@@ -5,7 +5,6 @@ import android.content.Intent
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.ErrorActivity
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
-import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.id.tools.InternalConstants
 
 object ClientRequestErrorRouter {
