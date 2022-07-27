@@ -22,7 +22,7 @@ class AuthenticationDataManagerImpl(
                 remoteInterface.requestAuthenticationData(projectId, userId, deviceId)
             }.toDomainAuthData()
         } catch (e: Exception) {
-            if (e is SyncCloudIntegrationException && (e.cause is HttpException) && (e.cause as HttpException).code() == 404)
+            if (e is SyncCloudIntegrationException && e.httpStatusCode() == 404)
                 throw AuthRequestInvalidCredentialsException()
             else
                 throw e
