@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.common
 
 import android.content.Context
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseOptions
@@ -70,7 +71,7 @@ open class FirebaseManagerImpl(
             } catch (ex: FirebaseNoSignedInUserException) {
                 Simber.d(ex)
                 null
-            } catch (ex: FirebaseNetworkException) {
+            } catch (ex: Exception) {
                 throw transformFirebaseExceptionIfNeeded(ex)
             }
 
@@ -173,7 +174,7 @@ open class FirebaseManagerImpl(
     private fun transformFirebaseExceptionIfNeeded(e: Exception): Exception {
         return when (e) {
             // Rethrow as NetworkConnectionException so we handle it properly as connectivity issue
-            is FirebaseNetworkException -> NetworkConnectionException(cause = e)
+            is FirebaseNetworkException, is ApiException -> NetworkConnectionException(cause = e)
             else -> e
         }
     }
