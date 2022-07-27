@@ -54,9 +54,6 @@ object KoinInjector {
     private val consumers = AtomicInteger(0)
     private var koinModule: Module? = null
 
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
-
     /**
      * Call this on the creation of activities
      */
