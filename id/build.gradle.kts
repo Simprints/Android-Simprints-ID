@@ -142,9 +142,6 @@ dependencies {
     implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
 
-    // RootBeer (root detection)
-    implementation(libs.rootbeer.core)
-
     // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
@@ -202,28 +199,18 @@ dependencies {
     testImplementation(libs.testing.coroutines.test)
     kaptTest(libs.dagger.compiler)
     testImplementation(project(":infralogging"))
-    testImplementation(project(":testtools")) {
-        exclude("org.mockito:mockito-android")
-    }
+    testImplementation(project(":testtools"))
 
     // ######################################################
     //                      Android test
     // ######################################################
 
-    androidTestImplementation(project(":fingerprintscannermock")) {
-        exclude("org.mockito")
-        exclude("org.robolectric")
-    }
-    androidTestImplementation(libs.testing.mockito.core)
-    androidTestImplementation(libs.testing.mockito.android)
-    androidTestImplementation(libs.testing.mockito.kotlin)
+    androidTestImplementation(project(":fingerprintscannermock"))
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.monitor)
     androidTestImplementation(libs.testing.androidX.core)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.runner)
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.work)
     androidTestImplementation(libs.testing.espresso.core)
@@ -245,11 +232,7 @@ dependencies {
         exclude("com.google.guava")
     }
     kaptAndroidTest(libs.dagger.compiler)
-    androidTestImplementation(project(":testtools")) {
-        exclude("org.mockito")
-        exclude("org.robolectric")
-        exclude("org.jetbrains.kotlinx")
-    }
+    androidTestImplementation(project(":testtools"))
 
     debugImplementation(libs.testing.fragment.testing) {
         exclude("androidx.test", "core")

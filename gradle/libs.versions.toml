@@ -5,7 +5,6 @@ kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.4.2"
 androidx_version = "1.4.0"
 androidx_test_orchestrator_version = "1.4.1"
-androidx_test_monitor_version = "1.5.0"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.4.1"
@@ -193,7 +192,6 @@ testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", versi
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.2.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX
-testing-AndroidX-monitor = { module = "androidx.test:monitor", version.ref = "androidx_test_monitor_version" }
 testing-AndroidX-ext_junit = "androidx.test.ext:junit:1.1.3"
 testing-AndroidX-core = { module = "androidx.test:core", version.ref = "androidx_version" }
 testing-AndroidX-core_testing = { module = "android.arch.core:core-testing", version.ref = "androidx_version" }
