@@ -2,7 +2,7 @@ package com.simprints.eventsystem.events_sync.down
 
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope

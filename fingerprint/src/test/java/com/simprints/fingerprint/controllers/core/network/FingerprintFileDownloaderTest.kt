@@ -1,10 +1,10 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.google.common.truth.Truth
-import com.simprints.core.login.LoginInfoManager
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.data.FirmwareTestData
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.MockKAnnotations
@@ -12,14 +12,15 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class FingerprintFileDownloaderTest {
 
-    lateinit var fingerprintFileDownloader: FingerprintFileDownloader
+    private lateinit var fingerprintFileDownloader: FingerprintFileDownloader
 
     @MockK
     lateinit var fingerprintApiClientFactory: FingerprintApiClientFactory
@@ -43,18 +44,19 @@ class FingerprintFileDownloaderTest {
                 dispatcherProvider
             )
     }
+
     @Test
-    fun getFileUrl() = runBlocking {
+    fun getFileUrl() = runTest(UnconfinedTestDispatcher()) {
         // Given
         val apiClient: FingerprintApiClient<FileUrlRemoteInterface> = mockk()
         val api: FileUrlRemoteInterface = mockk()
         coEvery { fingerprintApiClientFactory.buildClient<FileUrlRemoteInterface>(any()) } returns apiClient
         every { apiClient.api } returns api
         coEvery { api.getFileUrl(any(), any()) } returns FileUrl(FirmwareTestData.SOME_URL)
-        every { loginInfoManager.getSignedInProjectIdOrEmpty()} returns "projectId"
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns "projectId"
         // When
         val result = fingerprintFileDownloader.getFileUrl("Any fileId")
         // Then
-        Truth.assertThat(result).isEqualTo(FirmwareTestData.SOME_URL)
+        assertThat(result).isEqualTo(FirmwareTestData.SOME_URL)
     }
 }

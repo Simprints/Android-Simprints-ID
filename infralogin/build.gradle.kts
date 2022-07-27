@@ -29,6 +29,9 @@ android {
         }
 
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -37,7 +40,13 @@ dependencies {
     implementation(project(":infranetwork"))
 
     implementation(libs.androidX.core)
+
+    implementation(libs.firebase.auth)
+
+    implementation(libs.kotlin.coroutinesPlayServices)
+
     implementation(libs.playServices.safetynet)
+
     implementation(libs.retrofit.core)
 
     // Unit Tests
@@ -47,4 +56,5 @@ dependencies {
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
+    testImplementation(libs.testing.coroutines.test)
 }

@@ -4,10 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -28,24 +24,16 @@ import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.common.FirebaseManagerImpl
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.ImageUrlProvider
 import com.simprints.id.network.ImageUrlProviderImpl
-import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
 import com.simprints.id.orchestrator.PersonCreationEventHelper
@@ -59,8 +47,6 @@ import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
-import com.simprints.infra.security.random.RandomGenerator
-import com.simprints.infra.security.random.RandomGeneratorImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -68,14 +54,27 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.infra.login.db.FirebaseManagerImpl
+import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManagerImpl
+import com.simprints.infra.login.network.SimApiClientFactory
+import com.simprints.infra.login.network.SimApiClientFactoryImpl
+import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.url.BaseUrlProviderImpl
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
+import com.simprints.infra.security.random.RandomGenerator
+import com.simprints.infra.security.random.RandomGeneratorImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
-import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.infra.network.url.BaseUrlProviderImpl
 
 @Module
 open class AppModule {
@@ -90,12 +89,11 @@ open class AppModule {
         loginInfoManager: LoginInfoManager,
         context: Context,
         dispatcher: DispatcherProvider
-    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context, dispatcher)
+    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
 
     @Provides
     @Singleton
-    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
-        LoginInfoManagerImpl(improvedSharedPreferences)
+    open fun provideLoginInfoManager(ctx: Context): LoginInfoManager = LoginInfoManagerImpl(ctx)
 
     @Provides
     @Singleton

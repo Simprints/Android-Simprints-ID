@@ -71,4 +71,36 @@ class AttestationManagerImplTest {
         }
         assertThat(exception.reason).isEqualTo(SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
     }
+
+    @Test
+    fun `should throw a safety net exception with invalid claims when a null attestation`() {
+        every {
+            safetyNetClient.attest(
+                DECODED_NONCE,
+                BuildConfig.SAFETYNET_API_KEY
+            )
+        } returns attestationResponseTask
+        every { attestationResponse.jwsResult } returns null
+
+        val exception = assertThrows<SafetyNetException> {
+            attestationManagerImpl.requestAttestation(NONCE)
+        }
+        assertThat(exception.reason).isEqualTo(SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS)
+    }
+
+    @Test
+    fun `should throw a safety net exception with invalid claims when an attestation with error claim`() {
+        every {
+            safetyNetClient.attest(
+                DECODED_NONCE,
+                BuildConfig.SAFETYNET_API_KEY
+            )
+        } returns attestationResponseTask
+        every { attestationResponse.jwsResult } returns ERROR_JWS_RESULT
+
+        val exception = assertThrows<SafetyNetException> {
+            attestationManagerImpl.requestAttestation(NONCE)
+        }
+        assertThat(exception.reason).isEqualTo(SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS)
+    }
 }

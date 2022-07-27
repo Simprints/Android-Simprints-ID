@@ -2,7 +2,7 @@ package com.simprints.id.testtools.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
@@ -17,7 +17,7 @@ import com.simprints.eventsystem.event.local.SessionDataCacheImpl
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.tools.LocationManager
@@ -63,11 +63,9 @@ class TestAppModule(
 ) : AppModule() {
 
     override fun provideLoginInfoManager(
-        improvedSharedPreferences: ImprovedSharedPreferences
+        ctx: Context,
     ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
-        super.provideLoginInfoManager(
-            improvedSharedPreferences
-        )
+        super.provideLoginInfoManager(ctx)
     }
 
     override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =

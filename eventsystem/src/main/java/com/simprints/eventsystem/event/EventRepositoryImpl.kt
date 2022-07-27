@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent

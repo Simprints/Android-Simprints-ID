@@ -5,7 +5,6 @@ import android.os.Build.VERSION
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modes.FACE
 import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -36,20 +35,20 @@ import com.simprints.id.secure.models.SecurityState.Status
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class CheckLoginFromIntentPresenterTest {
 
     @get:Rule
@@ -135,7 +134,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setupIsCalled_shouldParseAppRequest() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
 
             presenter.setup()
 
@@ -145,7 +144,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setupIsCalled_shouldSetLastUserId() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppEnrolRequest(
                 DEFAULT_PROJECT_ID,
                 DEFAULT_USER_ID,
@@ -162,7 +161,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setup_shouldAddEnrolmentCallout() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppEnrolRequest(
                 DEFAULT_PROJECT_ID,
                 DEFAULT_USER_ID,
@@ -179,7 +178,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setup_shouldAddEnrolLastBiomentricsCallout() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppEnrolLastBiometricsRequest(
                 DEFAULT_PROJECT_ID,
                 DEFAULT_USER_ID,
@@ -197,7 +196,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setup_shouldAddConfirmIdentityCallout() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val appRequest =
                 AppConfirmIdentityRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
             every { view.parseRequest() } returns appRequest
@@ -210,7 +209,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setup_shouldAddIdentificationCallout() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppIdentifyRequest(
                 DEFAULT_PROJECT_ID,
                 DEFAULT_USER_ID,
@@ -224,22 +223,29 @@ class CheckLoginFromIntentPresenterTest {
             coVerify { eventRepositoryMock.addOrUpdateEvent(any<IdentificationCalloutEvent>()) }
         }
     }
+
     @Test
-    fun presenter_setup_shouldShowConfirmationTextForAppConfirmIdentityRequest() =runBlockingTest{
-            val appRequest = AppConfirmIdentityRequest(
-                DEFAULT_PROJECT_ID,
-                DEFAULT_USER_ID,
-                GUID1,
-                GUID2)
-            every { view.parseRequest() } returns appRequest
+    fun presenter_setup_shouldShowConfirmationTextForAppConfirmIdentityRequest() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
+        val appRequest = AppConfirmIdentityRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            GUID1,
+            GUID2
+        )
+        every { view.parseRequest() } returns appRequest
 
-            presenter.setup()
+        presenter.setup()
 
-            // showConfirmationText should be called for AppConfirmIdentityRequest type
-            coVerify {view.showConfirmationText()  }
+        // showConfirmationText should be called for AppConfirmIdentityRequest type
+        coVerify { view.showConfirmationText() }
     }
+
     @Test
-    fun presenter_setup_shouldNotShowConfirmationTextForAppIdentifyRequest()=runBlockingTest {
+    fun presenter_setup_shouldNotShowConfirmationTextForAppIdentifyRequest() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         val appRequest = AppIdentifyRequest(
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
@@ -249,12 +255,13 @@ class CheckLoginFromIntentPresenterTest {
         every { view.parseRequest() } returns appRequest
         presenter.setup()
         // showConfirmationText shouldn't be called for AppIdentifyRequest type
-        coVerify (exactly = 0){view.showConfirmationText()  }
+        coVerify(exactly = 0) { view.showConfirmationText() }
 
     }
+
     @Test
     fun presenter_setup_shouldAddVerificationCallout() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppVerifyRequest(
                 DEFAULT_PROJECT_ID,
                 DEFAULT_USER_ID,
@@ -272,7 +279,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_setup_shouldAddInfoToSessionThenCallOrchestrator() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             presenter.handleSignedInUser()
 
             coVerify(exactly = 2) { eventRepositoryMock.addOrUpdateEvent(any()) }
@@ -282,7 +289,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_signedIn_shouldUpdateUserId() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
 
             presenter.handleSignedInUser()
 
@@ -342,7 +349,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_signedIn_updateProjectIdInEventsInCurrentSession() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val session = createSessionCaptureEvent(projectId = GUID1)
             val callout = createEnrolmentCalloutEvent(projectId = GUID1)
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session

@@ -2,7 +2,7 @@ package com.simprints.id.data.db.project.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.id.data.db.RealmTestsBase

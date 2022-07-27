@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.common
+package com.simprints.infra.login.db
 
 import android.content.Context
 import com.google.firebase.FirebaseApp
@@ -8,19 +8,18 @@ import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
-import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
-import com.simprints.id.secure.models.Token
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.domain.JwtTokenHelper.Companion.extractTokenPayloadAsJson
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-open class FirebaseManagerImpl(
+class FirebaseManagerImpl(
     val loginInfoManager: LoginInfoManager,
     val context: Context,
-    private val dispatcher: DispatcherProvider
 ) : RemoteDbManager {
 
     override suspend fun signIn(token: Token) {
@@ -52,7 +51,7 @@ open class FirebaseManagerImpl(
     }
 
     override suspend fun getCurrentToken(): String =
-        withContext(dispatcher.io()) {
+        withContext(Dispatchers.IO) {
             // Projects that were signed in and then updated to 2021.2.0 need to check the
             // previous Firebase project until they login again.
             val result = try {

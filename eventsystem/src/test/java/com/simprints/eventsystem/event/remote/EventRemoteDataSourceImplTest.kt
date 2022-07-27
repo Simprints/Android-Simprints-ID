@@ -1,7 +1,7 @@
 package com.simprints.eventsystem.event.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event

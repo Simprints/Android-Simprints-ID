@@ -1,7 +1,7 @@
 package com.simprints.id.secure.securitystate.remote
 
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.fromApiToDomain

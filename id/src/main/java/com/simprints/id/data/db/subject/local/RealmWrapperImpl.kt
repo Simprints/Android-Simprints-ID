@@ -2,7 +2,7 @@ package com.simprints.id.data.db.subject.local
 
 import android.content.Context
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider

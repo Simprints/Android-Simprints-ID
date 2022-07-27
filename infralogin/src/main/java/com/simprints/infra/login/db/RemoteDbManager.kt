@@ -1,15 +1,13 @@
-package com.simprints.id.data.db.common
+package com.simprints.infra.login.db
 
 import com.google.firebase.FirebaseApp
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
-import com.simprints.id.secure.models.Token
+import com.simprints.infra.login.domain.models.Token
 
 interface RemoteDbManager {
 
     suspend fun signIn(token: Token)
     fun signOut()
 
-    /** @throws DifferentProjectIdSignedInException */
     fun isSignedIn(projectId: String, userId: String): Boolean
 
     suspend fun getCurrentToken(): String

@@ -1,15 +1,16 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
+import com.simprints.infra.login.domain.LoginInfoManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -31,7 +32,7 @@ class DashboardProjectDetailsRepositoryTest {
     }
 
     @Test
-    fun shouldGetProjectNameFromCache() = runBlockingTest {
+    fun shouldGetProjectNameFromCache() = runTest(UnconfinedTestDispatcher()) {
         val mockProjectRepository = mockk<ProjectRepository>().also {
             coEvery { it.loadFromCache(PROJECT_ID) } returns mockProject
         }
@@ -49,7 +50,9 @@ class DashboardProjectDetailsRepositoryTest {
     }
 
     @Test
-    fun whenFetchingFromCacheFails_shouldGetProjectNameFromRemote() = runBlockingTest {
+    fun whenFetchingFromCacheFails_shouldGetProjectNameFromRemote() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         val mockProjectRepository = mockk<ProjectRepository>().also {
             coEvery { it.loadFromCache(PROJECT_ID) } returns null
             coEvery { it.loadFromRemoteAndRefreshCache(PROJECT_ID) } returns mockProject

@@ -1,13 +1,13 @@
 package com.simprints.id.testtools.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource

@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN

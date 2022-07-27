@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 
 // TODO move this into infraconfig

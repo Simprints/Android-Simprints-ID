@@ -14,7 +14,7 @@
 //import com.simprints.id.testtools.di.TestAppModule
 //import com.simprints.id.testtools.di.TestDataModule
 //import com.simprints.id.testtools.di.TestPreferencesModule
-//import com.simprints.id.data.db.common.RemoteDbManager
+//import com.simprints.infra.login.db.RemoteDbManager
 //import com.simprints.eventsystem.person.PersonRepository
 //import com.simprints.eventsystem.common.models.PeopleCount
 //import com.simprints.id.data.db.project.ProjectRepository
