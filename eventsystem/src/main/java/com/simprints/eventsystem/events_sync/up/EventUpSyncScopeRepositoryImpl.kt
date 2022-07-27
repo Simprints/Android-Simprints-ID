@@ -1,6 +1,6 @@
 package com.simprints.eventsystem.events_sync.up
 
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope.ProjectScope

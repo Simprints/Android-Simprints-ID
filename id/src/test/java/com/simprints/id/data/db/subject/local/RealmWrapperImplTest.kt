@@ -3,7 +3,7 @@ package com.simprints.id.data.db.subject.local
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException

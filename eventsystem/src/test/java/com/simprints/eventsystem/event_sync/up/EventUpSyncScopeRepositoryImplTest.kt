@@ -1,16 +1,16 @@
 package com.simprints.eventsystem.event_sync.up
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.eventsystem.events_sync.up.domain.getUniqueKey
+import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectUpSyncScope
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -19,7 +19,8 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,10 +31,7 @@ class EventUpSyncScopeRepositoryImplTest {
     lateinit var loginInfoManager: LoginInfoManager
 
     @MockK
-    lateinit var preferencesManager: PreferencesManager
-
-    @MockK
-    lateinit var upSyncOperationOperationDao: com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
+    lateinit var upSyncOperationOperationDao: DbEventUpSyncOperationStateDao
 
     private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
 
@@ -74,7 +72,7 @@ class EventUpSyncScopeRepositoryImplTest {
 
     @Test
     fun `test insertOrUpdate shouldInsertIntoTheDb`() = runBlocking {
-        eventUpSyncScopeRepository.insertOrUpdate(SampleDefaults.projectUpSyncScope.operation)
+        eventUpSyncScopeRepository.insertOrUpdate(projectUpSyncScope.operation)
 
         coVerify { upSyncOperationOperationDao.insertOrUpdate(any()) }
     }
@@ -82,7 +80,7 @@ class EventUpSyncScopeRepositoryImplTest {
 
     @Test
     fun buildProjectUpSyncScope() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val syncScope = eventUpSyncScopeRepository.getUpSyncScope()
 
             coVerify { upSyncOperationOperationDao.load() }

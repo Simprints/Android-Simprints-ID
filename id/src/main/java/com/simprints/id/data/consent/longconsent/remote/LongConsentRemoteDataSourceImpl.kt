@@ -1,11 +1,11 @@
 package com.simprints.id.data.consent.longconsent.remote
 
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.network.SimApiClient
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.network.SimApiClientFactory
 
 class LongConsentRemoteDataSourceImpl(
     private val loginInfoManager: LoginInfoManager,

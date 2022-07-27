@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.logging.Simber

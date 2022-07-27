@@ -1,7 +1,7 @@
 package com.simprints.id.data.images.repository
 
 import android.content.Context
-import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.id.data.images.local.ImageLocalDataSource
 import com.simprints.id.data.images.local.ImageLocalDataSourceImpl
 import com.simprints.id.data.images.model.Path

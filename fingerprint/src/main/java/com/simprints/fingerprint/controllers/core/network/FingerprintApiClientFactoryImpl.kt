@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.network.SimRemoteInterface
 import kotlin.reflect.KClass
 

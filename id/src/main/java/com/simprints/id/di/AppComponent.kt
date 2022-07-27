@@ -1,7 +1,5 @@
 package com.simprints.id.di
 
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.time.TimeHelper
@@ -56,6 +54,8 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.network.SimApiClientFactory
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

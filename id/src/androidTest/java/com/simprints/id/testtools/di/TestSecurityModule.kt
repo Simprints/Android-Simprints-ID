@@ -2,29 +2,31 @@ package com.simprints.id.testtools.di
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.SecurityModule
-import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.id.secure.*
+import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.domain.AttestationManager
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
+import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -76,37 +78,23 @@ class TestSecurityModule(
     }
 
     override fun provideProjectAuthenticator(
-        authManager: AuthManager,
-        projectSecretManager: ProjectSecretManager,
-        loginInfoManager: LoginInfoManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider,
-        safetyNetClient: SafetyNetClient,
+        authenticationRemoteDataSource: AuthenticationRemoteDataSource,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRepository: ProjectRepository,
-        projectRemoteDataSource: ProjectRemoteDataSource,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
         preferencesManager: IdPreferencesManager,
         attestationManager: AttestationManager,
-        authenticationDataManager: AuthenticationDataManager
     ): ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
-                authManager,
-                projectSecretManager,
-                loginInfoManager,
-                simApiClientFactory,
-                baseUrlProvider,
-                safetyNetClient,
+                authenticationRemoteDataSource,
                 secureDataManager,
                 projectRepository,
-                projectRemoteDataSource,
                 signerManager,
                 longConsentRepository,
                 preferencesManager,
                 attestationManager,
-                authenticationDataManager
             )
         }
     }

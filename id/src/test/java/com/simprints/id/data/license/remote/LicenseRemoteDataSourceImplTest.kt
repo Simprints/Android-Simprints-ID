@@ -1,7 +1,7 @@
 package com.simprints.id.data.license.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.SimApiClientFactory
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.network.SimApiClient

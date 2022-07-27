@@ -1,7 +1,7 @@
 package com.simprints.id.data.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.id.network.ImageUrlProvider
 import com.simprints.infra.logging.Simber

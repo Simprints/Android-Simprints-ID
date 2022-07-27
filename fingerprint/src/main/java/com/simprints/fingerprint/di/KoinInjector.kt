@@ -115,7 +115,7 @@ object KoinInjector {
     }
 
     private fun buildKoinModule() =
-        module(override = true) {
+        module {
             defineBuildersForFingerprintManagers()
             defineBuildersForDomainClasses()
             defineBuildersForPresentersAndViewModels()

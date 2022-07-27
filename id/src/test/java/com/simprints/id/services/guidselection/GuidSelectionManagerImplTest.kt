@@ -1,6 +1,6 @@
 package com.simprints.id.services.guidselection
 
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT

@@ -1,6 +1,7 @@
 package com.simprints.infra.login.network
 
 import android.content.Context
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.SimApiClientImpl
 import com.simprints.infra.network.SimRemoteInterface
@@ -12,7 +13,7 @@ class SimApiClientFactoryImpl(
     private val deviceId: String,
     private val ctx: Context,
     private val versionName: String,
-    //private val remoteDbManager: RemoteDbManager,
+    private val remoteDbManager: RemoteDbManager,
 ) : SimApiClientFactory {
 
     // Not using `inline fun <reified T : SimRemoteInterface>` because it's not possible to
@@ -25,7 +26,7 @@ class SimApiClientFactoryImpl(
             baseUrlProvider.getApiBaseUrl(),
             deviceId,
             versionName,
-            null,
+            remoteDbManager.getCurrentToken(),
         )
     }
 

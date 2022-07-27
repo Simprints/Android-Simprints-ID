@@ -2,7 +2,7 @@ package com.simprints.id.services.config
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker

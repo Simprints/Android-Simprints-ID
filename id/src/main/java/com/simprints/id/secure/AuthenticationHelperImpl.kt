@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
@@ -9,11 +9,10 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.SafetyNetException
-import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
+import com.simprints.infra.login.exceptions.SafetyNetException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import java.io.IOException
@@ -68,11 +67,11 @@ class AuthenticationHelperImpl(
     }
 
     private fun getSafetyNetExceptionReason(
-        reason: SafetyNetExceptionReason
+        reason: SafetyNetException.SafetyNetExceptionReason
     ): Result {
         return when (reason) {
-            SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
-            SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
+            SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
+            SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
         }
     }
 

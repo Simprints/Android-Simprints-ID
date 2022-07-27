@@ -1,9 +1,9 @@
 package com.simprints.id.data.license.remote
 
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

@@ -1,7 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper

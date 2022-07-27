@@ -1,9 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
@@ -15,7 +12,7 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
-import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -35,6 +32,9 @@ import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.ImageUrlProvider
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.network.SimApiClientFactory
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
 import dagger.Provides
 import java.net.URL

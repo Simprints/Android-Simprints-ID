@@ -1,10 +1,10 @@
 package com.simprints.id.secure
 
+import com.simprints.id.secure.models.NonceScope
+import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
+import com.simprints.infra.login.exceptions.SafetyNetException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.SafetyNetException
-import com.simprints.id.secure.models.NonceScope
 import java.io.IOException
 
 interface ProjectAuthenticator {

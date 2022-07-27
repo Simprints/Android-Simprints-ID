@@ -1,16 +1,16 @@
 package com.simprints.id.secure
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.id.secure.models.Token
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.network.url.BaseUrlProvider
 
 open class SignerManagerImpl(
     private var projectRepository: ProjectRepository,

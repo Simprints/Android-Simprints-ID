@@ -1,23 +1,22 @@
 package com.simprints.id.secure
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.secure.models.Token
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -83,7 +82,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signIn_shouldSignInToRemoteDb() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockFetchingProjectInfo()
@@ -94,7 +92,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signInToRemoteFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn(true)
 
@@ -102,7 +99,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signIn_shouldStoreCredentialsLocally() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -114,7 +110,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun storeCredentialsFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally(true)
@@ -123,7 +118,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signIn_shouldFetchProjectInfo() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -135,7 +129,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun loadAndRefreshCacheFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -145,7 +138,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signIn_shouldSucceed() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -156,7 +148,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signIn_shouldScheduleSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
@@ -169,10 +160,7 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signOut_shouldRemoveAnyState() = runTest(UnconfinedTestDispatcher()) {
-        every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
-
         signerManager.signOut()
 
         verifyUpSyncGotPaused()
@@ -183,7 +171,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signOut_shouldCancelPeriodicSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
         every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
@@ -193,7 +180,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signOut_backgroundSyncWorkersAreCancelled() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
@@ -201,7 +187,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signOut_longConsentsAreDeleted() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
@@ -209,7 +194,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signOut_apiBaseUrlIsReset() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
@@ -217,7 +201,6 @@ class SignerManagerImplTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun signOut_clearRemoteConfig() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
