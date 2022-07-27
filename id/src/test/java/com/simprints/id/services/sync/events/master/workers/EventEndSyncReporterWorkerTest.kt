@@ -39,7 +39,7 @@ class EventEndSyncReporterWorkerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager()
+        UnitTestConfig().setupWorkManager()
 
         endSyncReportWorker = createWorker(workDataOf(SYNC_ID_TO_MARK_AS_COMPLETED to syncId))
         app.component = mockk(relaxed = true)
@@ -67,7 +67,7 @@ class EventEndSyncReporterWorkerTest {
         (TestListenableWorkerBuilder<EventEndSyncReporterWorker>(app)
             .setTags(listOf(tagForMasterSyncId))
             .setInputData(inputData)
-            .build() as EventEndSyncReporterWorker)
+            .build())
             .apply {
                 resultSetter = mockk(relaxed = true)
                 syncCache = mockk(relaxed = true)

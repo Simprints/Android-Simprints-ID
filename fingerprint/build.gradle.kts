@@ -42,17 +42,6 @@ android {
         }
     }
 
-
-    sourceSets {
-        val sharedTestDir = "src/commontesttools/java"
-        named("test") {
-            java.srcDir(sharedTestDir)
-        }
-        named("androidTest") {
-            java.srcDir(sharedTestDir)
-        }
-    }
-
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
@@ -99,6 +88,7 @@ dependencies {
     implementation(project(":fingerprintscanner"))
     implementation(project(":fingerprintscannermock"))
     implementation(project(":infralogging"))
+    implementation(project(":infranetwork"))
 
     // Kotlin
     implementation(libs.kotlin.reflect)
@@ -106,15 +96,11 @@ dependencies {
 
     // Android X
     implementation(libs.androidX.core)
-    implementation(libs.androidX.multidex)
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.room.core)
     implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.androidX.lifecycle.livedata)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.ui.cardview)
-    implementation(libs.androidX.ui.preference)
-    implementation(libs.androidX.ui.fragment)
     implementation(libs.androidX.ui.viewpager2)
     implementation(libs.androidX.navigation.fragment)
     implementation(libs.androidX.navigation.ui)
@@ -129,12 +115,6 @@ dependencies {
 
 
 
-    // Retrofit
-    implementation(libs.retrofit.core)
-    implementation(libs.retrofit.adapter)
-    implementation(libs.retrofit.logging)
-    implementation(libs.retrofit.okhttp)
-    implementation(libs.retrofit.jackson)
     // Splitties
     implementation(libs.splitties.core)
     // Koin
@@ -155,21 +135,13 @@ dependencies {
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.androidX.runner)
-    testImplementation(libs.testing.androidX.room)
     testImplementation(libs.testing.androidX.rules)
 
     // Espresso
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
-    testImplementation(libs.testing.espresso.contrib)
-
-    // Kotlin
-    testImplementation(libs.testing.koTest.kotlin)
-    testImplementation(libs.testing.coroutines.test)
 
     // Mocking and assertion frameworks
-    testImplementation(libs.testing.mockito.kotlin)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
 
@@ -177,9 +149,9 @@ dependencies {
     testImplementation(libs.testing.koin)
     testImplementation(libs.testing.live.data)
 
+
     // Robolectric
     testImplementation(libs.testing.robolectric.core)
-    testImplementation(libs.testing.robolectric.multidex)
 
     // ######################################################
     //                      Android test
@@ -187,8 +159,6 @@ dependencies {
 
     // Simprints
     androidTestImplementation(project(":testtools")) {
-        exclude("org.apache.maven")
-        exclude("org.mockito")
         exclude("org.robolectric")
         exclude("org.jetbrains.kotlinx")
         exclude("io.mockk")
@@ -199,42 +169,23 @@ dependencies {
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.monitor)
     androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.runner)
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.live.data)
-    androidTestImplementation(libs.androidX.cameraX.core)
-
-    // Android X navigation components
-    androidTestImplementation(libs.testing.androidX.navigation)
 
     // Mocking and assertion frameworks
-    androidTestImplementation(libs.testing.mockito.core)
-    androidTestImplementation(libs.testing.mockito.android)
-    androidTestImplementation(libs.testing.mockito.kotlin)
-    androidTestImplementation(libs.testing.truth)
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
 
     // Espresso
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
-    androidTestImplementation(libs.testing.espresso.barista) {
-        exclude("com.android.support")
-        exclude("com.google.code.findbugs")
-        exclude("org.jetbrains.kotlin")
-        exclude("com.google.guava")
-    }
+
 
     // Truth
     androidTestImplementation(libs.testing.truth)
-
-    // Trust me I hate this fix more than you
-    // This is to solve multiple imports of guava https://stackoverflow.com/a/60492942/4072335
-    androidTestImplementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 }
 
 configurations {

@@ -67,15 +67,9 @@ android {
     }
 
     sourceSets {
-        val sharedTestDir = "src/commontesttools/java"
         val eventCreators = "src/debug/java"
         named("test") {
-            java.srcDir(sharedTestDir)
             java.srcDir(eventCreators)
-        }
-        named("androidTest") {
-            java.srcDir(sharedTestDir)
-            java.srcDir("src/androidTest/java")
         }
     }
 
@@ -120,6 +114,8 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     implementation(project(":infralogging"))
+    implementation(project(":infranetwork"))
+    implementation(project(":infrasecurity"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
@@ -138,12 +134,6 @@ dependencies {
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
     implementation(libs.playServices.safetynet)
-    implementation(libs.retrofit.core)
-    implementation(libs.retrofit.adapter)
-    implementation(libs.retrofit.jackson)
-    implementation(libs.retrofit.logging)
-    implementation(libs.retrofit.okhttp)
-    implementation(libs.retrofit.converterScalars)
     implementation(libs.rxJava2.core)
     kapt(libs.androidX.room.compiler)
     kapt(libs.dagger.compiler)
@@ -179,9 +169,6 @@ dependencies {
     implementation(libs.androidX.sqlite)
     implementation(libs.sqlCipher.core)
 
-    implementation(libs.chuck.release)
-    debugImplementation(libs.chuck.debug)
-
     // ######################################################
     //                      Unit test
     // ######################################################
@@ -203,7 +190,6 @@ dependencies {
     testImplementation(libs.testing.androidX.rules)
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
-    testImplementation(libs.testing.espresso.contrib)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.koTest.kotlin)
 
@@ -225,7 +211,6 @@ dependencies {
     // ######################################################
 
     androidTestImplementation(project(":fingerprintscannermock")) {
-        exclude("org.apache.maven")
         exclude("org.mockito")
         exclude("org.robolectric")
     }
@@ -261,7 +246,6 @@ dependencies {
     }
     kaptAndroidTest(libs.dagger.compiler)
     androidTestImplementation(project(":testtools")) {
-        exclude("org.apache.maven")
         exclude("org.mockito")
         exclude("org.robolectric")
         exclude("org.jetbrains.kotlinx")
@@ -272,11 +256,6 @@ dependencies {
     }
 }
 configurations {
-    debugImplementation {
-        // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
-        // And a full feature version that should be added in debug build types
-        exclude("com.github.chuckerteam.chucker", "library-no-op")
-    }
     androidTestImplementation {
         // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
         // the issue is reported here https://github.com/mockk/mockk/issues/722

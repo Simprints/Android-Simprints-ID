@@ -1,11 +1,12 @@
 package com.simprints.id.testtools.testingapi
 
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_REALM_KEY
+import android.content.Context
+import com.simprints.infra.security.keyprovider.LocalDbKey
+import android.util.Base64
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.models.TestProjectCreationParameters
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
+import kotlinx.coroutines.runBlocking
 import org.junit.rules.TestRule
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -16,23 +17,28 @@ import org.junit.runner.Description
  * @build:Rule val testProjectRule = TestProjectRule()
  */
 class TestProjectRule(
-    val dispatcher: DispatcherProvider,
-    val testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()
+    private val ctx: Context,
+    private val testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()
 ) : TestWatcher() {
+
+    companion object {
+        private const val DEFAULT_REALM_KEY_STRING =
+            "Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ=="
+        private val DEFAULT_REALM_KEY: ByteArray =
+            Base64.decode(DEFAULT_REALM_KEY_STRING, Base64.NO_WRAP)
+    }
 
     lateinit var testProject: TestProject
     lateinit var localDbKey: LocalDbKey
 
-    override fun starting(description: Description?) {
+    override fun starting(description: Description?) = runBlocking {
 
-        testProject = RemoteTestingManager.create(dispatcher).createTestProject(testProjectCreationParameters)
+        testProject =
+            RemoteTestingManager.create(ctx).createTestProject(testProjectCreationParameters)
 
         localDbKey = LocalDbKey(
             testProject.id,
-            DEFAULT_REALM_KEY)
-    }
-
-    override fun finished(description: Description?) {
-        RemoteTestingManager.create(dispatcher).deleteTestProject(testProject.id)
+            DEFAULT_REALM_KEY
+        )
     }
 }

@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":id"))
     implementation(project(":moduleapi"))
     implementation(project(":infralogging"))
+    implementation(project(":infrasecurity"))
     implementation(libs.libsimprints)
 
     // Service Location

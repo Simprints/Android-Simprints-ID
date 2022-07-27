@@ -5,7 +5,7 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME

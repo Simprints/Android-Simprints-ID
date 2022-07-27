@@ -10,9 +10,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.di.TestViewModelModule
+import com.simprints.id.testtools.di.TestAppModule
+import com.simprints.id.testtools.di.TestPreferencesModule
+import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
@@ -76,7 +76,6 @@ class PrivacyNoticeActivityUnitTest {
     @Before
     fun setUp() {
         UnitTestConfig(
-            this,
             module,
             preferencesModule,
             viewModelModule = viewModelModule

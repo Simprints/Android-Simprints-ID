@@ -32,8 +32,8 @@ class CommCareActivityTest : BaseClientApiTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        loadKoinModules(module(override = true) {
-            factory { (context: Context) -> mockk<CommCareGuidSelectionNotifier>(relaxed = true) }
+        loadKoinModules(module {
+            factory { (_: Context) -> mockk<CommCareGuidSelectionNotifier>(relaxed = true) }
             factory { clientApiSessionEventsManager }
         })
         rule.launchActivity(buildIntent())

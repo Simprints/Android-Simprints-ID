@@ -13,5 +13,5 @@ interface EventRemoteDataSource {
 
     suspend fun getEvents(query: ApiRemoteEventQuery, scope: CoroutineScope): ReceiveChannel<Event>
 
-    suspend fun post(projectId: String, events: List<Event>)
+    suspend fun post(projectId: String, events: List<Event>, acceptInvalidEvents: Boolean = true)
 }

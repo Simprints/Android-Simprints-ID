@@ -3,42 +3,28 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
-import com.simprints.fingerprint.commontesttools.time.MockTimer
+import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
-import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
-import com.simprints.fingerprint.scanner.domain.versions.ChipFirmwareVersion
+import com.simprints.fingerprint.scanner.domain.ota.*
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
-import com.simprints.fingerprint.testtools.assertEventReceived
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
-import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
-import com.simprints.id.data.license.remote.ApiLicense
+import com.simprints.fingerprint.testtools.*
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Observable
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import retrofit2.HttpException
-import retrofit2.Response
 
 class OtaViewModelTest {
 
@@ -174,7 +160,7 @@ class OtaViewModelTest {
         every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
         every { scannerMock.performStmOta(any()) } returns Observable.concat(
             Observable.just(STM_OTA_STEPS[0]),
-            Observable.error(createBackendMaintenanceException())
+            Observable.error(BackendMaintenanceException(estimatedOutage = null))
         )
 
         otaViewModel.startOta(
@@ -282,13 +268,5 @@ class OtaViewModelTest {
                     Un20OtaStep.ReconnectingAfterValidating,
                     Un20OtaStep.UpdatingUnifiedVersionInformation
                 )
-    }
-
-    private fun createBackendMaintenanceException(): HttpException {
-        val errorResponse =
-            "{\"error\":\"002\"}"
-        val errorResponseBody = errorResponse.toResponseBody("application/json".toMediaTypeOrNull())
-        val mockResponse = Response.error<ApiLicense>(503, errorResponseBody)
-        return HttpException(mockResponse)
     }
 }

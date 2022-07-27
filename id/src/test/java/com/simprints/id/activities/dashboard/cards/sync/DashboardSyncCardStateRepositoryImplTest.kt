@@ -4,47 +4,36 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncComplete
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncConnecting
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncDefault
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailed
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncFailedBackendMaintenance
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncHasNoModules
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncOffline
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncProgress
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.SyncTryAgain
+import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
-import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Enqueued
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Failed
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Running
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Succeeded
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -64,7 +53,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     lateinit var preferencesManager: IdPreferencesManager
 
     @MockK
-    lateinit var downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+    lateinit var downSyncScopeRepository: EventDownSyncScopeRepository
 
     @MockK
     lateinit var cacheSync: EventSyncCache
@@ -85,7 +74,13 @@ class DashboardSyncCardStateRepositoryImplTest {
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
         every { eventSyncManager.getLastSyncState() } returns syncStateLiveData
-        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.projectDownSyncScope
+        coEvery {
+            downSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns SampleDefaults.projectDownSyncScope
         every { preferencesManager.selectedModules } returns emptySet()
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
         every { eventSyncManager.hasSyncEverRunBefore() } returns true
@@ -95,198 +90,295 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun deviceIsOffline_syncStateShouldBeSyncOffline() = runBlockingTest {
+    fun deviceIsOffline_syncStateShouldBeSyncOffline() = runTest(UnconfinedTestDispatcher()) {
         isConnectedUpdates.value = false
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncOffline(lastSyncTime))
+        assertThat(tester).isEqualTo(SyncOffline(lastSyncTime))
     }
 
     @Test
-    fun deviceIsOnline_syncStateShouldBeConnecting() = runBlockingTest {
+    fun deviceIsOnline_syncStateShouldBeConnecting() = runTest(UnconfinedTestDispatcher()) {
         isConnectedUpdates.value = true
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
+        assertThat(tester).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
     }
 
     @Test
-    fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
+    fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
+        coEvery {
+            downSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.ON
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncHasNoModules(lastSyncTime))
+        assertThat(tester).isEqualTo(SyncHasNoModules(lastSyncTime))
     }
 
     @Test
-    fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runBlockingTest {
+    fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
+        coEvery {
+            downSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncHasNoModules(lastSyncTime))
+        assertThat(tester).isEqualTo(SyncHasNoModules(lastSyncTime))
     }
 
     @Test
-    fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runBlockingTest {
+    fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
+        coEvery {
+            downSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns SampleDefaults.modulesDownSyncScope
         every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.OFF
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
+        assertThat(tester).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
     }
 
     @Test
-    fun modulesSelectedWithSyncByModule_syncStateShouldBeConnecting() = runBlockingTest {
+    fun modulesSelectedWithSyncByModule_syncStateShouldBeConnecting() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         every { preferencesManager.selectedModules } returns setOf(SampleDefaults.DEFAULT_MODULE_ID)
-        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.modulesDownSyncScope
+        coEvery {
+            downSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns SampleDefaults.modulesDownSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
+        assertThat(tester).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
     }
 
     @Test
-    fun noModulesSelectedWithSyncByProject_syncStateShouldBeConnecting() = runBlockingTest {
+    fun noModulesSelectedWithSyncByProject_syncStateShouldBeConnecting() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         every { preferencesManager.selectedModules } returns emptySet()
-        coEvery { downSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns SampleDefaults.projectDownSyncScope
+        coEvery {
+            downSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns SampleDefaults.projectDownSyncScope
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
+        assertThat(tester).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
     }
 
     @Test
-    fun syncWorkersCompleted_syncStateShouldBeCompleted() = runBlockingTest {
-        syncStateLiveData.value = EventSyncState(
-            syncId, 10, 10,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
-        )
-
-        dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncComplete(lastSyncTime))
-    }
-
-    @Test
-    fun syncWorkersEnqueued_syncStateShouldBeConnecting() = runBlockingTest {
-        syncStateLiveData.value = EventSyncState(
-            syncId, 0, null,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Enqueued)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
-        )
-
-        dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
-    }
-
-    @Test
-    fun syncWorkersFailedForNetworkIssues_syncStateShouldBeTryAgain() = runBlockingTest {
-        syncStateLiveData.value = EventSyncState(
-            syncId, 0, null,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
-        )
-
-        dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncTryAgain(lastSyncTime))
-    }
-
-    @Test
-    fun syncWorkersFailedBecauseCloudIntegration_syncStateShouldBeFailed() = runBlockingTest {
-        syncStateLiveData.value = EventSyncState(
-            syncId, 0, null,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
-        )
-
-        dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncFailed(lastSyncTime))
-    }
-
-    @Test
-    fun syncWorkersFailedBecauseBackendMaintenance_syncStateShouldBeFailedBecauseBackendMaintenance() = runBlockingTest {
+    fun syncWorkersCompleted_syncStateShouldBeCompleted() = runTest(UnconfinedTestDispatcher()) {
         syncStateLiveData.value = EventSyncState(
             syncId,
-            0,
-            null,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(failedBecauseBackendMaintenance = true))),
+            10,
+            10,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)),
             listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
         )
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val state = syncCardTestLiveData.getOrAwaitValue()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(state).isEqualTo(SyncFailedBackendMaintenance(lastSyncTime))
+        assertThat(tester).isEqualTo(SyncComplete(lastSyncTime))
     }
 
     @Test
-    fun noHistoryAboutSync_syncStateShouldBeDefault() = runBlockingTest {
+    fun syncWorkersEnqueued_syncStateShouldBeConnecting() = runTest(UnconfinedTestDispatcher()) {
+        syncStateLiveData.value = EventSyncState(
+            syncId,
+            0,
+            null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Enqueued)),
+            listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+        )
+
+        dashboardSyncCardStateRepository.syncIfRequired()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
+
+        assertThat(tester).isEqualTo(SyncConnecting(lastSyncTime, 0, null))
+    }
+
+    @Test
+    fun syncWorkersFailedForNetworkIssues_syncStateShouldBeTryAgain() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
+        syncStateLiveData.value = EventSyncState(
+            syncId,
+            0,
+            null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(false))),
+            listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+        )
+
+        dashboardSyncCardStateRepository.syncIfRequired()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
+
+        assertThat(tester).isEqualTo(SyncTryAgain(lastSyncTime))
+    }
+
+    @Test
+    fun syncWorkersFailedBecauseCloudIntegration_syncStateShouldBeFailed() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
+        syncStateLiveData.value = EventSyncState(
+            syncId,
+            0,
+            null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))),
+            listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+        )
+
+        dashboardSyncCardStateRepository.syncIfRequired()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
+
+        assertThat(tester).isEqualTo(SyncFailed(lastSyncTime))
+    }
+
+    @Test
+    fun syncWorkersFailedBecauseTooManyRequests_syncStateShouldBeFailedBecauseTooManyRequests() =
+        runTest(
+            UnconfinedTestDispatcher()
+        ) {
+            syncStateLiveData.value = EventSyncState(
+                syncId,
+                0,
+                null,
+                listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(failedBecauseTooManyRequest = true))),
+                listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+            )
+
+            dashboardSyncCardStateRepository.syncIfRequired()
+            val tester = syncCardTestLiveData.getOrAwaitValue()
+
+            assertThat(tester).isEqualTo(SyncTooManyRequests(lastSyncTime))
+        }
+
+    @Test
+    fun syncWorkersFailedBecauseBackendMaintenance_syncStateShouldBeFailedBecauseBackendMaintenance() =
+        runTest(
+            UnconfinedTestDispatcher()
+        ) {
+            syncStateLiveData.value = EventSyncState(
+                syncId,
+                0,
+                null,
+                listOf(
+                    SyncWorkerInfo(
+                        DOWN_COUNTER,
+                        Failed(failedBecauseBackendMaintenance = true)
+                    )
+                ),
+                listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+            )
+
+            dashboardSyncCardStateRepository.syncIfRequired()
+            val state = syncCardTestLiveData.getOrAwaitValue()
+
+            assertThat(state).isEqualTo(SyncFailedBackendMaintenance(lastSyncTime))
+        }
+
+    @Test
+    fun noHistoryAboutSync_syncStateShouldBeDefault() = runTest(UnconfinedTestDispatcher()) {
         syncStateLiveData.value =
             EventSyncState(syncId, 0, null, emptyList(), emptyList())
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncDefault(lastSyncTime))
+        assertThat(tester).isEqualTo(SyncDefault(lastSyncTime))
     }
 
     @Test
-    fun syncSucceedInBackgroundLongTimeAgo_syncShouldBeTriggered() = runBlockingTest {
-        dashboardSyncCardStateRepository = createRepository(TestTimeHelperImpl())
-        syncStateLiveData.value = EventSyncState(
-            syncId, 10, 10,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
-        )
-        every { cacheSync.readLastSuccessfulSyncTime() } returns Date(System.currentTimeMillis() - MAX_TIME_BEFORE_SYNC_AGAIN - 1)
+    fun syncSucceedInBackgroundLongTimeAgo_syncShouldBeTriggered() =
+        runTest(UnconfinedTestDispatcher()) {
+            dashboardSyncCardStateRepository = createRepository(TestTimeHelperImpl())
+            syncStateLiveData.value = EventSyncState(
+                syncId,
+                10,
+                10,
+                listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)),
+                listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+            )
+            every { cacheSync.readLastSuccessfulSyncTime() } returns Date(System.currentTimeMillis() - MAX_TIME_BEFORE_SYNC_AGAIN - 1)
 
-        dashboardSyncCardStateRepository.syncIfRequired()
-        syncCardTestLiveData.testObserver()
+            dashboardSyncCardStateRepository.syncIfRequired()
+            syncCardTestLiveData.getOrAwaitValue()
 
-        verify { eventSyncManager.sync() }
-    }
+            verify { eventSyncManager.sync() }
+        }
 
     @Test
-    fun syncSucceedInBackgroundNotTooLongAgo_syncShouldNotBeTriggered() = runBlockingTest {
+    fun syncSucceedInBackgroundNotTooLongAgo_syncShouldNotBeTriggered() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         dashboardSyncCardStateRepository = createRepository(timeHelper)
         syncStateLiveData.value = EventSyncState(
-            syncId, 10, 10,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+            syncId,
+            10,
+            10,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)),
+            listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
         )
         every { cacheSync.readLastSuccessfulSyncTime() } returns Date()
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        syncCardTestLiveData.testObserver()
+        syncCardTestLiveData.getOrAwaitValue()
 
         verify(exactly = 0) { eventSyncManager.sync() }
     }
 
     @Test
-    fun syncFinishedButOnlyRecently_syncIfRequired_shouldNotLaunchTheSync() = runBlockingTest {
+    fun syncFinishedButOnlyRecently_syncIfRequired_shouldNotLaunchTheSync() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         every { timeHelper.msBetweenNowAndTime(any()) } returns MAX_TIME_BEFORE_SYNC_AGAIN - 1
         syncStateLiveData.value = EventSyncState(
-            syncId, 0, null,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+            syncId,
+            0,
+            null,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Succeeded)),
+            listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
         )
 
         dashboardSyncCardStateRepository.syncIfRequired()
@@ -296,38 +388,52 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun noHistoryAboutSync_syncIfRequired_shouldNotLaunchTheSync() = runBlockingTest {
-        dashboardSyncCardStateRepository.syncIfRequired()
+    fun noHistoryAboutSync_syncIfRequired_shouldNotLaunchTheSync() =
+        runTest(UnconfinedTestDispatcher()) {
+            dashboardSyncCardStateRepository.syncIfRequired()
 
-        verify(exactly = 0) { eventSyncManager.sync() }
-    }
-
-    @Test
-    fun syncWorkersFailedDueToTimeout_syncStateShouldBeFailed() = runBlockingTest {
-        syncStateLiveData.value = EventSyncState(
-            syncId, 0, null,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))), listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
-        )
-
-        dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
-
-        assertThat(tester.observedValues.last()).isEqualTo(SyncFailed(lastSyncTime))
-    }
+            verify(exactly = 0) { eventSyncManager.sync() }
+        }
 
     @Test
-    fun syncWorkersAreRunning_syncStateShouldBeInProgress() = runBlockingTest {
+    fun syncWorkersFailedDueToTimeout_syncStateShouldBeFailed() =
+        runTest(UnconfinedTestDispatcher()) {
+            syncStateLiveData.value = EventSyncState(
+                syncId,
+                0,
+                null,
+                listOf(SyncWorkerInfo(DOWN_COUNTER, Failed(true))),
+                listOf(SyncWorkerInfo(UP_COUNTER, Succeeded))
+            )
+
+            dashboardSyncCardStateRepository.syncIfRequired()
+            val tester = syncCardTestLiveData.getOrAwaitValue()
+
+            assertThat(tester).isEqualTo(SyncFailed(lastSyncTime))
+        }
+
+    @Test
+    fun syncWorkersAreRunning_syncStateShouldBeInProgress() = runTest(UnconfinedTestDispatcher()) {
         val progress = 10
         val total = 100
         syncStateLiveData.value = EventSyncState(
-            syncId, progress, total,
-            listOf(SyncWorkerInfo(DOWN_COUNTER, Running)), listOf(SyncWorkerInfo(UP_COUNTER, Running))
+            syncId,
+            progress,
+            total,
+            listOf(SyncWorkerInfo(DOWN_COUNTER, Running)),
+            listOf(SyncWorkerInfo(UP_COUNTER, Running))
         )
 
         dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.testObserver()
+        val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester.observedValues.last()).isEqualTo(SyncProgress(lastSyncTime, progress, total))
+        assertThat(tester).isEqualTo(
+            SyncProgress(
+                lastSyncTime,
+                progress,
+                total
+            )
+        )
     }
 
 

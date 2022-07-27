@@ -76,7 +76,7 @@ class OrchestratorManagerImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        UnitTestConfig(this)
+        UnitTestConfig()
             .coroutinesMainThread()
             .rescheduleRxMainThread()
 

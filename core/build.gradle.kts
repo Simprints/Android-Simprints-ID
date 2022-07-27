@@ -22,18 +22,6 @@ android {
         animationsDisabled = true
     }
 
-    buildTypes {
-        getByName("release") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
-        }
-        getByName("staging") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
-        }
-        getByName("debug") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
-        }
-    }
-
     buildFeatures {
         viewBinding = true
     }
@@ -43,6 +31,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":moduleapi"))
+    api(project(":infranetwork"))
 
     api(libs.androidX.appcompat)
     implementation(libs.androidX.lifecycle.java8)
@@ -52,7 +41,6 @@ dependencies {
 
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.jackson.core)
-    implementation(libs.retrofit.core)
 
     implementation(libs.playcore.core)
 

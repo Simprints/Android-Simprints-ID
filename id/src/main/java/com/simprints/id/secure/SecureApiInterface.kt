@@ -1,11 +1,10 @@
 package com.simprints.id.secure
 
-import com.simprints.core.network.SimRemoteInterface
 import com.simprints.id.secure.models.AuthRequestBody
-import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
+import com.simprints.id.secure.models.remote.ApiSecurityState
 import com.simprints.id.secure.models.remote.ApiToken
-import retrofit2.Response
+import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.*
 
 interface SecureApiInterface : SimRemoteInterface {
@@ -15,19 +14,19 @@ interface SecureApiInterface : SimRemoteInterface {
         @Path("projectId") projectId: String,
         @Path("userId") userId: String,
         @Query("deviceId") deviceId: String
-    ): Response<ApiAuthenticationData>
+    ): ApiAuthenticationData
 
     @POST("projects/{projectId}/users/{userId}/authenticate")
     suspend fun requestCustomTokens(
         @Path("projectId") projectId: String,
         @Path("userId") userId: String,
         @Body credentials: AuthRequestBody
-    ): Response<ApiToken>
+    ): ApiToken
 
     @GET("projects/{projectId}/devices/{deviceId}")
     suspend fun requestSecurityState(
         @Path("projectId") projectId: String,
         @Path("deviceId") deviceId: String
-    ): Response<SecurityState>
+    ): ApiSecurityState
 
 }

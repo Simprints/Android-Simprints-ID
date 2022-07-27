@@ -1,12 +1,10 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.simprints.core.exceptions.SyncCloudIntegrationException
-import com.simprints.core.network.SimRemoteInterface
+import com.simprints.infra.network.SimRemoteInterface
 
 interface FingerprintApiClient<T : SimRemoteInterface> {
 
     val api: T
 
-    /** @throws SyncCloudIntegrationException */
-    suspend fun <V> executeCall(traceName: String?, networkBlock: suspend (T) -> V): V
+    suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V
 }
