@@ -22,7 +22,7 @@ object ConfirmIdentityFactory : RequestFactory() {
         )
 
     override fun getValidator(extractor: ClientRequestExtractor): ConfirmIdentityValidator =
-        ConfirmIdentityValidator(extractor as ConfirmIdentityExtractor,true)
+        ConfirmIdentityValidator(extractor as ConfirmIdentityExtractor, MOCK_SESSION_ID,true)
 
     override fun getBuilder(extractor: ClientRequestExtractor): ConfirmIdentifyBuilder =
         ConfirmIdentifyBuilder(extractor as ConfirmIdentityExtractor, getValidator(extractor))

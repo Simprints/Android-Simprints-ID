@@ -7,6 +7,7 @@ import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 
 
 class ConfirmIdentityValidator(val extractor: ConfirmIdentityExtractor,
+                               private val currentSessionId: String,
                                private val isSessionHasIdentificationCallback: Boolean)
     : ClientRequestValidator(extractor) {
 
@@ -27,6 +28,9 @@ class ConfirmIdentityValidator(val extractor: ConfirmIdentityExtractor,
     private fun validateSessionId(sessionId: String) {
         if (sessionId.isBlank())
             throw InvalidSessionIdException("Missing Session ID")
+        if(currentSessionId != sessionId)
+            throw InvalidSessionIdException("Invalid Session ID")
+
     }
 
     private fun validateSelectedGuid(selectedId: String) {
