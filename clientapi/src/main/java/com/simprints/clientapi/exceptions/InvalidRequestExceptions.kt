@@ -11,5 +11,3 @@ class InvalidSessionIdException(message: String = "") : InvalidRequestException(
 class InvalidStateForIntentAction(message: String = "") : InvalidRequestException(message)
 class InvalidUserIdException(message: String = "") : InvalidRequestException(message)
 class InvalidVerifyIdException(message: String = "") : InvalidRequestException(message)
-
-class CouldntSaveEventException(message: String = "") : ClientApiSafeException(message)
