@@ -13,7 +13,6 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
-import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.Size
 import com.simprints.infra.logging.Simber
