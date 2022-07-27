@@ -6,20 +6,17 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -65,7 +62,6 @@ class EventDownSyncDownloaderWorker(
     private suspend fun getDownSyncOperation() =
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
-    @ExperimentalCoroutinesApi
     override suspend fun doWork(): Result {
         getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
 
@@ -98,22 +94,27 @@ class EventDownSyncDownloaderWorker(
 
     private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
         return when (t) {
-            is BackendMaintenanceException -> {
-                fail(
-                    t,
-                    t.message,
-                    workDataOf(
-                        OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                        OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
-                    )
+            is BackendMaintenanceException -> fail(
+                t,
+                t.message,
+                workDataOf(
+                    OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
                 )
-            }
-            is SyncCloudIntegrationException -> {
-                fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
-            }
-            else -> {
-                retry(t)
-            }
+            )
+            is SyncCloudIntegrationException -> fail(
+                t,
+                t.message,
+                workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+            )
+            is TooManyRequestsException -> fail(
+                t,
+                t.message,
+                workDataOf(
+                    OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
+                )
+            )
+            else -> retry(t)
         }
     }
 

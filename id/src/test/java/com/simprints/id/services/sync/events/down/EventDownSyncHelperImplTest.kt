@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -25,8 +26,9 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,11 +41,21 @@ class EventDownSyncHelperImplTest {
     private lateinit var downloadEventsChannel: Channel<Event>
 
     private lateinit var eventDownSyncHelper: EventDownSyncHelper
-    @MockK private lateinit var subjectRepository: SubjectRepository
-    @MockK private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-    @MockK private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
-    @MockK private lateinit var timeHelper: TimeHelper
-    @MockK private lateinit var preferencesManager: IdPreferencesManager
+
+    @MockK
+    private lateinit var subjectRepository: SubjectRepository
+
+    @MockK
+    private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+
+    @MockK
+    private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var preferencesManager: IdPreferencesManager
     private val subjectFactory = SubjectFactoryImpl(EncodingUtilsImplForTests)
 
 
@@ -65,14 +77,14 @@ class EventDownSyncHelperImplTest {
             testDispatcherProvider
         )
 
-        runBlockingTest {
+        runTest(StandardTestDispatcher()) {
             mockProgressEmission(emptyList())
         }
     }
 
     @Test
     fun countForDownSync_shouldReturnRepoEventChannel() {
-        runBlockingTest {
+        runTest(StandardTestDispatcher()) {
             eventDownSyncHelper.countForDownSync(projectOp)
             coVerify { eventRepository.countEventsToDownload(any()) }
         }
@@ -80,16 +92,16 @@ class EventDownSyncHelperImplTest {
 
     @Test
     fun downSync_shouldConsumeRepoEventChannel() {
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             eventDownSyncHelper.downSync(this, projectOp)
 
-            coVerify { eventRepository.downloadEvents(this@runBlockingTest, projectOp.queryEvent) }
+            coVerify { eventRepository.downloadEvents(this@runTest, projectOp.queryEvent) }
         }
     }
 
     @Test
     fun downSync_shouldProgressEventsInBatches() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val eventsToDownload = mutableListOf<Event>()
             repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += createPersonCreationEvent() }
             mockProgressEmission(eventsToDownload)
@@ -111,33 +123,50 @@ class EventDownSyncHelperImplTest {
     }
 
     @Test
-    fun downSync_shouldEmitAFailureIfDownloadFails() {
-        runBlocking {
-            coEvery { eventRepository.downloadEvents(any(), any()) } throws Throwable("IO Exception")
+    fun downSync_shouldEmitAFailureIfDownloadFailsAndThrowsAnException() {
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventRepository.downloadEvents(
+                    any(),
+                    any()
+                )
+            } throws Throwable("IO Exception")
 
-            val channel = eventDownSyncHelper.downSync(this, projectOp)
+            assertThrows<Throwable> {
+                val channel = eventDownSyncHelper.downSync(this, projectOp)
 
-            val progress = channel.consumeAsFlow().toList()
-            assertThat(progress.last().operation.state).isEqualTo(FAILED)
-            coVerify(exactly = 2) { eventDownSyncScopeRepository.insertOrUpdate(any()) }
+                val progress = channel.consumeAsFlow().toList()
+                assertThat(progress.last().operation.state).isEqualTo(FAILED)
+                coVerify(exactly = 2) { eventDownSyncScopeRepository.insertOrUpdate(any()) }
+            }
         }
     }
 
     @Test
     fun downSync_shouldProcessRecordCreationEvent() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val event = createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(event))
 
             eventDownSyncHelper.downSync(this, projectOp).consumeAsFlow().toList()
 
-            coVerify { subjectRepository.performActions(listOf(Creation(subjectFactory.buildSubjectFromCreationPayload(event.payload)))) }
+            coVerify {
+                subjectRepository.performActions(
+                    listOf(
+                        Creation(
+                            subjectFactory.buildSubjectFromCreationPayload(
+                                event.payload
+                            )
+                        )
+                    )
+                )
+            }
         }
     }
 
     @Test
     fun downSync_shouldProcessRecordDeletionEvent() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val event = createEnrolmentRecordDeletionEvent()
             mockProgressEmission(listOf(event))
 
@@ -149,10 +178,13 @@ class EventDownSyncHelperImplTest {
 
     @Test
     fun moveSubjectFromModulesUnderSyncing_theOriginalModuleSyncShouldDoNothing() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
-            every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
+            every { preferencesManager.selectedModules } returns setOf(
+                DEFAULT_MODULE_ID,
+                DEFAULT_MODULE_ID_2
+            )
 
             eventDownSyncHelper.downSync(this, moduleOp).consumeAsFlow().toList()
 
@@ -164,17 +196,26 @@ class EventDownSyncHelperImplTest {
 
     @Test
     fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
-            every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
+            every { preferencesManager.selectedModules } returns setOf(
+                DEFAULT_MODULE_ID,
+                DEFAULT_MODULE_ID_2
+            )
 
-            val syncByModule2 = moduleOp.copy(queryEvent = moduleOp.queryEvent.copy(moduleIds = listOf(DEFAULT_MODULE_ID_2)))
+            val syncByModule2 = moduleOp.copy(
+                queryEvent = moduleOp.queryEvent.copy(
+                    moduleIds = listOf(DEFAULT_MODULE_ID_2)
+                )
+            )
             eventDownSyncHelper.downSync(this, syncByModule2).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(listOf(
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)))
+                subjectRepository.performActions(
+                    listOf(
+                        Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
+                    )
                 )
             }
         }
@@ -182,7 +223,7 @@ class EventDownSyncHelperImplTest {
 
     @Test
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
             every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
@@ -190,8 +231,10 @@ class EventDownSyncHelperImplTest {
             eventDownSyncHelper.downSync(this, moduleOp).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(listOf(
-                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId))
+                subjectRepository.performActions(
+                    listOf(
+                        Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId)
+                    )
                 )
             }
         }
@@ -199,17 +242,23 @@ class EventDownSyncHelperImplTest {
 
     @Test
     fun moveSubjectToAModuleUnderSyncing_shouldPerformCreationOnly() {
-        runBlocking {
+        runTest(StandardTestDispatcher()) {
             val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
             mockProgressEmission(listOf(eventToMoveToModule2))
             every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID_2)
 
-            val syncByModule2 = moduleOp.copy(queryEvent = moduleOp.queryEvent.copy(moduleIds = listOf(DEFAULT_MODULE_ID_2)))
+            val syncByModule2 = moduleOp.copy(
+                queryEvent = moduleOp.queryEvent.copy(
+                    moduleIds = listOf(DEFAULT_MODULE_ID_2)
+                )
+            )
             eventDownSyncHelper.downSync(this, syncByModule2).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(listOf(
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)))
+                subjectRepository.performActions(
+                    listOf(
+                        Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
+                    )
                 )
             }
         }

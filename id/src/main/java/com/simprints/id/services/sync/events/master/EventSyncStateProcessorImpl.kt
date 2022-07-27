@@ -10,14 +10,10 @@ import com.simprints.id.services.sync.events.common.filterByTags
 import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
 import com.simprints.id.services.sync.events.down.workers.getDownCountsFromOutput
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProvider
-import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProviderImpl
-import com.simprints.id.services.sync.events.master.internal.didFailBecauseBackendMaintenance
-import com.simprints.id.services.sync.events.master.internal.didFailBecauseCloudIntegration
-import com.simprints.id.services.sync.events.master.internal.getEstimatedOutageTime
+import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
@@ -26,9 +22,13 @@ import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
 import com.simprints.infra.logging.Simber
 
-class EventSyncStateProcessorImpl(val ctx: Context,
-                                  private val eventSyncCache: EventSyncCache,
-                                  private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : EventSyncStateProcessor {
+class EventSyncStateProcessorImpl(
+    val ctx: Context,
+    private val eventSyncCache: EventSyncCache,
+    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(
+        ctx
+    )
+) : EventSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<EventSyncState> =
         observerForLastSyncId().switchMap { lastSyncId ->
@@ -41,7 +41,13 @@ class EventSyncStateProcessorImpl(val ctx: Context,
                         val upSyncStates = upSyncUploadersStates() + upSyncCountersStates()
                         val downSyncStates = downSyncDownloadersStates() + downSyncCountersStates()
 
-                        val syncState = EventSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
+                        val syncState = EventSyncState(
+                            lastSyncId,
+                            progress,
+                            total,
+                            upSyncStates,
+                            downSyncStates
+                        )
                         this@apply.postValue(syncState)
                         Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
                     }
@@ -51,22 +57,23 @@ class EventSyncStateProcessorImpl(val ctx: Context,
 
 
     private fun observerForLastSyncId(): LiveData<String> {
-        return syncWorkersLiveDataProvider.getStartSyncReportersLiveData().switchMap { startSyncReporters ->
-            Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received updated from Master Scheduler")
+        return syncWorkersLiveDataProvider.getStartSyncReportersLiveData()
+            .switchMap { startSyncReporters ->
+                Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received updated from Master Scheduler")
 
-            val completedSyncMaster = startSyncReporters.completedWorkers()
-            val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
+                val completedSyncMaster = startSyncReporters.completedWorkers()
+                val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
 
-            MutableLiveData<String>().apply {
-                if (mostRecentSyncMaster != null) {
-                    val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
-                    if (!lastSyncId.isNullOrBlank()) {
-                        Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received sync id: $lastSyncId")
-                        this.postValue(lastSyncId)
+                MutableLiveData<String>().apply {
+                    if (mostRecentSyncMaster != null) {
+                        val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
+                        if (!lastSyncId.isNullOrBlank()) {
+                            Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received sync id: $lastSyncId")
+                            this.postValue(lastSyncId)
+                        }
                     }
                 }
             }
-        }
     }
 
     private fun observerForLastSyncIdWorkers(lastSyncId: String) =
@@ -88,7 +95,7 @@ class EventSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateTotalForDownSync(): Int? {
         val countersCompleted = this.filterByTags(tagForType(DOWN_COUNTER)).completedWorkers()
         val counter = countersCompleted.firstOrNull()
-        return counter?.getDownCountsFromOutput()?.sumBy { it.count }
+        return counter?.getDownCountsFromOutput()?.sumOf { it.count }
     }
 
     private fun List<WorkInfo>.calculateTotalForUpSync(): Int? {
@@ -98,28 +105,33 @@ class EventSyncStateProcessorImpl(val ctx: Context,
     }
 
     private fun List<WorkInfo>.upSyncUploadersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(UPLOADER)).map { SyncWorkerInfo(
-            UPLOADER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
-        ) }
+        filterByTags(tagForType(UPLOADER)).map {
+            SyncWorkerInfo(UPLOADER, it.toEventSyncWorkerState())
+        }
 
     private fun List<WorkInfo>.downSyncDownloadersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(DOWNLOADER)).map { SyncWorkerInfo(
-            DOWNLOADER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
-        ) }
+        filterByTags(tagForType(DOWNLOADER)).map {
+            SyncWorkerInfo(DOWNLOADER, it.toEventSyncWorkerState())
+        }
 
     private fun List<WorkInfo>.downSyncCountersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(DOWN_COUNTER)).map { SyncWorkerInfo(
-            DOWN_COUNTER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
-        ) }
+        filterByTags(tagForType(DOWN_COUNTER)).map {
+            SyncWorkerInfo(DOWN_COUNTER, it.toEventSyncWorkerState())
+        }
 
     private fun List<WorkInfo>.upSyncCountersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(UP_COUNTER)).map { SyncWorkerInfo(
-            UP_COUNTER,
-            fromWorkInfo(it.state, it.didFailBecauseCloudIntegration(), it.didFailBecauseBackendMaintenance(), it.getEstimatedOutageTime())
-        ) }
+        filterByTags(tagForType(UP_COUNTER)).map {
+            SyncWorkerInfo(UP_COUNTER, it.toEventSyncWorkerState())
+        }
+
+    private fun WorkInfo.toEventSyncWorkerState(): EventSyncWorkerState =
+        fromWorkInfo(
+            state,
+            didFailBecauseCloudIntegration(),
+            didFailBecauseBackendMaintenance(),
+            didFailBecauseTooManyRequests(),
+            getEstimatedOutageTime()
+        )
 
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
         val downWorkers = this.filterByTags(tagForType(DOWNLOADER))
@@ -127,7 +139,7 @@ class EventSyncStateProcessorImpl(val ctx: Context,
             worker.extractDownSyncProgress(eventSyncCache)
         }
 
-        return progresses.filterNotNull().sum()
+        return progresses.sum()
     }
 
     private fun List<WorkInfo>.calculateProgressForUpSync(): Int {
@@ -136,6 +148,6 @@ class EventSyncStateProcessorImpl(val ctx: Context,
             worker.extractUpSyncProgress(eventSyncCache)
         }
 
-        return progresses.filterNotNull().sum()
+        return progresses.sum()
     }
 }

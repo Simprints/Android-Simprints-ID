@@ -6,7 +6,6 @@ import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.Token
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import retrofit2.HttpException
 
 class AuthManagerImpl(private val simApiClientFactory: SimApiClientFactory) : AuthManager {
 
@@ -20,7 +19,7 @@ class AuthManagerImpl(private val simApiClientFactory: SimApiClientFactory) : Au
                 )
             }.toDomainToken()
         } catch (e: Exception) {
-            if (e is SyncCloudIntegrationException && (e.cause is HttpException) && (e.cause as HttpException).code() == 401)
+            if (e is SyncCloudIntegrationException && e.httpStatusCode() == 401)
                 throw AuthRequestInvalidCredentialsException()
             else
                 throw e
