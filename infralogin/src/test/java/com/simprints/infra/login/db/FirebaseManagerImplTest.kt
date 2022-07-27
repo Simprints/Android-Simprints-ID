@@ -4,12 +4,13 @@ import android.content.Context
 import com.google.android.gms.tasks.Tasks
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.AuthResult
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.simprints.infra.login.domain.LoginInfoManager
-import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
@@ -21,10 +22,17 @@ import org.junit.Test
 
 class FirebaseManagerImplTest {
 
+    companion object {
+        private const val GCP_PROJECT_ID = "GCP_PROJECT_ID"
+        private const val API_KEY = "API_KEY"
+        private const val APPLICATION_ID = "APPLICATION_ID"
+    }
+
     private val firebaseAuth = mockk<FirebaseAuth>(relaxed = true)
     private val firebaseApp = mockk<FirebaseApp>(relaxed = true)
     private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
-    private val context = mockk<Context>()
+    private val context = mockk<Context>(relaxed = true)
+    private val firebaseOptionsBuilder = mockk<FirebaseOptions.Builder>(relaxed = true)
     private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context)
 
     @Before
@@ -32,8 +40,15 @@ class FirebaseManagerImplTest {
         MockKAnnotations.init(this)
         mockkStatic(FirebaseAuth::class)
         mockkStatic(FirebaseApp::class)
+        mockkStatic(Firebase::class)
+        mockkStatic(FirebaseOptions.Builder::class)
         every { FirebaseApp.getInstance(any()) } returns firebaseApp
         every { FirebaseAuth.getInstance(any()) } returns firebaseAuth
+        // every { FirebaseOptions.Builder() } returns firebaseOptionsBuilder
+        every { firebaseOptionsBuilder.setApiKey(any()) } returns firebaseOptionsBuilder
+        every { firebaseOptionsBuilder.setProjectId(any()) } returns firebaseOptionsBuilder
+        every { firebaseOptionsBuilder.setApplicationId(any()) } returns firebaseOptionsBuilder
+
     }
 
     @Test
@@ -79,5 +94,51 @@ class FirebaseManagerImplTest {
 
         val result = firebaseManagerImpl.getCurrentToken()
         assertThat(result).isEqualTo("Token")
+    }
+
+    @Test
+    fun `getCoreApp should init the app if the Firebase getInstance() throws an IllegalStateException`() {
+        every { FirebaseApp.getInstance(any()) } throws IllegalStateException() andThenThrows IllegalStateException() andThen firebaseApp
+        every { loginInfoManager.coreFirebaseProjectId } returns GCP_PROJECT_ID
+        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
+        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
+        every { Firebase.initialize(any(), any(), any()) } returns mockk()
+
+        firebaseManagerImpl.getCoreApp()
+
+        verify(exactly = 1) {
+            Firebase.initialize(any(), match {
+                it.apiKey == API_KEY && it.applicationId == APPLICATION_ID && it.projectId == GCP_PROJECT_ID
+            }, any())
+        }
+    }
+
+    @Test
+    fun `getCoreApp should throw an IllegalStateException the app if the Firebase getInstance() throws an IllegalStateException and the coreFirebaseProjectId is empty`() {
+        every { FirebaseApp.getInstance(any()) } throws IllegalStateException() andThenThrows IllegalStateException() andThen firebaseApp
+        every { loginInfoManager.coreFirebaseProjectId } returns ""
+        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
+        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
+        every { Firebase.initialize(any(), any(), any()) } returns mockk()
+
+        assertThrows<IllegalStateException> { firebaseManagerImpl.getCoreApp() }
+    }
+
+    @Test
+    fun `getCoreApp should init the app and recreate the app if the Firebase getInstance() throws an IllegalStateException and the initialization failed`() {
+        every { FirebaseApp.getInstance(any()) } throws IllegalStateException() andThenThrows IllegalStateException() andThen firebaseApp
+        every { loginInfoManager.coreFirebaseProjectId } returns GCP_PROJECT_ID
+        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
+        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
+        every { Firebase.initialize(any(), any(), any()) } throws IllegalStateException() andThen mockk<FirebaseApp>()
+
+        firebaseManagerImpl.getCoreApp()
+
+        verify(exactly = 1) { firebaseApp.delete() }
+        verify(exactly = 2) {
+            Firebase.initialize(any(), match {
+                it.apiKey == API_KEY && it.applicationId == APPLICATION_ID && it.projectId == GCP_PROJECT_ID
+            }, any())
+        }
     }
 }
