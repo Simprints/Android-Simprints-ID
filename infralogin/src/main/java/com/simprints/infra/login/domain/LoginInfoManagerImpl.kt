@@ -2,7 +2,6 @@ package com.simprints.infra.login.domain
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.infra.login.exceptions.CredentialMissingException
 
 class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
 
@@ -21,26 +20,14 @@ class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
     private val prefs: SharedPreferences = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override var signedInProjectId: String = ""
-        get() {
-            val value = prefs.getString(PROJECT_ID, "")
-            if (value.isNullOrBlank()) {
-                throw CredentialMissingException()
-            }
-            return value
-        }
+        get() = prefs.getString(PROJECT_ID, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(PROJECT_ID, field).apply()
         }
 
     override var signedInUserId: String = ""
-        get() {
-            val value = prefs.getString(USER_ID, "")
-            if (value.isNullOrBlank()) {
-                throw CredentialMissingException()
-            }
-            return value
-        }
+        get() = prefs.getString(USER_ID, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(USER_ID, field).apply()
@@ -67,20 +54,6 @@ class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
             prefs.edit().putString(CORE_FIREBASE_API_KEY, field).apply()
         }
 
-    override fun getSignedInProjectIdOrEmpty(): String =
-        try {
-            signedInProjectId
-        } catch (e: CredentialMissingException) {
-            ""
-        }
-
-    override fun getSignedInUserIdOrEmpty(): String =
-        try {
-            signedInUserId
-        } catch (e: CredentialMissingException) {
-            ""
-        }
-
     override var projectIdTokenClaim: String? = ""
         get() = prefs.getString(PROJECT_ID_CLAIM, "")
         set(value) {
@@ -95,6 +68,11 @@ class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
             prefs.edit().putString(USER_ID_CLAIM, field ?: "").apply()
         }
 
+    override fun getSignedInProjectIdOrEmpty(): String =
+        signedInProjectId
+
+    override fun getSignedInUserIdOrEmpty(): String =
+        signedInUserId
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         getSignedInProjectIdOrEmpty().isNotEmpty() && getSignedInProjectIdOrEmpty() == possibleProjectId

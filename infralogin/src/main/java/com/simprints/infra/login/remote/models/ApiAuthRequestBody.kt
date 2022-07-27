@@ -18,5 +18,3 @@ data class ApiAuthRequestBody(
             )
     }
 }
-
-

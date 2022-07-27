@@ -8,4 +8,3 @@ data class ApiAuthenticationData(val nonce: String, val publicKey: String) {
 
     fun toDomain() = AuthenticationData(nonce, publicKey)
 }
-

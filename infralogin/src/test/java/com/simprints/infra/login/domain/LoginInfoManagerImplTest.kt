@@ -3,8 +3,7 @@ package com.simprints.infra.login.domain
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.exceptions.CredentialMissingException
-import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.android.log
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -28,15 +27,6 @@ class LoginInfoManagerImplTest {
     }
 
     @Test
-    fun `getting the signed in project id should throw an error if it's missing`() {
-        every { sharedPreferences.getString(any(), any()) } returns ""
-
-        assertThrows<CredentialMissingException> {
-            loginInfoManagerImpl.signedInProjectId
-        }
-    }
-
-    @Test
     fun `getting the signed in project id should returns it`() {
         every { sharedPreferences.getString(any(), any()) } returns "projectId"
 
@@ -49,15 +39,6 @@ class LoginInfoManagerImplTest {
 
         verify(exactly = 1) { editor.putString("PROJECT_ID", "projectId") }
         verify(exactly = 1) { editor.apply() }
-    }
-
-    @Test
-    fun `getting the signed in user id should throw an error if it's missing`() {
-        every { sharedPreferences.getString(any(), any()) } returns ""
-
-        assertThrows<CredentialMissingException> {
-            loginInfoManagerImpl.signedInUserId
-        }
     }
 
     @Test
@@ -169,5 +150,79 @@ class LoginInfoManagerImplTest {
         every { sharedPreferences.getString(any(), any()) } returns "user"
 
         assertThat(loginInfoManagerImpl.getSignedInUserIdOrEmpty()).isEqualTo("user")
+    }
+
+    @Test
+    fun `getting the project id claim should returns the string`() {
+        every { sharedPreferences.getString(any(), any()) } returns "project"
+
+        assertThat(loginInfoManagerImpl.projectIdTokenClaim).isEqualTo("project")
+    }
+
+    @Test
+    fun `setting the project id claim should set in the shared preferences`() {
+        loginInfoManagerImpl.projectIdTokenClaim = "project"
+
+        verify(exactly = 1) { editor.putString("PROJECT_ID_CLAIM", "project") }
+        verify(exactly = 1) { editor.apply() }
+    }
+
+    @Test
+    fun `getting the user id claim should returns the string`() {
+        every { sharedPreferences.getString(any(), any()) } returns "user"
+
+        assertThat(loginInfoManagerImpl.userIdTokenClaim).isEqualTo("user")
+    }
+
+    @Test
+    fun `setting the user id claim should set in the shared preferences`() {
+        loginInfoManagerImpl.userIdTokenClaim = "user"
+
+        verify(exactly = 1) { editor.putString("USER_ID_CLAIM", "user") }
+        verify(exactly = 1) { editor.apply() }
+    }
+
+    @Test
+    fun `isProjectIdSignedIn should return false if the signed in project id is empty`() {
+        every { sharedPreferences.getString(any(), any()) } returns ""
+
+        assertThat(loginInfoManagerImpl.isProjectIdSignedIn("project")).isFalse()
+    }
+
+    @Test
+    fun `isProjectIdSignedIn should return false if the signed in project id is different`() {
+        every { sharedPreferences.getString(any(), any()) } returns "another project"
+
+        assertThat(loginInfoManagerImpl.isProjectIdSignedIn("project")).isFalse()
+    }
+
+    @Test
+    fun `isProjectIdSignedIn should return false if the signed in project id is the same`() {
+        every { sharedPreferences.getString(any(), any()) } returns "project"
+
+        assertThat(loginInfoManagerImpl.isProjectIdSignedIn("project")).isTrue()
+    }
+
+    @Test
+    fun `cleanCredentials should reset all the credentials`() {
+        loginInfoManagerImpl.cleanCredentials()
+
+        verify(exactly = 1) { editor.putString("PROJECT_ID", "") }
+        verify(exactly = 1) { editor.putString("USER_ID", "") }
+        verify(exactly = 1) { editor.putString("PROJECT_ID_CLAIM", "") }
+        verify(exactly = 1) { editor.putString("USER_ID_CLAIM", "") }
+        verify(exactly = 1) { editor.putString("CORE_FIREBASE_PROJECT_ID", "") }
+        verify(exactly = 1) { editor.putString("CORE_FIREBASE_APPLICATION_ID", "") }
+        verify(exactly = 1) { editor.putString("CORE_FIREBASE_API_KEY", "") }
+        verify(exactly = 7) { editor.apply() }
+    }
+
+    @Test
+    fun `storeCredentials should set the credentials`() {
+        loginInfoManagerImpl.storeCredentials("project", "user")
+
+        verify(exactly = 1) { editor.putString("PROJECT_ID", "project") }
+        verify(exactly = 1) { editor.putString("USER_ID", "user") }
+        verify(exactly = 2) { editor.apply() }
     }
 }
