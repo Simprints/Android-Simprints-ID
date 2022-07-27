@@ -31,6 +31,7 @@ class CommCareConfirmationIdentityRequestTest : BaseCommCareClientApiTest() {
 
     private  val clientApiSessionEventsManager: ClientApiSessionEventsManager = mockk(relaxed = true){
         coEvery { isSessionHasIdentificationCallback(sessionIdField.value()) } returns true
+        coEvery { getCurrentSessionId() } returns sessionIdField.value()
     }
     @Before
     override fun setUp() {

@@ -26,6 +26,7 @@ import org.koin.dsl.module
 class StandardConfirmationIdentityRequestTest : BaseStandardClientApiTest() {
     private  val clientApiSessionEventsManager: ClientApiSessionEventsManager = mockk(relaxed = true){
         coEvery { isSessionHasIdentificationCallback(sessionIdField.value()) } returns true
+        coEvery { getCurrentSessionId() } returns sessionIdField.value()
     }
     @Before
     override fun setUp() {

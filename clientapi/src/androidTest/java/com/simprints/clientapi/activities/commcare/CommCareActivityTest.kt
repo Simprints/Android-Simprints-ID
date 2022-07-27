@@ -28,6 +28,8 @@ class CommCareActivityTest : BaseClientApiTest() {
 
     private  val clientApiSessionEventsManager: ClientApiSessionEventsManager = mockk(relaxed = true){
         coEvery { isSessionHasIdentificationCallback("sessionId") } returns true
+        coEvery { getCurrentSessionId() } returns "sessionId"
+
     }
     @Before
     override fun setUp() {
