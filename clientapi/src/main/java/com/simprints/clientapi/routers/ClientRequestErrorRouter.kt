@@ -15,8 +15,4 @@ object ClientRequestErrorRouter {
         intent.putExtra(AlertActRequest.BUNDLE_KEY, AlertActRequest(clientApiAlert))
         act.startActivityForResult(intent, InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST)
     }
-
-    fun extractPotentialAlertScreenResponse(data: Intent?): AlertActResponse? =
-        data?.getParcelableExtra(AlertActResponse.BUNDLE_KEY)
-
 }
