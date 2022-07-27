@@ -135,6 +135,7 @@ class LibSimprintsPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
         coEvery { clientApiSessionEventsManager.isSessionHasIdentificationCallback(any()) } returns true
+        coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
 
         LibSimprintsPresenter(
             view,
