@@ -172,8 +172,6 @@ class SignerManagerImplTest {
 
     @Test
     fun signOut_shouldCancelPeriodicSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
-        every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
-
         signerManager.signOut()
 
         verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
