@@ -68,9 +68,8 @@ class LongConsentRepositoryImplTest {
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
 
         with(states) {
-            assertThat(size).isEqualTo(2)
-            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
-            assertThat(get(1)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+            assertThat(size).isEqualTo(1)
+            assertThat(get(0)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
         }
     }
 
@@ -123,7 +122,7 @@ class LongConsentRepositoryImplTest {
     @Test
     fun `return error on failed network connection`() = runTest(StandardTestDispatcher()) {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
-        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws SocketTimeoutException()
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws Exception(SocketTimeoutException())
 
         val states = mutableListOf<LongConsentFetchResult>()
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
