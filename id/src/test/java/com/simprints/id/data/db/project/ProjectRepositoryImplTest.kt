@@ -23,7 +23,7 @@ import org.junit.Test
  * Source: https://github.com/Kotlin/kotlinx.coroutines/issues/1204
  */
 @ExperimentalCoroutinesApi
-class ProjectRepositoryTest {
+class ProjectRepositoryImplTest {
 
     private val localProject = Project(
         DEFAULT_PROJECT_ID,
