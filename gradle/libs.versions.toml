@@ -186,8 +186,8 @@ testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 #Testing-Objenesis
 testing-Objenesis-core = { module = "org.objenesis:objenesis", version.ref = "objenesis_version" }
 #Testing-Mockk
-testing-Mockk-core = "io.mockk:mockk:1.12.3"
-testing-Mockk-android = "io.mockk:mockk-android:1.12.3"
+testing-Mockk-core = "io.mockk:mockk:1.12.5"
+testing-Mockk-android = "io.mockk:mockk-android:1.12.5"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
