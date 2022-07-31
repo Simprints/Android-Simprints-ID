@@ -9,13 +9,13 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.id.exceptions.safe.BackendMaintenanceException
-import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import java.io.IOException
 
 class AuthenticationHelperImpl(
@@ -60,7 +60,7 @@ class AuthenticationHelperImpl(
         return when (t) {
             is IOException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
-            is SimprintsInternalServerException -> TECHNICAL_FAILURE
+            is SyncCloudIntegrationException -> TECHNICAL_FAILURE
             is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR
             is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
             else -> UNKNOWN

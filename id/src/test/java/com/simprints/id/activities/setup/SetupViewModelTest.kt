@@ -32,7 +32,7 @@ class SetupViewModelTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).coroutinesMainThread()
+        UnitTestConfig().coroutinesMainThread()
         MockKAnnotations.init(this)
         isConnectedUpdates = MutableLiveData()
         every { deviceManagerMock.isConnectedLiveData } returns isConnectedUpdates
@@ -96,7 +96,7 @@ class SetupViewModelTest {
     @Test
     fun `reStartDownloadIfNecessary should call cancelInstall when requestSessionStates isn't empty`() {     /* Given */
         // Given
-        val viewModel = SetupViewModel(deviceManagerMock)
+        val viewModel = spyk(SetupViewModel(deviceManagerMock))
         val modalityList = listOf("fingerprint", "face")
         mockRequestSessionStates(listOf(mockk()))
         every { splitInstallManagerMock.cancelInstall(any()) } returns mockk()

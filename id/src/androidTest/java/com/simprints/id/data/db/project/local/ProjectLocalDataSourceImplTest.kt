@@ -1,19 +1,17 @@
-package com.simprints.eventsystem.project.local
+package com.simprints.id.data.db.project.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.security.LocalDbKey
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.eventsystem.RealmTestsBase
+import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.db.subject.local.RealmWrapperImpl
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import io.mockk.every
 import io.mockk.mockk
 import io.realm.Realm
@@ -80,7 +78,7 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
     @Test
     fun load_shouldLoadAProjectFromTheDb() = runBlocking {
         realm.executeTransaction {
-            assertThat(it.insertOrUpdate(project.fromDomainToDb()))
+            it.insertOrUpdate(project.fromDomainToDb())
         }
 
         val projectFromDb = projectLocalDataSource.load(DEFAULT_PROJECT_ID)

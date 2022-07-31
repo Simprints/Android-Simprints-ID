@@ -13,7 +13,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.TestTimeHelperImpl
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
@@ -90,7 +90,7 @@ class EventSyncMasterWorkerTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).setupWorkManager()
+        UnitTestConfig().setupWorkManager()
 
         masterWorker =
             TestListenableWorkerBuilder<EventSyncMasterWorker>(app)

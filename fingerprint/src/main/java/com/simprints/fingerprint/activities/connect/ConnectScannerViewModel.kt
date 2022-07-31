@@ -9,9 +9,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.LOW_BATTERY
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
@@ -24,13 +22,7 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
-import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
@@ -66,8 +58,11 @@ class ConnectScannerViewModel(
 
     private var setupFlow: Disposable? = null
 
-    fun start(connectMode: ConnectScannerTaskRequest.ConnectMode) {
+    fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
+    }
+
+    fun start() {
         startSetup()
     }
 
@@ -88,9 +83,9 @@ class ConnectScannerViewModel(
     }
 
     fun stopConnectingAndResetState() {
-        progress.value = 0
-        message.value = R.string.connect_scanner_bt_connect
-        backButtonBehaviour.value = BackButtonBehaviour.EXIT_FORM
+        progress.postValue(0)
+        message.postValue(R.string.connect_scanner_bt_connect)
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
         setupFlow?.dispose()
     }
 
@@ -251,11 +246,11 @@ class ConnectScannerViewModel(
     }
 
     fun disableBackButton() {
-        backButtonBehaviour.value = BackButtonBehaviour.DISABLED
+        backButtonBehaviour.postValue(BackButtonBehaviour.DISABLED)
     }
 
     fun setBackButtonToExitWithError() {
-        backButtonBehaviour.value = BackButtonBehaviour.EXIT_WITH_ERROR
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_WITH_ERROR)
     }
 
     private fun addBluetoothConnectivityEvent() {

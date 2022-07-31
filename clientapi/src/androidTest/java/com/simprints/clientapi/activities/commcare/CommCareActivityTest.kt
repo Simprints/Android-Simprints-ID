@@ -6,9 +6,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.robots.commCare
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.libsimprints.Constants.*
+import io.mockk.coEvery
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
@@ -24,11 +26,17 @@ class CommCareActivityTest : BaseClientApiTest() {
     @JvmField
     val rule = ActivityTestRule(CommCareActivity::class.java, INITIAL_TOUCH_MODE, LAUNCH_ACTIVITY)
 
+    private  val clientApiSessionEventsManager: ClientApiSessionEventsManager = mockk(relaxed = true){
+        coEvery { isSessionHasIdentificationCallback("sessionId") } returns true
+        coEvery { getCurrentSessionId() } returns "sessionId"
+
+    }
     @Before
     override fun setUp() {
         super.setUp()
-        loadKoinModules(module(override = true) {
-            factory { (context: Context) -> mockk<CommCareGuidSelectionNotifier>(relaxed = true) }
+        loadKoinModules(module {
+            factory { (_: Context) -> mockk<CommCareGuidSelectionNotifier>(relaxed = true) }
+            factory { clientApiSessionEventsManager }
         })
         rule.launchActivity(buildIntent())
     }

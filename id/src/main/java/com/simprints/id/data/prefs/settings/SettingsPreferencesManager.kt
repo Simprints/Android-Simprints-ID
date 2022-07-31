@@ -51,7 +51,6 @@ interface SettingsPreferencesManager {
     var scannerGenerations: List<ScannerGeneration>
     var fingerprintLiveFeedbackOn: Boolean
     var fingerprintQualityThreshold: Int
-    var apiBaseUrl: String
 
     var faceQualityThreshold: Float
     var faceNbOfFramesCaptured: Int

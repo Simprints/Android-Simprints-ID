@@ -68,7 +68,8 @@ class CypressOtaHelperTest {
 
         val sentUnifiedVersion = CapturingSlot<ExtendedVersionInformation>()
         verify { scannerMock.setVersionInformation(capture(sentUnifiedVersion)) }
-        assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions()).isEqualTo(NEW_SCANNER_VERSION.toScannerFirmwareVersions())
+        assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions())
+            .isEqualTo(NEW_SCANNER_VERSION.firmwareVersions.toScannerFirmwareVersions())
     }
 
     @Test
@@ -148,20 +149,21 @@ class CypressOtaHelperTest {
 
         private val OLD_SCANNER_VERSION = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
-            firmwareVersions = ScannerVersionInfo.LegacyVersionInfo(
-               versionInfo = UnifiedVersionInformation(5066639776677915L,
-                   OLD_CYPRESS_VERSION, mockk(relaxed = true), mockk(relaxed = true))
-            )
+            firmwareVersions = UnifiedVersionInformation(
+                5066639776677915L,
+                OLD_CYPRESS_VERSION,
+                mockk(relaxed = true),
+                mockk(relaxed = true)
+            ).toExtendedVersionInfo()
         )
+
 
         private val NEW_SCANNER_VERSION = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
-            firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(
-                ExtendedVersionInformation(
-                    cypressFirmwareVersion = NEW_CYPRESS_VERSION,
-                    stmFirmwareVersion = mockk(relaxed = true),
-                    un20AppVersion = mockk(relaxed = true)
-                )
+            firmwareVersions = ExtendedVersionInformation(
+                cypressFirmwareVersion = NEW_CYPRESS_VERSION,
+                stmFirmwareVersion = mockk(relaxed = true),
+                un20AppVersion = mockk(relaxed = true)
             )
         )
     }

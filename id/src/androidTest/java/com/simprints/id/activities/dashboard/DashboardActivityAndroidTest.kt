@@ -12,13 +12,13 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.di.TestViewModelModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.di.TestPreferencesModule
+import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
@@ -54,7 +54,7 @@ class DashboardActivityAndroidTest {
             mockViewModelFactory.create<DashboardViewModel>(any())
         } returns mockViewModel
 
-        app.component = AndroidTestConfig(this, preferencesModule = preferencesModule)
+        app.component = AndroidTestConfig(preferencesModule = preferencesModule)
             .componentBuilder()
             .viewModelModule(buildViewModelModule())
             .build()

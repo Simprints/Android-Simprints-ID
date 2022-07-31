@@ -2,21 +2,20 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.network.SimApiClientFactory
-import com.simprints.core.security.SecureLocalDbKeyProvider
-import com.simprints.core.security.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.EventRepositoryImpl
@@ -37,13 +36,15 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.*
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.network.BaseUrlProvider
-import com.simprints.id.network.BaseUrlProviderImpl
+import com.simprints.id.network.ImageUrlProvider
+import com.simprints.id.network.ImageUrlProviderImpl
 import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
@@ -58,8 +59,8 @@ import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.RandomGeneratorImpl
+import com.simprints.infra.security.random.RandomGenerator
+import com.simprints.infra.security.random.RandomGeneratorImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -67,14 +68,14 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
-import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import okhttp3.Interceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
+import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.url.BaseUrlProviderImpl
 
 @Module
 open class AppModule {
@@ -128,32 +129,29 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    open fun provideBaseUrlProvider(
-        settingsPreferencesManager: SettingsPreferencesManager,
+    open fun provideImageUrlProvider(
         projectLocalDataSource: ProjectLocalDataSource,
         loginInfoManager: LoginInfoManager
-    ): BaseUrlProvider = BaseUrlProviderImpl(
-        settingsPreferencesManager,
+    ): ImageUrlProvider = ImageUrlProviderImpl(
         projectLocalDataSource,
         loginInfoManager
     )
 
     @Provides
+    open fun provideBaseUrlProvider(ctx: Context): BaseUrlProvider =
+        BaseUrlProviderImpl(ctx)
+
+    @Provides
     open fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider,
-        jsonHelper: JsonHelper,
-        dispatcher: DispatcherProvider,
-        @Named("ChuckerInterceptor") interceptor: Interceptor
+        baseUrlProvider: BaseUrlProvider
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
+        ctx,
         ctx.packageVersionName,
         remoteDbManager,
-        jsonHelper,
-        dispatcher,
-        interceptor
     )
 
     @Provides
@@ -172,11 +170,6 @@ open class AppModule {
     @Provides
     open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
         SessionEventValidatorsFactoryImpl()
-
-    @Provides
-    @Named("ChuckerInterceptor")
-    open fun provideChuckerInterceptor(ctx: Context): Interceptor =
-        ChuckerInterceptor.Builder(ctx).build()
 
     @Provides
     open fun provideDbEventDatabaseFactory(

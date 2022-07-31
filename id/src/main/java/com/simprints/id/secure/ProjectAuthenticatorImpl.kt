@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.security.SecureLocalDbKeyProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
@@ -97,7 +97,7 @@ class ProjectAuthenticatorImpl(
     }
 
     private fun createLocalDbKeyForProject(projectId: String) {
-        secureDataManager.setLocalDatabaseKey(projectId)
+        secureDataManager.createLocalDatabaseKeyIfMissing(projectId)
     }
 
     private fun updateLanguageAndReturnProjectLanguages(): Array<String> {
@@ -111,8 +111,8 @@ class ProjectAuthenticatorImpl(
 
     private suspend fun Array<String>.fetchProjectLongConsentTexts() {
         longConsentRepository.deleteLongConsents()
-        forEach {
-            longConsentRepository.getLongConsentResultForLanguage(it).catch { Simber.e(it) }
+        forEach { language ->
+            longConsentRepository.getLongConsentResultForLanguage(language).catch { Simber.e(it) }
                 .collect()
         }
     }

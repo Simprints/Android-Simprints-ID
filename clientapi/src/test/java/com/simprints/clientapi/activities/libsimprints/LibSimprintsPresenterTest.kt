@@ -1,12 +1,9 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Identify
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Invalid
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -20,28 +17,17 @@ import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
-import com.simprints.clientapi.requestFactories.EnrolRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
-import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.requestFactories.*
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
+import java.util.*
 
 class LibSimprintsPresenterTest {
 
@@ -148,6 +134,8 @@ class LibSimprintsPresenterTest {
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
+        coEvery { clientApiSessionEventsManager.isSessionHasIdentificationCallback(any()) } returns true
+        coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
 
         LibSimprintsPresenter(
             view,
@@ -224,7 +212,7 @@ class LibSimprintsPresenterTest {
             view = view,
             action = Enrol,
             sessionEventsManager = clientApiSessionEventsManager,
-            deviceManager = mockk(),
+            rootManager = mockk(),
             timeHelper = mockk(),
             subjectRepository = mockk(),
             jsonHelper = mockk(),
@@ -256,7 +244,7 @@ class LibSimprintsPresenterTest {
             view = view,
             action = Identify,
             sessionEventsManager = clientApiSessionEventsManager,
-            deviceManager = mockk(),
+            rootManager = mockk(),
             timeHelper = mockk(),
             subjectRepository = mockk(),
             jsonHelper = mockk(),
@@ -303,7 +291,7 @@ class LibSimprintsPresenterTest {
             view = view,
             action = Verify,
             sessionEventsManager = clientApiSessionEventsManager,
-            deviceManager = mockk(),
+            rootManager = mockk(),
             timeHelper = mockk(),
             subjectRepository = mockk(),
             jsonHelper = mockk(),
@@ -343,7 +331,7 @@ class LibSimprintsPresenterTest {
             view = view,
             action = Invalid,
             sessionEventsManager = clientApiSessionEventsManager,
-            deviceManager = mockk(),
+            rootManager = mockk(),
             timeHelper = mockk(),
             subjectRepository = mockk(),
             jsonHelper = mockk(),

@@ -8,7 +8,6 @@ import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
 import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
-import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerVersionInfo
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.reactive.advanceTime
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -144,12 +143,10 @@ class Un20OtaHelperTest {
         private val OLD_SCANNER_INFORMATION =
             ScannerInformation(
                 hardwareVersion = HARDWARE_VERSION,
-                firmwareVersions = ScannerVersionInfo.ExtendedVersionInfo(
-                    versionInfo = ExtendedVersionInformation(
-                        mockk(relaxed = true),
-                        mockk(relaxed = true),
-                        OLD_UN20_VERSION
-                    )
+                firmwareVersions = ExtendedVersionInformation(
+                    mockk(relaxed = true),
+                    mockk(relaxed = true),
+                    OLD_UN20_VERSION
                 )
             )
         private val NEW_SCANNER_VERSION = ExtendedVersionInformation(

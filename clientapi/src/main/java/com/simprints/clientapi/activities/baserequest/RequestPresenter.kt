@@ -1,45 +1,14 @@
 package com.simprints.clientapi.activities.baserequest
 
 import androidx.annotation.Keep
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_METADATA
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_MODULE_ID
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_PROJECT_ID
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_SELECTED_ID
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_SESSION_ID
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_USER_ID
-import com.simprints.clientapi.activities.errors.ClientApiAlert.INVALID_VERIFY_ID
-import com.simprints.clientapi.activities.errors.ClientApiAlert.ROOTED_DEVICE
-import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
-import com.simprints.clientapi.clientrequests.builders.EnrolBuilder
-import com.simprints.clientapi.clientrequests.builders.EnrolLastBiometricsBuilder
-import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
-import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
-import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsValidator
-import com.simprints.clientapi.clientrequests.validators.EnrolValidator
-import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.activities.errors.ClientApiAlert.*
+import com.simprints.clientapi.clientrequests.builders.*
+import com.simprints.clientapi.clientrequests.validators.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
-import com.simprints.clientapi.data.sharedpreferences.canSyncDataToSimprints
+import com.simprints.clientapi.data.sharedpreferences.*
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.exceptions.InvalidMetadataException
-import com.simprints.clientapi.exceptions.InvalidModuleIdException
-import com.simprints.clientapi.exceptions.InvalidProjectIdException
-import com.simprints.clientapi.exceptions.InvalidRequestException
-import com.simprints.clientapi.exceptions.InvalidSelectedIdException
-import com.simprints.clientapi.exceptions.InvalidSessionIdException
-import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
-import com.simprints.clientapi.exceptions.InvalidUserIdException
-import com.simprints.clientapi.exceptions.InvalidVerifyIdException
-import com.simprints.clientapi.exceptions.RootedDeviceException
+import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
@@ -47,15 +16,16 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.libsimprints.Constants
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.root.RootManager
+import com.simprints.libsimprints.Constants
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 
 abstract class RequestPresenter(
     private val view: RequestContract.RequestView,
     private val eventsManager: ClientApiSessionEventsManager,
-    private val deviceManager: DeviceManager,
+    private val rootManager: RootManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
     private val sharedPreferencesManager: SharedPreferencesManager,
     private val sessionEventsManager: ClientApiSessionEventsManager
@@ -76,7 +46,11 @@ abstract class RequestPresenter(
     override suspend fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
             view.confirmIdentityExtractor,
-            ConfirmIdentityValidator(view.confirmIdentityExtractor)
+            ConfirmIdentityValidator(
+                view.confirmIdentityExtractor,
+                eventsManager.getCurrentSessionId(),
+                eventsManager.isSessionHasIdentificationCallback(view.confirmIdentityExtractor.getSessionId())
+            )
         )
     )
 
@@ -103,7 +77,7 @@ abstract class RequestPresenter(
 
     protected suspend fun runIfDeviceIsNotRooted(block: suspend () -> Unit) {
         try {
-            deviceManager.checkIfDeviceIsRooted()
+            rootManager.checkIfDeviceIsRooted()
             block()
         } catch (ex: RootedDeviceException) {
             handleRootedDevice(ex)
