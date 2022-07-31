@@ -5,6 +5,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceMatchResponse
@@ -35,6 +36,13 @@ internal val identifyAppRequest = AppIdentifyRequest(
     DEFAULT_METADATA
 )
 
+internal val followUpRequest = AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest(
+    DEFAULT_PROJECT_ID,
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_METADATA,
+    GUID1,
+)
 @Parcelize
 internal class IFaceCaptureResponseImpl(
     override val capturingResult: List<IFaceCaptureResult>,
