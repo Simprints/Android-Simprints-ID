@@ -25,12 +25,16 @@ class DashboardDailyActivityRepositoryImpl(
         }
     }
 
-    @Suppress("NON_EXHAUSTIVE_WHEN")
     override fun updateDailyActivity(appResponse: AppResponse) {
         when (appResponse.type) {
             AppResponseType.ENROL -> computeNewEnrolment()
             AppResponseType.IDENTIFY -> computeNewIdentification()
             AppResponseType.VERIFY -> computeNewVerification()
+            AppResponseType.REFUSAL,
+            AppResponseType.CONFIRMATION,
+            AppResponseType.ERROR -> {
+                //Other cases are ignore and we don't show info in dashboard for it
+            }
         }
     }
 
