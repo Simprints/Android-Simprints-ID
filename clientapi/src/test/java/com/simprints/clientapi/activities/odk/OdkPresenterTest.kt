@@ -225,6 +225,7 @@ class OdkPresenterTest {
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
+        coEvery { clientApiSessionEventsManager.isSessionHasIdentificationCallback(any()) } returns true
 
         OdkPresenter(
             view,
