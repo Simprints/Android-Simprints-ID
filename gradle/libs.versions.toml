@@ -1,7 +1,7 @@
 [versions]
 kotlin_version = "1.6.21"
 androidx_navigation_version = "2.5.0"
-kotlin_coroutine_version = "1.6.3"
+kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.4.2"
 androidx_version = "1.4.0"
 androidx_test_orchestrator_version = "1.4.1"
@@ -9,9 +9,9 @@ androidx_test_monitor_version = "1.4.0"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.5.0"
-androidx_room_version = "2.4.2"
-androidx_camerax_version = "1.2.0-alpha03"
-dagger_version = "2.42"
+androidx_room_version = "2.4.3"
+androidx_camerax_version = "1.2.0-alpha04"
+dagger_version = "2.43.1"
 work_version = "2.7.1"
 location_services_version = "20.0.0"
 safetynet_services_version = "18.0.1"
@@ -36,7 +36,7 @@ simmatcher_version = "1.0.0"
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin_version" }
 kotlin-coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin_coroutine_version" }
 kotlin-coroutinesPlayServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlin_coroutine_version" }
-kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.3"
+kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4"
 #AndroidX
 androidX-core = "androidx.core:core-ktx:1.8.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
@@ -124,7 +124,6 @@ rxJava2-core = "io.reactivex.rxjava2:rxjava:2.2.21"
 rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.1.1"
 rxJava2-kotlin = "io.reactivex.rxjava2:rxkotlin:2.4.0"
 rxJava2-permissions = "com.github.tbruyelle:rxpermissions:0.12"
-rxJava2-location = "pl.charmas.android:android-reactive-location2:2.1"
 rxJava2-tasks = "io.ashdavies.rx:rx-tasks:2.2.0"
 
 #Fuzzywuzzy
@@ -174,7 +173,7 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 
 #Testing-KoTest
 testing-KoTest-kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
-testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.3.2"
+testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.4.1"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"
@@ -187,12 +186,11 @@ testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 #Testing-Objenesis
 testing-Objenesis-core = { module = "org.objenesis:objenesis", version.ref = "objenesis_version" }
 #Testing-Mockk
-testing-Mockk-core = "io.mockk:mockk:1.12.3"
-testing-Mockk-android = "io.mockk:mockk-android:1.12.3"
+testing-Mockk-core = "io.mockk:mockk:1.12.5"
+testing-Mockk-android = "io.mockk:mockk-android:1.12.5"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
-testing-Espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.2.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX
 testing-AndroidX-monitor = { module = "androidx.test:monitor", version.ref = "androidx_test_monitor_version" }

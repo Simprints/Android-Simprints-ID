@@ -1,10 +1,10 @@
 package com.simprints.id.secure.securitystate.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.exceptions.safe.SimprintsInternalServerException
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
@@ -58,11 +58,11 @@ class SecurityStateRepositoryImplTest {
         verify { mockLocalDataSource.securityStatus = status }
     }
 
-    @Test(expected = SimprintsInternalServerException::class)
-    fun remoteDataSourceThrowsInternalServerException_repositoryShouldThrow() {
+    @Test(expected = SyncCloudIntegrationException::class)
+    fun remoteDataSourceThrowsSyncCloudIntegrationException_repositoryShouldThrow() {
         coEvery {
             mockRemoteDataSource.getSecurityState()
-        } throws SimprintsInternalServerException()
+        } throws SyncCloudIntegrationException(cause = Exception())
 
         runBlocking {
             repository.getSecurityState()

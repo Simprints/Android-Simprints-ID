@@ -51,15 +51,19 @@ open class OrchestratorManagerImpl(
     override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
         modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)
 
-        val fingerprintCaptureCompleted =
-            !modalities.contains(Modality.FINGER) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }.all { it.getResult() is FingerprintCaptureResponse }
+        if (appRequest !is AppRequest.AppRequestFollowUp) {
+            val fingerprintCaptureCompleted =
+                !modalities.contains(Modality.FINGER) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }
+                    .all { it.getResult() is FingerprintCaptureResponse }
 
-        val faceCaptureCompleted =
-            !modalities.contains(Modality.FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }.all { it.getResult() is FaceCaptureResponse }
+            val faceCaptureCompleted =
+                !modalities.contains(Modality.FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }
+                    .all { it.getResult() is FaceCaptureResponse }
 
 
-        if (fingerprintCaptureCompleted && faceCaptureCompleted) {
-            personCreationEventHelper.addPersonCreationEventIfNeeded(modalitiesFlow.steps.mapNotNull { it.getResult() })
+            if (fingerprintCaptureCompleted && faceCaptureCompleted) {
+                personCreationEventHelper.addPersonCreationEventIfNeeded(modalitiesFlow.steps.mapNotNull { it.getResult() })
+            }
         }
 
         proceedToNextStepOrAppResponse()

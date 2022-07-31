@@ -2,7 +2,6 @@ package com.simprints.id.data.prefs.settings
 
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
-import com.simprints.core.network.NetworkConstants
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
@@ -10,7 +9,6 @@ import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
-import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
@@ -273,17 +271,17 @@ open class SettingsPreferencesManagerImpl(
             fingerprintsToCollectSerializer
         )
 
-   /**
+    /**
      * The Vero2FirmwareVersions as a JSON string
      */
 
-   override var firmwareDownloadableVersionsJson: String
-       by RemoteConfigPrimitivePreference(
-           prefs,
-           remoteConfigWrapper,
-           VERO2_FIRMWARE_VERSIONS_KEY,
-           VERO2_FIRMWARE_VERSIONS_DEFAULT
-       )
+    override var firmwareDownloadableVersionsJson: String
+        by RemoteConfigPrimitivePreference(
+            prefs,
+            remoteConfigWrapper,
+            VERO2_FIRMWARE_VERSIONS_KEY,
+            VERO2_FIRMWARE_VERSIONS_DEFAULT
+        )
 
     override var fingerImagesExist: Boolean
         by RemoteConfigPrimitivePreference(
@@ -342,9 +340,6 @@ open class SettingsPreferencesManagerImpl(
             FINGERPRINT_QUALITY_THRESHOLD_KEY,
             FINGERPRINT_QUALITY_THRESHOLD_DEFAULT
         )
-
-    override var apiBaseUrl: String
-        by PrimitivePreference(prefs, API_BASE_URL_KEY, NetworkConstants.DEFAULT_BASE_URL)
 
     override var faceQualityThreshold: Float
         by RemoteConfigPrimitivePreference(
@@ -495,8 +490,6 @@ open class SettingsPreferencesManagerImpl(
         const val FINGERPRINT_QUALITY_THRESHOLD_DEFAULT = 60
         const val FINGERPRINT_QUALITY_THRESHOLD_KEY = "FingerprintQualityThreshold"
 
-        const val API_BASE_URL_KEY = "ApiBaseUrl"
-
         const val FACE_QUALITY_THRESHOLD = "FaceQualityThreshold"
         const val FACE_QUALITY_THRESHOLD_DEFAULT = -1f
 
@@ -518,8 +511,7 @@ open class SettingsPreferencesManagerImpl(
         )
 
         const val VERO2_FIRMWARE_VERSIONS_KEY = "Vero2FirmwareVersions"
-        const val VERO2_FIRMWARE_VERSIONS_DEFAULT =
-            "{\"E-1\":{\"cypress\":\"1.E-1.1\",\"stm\":\"1.E-1.1\",\"un20\":\"1.E-1.0\"}}"
+        const val VERO2_FIRMWARE_VERSIONS_DEFAULT = ""
 
     }
 

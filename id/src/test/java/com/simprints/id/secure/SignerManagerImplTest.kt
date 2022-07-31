@@ -9,16 +9,17 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.network.BaseUrlProvider
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -83,7 +84,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signIn_shouldSignInToRemoteDb() = runBlockingTest {
+    fun signIn_shouldSignInToRemoteDb() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockFetchingProjectInfo()
 
@@ -94,7 +95,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signInToRemoteFails_signInShouldFail() = runBlockingTest {
+    fun signInToRemoteFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn(true)
 
         assertThrows<Throwable> { signIn() }
@@ -102,7 +103,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signIn_shouldStoreCredentialsLocally() = runBlockingTest {
+    fun signIn_shouldStoreCredentialsLocally() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
@@ -114,7 +115,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun storeCredentialsFails_signInShouldFail() = runBlockingTest {
+    fun storeCredentialsFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally(true)
 
@@ -123,7 +124,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signIn_shouldFetchProjectInfo() = runBlockingTest {
+    fun signIn_shouldFetchProjectInfo() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
@@ -135,7 +136,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun loadAndRefreshCacheFails_signInShouldFail() = runBlockingTest {
+    fun loadAndRefreshCacheFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo(true)
@@ -145,7 +146,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signIn_shouldSucceed() = runBlockingTest {
+    fun signIn_shouldSucceed() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
@@ -156,7 +157,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signIn_shouldScheduleSecurityStateCheck() = runBlockingTest {
+    fun signIn_shouldScheduleSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
@@ -169,7 +170,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_shouldRemoveAnyState() = runBlockingTest {
+    fun signOut_shouldRemoveAnyState() = runTest(UnconfinedTestDispatcher()) {
         every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         signerManager.signOut()
@@ -183,7 +184,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_shouldCancelPeriodicSecurityStateCheck() = runBlockingTest {
+    fun signOut_shouldCancelPeriodicSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
         every { mockLoginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         signerManager.signOut()
@@ -193,7 +194,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_backgroundSyncWorkersAreCancelled() = runBlockingTest {
+    fun signOut_backgroundSyncWorkersAreCancelled() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
         coVerify { mockSyncManager.cancelBackgroundSyncs() }
@@ -201,7 +202,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_longConsentsAreDeleted() = runBlockingTest {
+    fun signOut_longConsentsAreDeleted() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
         verify(exactly = 1) { mockLongConsentRepository.deleteLongConsents() }
@@ -209,7 +210,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_apiBaseUrlIsReset() = runBlockingTest {
+    fun signOut_apiBaseUrlIsReset() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
         verify { mockBaseUrlProvider.resetApiBaseUrl() }
@@ -217,7 +218,7 @@ class SignerManagerImplTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun signOut_clearRemoteConfig() = runBlockingTest {
+    fun signOut_clearRemoteConfig() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
         coVerify { mockRemoteConfigWrapper.clearRemoteConfig() }
@@ -276,5 +277,5 @@ class SignerManagerImplTest {
     private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() =
-        verify { mockPreferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
+        verify { mockPreferencesManager.clearAllSharedPreferences() }
 }

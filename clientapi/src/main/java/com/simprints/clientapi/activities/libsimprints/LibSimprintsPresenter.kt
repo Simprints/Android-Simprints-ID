@@ -2,35 +2,26 @@ package com.simprints.clientapi.activities.libsimprints
 
 import com.simprints.clientapi.Constants
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Identify
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Invalid
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.ConfirmationResponse
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.root.RootManager
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
-import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
-import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +30,7 @@ class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
     private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    deviceManager: DeviceManager,
+    rootManager: RootManager,
     private val timeHelper: ClientApiTimeHelper,
     private val subjectRepository: SubjectRepository,
     private val jsonHelper: JsonHelper,
@@ -47,7 +38,7 @@ class LibSimprintsPresenter(
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
-    deviceManager = deviceManager,
+    rootManager = rootManager,
     sharedPreferencesManager = sharedPreferencesManager,
     sessionEventsManager = sessionEventsManager
 ), LibSimprintsContract.Presenter {

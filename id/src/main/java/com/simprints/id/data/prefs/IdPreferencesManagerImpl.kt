@@ -6,13 +6,13 @@ import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl.Companion.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER
 
 
-class IdPreferencesManagerImpl(settings: SettingsPreferencesManager,
-                               lastEvents: RecentEventsPreferencesManager,
-                               context: Context)
-    : IdPreferencesManager,
+class IdPreferencesManagerImpl(
+    settings: SettingsPreferencesManager,
+    lastEvents: RecentEventsPreferencesManager,
+    context: Context
+) : IdPreferencesManager,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents {
 
@@ -33,14 +33,9 @@ class IdPreferencesManagerImpl(settings: SettingsPreferencesManager,
         }
     }
 
-    override fun clearAllSharedPreferencesExceptRealmKeys() {
+    override fun clearAllSharedPreferences() {
         prefs.all.forEach {
-            if (!containsRealmKey(it)) {
-                prefs.edit().remove(it.key).apply()
-            }
+            prefs.edit().remove(it.key).apply()
         }
     }
-
-    private fun containsRealmKey(it: Map.Entry<String, Any?>) =
-        it.key.contains(SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER)
 }

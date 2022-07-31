@@ -22,7 +22,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infralogging"))
 
-    api(libs.androidX.multidex)
     implementation(libs.testing.androidX.monitor)
     implementation(libs.testing.androidX.core)
     api(libs.testing.espresso.core)
@@ -33,19 +32,13 @@ dependencies {
         exclude("com.google.guava")
     }
 
-    annotationProcessor(libs.dagger.compiler)
-    implementation(libs.kotlin.reflect)
-
     implementation(libs.testing.mockito.inline)
     implementation(libs.testing.mockito.kotlin)
 
     implementation(libs.testing.robolectric.core)
-    implementation(libs.testing.robolectric.multidex)
-    api(libs.testing.mockwebserver)
     implementation(libs.rxJava2.android)
     api(libs.rxJava2.core)
-    api(libs.testing.retrofit)
-    implementation(libs.retrofit.core)
     api(libs.testing.coroutines.test)
     implementation(libs.testing.mockk.core)
+
 }

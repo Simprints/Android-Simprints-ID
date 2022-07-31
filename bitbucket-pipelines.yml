@@ -63,13 +63,19 @@ definitions:
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew eventsystem:jacocoTestReport
+                    - ./gradlew infraconfig:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
                     - ./gradlew infralogin:jacocoTestReport
+                    - ./gradlew infranetwork:jacocoTestReport
+                    - ./gradlew infrasecurity:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
+                    - infraconfig/build/reports/**
                     - infralogging/build/reports/**
                     - infralogin/build/reports/**
+                    - infranetwork/build/reports/**
+                    - infrasecurity/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -165,8 +171,11 @@ definitions:
                     - ./gradlew :fingerprintmatcher:projectHealth
                     - ./gradlew :fingerprintscannermock:projectHealth
                     - ./gradlew :moduleapi:projectHealth
+                    - ./gradlew infraconfig:projectHealth
                     - ./gradlew :infralogging:projectHealth
                     - ./gradlew :infralogin:projectHealth
+                    - ./gradlew :infranetwork:projectHealth
+                    - ./gradlew :infrasecurity:projectHealth
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
@@ -291,6 +300,26 @@ definitions:
                     - bash ./ci/deployment/signing_properties_setup
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
+        ######################################################################
+          # Promote the Alpha track build to the Production Track
+          #
+          # Signing vars are only available on a deployment step.
+        ######################################################################
+        -   step: &promote-alpha-to-production
+                name: "Promote Alpha Track to Production Track"
+                deployment: Production
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
+                    - ./gradlew promoteArtifact --from-track alpha --promote-track production
+
 
         ######################################################################
         # Run renovate automated dependency update tool
@@ -314,7 +343,6 @@ flows:
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-module-unit-tests
-                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate
@@ -335,12 +363,17 @@ flows:
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
+            -   step: *promote-alpha-to-production
     -   flow: &ci-test # For CI testing purposes only
-            -   step: *run-fingerprintscanner-unit-tests
+            -   step: *build-and-sign-universal-apk
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
+            -   step: *promote-internal-to-alpha
+            -   step: *promote-alpha-to-production
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
+    -   flow: &dependency-health-check-flow
+            -   step: *dependency-health-check
 
 
 ######################################################################
@@ -354,3 +387,4 @@ pipelines:
     custom:
         ci-test-pipeline: *ci-test # For CI testing purposes only
         renovate: *update-dependencies-flow
+        health-check: *dependency-health-check-flow

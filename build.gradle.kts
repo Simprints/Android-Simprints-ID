@@ -34,7 +34,7 @@ buildscript {
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.1")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.11.0")
+        classpath("io.realm:realm-gradle-plugin:10.11.1")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
@@ -62,10 +62,9 @@ allprojects {
         }
     }
 
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).forEach {
-        it.kotlinOptions {
-            freeCompilerArgs = listOf("-Xnew-inference")
-        }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        kotlinOptions.freeCompilerArgs += "-Xnew-inference"
     }
 }
 
@@ -91,6 +90,6 @@ Run tests in parallel to speed up tests
 https://docs.gradle.org/nightly/userguide/performance.html#suggestions_for_java_projects
 */
 tasks.withType(Test::class).configureEach {
-    maxParallelForks = Runtime.getRuntime().availableProcessors().div(2) ?: 1
+    maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
     retry.maxRetries.set(5)
 }
