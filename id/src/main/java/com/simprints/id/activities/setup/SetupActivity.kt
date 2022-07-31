@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequest
@@ -86,7 +85,7 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun observeViewState() {
-        viewModel.getViewStateLiveData().observe(this, Observer {
+        viewModel.getViewStateLiveData().observe(this) {
             when (it) {
                 StartingDownload -> updateUiForDownloadStarting()
                 is RequiresUserConfirmationToDownload -> requestUserConfirmationDoDownloadModalities(
@@ -98,17 +97,20 @@ class SetupActivity : BaseSplitActivity() {
                 }
                 ModalitiesInstalling -> updateUiForModalitiesInstalling()
                 ModalitiesInstalled -> updateUiForModalitiesInstalledAndAskPermissions()
+                else -> {
+                    //We ignore other cases
+                }
             }
-        })
+        }
     }
 
     private fun observeNetworkState() {
-        viewModel.getDeviceNetworkLiveData().observe(this, Observer {
+        viewModel.getDeviceNetworkLiveData().observe(this) {
             Simber.d("Setup - Observing network $it")
             if (it == DeviceOffline && viewModel.getViewStateLiveData().value != ModalitiesInstalled) {
                 launchAlertIfNecessary()
             }
-        })
+        }
     }
 
     private fun launchAlertIfNecessary() {
