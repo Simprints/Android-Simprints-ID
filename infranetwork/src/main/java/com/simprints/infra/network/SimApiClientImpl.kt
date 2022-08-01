@@ -59,30 +59,32 @@ class SimApiClientImpl<T : SimRemoteInterface>(
                             networkBlock(api)
                         }
                     } catch (e: Exception) {
-                        throw handleException(e)
+                        throw transformExceptionIfNeeded(e)
                     }
                 },
                 retryIf = { it is RetryableCloudException })
         } catch (e: Exception) {
-            throw when {
-                e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
-                e is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
+            throw when (e) {
+                is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
                 else -> e
             }
         }
 
-    private fun handleException(e: Exception): Exception {
-        if (e !is HttpException) {
-            return e
-        }
+    private fun transformExceptionIfNeeded(e: Exception): Exception {
         return when {
-            e.isBackendMaintenanceError() -> BackendMaintenanceException(
-                estimatedOutage = e.parseEstimatedOutage()
-            )
-            HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
-                cause = e
-            )
-            else -> SyncCloudIntegrationException(cause = e)
+            e is HttpException -> {
+                when {
+                    e.isBackendMaintenanceError() -> BackendMaintenanceException(
+                        estimatedOutage = e.parseEstimatedOutage()
+                    )
+                    HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
+                        cause = e
+                    )
+                    else -> SyncCloudIntegrationException(cause = e)
+                }
+            }
+            e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
+            else -> e
         }
     }
 
