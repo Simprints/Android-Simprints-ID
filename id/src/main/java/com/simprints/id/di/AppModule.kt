@@ -58,10 +58,6 @@ import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.LoginInfoManagerImpl
-import com.simprints.infra.login.network.SimApiClientFactory
-import com.simprints.infra.login.network.SimApiClientFactoryImpl
-import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.infra.network.url.BaseUrlProviderImpl
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
@@ -133,23 +129,6 @@ open class AppModule {
     ): ImageUrlProvider = ImageUrlProviderImpl(
         projectLocalDataSource,
         loginInfoManager
-    )
-
-    @Provides
-    open fun provideBaseUrlProvider(ctx: Context): BaseUrlProvider =
-        BaseUrlProviderImpl(ctx)
-
-    @Provides
-    open fun provideSimApiClientFactory(
-        ctx: Context,
-        remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider
-    ): SimApiClientFactory = SimApiClientFactoryImpl(
-        baseUrlProvider,
-        ctx.deviceId,
-        ctx,
-        ctx.packageVersionName,
-        remoteDbManager,
     )
 
     @Provides

@@ -106,7 +106,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     api(project(":eventsystem"))
-    implementation(project(":infralogin"))
+    api(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrasecurity"))
@@ -137,9 +137,9 @@ dependencies {
     implementation(libs.jackson.core)
 
     // Firebase
-    implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.barcode)
+    implementation(libs.kotlin.coroutinesPlayServices)
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
@@ -151,7 +151,6 @@ dependencies {
     implementation(libs.androidX.ui.constraintlayout)
     api(libs.androidX.navigation.dynamicfeatures)
     implementation(libs.kotlin.coroutinesAndroid)
-    implementation(libs.kotlin.coroutinesPlayServices)
     implementation(libs.androidX.cameraX.core)
     implementation(libs.koin.core)
     implementation(libs.koin.android)

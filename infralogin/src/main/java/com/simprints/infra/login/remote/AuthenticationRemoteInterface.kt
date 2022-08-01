@@ -6,7 +6,7 @@ import com.simprints.infra.login.remote.models.ApiToken
 import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.*
 
-interface AuthenticationRemoteInterface : SimRemoteInterface {
+internal interface AuthenticationRemoteInterface : SimRemoteInterface {
 
     @GET("projects/{projectId}/users/{userId}/authentication-data")
     suspend fun requestAuthenticationData(

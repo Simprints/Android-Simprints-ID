@@ -9,7 +9,7 @@ import com.simprints.infra.login.remote.models.ApiAuthRequestBody
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 
-class AuthenticationRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) :
+internal class AuthenticationRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) :
     AuthenticationRemoteDataSource {
 
     companion object {

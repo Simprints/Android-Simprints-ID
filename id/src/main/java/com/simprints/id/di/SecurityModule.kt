@@ -1,8 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
@@ -30,13 +28,10 @@ import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.AttestationManager
-import com.simprints.infra.login.domain.AttestationManagerImpl
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.network.SimApiClientFactory
-import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
-import com.simprints.infra.login.remote.AuthenticationRemoteDataSourceImpl
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
@@ -81,26 +76,20 @@ open class SecurityModule {
     ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository, jsonHelper)
 
     @Provides
-    open fun provideAttestationManager(safetyNetClient: SafetyNetClient): AttestationManager =
-        AttestationManagerImpl(safetyNetClient)
-
-    @Provides
     open fun provideProjectAuthenticator(
-        authenticationRemoteDataSource: AuthenticationRemoteDataSource,
+        loginManager: LoginManager,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRepository: ProjectRepository,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
         preferencesManager: IdPreferencesManager,
-        attestationManager: AttestationManager,
     ): ProjectAuthenticator = ProjectAuthenticatorImpl(
-        authenticationRemoteDataSource,
+        loginManager,
         secureDataManager,
         projectRepository,
         signerManager,
         longConsentRepository,
         preferencesManager,
-        attestationManager,
     )
 
     @Provides
@@ -119,11 +108,6 @@ open class SecurityModule {
     }
 
     @Provides
-    open fun provideSafetyNetClient(
-        context: Context
-    ): SafetyNetClient = SafetyNet.getClient(context)
-
-    @Provides
     open fun provideSecurityStateRemoteDataSource(
         simApiClientFactory: SimApiClientFactory,
         loginInfoManager: LoginInfoManager,
@@ -132,13 +116,6 @@ open class SecurityModule {
         simApiClientFactory,
         loginInfoManager,
         context.deviceId
-    )
-
-    @Provides
-    open fun provideAuthenticationRemoteDataSourceImpl(
-        simApiClientFactory: SimApiClientFactory,
-    ): AuthenticationRemoteDataSource = AuthenticationRemoteDataSourceImpl(
-        simApiClientFactory,
     )
 
     @Provides
