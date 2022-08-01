@@ -15,6 +15,7 @@ import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import java.io.IOException
 
@@ -44,7 +45,10 @@ class AuthenticationHelperImpl(
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
             AUTHENTICATED
         } catch (t: Throwable) {
-            Simber.e(t)
+            when (t) {
+                is NetworkConnectionException -> Simber.i(t)
+                else -> Simber.e(t)
+            }
 
             extractResultFromException(t).also { signInResult ->
                 logMessageForCrashReportWithNetworkTrigger("Sign in reason - $signInResult")
@@ -59,6 +63,7 @@ class AuthenticationHelperImpl(
     private fun extractResultFromException(t: Throwable): Result {
         return when (t) {
             is IOException -> OFFLINE
+            is NetworkConnectionException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
             is SyncCloudIntegrationException -> TECHNICAL_FAILURE
             is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR
