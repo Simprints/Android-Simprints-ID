@@ -42,8 +42,7 @@ class ProjectRepositoryImpl(
     } catch (t: Throwable) {
         when (t) {
             is NetworkConnectionException -> Simber.i(t)
-            //TODO: should we ignore all other exceptions here
-            else -> Simber.d(t)
+            else -> Simber.e(t)
         }
         null
     }
