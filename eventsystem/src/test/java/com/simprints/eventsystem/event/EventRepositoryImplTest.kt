@@ -537,6 +537,32 @@ class EventRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `test removeLocationDataFromCurrentSession does nothing if location is null`()= runTest{
+        // Given
+        val sessionCaptureEvent = mockk<SessionCaptureEvent>{
+            every { payload.location } returns null
+        }
+        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        //When
+        eventRepo.removeLocationDataFromCurrentSession()
+        //Then
+        coVerify (exactly = 0){eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)  }
+    }
+
+    @Test
+    fun `test removeLocationDataFromCurrentSession remove location if location exist`()= runTest{
+        // Given
+        val sessionCaptureEvent = mockk<SessionCaptureEvent>{
+            every { payload.location } returns mockk()
+        }
+        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        //When
+        eventRepo.removeLocationDataFromCurrentSession()
+        //Then
+        coVerify {eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)  }
+    }
+
     private fun mockSignedId() =
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 

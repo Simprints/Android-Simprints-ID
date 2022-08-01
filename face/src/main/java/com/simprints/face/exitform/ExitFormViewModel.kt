@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.extentions.inBackground
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
@@ -90,6 +91,11 @@ class ExitFormViewModel(
                     otherText = exitFormText
                 )
             )
+        removeLocationFromSession()
+    }
+
+    private  fun removeLocationFromSession() = inBackground {
+        faceSessionEventsManager.removeLocationDataFromSession()
     }
 
     fun handleBackButton() {

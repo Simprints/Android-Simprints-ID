@@ -6,4 +6,5 @@ interface FaceSessionEventsManager {
 
     fun addEventInBackground(event: Event)
     fun addEvent(event: Event)
+    suspend fun removeLocationDataFromSession()
 }
