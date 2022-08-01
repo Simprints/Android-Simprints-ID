@@ -49,4 +49,6 @@ interface EventRepository {
     ): ReceiveChannel<Event>
 
     suspend fun deleteSessionEvents(sessionId: String)
+
+    suspend fun removeLocationDataFromCurrentSession()
 }

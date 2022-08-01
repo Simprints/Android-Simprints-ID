@@ -6,6 +6,7 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelperImpl
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -42,6 +43,7 @@ class ExitFormViewModelTest {
                 true
             })
         }
+        coVerify { faceSessionEventsMgr.removeLocationDataFromSession() }
     }
 
     @Test
