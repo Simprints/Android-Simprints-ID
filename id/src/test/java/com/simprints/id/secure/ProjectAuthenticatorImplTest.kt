@@ -6,11 +6,10 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.infra.login.domain.AttestationManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.SafetyNetException
-import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.assertThrows
@@ -42,11 +41,7 @@ class ProjectAuthenticatorImplTest {
     private lateinit var preferencesManagerMock: IdPreferencesManager
 
     @MockK
-    private lateinit var authenticationDataManagerMock: AuthenticationRemoteDataSource
-
-    @MockK
-    private lateinit var attestationManagerMock: AttestationManager
-
+    private lateinit var loginManager: LoginManager
 
     private lateinit var authenticator: ProjectAuthenticator
 
@@ -67,7 +62,7 @@ class ProjectAuthenticatorImplTest {
     @Test
     fun offline_authenticationShouldThrowException() = runTest(StandardTestDispatcher()) {
         coEvery {
-            authenticationDataManagerMock.requestAuthToken(
+            loginManager.requestAuthToken(
                 PROJECT_ID,
                 USER_ID,
                 any()
@@ -83,7 +78,7 @@ class ProjectAuthenticatorImplTest {
     fun maintenance_authenticationShouldThrowMaintenanceException() =
         runTest(StandardTestDispatcher()) {
             coEvery {
-                authenticationDataManagerMock.requestAuthToken(
+                loginManager.requestAuthToken(
                     PROJECT_ID,
                     USER_ID,
                     any()
@@ -108,7 +103,7 @@ class ProjectAuthenticatorImplTest {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
             coVerify(exactly = 1) {
-                authenticationDataManagerMock.requestAuthenticationData(
+                loginManager.requestAuthenticationData(
                     PROJECT_ID,
                     USER_ID,
                     DEVICE_ID,
@@ -135,7 +130,7 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun safetyNetFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        every { attestationManagerMock.requestAttestation(any()) } throws SafetyNetException(
+        every { loginManager.requestAttestation(any()) } throws SafetyNetException(
             "",
             SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
         )
@@ -147,19 +142,18 @@ class ProjectAuthenticatorImplTest {
 
     private fun buildProjectAuthenticator(): ProjectAuthenticatorImpl {
         return ProjectAuthenticatorImpl(
-            authenticationDataManagerMock,
+            loginManager,
             secureDataManager,
             projectRepository,
             signerManager,
             longConsentRepositoryMock,
             preferencesManagerMock,
-            attestationManagerMock,
         )
     }
 
     private fun mockManagers() {
         coEvery {
-            authenticationDataManagerMock.requestAuthenticationData(
+            loginManager.requestAuthenticationData(
                 any(),
                 any(),
                 any()
@@ -170,7 +164,7 @@ class ProjectAuthenticatorImplTest {
         )
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
         coEvery {
-            authenticationDataManagerMock.requestAuthToken(
+            loginManager.requestAuthToken(
                 PROJECT_ID,
                 USER_ID,
                 any()
@@ -178,7 +172,7 @@ class ProjectAuthenticatorImplTest {
         } returns Token("", "", "", "")
         coEvery { projectRepository.fetchProjectConfigurationAndSave(any()) } returns mockk()
         every { preferencesManagerMock.projectLanguages } returns emptyArray()
-        every { attestationManagerMock.requestAttestation(any()) } returns "google_attestation"
+        every { loginManager.requestAttestation(any()) } returns "google_attestation"
         LanguageHelper.prefs = mockk(relaxed = true)
     }
 

@@ -1,7 +1,5 @@
 package com.simprints.id.testtools.di
 
-import android.content.Context
-import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -21,10 +19,9 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.LoginInfoManager
-import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.di.DependencyRule
@@ -35,7 +32,6 @@ class TestSecurityModule(
     private val loginActivityHelperRule: DependencyRule = RealRule,
     private val projectAuthenticatorRule: DependencyRule = RealRule,
     private val authenticationHelperRule: DependencyRule = RealRule,
-    private val safetyNetClientRule: DependencyRule = RealRule,
     private val signerManagerRule: DependencyRule = RealRule,
     private val securityStateRepositoryRule: DependencyRule = RealRule
 ) : SecurityModule() {
@@ -78,23 +74,21 @@ class TestSecurityModule(
     }
 
     override fun provideProjectAuthenticator(
-        authenticationRemoteDataSource: AuthenticationRemoteDataSource,
+        loginManager: LoginManager,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRepository: ProjectRepository,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
         preferencesManager: IdPreferencesManager,
-        attestationManager: AttestationManager,
     ): ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
-                authenticationRemoteDataSource,
+                loginManager,
                 secureDataManager,
                 projectRepository,
                 signerManager,
                 longConsentRepository,
                 preferencesManager,
-                attestationManager,
             )
         }
     }
@@ -115,11 +109,6 @@ class TestSecurityModule(
         }
     }
 
-    override fun provideSafetyNetClient(context: Context): SafetyNetClient {
-        return safetyNetClientRule.resolveDependency {
-            super.provideSafetyNetClient(context)
-        }
-    }
 
     @ExperimentalCoroutinesApi
     override fun provideSecurityStateRepository(

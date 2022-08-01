@@ -6,24 +6,22 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.domain.AttestationManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.security.cryptography.ProjectSecretEncrypter
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 
 class ProjectAuthenticatorImpl(
-    private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
+    private val loginManager: LoginManager,
     private val secureDataManager: SecureLocalDbKeyProvider,
     private val projectRepository: ProjectRepository,
     private val signerManager: SignerManager,
     private val longConsentRepository: LongConsentRepository,
     private val preferencesManager: IdPreferencesManager,
-    private val attestationManager: AttestationManager,
 ) : ProjectAuthenticator {
 
     override suspend fun authenticate(
@@ -53,14 +51,14 @@ class ProjectAuthenticatorImpl(
         projectSecret: String,
         deviceId: String
     ): AuthRequest {
-        val authenticationData = authenticationRemoteDataSource.requestAuthenticationData(
+        val authenticationData = loginManager.requestAuthenticationData(
             nonceScope.projectId,
             nonceScope.userId,
             deviceId
         )
         return buildAuthRequest(
             getEncryptedProjectSecret(projectSecret, authenticationData),
-            attestationManager.requestAttestation(authenticationData.nonce),
+            loginManager.requestAttestation(authenticationData.nonce),
             deviceId
         )
     }
@@ -79,7 +77,7 @@ class ProjectAuthenticatorImpl(
 
 
     private suspend fun AuthRequest.makeAuthRequest(nonceScope: NonceScope): Token =
-        authenticationRemoteDataSource.requestAuthToken(
+        loginManager.requestAuthToken(
             nonceScope.projectId,
             nonceScope.userId,
             this

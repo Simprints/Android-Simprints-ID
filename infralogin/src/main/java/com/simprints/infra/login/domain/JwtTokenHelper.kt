@@ -4,7 +4,7 @@ import android.util.Base64
 import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
-class JwtTokenHelper {
+internal class JwtTokenHelper {
 
     companion object {
         fun extractTokenPayloadAsJson(jwtToken: String?): JSONObject? {

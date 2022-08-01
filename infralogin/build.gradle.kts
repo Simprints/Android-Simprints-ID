@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    kotlin("kapt")
 }
 
 apply {
@@ -41,11 +42,12 @@ dependencies {
 
     implementation(libs.androidX.core)
 
+    implementation(libs.dagger.core)
+    kapt(libs.dagger.compiler)
+
     implementation(libs.firebase.auth)
-
     implementation(libs.kotlin.coroutinesPlayServices)
-
-    implementation(libs.playServices.safetynet)
+    api(libs.playServices.safetynet)
 
     implementation(libs.retrofit.core)
 
