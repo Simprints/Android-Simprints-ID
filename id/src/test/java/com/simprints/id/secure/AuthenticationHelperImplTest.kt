@@ -9,6 +9,7 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -46,6 +47,15 @@ class AuthenticationHelperImplTest {
     @Test
     fun shouldSetOfflineIfIOException() = runBlocking {
         val result = mockException(IOException())
+
+        assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
+    }
+
+    @Test
+    fun shouldSetOfflineIfNetworkConnectionException() = runBlocking {
+        val result = mockException(NetworkConnectionException(
+            cause = Throwable()
+        ))
 
         assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
     }
@@ -91,5 +101,12 @@ class AuthenticationHelperImplTest {
         coEvery { projectAuthenticator.authenticate(any(), "", "") } throws exception
 
         return authenticationHelperImpl.authenticateSafely("", "", "", "")
+    }
+
+    @Test
+    fun `should return AUTHENTICATED if no exception`() = runBlocking {
+        val result = authenticationHelperImpl.authenticateSafely("", "", "", "")
+
+        assertThat(result).isInstanceOf(Result.AUTHENTICATED::class.java)
     }
 }

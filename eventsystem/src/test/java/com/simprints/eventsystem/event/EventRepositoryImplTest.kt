@@ -24,6 +24,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -367,10 +368,29 @@ class EventRepositoryImplTest {
     }
 
     @Test
+    fun upload_fails_shouldNotDeleteEventsAfterGenericException() {
+        runBlocking {
+            mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
+
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
+
+            coVerify(exactly = 0) { eventLocalDataSource.delete(any()) }
+        }
+    }
+
+    @Test
     fun upload_fails_shouldNotDeleteEventsAfterNetworkIssues() {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("Network issue")
+            coEvery { eventRemoteDataSource.post(any(), any()) } throws NetworkConnectionException(
+                cause = Exception()
+            )
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,

@@ -2,9 +2,7 @@ package com.simprints.infra.network
 
 import android.content.Context
 import com.simprints.infra.network.coroutines.retryIO
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.network.exceptions.RetryableCloudException
-import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.network.exceptions.*
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -61,29 +59,32 @@ class SimApiClientImpl<T : SimRemoteInterface>(
                             networkBlock(api)
                         }
                     } catch (e: Exception) {
-                        throw handleException(e)
+                        throw transformExceptionIfNeeded(e)
                     }
                 },
                 retryIf = { it is RetryableCloudException })
         } catch (e: Exception) {
-            if (e is RetryableCloudException)
-                throw SyncCloudIntegrationException(cause = e.cause!!)
-            else
-                throw e
+            throw when (e) {
+                is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
+                else -> e
+            }
         }
 
-    private fun handleException(e: Exception): Exception {
-        if (e !is HttpException) {
-            return e
-        }
+    private fun transformExceptionIfNeeded(e: Exception): Exception {
         return when {
-            e.isBackendMaintenanceError() -> BackendMaintenanceException(
-                estimatedOutage = e.parseEstimatedOutage()
-            )
-            HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
-                cause = e
-            )
-            else -> SyncCloudIntegrationException(cause = e)
+            e is HttpException -> {
+                when {
+                    e.isBackendMaintenanceError() -> BackendMaintenanceException(
+                        estimatedOutage = e.parseEstimatedOutage()
+                    )
+                    HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
+                        cause = e
+                    )
+                    else -> SyncCloudIntegrationException(cause = e)
+                }
+            }
+            e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
+            else -> e
         }
     }
 
