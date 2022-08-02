@@ -41,8 +41,4 @@ class FaceSessionEventsManagerImpl(private val eventRepository: EventRepository)
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
             REFUSAL -> (event as RefusalEvent).fromDomainToCore()
         }
-
-    override suspend fun removeLocationDataFromSession() =
-        eventRepository.removeLocationDataFromCurrentSession()
-
 }

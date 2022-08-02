@@ -56,7 +56,4 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
             VERO_2_INFO_SNAPSHOT -> (event as Vero2InfoSnapshotEvent).fromDomainToCore()
             SCANNER_FIRMWARE_UPDATE -> (event as ScannerFirmwareUpdateEvent).fromDomainToCore()
         }
-
-    override suspend fun removeLocationDataFromSession() =
-        eventRepository.removeLocationDataFromCurrentSession()
 }
