@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
@@ -19,10 +18,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.io.IOException
 
-@RunWith(AndroidJUnit4::class)
 class ProjectAuthenticatorImplTest {
 
     @MockK
@@ -33,6 +30,9 @@ class ProjectAuthenticatorImplTest {
 
     @MockK
     private lateinit var secureDataManager: SecureLocalDbKeyProvider
+
+    @MockK
+    private lateinit var projectSecretManager: ProjectSecretManager
 
     @MockK
     private lateinit var signerManager: SignerManager
@@ -143,6 +143,7 @@ class ProjectAuthenticatorImplTest {
     private fun buildProjectAuthenticator(): ProjectAuthenticatorImpl {
         return ProjectAuthenticatorImpl(
             loginManager,
+            projectSecretManager,
             secureDataManager,
             projectRepository,
             signerManager,

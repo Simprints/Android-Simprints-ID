@@ -6,6 +6,7 @@ import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.di.*
+import com.simprints.infra.login.LoginManagerModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -20,7 +21,9 @@ import javax.inject.Singleton
         DataModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
-        ViewModelModule::class]
+        ViewModelModule::class,
+        LoginManagerModule::class,
+    ]
 )
 interface AppComponentForAndroidTests : AppComponent {
 

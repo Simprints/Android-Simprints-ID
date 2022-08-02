@@ -78,6 +78,7 @@ open class SecurityModule {
     @Provides
     open fun provideProjectAuthenticator(
         loginManager: LoginManager,
+        projectSecretManager: ProjectSecretManager,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRepository: ProjectRepository,
         signerManager: SignerManager,
@@ -85,6 +86,7 @@ open class SecurityModule {
         preferencesManager: IdPreferencesManager,
     ): ProjectAuthenticator = ProjectAuthenticatorImpl(
         loginManager,
+        projectSecretManager,
         secureDataManager,
         projectRepository,
         signerManager,
@@ -122,6 +124,10 @@ open class SecurityModule {
     open fun provideSecurityStateLocalDataSource(
         prefs: ImprovedSharedPreferences
     ): SecurityStateLocalDataSource = SecurityStateLocalDataSourceImpl(prefs)
+
+    @Provides
+    open fun provideSecretManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
+        ProjectSecretManager(loginInfoManager)
 
     @Provides
     @Singleton

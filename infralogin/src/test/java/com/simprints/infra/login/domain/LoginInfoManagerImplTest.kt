@@ -3,7 +3,6 @@ package com.simprints.infra.login.domain
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
-import com.simprints.testtools.android.log
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -38,6 +37,21 @@ class LoginInfoManagerImplTest {
         loginInfoManagerImpl.signedInProjectId = "projectId"
 
         verify(exactly = 1) { editor.putString("PROJECT_ID", "projectId") }
+        verify(exactly = 1) { editor.apply() }
+    }
+
+    @Test
+    fun `getting the encrypted project secret should returns it`() {
+        every { sharedPreferences.getString(any(), any()) } returns "secret"
+
+        assertThat(loginInfoManagerImpl.encryptedProjectSecret).isEqualTo("secret")
+    }
+
+    @Test
+    fun `setting the encrypted project secret should set in the shared preferences`() {
+        loginInfoManagerImpl.encryptedProjectSecret = "secret"
+
+        verify(exactly = 1) { editor.putString("ENCRYPTED_PROJECT_SECRET", "secret") }
         verify(exactly = 1) { editor.apply() }
     }
 

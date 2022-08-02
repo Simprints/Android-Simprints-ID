@@ -195,11 +195,4 @@ class TestAppModule(
     ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
         super.provideQrCodeDetector()
     }
-
-    override fun provideBaseUrlProvider(
-        ctx: Context
-    ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
-        super.provideBaseUrlProvider(ctx)
-    }
-
 }

@@ -6,6 +6,7 @@ interface LoginInfoManager {
     var projectIdTokenClaim: String?
     var userIdTokenClaim: String?
 
+    var encryptedProjectSecret: String
     var signedInProjectId: String
     var signedInUserId: String
 
@@ -14,6 +15,7 @@ interface LoginInfoManager {
     var coreFirebaseApplicationId: String
     var coreFirebaseApiKey: String
 
+    fun getEncryptedProjectSecretOrEmpty(): String
     fun getSignedInProjectIdOrEmpty(): String
 
     fun getSignedInUserIdOrEmpty(): String
