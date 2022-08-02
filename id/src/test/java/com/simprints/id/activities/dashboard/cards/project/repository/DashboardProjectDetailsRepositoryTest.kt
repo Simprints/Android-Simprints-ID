@@ -3,7 +3,7 @@ package com.simprints.id.activities.dashboard.cards.project.repository
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -17,7 +17,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class DashboardProjectDetailsRepositoryTest {
 
-    private val mockLoginInfoManager = mockk<LoginInfoManager>()
+    private val mockLoginManager = mockk<LoginManager>()
     private val mockPreferencesManager = mockk<PreferencesManager>()
     private val mockProject = mockk<Project>()
 
@@ -25,7 +25,7 @@ class DashboardProjectDetailsRepositoryTest {
 
     @Before
     fun setUp() {
-        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { mockLoginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
         every { mockPreferencesManager.lastUserUsed } returns "Some User"
         every { mockPreferencesManager.lastScannerUsed } returns "SP1234"
         every { mockProject.name } returns "Mock Project"
@@ -39,7 +39,7 @@ class DashboardProjectDetailsRepositoryTest {
 
         repository = DashboardProjectDetailsRepository(
             mockProjectRepository,
-            mockLoginInfoManager,
+            mockLoginManager,
             mockPreferencesManager
         )
 
@@ -60,7 +60,7 @@ class DashboardProjectDetailsRepositoryTest {
 
         repository = DashboardProjectDetailsRepository(
             mockProjectRepository,
-            mockLoginInfoManager,
+            mockLoginManager,
             mockPreferencesManager
         )
 

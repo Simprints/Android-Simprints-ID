@@ -29,9 +29,6 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.LoginInfoManager
-import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
@@ -46,8 +43,7 @@ open class SecurityModule {
     @Singleton
     open fun provideSignerManager(
         projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
         syncManager: SyncManager,
@@ -58,8 +54,7 @@ open class SecurityModule {
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
-        remoteDbManager,
-        loginInfoManager,
+        loginManager,
         preferencesManager,
         eventSyncManager,
         syncManager,
@@ -96,13 +91,13 @@ open class SecurityModule {
 
     @Provides
     open fun provideAuthenticationHelper(
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
         eventRepository: EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
-            loginInfoManager,
+            loginManager,
             timeHelper,
             projectAuthenticator,
             eventRepository
@@ -111,12 +106,10 @@ open class SecurityModule {
 
     @Provides
     open fun provideSecurityStateRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         context: Context
     ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
-        simApiClientFactory,
-        loginInfoManager,
+        loginManager,
         context.deviceId
     )
 
@@ -126,12 +119,11 @@ open class SecurityModule {
     ): SecurityStateLocalDataSource = SecurityStateLocalDataSourceImpl(prefs)
 
     @Provides
-    open fun provideSecretManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
-        ProjectSecretManager(loginInfoManager)
+    open fun provideSecretManager(loginManager: LoginManager): ProjectSecretManager =
+        ProjectSecretManager(loginManager)
 
     @Provides
     @Singleton
-    @ExperimentalCoroutinesApi
     open fun provideSecurityStateRepository(
         remoteDataSource: SecurityStateRemoteDataSource,
         localDataSource: SecurityStateLocalDataSource

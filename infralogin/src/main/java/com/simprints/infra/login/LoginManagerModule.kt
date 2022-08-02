@@ -3,6 +3,7 @@ package com.simprints.infra.login
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.AttestationManagerImpl
@@ -18,17 +19,26 @@ import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.network.url.BaseUrlProviderImpl
 import dagger.Module
 import dagger.Provides
+import dagger.Subcomponent
 
 @Module
-class LoginManagerModule {
+internal class LoginManagerModule {
 
     @Provides
     fun provideLoginManager(
         authenticationRemoteDataSource: AuthenticationRemoteDataSource,
         attestationManager: AttestationManager,
         loginInfoManager: LoginInfoManager,
+        remoteDbManager: RemoteDbManager,
+        simApiClientFactory: SimApiClientFactory,
     ): LoginManager =
-        LoginManagerImpl(authenticationRemoteDataSource, attestationManager, loginInfoManager)
+        LoginManagerImpl(
+            authenticationRemoteDataSource,
+            attestationManager,
+            loginInfoManager,
+            remoteDbManager,
+            simApiClientFactory
+        )
 
     @Provides
     fun provideAuthenticationRemoteDataSource(simApiClientFactory: SimApiClientFactory): AuthenticationRemoteDataSource =
@@ -61,4 +71,23 @@ class LoginManagerModule {
     @Provides
     fun provideLoginInfoManager(context: Context): LoginInfoManager =
         LoginInfoManagerImpl(context)
+
+    @Provides
+    fun provideRemoteDbManager(ctx: Context, loginInfoManager: LoginInfoManager): RemoteDbManager =
+        FirebaseManagerImpl(loginInfoManager, ctx)
 }
+
+@Subcomponent(modules = [LoginManagerModule::class])
+interface LoginComponent {
+
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): LoginComponent
+    }
+
+    fun getLoginManager(): LoginManager
+
+}
+
+@Module(subcomponents = [LoginComponent::class])
+class LoginProvider

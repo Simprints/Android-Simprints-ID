@@ -12,6 +12,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.SecurityModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.ProjectSecretManager
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
@@ -20,8 +21,6 @@ import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.di.DependencyRule
@@ -38,8 +37,7 @@ class TestSecurityModule(
 
     override fun provideSignerManager(
         projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
         syncManager: SyncManager,
@@ -51,8 +49,7 @@ class TestSecurityModule(
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
-            remoteDbManager,
-            loginInfoManager,
+            loginManager,
             preferencesManager,
             eventSyncManager,
             syncManager,
@@ -75,6 +72,7 @@ class TestSecurityModule(
 
     override fun provideProjectAuthenticator(
         loginManager: LoginManager,
+        projectSecretManager: ProjectSecretManager,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRepository: ProjectRepository,
         signerManager: SignerManager,
@@ -84,6 +82,7 @@ class TestSecurityModule(
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
                 loginManager,
+                projectSecretManager,
                 secureDataManager,
                 projectRepository,
                 signerManager,
@@ -94,14 +93,14 @@ class TestSecurityModule(
     }
 
     override fun provideAuthenticationHelper(
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
         eventRepository: EventRepository
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(
-                loginInfoManager,
+                loginManager,
                 timeHelper,
                 projectAuthenticator,
                 eventRepository

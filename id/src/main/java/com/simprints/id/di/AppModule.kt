@@ -54,10 +54,7 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
-import com.simprints.infra.login.db.FirebaseManagerImpl
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.LoginInfoManager
-import com.simprints.infra.login.domain.LoginInfoManagerImpl
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
@@ -78,18 +75,6 @@ open class AppModule {
     @Provides
     @Singleton
     fun provideContext(app: Application): Context = app
-
-    @Provides
-    @Singleton
-    open fun provideRemoteDbManager(
-        loginInfoManager: LoginInfoManager,
-        context: Context,
-        dispatcher: DispatcherProvider
-    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context)
-
-    @Provides
-    @Singleton
-    open fun provideLoginInfoManager(ctx: Context): LoginInfoManager = LoginInfoManagerImpl(ctx)
 
     @Provides
     @Singleton
@@ -125,10 +110,10 @@ open class AppModule {
     @Provides
     open fun provideImageUrlProvider(
         projectLocalDataSource: ProjectLocalDataSource,
-        loginInfoManager: LoginInfoManager
+        loginManager: LoginManager
     ): ImageUrlProvider = ImageUrlProviderImpl(
         projectLocalDataSource,
-        loginInfoManager
+        loginManager
     )
 
     @Provides
@@ -169,7 +154,7 @@ open class AppModule {
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         idPreferencesManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
@@ -177,7 +162,7 @@ open class AppModule {
         EventRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
-            loginInfoManager,
+            loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
@@ -200,13 +185,13 @@ open class AppModule {
     @Provides
     open fun provideGuidSelectionManager(
         context: Context,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         eventRepository: EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
-            loginInfoManager,
+            loginManager,
             timeHelper,
             eventRepository
         )

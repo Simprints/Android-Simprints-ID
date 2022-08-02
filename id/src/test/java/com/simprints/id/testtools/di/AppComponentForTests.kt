@@ -15,7 +15,8 @@ import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorkerTest
 import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
-import com.simprints.infra.login.LoginManagerModule
+import com.simprints.infra.login.LoginComponent
+import com.simprints.infra.login.LoginProvider
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -31,7 +32,7 @@ import javax.inject.Singleton
         DashboardActivityModule::class,
         SecurityModule::class,
         ViewModelModule::class,
-        LoginManagerModule::class,
+        LoginProvider::class,
     ]
 )
 interface AppComponentForTests : AppComponent {

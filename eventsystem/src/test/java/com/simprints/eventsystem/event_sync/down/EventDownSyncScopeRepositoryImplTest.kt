@@ -3,7 +3,6 @@ package com.simprints.eventsystem.event_sync.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
@@ -23,7 +22,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
 import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -32,7 +31,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -40,7 +38,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class EventDownSyncScopeRepositoryImplTest {
 
     companion object {
@@ -50,7 +47,7 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @MockK
-    lateinit var loginInfoManager: LoginInfoManager
+    lateinit var loginManager: LoginManager
 
     @MockK
     lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
@@ -76,13 +73,13 @@ class EventDownSyncScopeRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
         eventDownSyncScopeRepository =
             EventDownSyncScopeRepositoryImpl(
-                loginInfoManager,
+                loginManager,
                 downSyncOperationOperationDao,
                 testDispatcherProvider
             )
 
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { loginInfoManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 
@@ -130,7 +127,7 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun throwWhenProjectIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
+            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(
@@ -145,7 +142,7 @@ class EventDownSyncScopeRepositoryImplTest {
     @Test
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { loginInfoManager.getSignedInUserIdOrEmpty() } returns ""
+            every { loginManager.getSignedInUserIdOrEmpty() } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(

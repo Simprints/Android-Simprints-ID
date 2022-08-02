@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
@@ -25,8 +24,7 @@ import com.simprints.id.network.ImageUrlProvider
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.security.random.RandomGenerator
@@ -65,30 +63,11 @@ class TestAppModule(
     private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
-    override fun provideLoginInfoManager(
-        ctx: Context
-    ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
-        super.provideLoginInfoManager(ctx)
-    }
-
     override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
         SessionDataCacheImpl(app)
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
-
-    override fun provideRemoteDbManager(
-        loginInfoManager: LoginInfoManager,
-        context: Context,
-        dispatcher: DispatcherProvider
-    ): RemoteDbManager =
-        remoteDbManagerRule.resolveDependency {
-            super.provideRemoteDbManager(
-                loginInfoManager,
-                context,
-                dispatcher
-            )
-        }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
@@ -106,7 +85,7 @@ class TestAppModule(
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         idPreferencesManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
@@ -117,7 +96,7 @@ class TestAppModule(
                 eventLocalDataSource,
                 eventRemoteDataSource,
                 idPreferencesManager,
-                loginInfoManager,
+                loginManager,
                 timeHelper,
                 validatorFactory,
                 sessionDataCache
@@ -201,11 +180,11 @@ class TestAppModule(
 
     override fun provideImageUrlProvider(
         projectLocalDataSource: ProjectLocalDataSource,
-        loginInfoManager: LoginInfoManager
+        loginManager: LoginManager
     ): ImageUrlProvider = baseUrlProviderRule.resolveDependency {
         super.provideImageUrlProvider(
             projectLocalDataSource,
-            loginInfoManager
+            loginManager
         )
     }
 

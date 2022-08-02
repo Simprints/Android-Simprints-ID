@@ -54,9 +54,6 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
-import com.simprints.infra.login.LoginManagerModule
-import com.simprints.infra.login.domain.LoginInfoManager
-import com.simprints.infra.login.network.SimApiClientFactory
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -71,7 +68,6 @@ import javax.inject.Singleton
         SyncModule::class,
         DashboardActivityModule::class,
         ViewModelModule::class,
-        LoginManagerModule::class,
     ]
 )
 @Singleton
@@ -91,7 +87,6 @@ interface AppComponent {
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
         fun viewModelModule(viewModelModule: ViewModelModule): Builder
-        fun loginManagerModule(loginManagerModule: LoginManagerModule): Builder
 
         fun build(): AppComponent
     }
@@ -153,7 +148,5 @@ interface AppComponent {
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getImageRepository(): ImageRepository
-    fun getSimClientFactory(): SimApiClientFactory
     fun getLicenseRepository(): LicenseRepository
-    fun getLoginInfoManager(): LoginInfoManager
 }

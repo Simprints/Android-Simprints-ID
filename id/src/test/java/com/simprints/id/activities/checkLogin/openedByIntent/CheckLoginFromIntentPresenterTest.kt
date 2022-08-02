@@ -35,7 +35,7 @@ import com.simprints.id.secure.models.SecurityState.Status
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -75,7 +75,7 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var securityStateRepositoryMock: SecurityStateRepository
 
     @MockK
-    lateinit var loginInfoManagerMock: LoginInfoManager
+    lateinit var loginManagerMock: LoginManager
 
     @MockK
     lateinit var timeHelperMock: TimeHelper
@@ -100,7 +100,7 @@ class CheckLoginFromIntentPresenterTest {
             simNetworkUtils = simNetworkUtilsMock
             every { simNetworkUtils.connectionsStates } returns emptyList()
 
-            loginInfoManager = loginInfoManagerMock.apply {
+            loginManager = loginManagerMock.apply {
                 every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
             }
             LanguageHelper.prefs = mockk(relaxed = true)
@@ -293,7 +293,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.handleSignedInUser()
 
-            coVerify { loginInfoManagerMock setProperty "signedInUserId" value DEFAULT_USER_ID }
+            coVerify { loginManagerMock setProperty "signedInUserId" value DEFAULT_USER_ID }
         }
     }
 
@@ -307,7 +307,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
             coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
-            coEvery { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
+            coEvery { loginManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
             every { preferencesManagerMock.modalities } returns listOf(
                 Modality.FINGER,
                 Modality.FACE

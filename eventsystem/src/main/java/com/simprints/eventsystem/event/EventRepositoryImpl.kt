@@ -6,20 +6,14 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.domain.modality.Modes
-import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
+import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.isNotASubjectEvent
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
@@ -32,6 +26,7 @@ import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -40,12 +35,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
-import java.util.UUID
+import java.util.*
 
 open class EventRepositoryImpl(
     private val deviceId: String,
     private val appVersionName: String,
-    private val loginInfoManager: LoginInfoManager,
+    private val loginManager: LoginManager,
     private val eventLocalDataSource: EventLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
@@ -64,7 +59,7 @@ open class EventRepositoryImpl(
     private val validators = validatorsFactory.build()
 
     private val currentProject: String
-        get() = loginInfoManager.getSignedInProjectIdOrEmpty().ifEmpty {
+        get() = loginManager.getSignedInProjectIdOrEmpty().ifEmpty {
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 
@@ -163,7 +158,7 @@ open class EventRepositoryImpl(
     ): Flow<Int> = flow {
         Simber.tag("SYNC").d("[EVENT_REPO] Uploading")
 
-        if (projectId != loginInfoManager.getSignedInProjectIdOrEmpty()) {
+        if (projectId != loginManager.getSignedInProjectIdOrEmpty()) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
                 Simber.e(it)
             }
@@ -255,7 +250,7 @@ open class EventRepositoryImpl(
         eventRemoteDataSource.post(projectId, events)
     }
 
-    private suspend fun attemptInvalidEventUpload(projectId: String,sessionId: String): Int? =
+    private suspend fun attemptInvalidEventUpload(projectId: String, sessionId: String): Int? =
         try {
             Simber.tag("SYNC").i("Uploading invalid events for session $sessionId")
             eventLocalDataSource.loadAllEventJsonFromSession(sessionId).let {

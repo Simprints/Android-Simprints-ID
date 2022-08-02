@@ -3,7 +3,7 @@ package com.simprints.id.network
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -18,7 +18,7 @@ class ImageUrlProviderImplTest {
     lateinit var mockProjectLocalDataSource: ProjectLocalDataSource
 
     @MockK
-    lateinit var mockLoginInfoManager: LoginInfoManager
+    lateinit var mockLoginManager: LoginManager
 
     private lateinit var baseUrlProvider: ImageUrlProviderImpl
 
@@ -28,14 +28,14 @@ class ImageUrlProviderImplTest {
 
         baseUrlProvider = ImageUrlProviderImpl(
             mockProjectLocalDataSource,
-            mockLoginInfoManager
+            mockLoginManager
         )
     }
 
     @Test
     fun shouldReturnImageStorageBucketUrlFromProjectLocalDataSource() = runTest {
         val expected = "mock-bucket-url"
-        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns "mock-project-id"
+        every { mockLoginManager.getSignedInProjectIdOrEmpty() } returns "mock-project-id"
         coEvery {
             mockProjectLocalDataSource.load(any())
         } returns Project(
@@ -50,15 +50,15 @@ class ImageUrlProviderImplTest {
     }
 
     @Test
-    fun whenNoValueIsFoundInLoginInfoManager_shouldReturnNull() = runTest {
-        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
+    fun whenNoValueIsFoundInLoginManager_shouldReturnNull() = runTest {
+        every { mockLoginManager.getSignedInProjectIdOrEmpty() } returns ""
 
         assertThat(baseUrlProvider.getImageStorageBucketUrl()).isNull()
     }
 
     @Test
     fun whenNoValueIsFoundInProjectLocalDataSource_shouldReturnDefaultImageStorageBucketUrl() {
-        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns "mock-project-id"
+        every { mockLoginManager.getSignedInProjectIdOrEmpty() } returns "mock-project-id"
         coEvery { mockProjectLocalDataSource.load(any()) } returns null
 
         val expected = "gs://mock-project-id-images-eu"

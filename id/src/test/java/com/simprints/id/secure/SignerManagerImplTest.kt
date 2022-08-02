@@ -10,8 +10,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.testtools.common.syntax.assertThrows
@@ -28,10 +27,7 @@ class SignerManagerImplTest {
     lateinit var mockProjectRepository: ProjectRepository
 
     @MockK
-    lateinit var mockRemoteDbManager: RemoteDbManager
-
-    @MockK
-    lateinit var mockLoginInfoManager: LoginInfoManager
+    lateinit var mockLoginManager: LoginManager
 
     @MockK
     lateinit var mockPreferencesManager: PreferencesManager
@@ -69,8 +65,7 @@ class SignerManagerImplTest {
 
         signerManager = SignerManagerImpl(
             mockProjectRepository,
-            mockRemoteDbManager,
-            mockLoginInfoManager,
+            mockLoginManager,
             mockPreferencesManager,
             mockEventSyncManager,
             mockSyncManager,
@@ -88,7 +83,7 @@ class SignerManagerImplTest {
 
         signIn()
 
-        coVerify { mockRemoteDbManager.signIn(token) }
+        coVerify { mockLoginManager.signIn(token) }
     }
 
     @Test
@@ -106,7 +101,7 @@ class SignerManagerImplTest {
 
         signIn()
 
-        verify { mockLoginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }
+        verify { mockLoginManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }
     }
 
     @Test
@@ -208,7 +203,7 @@ class SignerManagerImplTest {
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
-        every { mockLoginInfoManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }.apply {
+        every { mockLoginManager.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }.apply {
             if (!error) {
                 this.returns(Unit)
             } else {
@@ -217,7 +212,7 @@ class SignerManagerImplTest {
         }
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
-        coEvery { mockRemoteDbManager.signIn(token) }.apply {
+        coEvery { mockLoginManager.signIn(token) }.apply {
             if (error) {
                 this.throws(Throwable("Failed to store credentials"))
             } else {
@@ -253,9 +248,9 @@ class SignerManagerImplTest {
 
     private fun verifyUpSyncGotPaused() = verify { mockSyncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() =
-        verify { mockLoginInfoManager.cleanCredentials() }
+        verify { mockLoginManager.cleanCredentials() }
 
-    private fun verifyRemoteManagerGotSignedOut() = verify { mockRemoteDbManager.signOut() }
+    private fun verifyRemoteManagerGotSignedOut() = verify { mockLoginManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() =
         verify { mockPreferencesManager.clearAllSharedPreferences() }

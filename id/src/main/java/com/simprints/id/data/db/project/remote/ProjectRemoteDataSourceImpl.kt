@@ -1,12 +1,12 @@
 package com.simprints.id.data.db.project.remote
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.simprints.infra.network.SimApiClient
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.infra.login.network.SimApiClientFactory
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.SimApiClient
 
 open class ProjectRemoteDataSourceImpl(
-    private val simApiClientFactory: SimApiClientFactory
+    private val loginManager: LoginManager
 ) : ProjectRemoteDataSource {
 
     override suspend fun loadProjectFromRemote(projectId: String): Project =
@@ -27,5 +27,5 @@ open class ProjectRemoteDataSourceImpl(
         }
 
     override suspend fun getProjectApiClient(): SimApiClient<ProjectRemoteInterface> =
-        simApiClientFactory.buildClient(ProjectRemoteInterface::class)
+        loginManager.buildClient(ProjectRemoteInterface::class)
 }

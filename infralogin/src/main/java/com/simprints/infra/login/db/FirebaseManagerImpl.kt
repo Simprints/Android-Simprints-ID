@@ -11,16 +11,16 @@ import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.login.domain.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FirebaseManagerImpl(
+internal class FirebaseManagerImpl(
     val loginInfoManager: LoginInfoManager,
     val context: Context,
 ) : RemoteDbManager {
