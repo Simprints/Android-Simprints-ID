@@ -67,11 +67,13 @@ class FirebaseManagerImpl(
             val result = try {
                 FirebaseAuth.getInstance(getLegacyAppFallback())
                     .getAccessToken(false).await() as GetTokenResult
-            } catch (ex: FirebaseNoSignedInUserException) {
-                Simber.d(ex)
-                null
             } catch (ex: Exception) {
-                throw transformFirebaseExceptionIfNeeded(ex)
+                if (ex is FirebaseNoSignedInUserException) {
+                    Simber.d(ex)
+                    null
+                } else {
+                    throw transformFirebaseExceptionIfNeeded(ex)
+                }
             }
 
             result?.token?.let {

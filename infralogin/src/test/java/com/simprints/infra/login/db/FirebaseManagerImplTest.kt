@@ -1,9 +1,12 @@
 package com.simprints.infra.login.db
 
 import android.content.Context
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.tasks.Tasks
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -12,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
@@ -44,12 +48,31 @@ class FirebaseManagerImplTest {
         mockkStatic(FirebaseOptions.Builder::class)
         every { FirebaseApp.getInstance(any()) } returns firebaseApp
         every { FirebaseAuth.getInstance(any()) } returns firebaseAuth
-        // every { FirebaseOptions.Builder() } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setApiKey(any()) } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setProjectId(any()) } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setApplicationId(any()) } returns firebaseOptionsBuilder
 
     }
+
+    @Test
+    fun `signIn should throw a NetworkConnectionException if Firebase throws FirebaseNetworkException`() =
+        runTest(UnconfinedTestDispatcher()) {
+            every { firebaseAuth.signInWithCustomToken(any()) } throws FirebaseNetworkException("")
+
+            assertThrows<NetworkConnectionException> {
+                firebaseManagerImpl.signIn(mockk(relaxed = true))
+            }
+        }
+
+    @Test
+    fun `signIn should throw a NetworkConnectionException if Firebase throws ApiException`() =
+        runTest(UnconfinedTestDispatcher()) {
+            every { firebaseAuth.signInWithCustomToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
+
+            assertThrows<NetworkConnectionException> {
+                firebaseManagerImpl.signIn(mockk(relaxed = true))
+            }
+        }
 
     @Test
     fun `signOut should succeed`() = runTest(UnconfinedTestDispatcher()) {
@@ -59,6 +82,26 @@ class FirebaseManagerImplTest {
         verify(exactly = 1) { firebaseApp.delete() }
         verify(exactly = 1) { loginInfoManager.clearCachedTokenClaims() }
     }
+
+    @Test
+    fun `signOut should throw a NetworkConnectionException if Firebase throws FirebaseNetworkException`() =
+        runTest(UnconfinedTestDispatcher()) {
+            every { firebaseAuth.signOut() } throws FirebaseNetworkException("")
+
+            assertThrows<NetworkConnectionException> {
+                firebaseManagerImpl.signOut()
+            }
+        }
+
+    @Test
+    fun `signOut should throw a NetworkConnectionException if Firebase throws ApiException`() =
+        runTest(UnconfinedTestDispatcher()) {
+            every { firebaseAuth.signOut() } throws ApiException(Status.RESULT_TIMEOUT)
+
+            assertThrows<NetworkConnectionException> {
+                firebaseManagerImpl.signOut()
+            }
+        }
 
     @Test
     fun `isSignedIn should return true if the project id claim is null`() {
@@ -79,7 +122,23 @@ class FirebaseManagerImplTest {
     }
 
     @Test
-    fun `getCurrentToken throw RemoteDbNotSignedInException if FirebaseNoSignedInUserException`() {
+    fun `getCurrentToken throws NetworkConnectionException if Firebase throws FirebaseNetworkException`() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNetworkException("")
+            assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
+        }
+    }
+
+    @Test
+    fun `getCurrentToken throws NetworkConnectionException if Firebase throws ApiException`() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { firebaseAuth.getAccessToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
+            assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
+        }
+    }
+
+    @Test
+    fun `getCurrentToken throws RemoteDbNotSignedInException if FirebaseNoSignedInUserException`() {
         runTest(UnconfinedTestDispatcher()) {
             every { firebaseAuth.getAccessToken(any()) } throws FirebaseNoSignedInUserException("")
             assertThrows<RemoteDbNotSignedInException> { firebaseManagerImpl.getCurrentToken() }
@@ -130,7 +189,13 @@ class FirebaseManagerImplTest {
         every { loginInfoManager.coreFirebaseProjectId } returns GCP_PROJECT_ID
         every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
         every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
-        every { Firebase.initialize(any(), any(), any()) } throws IllegalStateException() andThen mockk<FirebaseApp>()
+        every {
+            Firebase.initialize(
+                any(),
+                any(),
+                any()
+            )
+        } throws IllegalStateException() andThen mockk<FirebaseApp>()
 
         firebaseManagerImpl.getCoreApp()
 
