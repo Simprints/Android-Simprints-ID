@@ -5,7 +5,6 @@ import android.content.Intent
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.ErrorActivity
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
-import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.id.tools.InternalConstants
 
 object ClientRequestErrorRouter {
@@ -15,8 +14,4 @@ object ClientRequestErrorRouter {
         intent.putExtra(AlertActRequest.BUNDLE_KEY, AlertActRequest(clientApiAlert))
         act.startActivityForResult(intent, InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST)
     }
-
-    fun extractPotentialAlertScreenResponse(data: Intent?): AlertActResponse? =
-        data?.getParcelableExtra(AlertActResponse.BUNDLE_KEY)
-
 }
