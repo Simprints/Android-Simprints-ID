@@ -22,6 +22,8 @@ interface ClientApiSessionEventsManager {
 
     suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean
 
+    suspend fun isSessionHasIdentificationCallback(sessionId: String): Boolean
+
     suspend fun getAllEventsForSession(sessionId: String): Flow<Event>
 
     suspend fun deleteSessionEvents(sessionId: String)
