@@ -8,6 +8,4 @@ interface FingerprintSessionEventsManager {
     suspend fun addEvent(event: Event)
 
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
-
-    suspend fun removeLocationDataFromSession()
 }
