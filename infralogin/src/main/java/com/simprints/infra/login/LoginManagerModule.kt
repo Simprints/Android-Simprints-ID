@@ -6,6 +6,8 @@ import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.AttestationManagerImpl
+import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoManagerImpl
 import com.simprints.infra.login.extensions.deviceId
 import com.simprints.infra.login.extensions.packageVersionName
 import com.simprints.infra.login.network.SimApiClientFactory
@@ -23,9 +25,10 @@ class LoginManagerModule {
     @Provides
     fun provideLoginManager(
         authenticationRemoteDataSource: AuthenticationRemoteDataSource,
-        attestationManager: AttestationManager
+        attestationManager: AttestationManager,
+        loginInfoManager: LoginInfoManager,
     ): LoginManager =
-        LoginManagerImpl(authenticationRemoteDataSource, attestationManager)
+        LoginManagerImpl(authenticationRemoteDataSource, attestationManager, loginInfoManager)
 
     @Provides
     fun provideAuthenticationRemoteDataSource(simApiClientFactory: SimApiClientFactory): AuthenticationRemoteDataSource =
@@ -55,4 +58,7 @@ class LoginManagerModule {
     @Provides
     fun provideSafetyNetClient(context: Context): SafetyNetClient = SafetyNet.getClient(context)
 
+    @Provides
+    fun provideLoginInfoManager(context: Context): LoginInfoManager =
+        LoginInfoManagerImpl(context)
 }

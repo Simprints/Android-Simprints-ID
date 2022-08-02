@@ -3,11 +3,12 @@ package com.simprints.infra.login.domain
 import android.content.Context
 import android.content.SharedPreferences
 
-class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
+internal class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
 
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
         private const val PREF_MODE = Context.MODE_PRIVATE
+        private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
         private const val PROJECT_ID: String = "PROJECT_ID"
         private const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"
         private const val USER_ID_CLAIM: String = "USER_ID_CLAIM"
@@ -18,6 +19,13 @@ class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
     }
 
     private val prefs: SharedPreferences = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
+
+    override var encryptedProjectSecret: String = ""
+        get() = prefs.getString(ENCRYPTED_PROJECT_SECRET, "").orEmpty()
+        set(value) {
+            field = value
+            prefs.edit().putString(ENCRYPTED_PROJECT_SECRET, field).apply()
+        }
 
     override var signedInProjectId: String = ""
         get() = prefs.getString(PROJECT_ID, "").orEmpty()
@@ -67,6 +75,9 @@ class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
             field = value
             prefs.edit().putString(USER_ID_CLAIM, field ?: "").apply()
         }
+
+    override fun getEncryptedProjectSecretOrEmpty(): String =
+        encryptedProjectSecret
 
     override fun getSignedInProjectIdOrEmpty(): String =
         signedInProjectId
