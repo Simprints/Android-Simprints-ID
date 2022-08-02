@@ -35,7 +35,6 @@ import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -114,7 +113,7 @@ class OrchestratorManagerImplTest {
 
     @Test
     fun modalityFlowReceivesAWrongResult_orchestratorShouldNotGoAhead() {
-        runBlocking {
+        runTest {
             with(orchestrator) {
                 startFlowForEnrol(modalities)
                 progressWitFaceCapture(WRONG_REQUEST_CODE, null)
@@ -158,7 +157,18 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Face only - Person Creation Event should be added after face capture`() = runTest {
+    fun `test person creation event should not be added for followup requests`() = runTest {
+        with(orchestrator) {
+            mockFingerprintWithCaptureCompleted(null)
+
+            handleIntentResult(followUpRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+
+            coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+        }
+    }
+
+    @Test
+    fun faceCapture_orchestratorShouldAddPersonCreation() = runTest {
         with(orchestrator) {
             mockFaceWithCaptureCompleted()
 

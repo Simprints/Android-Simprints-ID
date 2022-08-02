@@ -54,13 +54,13 @@ fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
     EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload(
         startTime,
         version,
-        enrolmentRecordCreation?.let {
+        with(enrolmentRecordCreation) {
             EnrolmentRecordCreationInMove(
-                it.subjectId,
-                it.projectId,
-                it.moduleId,
-                it.attendantId,
-                it.biometricReferences?.map { it.fromApiToDomain() })
+                subjectId,
+                projectId,
+                moduleId,
+                attendantId,
+                biometricReferences?.map { it.fromApiToDomain() })
         },
         enrolmentRecordDeletion.let {
             EnrolmentRecordDeletionInMove(

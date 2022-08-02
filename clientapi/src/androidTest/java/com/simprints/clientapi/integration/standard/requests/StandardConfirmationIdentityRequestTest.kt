@@ -8,21 +8,32 @@ import androidx.test.espresso.intent.matcher.BundleMatchers
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.requests.IAppRequest
+import io.mockk.coEvery
+import io.mockk.mockk
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class StandardConfirmationIdentityRequestTest : BaseStandardClientApiTest() {
-
+    private  val clientApiSessionEventsManager: ClientApiSessionEventsManager = mockk(relaxed = true){
+        coEvery { isSessionHasIdentificationCallback(sessionIdField.value()) } returns true
+        coEvery { getCurrentSessionId() } returns sessionIdField.value()
+    }
     @Before
     override fun setUp() {
         super.setUp()
+        loadKoinModules(module {
+            factory { clientApiSessionEventsManager }
+        })
         val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
         Intents.intending(IntentMatchers.hasAction(APP_CONFIRM_ACTION)).respondWith(intentResultOk)
     }

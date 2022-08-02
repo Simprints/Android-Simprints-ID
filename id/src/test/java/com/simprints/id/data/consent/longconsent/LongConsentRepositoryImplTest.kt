@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.File
 import java.io.IOException
+import java.net.SocketTimeoutException
 import java.nio.charset.Charset
 import kotlin.random.Random
 
@@ -59,6 +60,19 @@ class LongConsentRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `return error on local consent reading exception`() = runTest(StandardTestDispatcher()) {
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } throws IOException()
+
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+
+        with(states) {
+            assertThat(size).isEqualTo(1)
+            assertThat(get(0)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+        }
+    }
+
     @Suppress("BlockingMethodInNonBlockingContext")
     @Test
     fun `download the consent in multiple parts`() = runTest(StandardTestDispatcher()) {
@@ -94,6 +108,36 @@ class LongConsentRepositoryImplTest {
     fun `return error on something wrong`() = runTest(StandardTestDispatcher()) {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
         coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws IOException()
+
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+
+        with(states) {
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
+            assertThat(get(1)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+        }
+    }
+
+    @Test
+    fun `return error on failed network connection`() = runTest(StandardTestDispatcher()) {
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws Exception(SocketTimeoutException())
+
+        val states = mutableListOf<LongConsentFetchResult>()
+        longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)
+
+        with(states) {
+            assertThat(size).isEqualTo(2)
+            assertThat(get(0)).isEqualTo(LongConsentFetchResult.InProgress(DEFAULT_LANGUAGE))
+            assertThat(get(1)).isInstanceOf(LongConsentFetchResult.Failed::class.java)
+        }
+    }
+
+    @Test
+    fun `return error on generic exception`() = runTest(StandardTestDispatcher()) {
+        every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws Exception()
 
         val states = mutableListOf<LongConsentFetchResult>()
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)

@@ -73,15 +73,16 @@ class PersonCreationEventHelperImpl(
             eventRepository.getEventsFromSession(currentCaptureSessionEvent.id)
                 .filterIsInstance<FaceCaptureBiometricsEvent>().toList()
 
-        eventRepository.addOrUpdateEvent(
-            build(
-                timeHelper,
-                faceCaptureBiometricsEvents,
-                fingerprintCaptureBiometricsEvents,
-                faceSamples,
-                fingerprintSamples
-            )
+        val personCreationEvent = build(
+            timeHelper,
+            faceCaptureBiometricsEvents,
+            fingerprintCaptureBiometricsEvents,
+            faceSamples,
+            fingerprintSamples
         )
+        if (personCreationEvent.hasBiometricData()) {
+            eventRepository.addOrUpdateEvent(personCreationEvent)
+        }
     }
 
     fun build(
@@ -125,3 +126,7 @@ class PersonCreationEventHelperImpl(
             .ifEmpty { null }
 
 }
+
+private fun PersonCreationEvent.hasBiometricData() =
+    payload.fingerprintCaptureIds?.isNotEmpty()==true || payload.faceCaptureIds?.isNotEmpty() ==true
+
