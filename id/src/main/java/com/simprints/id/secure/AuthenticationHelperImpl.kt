@@ -9,6 +9,7 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
@@ -22,7 +23,8 @@ class AuthenticationHelperImpl(
     private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val idPreferencesManager: IdPreferencesManager
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L
@@ -61,7 +63,12 @@ class AuthenticationHelperImpl(
             is IOException -> OFFLINE
             is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
             is SyncCloudIntegrationException -> TECHNICAL_FAILURE
-            is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR
+            is BackendMaintenanceException -> {
+                t.estimatedOutage?.let { outage ->
+                    idPreferencesManager.setSharedPreference(PREFS_ESTIMATED_OUTAGE, outage)
+                }
+                BACKEND_MAINTENANCE_ERROR
+            }
             is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
             else -> UNKNOWN
         }
@@ -92,5 +99,8 @@ class AuthenticationHelperImpl(
             result
         )
         inBackground { eventRepository.addOrUpdateEvent(event) }
+    }
+    companion object {
+        const val PREFS_ESTIMATED_OUTAGE = "PREFS_ESTIMATED_OUTAGE"
     }
 }

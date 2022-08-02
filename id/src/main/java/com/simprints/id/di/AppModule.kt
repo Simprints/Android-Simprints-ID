@@ -35,7 +35,6 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
