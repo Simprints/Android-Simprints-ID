@@ -128,7 +128,7 @@ object KoinInjector {
                 get()
             )
         }
-        viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM) }
+        viewModel { (mainVM: FaceCaptureViewModel) -> ExitFormViewModel(mainVM, get(), get()) }
 
         viewModel { ConfigurationViewModel(get(), get()) }
     }

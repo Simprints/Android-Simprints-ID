@@ -6,18 +6,28 @@ import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
+import com.simprints.face.controllers.core.events.model.RefusalEvent
+import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(
-    private val mainVM: FaceCaptureViewModel
+    private val mainVM: FaceCaptureViewModel,
+    private val faceSessionEventsManager: FaceSessionEventsManager,
+   private val timeHelper: FaceTimeHelper
 ) : ViewModel() {
-    private var reason: RefusalAnswer? = null
+    var reason: RefusalAnswer? = null
+    var exitFormStartTime: Long = 0
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestFormSubmitEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+
+    init {
+        exitFormStartTime = timeHelper.now()
+    }
 
     fun handleReligiousConcernsRadioClick() {
         reason = REFUSED_RELIGION
@@ -58,8 +68,8 @@ class ExitFormViewModel(
 
     fun submitExitForm(exitFormText: String) {
         reason?.let {
-            logExitFormEvent()
             mainVM.submitExitForm(it, exitFormText)
+            logExitFormEvent(reason = it, exitFormText = exitFormText)
         }
     }
 
@@ -71,8 +81,15 @@ class ExitFormViewModel(
         Simber.tag(CrashReportTag.REFUSAL.name).i(message)
     }
 
-    private fun logExitFormEvent() {
-        // TODO: log correct refusal event
+    private fun logExitFormEvent(reason: RefusalAnswer, exitFormText: String) {
+            faceSessionEventsManager.addEventInBackground(
+                RefusalEvent(
+                    startTime = exitFormStartTime,
+                    endTime = timeHelper.now(),
+                    reason = reason,
+                    otherText = exitFormText
+                )
+            )
     }
 
     fun handleBackButton() {

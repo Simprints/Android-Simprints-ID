@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "1.6.21"
+kotlin_version = "1.7.10"
 androidx_navigation_version = "2.4.2"
 kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.4.2"
@@ -8,9 +8,9 @@ androidx_test_orchestrator_version = "1.4.1"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.4.1"
-androidx_room_version = "2.4.2"
-androidx_camerax_version = "1.2.0-alpha03"
-dagger_version = "2.42"
+androidx_room_version = "2.4.3"
+androidx_camerax_version = "1.2.0-alpha04"
+dagger_version = "2.43.1"
 work_version = "2.7.1"
 location_services_version = "20.0.0"
 safetynet_services_version = "18.0.1"
@@ -172,7 +172,7 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 
 #Testing-KoTest
 testing-KoTest-kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
-testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.3.2"
+testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.4.1"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"
@@ -185,8 +185,8 @@ testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 #Testing-Objenesis
 testing-Objenesis-core = { module = "org.objenesis:objenesis", version.ref = "objenesis_version" }
 #Testing-Mockk
-testing-Mockk-core = "io.mockk:mockk:1.12.3"
-testing-Mockk-android = "io.mockk:mockk-android:1.12.3"
+testing-Mockk-core = "io.mockk:mockk:1.12.5"
+testing-Mockk-android = "io.mockk:mockk-android:1.12.5"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
