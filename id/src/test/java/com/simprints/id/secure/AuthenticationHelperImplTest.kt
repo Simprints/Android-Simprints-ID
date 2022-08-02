@@ -42,11 +42,19 @@ class AuthenticationHelperImplTest {
     }
 
     @Test
-    fun shouldSetBackendErrorIfBackendMaintenanceException() = runBlocking {
+    fun shouldSetBackendErrorIfBackendMaintenanceExceptionWithTime() = runBlocking {
         val result = mockException(BackendMaintenanceException(estimatedOutage = 100))
 
         assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
         verify(exactly = 1) { preferencesManager.setSharedPreference(PREFS_ESTIMATED_OUTAGE, any()) }
+    }
+
+    @Test
+    fun shouldSetBackendErrorIfBackendMaintenanceExceptionWithoutTime() = runBlocking {
+        val result = mockException(BackendMaintenanceException(estimatedOutage = null))
+
+        assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
+        verify(exactly = 0) { preferencesManager.setSharedPreference(PREFS_ESTIMATED_OUTAGE, any()) }
     }
 
     @Test
