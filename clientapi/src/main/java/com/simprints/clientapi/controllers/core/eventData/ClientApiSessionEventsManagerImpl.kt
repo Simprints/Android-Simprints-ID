@@ -19,6 +19,7 @@ import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
 import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
+import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
@@ -114,6 +115,13 @@ class ClientApiSessionEventsManagerImpl(
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
         return coreEventRepository.getEventsFromSession(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
+        }
+    }
+
+    override suspend fun isSessionHasIdentificationCallback(sessionId: String): Boolean {
+        val events = coreEventRepository.getEventsFromSession(sessionId)
+        return events.toList().any {
+            it is IdentificationCallbackEvent
         }
     }
 

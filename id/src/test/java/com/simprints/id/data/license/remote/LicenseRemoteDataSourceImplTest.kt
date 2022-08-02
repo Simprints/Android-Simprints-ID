@@ -6,6 +6,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.coEvery
@@ -109,6 +110,22 @@ class LicenseRemoteDataSourceImplTest {
                 Response.error<ApiLicense>(503, "".toResponseBody("application/json".toMediaType()))
             )
         )
+        coEvery {
+            remoteInterface.getLicense(
+                "networkConnectionException",
+                any(),
+                any()
+            )
+        } throws NetworkConnectionException(
+            cause = Throwable()
+        )
+        coEvery {
+            remoteInterface.getLicense(
+                "genericException",
+                any(),
+                any()
+            )
+        } throws Exception()
     }
 
     @Test
@@ -176,6 +193,30 @@ class LicenseRemoteDataSourceImplTest {
         val newLicense =
             licenseRemoteDataSourceImpl.getLicense(
                 "serviceUnavailable",
+                "deviceId",
+                LicenseVendor.RANK_ONE_FACE
+            )
+
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+    }
+
+    @Test
+    fun `Get no license if there is a connection exception - generic error`() = runTest(StandardTestDispatcher()) {
+        val newLicense =
+            licenseRemoteDataSourceImpl.getLicense(
+                "networkConnectionException",
+                "deviceId",
+                LicenseVendor.RANK_ONE_FACE
+            )
+
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+    }
+
+    @Test
+    fun `Get no license if there is a generic exception - generic error`() = runTest(StandardTestDispatcher()) {
+        val newLicense =
+            licenseRemoteDataSourceImpl.getLicense(
+                "genericException",
                 "deviceId",
                 LicenseVendor.RANK_ONE_FACE
             )

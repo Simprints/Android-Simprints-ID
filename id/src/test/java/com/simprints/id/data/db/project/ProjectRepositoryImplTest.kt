@@ -7,6 +7,7 @@ import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +23,7 @@ import org.junit.Test
  * Source: https://github.com/Kotlin/kotlinx.coroutines/issues/1204
  */
 @ExperimentalCoroutinesApi
-class ProjectRepositoryTest {
+class ProjectRepositoryImplTest {
 
     private val localProject = Project(
         DEFAULT_PROJECT_ID,
@@ -101,6 +102,29 @@ class ProjectRepositoryTest {
         assertThat(project).isNull()
         coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
         coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+    }
+
+    @Test
+    fun givenNoProjectStoredAndNetworkConnectionException_noErrorShouldBeThrown() = runBlocking {
+        coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns null
+        coEvery { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) } throws NetworkConnectionException(
+            cause = Exception()
+        )
+
+        val project = projectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID)
+
+        assertThat(project).isNull()
+        coVerify(exactly = 0) { projectLocalDataSourceMock.save(remoteProject) }
+        coVerify { projectRemoteDataSourceMock.loadProjectFromRemote(DEFAULT_PROJECT_ID) }
+    }
+
+    @Test
+    fun givenAProjectStoredLocally_shouldReturnItFromCache() = runBlocking {
+        coEvery { projectLocalDataSourceMock.load(DEFAULT_PROJECT_ID) } returns localProject
+
+        val project = projectRepository.loadFromCache(DEFAULT_PROJECT_ID)
+
+        assertThat(project).isEqualTo(localProject)
     }
 
     @Test
