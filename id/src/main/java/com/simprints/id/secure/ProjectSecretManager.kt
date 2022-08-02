@@ -1,9 +1,9 @@
 package com.simprints.id.secure
 
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.cryptography.ProjectSecretEncrypter
 
-class ProjectSecretManager(private val loginInfoManager: LoginInfoManager) {
+class ProjectSecretManager(private val loginManager: LoginManager) {
 
     fun encryptAndStoreAndReturnProjectSecret(
         projectSecret: String,
@@ -23,7 +23,7 @@ class ProjectSecretManager(private val loginInfoManager: LoginInfoManager) {
 
 
     private fun storeEncryptedProjectSecret(encryptedProjectSecret: String) {
-        loginInfoManager.encryptedProjectSecret = encryptedProjectSecret
+        loginManager.encryptedProjectSecret = encryptedProjectSecret
     }
 
 }

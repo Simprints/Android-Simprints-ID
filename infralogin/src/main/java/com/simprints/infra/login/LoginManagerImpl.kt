@@ -1,17 +1,25 @@
 package com.simprints.infra.login
 
+import com.google.firebase.FirebaseApp
+import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
+import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimRemoteInterface
+import kotlin.reflect.KClass
 
 
 internal class LoginManagerImpl(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val attestationManager: AttestationManager,
     private val loginInfoManager: LoginInfoManager,
+    private val remoteDbManager: RemoteDbManager,
+    private val simApiClientFactory: SimApiClientFactory,
 ) : LoginManager {
 
     override var projectIdTokenClaim: String?
@@ -94,4 +102,29 @@ internal class LoginManagerImpl(
     override fun storeCredentials(projectId: String, userId: String) {
         loginInfoManager.storeCredentials(projectId, userId)
     }
+
+    override suspend fun signIn(token: Token) =
+        remoteDbManager.signIn(token)
+
+    override fun signOut() =
+        remoteDbManager.signOut()
+
+    override fun isSignedIn(projectId: String, userId: String): Boolean =
+        remoteDbManager.isSignedIn(projectId, userId)
+
+    override suspend fun getCurrentToken(): String =
+        remoteDbManager.getCurrentToken()
+
+    override fun getCoreApp(): FirebaseApp =
+        remoteDbManager.getCoreApp()
+
+    override fun getLegacyAppFallback(): FirebaseApp =
+        remoteDbManager.getLegacyAppFallback()
+
+    override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimApiClient<T> =
+        simApiClientFactory.buildClient(remoteInterface)
+
+
+    override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimApiClient<T> =
+        simApiClientFactory.buildUnauthenticatedClient(remoteInterface)
 }

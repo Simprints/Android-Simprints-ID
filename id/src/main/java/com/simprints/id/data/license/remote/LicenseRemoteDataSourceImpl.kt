@@ -3,7 +3,7 @@ package com.simprints.id.data.license.remote
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.network.SimApiClientFactory
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -12,7 +12,7 @@ import okhttp3.ResponseBody
 import retrofit2.HttpException
 
 class LicenseRemoteDataSourceImpl(
-    private val simApiClientFactory: SimApiClientFactory,
+    private val loginManager: LoginManager,
     private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
 
@@ -75,5 +75,5 @@ class LicenseRemoteDataSourceImpl(
     }
 
     private suspend fun getProjectApiClient(): SimApiClient<LicenseRemoteInterface> =
-        simApiClientFactory.buildClient(LicenseRemoteInterface::class)
+        loginManager.buildClient(LicenseRemoteInterface::class)
 }

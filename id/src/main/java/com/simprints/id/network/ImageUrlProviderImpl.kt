@@ -1,16 +1,16 @@
 package com.simprints.id.network
 
-import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.infra.login.LoginManager
 
 // TODO move this into infraconfig
 class ImageUrlProviderImpl(
     private val projectLocalDataSource: ProjectLocalDataSource,
-    private val loginInfoManager: LoginInfoManager
+    private val loginManager: LoginManager
 ) : ImageUrlProvider {
 
     override suspend fun getImageStorageBucketUrl(): String? {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
 
         if (projectId.isEmpty())
             return null

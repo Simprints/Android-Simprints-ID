@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent.longconsent.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.id.tools.utils.FileUtil
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -19,7 +19,7 @@ class LongConsentLocalDataSourceImplTest {
         const val ABSOLUTE_PATH = "app_root_folder"
     }
 
-    @MockK lateinit var loginInfoManagerMock: LoginInfoManager
+    @MockK lateinit var loginManagerMock: LoginManager
     private lateinit var longConsentLocalDataSource: LongConsentLocalDataSourceImpl
 
     private val longConsentsPath = "$ABSOLUTE_PATH${File.separator}long-consents"
@@ -28,9 +28,9 @@ class LongConsentLocalDataSourceImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
 
-        longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock)
+        longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginManagerMock)
     }
 
     @Test
@@ -86,7 +86,7 @@ class LongConsentLocalDataSourceImplTest {
 
     @Test
     fun getLongConsent_shouldReturn_anEmptyString_whenLongConsent_isNotAvailable() {
-        longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginInfoManagerMock)
+        longConsentLocalDataSource = LongConsentLocalDataSourceImpl(ABSOLUTE_PATH, loginManagerMock)
 
         mockkObject(FileUtil)
         every { FileUtil.exists(any(), any()) } returns false

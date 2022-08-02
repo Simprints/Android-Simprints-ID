@@ -1,8 +1,12 @@
 package com.simprints.infra.login
 
+import com.google.firebase.FirebaseApp
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimRemoteInterface
+import kotlin.reflect.KClass
 
 interface LoginManager {
     fun requestAttestation(nonce: String): String
@@ -41,4 +45,29 @@ interface LoginManager {
     fun cleanCredentials()
     fun clearCachedTokenClaims()
     fun storeCredentials(projectId: String, userId: String)
+
+    suspend fun signIn(token: Token)
+    fun signOut()
+
+    fun isSignedIn(projectId: String, userId: String): Boolean
+
+    suspend fun getCurrentToken(): String
+
+    /**
+     * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only
+     * initialized once the client has logged in.
+     * @see signIn
+     * @return FirebaseApp
+     * @throws IllegalStateException if not initialized
+     */
+    fun getCoreApp(): FirebaseApp
+
+    @Deprecated(
+        message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
+        replaceWith = ReplaceWith("getCoreApp()")
+    )
+    fun getLegacyAppFallback(): FirebaseApp
+
+    suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimApiClient<T>
+    fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimApiClient<T>
 }

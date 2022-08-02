@@ -11,8 +11,7 @@ import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,16 +25,19 @@ abstract class CheckLoginPresenter(
 
     @Inject
     lateinit var preferencesManager: IdPreferencesManager
+
     @Inject
     lateinit var timeHelper: TimeHelper
+
     @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
+    lateinit var loginManager: LoginManager
+
     @Inject
     lateinit var secureDataManager: SecureLocalDbKeyProvider
+
     @Inject
     lateinit var syncManager: SyncManager
+
     @Inject
     lateinit var securityStateRepository: SecurityStateRepository
 
@@ -96,7 +98,7 @@ abstract class CheckLoginPresenter(
     private fun checkSignedInOrThrow() {
         val isUserSignedIn =
             isProjectIdStoredAndMatches() &&
-                isLocalKeyValid(loginInfoManager.getSignedInProjectIdOrEmpty()) &&
+                isLocalKeyValid(loginManager.getSignedInProjectIdOrEmpty()) &&
                 isUserIdStoredAndMatches() &&
                 isFirebaseTokenValid()
 
@@ -105,9 +107,9 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    private fun isFirebaseTokenValid(): Boolean = remoteDbManager.isSignedIn(
-        loginInfoManager.getSignedInProjectIdOrEmpty(),
-        loginInfoManager.getSignedInUserIdOrEmpty()
+    private fun isFirebaseTokenValid(): Boolean = loginManager.isSignedIn(
+        loginManager.getSignedInProjectIdOrEmpty(),
+        loginManager.getSignedInUserIdOrEmpty()
     )
 
     private fun isLocalKeyValid(projectId: String): Boolean = try {

@@ -8,7 +8,7 @@ import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.infra.network.url.BaseUrlProvider
 import kotlin.reflect.KClass
 
-class SimApiClientFactoryImpl(
+internal class SimApiClientFactoryImpl(
     private val baseUrlProvider: BaseUrlProvider,
     private val deviceId: String,
     private val ctx: Context,

@@ -2,9 +2,6 @@ package com.simprints.id.data.db.subject.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.domain.LoginInfoManager
-import com.simprints.infra.security.keyprovider.LocalDbKey
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.RealmTestsBase
@@ -16,6 +13,9 @@ import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.keyprovider.LocalDbKey
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import io.mockk.mockk
@@ -32,7 +32,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var subjectLocalDataSource: SubjectLocalDataSource
-    private val loginInfoManagerMock = mockk<LoginInfoManager> {
+    private val loginManagerMock = mockk<LoginManager> {
         every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
@@ -54,7 +54,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
             RealmWrapperImpl(
                 testContext,
                 secureLocalDbKeyProviderMock,
-                loginInfoManagerMock,
+                loginManagerMock,
                 testDispatcherProvider
             )
         )
@@ -78,7 +78,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
             RealmWrapperImpl(
                 testContext,
                 secureLocalDbKeyProviderMock,
-                loginInfoManagerMock,
+                loginManagerMock,
                 testDispatcherProvider
             )
         )

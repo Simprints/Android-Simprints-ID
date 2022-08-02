@@ -1,10 +1,10 @@
 package com.simprints.id.secure
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.login.exceptions.SafetyNetException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -20,7 +20,7 @@ import java.io.IOException
 class AuthenticationHelperImplTest {
 
     private lateinit var authenticationHelperImpl: AuthenticationHelperImpl
-    private val loginInfoManager: LoginInfoManager = mockk(relaxed = true)
+    private val loginManager: LoginManager = mockk(relaxed = true)
     private val timeHelper: TimeHelper = mockk(relaxed = true)
     private val projectAuthenticator: ProjectAuthenticator = mockk(relaxed = true)
     private val eventRepository: EventRepository = mockk(relaxed = true)
@@ -29,7 +29,7 @@ class AuthenticationHelperImplTest {
     fun setUp() {
         authenticationHelperImpl =
             AuthenticationHelperImpl(
-                loginInfoManager,
+                loginManager,
                 timeHelper,
                 projectAuthenticator,
                 eventRepository
@@ -52,9 +52,11 @@ class AuthenticationHelperImplTest {
 
     @Test
     fun shouldSetOfflineIfNetworkConnectionException() = runBlocking {
-        val result = mockException(NetworkConnectionException(
-            cause = Throwable()
-        ))
+        val result = mockException(
+            NetworkConnectionException(
+                cause = Throwable()
+            )
+        )
 
         assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
     }

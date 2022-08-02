@@ -10,7 +10,7 @@ import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStat
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.SampleDefaults.TIME1
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectUpSyncScope
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -28,7 +28,7 @@ import org.junit.Test
 class EventUpSyncScopeRepositoryImplTest {
 
     @MockK
-    lateinit var loginInfoManager: LoginInfoManager
+    lateinit var loginManager: LoginManager
 
     @MockK
     lateinit var upSyncOperationOperationDao: DbEventUpSyncOperationStateDao
@@ -53,12 +53,12 @@ class EventUpSyncScopeRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
         eventUpSyncScopeRepository =
             EventUpSyncScopeRepositoryImpl(
-                loginInfoManager,
+                loginManager,
                 upSyncOperationOperationDao,
                 testDispatcherProvider
             )
 
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns SampleDefaults.DEFAULT_PROJECT_ID
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns SampleDefaults.DEFAULT_PROJECT_ID
         coEvery { upSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 

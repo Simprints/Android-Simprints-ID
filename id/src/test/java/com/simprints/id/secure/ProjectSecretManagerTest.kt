@@ -2,7 +2,7 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
@@ -11,8 +11,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ProjectSecretManagerTest {
 
-    private val loginInfoManager: LoginInfoManager = mockk()
-    private val projectSecretManager = ProjectSecretManager(loginInfoManager)
+    private val loginManager: LoginManager = mockk()
+    private val projectSecretManager = ProjectSecretManager(loginManager)
 
 
     @Test
@@ -24,7 +24,7 @@ class ProjectSecretManagerTest {
             projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)
         assertThat(projectSecretEncrypted).isNotEmpty()
         verify {
-            loginInfoManager.setProperty("encryptedProjectSecret").value(projectSecretEncrypted)
+            loginManager.setProperty("encryptedProjectSecret").value(projectSecretEncrypted)
         }
     }
 }
