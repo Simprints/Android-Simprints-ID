@@ -42,6 +42,9 @@ buildscript {
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
         classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.2")
+
+        // Hilt
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.43.1")
     }
 
 }

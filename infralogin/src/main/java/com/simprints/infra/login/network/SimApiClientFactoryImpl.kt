@@ -6,9 +6,10 @@ import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.SimApiClientImpl
 import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.infra.network.url.BaseUrlProvider
+import javax.inject.Inject
 import kotlin.reflect.KClass
 
-internal class SimApiClientFactoryImpl(
+internal class SimApiClientFactoryImpl @Inject constructor(
     private val baseUrlProvider: BaseUrlProvider,
     private val deviceId: String,
     private val ctx: Context,

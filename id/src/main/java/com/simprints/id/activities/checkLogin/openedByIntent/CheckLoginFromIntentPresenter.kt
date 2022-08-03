@@ -57,6 +57,7 @@ class CheckLoginFromIntentPresenter(
 
     @Inject
     lateinit var simNetworkUtils: SimNetworkUtils
+
     internal lateinit var appRequest: AppRequest
 
     init {

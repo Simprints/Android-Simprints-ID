@@ -45,6 +45,9 @@ dependencies {
     implementation(libs.dagger.core)
     kapt(libs.dagger.compiler)
 
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
+
     implementation(libs.firebase.auth)
     implementation(libs.kotlin.coroutinesPlayServices)
     api(libs.playServices.safetynet)

@@ -7,8 +7,9 @@ import com.google.android.gms.tasks.Tasks
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.BuildConfig
 import com.simprints.infra.login.exceptions.SafetyNetException
+import javax.inject.Inject
 
-internal class AttestationManagerImpl(private val safetyNetClient: SafetyNetClient) : AttestationManager {
+internal class AttestationManagerImpl @Inject constructor(private val safetyNetClient: SafetyNetClient) : AttestationManager {
 
     override fun requestAttestation(nonce: String): String {
         val result = getSafetyNetAttestationResponse(safetyNetClient, nonce)

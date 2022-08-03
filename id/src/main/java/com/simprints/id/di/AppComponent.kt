@@ -56,6 +56,8 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.LoginManagerModule
+import com.simprints.infra.login.SafetyNetModule
+import com.simprints.infra.network.NetworkModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -70,7 +72,9 @@ import javax.inject.Singleton
         SyncModule::class,
         DashboardActivityModule::class,
         ViewModelModule::class,
-        LoginManagerModule::class
+        LoginManagerModule::class,
+        NetworkModule::class,
+        SafetyNetModule::class
     ]
 )
 @Singleton

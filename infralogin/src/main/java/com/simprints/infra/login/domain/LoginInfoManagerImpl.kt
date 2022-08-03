@@ -2,8 +2,9 @@ package com.simprints.infra.login.domain
 
 import android.content.Context
 import android.content.SharedPreferences
+import javax.inject.Inject
 
-internal class LoginInfoManagerImpl(ctx: Context) : LoginInfoManager {
+internal class LoginInfoManagerImpl @Inject constructor(ctx: Context) : LoginInfoManager {
 
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"

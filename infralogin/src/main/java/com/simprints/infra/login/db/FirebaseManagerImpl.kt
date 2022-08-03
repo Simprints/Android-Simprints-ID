@@ -19,8 +19,9 @@ import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-internal class FirebaseManagerImpl(
+internal class FirebaseManagerImpl @Inject constructor(
     val loginInfoManager: LoginInfoManager,
     val context: Context,
 ) : RemoteDbManager {
