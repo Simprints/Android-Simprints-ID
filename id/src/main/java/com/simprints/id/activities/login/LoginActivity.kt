@@ -20,12 +20,10 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.secure.AuthenticationHelperImpl.Companion.PREFS_ESTIMATED_OUTAGE
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
@@ -47,9 +45,6 @@ class LoginActivity : BaseSplitActivity() {
     @Inject
     lateinit var baseUrlProvider: BaseUrlProvider
 
-    @Inject
-    lateinit var idPreferencesManager: IdPreferencesManager
-
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
             ?: throw InvalidAppRequest()
@@ -57,6 +52,7 @@ class LoginActivity : BaseSplitActivity() {
 
     private lateinit var progressDialog: SimProgressDialog
     private lateinit var viewModel: LoginViewModel
+    private var estimatedOutage: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +63,7 @@ class LoginActivity : BaseSplitActivity() {
         baseUrlProvider.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
+        observeEstimatedOutage()
         observeSignInResult()
     }
 
@@ -100,6 +97,12 @@ class LoginActivity : BaseSplitActivity() {
         }
     }
 
+    private fun observeEstimatedOutage() {
+        viewModel.estimatedOutage.observe(this) {
+            estimatedOutage = it
+        }
+    }
+
     private fun observeSignInResult() {
         viewModel.getSignInResult().observe(this) {
             handleSignInResult(it)
@@ -114,9 +117,7 @@ class LoginActivity : BaseSplitActivity() {
             Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
             Result.SAFETYNET_INVALID_CLAIM,
             Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
-            Result.BACKEND_MAINTENANCE_ERROR -> handleSignInFailedBackendMaintenanceError(
-                idPreferencesManager.getSharedPreference(PREFS_ESTIMATED_OUTAGE,0L)
-            )
+            Result.BACKEND_MAINTENANCE_ERROR -> handleSignInFailedBackendMaintenanceError()
             Result.UNKNOWN -> handleSignInFailedUnknownReason()
         }
     }
@@ -236,13 +237,13 @@ class LoginActivity : BaseSplitActivity() {
         showToast(R.string.login_server_error)
     }
 
-    private fun handleSignInFailedBackendMaintenanceError(estimatedOutage: Long) {
+    private fun handleSignInFailedBackendMaintenanceError() {
         progressDialog.dismiss()
         binding.apply {
             errorCard.isVisible = true
-            errorTextView.text = if (estimatedOutage != 0L) getString(
+            errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
                 R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
-                    estimatedOutage
+                    estimatedOutage!!
                 )
             ) else getString(R.string.error_backend_maintenance_message)
         }
