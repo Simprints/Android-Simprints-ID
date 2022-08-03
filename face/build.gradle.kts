@@ -76,11 +76,6 @@ dependencies {
     implementation(libs.cameraView)
     implementation(libs.circleImageView)
 
-    // Retrofit
-    implementation(libs.retrofit.core)
-    implementation(libs.retrofit.logging)
-    implementation(libs.retrofit.okhttp)
-    implementation(libs.retrofit.converterScalars)
 
     // Fragment
     implementation(libs.androidX.ui.fragment)
@@ -92,14 +87,11 @@ dependencies {
     // Android X
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.cameraX.core)
-    implementation(libs.androidX.multidex)
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.monitor)
     androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.runner)
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
 
@@ -112,12 +104,6 @@ dependencies {
     androidTestImplementation(libs.testing.androidX.uiAutomator)
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
-    androidTestImplementation(libs.testing.espresso.barista) {
-        exclude("com.android.support")
-        exclude("com.google.code.findbugs")
-        exclude("org.jetbrains.kotlin")
-        exclude("com.google.guava")
-    }
 
     // Koin
     androidTestImplementation(libs.testing.koin)
@@ -128,15 +114,12 @@ dependencies {
 
     // Simprints
     testImplementation(project(":testtools"))
-    testImplementation(libs.testing.junit) {
-        exclude("com.android.support")
-    }
+    testImplementation(libs.testing.junit)
 
     // Android X
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.androidX.runner)
 
     // Kotlin
     testImplementation(libs.testing.coroutines.test)
