@@ -62,15 +62,12 @@ dependencies {
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.lifecycle.scope)
     implementation(libs.support.material)
-    implementation(libs.kotlin.reflect)
+
     // Splitties
     implementation(libs.splitties.core)
     // Kotlin
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
-
-    // RootBeer (root detection)
-    implementation(libs.rootbeer.core)
 
     // Unit Tests
     testImplementation(project(":testtools"))
@@ -78,22 +75,19 @@ dependencies {
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.robolectric.core)
-    testImplementation(libs.testing.robolectric.multidex)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.coroutines.test)
     testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.androidX.monitor)
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.koTest.kotlin)
 
+
     testImplementation(libs.testing.espresso.intents)
     testImplementation(libs.testing.koin)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.monitor)
     androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.androidX.runner)
@@ -107,7 +101,6 @@ dependencies {
 
     androidTestImplementation(libs.testing.koin)
     androidTestImplementation(libs.testing.truth)
-    androidTestImplementation(libs.testing.objenesis.core)
 
 }
 

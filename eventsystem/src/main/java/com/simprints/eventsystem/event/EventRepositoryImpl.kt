@@ -32,6 +32,7 @@ import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
@@ -243,11 +244,7 @@ open class EventRepositoryImpl(
             uploadEvents(filteredEvents, projectId)
             deleteEventsFromDb(events.map { it.id })
         } catch (t: Throwable) {
-            Simber.w(t)
-            // We don't need to report http exceptions as cloud logs all of them.
-            if (t !is HttpException) {
-                Simber.e(t)
-            }
+            handleUploadException(t)
         }
     }
 
@@ -267,11 +264,7 @@ open class EventRepositoryImpl(
                 it.size
             }
         } catch (t: Throwable) {
-            Simber.w(t)
-            // We don't need to report http exceptions as cloud logs all of them.
-            if (t !is HttpException) {
-                Simber.e(t)
-            }
+            handleUploadException(t)
             null
         }
 
@@ -350,4 +343,12 @@ open class EventRepositoryImpl(
             throw t
         }
 
+    private fun handleUploadException(t: Throwable) {
+        when (t) {
+            is NetworkConnectionException -> Simber.i(t)
+            // We don't need to report http exceptions as cloud logs all of them.
+            is HttpException -> Simber.i(t)
+            else -> Simber.e(t)
+        }
+    }
 }
