@@ -129,15 +129,13 @@ open class SecurityModule {
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        eventRepository: EventRepository,
-        preferencesManager: IdPreferencesManager
+        eventRepository: EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
             loginInfoManager,
             timeHelper,
             projectAuthenticator,
-            eventRepository,
-            preferencesManager
+            eventRepository
         )
     }
 
