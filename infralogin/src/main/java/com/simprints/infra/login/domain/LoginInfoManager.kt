@@ -1,6 +1,6 @@
 package com.simprints.infra.login.domain
 
-internal interface LoginInfoManager {
+interface LoginInfoManager {
     // Cached claims in the auth token. We used them to check whether the user is signed or not
     // in without reading the token from Firebase (async operation)
     var projectIdTokenClaim: String?

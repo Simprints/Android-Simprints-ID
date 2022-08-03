@@ -4,7 +4,7 @@ import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 
-internal interface AuthenticationRemoteDataSource {
+interface AuthenticationRemoteDataSource {
 
     suspend fun requestAuthenticationData(
         projectId: String,

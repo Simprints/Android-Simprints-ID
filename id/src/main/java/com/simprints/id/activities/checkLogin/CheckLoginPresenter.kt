@@ -41,6 +41,9 @@ abstract class CheckLoginPresenter(
     @Inject
     lateinit var securityStateRepository: SecurityStateRepository
 
+    @Inject
+    lateinit var loginInfoManager: LoginManager
+
     init {
         component.inject(this)
     }
