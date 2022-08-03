@@ -164,7 +164,6 @@ class TestAppModule(
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
     ): QrCodeProducer = qrCodeProducerRule.resolveDependency {

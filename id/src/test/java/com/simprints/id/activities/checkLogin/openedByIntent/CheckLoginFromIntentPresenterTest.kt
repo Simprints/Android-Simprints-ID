@@ -75,13 +75,12 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var securityStateRepositoryMock: SecurityStateRepository
 
     @MockK
-    lateinit var loginManagerMock: LoginManager
-
-    @MockK
     lateinit var timeHelperMock: TimeHelper
 
     @MockK
     lateinit var simNetworkUtilsMock: SimNetworkUtils
+
+    private val loginManagerMock = mockk<LoginManager>(relaxed = true)
 
     @Before
     fun setUp() {
