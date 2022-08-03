@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.id.secure.models.toDomainResult
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -16,8 +18,10 @@ class LoginViewModel(
 ) : ViewModel() {
 
     private val signInResultLiveData = MutableLiveData<Result>()
+    private val _estimatedOutage = MutableLiveData<Long?>()
 
     fun getSignInResult(): LiveData<Result> = signInResultLiveData
+    val estimatedOutage : LiveData<Long?> = _estimatedOutage
 
     fun signIn(userId: String, projectId: String, projectSecret: String, deviceId: String) {
         viewModelScope.launch {
@@ -28,7 +32,10 @@ class LoginViewModel(
                     projectSecret,
                     deviceId
                 )
-                signInResultLiveData.postValue(result)
+                if (result is AuthenticateDataResult.BackendMaintenanceError) {
+                    _estimatedOutage.postValue(result.estimatedOutage)
+                }
+                signInResultLiveData.postValue(result.toDomainResult())
             }
         }
     }
