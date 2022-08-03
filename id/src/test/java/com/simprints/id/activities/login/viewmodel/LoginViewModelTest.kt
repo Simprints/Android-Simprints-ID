@@ -2,7 +2,7 @@ package com.simprints.id.activities.login.viewmodel
 
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
@@ -54,7 +54,49 @@ class LoginViewModelTest {
         )
         val result = loginViewModel.getSignInResult().getOrAwaitValue()
         //Then
-        Truth.assertThat(result)
+        assertThat(result)
             .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED)
+    }
+
+    @Test
+    fun signIn_withBackendError() = runBlocking {
+        //Given
+        coEvery {
+            authenticationHelper.authenticateSafely(
+                "userId", "projectId", "projectSecret", "deviceId"
+            )
+        } returns AuthenticateDataResult.BackendMaintenanceError()
+
+        //When
+        loginViewModel.signIn(
+            "userId", "projectId", "projectSecret", "deviceId"
+        )
+        val result = loginViewModel.getSignInResult().getOrAwaitValue()
+        val estimatedOutage = loginViewModel.estimatedOutage.getOrAwaitValue()
+        //Then
+        assertThat(result)
+            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR)
+        assertThat(estimatedOutage).isNull()
+    }
+
+    @Test
+    fun signIn_withTimedBackendError() = runBlocking {
+        //Given
+        coEvery {
+            authenticationHelper.authenticateSafely(
+                "userId", "projectId", "projectSecret", "deviceId"
+            )
+        } returns AuthenticateDataResult.BackendMaintenanceError(600L)
+
+        //When
+        loginViewModel.signIn(
+            "userId", "projectId", "projectSecret", "deviceId"
+        )
+        val result = loginViewModel.getSignInResult().getOrAwaitValue()
+        val estimatedOutage = loginViewModel.estimatedOutage.getOrAwaitValue()
+        //Then
+        assertThat(result)
+            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR)
+        assertThat(estimatedOutage).isEqualTo(600)
     }
 }
