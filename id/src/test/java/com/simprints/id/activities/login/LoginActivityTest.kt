@@ -17,6 +17,7 @@ import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.AuthenticationHelperImpl
+import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
@@ -51,7 +52,6 @@ class LoginActivityTest {
 
     private val authenticationHelper: AuthenticationHelper = mockk(relaxed = true)
     private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-    private val preferencesManager: IdPreferencesManager = mockk(relaxed = true)
 
     private val viewModelModule by lazy {
         TestViewModelModule(
@@ -91,7 +91,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+            } returns AuthenticateDataResult.Authenticated
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -112,7 +112,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+            } returns AuthenticateDataResult.Offline
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -133,7 +133,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+            } returns AuthenticateDataResult.BadCredentials
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -154,7 +154,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+            } returns AuthenticateDataResult.TechnicalFailure
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -175,7 +175,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+            } returns AuthenticateDataResult.Unknown
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -196,7 +196,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM
+            } returns AuthenticateDataResult.SafetyNetInvalidClaim
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -217,7 +217,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE
+            } returns AuthenticateDataResult.SafetyNetUnavailable
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -238,7 +238,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
+            } returns AuthenticateDataResult.BackendMaintenanceError()
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -261,13 +261,9 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
+            } returns AuthenticateDataResult.BackendMaintenanceError(600L)
 
-            every { preferencesManager.getSharedPreference(AuthenticationHelperImpl.PREFS_ESTIMATED_OUTAGE,0L) } returns 600L
-
-            createAndStartActivity<LoginActivity>(loginBundle).apply {
-                idPreferencesManager = preferencesManager
-            }
+            createAndStartActivity<LoginActivity>(loginBundle)
 
             onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
             onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
