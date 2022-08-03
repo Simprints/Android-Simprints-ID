@@ -10,13 +10,10 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.AuthenticationHelperImpl
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -29,7 +26,6 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
