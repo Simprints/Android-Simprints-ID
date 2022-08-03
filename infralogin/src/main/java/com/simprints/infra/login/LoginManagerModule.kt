@@ -16,35 +16,42 @@ import com.simprints.infra.login.network.SimApiClientFactoryImpl
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSourceImpl
 import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.infra.network.url.BaseUrlProviderImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 
 @Module
-class LoginManagerModule {
+@InstallIn(ActivityComponent::class)
+abstract class LoginManagerModule {
+
+    @Binds
+    internal abstract fun provideLoginManager(loginManager: LoginManagerImpl): LoginManager
+
+    @Binds
+    internal abstract fun provideAuthenticationRemoteDataSource(authRemoteDataSource: AuthenticationRemoteDataSourceImpl): AuthenticationRemoteDataSource
+
+    @Binds
+    internal abstract fun provideAttestationManager(impl: AttestationManagerImpl): AttestationManager
+
+    @Binds
+    internal abstract fun provideLoginInfoManager(impl: LoginInfoManagerImpl): LoginInfoManager
+
+    @Binds
+    internal abstract fun provideRemoteDbManager(impl: FirebaseManagerImpl): RemoteDbManager
+
+}
+
+@Module
+@InstallIn(ActivityComponent::class)
+object SafetyNetModule {
 
     @Provides
-    fun provideLoginManager(
-        authenticationRemoteDataSource: AuthenticationRemoteDataSource,
-        attestationManager: AttestationManager,
-        loginInfoManager: LoginInfoManager,
-        remoteDbManager: RemoteDbManager,
-        simApiClientFactory: SimApiClientFactory,
-    ): LoginManager =
-        LoginManagerImpl(
-            authenticationRemoteDataSource,
-            attestationManager,
-            loginInfoManager,
-            remoteDbManager,
-            simApiClientFactory
-        )
+    fun provideSafetyNetClient(context: Context): SafetyNetClient = SafetyNet.getClient(context)
 
     @Provides
-    fun provideAuthenticationRemoteDataSource(simApiClientFactory: SimApiClientFactory): AuthenticationRemoteDataSource =
-        AuthenticationRemoteDataSourceImpl(simApiClientFactory)
-
-    @Provides
-    fun provideSimApiClientFactory(
+    internal fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
         baseUrlProvider: BaseUrlProvider
@@ -53,25 +60,7 @@ class LoginManagerModule {
         ctx.deviceId,
         ctx,
         ctx.packageVersionName,
-        remoteDbManager,
+        remoteDbManager
     )
 
-    @Provides
-    fun provideBaseUrlProvider(ctx: Context): BaseUrlProvider =
-        BaseUrlProviderImpl(ctx)
-
-    @Provides
-    fun provideAttestationManager(safetyNetClient: SafetyNetClient): AttestationManager =
-        AttestationManagerImpl(safetyNetClient)
-
-    @Provides
-    fun provideSafetyNetClient(context: Context): SafetyNetClient = SafetyNet.getClient(context)
-
-    @Provides
-    fun provideLoginInfoManager(context: Context): LoginInfoManager =
-        LoginInfoManagerImpl(context)
-
-    @Provides
-    fun provideRemoteDbManager(ctx: Context, loginInfoManager: LoginInfoManager): RemoteDbManager =
-        FirebaseManagerImpl(loginInfoManager, ctx)
 }

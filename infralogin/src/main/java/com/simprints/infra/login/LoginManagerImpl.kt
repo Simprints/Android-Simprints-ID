@@ -11,10 +11,11 @@ import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.SimRemoteInterface
+import javax.inject.Inject
 import kotlin.reflect.KClass
 
 
-class LoginManagerImpl(
+internal class LoginManagerImpl @Inject constructor(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val attestationManager: AttestationManager,
     private val loginInfoManager: LoginInfoManager,

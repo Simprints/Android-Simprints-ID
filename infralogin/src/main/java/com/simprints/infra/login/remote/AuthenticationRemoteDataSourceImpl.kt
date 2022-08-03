@@ -8,8 +8,9 @@ import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.models.ApiAuthRequestBody
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import javax.inject.Inject
 
-internal class AuthenticationRemoteDataSourceImpl(private val simApiClientFactory: SimApiClientFactory) :
+internal class AuthenticationRemoteDataSourceImpl @Inject constructor(private val simApiClientFactory: SimApiClientFactory) :
     AuthenticationRemoteDataSource {
 
     companion object {
