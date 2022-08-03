@@ -106,7 +106,7 @@ class AuthenticationHelperImplTest {
 
     @Test
     fun `should return AUTHENTICATED if no exception`() = runBlocking {
-        val result = authenticationHelperImpl.authenticateSafely("", "", "", "")
+        val result = authenticationHelperImpl.authenticateSafely("", "", "", "").toDomainResult()
 
         assertThat(result).isInstanceOf(Result.AUTHENTICATED::class.java)
     }
