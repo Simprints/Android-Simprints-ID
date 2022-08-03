@@ -115,14 +115,16 @@ class TestSecurityModule(
         loginInfoManager: LoginInfoManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
-        eventRepository: EventRepository
+        eventRepository: EventRepository,
+        idPreferencesManager: IdPreferencesManager
     ): AuthenticationHelper {
         return authenticationHelperRule.resolveDependency {
             super.provideAuthenticationHelper(
                 loginInfoManager,
                 timeHelper,
                 projectAuthenticator,
-                eventRepository
+                eventRepository,
+                idPreferencesManager
             )
         }
     }
