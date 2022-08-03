@@ -3,7 +3,6 @@ package com.simprints.id.activities.login.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -55,7 +54,7 @@ class LoginViewModelTest {
         val result = loginViewModel.getSignInResult().getOrAwaitValue()
         //Then
         assertThat(result)
-            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED)
+            .isEqualTo(AuthenticateDataResult.Authenticated)
     }
 
     @Test
@@ -72,11 +71,9 @@ class LoginViewModelTest {
             "userId", "projectId", "projectSecret", "deviceId"
         )
         val result = loginViewModel.getSignInResult().getOrAwaitValue()
-        val estimatedOutage = loginViewModel.estimatedOutage.getOrAwaitValue()
         //Then
         assertThat(result)
-            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR)
-        assertThat(estimatedOutage).isNull()
+            .isEqualTo(AuthenticateDataResult.BackendMaintenanceError())
     }
 
     @Test
@@ -93,10 +90,9 @@ class LoginViewModelTest {
             "userId", "projectId", "projectSecret", "deviceId"
         )
         val result = loginViewModel.getSignInResult().getOrAwaitValue()
-        val estimatedOutage = loginViewModel.estimatedOutage.getOrAwaitValue()
         //Then
         assertThat(result)
-            .isEqualTo(AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR)
-        assertThat(estimatedOutage).isEqualTo(600)
+            .isEqualTo(AuthenticateDataResult.BackendMaintenanceError(600L))
+        assertThat((result as AuthenticateDataResult.BackendMaintenanceError).estimatedOutage).isEqualTo(600L)
     }
 }
