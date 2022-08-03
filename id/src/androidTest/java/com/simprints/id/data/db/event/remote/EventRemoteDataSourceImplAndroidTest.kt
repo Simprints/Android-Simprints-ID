@@ -39,6 +39,7 @@ import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.eventsystem.event.remote.EventRemoteInterface
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
@@ -52,9 +53,8 @@ import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.network.SimApiClientFactoryImpl
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.SimApiClientImpl
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -98,7 +98,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private lateinit var eventLabels: EventLabels
 
     @MockK
-    var remoteDbManager = mockk<RemoteDbManager>()
+    var loginManager = mockk<LoginManager>()
 
     @Before
     fun setUp() {
@@ -112,17 +112,16 @@ class EventRemoteDataSourceImplAndroidTest {
                 userId = SIGNED_ID_USER
             )
         }
-        coEvery { remoteDbManager.getCurrentToken() } returns firebaseTestToken.token
-        val mockBaseUrlProvider = mockk<BaseUrlProvider>()
-        every { mockBaseUrlProvider.getApiBaseUrl() } returns URL
+        coEvery { loginManager.buildClient<EventRemoteInterface>(any()) } returns SimApiClientImpl(
+            EventRemoteInterface::class,
+            app,
+            URL,
+            "deviceId",
+            "Test",
+            firebaseTestToken.token,
+        )
         eventRemoteDataSource = EventRemoteDataSourceImpl(
-            SimApiClientFactoryImpl(
-                baseUrlProvider = mockBaseUrlProvider,
-                deviceId = "some_device",
-                ctx = app,
-                versionName = "Test",
-                remoteDbManager = remoteDbManager,
-            ),
+            loginManager,
             JsonHelper
         )
         every { timeHelper.nowMinus(any(), any()) } returns 100

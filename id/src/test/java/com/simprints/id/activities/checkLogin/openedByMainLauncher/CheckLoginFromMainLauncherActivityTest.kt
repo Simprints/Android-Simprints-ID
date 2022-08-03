@@ -9,11 +9,13 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,13 +29,14 @@ class CheckLoginFromMainLauncherActivityTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject
-    lateinit var loginManagerMock: LoginManager
+    lateinit var secureDataManager: SecureLocalDbKeyProvider
+
+    @Inject
+    lateinit var loginManager: LoginManager
 
     private val module by lazy {
         TestAppModule(
             app,
-            loginInfoManagerRule = MockkRule,
-            remoteDbManagerRule = MockkRule,
             secureDataManagerRule = MockkRule
         )
     }
@@ -45,27 +48,29 @@ class CheckLoginFromMainLauncherActivityTest {
 
     @Test
     fun appNotSignedInFirebase_shouldRequestLoginActComeUp() {
-        every { loginManagerMock.isSignedIn(any(), any()) } returns false
+        every { loginManager.isSignedIn(any(), any()) } returns false
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun projectIdEmpty_shouldRequestLoginActComeUp() {
-        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun userIdEmpty_shouldRequestLoginActComeUp() {
-        every { loginManagerMock.getSignedInUserIdOrEmpty() } returns ""
+        every { loginManager.getSignedInUserIdOrEmpty() } returns ""
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun userIsLogged_shouldDashboardActComeUp() {
-        every { loginManagerMock.isSignedIn(any(), any()) } returns true
-        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns "project"
-        every { loginManagerMock.getSignedInUserIdOrEmpty() } returns "user"
+        every { secureDataManager.getLocalDbKeyOrThrow(any()) } returns mockk()
+        every { loginManager.isSignedIn(any(), any()) } returns true
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns "project"
+        every { loginManager.getSignedInUserIdOrEmpty() } returns "user"
+
 
         startCheckLoginAndCheckNextActivity(DashboardActivity::class.java)
     }
