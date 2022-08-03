@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -45,7 +46,7 @@ class LoginViewModelTest {
             authenticationHelper.authenticateSafely(
                 "userId", "projectId", "projectSecret", "deviceId"
             )
-        } returns AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+        } returns AuthenticateDataResult.Authenticated
 
         //When
         loginViewModel.signIn(

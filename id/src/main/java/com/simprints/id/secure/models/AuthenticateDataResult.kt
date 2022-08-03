@@ -9,7 +9,7 @@ sealed class AuthenticateDataResult {
     object TechnicalFailure : AuthenticateDataResult()
     object SafetyNetUnavailable : AuthenticateDataResult()
     object SafetyNetInvalidClaim : AuthenticateDataResult()
-    data class BackendMaintenanceError(val estimatedOutage: Long?) : AuthenticateDataResult()
+    data class BackendMaintenanceError(val estimatedOutage: Long? = null) : AuthenticateDataResult()
     object Unknown : AuthenticateDataResult()
 }
 

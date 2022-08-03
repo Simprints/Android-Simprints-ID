@@ -5,16 +5,14 @@ import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
-import com.simprints.id.secure.AuthenticationHelperImpl.Companion.PREFS_ESTIMATED_OUTAGE
+import com.simprints.id.secure.models.toDomainResult
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +25,6 @@ class AuthenticationHelperImplTest {
     private val timeHelper: TimeHelper = mockk(relaxed = true)
     private val projectAuthenticator: ProjectAuthenticator = mockk(relaxed = true)
     private val eventRepository: EventRepository = mockk(relaxed = true)
-    private val preferencesManager: IdPreferencesManager = mockk(relaxed = true)
 
     @Before
     fun setUp() {
@@ -36,17 +33,8 @@ class AuthenticationHelperImplTest {
                 loginInfoManager,
                 timeHelper,
                 projectAuthenticator,
-                eventRepository,
-                preferencesManager
+                eventRepository
             )
-    }
-
-    @Test
-    fun shouldSetBackendErrorIfBackendMaintenanceExceptionWithTime() = runBlocking {
-        val result = mockException(BackendMaintenanceException(estimatedOutage = 100))
-
-        assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
-        verify(exactly = 1) { preferencesManager.setSharedPreference(PREFS_ESTIMATED_OUTAGE, any()) }
     }
 
     @Test
@@ -54,7 +42,6 @@ class AuthenticationHelperImplTest {
         val result = mockException(BackendMaintenanceException(estimatedOutage = null))
 
         assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
-        verify(exactly = 0) { preferencesManager.setSharedPreference(PREFS_ESTIMATED_OUTAGE, any()) }
     }
 
     @Test
@@ -104,6 +91,6 @@ class AuthenticationHelperImplTest {
     private suspend fun mockException(exception: Exception): Result {
         coEvery { projectAuthenticator.authenticate(any(), "", "") } throws exception
 
-        return authenticationHelperImpl.authenticateSafely("", "", "", "")
+        return authenticationHelperImpl.authenticateSafely("", "", "", "").toDomainResult()
     }
 }
