@@ -14,7 +14,9 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.AuthenticationHelperImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
@@ -26,6 +28,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -48,6 +51,7 @@ class LoginActivityTest {
 
     private val authenticationHelper: AuthenticationHelper = mockk(relaxed = true)
     private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+    private val preferencesManager: IdPreferencesManager = mockk(relaxed = true)
 
     private val viewModelModule by lazy {
         TestViewModelModule(
@@ -259,7 +263,11 @@ class LoginActivityTest {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
             } returns AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
 
-            createAndStartActivity<LoginActivity>(loginBundle)
+            every { preferencesManager.getSharedPreference(AuthenticationHelperImpl.PREFS_ESTIMATED_OUTAGE,0L) } returns 600L
+
+            createAndStartActivity<LoginActivity>(loginBundle).apply {
+                idPreferencesManager = preferencesManager
+            }
 
             onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
             onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
@@ -269,7 +277,7 @@ class LoginActivityTest {
             )
             onView(withId(R.id.errorTextView)).check(
                 matches(
-                    ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE)
+                    ViewMatchers.withText(SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE)
                 )
             )
         }
