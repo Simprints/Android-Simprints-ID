@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.analytics.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -24,6 +23,7 @@ import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
@@ -52,7 +52,6 @@ class LoginActivity : BaseSplitActivity() {
 
     private lateinit var progressDialog: SimProgressDialog
     private lateinit var viewModel: LoginViewModel
-    private var estimatedOutage: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +62,6 @@ class LoginActivity : BaseSplitActivity() {
         baseUrlProvider.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
-        observeEstimatedOutage()
         observeSignInResult()
     }
 
@@ -97,28 +95,22 @@ class LoginActivity : BaseSplitActivity() {
         }
     }
 
-    private fun observeEstimatedOutage() {
-        viewModel.estimatedOutage.observe(this) {
-            estimatedOutage = it
-        }
-    }
-
     private fun observeSignInResult() {
         viewModel.getSignInResult().observe(this) {
             handleSignInResult(it)
         }
     }
 
-    private fun handleSignInResult(result: Result) {
+    private fun handleSignInResult(result: AuthenticateDataResult) {
         when (result) {
-            Result.AUTHENTICATED -> handleSignInSuccess()
-            Result.OFFLINE -> handleSignInFailedNoConnection()
-            Result.BAD_CREDENTIALS -> handleSignInFailedInvalidCredentials()
-            Result.TECHNICAL_FAILURE -> handleSignInFailedServerError()
-            Result.SAFETYNET_INVALID_CLAIM,
-            Result.SAFETYNET_UNAVAILABLE -> handleSafetyNetDownError()
-            Result.BACKEND_MAINTENANCE_ERROR -> handleSignInFailedBackendMaintenanceError()
-            Result.UNKNOWN -> handleSignInFailedUnknownReason()
+            AuthenticateDataResult.Authenticated -> handleSignInSuccess()
+            is AuthenticateDataResult.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
+            AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
+            AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
+            AuthenticateDataResult.SafetyNetInvalidClaim,
+            AuthenticateDataResult.SafetyNetUnavailable -> handleSafetyNetDownError()
+            AuthenticateDataResult.TechnicalFailure -> handleSignInFailedServerError()
+            AuthenticateDataResult.Unknown -> handleSignInFailedUnknownReason()
         }
     }
 
@@ -237,13 +229,13 @@ class LoginActivity : BaseSplitActivity() {
         showToast(R.string.login_server_error)
     }
 
-    private fun handleSignInFailedBackendMaintenanceError() {
+    private fun handleSignInFailedBackendMaintenanceError(estimatedOutage: Long?) {
         progressDialog.dismiss()
         binding.apply {
             errorCard.isVisible = true
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
                 R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
-                    estimatedOutage!!
+                    estimatedOutage
                 )
             ) else getString(R.string.error_backend_maintenance_message)
         }
