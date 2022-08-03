@@ -54,6 +54,8 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.login.LoginManagerModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -68,6 +70,7 @@ import javax.inject.Singleton
         SyncModule::class,
         DashboardActivityModule::class,
         ViewModelModule::class,
+        LoginManagerModule::class
     ]
 )
 @Singleton
@@ -149,4 +152,6 @@ interface AppComponent {
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getImageRepository(): ImageRepository
     fun getLicenseRepository(): LicenseRepository
+    fun getLoginManager(): LoginManager
+
 }

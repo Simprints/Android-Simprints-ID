@@ -14,7 +14,7 @@ import com.simprints.infra.network.SimRemoteInterface
 import kotlin.reflect.KClass
 
 
-internal class LoginManagerImpl(
+class LoginManagerImpl(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val attestationManager: AttestationManager,
     private val loginInfoManager: LoginInfoManager,

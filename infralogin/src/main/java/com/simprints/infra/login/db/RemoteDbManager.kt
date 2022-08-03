@@ -3,7 +3,7 @@ package com.simprints.infra.login.db
 import com.google.firebase.FirebaseApp
 import com.simprints.infra.login.domain.models.Token
 
-internal interface RemoteDbManager {
+interface RemoteDbManager {
 
     suspend fun signIn(token: Token)
     fun signOut()

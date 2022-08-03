@@ -19,10 +19,9 @@ import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.network.url.BaseUrlProviderImpl
 import dagger.Module
 import dagger.Provides
-import dagger.Subcomponent
 
 @Module
-internal class LoginManagerModule {
+class LoginManagerModule {
 
     @Provides
     fun provideLoginManager(
@@ -76,18 +75,3 @@ internal class LoginManagerModule {
     fun provideRemoteDbManager(ctx: Context, loginInfoManager: LoginInfoManager): RemoteDbManager =
         FirebaseManagerImpl(loginInfoManager, ctx)
 }
-
-@Subcomponent(modules = [LoginManagerModule::class])
-interface LoginComponent {
-
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): LoginComponent
-    }
-
-    fun getLoginManager(): LoginManager
-
-}
-
-@Module(subcomponents = [LoginComponent::class])
-class LoginProvider
