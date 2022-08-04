@@ -192,28 +192,20 @@ dependencies {
     testImplementation(libs.testing.coroutines.test)
     kaptTest(libs.dagger.compiler)
     testImplementation(project(":infralogging"))
-    testImplementation(project(":testtools")) {
-        exclude("org.mockito:mockito-android")
-    }
+    testImplementation(project(":testtools"))
 
     // ######################################################
     //                      Android test
     // ######################################################
 
     androidTestImplementation(project(":fingerprintscannermock")) {
-        exclude("org.mockito")
         exclude("org.robolectric")
     }
-    androidTestImplementation(libs.testing.mockito.core)
-    androidTestImplementation(libs.testing.mockito.android)
-    androidTestImplementation(libs.testing.mockito.kotlin)
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.monitor)
     androidTestImplementation(libs.testing.androidX.core)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.runner)
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.work)
     androidTestImplementation(libs.testing.espresso.core)
@@ -236,9 +228,7 @@ dependencies {
     }
     kaptAndroidTest(libs.dagger.compiler)
     androidTestImplementation(project(":testtools")) {
-        exclude("org.mockito")
         exclude("org.robolectric")
-        exclude("org.jetbrains.kotlinx")
     }
 
     debugImplementation(libs.testing.fragment.testing) {

@@ -7,6 +7,10 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.Authent
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.login.exceptions.SafetyNetException
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.exceptions.safe.secure.SafetyNetException
+import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
+import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -37,17 +41,17 @@ class AuthenticationHelperImplTest {
     }
 
     @Test
-    fun shouldSetBackendErrorIfBackendMaintenanceException() = runBlocking {
-        val result = mockException(BackendMaintenanceException(estimatedOutage = 100))
+    fun shouldSetBackendErrorIfBackendMaintenanceExceptionWithoutTime() = runBlocking {
+        val result = mockException(BackendMaintenanceException(estimatedOutage = null))
 
-        assertThat(result).isInstanceOf(Result.BACKEND_MAINTENANCE_ERROR::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.BackendMaintenanceError::class.java)
     }
 
     @Test
     fun shouldSetOfflineIfIOException() = runBlocking {
         val result = mockException(IOException())
 
-        assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.Offline::class.java)
     }
 
     @Test
@@ -58,7 +62,7 @@ class AuthenticationHelperImplTest {
             )
         )
 
-        assertThat(result).isInstanceOf(Result.OFFLINE::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.Offline::class.java)
     }
 
     @Test
@@ -66,7 +70,7 @@ class AuthenticationHelperImplTest {
         val result =
             mockException(SafetyNetException(reason = SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
-        assertThat(result).isInstanceOf(Result.SAFETYNET_UNAVAILABLE::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.SafetyNetUnavailable::class.java)
     }
 
     @Test
@@ -74,31 +78,31 @@ class AuthenticationHelperImplTest {
         val result =
             mockException(SafetyNetException(reason = SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS))
 
-        assertThat(result).isInstanceOf(Result.SAFETYNET_INVALID_CLAIM::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.SafetyNetInvalidClaim::class.java)
     }
 
     @Test
     fun shouldSetUnknownIfGenericException() = runBlocking {
         val result = mockException(Exception())
 
-        assertThat(result).isInstanceOf(Result.UNKNOWN::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.Unknown::class.java)
     }
 
     @Test
     fun shouldTechnicalFailureIfSyncCloudIntegrationException() = runBlocking {
         val result = mockException(SyncCloudIntegrationException(cause = Exception()))
 
-        assertThat(result).isInstanceOf(Result.TECHNICAL_FAILURE::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.TechnicalFailure::class.java)
     }
 
     @Test
     fun shouldBadCredentialsIfAuthRequestInvalidCredentialsException() = runBlocking {
         val result = mockException(AuthRequestInvalidCredentialsException())
 
-        assertThat(result).isInstanceOf(Result.BAD_CREDENTIALS::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.BadCredentials::class.java)
     }
 
-    private suspend fun mockException(exception: Exception): Result {
+    private suspend fun mockException(exception: Exception): AuthenticateDataResult {
         coEvery { projectAuthenticator.authenticate(any(), "", "") } throws exception
 
         return authenticationHelperImpl.authenticateSafely("", "", "", "")
@@ -108,6 +112,6 @@ class AuthenticationHelperImplTest {
     fun `should return AUTHENTICATED if no exception`() = runBlocking {
         val result = authenticationHelperImpl.authenticateSafely("", "", "", "")
 
-        assertThat(result).isInstanceOf(Result.AUTHENTICATED::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.Authenticated::class.java)
     }
 }

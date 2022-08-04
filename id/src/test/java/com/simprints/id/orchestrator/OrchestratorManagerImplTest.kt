@@ -146,8 +146,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return`() =
-        runTest {
+    fun `Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return`() = runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted(null)
 
@@ -180,8 +179,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Face only - Person Creation Event should not be added if face capture didn't return`() =
-        runTest {
+    fun `Face only - Person Creation Event should not be added if face capture didn't return`() = runTest {
         with(orchestrator) {
             mockFaceWithCaptureCompleted(null)
 
@@ -192,8 +190,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Face and Fingerprint - Person Creation Event should be if both captures are completed`() =
-        runTest {
+    fun `Face and Fingerprint - Person Creation Event should be if both captures are completed`() = runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted()
 
@@ -204,8 +201,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Face and Fingerprint - Person Creation Event should not be added if face capture didn't return`() =
-        runTest {
+    fun `Face and Fingerprint - Person Creation Event should not be added if face capture didn't return`() = runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted(faceResult = null)
 
@@ -216,8 +212,7 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return`() =
-        runTest {
+    fun `Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return`() = runTest {
         with(orchestrator) {
             mockFaceAndFingerprintWithCaptureCompleted(fingerprintResult = null)
 
