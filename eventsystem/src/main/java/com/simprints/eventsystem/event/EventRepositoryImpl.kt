@@ -343,6 +343,13 @@ open class EventRepositoryImpl(
             throw t
         }
 
+    override suspend fun removeLocationDataFromCurrentSession() {
+        val currentCaptureSession = getCurrentCaptureSessionEvent()
+        if (currentCaptureSession.payload.location != null) {
+            currentCaptureSession.payload.location = null
+            addOrUpdateEvent(currentCaptureSession)
+        }
+    }
     private fun handleUploadException(t: Throwable) {
         when (t) {
             is NetworkConnectionException -> Simber.i(t)
