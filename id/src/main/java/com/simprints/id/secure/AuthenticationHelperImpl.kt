@@ -6,9 +6,9 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.secure.models.toDomainResult
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
@@ -32,7 +32,7 @@ class AuthenticationHelperImpl(
         projectId: String,
         projectSecret: String,
         deviceId: String
-    ): Result {
+    ): AuthenticateDataResult {
         val result = try {
             logMessageForCrashReportWithNetworkTrigger("Making authentication request")
             loginManager.cleanCredentials()
@@ -42,7 +42,7 @@ class AuthenticationHelperImpl(
             projectAuthenticator.authenticate(nonceScope, projectSecret, deviceId)
 
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
-            AUTHENTICATED
+            AuthenticateDataResult.Authenticated
         } catch (t: Throwable) {
             when (t) {
                 is NetworkConnectionException -> Simber.i(t)
@@ -55,28 +55,30 @@ class AuthenticationHelperImpl(
         }
 
         return result.also {
-            addEventAndUpdateProjectIdIfRequired(it, projectId, userId)
+            addEventAndUpdateProjectIdIfRequired(it.toDomainResult(), projectId, userId)
         }
     }
 
-    private fun extractResultFromException(t: Throwable): Result {
+    private fun extractResultFromException(t: Throwable): AuthenticateDataResult {
         return when (t) {
-            is IOException -> OFFLINE
-            is NetworkConnectionException -> OFFLINE
-            is AuthRequestInvalidCredentialsException -> BAD_CREDENTIALS
-            is SyncCloudIntegrationException -> TECHNICAL_FAILURE
-            is BackendMaintenanceException -> BACKEND_MAINTENANCE_ERROR
+            is IOException -> AuthenticateDataResult.Offline
+            is NetworkConnectionException -> AuthenticateDataResult.Offline
+            is AuthRequestInvalidCredentialsException -> AuthenticateDataResult.BadCredentials
+            is SyncCloudIntegrationException -> AuthenticateDataResult.TechnicalFailure
+            is BackendMaintenanceException -> {
+                AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
+            }
             is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
-            else -> UNKNOWN
+            else -> AuthenticateDataResult.Unknown
         }
     }
 
     private fun getSafetyNetExceptionReason(
         reason: SafetyNetException.SafetyNetExceptionReason
-    ): Result {
+    ): AuthenticateDataResult {
         return when (reason) {
-            SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
-            SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
+            SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> AuthenticateDataResult.SafetyNetUnavailable
+            SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS -> AuthenticateDataResult.SafetyNetInvalidClaim
         }
     }
 

@@ -27,14 +27,11 @@ import com.simprints.face.match.FaceMatchViewModel
 import com.simprints.face.match.FaceMatcher
 import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
-import com.simprints.id.Application
 import com.simprints.uicomponents.imageTools.LibYuvJni
-import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -53,9 +50,6 @@ import java.util.concurrent.atomic.AtomicInteger
 object KoinInjector {
     private val consumers = AtomicInteger(0)
     private var koinModule: Module? = null
-
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
 
     /**
      * Call this on the creation of activities

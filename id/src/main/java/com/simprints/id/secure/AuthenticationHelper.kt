@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.secure.models.AuthenticateDataResult
 
 interface AuthenticationHelper {
 
@@ -9,5 +9,5 @@ interface AuthenticationHelper {
         projectId: String,
         projectSecret: String,
         deviceId: String
-    ): Result
+    ): AuthenticateDataResult
 }

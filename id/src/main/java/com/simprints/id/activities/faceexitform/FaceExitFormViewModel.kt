@@ -13,6 +13,7 @@ class FaceExitFormViewModel(private val eventRepository: com.simprints.eventsyst
             eventRepository.addOrUpdateEvent(
                 RefusalEvent(startTime, endTime, faceExitFormReason.toRefusalEventAnswer(), otherText)
             )
+            eventRepository.removeLocationDataFromCurrentSession()
         }
     }
 }

@@ -3,6 +3,7 @@ package com.simprints.id.services.location
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.session.Location
@@ -53,7 +54,7 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
 
     private fun createLocationFlow(): Flow<android.location.Location?> {
         val locationRequest = LocationRequest.create().apply {
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            priority = Priority.PRIORITY_HIGH_ACCURACY
         }
         return locationManager.requestLocation(locationRequest).take(1)
     }
