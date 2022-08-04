@@ -3,14 +3,10 @@ package com.simprints.id.secure
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.login.exceptions.SafetyNetException
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.SafetyNetException
-import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
-import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
