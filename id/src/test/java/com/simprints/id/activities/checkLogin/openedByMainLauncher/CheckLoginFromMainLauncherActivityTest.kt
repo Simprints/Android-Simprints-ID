@@ -31,8 +31,7 @@ class CheckLoginFromMainLauncherActivityTest {
     @Inject
     lateinit var secureDataManager: SecureLocalDbKeyProvider
 
-    @Inject
-    lateinit var loginManager: LoginManager
+    val loginManager: LoginManager = mockk()
 
     private val module by lazy {
         TestAppModule(
@@ -78,6 +77,7 @@ class CheckLoginFromMainLauncherActivityTest {
     private fun startCheckLoginAndCheckNextActivity(clazzNextActivity: Class<out Activity>) {
         val controller = createActivity<CheckLoginFromMainLauncherActivity>()
         val activity = controller.get()
+        (activity.viewPresenter as CheckLoginFromMainLauncherPresenter).loginManager = loginManager
         controller.resume().visible()
         assertActivityStarted(clazzNextActivity, activity)
     }
