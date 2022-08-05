@@ -6,8 +6,9 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.infra.security.random.RandomGenerator
 import com.simprints.infra.security.random.RandomGeneratorImpl
+import javax.inject.Inject
 
-class SecureLocalDbKeyProviderImpl(
+internal class SecureLocalDbKeyProviderImpl @Inject constructor(
     private val encryptedSharedPrefs: SharedPreferences,
     private val randomGenerator: RandomGenerator = RandomGeneratorImpl()
 ) : SecureLocalDbKeyProvider {

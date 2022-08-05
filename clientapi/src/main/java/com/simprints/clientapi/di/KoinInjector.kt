@@ -22,13 +22,13 @@ import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
+import com.simprints.id.Application
+import com.simprints.id.di.AppComponent
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.infra.security.root.RootManager
-import com.simprints.infra.security.root.RootManagerImpl
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -115,7 +115,9 @@ object KoinInjector {
     }
 
     private fun Module.defineBuilderForRootManager() {
-        factory<RootManager> { RootManagerImpl(androidContext()) }
+        factory { androidContext().applicationContext as Application }
+        factory { get<Application>().component }
+        factory { get<AppComponent>().getRootManager() }
     }
 
 }

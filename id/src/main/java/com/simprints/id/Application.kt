@@ -102,6 +102,7 @@ open class Application : CoreApplication() {
         factory { component.getLoginManager() }
         factory { component.getLicenseRepository() }
         factory { component.getIdPreferencesManager() }
+        factory { component.getRootManager() }
     }
 
     override fun onTerminate() {

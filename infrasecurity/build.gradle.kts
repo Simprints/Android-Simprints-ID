@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    kotlin("kapt")
 }
 
 apply {
@@ -23,6 +24,9 @@ dependencies {
 
     // RootBeer (root detection)
     implementation(libs.rootbeer.core)
+
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     // Unit Tests
     testImplementation(project(":testtools"))
