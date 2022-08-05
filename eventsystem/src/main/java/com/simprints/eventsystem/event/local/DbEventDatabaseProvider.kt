@@ -1,8 +1,8 @@
 package com.simprints.eventsystem.event.local
 
 import android.content.Context
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.SecurityManager
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 
@@ -12,7 +12,7 @@ interface EventDatabaseFactory {
 
 class DbEventDatabaseFactoryImpl(
     val ctx: Context,
-    private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider
+    private val secureLocalDbKeyProvider: SecurityManager
 ) : EventDatabaseFactory {
 
     override fun build(): EventRoomDatabase {

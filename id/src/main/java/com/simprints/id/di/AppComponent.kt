@@ -58,8 +58,7 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
-import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.SecurityManager
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -161,7 +160,6 @@ interface AppComponent {
     fun getImageRepository(): ImageRepository
     fun getLicenseRepository(): LicenseRepository
     fun getLoginManager(): LoginManager
-    fun getRootManager(): RootManager
-    fun getEncryptedSharedPrefs(): EncryptedSharedPreferencesBuilder
+    fun getSecurityManager(): SecurityManager
 
 }

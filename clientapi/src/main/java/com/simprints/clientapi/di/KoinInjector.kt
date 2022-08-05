@@ -76,7 +76,7 @@ object KoinInjector {
     private fun Module.buildClientApiSessionEventsManager() {
         factory<StepEncoder> { StepEncoderImpl() }
 
-        factory { get<AppComponent>().getEncryptedSharedPrefs().buildEncryptedSharedPreferences() }
+        factory { get<AppComponent>().getSecurityManager().buildEncryptedSharedPreferences() }
 
         factory<HotCache> { HotCacheImpl(get(), get()) }
         factory<ClientApiSessionEventsManager> {
@@ -119,7 +119,7 @@ object KoinInjector {
     }
 
     private fun Module.defineBuilderForRootManager() {
-        factory { get<AppComponent>().getRootManager() }
+        factory { get<AppComponent>().getSecurityManager() }
     }
 
 }

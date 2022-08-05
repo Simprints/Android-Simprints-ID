@@ -17,7 +17,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.SecurityManager
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
@@ -30,7 +30,7 @@ class LibSimprintsPresenter(
     private val view: LibSimprintsContract.View,
     private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    rootManager: RootManager,
+    rootManager: SecurityManager,
     private val timeHelper: ClientApiTimeHelper,
     private val subjectRepository: SubjectRepository,
     private val jsonHelper: JsonHelper,
