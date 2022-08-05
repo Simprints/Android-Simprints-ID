@@ -7,15 +7,15 @@ import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.withContext
 
 class RealmWrapperImpl(
     private val appContext: Context,
-    private val secureDataManager: SecureLocalDbKeyProvider,
+    private val secureDataManager: SecurityManager,
     private val loginManager: LoginManager,
     private val dispatcher: DispatcherProvider,
 ) :

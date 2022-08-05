@@ -55,8 +55,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -116,7 +115,7 @@ open class AppModule {
     @Provides
     open fun provideDbEventDatabaseFactory(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
+        secureDataManager: SecurityManager,
     ): EventDatabaseFactory =
         DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
@@ -192,11 +191,6 @@ open class AppModule {
         )
 
     @Provides
-    @Named("EncryptedSharedPreferences")
-    open fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
-        builder.buildEncryptedSharedPreferences()
-
-    @Provides
     open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
         DeviceManagerImpl(connectivityHelper)
 
@@ -228,6 +222,12 @@ open class AppModule {
 
     @Provides
     open fun provideQrCodeDetector(): QrCodeDetector = QrCodeDetectorImpl()
+
+
+    @Provides
+    @Named("EncryptedSharedPreferences")
+    open fun provideEncryptedSharedPreferences(builder: SecurityManager): SharedPreferences =
+        builder.buildEncryptedSharedPreferences()
 
     @Provides
     fun provideHotCache(

@@ -29,5 +29,8 @@ abstract class SecurityModule {
     @Binds
     internal abstract fun bindEncryptedSharedPreferencesBuilder(impl: EncryptedSharedPreferencesBuilderImpl): EncryptedSharedPreferencesBuilder
 
+    @Binds
+    internal abstract fun bindSecurityManager(impl: SecurityManagerImpl): SecurityManager
+
 }
 
