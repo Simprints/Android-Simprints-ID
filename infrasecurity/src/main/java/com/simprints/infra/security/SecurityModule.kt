@@ -1,5 +1,7 @@
 package com.simprints.infra.security
 
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
 import com.simprints.infra.security.random.RandomGenerator
@@ -23,6 +25,9 @@ abstract class SecurityModule {
 
     @Binds
     internal abstract fun bindRootManager(impl: RootManagerImpl): RootManager
+
+    @Binds
+    internal abstract fun bindEncryptedSharedPreferencesBuilder(impl: EncryptedSharedPreferencesBuilderImpl): EncryptedSharedPreferencesBuilder
 
 }
 

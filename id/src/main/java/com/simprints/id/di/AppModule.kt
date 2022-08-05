@@ -56,7 +56,6 @@ import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
 import dagger.Provides
@@ -191,10 +190,6 @@ open class AppModule {
             subjectRepository,
             preferencesManager
         )
-
-    @Provides
-    open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
-        EncryptedSharedPreferencesBuilderImpl(app)
 
     @Provides
     @Named("EncryptedSharedPreferences")
