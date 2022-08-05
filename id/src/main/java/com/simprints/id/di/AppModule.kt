@@ -58,10 +58,6 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
-import com.simprints.infra.security.random.RandomGenerator
-import com.simprints.infra.security.random.RandomGeneratorImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,21 +83,6 @@ open class AppModule {
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
-
-    @Provides
-    @Singleton
-    open fun provideRandomGenerator(): RandomGenerator = RandomGeneratorImpl()
-
-    @Provides
-    @Singleton
-    open fun provideSecureLocalDbKeyProvider(
-        builder: EncryptedSharedPreferencesBuilder,
-        randomGenerator: RandomGenerator
-    ): SecureLocalDbKeyProvider =
-        SecureLocalDbKeyProviderImpl(
-            builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
-            randomGenerator
-        )
 
     @Provides
     @Singleton
