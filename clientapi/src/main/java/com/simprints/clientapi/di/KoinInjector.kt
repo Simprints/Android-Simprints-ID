@@ -1,7 +1,6 @@
 package com.simprints.clientapi.di
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
@@ -28,7 +27,6 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -56,12 +54,18 @@ object KoinInjector {
 
     private fun buildKoinModule() =
         module {
+            defineAppComponent()
             defineBuildersForDomainManagers()
             defineBuildersForPresenters()
             defineBuildersForGuidSelectionNotifiers()
             defineBuilderForRootManager()
             factory { JsonHelper }
         }
+
+    private fun Module.defineAppComponent() {
+        factory { androidContext().applicationContext as Application }
+        factory { get<Application>().component }
+    }
 
     private fun Module.defineBuildersForDomainManagers() {
         factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
@@ -71,9 +75,9 @@ object KoinInjector {
 
     private fun Module.buildClientApiSessionEventsManager() {
         factory<StepEncoder> { StepEncoderImpl() }
-        factory<SharedPreferences> {
-            EncryptedSharedPreferencesBuilderImpl(androidContext()).buildEncryptedSharedPreferences()
-        }
+
+        factory { get<AppComponent>().getEncryptedSharedPrefs().buildEncryptedSharedPreferences() }
+
         factory<HotCache> { HotCacheImpl(get(), get()) }
         factory<ClientApiSessionEventsManager> {
             ClientApiSessionEventsManagerImpl(
@@ -115,8 +119,6 @@ object KoinInjector {
     }
 
     private fun Module.defineBuilderForRootManager() {
-        factory { androidContext().applicationContext as Application }
-        factory { get<Application>().component }
         factory { get<AppComponent>().getRootManager() }
     }
 
