@@ -56,10 +56,9 @@ class PrivacyNoticeActivityTest {
         every { viewModelFactory.create<PrivacyNoticeViewModel>(any()) } returns viewModel
 
 
-        app.component = AndroidTestConfig(appModule = appModule)
-            .componentBuilder()
-            .viewModelModule(testViewModelModule)
-            .build()
+        app.component =
+            AndroidTestConfig(appModule = appModule, viewModelModule = testViewModelModule)
+            .componentBuilder().build()
     }
 
     @Test
