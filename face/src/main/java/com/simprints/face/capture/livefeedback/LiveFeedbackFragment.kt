@@ -13,7 +13,6 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
-import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.Size
 import com.simprints.infra.logging.Simber
@@ -87,18 +86,6 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
         } catch (t: Throwable) {
             Simber.e(t)
             mainVm.submitError(t)
-        }
-    }
-
-    private fun renderDebugInfo(face: Face?) {
-        if (face == null) {
-            binding.captureFeedbackTxtDebug.text = null
-        } else {
-            binding.captureFeedbackTxtDebug.text = getString(
-                R.string.capture_debug_features,
-                face.yaw.toString(),
-                face.roll.toString()
-            )
         }
     }
 

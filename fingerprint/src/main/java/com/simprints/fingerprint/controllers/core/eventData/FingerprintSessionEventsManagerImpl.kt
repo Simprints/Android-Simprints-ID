@@ -27,9 +27,7 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
     override suspend fun addEvent(event: Event) {
         ignoreException {
             fromDomainToCore(event).let {
-                runBlocking {
-                    eventRepository.addOrUpdateEvent(it)
-                }
+                eventRepository.addOrUpdateEvent(it)
             }
         }
     }

@@ -3,6 +3,7 @@ package com.simprints.infra.network
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
@@ -11,6 +12,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.SocketPolicy
+import okio.IOException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -154,6 +157,25 @@ class SimApiClientImplTest {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.cause).isInstanceOf(HttpException::class.java)
+            assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNotNull()
+            assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNull()
+        }
+
+    @Test
+    fun `should throw a network connection exception when no response is received and not retry`() =
+        runTest(
+            StandardTestDispatcher()
+        ) {
+
+            val failedResponse = MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)
+            mockWebServer.enqueue(failedResponse)
+            val successfulResponse = MockResponse()
+            mockWebServer.enqueue(successfulResponse)
+
+            val exception = assertThrows<NetworkConnectionException> {
+                simApiClientImpl.executeCall { it.get() }
+            }
+            assertThat(exception.cause).isInstanceOf(IOException::class.java)
             assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNotNull()
             assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNull()
         }

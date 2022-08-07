@@ -33,21 +33,9 @@ fun assertActivityStarted(clazz: Class<out Activity>, intent: Intent) {
     assertActivityStarted(clazz.name, intent)
 }
 
-fun assertActivityStarted(clazzName: String, activity: Activity) {
-    val shadowActivity = Shadows.shadowOf(activity)
-    assertActivityStarted(clazzName, shadowActivity)
-}
-
-fun assertActivityStarted(clazzName: String, shadowActivity: ShadowActivity) {
-    val startedIntent = shadowActivity.nextStartedActivity
-    assertActivityStarted(clazzName, startedIntent)
-}
-
 fun assertActivityStarted(clazzName: String, intent: Intent) {
     assertEquals(clazzName, intent.component?.className)
 }
-
-fun <T : Activity> ActivityController<T>.showOnScreen(): ActivityController<T> = this.start().resume().visible()
 
 fun getSharedPreferences(fileName: String): SharedPreferences =
     ApplicationProvider.getApplicationContext<Application>().getSharedPreferences(fileName, Context.MODE_PRIVATE)

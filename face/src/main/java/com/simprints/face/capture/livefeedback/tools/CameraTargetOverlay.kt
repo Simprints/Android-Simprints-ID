@@ -57,13 +57,6 @@ class CameraTargetOverlay(
         drawingFunc?.invoke(canvas)
     }
 
-    fun drawColorNoTarget(color: Int) {
-        drawingFunc = {
-            drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-            drawColor(color, PorterDuff.Mode.SRC_OVER)
-        }
-    }
-
     fun drawSemiTransparentTarget() {
         drawingFunc = {
             drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
