@@ -1,17 +1,16 @@
 [versions]
-kotlin_version = "1.6.21"
+kotlin_version = "1.7.10"
 androidx_navigation_version = "2.5.0"
 kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.4.2"
 androidx_version = "1.4.0"
 androidx_test_orchestrator_version = "1.4.1"
-androidx_test_monitor_version = "1.4.0"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.5.0"
 androidx_room_version = "2.4.3"
 androidx_camerax_version = "1.2.0-alpha04"
-dagger_version = "2.43.1"
+dagger_version = "2.43.2"
 work_version = "2.7.1"
 location_services_version = "20.0.0"
 safetynet_services_version = "18.0.1"
@@ -83,7 +82,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 dagger-javax = "javax.inject:javax.inject:1"
 
 #SqlCipher
-sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.1"
+sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.2"
 
 #Support
 support-material = "com.google.android.material:material:1.6.1"
@@ -100,7 +99,7 @@ playcore-core = "com.google.android.play:core:1.10.3"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth:21.0.6"
+firebase-auth = "com.google.firebase:firebase-auth:21.0.7"
 firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
 firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
@@ -193,7 +192,6 @@ testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", versi
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.2.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX
-testing-AndroidX-monitor = { module = "androidx.test:monitor", version.ref = "androidx_test_monitor_version" }
 testing-AndroidX-ext_junit = "androidx.test.ext:junit:1.1.3"
 testing-AndroidX-core = { module = "androidx.test:core", version.ref = "androidx_version" }
 testing-AndroidX-core_testing = { module = "android.arch.core:core-testing", version.ref = "androidx_version" }
