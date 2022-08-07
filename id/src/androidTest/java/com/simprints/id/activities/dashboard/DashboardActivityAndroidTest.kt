@@ -54,9 +54,11 @@ class DashboardActivityAndroidTest {
             mockViewModelFactory.create<DashboardViewModel>(any())
         } returns mockViewModel
 
-        app.component = AndroidTestConfig(preferencesModule = preferencesModule)
+        app.component = AndroidTestConfig(
+            preferencesModule = preferencesModule,
+            viewModelModule = buildViewModelModule()
+        )
             .componentBuilder()
-            .viewModelModule(buildViewModelModule())
             .build()
 
         mockPreferencesManager = app.component.getIdPreferencesManager()
