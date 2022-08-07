@@ -21,7 +21,6 @@ jackson_version = "2.13.3"
 koin_version = "3.2.0"
 rootbeer_version = "0.1.0"
 mockito_version = "4.5.1"
-objenesis_version = "3.3"
 robolectric_version = "4.8.1"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
@@ -182,8 +181,6 @@ testing-Mockito-core = { module = "org.mockito:mockito-core", version.ref = "moc
 testing-Mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito_version" } #Required to mock final classes
 testing-Mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito_version" } #Required to use Mock in AndroidTests
 testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
-#Testing-Objenesis
-testing-Objenesis-core = { module = "org.objenesis:objenesis", version.ref = "objenesis_version" }
 #Testing-Mockk
 testing-Mockk-core = "io.mockk:mockk:1.12.5"
 testing-Mockk-android = "io.mockk:mockk-android:1.12.5"
