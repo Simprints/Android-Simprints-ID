@@ -97,7 +97,6 @@ dependencies {
 
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
-    androidTestImplementation(libs.testing.objenesis.core)
     androidTestImplementation(libs.testing.truth)
 
     // Espresso
