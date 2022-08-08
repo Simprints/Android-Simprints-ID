@@ -10,8 +10,8 @@ import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
 import com.simprints.id.data.db.subject.local.RealmWrapperImpl
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import io.mockk.every
 import io.mockk.mockk
 import io.realm.Realm
@@ -30,7 +30,7 @@ class ProjectLocalDataSourceImplTest : RealmTestsBase() {
         every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
-    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider>().apply {
+    private val secureLocalDbKeyProviderMock = mockk<SecurityManager>().apply {
         every {
             getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
         } returns LocalDbKey(newDatabaseName, newDatabaseKey)
