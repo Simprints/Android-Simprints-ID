@@ -17,6 +17,7 @@ import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.android.waitOnUi
@@ -42,7 +43,9 @@ class DashboardActivityAndroidTest {
     lateinit var mockViewModel: DashboardViewModel
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-
+    private val appModule by lazy {
+        TestAppModule(app)
+    }
     private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpykRule)
     }
@@ -54,12 +57,11 @@ class DashboardActivityAndroidTest {
             mockViewModelFactory.create<DashboardViewModel>(any())
         } returns mockViewModel
 
-        app.component = AndroidTestConfig(
-            preferencesModule = preferencesModule,
+        AndroidTestConfig(
+            appModule = appModule,
+            preferencesModule=preferencesModule,
             viewModelModule = buildViewModelModule()
-        )
-            .componentBuilder()
-            .build()
+        ).initComponent().testAppComponent.inject(this)
 
         mockPreferencesManager = app.component.getIdPreferencesManager()
     }
