@@ -35,7 +35,8 @@ import javax.inject.Singleton
         ViewModelModule::class,
         LoginManagerModule::class,
         NetworkModule::class,
-        SafetyNetModule::class
+        SafetyNetModule::class,
+        TestSecurityModule::class
     ]
 )
 interface AppComponentForTests : AppComponent {

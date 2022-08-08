@@ -8,8 +8,8 @@ import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -38,7 +38,7 @@ class RealmWrapperImplTest {
         every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
-    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider> {
+    private val secureLocalDbKeyProviderMock = mockk<SecurityManager> {
         every { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
             "DatabaseName",
             "DatabaseKey".toByteArray()
