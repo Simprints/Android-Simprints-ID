@@ -2,12 +2,15 @@ package com.simprints.infra.security
 
 import android.content.SharedPreferences
 import com.simprints.infra.security.exceptions.RootedDeviceException
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder.Companion.FILENAME
+import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder.Companion.SHARED_PREFS_FILENAME
 import com.simprints.infra.security.keyprovider.LocalDbKey
 
 interface SecurityManager {
 
-    fun buildEncryptedSharedPreferences(filename: String = FILENAME): SharedPreferences
+    /**
+     * If no argument is supplied for filename then it uses the shared encrypted shared prefs file
+     */
+    fun buildEncryptedSharedPreferences(filename: String = SHARED_PREFS_FILENAME): SharedPreferences
 
     fun createLocalDatabaseKeyIfMissing(dbName: String)
 
