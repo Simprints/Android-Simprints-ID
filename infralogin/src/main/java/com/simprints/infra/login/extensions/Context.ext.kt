@@ -3,12 +3,7 @@ package com.simprints.infra.login.extensions
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.provider.Settings
-import android.util.TypedValue
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
 
 internal val Context.deviceId: String
     @SuppressLint("HardwareIds")
