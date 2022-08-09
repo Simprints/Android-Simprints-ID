@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 
 internal interface EncryptedSharedPreferencesBuilder {
     companion object {
-        const val FILENAME = "encrypted_shared"
+        const val SHARED_PREFS_FILENAME = "encrypted_shared"
     }
 
     fun buildEncryptedSharedPreferences(filename: String): SharedPreferences
