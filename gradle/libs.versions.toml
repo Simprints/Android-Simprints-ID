@@ -10,7 +10,7 @@ uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.4.1"
 androidx_room_version = "2.4.3"
 androidx_camerax_version = "1.2.0-alpha04"
-dagger_version = "2.43.1"
+dagger_version = "2.43.2"
 work_version = "2.7.1"
 location_services_version = "20.0.0"
 safetynet_services_version = "18.0.1"
@@ -21,7 +21,6 @@ jackson_version = "2.13.3"
 koin_version = "3.2.0"
 rootbeer_version = "0.1.0"
 mockito_version = "4.5.1"
-objenesis_version = "3.2"
 robolectric_version = "4.8.1"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
@@ -83,7 +82,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 dagger-javax = "javax.inject:javax.inject:1"
 
 #SqlCipher
-sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.1"
+sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.2"
 
 #Support
 support-material = "com.google.android.material:material:1.6.1"
@@ -100,7 +99,7 @@ playcore-core = "com.google.android.play:core:1.10.3"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth-ktx:21.0.6"
+firebase-auth = "com.google.firebase:firebase-auth-ktx:21.0.7"
 firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
 firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
@@ -187,8 +186,6 @@ testing-Mockito-core = { module = "org.mockito:mockito-core", version.ref = "moc
 testing-Mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito_version" } #Required to mock final classes
 testing-Mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito_version" } #Required to use Mock in AndroidTests
 testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
-#Testing-Objenesis
-testing-Objenesis-core = { module = "org.objenesis:objenesis", version.ref = "objenesis_version" }
 #Testing-Mockk
 testing-Mockk-core = "io.mockk:mockk:1.12.5"
 testing-Mockk-android = "io.mockk:mockk-android:1.12.5"
