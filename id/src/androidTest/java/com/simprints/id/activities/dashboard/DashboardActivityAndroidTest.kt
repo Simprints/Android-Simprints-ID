@@ -12,8 +12,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
-import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
-import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
@@ -23,7 +21,10 @@ import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
@@ -133,8 +134,6 @@ class DashboardActivityAndroidTest {
     private fun buildViewModelModule() = TestViewModelModule(
         dashboardViewModelFactoryRule = DependencyRule.ReplaceRule {
             mockViewModelFactory
-        },
-        loginViewModelFactoryRule = DependencyRule.ReplaceRule { mockk<LoginViewModelFactory>() },
-        privacyViewModelFactoryRule = DependencyRule.ReplaceRule { mockk<PrivacyNoticeViewModelFactory>() }
+        }
     )
 }
