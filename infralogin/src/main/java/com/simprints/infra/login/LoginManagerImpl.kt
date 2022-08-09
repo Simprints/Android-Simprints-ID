@@ -104,11 +104,13 @@ internal class LoginManagerImpl @Inject constructor(
         loginInfoManager.storeCredentials(projectId, userId)
     }
 
-    override suspend fun signIn(token: Token) =
+    override suspend fun signIn(token: Token) {
         remoteDbManager.signIn(token)
+    }
 
-    override fun signOut() =
+    override fun signOut() {
         remoteDbManager.signOut()
+    }
 
     override fun isSignedIn(projectId: String, userId: String): Boolean =
         remoteDbManager.isSignedIn(projectId, userId)
