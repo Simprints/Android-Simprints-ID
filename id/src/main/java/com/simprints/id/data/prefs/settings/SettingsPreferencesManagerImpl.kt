@@ -31,7 +31,7 @@ open class SettingsPreferencesManagerImpl(
     groupSerializer: Serializer<GROUP>,
     modalitySerializer: Serializer<List<Modality>>,
     languagesStringArraySerializer: Serializer<Array<String>>,
-    moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+    moduleNamesStringSetSerializer: Serializer<Set<String>>,
     eventDownSyncSettingSerializer: Serializer<EventDownSyncSetting>,
     captureFingerprintStrategySerializer: Serializer<CaptureFingerprintStrategy>,
     fingerComparisonStrategySerializer: Serializer<FingerComparisonStrategy>,
@@ -82,7 +82,7 @@ open class SettingsPreferencesManagerImpl(
             remoteConfigWrapper,
             MODULE_ID_OPTIONS_KEY,
             MODULE_ID_OPTIONS_DEFAULT,
-            moduleIdOptionsStringSetSerializer
+            moduleNamesStringSetSerializer
         )
 
     /**
@@ -93,7 +93,7 @@ open class SettingsPreferencesManagerImpl(
             prefs,
             SELECTED_MODULES_KEY,
             SELECTED_MODULES_DEFAULT,
-            moduleIdOptionsStringSetSerializer
+            moduleNamesStringSetSerializer
         )
 
     /**
@@ -104,8 +104,7 @@ open class SettingsPreferencesManagerImpl(
             prefs,
             NEWLY_ADDED_MODULES_KEY,
             NEWLY_ADDED_MODULES_DEFAULT,
-            //TODO: have a general StringSetSerializer?
-            moduleIdOptionsStringSetSerializer
+            moduleNamesStringSetSerializer
         )
 
     override var maxNumberOfModules: Int
