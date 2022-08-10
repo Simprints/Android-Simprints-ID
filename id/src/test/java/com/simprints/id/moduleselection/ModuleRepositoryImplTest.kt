@@ -10,7 +10,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,7 +35,7 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
-    fun saveModules_shouldDeleteRecordsFromUnselectedModules() = runBlockingTest {
+    fun saveModules_shouldDeleteRecordsFromUnselectedModules() = runTest {
         val modules = listOf(
             Module("1", true),
             Module("2", true),
@@ -46,9 +46,23 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        coVerify {
-            mockSubjectRepository.delete(any())
-        }
+        coVerify { mockSubjectRepository.delete(any()) }
+    }
+
+    @Test
+    fun saveModules_shouldSaveNewlyAddedModules() = runTest {
+        val modules = listOf(
+            Module("a", true),
+            Module("b", false),
+            Module("c", false),
+            Module("d", true)
+        )
+
+        val newlyAddedModules = setOf("a", "d")
+
+        repository.saveModules(modules)
+
+        coVerify { mockPreferencesManager.newlyAddedModules = newlyAddedModules }
     }
 
     @Test
@@ -66,19 +80,7 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
-    fun shouldReturnSelectedModules() {
-        val expected = listOf(
-            Module("b", true),
-            Module("c", true)
-        )
-
-        val actual = repository.getModules().filter { it.isSelected }
-
-        assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
-    fun shouldFetchMaxNumberOfModulesFromRemoteConfig() = runBlockingTest {
+    fun shouldFetchMaxNumberOfModulesFromRemoteConfig() = runTest {
         every {
             repository.preferencesManager.maxNumberOfModules
         } returns 10
