@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import com.simprints.infra.network.BuildConfig
+import javax.inject.Inject
 
-class BaseUrlProviderImpl(context: Context) : BaseUrlProvider {
+internal class BaseUrlProviderImpl @Inject constructor(context: Context) : BaseUrlProvider {
 
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"

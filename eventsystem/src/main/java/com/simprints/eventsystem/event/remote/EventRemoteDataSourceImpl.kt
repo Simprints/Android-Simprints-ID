@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
@@ -14,17 +13,17 @@ import com.simprints.eventsystem.event.remote.models.ApiEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import retrofit2.HttpException
 import java.io.InputStream
 
 class EventRemoteDataSourceImpl(
-    private val simApiClientFactory: SimApiClientFactory,
+    private val loginManager: LoginManager,
     private val jsonHelper: JsonHelper
 ) : EventRemoteDataSource {
 
@@ -129,7 +128,7 @@ class EventRemoteDataSourceImpl(
         }
 
     private suspend fun getEventsApiClient(): SimApiClient<EventRemoteInterface> =
-        simApiClientFactory.buildClient(EventRemoteInterface::class)
+        loginManager.buildClient(EventRemoteInterface::class)
 
     companion object {
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000

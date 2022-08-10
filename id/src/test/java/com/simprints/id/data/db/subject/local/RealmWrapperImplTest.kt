@@ -3,11 +3,11 @@ package com.simprints.id.data.db.subject.local
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -34,7 +34,7 @@ class RealmWrapperImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
     private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-    private val loginInfoManagerMock = mockk<LoginInfoManager> {
+    private val loginManagerMock = mockk<LoginManager> {
         every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
@@ -64,7 +64,7 @@ class RealmWrapperImplTest {
         realmWrapper = RealmWrapperImpl(
             ApplicationProvider.getApplicationContext(),
             secureLocalDbKeyProviderMock,
-            loginInfoManagerMock,
+            loginManagerMock,
             testDispatcherProvider
         )
     }
@@ -81,7 +81,7 @@ class RealmWrapperImplTest {
     @Test(expected = RealmUninitialisedException::class)
     fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
         runTest(UnconfinedTestDispatcher()) {
-            every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+            every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
             realmWrapper.useRealmInstance { }
             // Then should throw RealmUninitialisedException
         }

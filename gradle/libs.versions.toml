@@ -27,6 +27,7 @@ kronos_version = "0.0.1-alpha11"
 fragment_version = "1.4.1"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
+hilt_version = "2.43.1"
 
 
 [libraries]
@@ -62,7 +63,7 @@ androidX-security = "androidx.security:security-crypto:1.0.0"
 androidX-cameraX-core = { module = "androidx.camera:camera-core", version.ref = "androidx_camerax_version" }
 androidX-cameraX-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx_camerax_version" }
 androidX-cameraX-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx_camerax_version" }
-androidX-cameraX-view = { module =  "androidx.camera:camera-view", version.ref = "androidx_camerax_version" }
+androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = "androidx_camerax_version" }
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
@@ -98,7 +99,7 @@ playcore-core = "com.google.android.play:core:1.10.3"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth:21.0.7"
+firebase-auth = "com.google.firebase:firebase-auth-ktx:21.0.7"
 firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
 firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
@@ -152,6 +153,10 @@ kronos-kronos = { module = "com.lyft.kronos:kronos-android", version.ref = "kron
 libsimprints = "com.simprints:libsimprints:2022.2.0"
 #simmatcher
 simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher_version" }
+
+#hilt
+hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
+hilt-kapt = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt_version" }
 
 #Testing
 testing-junit = "junit:junit:4.13.2"
