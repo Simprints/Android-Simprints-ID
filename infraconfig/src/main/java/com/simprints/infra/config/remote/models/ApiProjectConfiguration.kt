@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.ProjectConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 
 @Keep
 internal data class ApiProjectConfiguration(

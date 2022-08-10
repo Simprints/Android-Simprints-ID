@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.IdentificationConfiguration
+import com.simprints.infra.config.domain.models.IdentificationConfiguration
 
 @Keep
 internal data class ApiIdentificationConfiguration(

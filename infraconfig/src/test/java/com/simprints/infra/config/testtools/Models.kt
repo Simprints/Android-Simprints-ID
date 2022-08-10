@@ -1,6 +1,6 @@
 package com.simprints.infra.config.testtools
 
-import com.simprints.infra.config.domain.*
+import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.config.remote.models.*
 
 internal val apiConsentConfiguration = ApiConsentConfiguration(

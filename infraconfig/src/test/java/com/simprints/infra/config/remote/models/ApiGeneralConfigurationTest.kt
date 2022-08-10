@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.GeneralConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.testtools.apiGeneralConfiguration
 import com.simprints.infra.config.testtools.generalConfiguration
 import org.junit.Test
