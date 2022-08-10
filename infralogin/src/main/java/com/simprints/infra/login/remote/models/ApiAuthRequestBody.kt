@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.login.domain.models.AuthRequest
 
 @Keep
-data class ApiAuthRequestBody(
+internal data class ApiAuthRequestBody(
     var encryptedProjectSecret: String = "",
     var safetyNetAttestationResult: String = "",
     var deviceId: String
