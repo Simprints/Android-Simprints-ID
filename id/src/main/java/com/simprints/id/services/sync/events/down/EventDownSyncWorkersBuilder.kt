@@ -5,5 +5,6 @@ import androidx.work.OneTimeWorkRequest
 interface EventDownSyncWorkersBuilder {
 
     suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest>
+    suspend fun buildNewModulesDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest>?
 
 }

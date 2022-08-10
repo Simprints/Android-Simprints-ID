@@ -3,6 +3,7 @@ package com.simprints.id.services.sync.events.common
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.DOWN_SYNC_NEW_MODULES
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
@@ -45,6 +46,9 @@ internal fun WorkRequest.Builder<*, *>.addCommonTagForDownloaders(): WorkRequest
 
 internal fun WorkRequest.Builder<*, *>.addCommonTagForDownCounters(): WorkRequest.Builder<*, *> =
     this.addTag(tagForType(DOWN_COUNTER))
+
+internal fun WorkRequest.Builder<*, *>.addCommonTagForNewModuleDownloaders(): WorkRequest.Builder<*, *> =
+    this.addTag(DOWN_SYNC_NEW_MODULES)
 
 // Up Sync Workers tags
 internal fun WorkRequest.Builder<*, *>.addTagFoUpSyncId(uniqueDownMasterSyncId: String): WorkRequest.Builder<*, *> =

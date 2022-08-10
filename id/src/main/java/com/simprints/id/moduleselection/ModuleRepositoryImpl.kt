@@ -13,18 +13,22 @@ class ModuleRepositoryImpl(
     private val subjectRepository: SubjectRepository
 ): ModuleRepository {
 
-    override fun getModules(): List<Module> = buildModulesList()
+    override fun getModules(): List<Module> = preferencesManager.moduleIdOptions.map {
+        Module(it, isModuleSelected(it))
+    }
 
     override suspend fun saveModules(modules: List<Module>) {
+        val oldSelectedModules = getModules().filter { it.isSelected }
+        val addedModules = modules
+            .filter { it.isSelected }
+            .filter { !oldSelectedModules.contains(it) }
+        preferencesManager.newlyAddedModules = addedModules.map { it.name }.toSet()
+
         setSelectedModules(modules.filter { it.isSelected })
         handleUnselectedModules(modules.filter { !it.isSelected })
     }
 
     override fun getMaxNumberOfModules(): Int = preferencesManager.maxNumberOfModules
-
-    private fun buildModulesList() = preferencesManager.moduleIdOptions.map {
-        Module(it, isModuleSelected(it))
-    }
 
     private fun isModuleSelected(moduleName: String): Boolean {
         return preferencesManager.selectedModules.contains(moduleName)

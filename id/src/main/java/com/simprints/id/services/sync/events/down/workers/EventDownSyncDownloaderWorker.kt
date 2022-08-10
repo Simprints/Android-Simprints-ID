@@ -7,6 +7,7 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -26,6 +27,8 @@ class EventDownSyncDownloaderWorker(
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
+        const val DOWN_SYNC_NEW_MODULES = "DOWN_SYNC_NEW_MODULES"
+
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
@@ -38,6 +41,9 @@ class EventDownSyncDownloaderWorker(
 
     @Inject
     lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+
+    @Inject
+    lateinit var preferencesManager: IdPreferencesManager
 
     @Inject
     lateinit var syncCache: EventSyncCache
@@ -71,14 +77,26 @@ class EventDownSyncDownloaderWorker(
 
                 crashlyticsLog("Start - Params: $downSyncOperationInput")
 
+                //Do not refresh operation if request is for new modules so we get all events,
+                //not just the ones after last sync
+                val operation = if (isNewModulesDownSyncRequest()) {
+                    downSyncOperationInput
+                } else {
+                    getDownSyncOperation()
+                }
+
                 val count = eventDownSyncDownloaderTask.execute(
                     this@EventDownSyncDownloaderWorker.id.toString(),
-                    getDownSyncOperation(),
+                    operation,
                     downSyncHelper,
                     syncCache,
                     this@EventDownSyncDownloaderWorker,
                     this
                 )
+
+                if (isNewModulesDownSyncRequest()) {
+                    preferencesManager.newlyAddedModules = setOf()
+                }
 
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
                 success(
@@ -91,6 +109,8 @@ class EventDownSyncDownloaderWorker(
             retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
         }
     }
+
+    private fun isNewModulesDownSyncRequest() = tags.contains(DOWN_SYNC_NEW_MODULES)
 
     private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
         return when (t) {
