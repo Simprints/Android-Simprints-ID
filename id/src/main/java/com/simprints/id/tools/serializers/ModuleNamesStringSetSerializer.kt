@@ -1,6 +1,6 @@
 package com.simprints.id.tools.serializers
 
-class ModuleIdOptionsStringSetSerializer : Serializer<Set<String>> {
+class ModuleNamesStringSetSerializer : Serializer<Set<String>> {
 
     override fun serialize(value: Set<String>): String = StringBuilder().apply {
         value.forEachIndexed { index, language ->

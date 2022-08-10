@@ -22,7 +22,7 @@ import com.simprints.id.tools.serializers.IntegerSerializer
 import com.simprints.id.tools.serializers.LanguagesStringArraySerializer
 import com.simprints.id.tools.serializers.MapSerializer
 import com.simprints.id.tools.serializers.ModalitiesListSerializer
-import com.simprints.id.tools.serializers.ModuleIdOptionsStringSetSerializer
+import com.simprints.id.tools.serializers.ModuleNamesStringSetSerializer
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.id.tools.serializers.SimprintsSyncSerializer
 import dagger.Module
@@ -124,7 +124,7 @@ class SerializerModule {
     @Singleton
     @Named("ModuleIdOptionsStringSetSerializer")
     fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> =
-        ModuleIdOptionsStringSetSerializer()
+        ModuleNamesStringSetSerializer()
 
     @Provides
     @Singleton
