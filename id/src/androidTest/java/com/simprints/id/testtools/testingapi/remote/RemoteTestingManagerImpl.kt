@@ -5,7 +5,7 @@ import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
 import com.simprints.id.testtools.testingapi.models.*
-import com.simprints.infra.network.SimApiClientImpl
+import com.simprints.infra.network.SimApiClient
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -15,7 +15,7 @@ import io.reactivex.schedulers.Schedulers
  */
 class RemoteTestingManagerImpl(ctx: Context) : RemoteTestingManager {
 
-    private val remoteTestingApi = SimApiClientImpl(
+    private val remoteTestingApi = SimApiClient.getSimApiClient(
         RemoteTestingApi::class,
         ctx,
         RemoteTestingApi.baseUrl,

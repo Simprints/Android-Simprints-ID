@@ -3,6 +3,7 @@ package com.simprints.infra.network
 import android.content.Context
 import com.simprints.infra.network.coroutines.retryIO
 import com.simprints.infra.network.exceptions.*
+import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +15,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import kotlin.reflect.KClass
 
-class SimApiClientImpl<T : SimRemoteInterface>(
+internal class SimApiClientImpl<T : SimRemoteInterface>(
     private val service: KClass<T>,
     private val ctx: Context,
     private val url: String,

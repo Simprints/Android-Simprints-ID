@@ -1,7 +1,9 @@
 package com.simprints.infra.network
 
+import android.content.Context
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import kotlin.reflect.KClass
 
 interface SimApiClient<T : SimRemoteInterface> {
 
@@ -13,4 +15,27 @@ interface SimApiClient<T : SimRemoteInterface> {
      * @throws SyncCloudIntegrationException if the backend returns an error code
      */
     suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V
+
+    companion object {
+
+        fun <T : SimRemoteInterface> getSimApiClient(
+            remoteInterface: KClass<T>,
+            ctx: Context,
+            url: String,
+            deviceId: String,
+            versionName: String,
+            authToken: String?
+        ): SimApiClient<T> {
+            return SimApiClientImpl(
+                remoteInterface,
+                ctx,
+                url,
+                deviceId,
+                versionName,
+                authToken
+            )
+        }
+
+    }
+
 }
