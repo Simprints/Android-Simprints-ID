@@ -28,12 +28,12 @@ import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Module
@@ -42,7 +42,7 @@ open class SecurityModule {
     @Provides
     @Singleton
     open fun provideSignerManager(
-        projectRepository: ProjectRepository,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
@@ -53,7 +53,7 @@ open class SecurityModule {
         baseUrlProvider: BaseUrlProvider,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
-        projectRepository,
+        configManager,
         loginManager,
         preferencesManager,
         eventSyncManager,

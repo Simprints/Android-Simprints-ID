@@ -107,6 +107,7 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     api(project(":infralogin"))
+    implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrasecurity"))

@@ -6,7 +6,7 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimApiClient
 import javax.inject.Inject
 
-class ConfigRemoteDataSourceImpl @Inject constructor(private val loginManager: LoginManager) :
+internal class ConfigRemoteDataSourceImpl @Inject constructor(private val loginManager: LoginManager) :
     ConfigRemoteDataSource {
 
     override suspend fun getConfiguration(projectId: String): ProjectConfiguration =

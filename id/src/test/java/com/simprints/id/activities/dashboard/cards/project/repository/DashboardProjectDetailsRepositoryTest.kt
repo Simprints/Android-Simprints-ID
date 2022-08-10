@@ -1,8 +1,8 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
 import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.domain.Project
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.login.LoginManager
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -33,41 +33,19 @@ class DashboardProjectDetailsRepositoryTest {
 
     @Test
     fun shouldGetProjectNameFromCache() = runTest(UnconfinedTestDispatcher()) {
-        val mockProjectRepository = mockk<ProjectRepository>().also {
-            coEvery { it.loadFromCache(PROJECT_ID) } returns mockProject
+        val mockConfigManager = mockk<ConfigManager>().also {
+            coEvery { it.refreshProject(PROJECT_ID) } returns mockProject
         }
 
         repository = DashboardProjectDetailsRepository(
-            mockProjectRepository,
+            mockConfigManager,
             mockLoginManager,
             mockPreferencesManager
         )
 
         repository.getProjectDetails()
 
-        coVerify(exactly = 1) { mockProjectRepository.loadFromCache(PROJECT_ID) }
-        coVerify(exactly = 0) { mockProjectRepository.loadFromRemoteAndRefreshCache(PROJECT_ID) }
-    }
-
-    @Test
-    fun whenFetchingFromCacheFails_shouldGetProjectNameFromRemote() = runTest(
-        UnconfinedTestDispatcher()
-    ) {
-        val mockProjectRepository = mockk<ProjectRepository>().also {
-            coEvery { it.loadFromCache(PROJECT_ID) } returns null
-            coEvery { it.loadFromRemoteAndRefreshCache(PROJECT_ID) } returns mockProject
-        }
-
-        repository = DashboardProjectDetailsRepository(
-            mockProjectRepository,
-            mockLoginManager,
-            mockPreferencesManager
-        )
-
-        repository.getProjectDetails()
-
-        coVerify(exactly = 1) { mockProjectRepository.loadFromCache(PROJECT_ID) }
-        coVerify(exactly = 1) { mockProjectRepository.loadFromRemoteAndRefreshCache(PROJECT_ID) }
+        coVerify(exactly = 1) { mockConfigManager.refreshProject(PROJECT_ID) }
     }
 
     private companion object {

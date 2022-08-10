@@ -17,7 +17,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -46,7 +45,7 @@ object DataStoreModule {
 
     @Singleton
     @Provides
-    fun provideProjectProtoDataStore(@ApplicationContext appContext: Context): DataStore<ProtoProject> {
+    fun provideProjectProtoDataStore(appContext: Context): DataStore<ProtoProject> {
         return DataStoreFactory.create(
             serializer = ProjectSerializer,
             produceFile = { appContext.dataStoreFile(PROJECT_DATA_STORE_FILE_NAME) },

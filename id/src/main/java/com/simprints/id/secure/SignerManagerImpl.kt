@@ -7,12 +7,13 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.url.BaseUrlProvider
 
 open class SignerManagerImpl(
-    private var projectRepository: ProjectRepository,
+    private val configManager: ConfigManager,
     private val loginManager: LoginManager,
     private val preferencesManager: PreferencesManager,
     private val eventSyncManager: EventSyncManager,
@@ -26,8 +27,7 @@ open class SignerManagerImpl(
     override suspend fun signIn(projectId: String, userId: String, token: Token) {
         loginManager.signIn(token)
         loginManager.storeCredentials(projectId, userId)
-        projectRepository.loadFromRemoteAndRefreshCache(projectId)
-            ?: throw Exception("project not found")
+        configManager.refreshProject(projectId)
         securityStateScheduler.scheduleSecurityStateCheck()
     }
 
