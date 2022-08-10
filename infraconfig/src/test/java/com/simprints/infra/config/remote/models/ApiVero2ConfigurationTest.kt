@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.Vero2Configuration
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.infra.config.testtools.apiVero2Configuration
 import com.simprints.infra.config.testtools.vero2Configuration
 import org.junit.Test

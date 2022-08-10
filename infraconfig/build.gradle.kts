@@ -1,7 +1,13 @@
+import com.google.protobuf.gradle.generateProtoTasks
+import com.google.protobuf.gradle.plugins
+import com.google.protobuf.gradle.protobuf
+import com.google.protobuf.gradle.protoc
+
 plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("kapt")
+    id("com.google.protobuf") version "0.8.17"
 }
 
 apply {
@@ -23,6 +29,8 @@ dependencies {
     implementation(project(":infralogin"))
 
     implementation(libs.androidX.core)
+    implementation(libs.datastore)
+    implementation(libs.protobuf)
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
@@ -32,8 +40,30 @@ dependencies {
     // Unit Tests
     testImplementation(project(":testtools"))
 
+    testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.coroutines.test)
 }
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.19.4"
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
+kapt {
+    correctErrorTypes = true
+}
+

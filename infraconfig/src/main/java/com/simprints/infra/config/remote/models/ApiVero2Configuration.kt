@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.Vero2Configuration
+import com.simprints.infra.config.domain.models.Vero2Configuration
 
 @Keep
 internal data class ApiVero2Configuration(

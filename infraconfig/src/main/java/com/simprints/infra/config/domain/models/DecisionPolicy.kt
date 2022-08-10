@@ -1,4 +1,4 @@
-package com.simprints.infra.config.domain
+package com.simprints.infra.config.domain.models
 
 data class DecisionPolicy(
     val low: Int,

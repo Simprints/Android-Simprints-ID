@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.ConsentConfiguration
+import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.testtools.apiConsentConfiguration
 import com.simprints.infra.config.testtools.consentConfiguration
 import org.junit.Test

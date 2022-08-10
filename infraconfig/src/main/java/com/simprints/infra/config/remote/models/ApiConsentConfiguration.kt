@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.ConsentConfiguration
+import com.simprints.infra.config.domain.models.ConsentConfiguration
 
 @Keep
 internal data class ApiConsentConfiguration(

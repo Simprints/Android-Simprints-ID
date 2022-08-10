@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.FingerprintConfiguration
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.config.testtools.apiFingerprintConfiguration
 import com.simprints.infra.config.testtools.fingerprintConfiguration
 import org.junit.Test

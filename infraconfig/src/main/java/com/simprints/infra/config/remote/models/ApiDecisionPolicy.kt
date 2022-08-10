@@ -1,7 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.DecisionPolicy
+import com.simprints.infra.config.domain.models.DecisionPolicy
 
 @Keep
 internal data class ApiDecisionPolicy(

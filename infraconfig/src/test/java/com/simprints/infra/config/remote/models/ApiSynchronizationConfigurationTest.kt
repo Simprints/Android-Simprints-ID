@@ -1,9 +1,9 @@
 package com.simprints.infra.config.remote.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.SynchronizationConfiguration
-import com.simprints.infra.config.domain.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.testtools.apiSynchronizationConfiguration
 import com.simprints.infra.config.testtools.synchronizationConfiguration
 import org.junit.Test

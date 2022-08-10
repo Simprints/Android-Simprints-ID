@@ -1,9 +1,9 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.SynchronizationConfiguration
-import com.simprints.infra.config.domain.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 
 @Keep
 internal data class ApiSynchronizationConfiguration(
