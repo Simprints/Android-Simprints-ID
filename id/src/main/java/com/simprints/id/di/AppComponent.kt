@@ -54,6 +54,9 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.ConfigManagerModule
+import com.simprints.infra.config.DataStoreModule
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
@@ -74,7 +77,9 @@ import javax.inject.Singleton
         ViewModelModule::class,
         LoginManagerModule::class,
         NetworkModule::class,
-        SafetyNetModule::class
+        SafetyNetModule::class,
+        ConfigManagerModule::class,
+        DataStoreModule::class
     ]
 )
 @Singleton
@@ -157,5 +162,6 @@ interface AppComponent {
     fun getImageRepository(): ImageRepository
     fun getLicenseRepository(): LicenseRepository
     fun getLoginManager(): LoginManager
+    fun getConfigManager(): ConfigManager
 
 }

@@ -3,7 +3,7 @@ package com.simprints.infra.config.remote
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 
-interface ConfigRemoteDataSource {
+internal interface ConfigRemoteDataSource {
 
     suspend fun getConfiguration(projectId: String): ProjectConfiguration
 

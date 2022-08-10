@@ -4,12 +4,12 @@ import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.url.BaseUrlProvider
@@ -24,7 +24,7 @@ import org.junit.Test
 class SignerManagerImplTest {
 
     @MockK
-    lateinit var mockProjectRepository: ProjectRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var mockLoginManager: LoginManager
@@ -64,7 +64,7 @@ class SignerManagerImplTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         signerManager = SignerManagerImpl(
-            mockProjectRepository,
+            configManager,
             mockLoginManager,
             mockPreferencesManager,
             mockEventSyncManager,
@@ -120,7 +120,7 @@ class SignerManagerImplTest {
 
         signIn()
 
-        coVerify { mockProjectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID) }
+        coVerify { configManager.refreshProject(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -221,7 +221,7 @@ class SignerManagerImplTest {
         }
 
     private fun mockFetchingProjectInfo(error: Boolean = false) =
-        coEvery { mockProjectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
+        coEvery { configManager.refreshProject(any()) }.apply {
             if (!error) {
                 this.returns(
                     Project(
