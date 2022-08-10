@@ -18,6 +18,7 @@ import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEve
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.libsimprints.Constants
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
