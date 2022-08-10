@@ -54,7 +54,7 @@ import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClientImpl
+import com.simprints.infra.network.SimApiClient
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -112,7 +112,7 @@ class EventRemoteDataSourceImplAndroidTest {
                 userId = SIGNED_ID_USER
             )
         }
-        coEvery { loginManager.buildClient<EventRemoteInterface>(any()) } returns SimApiClientImpl(
+        coEvery { loginManager.buildClient<EventRemoteInterface>(any()) } returns SimApiClient.getSimApiClient(
             EventRemoteInterface::class,
             app,
             URL,
