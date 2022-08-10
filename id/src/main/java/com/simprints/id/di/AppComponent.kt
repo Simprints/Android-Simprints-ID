@@ -1,7 +1,5 @@
 package com.simprints.id.di
 
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.time.TimeHelper
@@ -56,6 +54,10 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.login.LoginManagerModule
+import com.simprints.infra.login.SafetyNetModule
+import com.simprints.infra.network.NetworkModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -69,7 +71,10 @@ import javax.inject.Singleton
         SerializerModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
-        ViewModelModule::class
+        ViewModelModule::class,
+        LoginManagerModule::class,
+        NetworkModule::class,
+        SafetyNetModule::class
     ]
 )
 @Singleton
@@ -150,7 +155,7 @@ interface AppComponent {
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getImageRepository(): ImageRepository
-    fun getSimClientFactory(): SimApiClientFactory
     fun getLicenseRepository(): LicenseRepository
-    fun getLoginInfoManager(): LoginInfoManager
+    fun getLoginManager(): LoginManager
+
 }

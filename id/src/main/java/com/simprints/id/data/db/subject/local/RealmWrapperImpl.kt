@@ -2,13 +2,13 @@ package com.simprints.id.data.db.subject.local
 
 import android.content.Context
 import com.simprints.core.analytics.CrashReportTag
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.infra.security.keyprovider.LocalDbKey
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.keyprovider.LocalDbKey
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.withContext
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 class RealmWrapperImpl(
     private val appContext: Context,
     private val secureDataManager: SecureLocalDbKeyProvider,
-    private val loginInfoManager: LoginInfoManager,
+    private val loginManager: LoginManager,
     private val dispatcher: DispatcherProvider,
 ) :
     RealmWrapper {
@@ -40,7 +40,7 @@ class RealmWrapperImpl(
         SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
     private fun getLocalDbKey(): LocalDbKey =
-        loginInfoManager.getSignedInProjectIdOrEmpty().let {
+        loginManager.getSignedInProjectIdOrEmpty().let {
             return if (it.isNotEmpty()) {
                 secureDataManager.getLocalDbKeyOrThrow(it)
             } else {

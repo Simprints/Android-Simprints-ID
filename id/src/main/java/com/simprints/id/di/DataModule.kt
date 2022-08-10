@@ -1,9 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
@@ -15,7 +12,6 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.ProjectRepositoryImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
@@ -35,6 +31,8 @@ import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.ImageUrlProvider
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
 import dagger.Provides
 import java.net.URL
@@ -45,9 +43,9 @@ open class DataModule {
 
     @Provides
     open fun provideEventRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory,
+        loginManager: LoginManager,
         jsonHelper: JsonHelper
-    ): EventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, jsonHelper)
+    ): EventRemoteDataSource = EventRemoteDataSourceImpl(loginManager, jsonHelper)
 
     @Provides
     open fun provideProjectLocalDataSource(
@@ -59,9 +57,9 @@ open class DataModule {
     @Provides
     @Singleton
     open fun provideProjectRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory
+        loginManager: LoginManager,
     ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
-        simApiClientFactory
+        loginManager
     )
 
     @Provides
@@ -87,12 +85,12 @@ open class DataModule {
     open fun provideRealmWrapper(
         ctx: Context,
         secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         dispatcher: DispatcherProvider,
     ): RealmWrapper = RealmWrapperImpl(
         ctx,
         secureLocalDbKeyProvider,
-        loginInfoManager,
+        loginManager,
         dispatcher
     )
 
@@ -118,24 +116,22 @@ open class DataModule {
     open fun provideImageRepository(
         context: Context,
         imageUrlProvider: ImageUrlProvider,
-        remoteDbManager: RemoteDbManager
-    ): ImageRepository = ImageRepositoryImpl(context, imageUrlProvider, remoteDbManager)
+        loginManager: LoginManager
+    ): ImageRepository = ImageRepositoryImpl(context, imageUrlProvider, loginManager)
 
     @Provides
     open fun provideLongConsentLocalDataSource(
         context: Context,
-        loginInfoManager: LoginInfoManager
+        loginManager: LoginManager
     ): LongConsentLocalDataSource =
-        LongConsentLocalDataSourceImpl(context.filesDir.absolutePath, loginInfoManager)
+        LongConsentLocalDataSourceImpl(context.filesDir.absolutePath, loginManager)
 
     @Provides
     open fun provideLongConsentRemoteDataSource(
-        loginInfoManager: LoginInfoManager,
-        simApiClientFactory: SimApiClientFactory
+        loginManager: LoginManager,
     ): LongConsentRemoteDataSource =
         LongConsentRemoteDataSourceImpl(
-            loginInfoManager,
-            simApiClientFactory,
+            loginManager,
             consentDownloader = { fileUrl -> URL(fileUrl.url).readBytes() }
         )
 
@@ -160,9 +156,9 @@ open class DataModule {
 
     @Provides
     open fun provideLicenseRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory,
+        loginManager: LoginManager,
         jsonHelper: JsonHelper
-    ): LicenseRemoteDataSource = LicenseRemoteDataSourceImpl(simApiClientFactory, jsonHelper)
+    ): LicenseRemoteDataSource = LicenseRemoteDataSourceImpl(loginManager, jsonHelper)
 
     @Provides
     open fun provideLicenseRepository(

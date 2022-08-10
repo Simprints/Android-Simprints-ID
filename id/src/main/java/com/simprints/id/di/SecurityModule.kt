@@ -1,11 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
@@ -14,14 +9,11 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
@@ -36,6 +28,9 @@ import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,8 +43,7 @@ open class SecurityModule {
     @Singleton
     open fun provideSignerManager(
         projectRepository: ProjectRepository,
-        remoteDbManager: RemoteDbManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
         syncManager: SyncManager,
@@ -60,8 +54,7 @@ open class SecurityModule {
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
-        remoteDbManager,
-        loginInfoManager,
+        loginManager,
         preferencesManager,
         eventSyncManager,
         syncManager,
@@ -78,61 +71,33 @@ open class SecurityModule {
     ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository, jsonHelper)
 
     @Provides
-    open fun provideSecreteManager(loginInfoManager: LoginInfoManager): ProjectSecretManager =
-        ProjectSecretManager(loginInfoManager)
-
-    @Provides
-    open fun provideAuthManager(
-        apiClientFactory: SimApiClientFactory
-    ): AuthManager = AuthManagerImpl(apiClientFactory)
-
-    @Provides
-    open fun provideAuthenticationDataManager(
-        apiClientFactory: SimApiClientFactory,
-        context: Context
-    ): AuthenticationDataManager = AuthenticationDataManagerImpl(apiClientFactory, context.deviceId)
-
-    @Provides
-    open fun provideAttestationManager(): AttestationManager = AttestationManagerImpl()
-
-    @Provides
     open fun provideProjectAuthenticator(
-        authManager: AuthManager,
+        loginManager: LoginManager,
         projectSecretManager: ProjectSecretManager,
-        loginInfoManager: LoginInfoManager,
-        simApiClientFactory: SimApiClientFactory,
-        baseUrlProvider: BaseUrlProvider,
-        safetyNetClient: SafetyNetClient,
         secureDataManager: SecureLocalDbKeyProvider,
         projectRepository: ProjectRepository,
-        projectRemoteDataSource: ProjectRemoteDataSource,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
         preferencesManager: IdPreferencesManager,
-        attestationManager: AttestationManager,
-        authenticationDataManager: AuthenticationDataManager
     ): ProjectAuthenticator = ProjectAuthenticatorImpl(
-        authManager,
+        loginManager,
         projectSecretManager,
-        safetyNetClient,
         secureDataManager,
         projectRepository,
         signerManager,
         longConsentRepository,
         preferencesManager,
-        attestationManager,
-        authenticationDataManager
     )
 
     @Provides
     open fun provideAuthenticationHelper(
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         projectAuthenticator: ProjectAuthenticator,
         eventRepository: EventRepository
     ): AuthenticationHelper {
         return AuthenticationHelperImpl(
-            loginInfoManager,
+            loginManager,
             timeHelper,
             projectAuthenticator,
             eventRepository
@@ -140,18 +105,11 @@ open class SecurityModule {
     }
 
     @Provides
-    open fun provideSafetyNetClient(
-        context: Context
-    ): SafetyNetClient = SafetyNet.getClient(context)
-
-    @Provides
     open fun provideSecurityStateRemoteDataSource(
-        simApiClientFactory: SimApiClientFactory,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         context: Context
     ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
-        simApiClientFactory,
-        loginInfoManager,
+        loginManager,
         context.deviceId
     )
 
@@ -161,8 +119,11 @@ open class SecurityModule {
     ): SecurityStateLocalDataSource = SecurityStateLocalDataSourceImpl(prefs)
 
     @Provides
+    open fun provideSecretManager(loginManager: LoginManager): ProjectSecretManager =
+        ProjectSecretManager(loginManager)
+
+    @Provides
     @Singleton
-    @ExperimentalCoroutinesApi
     open fun provideSecurityStateRepository(
         remoteDataSource: SecurityStateRemoteDataSource,
         localDataSource: SecurityStateLocalDataSource

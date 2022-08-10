@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    kotlin("kapt")
 }
 
 apply {
@@ -47,6 +48,9 @@ dependencies {
     implementation(libs.retrofit.jackson)
     api(libs.retrofit.logging)
     api(libs.retrofit.okhttp)
+
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     // Unit Tests
     testImplementation(project(":testtools"))

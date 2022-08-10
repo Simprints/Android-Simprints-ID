@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
@@ -26,6 +25,7 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -87,7 +87,7 @@ class OrchestratorModule {
         timeHelper: TimeHelper,
         eventRepository: EventRepository,
         preferenceManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         ctx: Context
     ): ModalityFlow =
         ModalityFlowEnrolImpl(
@@ -99,7 +99,7 @@ class OrchestratorModule {
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
             preferenceManager.modalities,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId,
             preferenceManager.isEnrolmentPlus,
             preferenceManager.matchGroup
@@ -114,7 +114,7 @@ class OrchestratorModule {
         timeHelper: TimeHelper,
         eventRepository: EventRepository,
         preferenceManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         ctx: Context
     ): ModalityFlow =
         ModalityFlowVerifyImpl(
@@ -126,7 +126,7 @@ class OrchestratorModule {
             preferenceManager.consentRequired,
             preferenceManager.locationPermissionRequired,
             preferenceManager.modalities,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )
 
@@ -139,7 +139,7 @@ class OrchestratorModule {
         timeHelper: TimeHelper,
         prefs: IdPreferencesManager,
         eventRepository: EventRepository,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         ctx: Context
     ): ModalityFlow =
         ModalityFlowIdentifyImpl(
@@ -152,7 +152,7 @@ class OrchestratorModule {
             prefs.consentRequired,
             prefs.locationPermissionRequired,
             prefs.modalities,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginManager.getSignedInProjectIdOrEmpty(),
             ctx.deviceId
         )
 
@@ -165,7 +165,13 @@ class OrchestratorModule {
         @Named("ModalityConfirmationFlow") confirmationIdentityFlow: ModalityFlow,
         @Named("ModalityEnrolLastBiometricsFlow") enrolLastBiometricsFlow: ModalityFlow
     ): ModalityFlowFactory =
-        ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow, confirmationIdentityFlow, enrolLastBiometricsFlow)
+        ModalityFlowFactoryImpl(
+            enrolFlow,
+            verifyFlow,
+            identifyFlow,
+            confirmationIdentityFlow,
+            enrolLastBiometricsFlow
+        )
 
     @Provides
     fun provideOrchestratorManager(orchestratorManagerImpl: OrchestratorManagerImpl): OrchestratorManager {
@@ -218,6 +224,9 @@ class OrchestratorModule {
 
     @Provides
     fun provideEnrolAdjudicationActionHelper(prefs: IdPreferencesManager): EnrolResponseAdjudicationHelper =
-        EnrolResponseAdjudicationHelperImpl(prefs.fingerprintConfidenceThresholds, prefs.faceConfidenceThresholds)
+        EnrolResponseAdjudicationHelperImpl(
+            prefs.fingerprintConfidenceThresholds,
+            prefs.faceConfidenceThresholds
+        )
 
 }

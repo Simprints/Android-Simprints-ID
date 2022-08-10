@@ -1,27 +1,27 @@
 package com.simprints.id.secure
 
-import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.login.domain.models.AuthRequest
+import com.simprints.infra.login.domain.models.AuthenticationData
+import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 
 class ProjectAuthenticatorImpl(
-    private val authManager: AuthManager,
+    private val loginManager: LoginManager,
     private val projectSecretManager: ProjectSecretManager,
-    private val safetyNetClient: SafetyNetClient,
     private val secureDataManager: SecureLocalDbKeyProvider,
     private val projectRepository: ProjectRepository,
     private val signerManager: SignerManager,
     private val longConsentRepository: LongConsentRepository,
     private val preferencesManager: IdPreferencesManager,
-    private val attestationManager: AttestationManager,
-    private val authenticationDataManager: AuthenticationDataManager
 ) : ProjectAuthenticator {
 
     override suspend fun authenticate(
@@ -32,7 +32,7 @@ class ProjectAuthenticatorImpl(
         createLocalDbKeyForProject(nonceScope.projectId)
 
         prepareAuthRequestParameters(nonceScope, projectSecret, deviceId)
-            .makeAuthRequest()
+            .makeAuthRequest(nonceScope)
             .signIn(nonceScope.projectId, nonceScope.userId)
 
         projectRepository.fetchProjectConfigurationAndSave(nonceScope.projectId)
@@ -51,17 +51,17 @@ class ProjectAuthenticatorImpl(
         projectSecret: String,
         deviceId: String
     ): AuthRequest {
-        val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
+        val authenticationData = loginManager.requestAuthenticationData(
+            nonceScope.projectId,
+            nonceScope.userId,
+            deviceId
+        )
         return buildAuthRequest(
             getEncryptedProjectSecret(projectSecret, authenticationData),
-            getGoogleAttestation(safetyNetClient, authenticationData),
-            nonceScope,
+            loginManager.requestAttestation(authenticationData.nonce),
             deviceId
         )
     }
-
-    private suspend fun getAuthenticationData(projectId: String, userId: String) =
-        authenticationDataManager.requestAuthenticationData(projectId, userId)
 
     private fun getEncryptedProjectSecret(
         projectSecret: String,
@@ -69,28 +69,22 @@ class ProjectAuthenticatorImpl(
     ): String =
         projectSecretManager.encryptAndStoreAndReturnProjectSecret(
             projectSecret,
-            authenticationData.publicKeyString
+            authenticationData.publicKey
         )
-
-    private fun getGoogleAttestation(
-        safetyNetClient: SafetyNetClient,
-        authenticationData: AuthenticationData
-    ): AttestToken =
-        attestationManager.requestAttestation(safetyNetClient, authenticationData.nonce)
 
     private fun buildAuthRequest(
         encryptedProjectSecret: String,
-        googleAttestation: AttestToken,
-        nonceScope: NonceScope,
+        googleAttestation: String,
         deviceId: String
-    ): AuthRequest = AuthRequest(
-        nonceScope.projectId,
-        nonceScope.userId,
-        AuthRequestBody(encryptedProjectSecret, googleAttestation.value, deviceId)
-    )
+    ): AuthRequest = AuthRequest(encryptedProjectSecret, googleAttestation, deviceId)
 
-    private suspend fun AuthRequest.makeAuthRequest(): Token =
-        authManager.requestAuthToken(this)
+
+    private suspend fun AuthRequest.makeAuthRequest(nonceScope: NonceScope): Token =
+        loginManager.requestAuthToken(
+            nonceScope.projectId,
+            nonceScope.userId,
+            this
+        )
 
     private suspend fun Token.signIn(projectId: String, userId: String) {
         signerManager.signIn(projectId, userId, this)
