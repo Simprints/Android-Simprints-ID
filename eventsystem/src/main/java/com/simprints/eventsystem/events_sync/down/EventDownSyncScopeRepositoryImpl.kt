@@ -2,7 +2,6 @@ package com.simprints.eventsystem.events_sync.down
 
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
@@ -11,10 +10,11 @@ import com.simprints.eventsystem.events_sync.down.domain.getUniqueKey
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
 import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
+import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.withContext
 
 class EventDownSyncScopeRepositoryImpl(
-    val loginInfoManager: LoginInfoManager,
+    val loginManager: LoginManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
     private val dispatcher: DispatcherProvider
 ) : EventDownSyncScopeRepository {
@@ -24,8 +24,17 @@ class EventDownSyncScopeRepositoryImpl(
         selectedModuleIDs: List<String>,
         syncGroup: GROUP
     ): EventDownSyncScope {
-        val projectId = getProjectId()
-        val possibleUserId = getUserId()
+        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+
+        val possibleUserId: String = loginInfoManager.getSignedInUserIdOrEmpty()
+
+        if (projectId.isBlank()) {
+            throw MissingArgumentForDownSyncScopeException("ProjectId required")
+        }
+
+        if (possibleUserId.isBlank()) {
+            throw MissingArgumentForDownSyncScopeException("UserId required")
+        }
 
         val syncScope = when (syncGroup) {
             GROUP.GLOBAL ->
@@ -53,7 +62,7 @@ class EventDownSyncScopeRepositoryImpl(
     }
 
     private fun getProjectId(): String {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
         if (projectId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("ProjectId required")
         }
@@ -61,7 +70,7 @@ class EventDownSyncScopeRepositoryImpl(
     }
 
     private fun getUserId(): String {
-        val possibleUserId: String = loginInfoManager.getSignedInUserIdOrEmpty()
+        val possibleUserId: String = loginManager.getSignedInUserIdOrEmpty()
         if (possibleUserId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }

@@ -1,14 +1,14 @@
 package com.simprints.id.data.consent.longconsent.local
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.tools.utils.FileUtil
+import com.simprints.infra.login.LoginManager
 import java.io.BufferedReader
 import java.io.File
 
 class LongConsentLocalDataSourceImpl(
     absolutePath: String,
-    private val loginInfoManager: LoginInfoManager,
+    private val loginManager: LoginManager,
 ) : LongConsentLocalDataSource {
 
     companion object {
@@ -42,7 +42,7 @@ class LongConsentLocalDataSourceImpl(
     }
 
     private fun createLocalFilePath(absolutePath: String): File {
-        val filePath = absolutePath + File.separator + loginInfoManager.getSignedInProjectIdOrEmpty()
+        val filePath = absolutePath + File.separator + loginManager.getSignedInProjectIdOrEmpty()
         val file = FileUtil.createDirectory(filePath)
 
         if (!file.exists()) {

@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
@@ -24,6 +23,7 @@ import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
 
@@ -37,11 +37,11 @@ open class DashboardActivityModule {
     @Provides
     open fun provideProjectDetailsRepository(
         projectRepository: ProjectRepository,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         preferencesManager: PreferencesManager
     ): DashboardProjectDetailsRepository = DashboardProjectDetailsRepository(
         projectRepository,
-        loginInfoManager,
+        loginManager,
         preferencesManager
     )
 

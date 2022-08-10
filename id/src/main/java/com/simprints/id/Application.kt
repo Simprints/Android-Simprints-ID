@@ -99,7 +99,7 @@ open class Application : CoreApplication() {
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
-        factory { component.getSimClientFactory() }
+        factory { component.getLoginManager() }
         factory { component.getLicenseRepository() }
         factory { component.getIdPreferencesManager() }
     }

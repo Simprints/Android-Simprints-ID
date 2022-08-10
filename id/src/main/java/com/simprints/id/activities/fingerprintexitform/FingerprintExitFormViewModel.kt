@@ -12,6 +12,7 @@ class FingerprintExitFormViewModel(private val eventRepository: com.simprints.ev
                          fingerprintExitFormReason: FingerprintExitFormReason) {
         inBackground {
             eventRepository.addOrUpdateEvent(RefusalEvent(startTime, endTime, fingerprintExitFormReason.toRefusalEventAnswer(), otherText))
+            eventRepository.removeLocationDataFromCurrentSession()
         }
     }
 }

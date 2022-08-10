@@ -1,6 +1,5 @@
 package com.simprints.id.di
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
@@ -39,6 +38,7 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -90,7 +90,7 @@ open class ViewModelModule {
         eventRepository: EventRepository,
         subjectRepository: SubjectRepository,
         preferencesManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
         eventSyncManager: EventSyncManager,
@@ -101,7 +101,7 @@ open class ViewModelModule {
             eventRepository,
             subjectRepository,
             preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginManager.getSignedInProjectIdOrEmpty(),
             eventDownSyncScopeRepository,
             imageRepository,
             dispatcher
