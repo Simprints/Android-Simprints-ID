@@ -7,6 +7,7 @@ import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.After
@@ -26,7 +27,7 @@ class ModuleSelectionViewModelTest {
 
     @Before
     fun setUp() {
-        configureMock()
+        configureMockRepository()
         viewModel = ModuleSelectionViewModel(repository, eventSyncManager)
     }
 
@@ -45,15 +46,58 @@ class ModuleSelectionViewModelTest {
     }
 
     @Test
-    fun shouldReturnSelectedModules() {
-        val expected = listOf(
+    fun shouldUpdateCachedModules() {
+        val updatedModules = listOf(
+            Module("a", true),
             Module("b", true),
-            Module("c", true)
+            Module("c", true),
+            Module("d", false)
+        )
+        viewModel.updateModules(updatedModules)
+        val actual = viewModel.modulesList.value
+
+        assertThat(actual).isEqualTo(updatedModules)
+    }
+
+    @Test
+    fun shouldResetCachedModules() {
+        val updatedModules = listOf(
+            Module("a", true),
+            Module("b", true),
+            Module("c", true),
+            Module("d", false)
+        )
+        viewModel.updateModules(updatedModules)
+        viewModel.resetModules()
+        val actual = viewModel.modulesList.value
+
+        val expected = listOf(
+            Module("a", false),
+            Module("b", true),
+            Module("c", true),
+            Module("d", false)
         )
 
-        val actual = viewModel.modulesList.value?.filter { it.isSelected }
-
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun shouldSaveModulesAndTriggerSync() {
+        val updatedModules = listOf(
+            Module("a", true),
+            Module("b", true),
+            Module("c", true),
+            Module("d", false)
+        )
+        viewModel.saveModules(updatedModules)
+        coVerify(exactly = 1) { repository.saveModules(updatedModules) }
+        coVerify(exactly = 1) { eventSyncManager.stop() }
+        coVerify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun shouldReturnMaxNumberOfModules() {
+        assertThat(viewModel.getMaxNumberOfModules()).isEqualTo(5)
     }
 
     @After
@@ -61,7 +105,7 @@ class ModuleSelectionViewModelTest {
         stopKoin()
     }
 
-    private fun configureMock() {
+    private fun configureMockRepository() {
         every {
             repository.getModules()
         } returns listOf(
@@ -70,5 +114,8 @@ class ModuleSelectionViewModelTest {
             Module("c", true),
             Module("d", false)
         )
+        every {
+            repository.getMaxNumberOfModules()
+        } returns 5
     }
 }
