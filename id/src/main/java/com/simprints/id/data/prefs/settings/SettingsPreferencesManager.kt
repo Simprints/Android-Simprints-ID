@@ -71,15 +71,15 @@ interface SettingsPreferencesManager {
 
 fun SettingsPreferencesManager.canDownSyncEvents() =
     eventDownSyncSetting != EventDownSyncSetting.OFF
-//TODO: compare enums directly
+
 fun SettingsPreferencesManager.canSyncDataToSimprints() =
-    simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
+    simprintsSyncSetting != SimprintsSyncSetting.SIM_SYNC_NONE
 
 fun SettingsPreferencesManager.canSyncAllDataToSimprints() =
-    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ALL.name
+    simprintsSyncSetting == SimprintsSyncSetting.SIM_SYNC_ALL
 
 fun SettingsPreferencesManager.canSyncBiometricDataToSimprints() =
-    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS.name
+    simprintsSyncSetting == SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS
 
 fun SettingsPreferencesManager.canSyncAnalyticsDataToSimprints() =
-    simprintsSyncSetting.name == SimprintsSyncSetting.SIM_SYNC_ONLY_ANALYTICS.name
+    simprintsSyncSetting == SimprintsSyncSetting.SIM_SYNC_ONLY_ANALYTICS
