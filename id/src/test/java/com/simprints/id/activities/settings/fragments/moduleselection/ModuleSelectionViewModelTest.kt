@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.every
@@ -17,15 +18,16 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ModuleViewModelTest {
+class ModuleSelectionViewModelTest {
 
     private val repository: ModuleRepository = mockk()
-    private lateinit var viewModel: ModuleViewModel
+    private val eventSyncManager: EventSyncManager = mockk()
+    private lateinit var viewModel: ModuleSelectionViewModel
 
     @Before
     fun setUp() {
         configureMock()
-        viewModel = ModuleViewModel(repository)
+        viewModel = ModuleSelectionViewModel(repository, eventSyncManager)
     }
 
     @Test

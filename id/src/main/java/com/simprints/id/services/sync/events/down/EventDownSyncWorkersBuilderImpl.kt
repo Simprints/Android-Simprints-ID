@@ -22,40 +22,60 @@ class EventDownSyncWorkersBuilderImpl(
     private val preferencesManager: IdPreferencesManager
 ) : EventDownSyncWorkersBuilder {
 
-
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             preferencesManager.modalities.map { it.toMode() },
             preferencesManager.selectedModules.toList(),
             preferencesManager.syncGroup
         )
+
         val uniqueDownSyncId = UUID.randomUUID().toString()
-        return downSyncScope.operations.map {
-            buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it)
+        val workerBuilders = downSyncScope.operations.map {
+            getDownSyncWorkerBuilder(uniqueSyncId, uniqueDownSyncId, it)
         } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
+
+        return workerBuilders.map { it.build() }
     }
 
-    private fun buildDownSyncWorkers(
+    override suspend fun buildNewModulesDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest>? {
+        if (!preferencesManager.newlyAddedModules.isEmpty()) {
+            val downSyncScope = downSyncScopeRepository.getNewModulesDownSyncScope(
+                preferencesManager.modalities.map { it.toMode() },
+                preferencesManager.newlyAddedModules.toList()
+            )
+
+            val uniqueDownSyncId = UUID.randomUUID().toString()
+            val workerBuilders = downSyncScope.operations.map {
+                getDownSyncWorkerBuilder(uniqueSyncId, uniqueDownSyncId, it)
+                    .addCommonTagForNewModuleDownloaders() as OneTimeWorkRequest.Builder
+            } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
+                .addCommonTagForNewModuleDownloaders() as OneTimeWorkRequest.Builder
+
+            return workerBuilders.map { it.build() }
+        } else {
+            return null
+        }
+    }
+
+    private fun getDownSyncWorkerBuilder(
         uniqueSyncID: String?,
         uniqueDownSyncID: String,
         downSyncOperation: EventDownSyncOperation
-    ): OneTimeWorkRequest =
+    ): OneTimeWorkRequest.Builder =
         OneTimeWorkRequest.Builder(EventDownSyncDownloaderWorker::class.java)
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addCommonTagForDownloaders()
-            .build() as OneTimeWorkRequest
+            .addCommonTagForDownloaders() as OneTimeWorkRequest.Builder
 
     private fun buildCountWorker(
         uniqueSyncID: String?,
         uniqueDownSyncID: String,
         eventDownSyncScope: EventDownSyncScope
-    ): OneTimeWorkRequest =
+    ): OneTimeWorkRequest.Builder =
         OneTimeWorkRequest.Builder(EventDownSyncCountWorker::class.java)
             .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to jsonHelper.toJson(eventDownSyncScope)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addCommonTagForDownCounters()
-            .build() as OneTimeWorkRequest
+            .addCommonTagForDownCounters() as OneTimeWorkRequest.Builder
 
     private fun getDownSyncWorkerConstraints() =
         Constraints.Builder()

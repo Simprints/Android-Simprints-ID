@@ -9,6 +9,7 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -85,31 +86,52 @@ open class EventSyncMasterWorker(
             try {
                 crashlyticsLog("Start")
 
-                if (!preferenceManager.canSyncDataToSimprints() && isDownSyncOff()) return@withContext success(
-                    message = "Can't sync to SimprintsID, skip"
-                )
+                if (!preferenceManager.canSyncDataToSimprints() && !preferenceManager.canDownSyncEvents())
+                    return@withContext success(
+                        message = "Can't sync to SimprintsID, skip"
+                    )
 
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
-                    val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                    val workerChain = mutableListOf<OneTimeWorkRequest>()
-                    if (preferenceManager.canSyncDataToSimprints())
-                        workerChain += upSyncWorkersChain(uniqueSyncId).also {
+                    val startSyncReporterWorker =
+                        eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    var workContinuation = wm.beginWith(startSyncReporterWorker)
+
+                    val regularSyncWorkersChain = mutableListOf<OneTimeWorkRequest>()
+                    var newModulesSyncWorkersChain: List<OneTimeWorkRequest>? = null
+                    if (preferenceManager.canSyncDataToSimprints()) {
+                        regularSyncWorkersChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(
+                            uniqueSyncId
+                        ).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
                         }
-
-                    if (preferenceManager.eventDownSyncSetting != OFF)
-                        workerChain += downSyncWorkersChain(uniqueSyncId).also {
+                    }
+                    if (preferenceManager.canDownSyncEvents()) {
+                        regularSyncWorkersChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(
+                            uniqueSyncId
+                        ).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
                         }
 
+                        newModulesSyncWorkersChain = downSyncWorkerBuilder.buildNewModulesDownSyncWorkerChain(
+                            uniqueSyncId
+                        )?.also {
+                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} new modules down workers")
+                        }
+                    }
+                    workContinuation = workContinuation.then(regularSyncWorkersChain)
+                    // Chain new modules sync to happen after regular downsync to ensure we will not
+                    // miss any events that have happened before the last event of the new modules
+                    newModulesSyncWorkersChain?.let {
+                        workContinuation = workContinuation.then(it)
+                    }
+
                     val endSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    wm.beginWith(startSyncReporterWorker).then(workerChain).then(endSyncReporterWorker)
-                        .enqueue()
+                    workContinuation.then(endSyncReporterWorker).enqueue()
 
                     eventSyncCache.clearProgresses()
 
@@ -130,25 +152,6 @@ open class EventSyncMasterWorker(
             }
         }
     }
-
-    private fun isDownSyncOff() = preferenceManager.eventDownSyncSetting == OFF
-
-    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val downSyncChainRequired = isEventDownSyncAllowed()
-
-        return if (downSyncChainRequired) {
-            downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
-        } else {
-            emptyList()
-        }
-    }
-
-    private fun isEventDownSyncAllowed() = with(preferenceManager) {
-        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-    }
-
-    private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
-        upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun getLastSyncId(): String? {
         return syncWorkers.last()?.getUniqueSyncId()

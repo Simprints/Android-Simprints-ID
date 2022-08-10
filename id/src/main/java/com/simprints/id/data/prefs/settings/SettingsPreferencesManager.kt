@@ -22,6 +22,7 @@ interface SettingsPreferencesManager {
     var projectLanguages: Array<String>
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
+    var newlyAddedModules: Set<String>
     var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP
@@ -68,7 +69,10 @@ interface SettingsPreferencesManager {
 
 }
 
-fun SettingsPreferencesManager.canSyncDataToSimprints(): Boolean =
+fun SettingsPreferencesManager.canDownSyncEvents() =
+    eventDownSyncSetting != EventDownSyncSetting.OFF
+//TODO: compare enums directly
+fun SettingsPreferencesManager.canSyncDataToSimprints() =
     simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
 
 fun SettingsPreferencesManager.canSyncAllDataToSimprints() =

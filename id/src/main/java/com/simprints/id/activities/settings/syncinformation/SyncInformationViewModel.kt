@@ -52,7 +52,6 @@ class SyncInformationViewModel(
         viewModelScope.launch(dispatchers.io()) {
             imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
         }
-        viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
         viewModelScope.launch { moduleCounts.value = fetchAndUpdateSelectedModulesCount() }
     }
 
