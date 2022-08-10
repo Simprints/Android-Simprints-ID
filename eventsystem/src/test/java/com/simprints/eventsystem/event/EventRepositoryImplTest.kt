@@ -2,7 +2,7 @@ package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.login.LoginInfoManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
@@ -47,7 +47,7 @@ class EventRepositoryImplTest {
     private lateinit var eventRepo: EventRepository
 
     @MockK
-    lateinit var loginInfoManager: LoginInfoManager
+    lateinit var loginManager: LoginManager
 
     @MockK
     lateinit var eventLocalDataSource: EventLocalDataSource
@@ -71,14 +71,14 @@ class EventRepositoryImplTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() } returns NOW
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
 
         eventRepo = EventRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
-            loginInfoManager,
+            loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
@@ -114,7 +114,7 @@ class EventRepositoryImplTest {
     @Test
     fun createSession_ForEmptyProjectId() {
         runBlocking {
-            every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns ""
+            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
 
             val session = eventRepo.createSession()
@@ -557,8 +557,34 @@ class EventRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `test removeLocationDataFromCurrentSession does nothing if location is null`()= runTest{
+        // Given
+        val sessionCaptureEvent = mockk<SessionCaptureEvent>{
+            every { payload.location } returns null
+        }
+        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        //When
+        eventRepo.removeLocationDataFromCurrentSession()
+        //Then
+        coVerify (exactly = 0){eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)  }
+    }
+
+    @Test
+    fun `test removeLocationDataFromCurrentSession remove location if location exist`()= runTest{
+        // Given
+        val sessionCaptureEvent = mockk<SessionCaptureEvent>{
+            every { payload.location } returns mockk()
+        }
+        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        //When
+        eventRepo.removeLocationDataFromCurrentSession()
+        //Then
+        coVerify {eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)  }
+    }
+
     private fun mockSignedId() =
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 
     companion object {
         const val DEVICE_ID = "DEVICE_ID"

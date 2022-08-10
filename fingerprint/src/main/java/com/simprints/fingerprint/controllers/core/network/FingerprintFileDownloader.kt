@@ -1,23 +1,24 @@
 package com.simprints.fingerprint.controllers.core.network
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
 
 class FingerprintFileDownloader(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
-    private val loginInfoManager: LoginInfoManager,
+    private val loginManager: LoginManager,
     private val dispatcherProvider: DispatcherProvider
-    ) {
+) {
 
 
     private val projectId by lazy {
-        loginInfoManager.getSignedInProjectIdOrEmpty()
+        loginManager.getSignedInProjectIdOrEmpty()
     }
+
     /** @throws IOException */
     suspend fun download(url: String): ByteArray = withContext(dispatcherProvider.io()) {
         // issue with timber logging URLs when interpolated in kotlin, check out this article

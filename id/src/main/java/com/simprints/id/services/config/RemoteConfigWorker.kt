@@ -2,21 +2,22 @@ package com.simprints.id.services.config
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
+class RemoteConfigWorker(context: Context, params: WorkerParameters) :
+    SimCoroutineWorker(context, params) {
     override val tag: String = RemoteConfigWorker::class.java.simpleName
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
-    lateinit var loginInfoManager: LoginInfoManager
+    lateinit var loginManager: LoginManager
 
     @Inject
     lateinit var projectRepository: ProjectRepository
@@ -27,7 +28,7 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
         return withContext(dispatcherProvider.io()) {
             try {
                 crashlyticsLog("Starting")
-                val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                val projectId = loginManager.getSignedInProjectIdOrEmpty()
 
                 // if the user is not signed in, we shouldn't try again
                 if (projectId.isEmpty()) {
@@ -42,5 +43,5 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) : SimCorout
             }
         }
     }
-    
+
 }

@@ -1,22 +1,23 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
+import com.simprints.infra.login.LoginManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class DashboardProjectDetailsRepositoryTest {
 
-    private val mockLoginInfoManager = mockk<LoginInfoManager>()
+    private val mockLoginManager = mockk<LoginManager>()
     private val mockPreferencesManager = mockk<PreferencesManager>()
     private val mockProject = mockk<Project>()
 
@@ -24,21 +25,21 @@ class DashboardProjectDetailsRepositoryTest {
 
     @Before
     fun setUp() {
-        every { mockLoginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { mockLoginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
         every { mockPreferencesManager.lastUserUsed } returns "Some User"
         every { mockPreferencesManager.lastScannerUsed } returns "SP1234"
         every { mockProject.name } returns "Mock Project"
     }
 
     @Test
-    fun shouldGetProjectNameFromCache() = runBlockingTest {
+    fun shouldGetProjectNameFromCache() = runTest(UnconfinedTestDispatcher()) {
         val mockProjectRepository = mockk<ProjectRepository>().also {
             coEvery { it.loadFromCache(PROJECT_ID) } returns mockProject
         }
 
         repository = DashboardProjectDetailsRepository(
             mockProjectRepository,
-            mockLoginInfoManager,
+            mockLoginManager,
             mockPreferencesManager
         )
 
@@ -49,7 +50,9 @@ class DashboardProjectDetailsRepositoryTest {
     }
 
     @Test
-    fun whenFetchingFromCacheFails_shouldGetProjectNameFromRemote() = runBlockingTest {
+    fun whenFetchingFromCacheFails_shouldGetProjectNameFromRemote() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         val mockProjectRepository = mockk<ProjectRepository>().also {
             coEvery { it.loadFromCache(PROJECT_ID) } returns null
             coEvery { it.loadFromRemoteAndRefreshCache(PROJECT_ID) } returns mockProject
@@ -57,7 +60,7 @@ class DashboardProjectDetailsRepositoryTest {
 
         repository = DashboardProjectDetailsRepository(
             mockProjectRepository,
-            mockLoginInfoManager,
+            mockLoginManager,
             mockPreferencesManager
         )
 

@@ -8,13 +8,12 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestSecurityModule
@@ -107,7 +106,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeValidCredentials_clickSignIn_shouldBeAuthenticated() {
-        mockAuthenticationResult(AUTHENTICATED)
+        mockAuthenticationResult(AuthenticateDataResult.Authenticated)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -122,7 +121,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenOffline_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(OFFLINE)
+        mockAuthenticationResult(AuthenticateDataResult.Offline)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -137,7 +136,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenBackendMaintenance_clickSignIn_shouldShowTimedError() {
-        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR)
+        mockAuthenticationResult(AuthenticateDataResult.BackendMaintenanceError(600L))
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -149,7 +148,7 @@ class LoginActivityAndroidTest {
             onView(withId(R.id.errorTextView)).check(
                 matches(
                     ViewMatchers.withText(
-                        SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
+                        SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE
                     )
                 )
             )
@@ -160,7 +159,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun whenBackendMaintenance_clickSignIn_shouldShowError() {
-        mockAuthenticationResult(BACKEND_MAINTENANCE_ERROR)
+        mockAuthenticationResult(AuthenticateDataResult.BackendMaintenanceError())
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -183,7 +182,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun typeInvalidCredentials_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(BAD_CREDENTIALS)
+        mockAuthenticationResult(AuthenticateDataResult.BadCredentials)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -198,7 +197,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withServerError_clickSignIn_shouldShowToast() {
-        mockAuthenticationResult(TECHNICAL_FAILURE)
+        mockAuthenticationResult(AuthenticateDataResult.TechnicalFailure)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -213,7 +212,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(SAFETYNET_INVALID_CLAIM)
+        mockAuthenticationResult(AuthenticateDataResult.SafetyNetInvalidClaim)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -228,7 +227,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(SAFETYNET_UNAVAILABLE)
+        mockAuthenticationResult(AuthenticateDataResult.SafetyNetUnavailable)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -243,7 +242,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withUnknownError_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(UNKNOWN)
+        mockAuthenticationResult(AuthenticateDataResult.Unknown)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -305,7 +304,7 @@ class LoginActivityAndroidTest {
         Intents.release()
     }
 
-    private fun mockAuthenticationResult(result: AuthenticationPayload.Result) {
+    private fun mockAuthenticationResult(result: AuthenticateDataResult) {
         coEvery {
             mockAuthenticationHelper.authenticateSafely(any(), any(), any(), any())
         } returns result

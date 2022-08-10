@@ -1,25 +1,29 @@
 package com.simprints.id.secure
 
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.id.secure.models.PublicKeyString
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.cryptography.ProjectSecretEncrypter
 
-class ProjectSecretManager(private val loginInfoManager: LoginInfoManager) {
+class ProjectSecretManager(private val loginManager: LoginManager) {
 
     fun encryptAndStoreAndReturnProjectSecret(
         projectSecret: String,
-        publicKeyString: PublicKeyString
+        publicKey: String
     ): String =
-        encryptProjectSecret(projectSecret, publicKeyString)
-            .also { storeEncryptedProjectSecret(it) }
+        encryptProjectSecret(
+            projectSecret,
+            publicKey
+        ).also { storeEncryptedProjectSecret(it) }
+
 
     private fun encryptProjectSecret(
         projectSecret: String,
-        publicKeyString: PublicKeyString
+        publicKey: String
     ): String =
-        ProjectSecretEncrypter(publicKeyString.value).encrypt(projectSecret)
+        ProjectSecretEncrypter(publicKey).encrypt(projectSecret)
+
 
     private fun storeEncryptedProjectSecret(encryptedProjectSecret: String) {
-        loginInfoManager.encryptedProjectSecret = encryptedProjectSecret
+        loginManager.encryptedProjectSecret = encryptedProjectSecret
     }
+
 }

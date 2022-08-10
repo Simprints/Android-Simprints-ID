@@ -17,10 +17,6 @@ apply {
     from("${rootDir}${File.separator}ci${File.separator}deployment${File.separator}deploy_config.gradle")
 }
 
-val RELEASE_SAFETYNET_KEY: String by extra
-val STAGING_SAFETYNET_KEY: String by extra
-val DEV_SAFETYNET_KEY: String by extra
-
 android {
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
@@ -40,14 +36,12 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"$RELEASE_SAFETYNET_KEY\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
         getByName("staging") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"$STAGING_SAFETYNET_KEY\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
@@ -59,7 +53,6 @@ android {
                     invokeMethod("setInstrumentationEnabled", false)
                 }
             }
-            buildConfigField("String", "SAFETYNET_API_KEY", "\"$DEV_SAFETYNET_KEY\"")
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
@@ -113,6 +106,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     api(project(":eventsystem"))
+    api(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrasecurity"))
@@ -133,7 +127,7 @@ dependencies {
     implementation(libs.support.material)
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
-    implementation(libs.playServices.safetynet)
+
     implementation(libs.rxJava2.core)
     kapt(libs.androidX.room.compiler)
     kapt(libs.dagger.compiler)
@@ -143,9 +137,9 @@ dependencies {
     implementation(libs.jackson.core)
 
     // Firebase
-    implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.barcode)
+    implementation(libs.kotlin.coroutinesPlayServices)
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
@@ -157,7 +151,6 @@ dependencies {
     implementation(libs.androidX.ui.constraintlayout)
     api(libs.androidX.navigation.dynamicfeatures)
     implementation(libs.kotlin.coroutinesAndroid)
-    implementation(libs.kotlin.coroutinesPlayServices)
     implementation(libs.androidX.cameraX.core)
     implementation(libs.koin.core)
     implementation(libs.koin.android)

@@ -2,10 +2,8 @@ package com.simprints.id.testtools.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
@@ -17,13 +15,12 @@ import com.simprints.eventsystem.event.local.SessionDataCacheImpl
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.security.random.RandomGenerator
@@ -62,13 +59,6 @@ class TestAppModule(
     private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
 
-    override fun provideLoginInfoManager(
-        improvedSharedPreferences: ImprovedSharedPreferences
-    ): LoginInfoManager = loginInfoManagerRule.resolveDependency {
-        super.provideLoginInfoManager(
-            improvedSharedPreferences
-        )
-    }
 
     override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
         SessionDataCacheImpl(app)
@@ -76,18 +66,6 @@ class TestAppModule(
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
-    override fun provideRemoteDbManager(
-        loginInfoManager: LoginInfoManager,
-        context: Context,
-        dispatcher: DispatcherProvider
-    ): RemoteDbManager =
-        remoteDbManagerRule.resolveDependency {
-            super.provideRemoteDbManager(
-                loginInfoManager,
-                context,
-                dispatcher
-            )
-        }
 
     override fun provideSecureLocalDbKeyProvider(
         builder: EncryptedSharedPreferencesBuilder,
@@ -105,7 +83,7 @@ class TestAppModule(
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         idPreferencesManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
@@ -116,7 +94,7 @@ class TestAppModule(
                 eventLocalDataSource,
                 eventRemoteDataSource,
                 idPreferencesManager,
-                loginInfoManager,
+                loginManager,
                 timeHelper,
                 validatorFactory,
                 sessionDataCache
@@ -186,7 +164,6 @@ class TestAppModule(
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
     ): QrCodeProducer = qrCodeProducerRule.resolveDependency {
@@ -197,11 +174,4 @@ class TestAppModule(
     ): QrCodeDetector = qrCodeDetectorRule.resolveDependency {
         super.provideQrCodeDetector()
     }
-
-    override fun provideBaseUrlProvider(
-        ctx: Context
-    ): BaseUrlProvider = baseUrlProviderRule.resolveDependency {
-        super.provideBaseUrlProvider(ctx)
-    }
-
 }

@@ -57,6 +57,7 @@ class CheckLoginFromIntentPresenter(
 
     @Inject
     lateinit var simNetworkUtils: SimNetworkUtils
+
     internal lateinit var appRequest: AppRequest
 
     init {
@@ -222,9 +223,9 @@ class CheckLoginFromIntentPresenter(
 
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
-        loginInfoManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
+        loginManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
             matchProjectIdsOrThrow(
-                loginInfoManager.getSignedInProjectIdOrEmpty(),
+                loginManager.getSignedInProjectIdOrEmpty(),
                 appRequest.projectId
             )
 
@@ -239,7 +240,7 @@ class CheckLoginFromIntentPresenter(
     //else
         /** Hack to support multiple users: we do not check if the signed UserId
         matches the userId from the Intent */
-        loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        loginManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
@@ -253,7 +254,7 @@ class CheckLoginFromIntentPresenter(
          *  user otherwise will be set to "" and the following requests would fail.
          *  */
         if (appRequest.userId.isNotEmpty()) {
-            loginInfoManager.signedInUserId = appRequest.userId
+            loginManager.signedInUserId = appRequest.userId
         }
 
         updateProjectInCurrentSession()
@@ -280,7 +281,7 @@ class CheckLoginFromIntentPresenter(
     private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
-        val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        val signedProjectId = loginManager.getSignedInProjectIdOrEmpty()
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             currentSessionEvent.updateProjectId(signedProjectId)
             currentSessionEvent.updateModalities(preferencesManager.modalities)
@@ -306,8 +307,8 @@ class CheckLoginFromIntentPresenter(
     }
 
     private fun initAnalyticsKeyInCrashManager() {
-        Simber.tag(PROJECT_ID, true).i(loginInfoManager.getSignedInProjectIdOrEmpty())
-        Simber.tag(USER_ID, true).i(loginInfoManager.getSignedInUserIdOrEmpty())
+        Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
+        Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
         Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(preferencesManager.eventDownSyncSetting.toString())
@@ -322,8 +323,8 @@ class CheckLoginFromIntentPresenter(
             result,
             if (result == AuthorizationResult.AUTHORIZED) {
                 UserInfo(
-                    loginInfoManager.getSignedInProjectIdOrEmpty(),
-                    loginInfoManager.getSignedInUserIdOrEmpty()
+                    loginManager.getSignedInProjectIdOrEmpty(),
+                    loginManager.getSignedInUserIdOrEmpty()
                 )
             } else {
                 null
