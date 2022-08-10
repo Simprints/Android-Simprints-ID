@@ -24,17 +24,8 @@ class EventDownSyncScopeRepositoryImpl(
         selectedModuleIDs: List<String>,
         syncGroup: GROUP
     ): EventDownSyncScope {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-
-        val possibleUserId: String = loginInfoManager.getSignedInUserIdOrEmpty()
-
-        if (projectId.isBlank()) {
-            throw MissingArgumentForDownSyncScopeException("ProjectId required")
-        }
-
-        if (possibleUserId.isBlank()) {
-            throw MissingArgumentForDownSyncScopeException("UserId required")
-        }
+        val projectId = getProjectId()
+        val possibleUserId = getUserId()
 
         val syncScope = when (syncGroup) {
             GROUP.GLOBAL ->
