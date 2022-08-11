@@ -17,29 +17,16 @@ interface SimNetwork {
          * @throws SyncCloudIntegrationException if the backend returns an error code
          */
         suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V
-
-        companion object {
-            fun <T : SimRemoteInterface> getSimApiClient(
-                remoteInterface: KClass<T>,
-                ctx: Context,
-                url: String,
-                deviceId: String,
-                versionName: String,
-                authToken: String?
-            ): SimApiClient<T> {
-                return SimNetworkClientImpl.getSimApiClient(
-                    remoteInterface,
-                    ctx,
-                    url,
-                    deviceId,
-                    versionName,
-                    authToken
-                )
-            }
-
-        }
-
     }
+
+    fun <T : SimRemoteInterface> getSimApiClient(
+        remoteInterface: KClass<T>,
+        ctx: Context,
+        url: String,
+        deviceId: String,
+        versionName: String,
+        authToken: String?
+    ): SimApiClient<T>
 
     fun getApiBaseUrl(): String
     fun setApiBaseUrl(apiBaseUrl: String?)
