@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.login.domain.models.Token
 
 @Keep
-data class ApiToken(val firebaseCustomToken: String = "", val firebaseOptions: FirebaseOptions) {
+internal  data class ApiToken(val firebaseCustomToken: String = "", val firebaseOptions: FirebaseOptions) {
 
     @Keep
     data class FirebaseOptions(

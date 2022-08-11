@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.login.domain.models.AuthenticationData
 
 @Keep
-data class ApiAuthenticationData(val nonce: String, val publicKey: String) {
+internal data class ApiAuthenticationData(val publicKey: String, val nonce: String) {
 
-    fun toDomain() = AuthenticationData(nonce, publicKey)
+    fun toDomain() = AuthenticationData(publicKey, nonce)
 }

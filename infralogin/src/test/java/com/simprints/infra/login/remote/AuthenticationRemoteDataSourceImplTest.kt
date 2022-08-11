@@ -1,6 +1,6 @@
 package com.simprints.infra.login.remote
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
@@ -63,7 +63,7 @@ class AuthenticationRemoteDataSourceImplTest {
                     USER_ID,
                     DEVICE_ID
                 )
-            } returns ApiAuthenticationData(NONCE, PUBLIC_KEY)
+            } returns ApiAuthenticationData(PUBLIC_KEY, NONCE)
 
             val actualAuthenticationData =
                 authenticationRemoteDataSourceImpl.requestAuthenticationData(
@@ -71,8 +71,8 @@ class AuthenticationRemoteDataSourceImplTest {
                     USER_ID,
                     DEVICE_ID
                 )
-            val expectedAuthenticationData = AuthenticationData(NONCE, PUBLIC_KEY)
-            Truth.assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
+            val expectedAuthenticationData = AuthenticationData(PUBLIC_KEY, NONCE)
+            assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
         }
 
     @Test
@@ -94,7 +94,7 @@ class AuthenticationRemoteDataSourceImplTest {
                     DEVICE_ID
                 )
             }
-            Truth.assertThat(receivedException).isEqualTo(exception)
+            assertThat(receivedException).isEqualTo(exception)
         }
 
     @Test
@@ -116,7 +116,7 @@ class AuthenticationRemoteDataSourceImplTest {
                     DEVICE_ID
                 )
             }
-            Truth.assertThat(receivedException).isEqualTo(exception)
+            assertThat(receivedException).isEqualTo(exception)
         }
 
     @Test
@@ -164,7 +164,7 @@ class AuthenticationRemoteDataSourceImplTest {
                 AUTH_REQUEST
             )
             val expectedToken = Token("token", "project", "api", "application")
-            Truth.assertThat(actualToken).isEqualTo(expectedToken)
+            assertThat(actualToken).isEqualTo(expectedToken)
         }
 
     @Test
@@ -182,7 +182,7 @@ class AuthenticationRemoteDataSourceImplTest {
                     AUTH_REQUEST
                 )
             }
-            Truth.assertThat(receivedException).isEqualTo(exception)
+            assertThat(receivedException).isEqualTo(exception)
         }
 
     @Test
@@ -200,7 +200,7 @@ class AuthenticationRemoteDataSourceImplTest {
                     AUTH_REQUEST
                 )
             }
-            Truth.assertThat(receivedException).isEqualTo(exception)
+            assertThat(receivedException).isEqualTo(exception)
         }
 
     @Test
