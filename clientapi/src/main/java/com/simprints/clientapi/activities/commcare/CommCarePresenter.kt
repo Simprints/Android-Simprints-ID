@@ -16,7 +16,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.SecurityManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -32,7 +32,7 @@ class CommCarePresenter(
     private val jsonHelper: JsonHelper,
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
-    rootManager: RootManager,
+    rootManager: SecurityManager,
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : RequestPresenter(
     view = view,
