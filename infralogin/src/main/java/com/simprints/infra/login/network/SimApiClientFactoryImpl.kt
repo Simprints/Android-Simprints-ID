@@ -19,7 +19,7 @@ internal class SimApiClientFactoryImpl @Inject constructor(
     // create an interface for that or mock it. SimApiClientFactory is injected everywhere, so it's important
     // that we are able to mock it.
     override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
-        return SimNetwork.SimApiClient.getSimApiClient(
+        return baseUrlProvider.getSimApiClient(
             remoteInterface,
             ctx,
             baseUrlProvider.getApiBaseUrl(),
@@ -30,7 +30,7 @@ internal class SimApiClientFactoryImpl @Inject constructor(
     }
 
     override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
-        return SimNetwork.SimApiClient.getSimApiClient(
+        return baseUrlProvider.getSimApiClient(
             remoteInterface,
             ctx,
             baseUrlProvider.getApiBaseUrl(),

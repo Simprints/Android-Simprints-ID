@@ -1,6 +1,7 @@
 package com.simprints.infra.network.apiclient
 
 import android.content.Context
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.infra.network.coroutines.retryIO
 import com.simprints.infra.network.exceptions.*
@@ -25,7 +26,7 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
     private val authToken: String? = null,
     private val attempts: Int = ATTEMPTS_FOR_NETWORK_CALLS,
     private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
-) : SimApiClient<T> {
+) : SimNetwork.SimApiClient<T> {
 
     companion object {
         private const val BACKEND_MAINTENANCE_ERROR_STRING = "002"

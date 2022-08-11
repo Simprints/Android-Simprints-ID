@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.apiclient.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -28,7 +28,7 @@ class LongConsentRemoteDataSourceImplTest {
     lateinit var consentDownloader: (FileUrl) -> ByteArray
 
     @MockK
-    lateinit var remoteApiClient: SimApiClient<FileUrlRemoteInterface>
+    lateinit var remoteApiClient: SimNetwork.SimApiClient<FileUrlRemoteInterface>
 
 
     private lateinit var remoteDataSource: LongConsentRemoteDataSourceImpl

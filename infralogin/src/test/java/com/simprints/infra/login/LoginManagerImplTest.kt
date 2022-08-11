@@ -10,7 +10,7 @@ import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
-import com.simprints.infra.network.apiclient.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -336,6 +336,6 @@ class LoginManagerImplTest {
         private val TOKEN = Token("token", "projectId", "apiKey", "application")
         private const val TOKEN_STRING = "token"
         private val FIREBASE_APP = mockk<FirebaseApp>()
-        private val SIM_API_CLIENT = mockk<SimApiClient<SimRemoteInterface>>()
+        private val SIM_API_CLIENT = mockk<SimNetwork.SimApiClient<SimRemoteInterface>>()
     }
 }

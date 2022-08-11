@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.apiclient.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -28,7 +28,7 @@ class LicenseRemoteDataSourceImplTest {
     private val license = UUID.randomUUID().toString()
 
     private val remoteInterface = mockk<LicenseRemoteInterface>()
-    private val simApiClient = mockk<SimApiClient<LicenseRemoteInterface>>()
+    private val simApiClient = mockk<SimNetwork.SimApiClient<LicenseRemoteInterface>>()
     private val loginManager = mockk<LoginManager>()
     private val licenseRemoteDataSourceImpl =
         LicenseRemoteDataSourceImpl(loginManager, JsonHelper)
