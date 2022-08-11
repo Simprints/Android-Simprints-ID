@@ -21,8 +21,7 @@ internal class ConfigServiceImpl @Inject constructor(
         }
 
     override suspend fun refreshProject(projectId: String): Project =
-        remoteDataSource.getProject(projectId).let {
+        remoteDataSource.getProject(projectId).also {
             localDataSource.saveProject(it)
-            it
         }
 }

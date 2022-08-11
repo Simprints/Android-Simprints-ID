@@ -16,11 +16,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(private val project
     }
 
     override suspend fun getProject(): Project =
-        projectDataStore.data.first().toDomain().let {
+        projectDataStore.data.first().toDomain().also {
             if (it.id == "") {
                 throw NoSuchElementException()
             }
-            it
         }
 
 }
