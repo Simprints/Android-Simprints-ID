@@ -22,36 +22,34 @@ class ProjectRealmMigration @Inject constructor(
     }
 
     override suspend fun cleanUp() {
-
-    }
-
-    override suspend fun migrate(currentData: ProtoProject): ProtoProject {
-        Simber.i("Start migration of project to Datastore")
-        val dbProject = load(loginManager.signedInProjectId)
-        if (dbProject == null) {
-            Simber.i("Got null project")
-            return currentData
+        Simber.i("Migration of project to Datastore done")
+        realmWrapper.useRealmInstance { realm ->
+            realm.beginTransaction()
+            realm.delete(DbProject::class.java)
+            realm.commitTransaction()
         }
-        Simber.i("Got project from Realm with id ${dbProject.id}")
-        return currentData
-            .toBuilder()
-            .setId(dbProject.id)
-            .setName(dbProject.name)
-            .setCreator(dbProject.creator)
-            .setDescription(dbProject.description)
-            .setImageBucket(dbProject.imageBucket)
-            .build()
     }
+
+    override suspend fun migrate(currentData: ProtoProject): ProtoProject =
+        realmWrapper.useRealmInstance { realm ->
+            Simber.i("Start migration of project to Datastore")
+            val dbProject = realm
+                .where(DbProject::class.java)
+                .equalTo(PROJECT_ID_FIELD, loginManager.signedInProjectId)
+                .findFirst() ?: return@useRealmInstance currentData
+
+            currentData
+                .toBuilder()
+                .setId(dbProject.id)
+                .setName(dbProject.name)
+                .setCreator(dbProject.creator)
+                .setDescription(dbProject.description)
+                .setImageBucket(dbProject.imageBucket)
+                .build()
+        }
 
     override suspend fun shouldMigrate(currentData: ProtoProject): Boolean {
         return loginManager.signedInProjectId.isNotEmpty() && currentData.id.isEmpty()
     }
-
-    private suspend fun load(projectId: String): DbProject? =
-        realmWrapper.useRealmInstance { realm ->
-            realm.where(DbProject::class.java)
-                .equalTo(PROJECT_ID_FIELD, projectId)
-                .findFirst()
-        }
 }
 
