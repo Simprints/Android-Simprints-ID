@@ -8,6 +8,7 @@ import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.config.domain.ConfigServiceImpl
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.local.ConfigLocalDataSourceImpl
+import com.simprints.infra.config.local.migrations.ProjectRealmMigration
 import com.simprints.infra.config.local.models.ProjectSerializer
 import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
@@ -45,10 +46,14 @@ object DataStoreModule {
 
     @Singleton
     @Provides
-    fun provideProjectProtoDataStore(appContext: Context): DataStore<ProtoProject> {
+    fun provideProjectProtoDataStore(
+        appContext: Context,
+        projectRealmMigration: ProjectRealmMigration
+    ): DataStore<ProtoProject> {
         return DataStoreFactory.create(
             serializer = ProjectSerializer,
             produceFile = { appContext.dataStoreFile(PROJECT_DATA_STORE_FILE_NAME) },
+            migrations = listOf(projectRealmMigration)
         )
     }
 }

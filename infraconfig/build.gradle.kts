@@ -7,6 +7,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("kapt")
+    id("realm-android")
     id("com.google.protobuf") version "0.8.17"
 }
 
@@ -27,6 +28,7 @@ dependencies {
     implementation(project(":infranetwork"))
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
+    implementation(project(":infrasecurity"))
 
     implementation(libs.androidX.core)
     implementation(libs.datastore)
