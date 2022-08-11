@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.subject.migration.oldschemas
+package com.simprints.infra.realm.migration.oldschemas
 
-object PeopleSchemaV5{
+internal object PeopleSchemaV5{
     const val PERSON_TABLE = "rl_Person"
     const val FINGERPRINT_TABLE = "rl_Fingerprint"
     const val PROJECT_TABLE = "rl_Project"

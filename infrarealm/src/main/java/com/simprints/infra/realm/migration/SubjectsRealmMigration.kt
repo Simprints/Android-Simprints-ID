@@ -1,46 +1,32 @@
-package com.simprints.id.data.db.subject.migration
+package com.simprints.infra.realm.migration
 
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.subject.local.models.DbFaceSample
-import com.simprints.id.data.db.subject.local.models.DbFingerprintSample
-import com.simprints.id.data.db.subject.local.models.DbSubject
-import com.simprints.id.data.db.subject.migration.oldschemas.*
-import com.simprints.id.domain.Constants
+import com.simprints.infra.realm.migration.oldschemas.*
 import io.realm.*
 import io.realm.FieldAttribute.REQUIRED
-import io.realm.annotations.RealmModule
 import java.util.*
 
-internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
-
-    @RealmModule(
-        classes = [
-            DbFingerprintSample::class,
-            DbFaceSample::class,
-            DbSubject::class,
-            DbProject::class
-        ]
-    )
-    class SubjectsModule
+internal class RealmMigrations(private val projectId: String) : RealmMigration {
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 11
 
-        const val FINGERPRINT_TABLE: String = "DbFingerprint"
-        const val SYNC_INFO_TABLE: String = "DbSyncInfo"
-        const val PROJECT_TABLE: String = "DbProject"
+        private const val FINGERPRINT_TABLE: String = "DbFingerprint"
+        private const val SYNC_INFO_TABLE: String = "DbSyncInfo"
+        private const val PROJECT_TABLE: String = "DbProject"
 
-        const val PROJECT_ID = "id"
-        const val PROJECT_LEGACY_ID = "legacyId"
-        const val PROJECT_NAME = "name"
-        const val PROJECT_DESCRIPTION = "description"
-        const val PROJECT_CREATOR = "creator"
-        const val IMAGE_BUCKET = "imageBucket"
-        const val PROJECT_UPDATED_AT = "updatedAt"
+        private const val GLOBAL_ID = "GLOBAL-2b14bf72-b68a-4c24-acaf-66d5e1fcc4bc"
+        private const val PROJECT_ID = "id"
+        private const val PROJECT_LEGACY_ID = "legacyId"
+        private const val PROJECT_NAME = "name"
+        private const val PROJECT_DESCRIPTION = "description"
+        private const val PROJECT_CREATOR = "creator"
+        private const val IMAGE_BUCKET = "imageBucket"
+        private const val PROJECT_UPDATED_AT = "updatedAt"
 
-        const val FINGERPRINT_PERSON = "person"
+        private const val FINGERPRINT_PERSON = "person"
+
+        private const val ISO_19794_2_FORMAT = "ISO_19794_2"
+        private const val RANK_ONE_1_23_FORMAT = "RANK_ONE"
+
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -64,7 +50,7 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     private fun migrateTo1(schema: RealmSchema) {
         with(PeopleSchemaV1) {
             schema.get(PERSON_TABLE)?.addField(MODULE_FIELD, String::class.java)?.transform {
-                it.set(MODULE_FIELD, Constants.GLOBAL_ID)
+                it.set(MODULE_FIELD, GLOBAL_ID)
             }
 
             schema.remove("rl_User")
@@ -82,9 +68,10 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migratePersonTo2(schema: RealmSchema) {
         with(PeopleSchemaV2) {
-            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
-                it.setString(PERSON_PROJECT_ID, projectId)
-            }?.setRequired(PERSON_PROJECT_ID, true)
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(PERSON_PROJECT_ID, String::class.java)
+                ?.transform {
+                    it.setString(PERSON_PROJECT_ID, projectId)
+                }?.setRequired(PERSON_PROJECT_ID, true)
 
             // Workaround to make primary key required (kotlin not nullable)
             // https://github.com/realm/realm-java/issues/5235
@@ -109,9 +96,10 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
             // even consistent with toSync = person.updatedAt == null || person.createdAt == null
             schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(UPDATE_FIELD, Date::class.java)
 
-            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
-                it.set(SYNC_FIELD, true)
-            }
+            schema.get(PeopleSchemaV1.PERSON_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)
+                ?.transform {
+                    it.set(SYNC_FIELD, true)
+                }
         }
     }
 
@@ -128,7 +116,8 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
     private fun migrateProjectInfoTo2(schema: RealmSchema) {
         schema.create(PROJECT_TABLE)
             .addField(PROJECT_ID, String::class.java, FieldAttribute.PRIMARY_KEY).setRequired(
-                PROJECT_ID, true)
+                PROJECT_ID, true
+            )
             .addStringAndMakeRequired(PROJECT_LEGACY_ID)
             .addStringAndMakeRequired(PROJECT_NAME)
             .addStringAndMakeRequired(PROJECT_DESCRIPTION)
@@ -173,7 +162,10 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
 
             schema.rename(PeopleSchemaV6.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
                 .addNewField<String>(FINGERPRINT_FIELD_ID, REQUIRED)
-                .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_FINGER_IDENTIFIER, FINGERPRINT_FIELD_FINGER_IDENTIFIER)
+                .renameField(
+                    PeopleSchemaV6.FINGERPRINT_FIELD_FINGER_IDENTIFIER,
+                    FINGERPRINT_FIELD_FINGER_IDENTIFIER
+                )
                 .renameField(
                     PeopleSchemaV6.FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE,
                     FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE
@@ -181,7 +173,10 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
                 .markAsRequired(FINGERPRINT_FIELD_TEMPLATE)
 
             schema.get(PERSON_TABLE)
-                ?.renameField(PeopleSchemaV6.PERSON_FIELD_FINGERPRINT_SAMPLES, PERSON_FIELD_FINGERPRINT_SAMPLES)
+                ?.renameField(
+                    PeopleSchemaV6.PERSON_FIELD_FINGERPRINT_SAMPLES,
+                    PERSON_FIELD_FINGERPRINT_SAMPLES
+                )
                 ?.addRealmListField(PERSON_FIELD_FACE_SAMPLES, faceSamplesScheme)
         }
     }
@@ -208,13 +203,13 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
         schema.get(PeopleSchemaV7.FINGERPRINT_TABLE)
             ?.addStringAndMakeRequired(SubjectsSchemaV11.FIELD_FORMAT)
             ?.transform {
-                it.set(SubjectsSchemaV11.FIELD_FORMAT, FingerprintTemplateFormat.ISO_19794_2.name)
+                it.set(SubjectsSchemaV11.FIELD_FORMAT, ISO_19794_2_FORMAT)
             }
 
         schema.get(PeopleSchemaV7.FACE_TABLE)
             ?.addStringAndMakeRequired(SubjectsSchemaV11.FIELD_FORMAT)
             ?.transform {
-                it.set(SubjectsSchemaV11.FIELD_FORMAT, FaceTemplateFormat.RANK_ONE_1_23.name)
+                it.set(SubjectsSchemaV11.FIELD_FORMAT, RANK_ONE_1_23_FORMAT)
             }
     }
 
@@ -234,10 +229,10 @@ internal class SubjectsRealmMigration(val projectId: String) : RealmMigration {
         this.setRequired(name, true)
 
     override fun hashCode(): Int {
-        return SubjectsRealmMigration.hashCode()
+        return RealmMigrations.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is SubjectsRealmMigration
+        return other is RealmMigrations
     }
 }

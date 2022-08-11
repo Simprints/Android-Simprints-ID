@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.subject.migration.oldschemas
+package com.simprints.infra.realm.migration.oldschemas
 
-object PeopleSchemaV7 {
+internal object PeopleSchemaV7 {
 
     const val FINGERPRINT_TABLE: String = "DbFingerprintSample"
     const val FINGERPRINT_FIELD_TEMPLATE: String = "template"

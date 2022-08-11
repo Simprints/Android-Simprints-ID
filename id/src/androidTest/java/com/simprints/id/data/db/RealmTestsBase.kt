@@ -1,12 +1,12 @@
 package com.simprints.id.data.db
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.data.db.subject.migration.SubjectsRealmConfig
 import com.simprints.id.testtools.SubjectsGeneratorUtils
+import com.simprints.infra.realm.config.RealmConfig
+import com.simprints.infra.realm.models.DbSubject
+import com.simprints.infra.security.keyprovider.LocalDbKey
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -29,11 +29,12 @@ open class RealmTestsBase {
 
     init {
         Realm.init(testContext)
-        config = SubjectsRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        config = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): DbSubject = SubjectsGeneratorUtils.getRandomSubject().fromDomainToDb()
+    protected fun getFakePerson(): DbSubject =
+        SubjectsGeneratorUtils.getRandomSubject().fromDomainToDb()
 
     protected fun saveFakePerson(realm: Realm, fakeSubject: DbSubject): DbSubject =
         fakeSubject.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakeSubject) } }
