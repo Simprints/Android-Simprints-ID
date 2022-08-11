@@ -27,7 +27,11 @@ class ProjectRealmMigration @Inject constructor(
 
     override suspend fun migrate(currentData: ProtoProject): ProtoProject {
         Simber.i("Start migration of project to Datastore")
-        val dbProject = load(loginManager.signedInProjectId) ?: return currentData
+        val dbProject = load(loginManager.signedInProjectId)
+        if (dbProject == null) {
+            Simber.i("Got null project")
+            return currentData
+        }
         Simber.i("Got project from Realm with id ${dbProject.id}")
         return currentData
             .toBuilder()

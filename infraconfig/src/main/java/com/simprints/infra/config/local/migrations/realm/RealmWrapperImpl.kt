@@ -1,6 +1,7 @@
 package com.simprints.infra.config.local.migrations.realm
 
 import android.content.Context
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
@@ -8,8 +9,9 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RealmWrapperImpl(
+class RealmWrapperImpl @Inject constructor(
     private val appContext: Context,
     private val secureDataManager: SecureLocalDbKeyProvider,
     private val loginManager: LoginManager,
@@ -20,6 +22,7 @@ class RealmWrapperImpl(
      */
     suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
+            Simber.i("Use realm")
             Realm.getInstance(config).use(block)
         }
 

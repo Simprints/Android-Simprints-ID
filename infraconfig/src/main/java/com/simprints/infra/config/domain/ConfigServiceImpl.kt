@@ -16,8 +16,9 @@ internal class ConfigServiceImpl @Inject constructor(
         } catch (e: Exception) {
             if (e is NoSuchElementException) {
                 refreshProject(projectId)
+            } else {
+                throw e
             }
-            throw e
         }
 
     override suspend fun refreshProject(projectId: String): Project =
