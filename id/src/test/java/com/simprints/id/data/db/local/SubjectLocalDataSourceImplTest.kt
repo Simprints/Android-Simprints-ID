@@ -2,16 +2,20 @@ package com.simprints.id.data.db.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.testtools.SubjectsGeneratorUtils
-import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.db.subject.local.*
-import com.simprints.id.data.db.subject.local.models.DbSubject
+import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
+import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.id.testtools.SubjectsGeneratorUtils
+import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbSubject
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
@@ -41,7 +45,7 @@ open class SubjectLocalDataSourceImplTest {
     @Before
     fun setup() {
         localSubjects = mutableListOf()
-        realm = mockk() {
+        realm = mockk {
             val transaction = slot<Realm.Transaction>()
             every { executeTransaction(capture(transaction)) } answers {
                 transaction.captured.execute(realm)
@@ -181,6 +185,7 @@ open class SubjectLocalDataSourceImplTest {
         val peopleCount = subjectLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
     }
+
     @Test
     fun performNoAction() = runBlocking {
         val subject = getFakePerson()
@@ -191,6 +196,7 @@ open class SubjectLocalDataSourceImplTest {
         val peopleCount = subjectLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
     }
+
     @Test
     fun shouldDeleteAllSubjects() = runBlocking {
         saveFakePeople(getRandomPeople(5))
