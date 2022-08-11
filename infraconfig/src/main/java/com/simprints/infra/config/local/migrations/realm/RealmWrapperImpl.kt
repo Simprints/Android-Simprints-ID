@@ -23,7 +23,8 @@ class RealmWrapperImpl @Inject constructor(
     suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
             Simber.i("Use realm")
-            Realm.getInstance(config).use(block)
+            val realm = Realm.getInstance(config)
+            realm.use(block)
         }
 
     private val config: RealmConfiguration by lazy {
