@@ -67,6 +67,7 @@ definitions:
                     - ./gradlew infralogging:jacocoTestReport
                     - ./gradlew infralogin:jacocoTestReport
                     - ./gradlew infranetwork:jacocoTestReport
+                    - ./gradlew infrarealm:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
@@ -75,6 +76,7 @@ definitions:
                     - infralogging/build/reports/**
                     - infralogin/build/reports/**
                     - infranetwork/build/reports/**
+                    - infrarealm/build/reports/**
                     - infrasecurity/build/reports/**
 
         ######################################################################
@@ -175,6 +177,7 @@ definitions:
                     - ./gradlew :infralogging:projectHealth
                     - ./gradlew :infralogin:projectHealth
                     - ./gradlew :infranetwork:projectHealth
+                    - ./gradlew :infrarealm:projectHealth
                     - ./gradlew :infrasecurity:projectHealth
 
         ######################################################################
@@ -366,10 +369,7 @@ flows:
             -   step: *promote-alpha-to-production
     -   flow: &ci-test # For CI testing purposes only
             -   step: *build-and-sign-universal-apk
-            -   step: *sign-and-deploy-to-staging
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-internal-to-alpha
-            -   step: *promote-alpha-to-production
+            -   step: *run-all-android-tests
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
     -   flow: &dependency-health-check-flow

@@ -7,11 +7,12 @@ import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
 import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
-import com.simprints.id.data.db.subject.local.models.DbSubject
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbSubject
 import io.realm.Realm
 import io.realm.RealmQuery
 import kotlinx.coroutines.flow.Flow

@@ -12,7 +12,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ abstract class CheckLoginPresenter(
     lateinit var loginManager: LoginManager
 
     @Inject
-    lateinit var secureDataManager: SecureLocalDbKeyProvider
+    lateinit var secureDataManager: SecurityManager
 
     @Inject
     lateinit var syncManager: SyncManager

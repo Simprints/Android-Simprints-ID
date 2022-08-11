@@ -22,7 +22,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -73,7 +73,7 @@ class TestSecurityModule(
     override fun provideProjectAuthenticator(
         loginManager: LoginManager,
         projectSecretManager: ProjectSecretManager,
-        secureDataManager: SecureLocalDbKeyProvider,
+        secureDataManager: SecurityManager,
         projectRepository: ProjectRepository,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,

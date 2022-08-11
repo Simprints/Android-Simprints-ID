@@ -1,4 +1,4 @@
 package com.simprints.infra.security.exceptions
 
-class MissingLocalDatabaseKeyException(message: String = "MissingLocalDatabaseKeyException") :
+internal class MissingLocalDatabaseKeyException(message: String = "MissingLocalDatabaseKeyException") :
     RuntimeException(message)

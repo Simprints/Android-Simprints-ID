@@ -110,6 +110,7 @@ dependencies {
     implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
+    implementation(project(":infrarealm"))
     implementation(project(":infrasecurity"))
     implementation(libs.libsimprints)
 
@@ -163,9 +164,12 @@ dependencies {
     // ######################################################
     //                      Unit test
     // ######################################################
-
+    
     testImplementation(project(":fingerprintscannermock"))
     testImplementation(project(":eventsystem"))
+
+    testImplementation(libs.testing.hilt)
+    kaptTest(libs.testing.hilt.kapt)
 
     testImplementation(libs.testing.retrofit)
     testImplementation(libs.testing.junit) {
@@ -219,7 +223,6 @@ dependencies {
     androidTestImplementation(libs.testing.coroutines.test)
     androidTestImplementation(libs.testing.androidX.room)
     androidTestImplementation(libs.rxJava2.kotlin)
-
 
     androidTestImplementation(libs.testing.espresso.barista) {
         exclude("com.android.support")

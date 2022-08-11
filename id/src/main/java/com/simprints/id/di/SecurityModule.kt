@@ -31,7 +31,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -74,7 +74,7 @@ open class SecurityModule {
     open fun provideProjectAuthenticator(
         loginManager: LoginManager,
         projectSecretManager: ProjectSecretManager,
-        secureDataManager: SecureLocalDbKeyProvider,
+        secureDataManager: SecurityManager,
         projectRepository: ProjectRepository,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
