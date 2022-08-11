@@ -1,8 +1,9 @@
-package com.simprints.infra.config.local.models
+package com.simprints.infra.config.local.serializer
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
+import com.simprints.infra.config.local.models.ProtoProject
 import java.io.InputStream
 import java.io.OutputStream
 

@@ -9,7 +9,7 @@ import com.simprints.infra.config.domain.ConfigServiceImpl
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.local.migrations.ProjectRealmMigration
-import com.simprints.infra.config.local.models.ProjectSerializer
+import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSourceImpl

@@ -5,7 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.local.models.ProjectSerializer
+import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.project
 import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

@@ -1,0 +1,183 @@
+syntax = "proto3";
+
+option java_package = "com.simprints.infra.config.local.models";
+option java_multiple_files = true;
+
+message ProtoProjectConfiguration {
+    string project_id = 1;
+    ProtoGeneralConfiguration general = 2;
+    optional ProtoFaceConfiguration face = 3;
+    optional ProtoFingerprintConfiguration fingerprint = 4;
+    ProtoConsentConfiguration consent = 5;
+    ProtoIdentificationConfiguration identification = 6;
+    ProtoSynchronizationConfiguration synchronization = 7;
+}
+
+message ProtoGeneralConfiguration {
+    repeated ProtoModality modalities = 1;
+    repeated string language_options = 2;
+    string default_language = 3;
+    bool collect_location = 4;
+    bool duplicate_biometric_enrolment_check = 5;
+
+    enum ProtoModality {
+        FACE = 0;
+        FINGERPRINT = 1;
+    }
+}
+
+message ProtoFaceConfiguration {
+    int32 nb_of_images_to_capture = 1;
+    int32 quality_threshold = 2;
+    ImageSavingStrategy image_saving_strategy = 3;
+    ProtoDecisionPolicy decision_policy = 4;
+
+    enum ImageSavingStrategy {
+        NEVER = 0;
+        ONLY_GOOD_SCAN = 1;
+    }
+}
+
+message ProtoFingerprintConfiguration {
+    repeated Finger fingers_to_capture = 1;
+    int32 quality_threshold = 2;
+    ProtoDecisionPolicy decision_policy = 3;
+    repeated VeroGeneration allowed_vero_generations = 4;
+    FingerComparisonStrategy comparison_strategy_for_verification = 5;
+    bool display_hand_icons = 6;
+    optional ProtoVero2Configuration vero_2 = 7;
+
+    enum Finger {
+        LEFT_THUMB = 0;
+        LEFT_INDEX_FINGER = 1;
+        LEFT_3RD_FINGER = 2;
+        LEFT_4TH_FINGER = 3;
+        LEFT_5TH_FINGER = 4;
+        RIGHT_THUMB = 5;
+        RIGHT_INDEX_FINGER = 6;
+        RIGHT_3RD_FINGER = 7;
+        RIGHT_4TH_FINGER = 8;
+        RIGHT_5TH_FINGER = 9;
+    }
+
+    enum VeroGeneration {
+        VERO_1 = 0;
+        VERO_2 = 1;
+    }
+
+    enum FingerComparisonStrategy {
+        SAME_FINGER = 0;
+        CROSS_FINGER_USING_MEAN_OF_MAX = 1;
+    }
+}
+
+message ProtoVero2Configuration {
+    ImageSavingStrategy image_saving_strategy = 1;
+    CaptureStrategy capture_strategy = 2;
+    bool display_live_feedback = 3;
+    map<string, Vero2FirmwareVersions> firmware_versions = 4;
+
+    enum ImageSavingStrategy {
+        NEVER = 0;
+        ONLY_GOOD_SCAN = 1;
+        EAGER = 2;
+    }
+
+    enum CaptureStrategy {
+        SECUGEN_ISO_500_DPI = 0;
+        SECUGEN_ISO_1000_DPI = 1;
+        SECUGEN_ISO_1300_DPI = 2;
+        SECUGEN_ISO_1700_DPI = 3;
+    }
+
+    message Vero2FirmwareVersions {
+        string cypress = 1;
+        string stm = 2;
+        string un20 = 3;
+    }
+}
+
+message ProtoConsentConfiguration {
+    string program_name = 1;
+    string organization_name = 2;
+    bool collect_consent = 3;
+    bool display_simprints_logo = 4;
+    bool allow_parental_consent = 5;
+    optional ConsentPromptConfiguration general_prompt = 6;
+    optional ConsentPromptConfiguration parental_prompt = 7;
+
+    message ConsentPromptConfiguration {
+        ConsentEnrolmentVariant enrolment_variant = 1;
+        bool data_shared_with_partner = 2;
+        bool data_used_for_r_and_d = 3;
+        bool privacy_rights = 4;
+        bool confirmation = 5;
+    }
+
+    enum ConsentEnrolmentVariant {
+        STANDARD = 0;
+        ENROLMENT_ONLY = 1;
+    }
+}
+
+message ProtoIdentificationConfiguration {
+    int32 max_nb_of_returned_candidates = 1;
+    PoolType pool_type = 2;
+
+    enum  PoolType {
+        PROJECT = 0;
+        MODULE = 1;
+        USER = 2;
+    }
+}
+
+message ProtoSynchronizationConfiguration {
+    Frequency frequency = 1;
+    ProtoUpSynchronizationConfiguration up = 2;
+    ProtoDownSynchronizationConfiguration down = 3;
+
+    enum Frequency {
+        ONLY_PERIODICALLY_UP_SYNC = 0;
+        PERIODICALLY = 1;
+        PERIODICALLY_AND_ON_SESSION_START = 2;
+    }
+}
+
+message ProtoDownSynchronizationConfiguration {
+    PartitionType partition_type = 1;
+    int32 max_nb_of_modules = 2;
+    repeated string module_options = 3;
+
+    enum PartitionType {
+        PROJECT = 0;
+        MODULE = 1;
+        USER = 2;
+    }
+}
+
+message ProtoUpSynchronizationConfiguration {
+    SimprintsUpSynchronizationConfiguration simprints = 1;
+    CoSyncUpSynchronizationConfiguration co_sync = 2;
+
+    message SimprintsUpSynchronizationConfiguration {
+        UpSynchronizationKind kind = 1;
+    }
+
+    message CoSyncUpSynchronizationConfiguration {
+        UpSynchronizationKind kind = 1;
+    }
+
+    enum UpSynchronizationKind {
+        NONE = 0;
+        ONLY_ANALYTICS = 1;
+        ONLY_BIOMETRICS = 2;
+        ALL = 3;
+    }
+}
+
+
+message ProtoDecisionPolicy {
+    int32 low = 1;
+    int32 medium = 2;
+    int32 high = 3;
+}
