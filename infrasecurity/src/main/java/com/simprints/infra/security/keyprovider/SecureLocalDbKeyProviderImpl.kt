@@ -1,14 +1,15 @@
 package com.simprints.infra.security.keyprovider
 
-import android.content.SharedPreferences
 import android.util.Base64.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MissingLocalDatabaseKeyException
+import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.infra.security.random.RandomGenerator
 import com.simprints.infra.security.random.RandomGeneratorImpl
+import javax.inject.Inject
 
-class SecureLocalDbKeyProviderImpl(
-    private val encryptedSharedPrefs: SharedPreferences,
+internal class SecureLocalDbKeyProviderImpl @Inject constructor(
+    private val encryptedSharedPrefs: EncryptedSharedPreferencesBuilder,
     private val randomGenerator: RandomGenerator = RandomGeneratorImpl()
 ) : SecureLocalDbKeyProvider {
 
@@ -22,7 +23,8 @@ class SecureLocalDbKeyProviderImpl(
         var key = readRealmKeyFromSharedPrefs(dbName)
         if (key == null) {
             key = generateRealmKey()
-            encryptedSharedPrefs.edit().putString(getSharedPrefsKeyForDbName(dbName), key).apply()
+            encryptedSharedPrefs.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS)
+                .edit().putString(getSharedPrefsKeyForDbName(dbName), key).apply()
         }
     }
 
@@ -48,7 +50,9 @@ class SecureLocalDbKeyProviderImpl(
 
     private fun readRealmKeyFromSharedPrefs(dnName: String): String? {
         val sharedPrefsKeyForRealm = getSharedPrefsKeyForDbName(dnName)
-        return encryptedSharedPrefs.getString(sharedPrefsKeyForRealm, null)
+        return encryptedSharedPrefs.buildEncryptedSharedPreferences(
+            FILENAME_FOR_REALM_KEY_SHARED_PREFS
+        ).getString(sharedPrefsKeyForRealm, null)
     }
 
     private fun generateRealmKey(): String {
