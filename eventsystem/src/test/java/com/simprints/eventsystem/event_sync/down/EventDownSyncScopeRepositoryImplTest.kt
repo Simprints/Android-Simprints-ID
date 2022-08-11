@@ -123,9 +123,20 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
+    @Test
+    fun buildNewModulesDownSyncScope() {
+        runTest(UnconfinedTestDispatcher()) {
+            val syncScope = eventDownSyncScopeRepository.getNewModulesDownSyncScope(
+                listOf(Modes.FINGERPRINT),
+                DEFAULT_MODULES.toList()
+            )
+
+            assertModuleSyncScope(syncScope)
+        }
+    }
 
     @Test
-    fun throwWhenProjectIsMissing() {
+    fun throwWhenProjectIsMissingForStandardScope() {
         runTest(UnconfinedTestDispatcher()) {
             every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
 
@@ -134,6 +145,20 @@ class EventDownSyncScopeRepositoryImplTest {
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
                     GROUP.GLOBAL
+                )
+            }
+        }
+    }
+
+    @Test
+    fun throwWhenProjectIsMissingForNewModulesScope() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
+
+            assertThrows<MissingArgumentForDownSyncScopeException> {
+                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
+                    listOf(Modes.FINGERPRINT),
+                    DEFAULT_MODULES.toList()
                 )
             }
         }
@@ -149,6 +174,20 @@ class EventDownSyncScopeRepositoryImplTest {
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
                     GROUP.GLOBAL
+                )
+            }
+        }
+    }
+
+    @Test
+    fun throwWhenUserIsMissingForNewModulesScope() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { loginManager.getSignedInUserIdOrEmpty() } returns ""
+
+            assertThrows<MissingArgumentForDownSyncScopeException> {
+                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
+                    listOf(Modes.FINGERPRINT),
+                    DEFAULT_MODULES.toList()
                 )
             }
         }
