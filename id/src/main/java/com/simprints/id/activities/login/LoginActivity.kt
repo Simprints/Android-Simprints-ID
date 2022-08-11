@@ -29,7 +29,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 
 class LoginActivity : BaseSplitActivity() {
@@ -43,7 +43,7 @@ class LoginActivity : BaseSplitActivity() {
     lateinit var loginActivityHelper: LoginActivityHelper
 
     @Inject
-    lateinit var baseUrlProvider: BaseUrlProvider
+    lateinit var baseUrlProvider: SimNetwork
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)

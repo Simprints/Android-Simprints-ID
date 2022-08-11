@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.apiclient.SimApiClient
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

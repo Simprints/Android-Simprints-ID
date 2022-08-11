@@ -1,6 +1,7 @@
-package com.simprints.infra.network
+package com.simprints.infra.network.apiclient
 
 import android.content.Context
+import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.infra.network.coroutines.retryIO
 import com.simprints.infra.network.exceptions.*
 import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder

@@ -1,7 +1,8 @@
-package com.simprints.infra.network
+package com.simprints.infra.network.apiclient
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.network.FakeRetrofitInterface
 import com.simprints.infra.network.exceptions.ApiError
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException

@@ -10,7 +10,7 @@ import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.apiclient.SimApiClient
 import com.simprints.infra.network.SimRemoteInterface
 import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
