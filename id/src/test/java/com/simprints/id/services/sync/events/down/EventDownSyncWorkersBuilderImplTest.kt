@@ -26,10 +26,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class EventDownSyncWorkersBuilderImplTest {
 
-    private lateinit var eventDownSyncWorkersFactory: EventDownSyncWorkersBuilder
+    private lateinit var eventDownSyncWorkersBuilder: EventDownSyncWorkersBuilder
 
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -41,7 +43,7 @@ class EventDownSyncWorkersBuilderImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        eventDownSyncWorkersFactory = EventDownSyncWorkersBuilderImpl(
+        eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilderImpl(
             eventDownSyncScopeRepository,
             JsonHelper,
             mockPreferencesManager
@@ -59,10 +61,10 @@ class EventDownSyncWorkersBuilderImplTest {
                 )
             } returns projectDownSyncScope
 
-            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
+            val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
 
-            chain.assertNumberOfDownSyncDownloaderWorker(1)
-            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            chain.assertNumberOfDownSyncDownloaderWorkers(1)
+            chain.assertNumberOfDownSyncCountWorkers(1)
             chain.assertDownSyncDownloaderWorkerInput(projectDownSyncScope)
             chain.assertDownSyncCountWorkerInput(projectDownSyncScope)
             assertThat(chain.size).isEqualTo(2)
@@ -78,9 +80,9 @@ class EventDownSyncWorkersBuilderImplTest {
             )
         } returns userDownSyncScope
 
-        val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
-        chain.assertNumberOfDownSyncDownloaderWorker(1)
-        chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        chain.assertNumberOfDownSyncDownloaderWorkers(1)
+        chain.assertNumberOfDownSyncCountWorkers(1)
         chain.assertDownSyncDownloaderWorkerInput(userDownSyncScope)
         chain.assertDownSyncCountWorkerInput(userDownSyncScope)
         assertThat(chain.size).isEqualTo(2)
@@ -97,9 +99,9 @@ class EventDownSyncWorkersBuilderImplTest {
                 )
             } returns modulesDownSyncScope
 
-            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
-            chain.assertNumberOfDownSyncDownloaderWorker(2)
-            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+            chain.assertNumberOfDownSyncDownloaderWorkers(2)
+            chain.assertNumberOfDownSyncCountWorkers(1)
             chain.assertDownSyncDownloaderWorkerInput(modulesDownSyncScope)
             chain.assertDownSyncCountWorkerInput(modulesDownSyncScope)
             assertThat(chain.size).isEqualTo(3)
@@ -116,7 +118,7 @@ class EventDownSyncWorkersBuilderImplTest {
                 )
             } returns modulesDownSyncScope
 
-            eventDownSyncWorkersFactory.buildDownSyncWorkerChain("")
+            eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
             verify(exactly = 1) { mockPreferencesManager.selectedModules }
             verify(exactly = 0) { mockPreferencesManager.moduleIdOptions }
         }
@@ -132,9 +134,9 @@ class EventDownSyncWorkersBuilderImplTest {
                 )
             } returns projectDownSyncScope
             val uniqueSyncId = "uniqueSyncId"
-            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(uniqueSyncId)
-            chain.assertNumberOfDownSyncDownloaderWorker(1)
-            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId)
+            chain.assertNumberOfDownSyncDownloaderWorkers(1)
+            chain.assertNumberOfDownSyncCountWorkers(1)
             chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
                 .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
             chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
@@ -152,14 +154,108 @@ class EventDownSyncWorkersBuilderImplTest {
                 )
             } returns projectDownSyncScope
 
-            val chain = eventDownSyncWorkersFactory.buildDownSyncWorkerChain(null)
-            chain.assertNumberOfDownSyncDownloaderWorker(1)
-            chain.assertSubjectsDownSyncCountWorkerTagsForPeriodic(1)
+            val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(null)
+            chain.assertNumberOfDownSyncDownloaderWorkers(1)
+            chain.assertNumberOfDownSyncCountWorkers(1)
             chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
                 .assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
             chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
                 .assertSubjectsDownSyncCountWorkerTagsForOneTime()
         }
+
+    @Test
+    fun builder_forNewModulesDownSync_shouldReturnNull() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                mockPreferencesManager.newlyAddedModules
+            } returns setOf()
+
+            val chain = eventDownSyncWorkersBuilder.buildNewModulesDownSyncWorkerChain("")
+            assertNull(chain)
+        }
+
+    @Test
+    fun builder_forNewModulesDownSync_shouldReturnTheRightWorkers() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
+                    any(),
+                    listOf("ModuleA")
+                )
+            } returns modulesDownSyncScope
+            coEvery {
+                mockPreferencesManager.newlyAddedModules
+            } returns setOf("ModuleA")
+
+            val chain = eventDownSyncWorkersBuilder.buildNewModulesDownSyncWorkerChain("")
+            assertNotNull(chain)
+            chain.assertNumberOfDownSyncDownloaderWorkers(2)
+            chain.assertNumberOfDownSyncCountWorkers(1)
+            chain.assertDownSyncDownloaderWorkerInput(modulesDownSyncScope)
+            chain.assertDownSyncCountWorkerInput(modulesDownSyncScope)
+            assertThat(chain.size).isEqualTo(3)
+        }
+
+    @Test
+    fun builder_forNewModulesDownSync_shouldOnlySyncNewModules() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
+                    any(),
+                    listOf("ModuleA")
+                )
+            } returns modulesDownSyncScope
+            coEvery {
+                mockPreferencesManager.newlyAddedModules
+            } returns setOf("ModuleA")
+
+            eventDownSyncWorkersBuilder.buildNewModulesDownSyncWorkerChain("")
+            verify(exactly = 2) { mockPreferencesManager.newlyAddedModules }
+            verify(exactly = 0) { mockPreferencesManager.selectedModules }
+            verify(exactly = 0) { mockPreferencesManager.moduleIdOptions }
+        }
+
+    @Test
+    fun builder_forNewModuleDownSyncWorkers_shouldHaveTheRightTags() =
+        runTest(StandardTestDispatcher()) {
+            coEvery {
+                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
+                    any(),
+                    listOf("ModuleA")
+                )
+            } returns modulesDownSyncScope
+            coEvery {
+                mockPreferencesManager.newlyAddedModules
+            } returns setOf("ModuleA")
+
+            val uniqueSyncId = "uniqueSyncId"
+            val chain = eventDownSyncWorkersBuilder.buildNewModulesDownSyncWorkerChain(uniqueSyncId)
+            assertNotNull(chain)
+            chain.assertNumberOfDownSyncDownloaderWorkers(2)
+            chain.assertNumberOfDownSyncCountWorkers(1)
+            chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+                .assertSubjectsDownSyncDownloaderWorkerTagsForNewModules()
+            chain.first { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }
+                .assertSubjectsDownSyncCountWorkerTagsForNewModules()
+        }
+}
+
+private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForNewModules() {
+    assertThat(tags.size).isEqualTo(8)
+    assertUniqueMasterIdTag()
+
+    assertCommonDownSyncWorkersTags()
+    assertCommonDownSyncDownloadersWorkersTag()
+    assertCommonNewModulesDownSyncTag()
+}
+
+private fun WorkRequest.assertSubjectsDownSyncCountWorkerTagsForNewModules() {
+    assertThat(tags.size).isEqualTo(8)
+    assertUniqueMasterIdTag()
+
+    assertCommonDownSyncWorkersTags()
+    assertCommonDownSyncCounterWorkersTag()
+    assertCommonNewModulesDownSyncTag()
 }
 
 private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic() {
@@ -212,18 +308,21 @@ private fun WorkRequest.assertCommonSyncTag() =
 private fun WorkRequest.assertCommonDownSyncTag() =
     assertThat(tags).contains(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
 
+private fun WorkRequest.assertCommonNewModulesDownSyncTag() =
+    assertThat(tags).contains(TAG_DOWN_SYNC_NEW_MODULES)
+
 private fun WorkRequest.assertScheduleAtTag() =
     assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
 
 private fun WorkRequest.assertUniqueDownSyncMasterTag() =
     assertThat(tags.firstOrNull { it.contains(TAG_DOWN_MASTER_SYNC_ID) }).isNotNull()
 
-private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorker(count: Int) =
+private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorkers(count: Int) =
     assertThat(count { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }).isEqualTo(
         count
     )
 
-private fun List<WorkRequest>.assertSubjectsDownSyncCountWorkerTagsForPeriodic(count: Int) =
+private fun List<WorkRequest>.assertNumberOfDownSyncCountWorkers(count: Int) =
     assertThat(count { it.tags.contains(EventDownSyncCountWorker::class.qualifiedName) }).isEqualTo(
         count
     )

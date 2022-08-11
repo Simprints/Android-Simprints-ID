@@ -10,6 +10,7 @@ import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsExceptio
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.id.services.sync.events.common.TAG_DOWN_SYNC_NEW_MODULES
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -27,8 +28,6 @@ class EventDownSyncDownloaderWorker(
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
-        const val DOWN_SYNC_NEW_MODULES = "DOWN_SYNC_NEW_MODULES"
-
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
@@ -110,7 +109,7 @@ class EventDownSyncDownloaderWorker(
         }
     }
 
-    private fun isNewModulesDownSyncRequest() = tags.contains(DOWN_SYNC_NEW_MODULES)
+    private fun isNewModulesDownSyncRequest() = tags.contains(TAG_DOWN_SYNC_NEW_MODULES)
 
     private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
         return when (t) {

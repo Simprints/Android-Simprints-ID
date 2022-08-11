@@ -47,9 +47,9 @@ class EventDownSyncWorkersBuilderImpl(
             val uniqueDownSyncId = UUID.randomUUID().toString()
             val workerBuilders = downSyncScope.operations.map {
                 getDownSyncWorkerBuilder(uniqueSyncId, uniqueDownSyncId, it)
-                    .addCommonTagForNewModuleDownloaders() as OneTimeWorkRequest.Builder
+                    .addCommonTagForNewModulesDownloaders() as OneTimeWorkRequest.Builder
             } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
-                .addCommonTagForNewModuleDownloaders() as OneTimeWorkRequest.Builder
+                .addCommonTagForNewModulesDownloaders() as OneTimeWorkRequest.Builder
 
             return workerBuilders.map { it.build() }
         } else {
