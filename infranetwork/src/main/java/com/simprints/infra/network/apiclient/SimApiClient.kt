@@ -1,11 +1,10 @@
-package com.simprints.infra.network
+package com.simprints.infra.network.apiclient
 
 import android.content.Context
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.network.SimRemoteInterface
 import kotlin.reflect.KClass
 
-interface SimApiClient<T : SimRemoteInterface> {
+internal interface SimApiClient<T : SimRemoteInterface> {
 
     val api: T
 

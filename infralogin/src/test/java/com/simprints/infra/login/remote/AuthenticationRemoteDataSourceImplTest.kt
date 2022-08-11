@@ -9,7 +9,7 @@ import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.models.ApiAuthRequestBody
 import com.simprints.infra.login.remote.models.ApiAuthenticationData
 import com.simprints.infra.login.remote.models.ApiToken
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.apiclient.SimApiClient
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation

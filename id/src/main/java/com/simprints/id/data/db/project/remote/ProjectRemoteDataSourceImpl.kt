@@ -3,7 +3,7 @@ package com.simprints.id.data.db.project.remote
 import com.fasterxml.jackson.databind.JsonNode
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 
 open class ProjectRemoteDataSourceImpl(
     private val loginManager: LoginManager
@@ -26,6 +26,6 @@ open class ProjectRemoteDataSourceImpl(
             }
         }
 
-    override suspend fun getProjectApiClient(): SimApiClient<ProjectRemoteInterface> =
+    override suspend fun getProjectApiClient(): SimNetwork.SimApiClient<ProjectRemoteInterface> =
         loginManager.buildClient(ProjectRemoteInterface::class)
 }

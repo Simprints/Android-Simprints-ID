@@ -1,8 +1,8 @@
 package com.simprints.core.network
 
-import kotlin.reflect.KClass
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.SimRemoteInterface
+import kotlin.reflect.KClass
 
 // TODO move this into the infralogin
 interface SimApiClientFactory {

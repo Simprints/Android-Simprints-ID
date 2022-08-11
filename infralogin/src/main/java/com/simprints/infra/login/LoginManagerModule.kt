@@ -15,7 +15,7 @@ import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.network.SimApiClientFactoryImpl
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSourceImpl
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -54,7 +54,7 @@ object SafetyNetModule {
     internal fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider
+        baseUrlProvider: SimNetwork
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         baseUrlProvider,
         ctx.deviceId,
