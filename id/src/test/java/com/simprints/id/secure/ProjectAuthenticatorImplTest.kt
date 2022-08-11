@@ -10,7 +10,7 @@ import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.SafetyNetException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -29,7 +29,7 @@ class ProjectAuthenticatorImplTest {
     private lateinit var longConsentRepositoryMock: LongConsentRepository
 
     @MockK
-    private lateinit var secureDataManager: SecureLocalDbKeyProvider
+    private lateinit var secureDataManager: SecurityManager
 
     @MockK
     private lateinit var projectSecretManager: ProjectSecretManager

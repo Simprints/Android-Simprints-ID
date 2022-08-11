@@ -6,8 +6,8 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.exceptions.RootedDeviceException
-import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coVerify
 import io.mockk.every
@@ -96,7 +96,7 @@ class RequestPresenterTest {
 
     @Test
     fun withRootedDevice_shouldShowAlertScreen() = runTest {
-        val mockDeviceManager = mockk<RootManager>(relaxed = true)
+        val mockDeviceManager = mockk<SecurityManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
         val presenter = ImplRequestPresenter(
@@ -117,7 +117,7 @@ class RequestPresenterTest {
 class ImplRequestPresenter(
     view: RequestContract.RequestView,
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
-    rootManager: RootManager,
+    rootManager: SecurityManager,
     sharedPreferencesManager: SharedPreferencesManager,
     sessionEventsManager: ClientApiSessionEventsManager
 ) : RequestPresenter(

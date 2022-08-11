@@ -16,7 +16,7 @@ import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ class OdkPresenter(
     private val view: OdkContract.View,
     private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    rootManager: RootManager,
+    rootManager: SecurityManager,
     sharedPreferencesManager: SharedPreferencesManager
 ) : RequestPresenter(
     view = view,

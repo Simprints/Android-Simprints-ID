@@ -61,9 +61,13 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
+import com.simprints.infra.realm.RealmModule
+import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.security.SecurityManager
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
+import com.simprints.infra.security.SecurityModule as SecurityManagerModule
 
 @Component(
     modules = [
@@ -78,6 +82,8 @@ import javax.inject.Singleton
         LoginManagerModule::class,
         NetworkModule::class,
         SafetyNetModule::class,
+        SecurityManagerModule::class,
+        RealmModule::class
         ConfigManagerModule::class,
         DataStoreModule::class
     ]
@@ -163,5 +169,7 @@ interface AppComponent {
     fun getLicenseRepository(): LicenseRepository
     fun getLoginManager(): LoginManager
     fun getConfigManager(): ConfigManager
+    fun getSecurityManager(): SecurityManager
+    fun getRealmWrapper(): RealmWrapper
 
 }
