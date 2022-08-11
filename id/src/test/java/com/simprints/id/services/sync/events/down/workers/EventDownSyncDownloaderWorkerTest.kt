@@ -12,6 +12,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.id.services.sync.events.common.TAG_DOWN_SYNC_NEW_MODULES
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -22,10 +23,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -78,6 +76,30 @@ class EventDownSyncDownloaderWorkerTest {
                 doWork()
 
                 verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
+            }
+        }
+    }
+
+    @Test
+    fun worker_shouldNotRefreshOperationForNewModulesSync() {
+        runBlocking {
+            with(eventDownSyncDownloaderWorker) {
+                tags.add(TAG_DOWN_SYNC_NEW_MODULES)
+                doWork()
+
+                coVerify(exactly = 0) { eventDownSyncScopeRepository.refreshState(any()) }
+            }
+        }
+    }
+
+    @Test
+    fun worker_shouldClearNewlyAddedModulesAfterSuccessfulSync() {
+        runBlocking {
+            with(eventDownSyncDownloaderWorker) {
+                tags.add(TAG_DOWN_SYNC_NEW_MODULES)
+                doWork()
+
+                coVerify(exactly = 1) { preferencesManager.newlyAddedModules = setOf() }
             }
         }
     }
@@ -240,7 +262,14 @@ class EventDownSyncDownloaderWorkerTest {
         val syncCacheMock = mockk<EventSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns progress
 
-        val workInfo = WorkInfo(UUID.randomUUID(), RUNNING, workDataOf(), listOf(), workDataOf(), 2)
+        val workInfo = WorkInfo(
+            UUID.randomUUID(),
+            RUNNING,
+            workDataOf(),
+            listOf(),
+            workDataOf(),
+            2
+        )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
 
@@ -256,6 +285,7 @@ class EventDownSyncDownloaderWorkerTest {
             eventDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncHelper = mockk(relaxed = true)
             dispatcher = testDispatcherProvider
+            preferencesManager = mockk()
         }
 }
 
