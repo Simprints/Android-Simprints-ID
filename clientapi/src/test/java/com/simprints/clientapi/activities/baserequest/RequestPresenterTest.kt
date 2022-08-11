@@ -6,8 +6,8 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.exceptions.RootedDeviceException
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.mockk.coVerify
 import io.mockk.every
