@@ -9,7 +9,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
@@ -29,7 +29,7 @@ class CheckLoginFromMainLauncherActivityTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject
-    lateinit var secureDataManager: SecureLocalDbKeyProvider
+    lateinit var secureDataManager: SecurityManager
 
     val loginManager: LoginManager = mockk()
 
@@ -65,7 +65,6 @@ class CheckLoginFromMainLauncherActivityTest {
 
     @Test
     fun userIsLogged_shouldDashboardActComeUp() {
-        every { secureDataManager.getLocalDbKeyOrThrow(any()) } returns mockk()
         every { loginManager.isSignedIn(any(), any()) } returns true
         every { loginManager.getSignedInProjectIdOrEmpty() } returns "project"
         every { loginManager.getSignedInUserIdOrEmpty() } returns "user"

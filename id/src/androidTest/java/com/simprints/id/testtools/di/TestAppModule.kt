@@ -3,7 +3,6 @@
 package com.simprints.id.testtools.di
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
@@ -25,13 +24,8 @@ import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
-import com.simprints.infra.security.random.RandomGenerator
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
-import io.mockk.every
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class TestAppModule(
@@ -65,20 +59,6 @@ class TestAppModule(
 
     override fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
         SessionDataCacheImpl(app)
-
-    override fun provideRandomGenerator(): RandomGenerator =
-        randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
-
-    override fun provideSecureLocalDbKeyProvider(
-        builder: EncryptedSharedPreferencesBuilder,
-        randomGenerator: RandomGenerator,
-    ): SecureLocalDbKeyProvider =
-        secureDataManagerRule.resolveDependency {
-            super.provideSecureLocalDbKeyProvider(
-                builder,
-                randomGenerator
-            )
-        }
 
     override fun provideEventRepository(
         ctx: Context,
@@ -119,26 +99,6 @@ class TestAppModule(
         locationManagerRule.resolveDependency {
             super.provideLocationManager(ctx)
         }
-
-    // Android keystore is not available in unit tests - so it returns a mock that builds the standard shared prefs.
-    override fun provideEncryptedSharedPreferencesBuilder(
-        app: Application
-    ): EncryptedSharedPreferencesBuilder = mockk<EncryptedSharedPreferencesBuilder>().apply {
-        every { this@apply.buildEncryptedSharedPreferences(any()) } answers {
-            app.getSharedPreferences(
-                args[0] as String,
-                Context.MODE_PRIVATE
-            )
-        }
-    }
-
-    override fun provideEncryptedSharedPreferences(
-        builder: EncryptedSharedPreferencesBuilder
-    ): SharedPreferences = encryptedSharedPreferencesRule.resolveDependency {
-        super.provideEncryptedSharedPreferences(
-            builder
-        )
-    }
 
     override fun provideDeviceManager(
         connectivityHelper: ConnectivityHelper

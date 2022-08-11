@@ -158,6 +158,9 @@ simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
 hilt-kapt = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt_version" }
 
+testing-hilt = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt_version" }
+testing-hilt-kapt = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_version" }
+
 #Testing
 testing-junit = "junit:junit:4.13.2"
 testing-truth = "com.google.truth:truth:1.1.3"

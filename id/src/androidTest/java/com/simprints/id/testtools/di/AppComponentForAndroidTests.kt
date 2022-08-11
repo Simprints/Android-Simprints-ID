@@ -26,7 +26,8 @@ import javax.inject.Singleton
         ViewModelModule::class,
         LoginManagerModule::class,
         NetworkModule::class,
-        SafetyNetModule::class
+        SafetyNetModule::class,
+        com.simprints.infra.security.SecurityModule::class
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {
