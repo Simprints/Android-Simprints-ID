@@ -14,13 +14,13 @@ message ProtoProjectConfiguration {
 }
 
 message ProtoGeneralConfiguration {
-    repeated ProtoModality modalities = 1;
+    repeated Modality modalities = 1;
     repeated string language_options = 2;
     string default_language = 3;
     bool collect_location = 4;
     bool duplicate_biometric_enrolment_check = 5;
 
-    enum ProtoModality {
+    enum Modality {
         FACE = 0;
         FINGERPRINT = 1;
     }
