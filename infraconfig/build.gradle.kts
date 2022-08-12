@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
     implementation(project(":infrasecurity"))
+    implementation(project(":infrarealm"))
 
     implementation(libs.androidX.core)
     implementation(libs.datastore)

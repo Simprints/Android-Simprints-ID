@@ -9,8 +9,10 @@ import com.simprints.infra.config.domain.ConfigServiceImpl
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.local.migrations.ProjectRealmMigration
-import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.local.models.ProtoProject
+import com.simprints.infra.config.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
+import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSourceImpl
 import dagger.Binds
@@ -22,6 +24,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 private const val PROJECT_DATA_STORE_FILE_NAME = "project_prefs.pb"
+private const val PROJECT_CONFIG_DATA_STORE_FILE_NAME = "project_config_prefs.pb"
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -54,6 +57,15 @@ object DataStoreModule {
             serializer = ProjectSerializer,
             produceFile = { appContext.dataStoreFile(PROJECT_DATA_STORE_FILE_NAME) },
             migrations = listOf(projectRealmMigration)
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideConfigurationProtoDataStore(appContext: Context): DataStore<ProtoProjectConfiguration> {
+        return DataStoreFactory.create(
+            serializer = ProjectConfigSerializer,
+            produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
         )
     }
 }

@@ -2,13 +2,18 @@ package com.simprints.infra.config.local
 
 import androidx.datastore.core.DataStore
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.local.models.ProtoProject
+import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.local.models.toDomain
 import com.simprints.infra.config.local.models.toProto
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-internal class ConfigLocalDataSourceImpl @Inject constructor(private val projectDataStore: DataStore<ProtoProject>) :
+internal class ConfigLocalDataSourceImpl @Inject constructor(
+    private val projectDataStore: DataStore<ProtoProject>,
+    private val configDataStore: DataStore<ProtoProjectConfiguration>
+) :
     ConfigLocalDataSource {
 
     override suspend fun saveProject(project: Project) {
@@ -21,5 +26,12 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(private val project
                 throw NoSuchElementException()
             }
         }
+
+    override suspend fun saveProjectConfiguration(config: ProjectConfiguration) {
+        configDataStore.updateData { config.toProto() }
+    }
+
+    override suspend fun getProjectConfiguration(): ProjectConfiguration =
+        configDataStore.data.first().toDomain()
 
 }

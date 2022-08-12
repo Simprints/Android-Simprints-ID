@@ -1,11 +1,11 @@
 package com.simprints.infra.config.local.migrations
 
 import androidx.datastore.core.DataMigration
-import com.simprints.infra.config.local.migrations.realm.DbProject
-import com.simprints.infra.config.local.migrations.realm.RealmWrapperImpl
 import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbProject
 import javax.inject.Inject
 
 /**
@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class ProjectRealmMigration @Inject constructor(
     private val loginManager: LoginManager,
-    private val realmWrapper: RealmWrapperImpl,
+    private val realmWrapper: RealmWrapper,
 ) :
     DataMigration<ProtoProject> {
 
