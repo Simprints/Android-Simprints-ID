@@ -42,16 +42,6 @@ class EventDownSyncScopeRepositoryImpl(
         return syncScope
     }
 
-    override suspend fun getNewModulesDownSyncScope(
-        modes: List<Modes>,
-        newModuleIDs: List<String>
-    ): EventDownSyncScope {
-        val projectId = getProjectId()
-        getUserId()
-
-        return SubjectModuleScope(projectId, newModuleIDs, modes)
-    }
-
     private fun getProjectId(): String {
         val projectId = loginManager.getSignedInProjectIdOrEmpty()
         if (projectId.isBlank()) {

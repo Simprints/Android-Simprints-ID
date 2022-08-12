@@ -124,18 +124,6 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @Test
-    fun buildNewModulesDownSyncScope() {
-        runTest(UnconfinedTestDispatcher()) {
-            val syncScope = eventDownSyncScopeRepository.getNewModulesDownSyncScope(
-                listOf(Modes.FINGERPRINT),
-                DEFAULT_MODULES.toList()
-            )
-
-            assertModuleSyncScope(syncScope)
-        }
-    }
-
-    @Test
     fun throwWhenProjectIsMissingForStandardScope() {
         runTest(UnconfinedTestDispatcher()) {
             every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
@@ -151,20 +139,6 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @Test
-    fun throwWhenProjectIsMissingForNewModulesScope() {
-        runTest(UnconfinedTestDispatcher()) {
-            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
-
-            assertThrows<MissingArgumentForDownSyncScopeException> {
-                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
-                    listOf(Modes.FINGERPRINT),
-                    DEFAULT_MODULES.toList()
-                )
-            }
-        }
-    }
-
-    @Test
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
             every { loginManager.getSignedInUserIdOrEmpty() } returns ""
@@ -174,20 +148,6 @@ class EventDownSyncScopeRepositoryImplTest {
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
                     GROUP.GLOBAL
-                )
-            }
-        }
-    }
-
-    @Test
-    fun throwWhenUserIsMissingForNewModulesScope() {
-        runTest(UnconfinedTestDispatcher()) {
-            every { loginManager.getSignedInUserIdOrEmpty() } returns ""
-
-            assertThrows<MissingArgumentForDownSyncScopeException> {
-                eventDownSyncScopeRepository.getNewModulesDownSyncScope(
-                    listOf(Modes.FINGERPRINT),
-                    DEFAULT_MODULES.toList()
                 )
             }
         }

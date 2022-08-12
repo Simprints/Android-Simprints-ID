@@ -16,7 +16,6 @@ internal const val TAG_SCHEDULED_AT = "TAG_SCHEDULED_AT_"
 
 internal const val TAG_DOWN_MASTER_SYNC_ID = "TAG_DOWN_MASTER_SYNC_ID_"
 internal const val TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS = "DOWN_${TAG_SUBJECTS_SYNC_ALL_WORKERS}"
-internal const val TAG_DOWN_SYNC_NEW_MODULES = "TAG_DOWN_SYNC_NEW_MODULES"
 
 internal const val TAG_UP_MASTER_SYNC_ID = "TAG_UP_MASTER_SYNC_ID"
 internal const val TAG_SUBJECTS_UP_SYNC_ALL_WORKERS = "UP_${TAG_SUBJECTS_SYNC_ALL_WORKERS}"
@@ -46,9 +45,6 @@ internal fun WorkRequest.Builder<*, *>.addCommonTagForDownloaders(): WorkRequest
 
 internal fun WorkRequest.Builder<*, *>.addCommonTagForDownCounters(): WorkRequest.Builder<*, *> =
     this.addTag(tagForType(DOWN_COUNTER))
-
-internal fun WorkRequest.Builder<*, *>.addCommonTagForNewModulesDownloaders(): WorkRequest.Builder<*, *> =
-    this.addTag(TAG_DOWN_SYNC_NEW_MODULES)
 
 // Up Sync Workers tags
 internal fun WorkRequest.Builder<*, *>.addTagFoUpSyncId(uniqueDownMasterSyncId: String): WorkRequest.Builder<*, *> =

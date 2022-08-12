@@ -96,17 +96,6 @@ open class SettingsPreferencesManagerImpl(
             moduleNamesStringSetSerializer
         )
 
-    /**
-     * What modules were newly selected (but not yet synced) by the user
-     */
-    override var newlyAddedModules: Set<String>
-        by ComplexPreference(
-            prefs,
-            NEWLY_ADDED_MODULES_KEY,
-            NEWLY_ADDED_MODULES_DEFAULT,
-            moduleNamesStringSetSerializer
-        )
-
     override var maxNumberOfModules: Int
         by RemoteConfigPrimitivePreference(
             prefs,
@@ -420,9 +409,6 @@ open class SettingsPreferencesManagerImpl(
 
         const val SELECTED_MODULES_KEY = "SelectedModules"
         val SELECTED_MODULES_DEFAULT = setOf<String>()
-
-        const val NEWLY_ADDED_MODULES_KEY = "NewlyAddedModules"
-        val NEWLY_ADDED_MODULES_DEFAULT = setOf<String>()
 
         const val MAX_NUMBER_OF_MODULES_KEY = "MaxNbOfModules"
         const val MAX_NUMBER_OF_MODULES_DEFAULT = 6

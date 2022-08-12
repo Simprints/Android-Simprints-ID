@@ -12,7 +12,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
-import com.simprints.id.services.sync.events.common.TAG_DOWN_SYNC_NEW_MODULES
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -76,30 +75,6 @@ class EventDownSyncDownloaderWorkerTest {
                 doWork()
 
                 verify { resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
-            }
-        }
-    }
-
-    @Test
-    fun worker_shouldNotRefreshOperationForNewModulesSync() {
-        runBlocking {
-            with(eventDownSyncDownloaderWorker) {
-                tags.add(TAG_DOWN_SYNC_NEW_MODULES)
-                doWork()
-
-                coVerify(exactly = 0) { eventDownSyncScopeRepository.refreshState(any()) }
-            }
-        }
-    }
-
-    @Test
-    fun worker_shouldClearNewlyAddedModulesAfterSuccessfulSync() {
-        runBlocking {
-            with(eventDownSyncDownloaderWorker) {
-                tags.add(TAG_DOWN_SYNC_NEW_MODULES)
-                doWork()
-
-                coVerify(exactly = 1) { preferencesManager.newlyAddedModules = setOf() }
             }
         }
     }

@@ -10,7 +10,6 @@ import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsExceptio
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import com.simprints.id.services.sync.events.common.TAG_DOWN_SYNC_NEW_MODULES
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -76,26 +75,14 @@ class EventDownSyncDownloaderWorker(
 
                 crashlyticsLog("Start - Params: $downSyncOperationInput")
 
-                //Do not refresh operation if request is for new modules so we get all events,
-                //not just the ones after last sync
-                val operation = if (isNewModulesDownSyncRequest()) {
-                    downSyncOperationInput
-                } else {
-                    getDownSyncOperation()
-                }
-
                 val count = eventDownSyncDownloaderTask.execute(
                     this@EventDownSyncDownloaderWorker.id.toString(),
-                    operation,
+                    getDownSyncOperation(),
                     downSyncHelper,
                     syncCache,
                     this@EventDownSyncDownloaderWorker,
                     this
                 )
-
-                if (isNewModulesDownSyncRequest()) {
-                    preferencesManager.newlyAddedModules = setOf()
-                }
 
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
                 success(
@@ -108,8 +95,6 @@ class EventDownSyncDownloaderWorker(
             retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
         }
     }
-
-    private fun isNewModulesDownSyncRequest() = tags.contains(TAG_DOWN_SYNC_NEW_MODULES)
 
     private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
         return when (t) {
