@@ -175,7 +175,20 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @Test
-    fun deleteAll_shouldDeleteOpsFromDb() {
+    fun deleteOperations_shouldDeleteOpsFromDb() {
+        runBlocking {
+
+            eventDownSyncScopeRepository.deleteOperations(
+                DEFAULT_MODULES.toList(),
+                listOf(Modes.FINGERPRINT)
+            )
+
+            coVerify(exactly = DEFAULT_MODULES.size) { downSyncOperationOperationDao.delete(any()) }
+        }
+    }
+
+    @Test
+    fun deleteAll_shouldDeleteAllOpsFromDb() {
         runBlocking {
 
             eventDownSyncScopeRepository.deleteAll()
