@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
-object JsonHelper {
+internal object JsonHelper {
 
     val jackson: ObjectMapper by lazy {
         ObjectMapper()

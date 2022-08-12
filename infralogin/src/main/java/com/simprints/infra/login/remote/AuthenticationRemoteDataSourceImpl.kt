@@ -6,7 +6,7 @@ import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.models.ApiAuthRequestBody
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import javax.inject.Inject
 
@@ -54,6 +54,6 @@ internal class AuthenticationRemoteDataSourceImpl @Inject constructor(private va
                 throw e
         }
 
-    private fun getApiClient(): SimApiClient<AuthenticationRemoteInterface> =
+    private fun getApiClient(): SimNetwork.SimApiClient<AuthenticationRemoteInterface> =
         simApiClientFactory.buildUnauthenticatedClient(AuthenticationRemoteInterface::class)
 }

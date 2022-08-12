@@ -2,7 +2,7 @@ package com.simprints.infra.network.coroutines
 
 import kotlinx.coroutines.delay
 
-suspend fun <T> retryIO(
+internal suspend fun <T> retryIO(
     times: Int = Int.MAX_VALUE,
     initialDelay: Long = 100, // 0.1 second
     maxDelay: Long = 1000,    // 1 second

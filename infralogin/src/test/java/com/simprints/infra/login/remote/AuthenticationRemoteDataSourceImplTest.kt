@@ -9,7 +9,7 @@ import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.models.ApiAuthRequestBody
 import com.simprints.infra.login.remote.models.ApiAuthenticationData
 import com.simprints.infra.login.remote.models.ApiToken
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -37,7 +37,7 @@ class AuthenticationRemoteDataSourceImplTest {
     }
 
     private val remoteInterface = mockk<AuthenticationRemoteInterface>()
-    private val simApiClient = mockk<SimApiClient<AuthenticationRemoteInterface>>()
+    private val simApiClient = mockk<SimNetwork.SimApiClient<AuthenticationRemoteInterface>>()
     private val simApiClientFactory = mockk<SimApiClientFactory>()
     private val authenticationRemoteDataSourceImpl =
         AuthenticationRemoteDataSourceImpl(simApiClientFactory)
