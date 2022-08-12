@@ -22,7 +22,6 @@ interface SettingsPreferencesManager {
     var projectLanguages: Array<String>
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
-    var newlyAddedModules: Set<String>
     var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP

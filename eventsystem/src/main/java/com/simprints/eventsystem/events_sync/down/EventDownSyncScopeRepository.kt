@@ -13,11 +13,6 @@ interface EventDownSyncScopeRepository {
         syncGroup: GROUP
     ): EventDownSyncScope
 
-    suspend fun getNewModulesDownSyncScope(
-        modes: List<Modes>,
-        newModuleIDs: List<String>
-    ): EventDownSyncScope
-
     suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation)
 
     suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation

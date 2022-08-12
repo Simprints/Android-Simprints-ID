@@ -95,40 +95,21 @@ open class EventSyncMasterWorker(
                 if (!isSyncRunning()) {
                     val startSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                    var workContinuation = wm.beginWith(startSyncReporterWorker)
-
-                    val regularSyncWorkersChain = mutableListOf<OneTimeWorkRequest>()
-                    var newModulesSyncWorkersChain: List<OneTimeWorkRequest>? = null
-                    if (preferenceManager.canSyncDataToSimprints()) {
-                        regularSyncWorkersChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(
-                            uniqueSyncId
-                        ).also {
+                    val workerChain = mutableListOf<OneTimeWorkRequest>()
+                    if (preferenceManager.canSyncDataToSimprints())
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
                         }
-                    }
-                    if (preferenceManager.canDownSyncEvents()) {
-                        regularSyncWorkersChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(
-                            uniqueSyncId
-                        ).also {
+
+                    if (preferenceManager.canDownSyncEvents())
+                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
                         }
 
-                        newModulesSyncWorkersChain = downSyncWorkerBuilder.buildNewModulesDownSyncWorkerChain(
-                            uniqueSyncId
-                        )?.also {
-                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} new modules down workers")
-                        }
-                    }
-                    workContinuation = workContinuation.then(regularSyncWorkersChain)
-                    // Chain new modules sync to happen after regular downsync to ensure we will not
-                    // miss any events that have happened before the last event of the new modules
-                    newModulesSyncWorkersChain?.let {
-                        workContinuation = workContinuation.then(it)
-                    }
-
                     val endSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    workContinuation.then(endSyncReporterWorker).enqueue()
+                    wm.beginWith(startSyncReporterWorker).then(workerChain).then(endSyncReporterWorker)
+                        .enqueue()
 
                     eventSyncCache.clearProgresses()
 
