@@ -3,9 +3,10 @@ package com.simprints.infra.security.keyprovider
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import javax.inject.Inject
 
 
-class EncryptedSharedPreferencesBuilderImpl(private val ctx: Context) :
+internal class EncryptedSharedPreferencesBuilderImpl @Inject constructor(private val ctx: Context) :
     EncryptedSharedPreferencesBuilder {
 
 
