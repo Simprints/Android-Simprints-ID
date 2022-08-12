@@ -45,7 +45,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
+import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
 
@@ -142,7 +142,7 @@ open class SyncModule {
         database.downSyncOperationsDao
 
     @Provides
-    open fun providePeopleSyncProgressCache(builder: EncryptedSharedPreferencesBuilder): EventSyncCache =
+    open fun providePeopleSyncProgressCache(builder: SecurityManager): EventSyncCache =
         EventSyncCacheImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_PROGRESSES_SHARED_PREFS),
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)

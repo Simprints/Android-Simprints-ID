@@ -23,13 +23,15 @@ class SecureLocalDbKeyProviderImplTest {
         private const val DB_NAME = "name"
     }
 
+    private val sharedPreferencesBuilder = mockk<EncryptedSharedPreferencesBuilder>()
     private val sharedPrefs = mockk<SharedPreferences>()
     private val randomGenerator = mockk<RandomGenerator>()
     private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
-    private val dbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPrefs, randomGenerator)
+    private val dbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPreferencesBuilder, randomGenerator)
 
     @Before
     fun setup() {
+        every { sharedPreferencesBuilder.buildEncryptedSharedPreferences(any()) } returns sharedPrefs
         every { sharedPrefs.edit() } returns editor
     }
 

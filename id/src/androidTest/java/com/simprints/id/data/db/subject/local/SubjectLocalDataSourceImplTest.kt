@@ -14,8 +14,8 @@ import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import io.mockk.mockk
@@ -36,7 +36,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
-    private val secureLocalDbKeyProviderMock = mockk<SecureLocalDbKeyProvider> {
+    private val secureLocalDbKeyProviderMock = mockk<SecurityManager> {
         every { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns LocalDbKey(
             newDatabaseName,
             newDatabaseKey

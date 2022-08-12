@@ -17,6 +17,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.core.domain.modality.Modality
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -52,7 +53,7 @@ class AlertActivityTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @Inject
-    lateinit var eventEventManagerMock: com.simprints.eventsystem.event.EventRepository
+    lateinit var eventEventManagerMock: EventRepository
     @Inject
     lateinit var preferencesManagerSpy: IdPreferencesManager
 

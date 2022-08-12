@@ -32,7 +32,7 @@ import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.ImageUrlProvider
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
+import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
 import java.net.URL
@@ -84,7 +84,7 @@ open class DataModule {
     @Provides
     open fun provideRealmWrapper(
         ctx: Context,
-        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        secureLocalDbKeyProvider: SecurityManager,
         loginManager: LoginManager,
         dispatcher: DispatcherProvider,
     ): RealmWrapper = RealmWrapperImpl(

@@ -162,9 +162,12 @@ dependencies {
     // ######################################################
     //                      Unit test
     // ######################################################
-
+    
     testImplementation(project(":fingerprintscannermock"))
     testImplementation(project(":eventsystem"))
+
+    testImplementation(libs.testing.hilt)
+    kaptTest(libs.testing.hilt.kapt)
 
     testImplementation(libs.testing.retrofit)
     testImplementation(libs.testing.junit) {
