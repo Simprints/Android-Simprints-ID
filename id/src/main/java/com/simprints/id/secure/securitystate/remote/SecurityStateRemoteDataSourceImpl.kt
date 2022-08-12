@@ -4,7 +4,7 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.fromApiToDomain
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 
 class SecurityStateRemoteDataSourceImpl(
     private val loginManager: LoginManager,
@@ -19,7 +19,7 @@ class SecurityStateRemoteDataSourceImpl(
         }.fromApiToDomain()
     }
 
-    private suspend fun getClient(): SimApiClient<SecureApiInterface> {
+    private suspend fun getClient(): SimNetwork.SimApiClient<SecureApiInterface> {
         return loginManager.buildClient(SecureApiInterface::class)
     }
 }

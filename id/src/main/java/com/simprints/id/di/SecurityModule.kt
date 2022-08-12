@@ -29,7 +29,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
@@ -49,7 +49,7 @@ open class SecurityModule {
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
-        baseUrlProvider: BaseUrlProvider,
+        simNetwork: SimNetwork,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
@@ -59,7 +59,7 @@ open class SecurityModule {
         syncManager,
         securityStateScheduler,
         longConsentRepository,
-        baseUrlProvider,
+        simNetwork,
         remoteConfigWrapper
     )
 
