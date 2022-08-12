@@ -43,6 +43,7 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
                 8 -> migrateTo9(realm.schema)
                 9 -> migrateTo10(realm.schema)
                 10 -> migrateTo11(realm.schema)
+                11 -> migrateTo12(realm.schema)
             }
         }
     }
@@ -211,6 +212,14 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             ?.transform {
                 it.set(SubjectsSchemaV11.FIELD_FORMAT, RANK_ONE_1_23_FORMAT)
             }
+    }
+
+    private fun migrateTo12(schema: RealmSchema) {
+        schema.get(PeopleSchemaV7.FINGERPRINT_TABLE)
+            ?.addPrimaryKey(PeopleSchemaV7.FINGERPRINT_FIELD_ID)
+
+        schema.get(PeopleSchemaV7.FACE_TABLE)
+            ?.addPrimaryKey(PeopleSchemaV7.FACE_FIELD_ID)
     }
 
     private inline fun <reified T> RealmObjectSchema.addNewField(
