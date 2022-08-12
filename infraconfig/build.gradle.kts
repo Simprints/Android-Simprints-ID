@@ -38,6 +38,8 @@ dependencies {
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
+    implementation(libs.jackson.core)
+
     implementation(libs.retrofit.core)
 
     // Unit Tests
