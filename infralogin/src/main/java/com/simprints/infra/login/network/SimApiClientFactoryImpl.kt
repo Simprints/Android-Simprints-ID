@@ -8,7 +8,7 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 internal class SimApiClientFactoryImpl @Inject constructor(
-    private val baseUrlProvider: SimNetwork,
+    private val simNetwork: SimNetwork,
     private val deviceId: String,
     private val ctx: Context,
     private val versionName: String,
@@ -19,10 +19,10 @@ internal class SimApiClientFactoryImpl @Inject constructor(
     // create an interface for that or mock it. SimApiClientFactory is injected everywhere, so it's important
     // that we are able to mock it.
     override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
-        return baseUrlProvider.getSimApiClient(
+        return simNetwork.getSimApiClient(
             remoteInterface,
             ctx,
-            baseUrlProvider.getApiBaseUrl(),
+            simNetwork.getApiBaseUrl(),
             deviceId,
             versionName,
             remoteDbManager.getCurrentToken(),
@@ -30,10 +30,10 @@ internal class SimApiClientFactoryImpl @Inject constructor(
     }
 
     override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
-        return baseUrlProvider.getSimApiClient(
+        return simNetwork.getSimApiClient(
             remoteInterface,
             ctx,
-            baseUrlProvider.getApiBaseUrl(),
+            simNetwork.getApiBaseUrl(),
             deviceId,
             versionName,
             null,

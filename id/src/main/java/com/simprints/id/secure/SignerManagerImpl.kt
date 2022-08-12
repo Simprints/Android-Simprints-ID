@@ -19,7 +19,7 @@ open class SignerManagerImpl(
     private val syncManager: SyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
-    private val baseUrlProvider: SimNetwork,
+    private val simNetwork: SimNetwork,
     private val remoteConfigWrapper: RemoteConfigWrapper
 ) : SignerManager {
 
@@ -41,7 +41,7 @@ open class SignerManagerImpl(
         eventSyncManager.deleteSyncInfo()
         preferencesManager.clearAllSharedPreferences()
         longConsentRepository.deleteLongConsents()
-        baseUrlProvider.resetApiBaseUrl()
+        simNetwork.resetApiBaseUrl()
         remoteConfigWrapper.clearRemoteConfig()
     }
 

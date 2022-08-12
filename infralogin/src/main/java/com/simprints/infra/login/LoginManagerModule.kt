@@ -54,9 +54,9 @@ object SafetyNetModule {
     internal fun provideSimApiClientFactory(
         ctx: Context,
         remoteDbManager: RemoteDbManager,
-        baseUrlProvider: SimNetwork
+        simNetwork: SimNetwork
     ): SimApiClientFactory = SimApiClientFactoryImpl(
-        baseUrlProvider,
+        simNetwork,
         ctx.deviceId,
         ctx,
         ctx.packageVersionName,
