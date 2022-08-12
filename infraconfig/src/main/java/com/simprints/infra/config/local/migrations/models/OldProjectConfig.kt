@@ -148,10 +148,26 @@ internal data class OldProjectConfig(
             },
             up = UpSynchronizationConfiguration(
                 simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-
+                    kind = if (SimprintsSync == null) {
+                        if (SyncDestination.contains("SIMPRINTS")) {
+                            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+                        } else {
+                            UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                        }
+                    } else {
+                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(SimprintsSync)
+                    }
                 ),
                 coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
-
+                    kind = if (CoSync == null) {
+                        if (SyncDestination.contains("COMMCARE")) {
+                            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+                        } else {
+                            UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                        }
+                    } else {
+                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(CoSync)
+                    }
                 )
             ),
             down = DownSynchronizationConfiguration(

@@ -83,7 +83,7 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         NetworkModule::class,
         SafetyNetModule::class,
         SecurityManagerModule::class,
-        RealmModule::class
+        RealmModule::class,
         ConfigManagerModule::class,
         DataStoreModule::class
     ]
