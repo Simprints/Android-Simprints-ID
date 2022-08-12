@@ -83,7 +83,7 @@ class PerformanceMonitoringTraceTest {
         verify {
             simberSpy.i(message = withArg {
                 it.contains("Trace time for $TRACE_NAME =")
-            }, null)
+            })
         }
     }
 
