@@ -43,7 +43,7 @@ class LoginActivity : BaseSplitActivity() {
     lateinit var loginActivityHelper: LoginActivityHelper
 
     @Inject
-    lateinit var baseUrlProvider: SimNetwork
+    lateinit var simNetwork: SimNetwork
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -59,7 +59,7 @@ class LoginActivity : BaseSplitActivity() {
 
         setContentView(binding.root)
 
-        baseUrlProvider.resetApiBaseUrl()
+        simNetwork.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
         observeSignInResult()
@@ -146,7 +146,7 @@ class LoginActivity : BaseSplitActivity() {
             Simber.d("QR code response: $qrCodeResponse")
             val projectId = qrCodeResponse.projectId
             val projectSecret = qrCodeResponse.projectSecret
-            baseUrlProvider.setApiBaseUrl(qrCodeResponse.apiBaseUrl)
+            simNetwork.setApiBaseUrl(qrCodeResponse.apiBaseUrl)
 
             updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")

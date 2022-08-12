@@ -44,7 +44,7 @@ class TestSecurityModule(
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
-        baseUrlProvider: SimNetwork,
+        simNetwork: SimNetwork,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
@@ -56,7 +56,7 @@ class TestSecurityModule(
             securityStateScheduler,
             longConsentRepository,
             eventRepository,
-            baseUrlProvider,
+            simNetwork,
             remoteConfigWrapper
         )
     }

@@ -49,7 +49,7 @@ open class SecurityModule {
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
-        baseUrlProvider: SimNetwork,
+        simNetwork: SimNetwork,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         projectRepository,
@@ -59,7 +59,7 @@ open class SecurityModule {
         syncManager,
         securityStateScheduler,
         longConsentRepository,
-        baseUrlProvider,
+        simNetwork,
         remoteConfigWrapper
     )
 
