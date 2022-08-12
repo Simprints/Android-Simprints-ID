@@ -12,7 +12,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -45,7 +45,7 @@ class SignerManagerImplTest {
     lateinit var mockLongConsentRepository: LongConsentRepository
 
     @MockK
-    lateinit var mockBaseUrlProvider: BaseUrlProvider
+    lateinit var mockSimNetwork: SimNetwork
 
     @MockK
     lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
@@ -71,7 +71,7 @@ class SignerManagerImplTest {
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
-            mockBaseUrlProvider,
+            mockSimNetwork,
             mockRemoteConfigWrapper
         )
     }
@@ -190,7 +190,7 @@ class SignerManagerImplTest {
     fun signOut_apiBaseUrlIsReset() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        verify { mockBaseUrlProvider.resetApiBaseUrl() }
+        verify { mockSimNetwork.resetApiBaseUrl() }
     }
 
     @Test
