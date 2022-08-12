@@ -93,6 +93,15 @@ class EventDownSyncScopeRepositoryImpl(
         )
     }
 
+    override suspend fun deleteOperations(moduleIds: List<String>, modes: List<Modes>) {
+        withContext(dispatcher.io()) {
+            val scope = SubjectModuleScope(getProjectId(), moduleIds, modes)
+            scope.operations.forEach {
+                downSyncOperationOperationDao.delete(it.getUniqueKey())
+            }
+        }
+    }
+
     override suspend fun deleteAll() {
         withContext(dispatcher.io()) {
             downSyncOperationOperationDao.deleteAll()
