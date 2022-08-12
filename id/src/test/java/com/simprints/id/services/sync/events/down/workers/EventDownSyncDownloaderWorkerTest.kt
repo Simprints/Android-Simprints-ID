@@ -260,7 +260,6 @@ class EventDownSyncDownloaderWorkerTest {
             eventDownSyncDownloaderTask = mockk(relaxed = true)
             downSyncHelper = mockk(relaxed = true)
             dispatcher = testDispatcherProvider
-            preferencesManager = mockk()
         }
 }
 
