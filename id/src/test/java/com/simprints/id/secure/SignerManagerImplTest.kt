@@ -45,7 +45,7 @@ class SignerManagerImplTest {
     lateinit var mockLongConsentRepository: LongConsentRepository
 
     @MockK
-    lateinit var mockBaseUrlProvider: SimNetwork
+    lateinit var mockSimNetwork: SimNetwork
 
     @MockK
     lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
@@ -71,7 +71,7 @@ class SignerManagerImplTest {
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
-            mockBaseUrlProvider,
+            mockSimNetwork,
             mockRemoteConfigWrapper
         )
     }
@@ -190,7 +190,7 @@ class SignerManagerImplTest {
     fun signOut_apiBaseUrlIsReset() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        verify { mockBaseUrlProvider.resetApiBaseUrl() }
+        verify { mockSimNetwork.resetApiBaseUrl() }
     }
 
     @Test
