@@ -21,7 +21,7 @@ object RealmConfig {
     )
     class Module
 
-    private const val REALM_SCHEMA_VERSION: Long = 11
+    private const val REALM_SCHEMA_VERSION: Long = 12
 
     fun get(databaseName: String, key: ByteArray, projectId: String): RealmConfiguration {
         val builder = RealmConfiguration
