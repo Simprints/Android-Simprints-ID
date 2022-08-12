@@ -11,7 +11,7 @@ import javax.inject.Inject
 /**
  * Can be removed once all the devices have been updated to 2022.3.0
  */
-class ProjectRealmMigration @Inject constructor(
+internal class ProjectRealmMigration @Inject constructor(
     private val loginManager: LoginManager,
     private val realmWrapper: RealmWrapper,
 ) :
@@ -48,8 +48,8 @@ class ProjectRealmMigration @Inject constructor(
                 .build()
         }
 
-    override suspend fun shouldMigrate(currentData: ProtoProject): Boolean {
-        return loginManager.signedInProjectId.isNotEmpty() && currentData.id.isEmpty()
-    }
+    override suspend fun shouldMigrate(currentData: ProtoProject): Boolean =
+        loginManager.signedInProjectId.isNotEmpty() && currentData.id.isEmpty()
+
 }
 

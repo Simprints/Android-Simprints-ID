@@ -1,5 +1,7 @@
 package com.simprints.infra.config.domain.models
 
+import androidx.annotation.Keep
+
 data class Vero2Configuration(
     val imageSavingStrategy: ImageSavingStrategy,
     val captureStrategy: CaptureStrategy,
@@ -20,6 +22,7 @@ data class Vero2Configuration(
         SECUGEN_ISO_1700_DPI;
     }
 
+    @Keep
     data class Vero2FirmwareVersions(
         val cypress: String,
         val stm: String,
