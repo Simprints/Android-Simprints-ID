@@ -2,6 +2,7 @@ package com.simprints.id.moduleselection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
@@ -23,15 +24,36 @@ class ModuleRepositoryImplTest {
 
     private val mockPreferencesManager: IdPreferencesManager = mockk(relaxed = true)
     private val mockSubjectRepository: SubjectRepository = mockk(relaxed = true)
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
 
     private var repository = ModuleRepositoryImpl(
         mockPreferencesManager,
-        mockSubjectRepository
+        mockSubjectRepository,
+        eventDownSyncScopeRepository
     )
 
     @Before
     fun setUp() {
         configureMock()
+    }
+
+    @Test
+    fun saveModules_shouldSaveSelectedModules() = runTest {
+        val modules = listOf(
+            Module("1", true),
+            Module("2", true),
+            Module("3", false),
+            Module("4", true),
+            Module("5", false)
+        )
+
+        val selectedModuleNames = modules.filter { it.isSelected }.map { it.name }.toSet()
+
+        repository.saveModules(modules)
+
+        coVerify {
+            mockPreferencesManager.selectedModules = selectedModuleNames
+        }
     }
 
     @Test
@@ -50,7 +72,7 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
-    fun saveModules_shouldSaveNewlyAddedModules() = runTest {
+    fun saveModules_shouldDeleteOperationsForUnselectedModules() = runTest {
         val modules = listOf(
             Module("a", true),
             Module("b", false),
@@ -58,11 +80,13 @@ class ModuleRepositoryImplTest {
             Module("d", true)
         )
 
-        val newlyAddedModules = setOf("a", "d")
+        val unselectedModules = listOf("b", "c")
 
         repository.saveModules(modules)
 
-        coVerify { mockPreferencesManager.newlyAddedModules = newlyAddedModules }
+        coVerify(exactly = 1) {
+            eventDownSyncScopeRepository.deleteOperations(unselectedModules, any())
+        }
     }
 
     @Test
@@ -82,7 +106,7 @@ class ModuleRepositoryImplTest {
     @Test
     fun shouldFetchMaxNumberOfModulesFromRemoteConfig() = runTest {
         every {
-            repository.preferencesManager.maxNumberOfModules
+            mockPreferencesManager.maxNumberOfModules
         } returns 10
 
         assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
