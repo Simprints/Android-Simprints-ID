@@ -5,6 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.project
 import com.simprints.testtools.common.syntax.assertThrows
@@ -18,15 +19,21 @@ import org.junit.runner.RunWith
 class ConfigLocalDataSourceImplTest {
 
     companion object {
-        private const val TEST_DATASTORE_NAME: String = "test_datastore"
+        private const val TEST_PROJECT_DATASTORE_NAME: String = "test_project_datastore"
+        private const val TEST_CONFIG_DATASTORE_NAME: String = "test_config_datastore"
     }
 
     private val testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private val testProjectDataStore = DataStoreFactory.create(
         serializer = ProjectSerializer,
-        produceFile = { testContext.dataStoreFile(TEST_DATASTORE_NAME) }
+        produceFile = { testContext.dataStoreFile(TEST_PROJECT_DATASTORE_NAME) }
     )
-    private val configLocalDataSourceImpl = ConfigLocalDataSourceImpl(testProjectDataStore)
+    private val testProjectConfigDataStore = DataStoreFactory.create(
+        serializer = ProjectConfigSerializer,
+        produceFile = { testContext.dataStoreFile(TEST_CONFIG_DATASTORE_NAME) }
+    )
+    private val configLocalDataSourceImpl =
+        ConfigLocalDataSourceImpl(testProjectDataStore, testProjectConfigDataStore)
 
     @After
     fun teardown() = runTest(UnconfinedTestDispatcher()) {

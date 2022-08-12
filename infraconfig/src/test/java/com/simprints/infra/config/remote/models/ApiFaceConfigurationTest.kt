@@ -24,11 +24,4 @@ class ApiFaceConfigurationTest {
             assertThat(it.key.toDomain()).isEqualTo(it.value)
         }
     }
-
-    @Test
-    fun `should map correctly the ImageSavingStrategy ONLY_GOOD_SCAN`() {
-        val imageSavingStrategy = ApiFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN.toDomain()
-
-        assertThat(imageSavingStrategy).isEqualTo(FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN)
-    }
 }
