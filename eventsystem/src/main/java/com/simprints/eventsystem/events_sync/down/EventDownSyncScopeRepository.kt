@@ -22,5 +22,7 @@ interface EventDownSyncScopeRepository {
 
     suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation
 
+    suspend fun deleteOperations(moduleIds: List<String>, modes: List<Modes>)
+
     suspend fun deleteAll()
 }
