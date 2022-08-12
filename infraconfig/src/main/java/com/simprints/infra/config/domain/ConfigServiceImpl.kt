@@ -1,6 +1,7 @@
 package com.simprints.infra.config.domain
 
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import javax.inject.Inject
@@ -24,5 +25,13 @@ internal class ConfigServiceImpl @Inject constructor(
     override suspend fun refreshProject(projectId: String): Project =
         remoteDataSource.getProject(projectId).also {
             localDataSource.saveProject(it)
+        }
+
+    override suspend fun getConfiguration(): ProjectConfiguration =
+        localDataSource.getProjectConfiguration()
+
+    override suspend fun refreshConfiguration(projectId: String): ProjectConfiguration =
+        remoteDataSource.getConfiguration(projectId).also {
+            localDataSource.saveProjectConfiguration(it)
         }
 }
