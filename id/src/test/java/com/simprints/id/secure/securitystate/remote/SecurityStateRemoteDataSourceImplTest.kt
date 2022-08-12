@@ -5,7 +5,7 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.ApiSecurityState
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -29,7 +29,7 @@ class SecurityStateRemoteDataSourceImplTest {
 
     private val loginManager = mockk<LoginManager>()
     private val remoteInterface = mockk<SecureApiInterface>()
-    private val simApiClient = mockk<SimApiClient<SecureApiInterface>>()
+    private val simApiClient = mockk<SimNetwork.SimApiClient<SecureApiInterface>>()
     private val securityStateRemoteDataSource =
         SecurityStateRemoteDataSourceImpl(loginManager, DEVICE_ID)
 

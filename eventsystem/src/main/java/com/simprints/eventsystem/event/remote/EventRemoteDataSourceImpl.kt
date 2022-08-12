@@ -14,7 +14,7 @@ import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope

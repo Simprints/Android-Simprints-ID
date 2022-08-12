@@ -19,7 +19,7 @@ object Simber {
      * RELEASE: Is ignored
      */
     fun v(t: Throwable) = Timber.v(t)
-    fun v(message: String, args: Any? = null) = Timber.v(message, args)
+    fun v(message: String, vararg args: Any?) = Timber.v(message, *args)
     fun v(t: Throwable, message: String, args: Any? = null) = Timber.v(t, message, args)
 
     /**
@@ -32,7 +32,7 @@ object Simber {
      */
     @JvmStatic
     fun d(t: Throwable) = Timber.d(t)
-    fun d(message: String, args: Any? = null) = Timber.d(message, args)
+    fun d(message: String, vararg args: Any?) = Timber.d(message, *args)
     fun d(t: Throwable, message: String, args: Any? = null) = Timber.d(t, message, args)
 
     /**
@@ -44,7 +44,7 @@ object Simber {
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
     fun i(t: Throwable) = Timber.i(t)
-    fun i(message: String, args: Any? = null) = Timber.i(message, args)
+    fun i(message: String, vararg args: Any?) = Timber.i(message, *args)
     fun i(t: Throwable, message: String, args: Any? = null) = Timber.i(t, message, args)
 
     /**
@@ -57,7 +57,7 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun w(t: Throwable) = Timber.w(t)
-    fun w(message: String, args: Any? = null) = Timber.w(message, args)
+    fun w(message: String, vararg args: Any?) = Timber.w(message, *args)
     fun w(t: Throwable, message: String, args: Any? = null) = Timber.w(t, message, args)
 
     /**
@@ -70,7 +70,7 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun e(t: Throwable) = Timber.e(t)
-    fun e(message: String, args: Any? = null) = Timber.e(message, args)
+    fun e(message: String, vararg args: Any?) = Timber.e(message, *args)
     fun e(t: Throwable, message: String, args: Any? = null) = Timber.e(t, message, args)
 
     /**

@@ -12,6 +12,9 @@ import dagger.hilt.android.components.ActivityComponent
 abstract class NetworkModule {
 
     @Binds
+    internal abstract fun provideSimNetwork(impl: SimNetworkImpl): SimNetwork
+
+    @Binds
     internal abstract fun provideBaseUrlProvider(impl: BaseUrlProviderImpl): BaseUrlProvider
 
 }

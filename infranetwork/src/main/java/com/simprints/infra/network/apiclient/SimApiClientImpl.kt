@@ -1,8 +1,11 @@
-package com.simprints.infra.network
+package com.simprints.infra.network.apiclient
 
 import android.content.Context
+import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.infra.network.coroutines.retryIO
 import com.simprints.infra.network.exceptions.*
+import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,6 +17,11 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import kotlin.reflect.KClass
 
+/**
+ * This class isn't marked internal yet because we need to build it currently in other modules'
+ * android tests, which can't be accessed via DI yet. Once the testing DI is cleaned up this class
+ * can be marked internal.
+ */
 class SimApiClientImpl<T : SimRemoteInterface>(
     private val service: KClass<T>,
     private val ctx: Context,
@@ -22,8 +30,7 @@ class SimApiClientImpl<T : SimRemoteInterface>(
     private val versionName: String,
     private val authToken: String? = null,
     private val attempts: Int = ATTEMPTS_FOR_NETWORK_CALLS,
-    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
-) : SimApiClient<T> {
+) : SimNetwork.SimApiClient<T> {
 
     companion object {
         private const val BACKEND_MAINTENANCE_ERROR_STRING = "002"
@@ -31,6 +38,8 @@ class SimApiClientImpl<T : SimRemoteInterface>(
         private val HTTP_CODES_FOR_RETRYABLE_ERROR = listOf(500, 502, 503)
         private const val ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
+
+    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
 
     override val api: T by lazy {
         retrofit.create(service.java)
