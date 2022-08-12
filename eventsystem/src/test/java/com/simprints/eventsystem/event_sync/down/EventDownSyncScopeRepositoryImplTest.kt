@@ -124,7 +124,7 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @Test
-    fun throwWhenProjectIsMissingForStandardScope() {
+    fun throwWhenProjectIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
             every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
 

@@ -7,7 +7,6 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -39,9 +38,6 @@ class EventDownSyncDownloaderWorker(
 
     @Inject
     lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-
-    @Inject
-    lateinit var preferencesManager: IdPreferencesManager
 
     @Inject
     lateinit var syncCache: EventSyncCache
