@@ -489,7 +489,7 @@ class EventRepositoryImplTest {
 
             eventRepo.createSession()
 
-            coVerify { eventLocalDataSource.loadAllSessions(false) }
+            coVerify { eventLocalDataSource.loadOpenedSessions() }
             verifyArtificialEventWasAdded(GUID1, NEW_SESSION)
         }
     }
@@ -513,7 +513,7 @@ class EventRepositoryImplTest {
 
             eventRepo.addOrUpdateEvent(eventInSession)
 
-            coVerify { eventLocalDataSource.loadAllSessions(false) }
+            coVerify { eventLocalDataSource.loadOpenedSessions() }
             coVerify {
                 eventLocalDataSource.insertOrUpdate(
                     eventInSession.copy(

@@ -36,9 +36,9 @@ open class EventLocalDataSourceImpl(
             eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
         }
 
-    override suspend fun loadAllSessions(isClosed: Boolean): Flow<Event> =
+    override suspend fun loadOpenedSessions(): Flow<Event> =
         withContext(readingDispatcher) {
-            eventDao.loadAllSessions(isClosed).map { it.fromDbToDomain() }.asFlow()
+            eventDao.loadOpenedSessions().map { it.fromDbToDomain() }.asFlow()
         }
 
     override suspend fun loadAllClosedSessionIds(projectId: String): List<String> =
