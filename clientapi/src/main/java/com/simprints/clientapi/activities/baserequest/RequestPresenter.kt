@@ -17,7 +17,8 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.root.RootManager
+import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.libsimprints.Constants
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
@@ -25,7 +26,7 @@ import kotlinx.coroutines.flow.toList
 abstract class RequestPresenter(
     private val view: RequestContract.RequestView,
     private val eventsManager: ClientApiSessionEventsManager,
-    private val rootManager: RootManager,
+    private val rootManager: SecurityManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
     private val sharedPreferencesManager: SharedPreferencesManager,
     private val sessionEventsManager: ClientApiSessionEventsManager

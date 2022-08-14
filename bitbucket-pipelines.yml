@@ -366,10 +366,7 @@ flows:
             -   step: *promote-alpha-to-production
     -   flow: &ci-test # For CI testing purposes only
             -   step: *build-and-sign-universal-apk
-            -   step: *sign-and-deploy-to-staging
-            -   step: *sign-and-deploy-to-internal
-            -   step: *promote-internal-to-alpha
-            -   step: *promote-alpha-to-production
+            -   step: *run-all-android-tests
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
     -   flow: &dependency-health-check-flow
