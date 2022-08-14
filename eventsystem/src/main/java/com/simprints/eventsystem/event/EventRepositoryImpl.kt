@@ -269,12 +269,12 @@ open class EventRepositoryImpl(
     }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
-        cachedSessionCaptureEvent()
+        cachedCaptureSessionEvent()
             ?: localCaptureSessionEvent()
             ?: createSession()
     }
 
-    private fun cachedSessionCaptureEvent() =
+    private fun cachedCaptureSessionEvent() =
         sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
             .maxByOrNull {
                 it.payload.createdAt
