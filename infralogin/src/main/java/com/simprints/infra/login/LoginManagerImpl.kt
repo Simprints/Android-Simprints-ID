@@ -9,7 +9,7 @@ import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -124,10 +124,10 @@ internal class LoginManagerImpl @Inject constructor(
     override fun getLegacyAppFallback(): FirebaseApp =
         remoteDbManager.getLegacyAppFallback()
 
-    override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimApiClient<T> =
+    override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
         simApiClientFactory.buildClient(remoteInterface)
 
 
-    override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimApiClient<T> =
+    override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
         simApiClientFactory.buildUnauthenticatedClient(remoteInterface)
 }

@@ -1,13 +1,14 @@
-package com.simprints.infra.network
+package com.simprints.infra.network.httpclient
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.simprints.infra.network.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
-class DefaultOkHttpClientBuilder {
+internal class DefaultOkHttpClientBuilder {
 
     companion object {
         const val DEVICE_ID_HEADER = "X-Device-ID"
