@@ -10,7 +10,6 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.local.models.DbEvent
-import com.simprints.eventsystem.event.local.models.fromDbToDomain
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -85,15 +84,17 @@ class EventRoomDaoTest {
     }
 
     @Test
-    fun loadAllSessions() {
+    fun loadOpenedSessions() {
         runBlocking {
-            val closedEvent = event.copy(
+            val openedEvent = event.copy(
                 id = randomUUID(),
-                sessionIsClosed = true
+                sessionIsClosed = false
             )
-            addIntoDb(event, closedEvent)
-            verifyEvents(listOf(event), eventDao.loadAllSessions(false))
-            verifyEvents(listOf(closedEvent), eventDao.loadAllSessions(true))
+            addIntoDb(event, openedEvent)
+            verifyEvents(
+                listOf(event),
+                eventDao.loadOpenedSessions()
+            )
         }
     }
 

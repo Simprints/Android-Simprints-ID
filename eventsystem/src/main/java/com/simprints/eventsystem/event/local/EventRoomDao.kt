@@ -22,9 +22,8 @@ interface EventRoomDao {
     @Query("select * from DbEvent where projectId = :projectId order by createdAt desc")
     suspend fun loadFromProject(projectId: String): List<DbEvent>
 
-    @Query("select * from DbEvent where sessionIsClosed = :isClosed and type = :type")
-    suspend fun loadAllSessions(
-        isClosed: Boolean,
+    @Query("select * from DbEvent where sessionIsClosed = ${false} and type = :type order by createdAt desc")
+    suspend fun loadOpenedSessions(
         type: EventType = EventType.SESSION_CAPTURE
     ): List<DbEvent>
 

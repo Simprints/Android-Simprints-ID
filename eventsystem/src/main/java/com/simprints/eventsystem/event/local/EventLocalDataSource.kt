@@ -12,7 +12,7 @@ interface EventLocalDataSource {
     suspend fun loadAll(): Flow<Event>
     suspend fun loadAllEventJsonFromSession(sessionId: String): List<String>
     suspend fun loadAllFromSession(sessionId: String): List<Event>
-    suspend fun loadAllSessions(isClosed: Boolean): Flow<Event>
+    suspend fun loadOpenedSessions(): Flow<Event>
     suspend fun loadAllClosedSessionIds(projectId: String): List<String>
     suspend fun delete(ids: List<String>)
     suspend fun deleteAllFromSession(sessionId: String)
