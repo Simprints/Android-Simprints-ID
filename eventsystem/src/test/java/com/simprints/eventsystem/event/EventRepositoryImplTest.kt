@@ -30,6 +30,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -495,14 +496,69 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun getCurrentOpenSession() {
-        runBlocking {
-            val session = mockDbToHaveOneOpenSession(GUID1)
-
-            val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
-            assertThat(loadedSession).isEqualTo(session)
+    fun `test getCurrentCaptureSessionEvent from cached events`() = runTest {
+        //Given
+        val closedSessionCaptureEvent = mockk<SessionCaptureEvent> {
+            every { payload.sessionIsClosed } returns true
         }
+        val oldOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
+            every { payload.sessionIsClosed } returns false
+            every { payload.createdAt } returns 1
+        }
+        val recentOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
+            every { payload.sessionIsClosed } returns false
+            every { payload.createdAt } returns 2
+        }
+        every { sessionDataCache.eventCache } returns mutableMapOf(
+            "SessionCaptureEvent1" to closedSessionCaptureEvent,
+            "SessionCaptureEvent2" to oldOpenedSessionCaptureEvent,
+            "SessionCaptureEvent3" to recentOpenedSessionCaptureEvent
+        )
+        //When
+        val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
+        //Then
+        assertThat(loadedSession).isEqualTo(recentOpenedSessionCaptureEvent)
     }
+
+    @Test
+    fun `test getCurrentCaptureSessionEvent from db`() = runTest {
+
+        val oldOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
+            every { payload.sessionIsClosed } returns false
+            every { payload.createdAt } returns 1
+        }
+        val recentOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
+            every { payload.sessionIsClosed } returns false
+            every { payload.createdAt } returns 2
+        }
+        coEvery { eventLocalDataSource.loadOpenedSessions() } returns flowOf(
+            recentOpenedSessionCaptureEvent,
+            oldOpenedSessionCaptureEvent
+        )
+        val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
+        assertThat(loadedSession).isEqualTo(recentOpenedSessionCaptureEvent)
+    }
+
+
+    @Test
+    fun `test getCurrentCaptureSessionEvent should create new CaptureSessionEvent is not exist` () =
+        runTest {
+            //Given
+            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+            every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
+            //When
+            val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
+            //Then
+            assertThat(loadedSession.labels.projectId).isEqualTo("projectId")
+        }
+
+    @Test(expected = Exception::class)
+    fun `test getCurrentCaptureSessionEvent should throw if  CaptureSessionEvent is not exist and createSessionCaptureEventIfNotExist=false` () =
+        runTest {
+
+            eventRepo.getCurrentCaptureSessionEvent(false)
+            //Should throw exception
+        }
 
     @Test
     fun insertEventIntoCurrentOpenSession() {
