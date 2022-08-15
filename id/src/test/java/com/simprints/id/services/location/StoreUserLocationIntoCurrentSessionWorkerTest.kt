@@ -55,7 +55,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     }
 
     private fun mockDependencies() {
-        coEvery { mockEventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+        coEvery { mockEventRepository.getCurrentCaptureSessionEvent(false) } returns createSessionCaptureEvent()
         with(worker) {
             locationManager = mockLocationManager
             eventRepository = mockEventRepository
@@ -66,7 +66,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     fun storeUserLocationIntoCurrentSession() = runBlocking {
         every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
         worker.doWork()
-        coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent() }
+        coVerify(exactly = 1) { mockEventRepository.getCurrentCaptureSessionEvent(false) }
         coVerify(exactly = 1) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 
@@ -74,7 +74,18 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     fun `storeUserLocationIntoCurrentSession requestLocation throw exception`() = runBlocking {
         every { mockLocationManager.requestLocation(any()) } throws Exception("Location collect exception")
         worker.doWork()
-        coVerify(exactly = 0) { mockEventRepository.getCurrentCaptureSessionEvent() }
+        coVerify(exactly = 0) { mockEventRepository.getCurrentCaptureSessionEvent(false) }
+        coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
+    }
+
+    @Test (expected = Test.None::class)
+    fun `storeUserLocationIntoCurrentSession can't save event shouldn't crash the app`() = runBlocking {
+        every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
+        coEvery {
+            mockEventRepository.getCurrentCaptureSessionEvent(false
+            )
+        } throws Exception("No session capture event found")
+        worker.doWork()
         coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 

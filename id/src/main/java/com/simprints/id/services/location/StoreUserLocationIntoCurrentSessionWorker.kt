@@ -42,7 +42,9 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
             try {
                 val locationsFlow = createLocationFlow()
                 locationsFlow.filterNotNull().collect { location ->
-                    saveUserLocation(location)
+                    runCatching {
+                        saveUserLocation(location)
+                    }
                 }
             } catch (t: Throwable) {
                 Simber.e(t)
@@ -60,7 +62,7 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
     }
 
     private suspend fun saveUserLocation(lastLocation: android.location.Location) {
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+        val currentSession = eventRepository.getCurrentCaptureSessionEvent(false)
         currentSession.payload.location =
             Location(lastLocation.latitude, lastLocation.longitude)
         eventRepository.addOrUpdateEvent(currentSession)

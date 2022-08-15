@@ -268,11 +268,16 @@ open class EventRepositoryImpl(
         eventLocalDataSource.delete(eventsIds)
     }
 
-    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
-        cachedCaptureSessionEvent()
-            ?: localCaptureSessionEvent()
-            ?: createSession()
-    }
+    override suspend fun getCurrentCaptureSessionEvent(createSessionCaptureEventIfNotExist: Boolean): SessionCaptureEvent =
+        reportException {
+            cachedCaptureSessionEvent()
+                ?: localCaptureSessionEvent()
+                ?: if (createSessionCaptureEventIfNotExist) {
+                    createSession()
+                } else {
+                    throw Exception("No session capture event found")
+                }
+        }
 
     private fun cachedCaptureSessionEvent() =
         sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
