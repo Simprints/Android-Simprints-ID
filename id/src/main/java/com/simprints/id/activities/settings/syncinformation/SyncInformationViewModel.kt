@@ -42,6 +42,12 @@ class SyncInformationViewModel(
 
     private var lastKnownEventSyncState: EventSyncState? = null
 
+    /**
+     * Calls fetchSyncInformation() when all workers are done.
+     * To determine this EventSyncState is checked to have all workers in Succeeded state.
+     * Also, to avoid consecutive calls with the same EventSyncState the last one is saved
+     * and compared with new one before evaluating it.
+     */
     fun fetchSyncInformationIfNeeded(eventSyncState: EventSyncState) {
         if (eventSyncState != lastKnownEventSyncState) {
             val unfinishedDownSyncWorkers = eventSyncState.downSyncWorkersInfo.filter {
