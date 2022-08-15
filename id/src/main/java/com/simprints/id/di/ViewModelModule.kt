@@ -93,7 +93,6 @@ open class ViewModelModule {
         loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        eventSyncManager: EventSyncManager,
         dispatcher: DispatcherProvider
     ): SyncInformationViewModelFactory =
         SyncInformationViewModelFactory(
