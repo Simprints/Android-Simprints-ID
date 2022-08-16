@@ -183,7 +183,14 @@ class EventDownSyncScopeRepositoryImplTest {
                 listOf(Modes.FINGERPRINT)
             )
 
-            coVerify(exactly = DEFAULT_MODULES.size) { downSyncOperationOperationDao.delete(any()) }
+            DEFAULT_MODULES.forEach { moduleId ->
+                val scope = SubjectModuleScope(
+                    DEFAULT_PROJECT_ID,
+                    listOf(moduleId),
+                    listOf(Modes.FINGERPRINT)
+                )
+                coVerify(exactly = 1) { downSyncOperationOperationDao.delete(scope.operations.first().getUniqueKey()) }
+            }
         }
     }
 
