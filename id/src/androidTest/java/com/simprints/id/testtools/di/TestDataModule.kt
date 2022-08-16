@@ -1,13 +1,10 @@
 package com.simprints.id.testtools.di
 
 import android.content.Context
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
@@ -18,6 +15,7 @@ import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.id.network.ImageUrlProvider
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.mockk
 
@@ -41,9 +39,9 @@ class TestDataModule(
             )
         }
 
-    override fun provideProjectRemoteDataSource(simApiClientFactory: SimApiClientFactory): ProjectRemoteDataSource =
+    override fun provideProjectRemoteDataSource(loginManager: LoginManager): ProjectRemoteDataSource =
         projectRemoteDataSourceRule.resolveDependency {
-            super.provideProjectRemoteDataSource(simApiClientFactory)
+            super.provideProjectRemoteDataSource(loginManager)
         }
 
     override fun provideProjectRepository(
@@ -72,19 +70,19 @@ class TestDataModule(
     override fun provideImageRepository(
         context: Context,
         imageUrlProvider: ImageUrlProvider,
-        remoteDbManager: RemoteDbManager
+        loginManager: LoginManager
     ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, imageUrlProvider, remoteDbManager)
+        super.provideImageRepository(context, imageUrlProvider, loginManager)
     }
 
     override fun provideLongConsentLocalDataSource(
         context: Context,
-        loginInfoManager: LoginInfoManager
+        loginManager: LoginManager
     ): LongConsentLocalDataSource =
         longConsentLocalDataSourceRule.resolveDependency {
             super.provideLongConsentLocalDataSource(
                 context,
-                loginInfoManager
+                loginManager
             )
         }
 
@@ -107,5 +105,5 @@ class TestDataModule(
                 mockk()
             )
         }
- }
+}
 

@@ -115,7 +115,7 @@ object KoinInjector {
     }
 
     private fun buildKoinModule() =
-        module(override = true) {
+        module {
             defineBuildersForFingerprintManagers()
             defineBuildersForDomainClasses()
             defineBuildersForPresentersAndViewModels()
@@ -144,7 +144,7 @@ object KoinInjector {
         factory { androidContext().applicationContext as Application }
 
         factory { get<Application>().component }
-        factory { get<AppComponent>().getLoginInfoManager() }
+        factory { get<AppComponent>().getLoginManager() }
         factory<DispatcherProvider> { DefaultDispatcherProvider() }
         factory { FingerprintFileDownloader(get(), get(), get()) }
         factory { FirmwareRemoteDataSource(get(), get()) }

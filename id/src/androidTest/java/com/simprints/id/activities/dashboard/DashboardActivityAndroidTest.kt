@@ -54,7 +54,7 @@ class DashboardActivityAndroidTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every {
-            mockViewModelFactory.create<DashboardViewModel>(any())
+            mockViewModelFactory.create<DashboardViewModel>(any(), any())
         } returns mockViewModel
 
         AndroidTestConfig(

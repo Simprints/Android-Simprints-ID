@@ -5,9 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.*
@@ -29,7 +29,7 @@ class RemoteConfigWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
     private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
-    private val loginInfoManagerMock: LoginInfoManager = mockk {
+    private val loginManagerMock: LoginManager = mockk {
         every { getSignedInProjectIdOrEmpty() } returns UUID.randomUUID().toString()
     }
 
@@ -38,7 +38,7 @@ class RemoteConfigWorkerTest {
     @Before
     fun setUp() {
         remoteConfigWorker = TestListenableWorkerBuilder<RemoteConfigWorker>(app).build().apply {
-            loginInfoManager = loginInfoManagerMock
+            loginManager = loginManagerMock
             projectRepository = projectRepositoryMock
             dispatcherProvider = testDispatcherProvider
         }
@@ -46,17 +46,18 @@ class RemoteConfigWorkerTest {
     }
 
     @Test
-    fun `when download settings correctly - should return success`() = testCoroutineRule.runBlockingTest {
-        coEvery { projectRepositoryMock.fetchProjectConfigurationAndSave(any()) } just Runs
+    fun `when download settings correctly - should return success`() =
+        testCoroutineRule.runBlockingTest {
+            coEvery { projectRepositoryMock.fetchProjectConfigurationAndSave(any()) } just Runs
 
-        val result = remoteConfigWorker.doWork()
+            val result = remoteConfigWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.success())
-    }
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
 
     @Test
     fun `when not signed in - should return failure`() = testCoroutineRule.runBlockingTest {
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
 
         val result = remoteConfigWorker.doWork()
 

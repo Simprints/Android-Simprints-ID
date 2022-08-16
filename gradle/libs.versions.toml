@@ -20,13 +20,14 @@ fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.13.3"
 koin_version = "3.2.0"
 rootbeer_version = "0.1.0"
-mockito_version = "4.5.1"
+mockito_version = "4.7.0"
 robolectric_version = "4.8.1"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
 fragment_version = "1.5.0"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
+hilt_version = "2.43.2"
 
 
 [libraries]
@@ -62,7 +63,7 @@ androidX-security = "androidx.security:security-crypto:1.0.0"
 androidX-cameraX-core = { module = "androidx.camera:camera-core", version.ref = "androidx_camerax_version" }
 androidX-cameraX-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx_camerax_version" }
 androidX-cameraX-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx_camerax_version" }
-androidX-cameraX-view = { module =  "androidx.camera:camera-view", version.ref = "androidx_camerax_version" }
+androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = "androidx_camerax_version" }
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
@@ -98,7 +99,7 @@ playcore-core = "com.google.android.play:core:1.10.3"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth:21.0.7"
+firebase-auth = "com.google.firebase:firebase-auth-ktx:21.0.7"
 firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
 firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.0.0"
 
@@ -153,6 +154,13 @@ libsimprints = "com.simprints:libsimprints:2022.2.0"
 #simmatcher
 simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher_version" }
 
+#hilt
+hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
+hilt-kapt = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt_version" }
+
+testing-hilt = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt_version" }
+testing-hilt-kapt = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_version" }
+
 #Testing
 testing-junit = "junit:junit:4.13.2"
 testing-truth = "com.google.truth:truth:1.1.3"
@@ -171,7 +179,7 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 
 #Testing-KoTest
 testing-KoTest-kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
-testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.4.1"
+testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.4.2"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"
