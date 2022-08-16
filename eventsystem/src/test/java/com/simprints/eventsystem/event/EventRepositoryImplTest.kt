@@ -552,14 +552,6 @@ class EventRepositoryImplTest {
             assertThat(loadedSession.labels.projectId).isEqualTo("projectId")
         }
 
-    @Test(expected = Exception::class)
-    fun `test getCurrentCaptureSessionEvent should throw if  CaptureSessionEvent is not exist and createSessionCaptureEventIfNotExist=false` () =
-        runTest {
-
-            eventRepo.getCurrentCaptureSessionEvent(false)
-            //Should throw exception
-        }
-
     @Test
     fun insertEventIntoCurrentOpenSession() {
         runBlocking {

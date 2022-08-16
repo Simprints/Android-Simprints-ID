@@ -26,13 +26,10 @@ interface EventRepository {
 
     /**
      * Get current capture session event from event cache or from room db.
-     * It should throw exception if it can't retrieve the capture event instead of creating a new event
-     * but this needs big refactoring effort because this method is being used in many places
-     *
-     * @param createSessionCaptureEventIfNotExist
+     * or create a new event if needed
      * @return SessionCaptureEvent
      */
-    suspend fun getCurrentCaptureSessionEvent(createSessionCaptureEventIfNotExist:Boolean =true): SessionCaptureEvent
+    suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
     suspend fun getEventsFromSession(sessionId: String): Flow<Event>
 
