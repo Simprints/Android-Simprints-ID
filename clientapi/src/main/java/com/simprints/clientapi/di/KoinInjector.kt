@@ -27,6 +27,7 @@ import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.cache.StepEncoderImpl
+import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -76,7 +77,7 @@ object KoinInjector {
     private fun Module.buildClientApiSessionEventsManager() {
         factory<StepEncoder> { StepEncoderImpl() }
 
-        factory { get<AppComponent>().getSecurityManager().buildEncryptedSharedPreferences() }
+        factory { get<AppComponent>().getSecurityManager().buildEncryptedSharedPreferences(GLOBAL_SHARED_PREFS_FILENAME) }
 
         factory<HotCache> { HotCacheImpl(get(), get()) }
         factory<ClientApiSessionEventsManager> {
