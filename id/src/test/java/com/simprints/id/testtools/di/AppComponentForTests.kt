@@ -11,6 +11,7 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeActivityUnitTest
 import com.simprints.id.activities.settings.SettingsActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragmentTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionViewModelTest
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivityTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorkerTest
@@ -69,6 +70,7 @@ interface AppComponentForTests : AppComponent {
     fun inject(moduleSelectionFragmentTest: ModuleSelectionFragmentTest)
     fun inject(loginActivityTest: LoginActivityTest)
     fun inject(privacyNoticeActivityUnitTest: PrivacyNoticeActivityUnitTest)
+    fun inject(syncInformationActivityTest: SyncInformationActivityTest)
 
     fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
 }
