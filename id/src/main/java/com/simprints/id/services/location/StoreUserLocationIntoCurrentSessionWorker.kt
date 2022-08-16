@@ -62,7 +62,7 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
     }
 
     private suspend fun saveUserLocation(lastLocation: android.location.Location) {
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent(false)
+        val currentSession = eventRepository.getCurrentCaptureSessionEvent()
         currentSession.payload.location =
             Location(lastLocation.latitude, lastLocation.longitude)
         eventRepository.addOrUpdateEvent(currentSession)
