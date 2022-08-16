@@ -1,7 +1,6 @@
 package com.simprints.eventsystem.event.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
@@ -18,7 +17,8 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -40,10 +40,10 @@ import retrofit2.Response
 class EventRemoteDataSourceImplTest {
 
     @MockK
-    lateinit var simApiClientFactory: SimApiClientFactory
+    lateinit var loginManager: LoginManager
 
     @MockK
-    lateinit var simApiClient: SimApiClient<EventRemoteInterface>
+    lateinit var simApiClient: SimNetwork.SimApiClient<EventRemoteInterface>
 
     @MockK
     lateinit var eventRemoteInterface: EventRemoteInterface
@@ -69,8 +69,8 @@ class EventRemoteDataSourceImplTest {
             (args[0] as InterfaceInvocation<EventRemoteInterface, Int>).invoke(eventRemoteInterface)
         }
 
-        coEvery { simApiClientFactory.buildClient(EventRemoteInterface::class) } returns simApiClient
-        eventRemoteDataSource = EventRemoteDataSourceImpl(simApiClientFactory, JsonHelper)
+        coEvery { loginManager.buildClient(EventRemoteInterface::class) } returns simApiClient
+        eventRemoteDataSource = EventRemoteDataSourceImpl(loginManager, JsonHelper)
     }
 
     @Test

@@ -42,6 +42,7 @@ dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
     implementation(project(":infralogging"))
+    implementation(project(":infralogin"))
     api(project(":infranetwork"))
     implementation(project(":infrasecurity"))
 

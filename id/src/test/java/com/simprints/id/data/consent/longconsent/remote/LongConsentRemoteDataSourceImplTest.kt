@@ -1,11 +1,10 @@
 package com.simprints.id.data.consent.longconsent.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.SimNetwork
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -20,19 +19,16 @@ import org.junit.Test
 class LongConsentRemoteDataSourceImplTest {
 
     @MockK
-    lateinit var loginInfoManagerMock: LoginInfoManager
+    lateinit var loginManagerMock: LoginManager
 
     @MockK
     lateinit var remoteApi: FileUrlRemoteInterface
 
     @MockK
-    lateinit var simApiFactory: SimApiClientFactory
-
-    @MockK
     lateinit var consentDownloader: (FileUrl) -> ByteArray
 
     @MockK
-    lateinit var remoteApiClient: SimApiClient<FileUrlRemoteInterface>
+    lateinit var remoteApiClient: SimNetwork.SimApiClient<FileUrlRemoteInterface>
 
 
     private lateinit var remoteDataSource: LongConsentRemoteDataSourceImpl
@@ -42,12 +38,11 @@ class LongConsentRemoteDataSourceImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { remoteApiClient.api } returns remoteApi
-        coEvery { simApiFactory.buildClient(FileUrlRemoteInterface::class) } returns remoteApiClient
-        every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
+        coEvery { loginManagerMock.buildClient(FileUrlRemoteInterface::class) } returns remoteApiClient
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns PROJECT_ID_TEST
 
         remoteDataSource = LongConsentRemoteDataSourceImpl(
-            loginInfoManagerMock,
-            simApiFactory,
+            loginManagerMock,
             consentDownloader
         )
     }

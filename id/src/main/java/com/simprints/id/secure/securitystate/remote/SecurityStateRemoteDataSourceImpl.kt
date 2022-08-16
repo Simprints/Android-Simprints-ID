@@ -1,27 +1,25 @@
 package com.simprints.id.secure.securitystate.remote
 
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.fromApiToDomain
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.SimNetwork
 
 class SecurityStateRemoteDataSourceImpl(
-    private val simApiClientFactory: SimApiClientFactory,
-    private val loginInfoManager: LoginInfoManager,
+    private val loginManager: LoginManager,
     private val deviceId: String
 ) : SecurityStateRemoteDataSource {
 
     override suspend fun getSecurityState(): SecurityState {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
 
         return getClient().executeCall {
             it.requestSecurityState(projectId, deviceId)
         }.fromApiToDomain()
     }
 
-    private suspend fun getClient(): SimApiClient<SecureApiInterface> {
-        return simApiClientFactory.buildClient(SecureApiInterface::class)
+    private suspend fun getClient(): SimNetwork.SimApiClient<SecureApiInterface> {
+        return loginManager.buildClient(SecureApiInterface::class)
     }
 }

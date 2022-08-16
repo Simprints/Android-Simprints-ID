@@ -52,7 +52,7 @@ class PrivacyNoticeActivityTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { viewModelFactory.create<PrivacyNoticeViewModel>(any()) } returns viewModel
+        every { viewModelFactory.create<PrivacyNoticeViewModel>(any(), any()) } returns viewModel
 
         AndroidTestConfig(
             appModule = appModule,

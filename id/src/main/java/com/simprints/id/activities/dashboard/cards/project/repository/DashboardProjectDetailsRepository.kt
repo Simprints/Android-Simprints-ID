@@ -1,18 +1,18 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.infra.login.LoginManager
 
 class DashboardProjectDetailsRepository(
     private val projectRepository: ProjectRepository,
-    private val loginInfoManager: LoginInfoManager,
+    private val loginManager: LoginManager,
     private val preferencesManager: PreferencesManager
 ) {
 
     suspend fun getProjectDetails(): DashboardProjectState {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
         val cachedProject = projectRepository.loadFromCache(projectId)
 
         val projectName = cachedProject?.name

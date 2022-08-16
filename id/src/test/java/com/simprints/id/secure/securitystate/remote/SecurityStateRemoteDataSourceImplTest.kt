@@ -1,12 +1,11 @@
 package com.simprints.id.secure.securitystate.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.ApiSecurityState
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -28,12 +27,11 @@ class SecurityStateRemoteDataSourceImplTest {
         private const val DEVICE_ID = "deviceId"
     }
 
-    private val loginInfoManager = mockk<LoginInfoManager>()
+    private val loginManager = mockk<LoginManager>()
     private val remoteInterface = mockk<SecureApiInterface>()
-    private val simApiClient = mockk<SimApiClient<SecureApiInterface>>()
-    private val simApiClientFactory = mockk<SimApiClientFactory>()
+    private val simApiClient = mockk<SimNetwork.SimApiClient<SecureApiInterface>>()
     private val securityStateRemoteDataSource =
-        SecurityStateRemoteDataSourceImpl(simApiClientFactory, loginInfoManager, DEVICE_ID)
+        SecurityStateRemoteDataSourceImpl(loginManager, DEVICE_ID)
 
 
     @Before
@@ -45,8 +43,8 @@ class SecurityStateRemoteDataSourceImplTest {
                 remoteInterface
             )
         }
-        coEvery { simApiClientFactory.buildClient(SecureApiInterface::class) } returns simApiClient
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        coEvery { loginManager.buildClient(SecureApiInterface::class) } returns simApiClient
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
     }
 
     @Test

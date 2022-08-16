@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.simprints.core.login.LoginInfoManager
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
@@ -21,7 +20,6 @@ import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
@@ -46,6 +44,8 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
 
@@ -65,12 +65,12 @@ open class SyncModule {
 
     @Provides
     open fun provideEventUpSyncScopeRepo(
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao,
         dispatcher: DispatcherProvider
     ): EventUpSyncScopeRepository =
         EventUpSyncScopeRepositoryImpl(
-            loginInfoManager,
+            loginManager,
             dbEventUpSyncOperationStateDao,
             dispatcher
         )
@@ -106,13 +106,13 @@ open class SyncModule {
 
     @Provides
     open fun provideEventDownSyncScopeRepo(
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         downSyncOperationStateDao: DbEventDownSyncOperationStateDao,
         dispatcher: DispatcherProvider
     ): EventDownSyncScopeRepository =
         EventDownSyncScopeRepositoryImpl(
-            loginInfoManager,
+            loginManager,
             downSyncOperationStateDao,
             dispatcher
         )
@@ -142,7 +142,7 @@ open class SyncModule {
         database.downSyncOperationsDao
 
     @Provides
-    open fun providePeopleSyncProgressCache(builder: EncryptedSharedPreferencesBuilder): EventSyncCache =
+    open fun providePeopleSyncProgressCache(builder: SecurityManager): EventSyncCache =
         EventSyncCacheImpl(
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_PROGRESSES_SHARED_PREFS),
             builder.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
@@ -182,7 +182,12 @@ open class SyncModule {
         timerHelper: TimeHelper,
         settingsPreferencesManager: SettingsPreferencesManager
     ): EventUpSyncHelper =
-        EventUpSyncHelperImpl(eventRepository, eventUpSyncScopeRepo, timerHelper, settingsPreferencesManager)
+        EventUpSyncHelperImpl(
+            eventRepository,
+            eventUpSyncScopeRepo,
+            timerHelper,
+            settingsPreferencesManager
+        )
 
     @Provides
     open fun providePeopleSyncSubMasterWorkersBuilder(): EventSyncSubMasterWorkersBuilder =

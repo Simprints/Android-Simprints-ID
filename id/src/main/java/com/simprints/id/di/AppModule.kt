@@ -4,10 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.modality.toMode
-import com.simprints.core.login.LoginInfoManager
-import com.simprints.core.network.SimApiClientFactory
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider.Companion.FILENAME_FOR_REALM_KEY_SHARED_PREFS
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -28,23 +24,16 @@ import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.common.FirebaseManagerImpl
-import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
-import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.network.ImageUrlProvider
 import com.simprints.id.network.ImageUrlProviderImpl
-import com.simprints.id.network.SimApiClientFactoryImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
 import com.simprints.id.orchestrator.PersonCreationEventHelper
@@ -58,8 +47,6 @@ import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
-import com.simprints.infra.security.random.RandomGenerator
-import com.simprints.infra.security.random.RandomGeneratorImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -67,14 +54,14 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
-import com.simprints.infra.network.url.BaseUrlProvider
-import com.simprints.infra.network.url.BaseUrlProviderImpl
 
 @Module
 open class AppModule {
@@ -82,19 +69,6 @@ open class AppModule {
     @Provides
     @Singleton
     fun provideContext(app: Application): Context = app
-
-    @Provides
-    @Singleton
-    open fun provideRemoteDbManager(
-        loginInfoManager: LoginInfoManager,
-        context: Context,
-        dispatcher: DispatcherProvider
-    ): RemoteDbManager = FirebaseManagerImpl(loginInfoManager, context, dispatcher)
-
-    @Provides
-    @Singleton
-    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
-        LoginInfoManagerImpl(improvedSharedPreferences)
 
     @Provides
     @Singleton
@@ -110,47 +84,15 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideRandomGenerator(): RandomGenerator = RandomGeneratorImpl()
-
-    @Provides
-    @Singleton
-    open fun provideSecureLocalDbKeyProvider(
-        builder: EncryptedSharedPreferencesBuilder,
-        randomGenerator: RandomGenerator
-    ): SecureLocalDbKeyProvider =
-        SecureLocalDbKeyProviderImpl(
-            builder.buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS),
-            randomGenerator
-        )
-
-    @Provides
-    @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     open fun provideImageUrlProvider(
         projectLocalDataSource: ProjectLocalDataSource,
-        loginInfoManager: LoginInfoManager
+        loginManager: LoginManager
     ): ImageUrlProvider = ImageUrlProviderImpl(
         projectLocalDataSource,
-        loginInfoManager
-    )
-
-    @Provides
-    open fun provideBaseUrlProvider(ctx: Context): BaseUrlProvider =
-        BaseUrlProviderImpl(ctx)
-
-    @Provides
-    open fun provideSimApiClientFactory(
-        ctx: Context,
-        remoteDbManager: RemoteDbManager,
-        baseUrlProvider: BaseUrlProvider
-    ): SimApiClientFactory = SimApiClientFactoryImpl(
-        baseUrlProvider,
-        ctx.deviceId,
-        ctx,
-        ctx.packageVersionName,
-        remoteDbManager,
+        loginManager
     )
 
     @Provides
@@ -173,7 +115,7 @@ open class AppModule {
     @Provides
     open fun provideDbEventDatabaseFactory(
         ctx: Context,
-        secureDataManager: SecureLocalDbKeyProvider,
+        secureDataManager: SecurityManager,
     ): EventDatabaseFactory =
         DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
@@ -191,7 +133,7 @@ open class AppModule {
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
         idPreferencesManager: IdPreferencesManager,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
@@ -199,7 +141,7 @@ open class AppModule {
         EventRepositoryImpl(
             ctx.deviceId,
             ctx.packageVersionName,
-            loginInfoManager,
+            loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
@@ -222,13 +164,13 @@ open class AppModule {
     @Provides
     open fun provideGuidSelectionManager(
         context: Context,
-        loginInfoManager: LoginInfoManager,
+        loginManager: LoginManager,
         timeHelper: TimeHelper,
         eventRepository: EventRepository
     ): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId,
-            loginInfoManager,
+            loginManager,
             timeHelper,
             eventRepository
         )
@@ -247,15 +189,6 @@ open class AppModule {
             subjectRepository,
             preferencesManager
         )
-
-    @Provides
-    open fun provideEncryptedSharedPreferencesBuilder(app: Application): EncryptedSharedPreferencesBuilder =
-        EncryptedSharedPreferencesBuilderImpl(app)
-
-    @Provides
-    @Named("EncryptedSharedPreferences")
-    open fun provideEncryptedSharedPreferences(builder: EncryptedSharedPreferencesBuilder): SharedPreferences =
-        builder.buildEncryptedSharedPreferences()
 
     @Provides
     open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
@@ -289,6 +222,12 @@ open class AppModule {
 
     @Provides
     open fun provideQrCodeDetector(): QrCodeDetector = QrCodeDetectorImpl()
+
+
+    @Provides
+    @Named("EncryptedSharedPreferences")
+    open fun provideEncryptedSharedPreferences(builder: SecurityManager): SharedPreferences =
+        builder.buildEncryptedSharedPreferences()
 
     @Provides
     fun provideHotCache(
