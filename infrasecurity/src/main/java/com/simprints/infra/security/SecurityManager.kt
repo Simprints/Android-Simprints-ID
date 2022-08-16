@@ -2,15 +2,20 @@ package com.simprints.infra.security
 
 import android.content.SharedPreferences
 import com.simprints.infra.security.exceptions.RootedDeviceException
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder.Companion.SHARED_PREFS_FILENAME
 import com.simprints.infra.security.keyprovider.LocalDbKey
 
 interface SecurityManager {
 
-    /**
-     * If no argument is supplied for filename then it uses the shared encrypted shared prefs file
-     */
-    fun buildEncryptedSharedPreferences(filename: String = SHARED_PREFS_FILENAME): SharedPreferences
+    companion object {
+        /**
+         * This is a global shared prefs file other modules can use to store values. Keep in mind
+         * that if two modules use the same field name then they will overwrite each others values,
+         * so it is advised to use module specific shared preference files.
+         */
+        const val GLOBAL_SHARED_PREFS_FILENAME = "encrypted_shared"
+    }
+
+    fun buildEncryptedSharedPreferences(filename: String): SharedPreferences
 
     fun createLocalDatabaseKeyIfMissing(dbName: String)
 

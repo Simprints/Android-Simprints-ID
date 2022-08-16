@@ -56,6 +56,7 @@ import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -227,7 +228,7 @@ open class AppModule {
     @Provides
     @Named("EncryptedSharedPreferences")
     open fun provideEncryptedSharedPreferences(builder: SecurityManager): SharedPreferences =
-        builder.buildEncryptedSharedPreferences()
+        builder.buildEncryptedSharedPreferences(GLOBAL_SHARED_PREFS_FILENAME)
 
     @Provides
     fun provideHotCache(
