@@ -22,7 +22,6 @@ class EventDownSyncWorkersBuilderImpl(
     private val preferencesManager: IdPreferencesManager
 ) : EventDownSyncWorkersBuilder {
 
-
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             preferencesManager.modalities.map { it.toMode() },

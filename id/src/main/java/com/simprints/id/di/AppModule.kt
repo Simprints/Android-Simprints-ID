@@ -19,6 +19,7 @@ import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsF
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
 import com.simprints.eventsystem.event.local.*
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
@@ -156,10 +157,12 @@ open class AppModule {
     @Provides
     fun provideModuleRepository(
         preferencesManager: IdPreferencesManager,
-        subjectRepository: SubjectRepository
+        subjectRepository: SubjectRepository,
+        eventDownSyncScopeRepository: EventDownSyncScopeRepository
     ): ModuleRepository = ModuleRepositoryImpl(
         preferencesManager,
-        subjectRepository
+        subjectRepository,
+        eventDownSyncScopeRepository
     )
 
     @Provides

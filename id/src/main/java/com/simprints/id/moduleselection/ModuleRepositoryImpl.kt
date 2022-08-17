@@ -1,6 +1,8 @@
 package com.simprints.id.moduleselection
 
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.core.domain.modality.toMode
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
@@ -9,11 +11,14 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MOD
 import com.simprints.infra.logging.Simber
 
 class ModuleRepositoryImpl(
-    val preferencesManager: IdPreferencesManager,
-    private val subjectRepository: SubjectRepository
+    private val preferencesManager: IdPreferencesManager,
+    private val subjectRepository: SubjectRepository,
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository
 ): ModuleRepository {
 
-    override fun getModules(): List<Module> = buildModulesList()
+    override fun getModules(): List<Module> = preferencesManager.moduleIdOptions.map {
+        Module(it, isModuleSelected(it))
+    }
 
     override suspend fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })
@@ -21,10 +26,6 @@ class ModuleRepositoryImpl(
     }
 
     override fun getMaxNumberOfModules(): Int = preferencesManager.maxNumberOfModules
-
-    private fun buildModulesList() = preferencesManager.moduleIdOptions.map {
-        Module(it, isModuleSelected(it))
-    }
 
     private fun isModuleSelected(moduleName: String): Boolean {
         return preferencesManager.selectedModules.contains(moduleName)
@@ -41,6 +42,13 @@ class ModuleRepositoryImpl(
             SubjectQuery(moduleId = it.name)
         }
         subjectRepository.delete(queries)
+
+        // Delete operations for unselected modules to ensure full sync if they are reselected
+        // in the future
+        eventDownSyncScopeRepository.deleteOperations(
+            unselectedModules.map { it.name },
+            preferencesManager.modalities.map { it.toMode() }
+        )
     }
 
     private fun setCrashlyticsKeyForModules() {
