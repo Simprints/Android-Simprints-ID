@@ -1,6 +1,6 @@
 package com.simprints.id.moduleselection
 
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.domain.modality.toMode
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository

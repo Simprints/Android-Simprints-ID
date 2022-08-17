@@ -109,6 +109,7 @@ dependencies {
     api(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
+    implementation(project(":infrarealm"))
     implementation(project(":infrasecurity"))
     implementation(libs.libsimprints)
 
@@ -221,7 +222,6 @@ dependencies {
     androidTestImplementation(libs.testing.coroutines.test)
     androidTestImplementation(libs.testing.androidX.room)
     androidTestImplementation(libs.rxJava2.kotlin)
-
 
     androidTestImplementation(libs.testing.espresso.barista) {
         exclude("com.android.support")

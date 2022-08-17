@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
@@ -20,7 +19,10 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.SubjectRepositoryImpl
-import com.simprints.id.data.db.subject.local.*
+import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
+import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
+import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.license.local.LicenseLocalDataSource
@@ -32,7 +34,7 @@ import com.simprints.id.data.license.repository.LicenseRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.network.ImageUrlProvider
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.realm.RealmWrapper
 import dagger.Module
 import dagger.Provides
 import java.net.URL
@@ -79,19 +81,6 @@ open class DataModule {
         eventRemoteDataSource: EventRemoteDataSource
     ): SubjectRepository = SubjectRepositoryImpl(
         subjectLocalDataSource
-    )
-
-    @Provides
-    open fun provideRealmWrapper(
-        ctx: Context,
-        secureLocalDbKeyProvider: SecurityManager,
-        loginManager: LoginManager,
-        dispatcher: DispatcherProvider,
-    ): RealmWrapper = RealmWrapperImpl(
-        ctx,
-        secureLocalDbKeyProvider,
-        loginManager,
-        dispatcher
     )
 
     @Provides
