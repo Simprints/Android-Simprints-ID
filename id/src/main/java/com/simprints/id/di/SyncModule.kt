@@ -20,8 +20,6 @@ import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.services.config.RemoteConfigScheduler
-import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -44,6 +42,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
@@ -97,11 +96,11 @@ open class SyncModule {
     open fun provideSyncManager(
         eventSyncManager: EventSyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler,
-        remoteConfigScheduler: RemoteConfigScheduler
+        configManager: ConfigManager,
     ): SyncManager = SyncSchedulerImpl(
         eventSyncManager,
         imageUpSyncScheduler,
-        remoteConfigScheduler
+        configManager
     )
 
     @Provides
@@ -196,8 +195,4 @@ open class SyncModule {
     @Provides
     open fun provideImageUpSyncScheduler(context: Context): ImageUpSyncScheduler =
         ImageUpSyncSchedulerImpl(context)
-
-    @Provides
-    fun provideRemoteConfigScheduler(context: Context): RemoteConfigScheduler =
-        RemoteConfigSchedulerImpl(context)
 }

@@ -6,7 +6,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -20,13 +19,14 @@ import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.config.RemoteConfigScheduler
-import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -37,7 +37,10 @@ class DebugActivity : BaseSplitActivity() {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var remoteConfigScheduler: RemoteConfigScheduler
+    lateinit var configManager: ConfigManager
+
+    @Inject
+    lateinit var loginManager: LoginManager
 
     @Inject
     lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
@@ -69,17 +72,23 @@ class DebugActivity : BaseSplitActivity() {
 
         setContentView(binding.root)
 
-        eventSyncManager.getLastSyncState().observe(this, Observer {
-            val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
+        eventSyncManager.getLastSyncState().observe(this) { state ->
+            val states =
+                (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
             val message =
-                "${it.syncId.takeLast(5)} - " +
+                "${state.syncId.takeLast(5)} - " +
                     "${states.toDebugActivitySyncState().name} - " +
-                    "${it.progress}/${it.total}"
+                    "${state.progress}/${state.total}"
 
-            val ssb = SpannableStringBuilder(coloredText("\n$message", Color.parseColor(getRandomColor())))
+            val ssb = SpannableStringBuilder(
+                coloredText(
+                    "\n$message",
+                    Color.parseColor(getRandomColor())
+                )
+            )
 
             binding.logs.append(ssb)
-        })
+        }
 
         binding.syncSchedule.setOnClickListener {
             eventSyncManager.scheduleSync()
@@ -132,21 +141,16 @@ class DebugActivity : BaseSplitActivity() {
         }
 
         binding.syncConfig.setOnClickListener {
-            remoteConfigScheduler.syncNow()
             binding.logs.append("\nGetting Configs from BFSID")
+            runBlocking {
+                configManager.refreshConfiguration(loginManager.signedInProjectId)
+            }
+            binding.logs.append("\nGot Configs from BFSID")
         }
-
-        wm.getWorkInfosForUniqueWorkLiveData(RemoteConfigSchedulerImpl.WORK_NAME_ONE_TIME)
-            .observe(this, Observer { workInfos ->
-                binding.logs.append(
-                    workInfos.joinToString("", "\n") { workInfo ->
-                        "${workInfo.id.toString().take(5)} - ${workInfo.state}"
-                    }
-                )
-            })
     }
 
-    private fun getRandomColor(): String = arrayOf("red", "black", "purple", "green", "blue").random()
+    private fun getRandomColor(): String =
+        arrayOf("red", "black", "purple", "green", "blue").random()
 
     private fun coloredText(text: String, color: Int): SpannableString {
         val spannableString = SpannableString(text)

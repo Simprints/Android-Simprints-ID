@@ -1,29 +1,20 @@
 package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
-import androidx.work.workDataOf
+import androidx.work.*
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import com.simprints.id.services.sync.events.common.getAllSubjectsSyncWorkersInfo
-import com.simprints.id.services.sync.events.common.getUniqueSyncId
-import com.simprints.id.services.sync.events.common.sortByScheduledTime
+import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 open class EventSyncMasterWorker(
@@ -50,7 +41,7 @@ open class EventSyncMasterWorker(
     lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
 
     @Inject
-    lateinit var preferenceManager: IdPreferencesManager
+    lateinit var configManager: ConfigManager
 
     @Inject
     lateinit var eventSyncCache: EventSyncCache
@@ -84,8 +75,9 @@ open class EventSyncMasterWorker(
         return withContext(dispatcher.io()) {
             try {
                 crashlyticsLog("Start")
+                val configuration = configManager.getConfiguration()
 
-                if (!preferenceManager.canSyncDataToSimprints() && isDownSyncOff()) return@withContext success(
+                if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed()) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
                 )
 
@@ -94,21 +86,24 @@ open class EventSyncMasterWorker(
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
-                    val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    val startSyncReporterWorker =
+                        eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
-                    if (preferenceManager.canSyncDataToSimprints())
+                    if (configuration.canSyncDataToSimprints())
                         workerChain += upSyncWorkersChain(uniqueSyncId).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
                         }
 
-                    if (preferenceManager.eventDownSyncSetting != OFF)
-                        workerChain += downSyncWorkersChain(uniqueSyncId).also {
-                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
-                        }
+                    if (configuration.isEventDownSyncAllowed())
+                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId)
+                            .also {
+                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
+                            }
 
                     val endSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    wm.beginWith(startSyncReporterWorker).then(workerChain).then(endSyncReporterWorker)
+                    wm.beginWith(startSyncReporterWorker).then(workerChain)
+                        .then(endSyncReporterWorker)
                         .enqueue()
 
                     eventSyncCache.clearProgresses()
@@ -131,21 +126,10 @@ open class EventSyncMasterWorker(
         }
     }
 
-    private fun isDownSyncOff() = preferenceManager.eventDownSyncSetting == OFF
-
-    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val downSyncChainRequired = isEventDownSyncAllowed()
-
-        return if (downSyncChainRequired) {
-            downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
-        } else {
-            emptyList()
+    private suspend fun isEventDownSyncAllowed() =
+        with(configManager.getConfiguration().synchronization) {
+            frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
         }
-    }
-
-    private fun isEventDownSyncAllowed() = with(preferenceManager) {
-        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-    }
 
     private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
@@ -159,4 +143,10 @@ open class EventSyncMasterWorker(
     private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? {
         return syncWorkers?.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
     }
+
+    private fun ProjectConfiguration.canSyncDataToSimprints(): Boolean =
+        synchronization.up.simprints.kind != UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+
+    private fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean =
+        synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 }

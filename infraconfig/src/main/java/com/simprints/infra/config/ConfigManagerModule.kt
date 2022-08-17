@@ -16,6 +16,8 @@ import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSourceImpl
+import com.simprints.infra.config.worker.ConfigurationScheduler
+import com.simprints.infra.config.worker.ConfigurationSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -33,6 +35,10 @@ abstract class ConfigManagerModule {
 
     @Binds
     internal abstract fun provideConfigManager(configManager: ConfigManagerImpl): ConfigManager
+
+    @Binds
+    internal abstract fun provideConfigurationScheduler(configurationScheduler: ConfigurationSchedulerImpl): ConfigurationScheduler
+
 
     @Binds
     internal abstract fun provideConfigRepository(service: ConfigServiceImpl): ConfigService
