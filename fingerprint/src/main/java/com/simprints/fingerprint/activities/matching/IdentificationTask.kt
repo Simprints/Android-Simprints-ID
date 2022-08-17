@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager

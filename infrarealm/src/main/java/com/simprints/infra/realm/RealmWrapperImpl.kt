@@ -1,6 +1,7 @@
 package com.simprints.infra.realm
 
 import android.content.Context
+import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.config.RealmConfig
@@ -25,7 +26,8 @@ class RealmWrapperImpl @Inject constructor(
      */
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
-            Simber.d("[RealmWrapperImpl] getting new realm instance")
+            Simber.tag(LoggingConstants.CrashReportTag.REALM_DB.name)
+                .d("[RealmWrapperImpl] getting new realm instance")
             Realm.getInstance(config).use(block)
         }
 
