@@ -9,7 +9,7 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.RealmWrapper
+import com.simprints.infra.realm.RealmWrapper
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper

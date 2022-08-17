@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException

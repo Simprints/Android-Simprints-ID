@@ -1,10 +1,9 @@
-package com.simprints.eventsystem.project.domain
+package com.simprints.id.data.db.project.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDbToDomain
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
+import com.simprints.infra.realm.models.DbProject
 import org.junit.Test
 
 class ProjectTest {

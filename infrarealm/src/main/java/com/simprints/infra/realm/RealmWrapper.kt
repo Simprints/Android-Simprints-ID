@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.local
+package com.simprints.infra.realm
 
 import io.realm.Realm
 
