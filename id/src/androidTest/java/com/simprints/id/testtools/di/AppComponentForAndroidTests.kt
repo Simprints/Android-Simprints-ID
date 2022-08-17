@@ -3,12 +3,14 @@ package com.simprints.id.testtools.di
 import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivityTest
 import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.di.*
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
+import com.simprints.infra.realm.RealmModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -27,7 +29,8 @@ import javax.inject.Singleton
         LoginManagerModule::class,
         NetworkModule::class,
         SafetyNetModule::class,
-        com.simprints.infra.security.SecurityModule::class
+        com.simprints.infra.security.SecurityModule::class,
+        RealmModule::class,
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {
@@ -53,5 +56,6 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(loginActivityAndroidTest: LoginActivityAndroidTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
+    fun inject(privacyNoticeActivityTest: PrivacyNoticeActivityTest)
     fun inject(qrCaptureActivityAndroidTest: QrCaptureActivityAndroidTest)
 }

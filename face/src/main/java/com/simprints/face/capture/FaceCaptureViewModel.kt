@@ -3,7 +3,7 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send

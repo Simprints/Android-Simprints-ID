@@ -2,7 +2,7 @@ package com.simprints.face.orchestrator
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse

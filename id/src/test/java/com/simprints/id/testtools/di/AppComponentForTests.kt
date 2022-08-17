@@ -19,6 +19,7 @@ import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
+import com.simprints.infra.realm.RealmModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -37,7 +38,8 @@ import javax.inject.Singleton
         LoginManagerModule::class,
         NetworkModule::class,
         SafetyNetModule::class,
-        TestSecurityModule::class
+        TestSecurityModule::class,
+        RealmModule::class,
     ]
 )
 interface AppComponentForTests : AppComponent {

@@ -1,13 +1,13 @@
 [versions]
 kotlin_version = "1.7.10"
-androidx_navigation_version = "2.4.2"
+androidx_navigation_version = "2.5.0"
 kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.4.2"
 androidx_version = "1.4.0"
 androidx_test_orchestrator_version = "1.4.1"
 espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
-androidx_lifecycle_version = "2.4.1"
+androidx_lifecycle_version = "2.5.0"
 androidx_room_version = "2.4.3"
 androidx_camerax_version = "1.2.0-alpha04"
 dagger_version = "2.43.2"
@@ -20,14 +20,14 @@ fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.13.3"
 koin_version = "3.2.0"
 rootbeer_version = "0.1.0"
-mockito_version = "4.5.1"
+mockito_version = "4.7.0"
 robolectric_version = "4.8.1"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
-fragment_version = "1.4.1"
+fragment_version = "1.5.0"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
-hilt_version = "2.43.1"
+hilt_version = "2.43.2"
 
 
 [libraries]
@@ -179,7 +179,7 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 
 #Testing-KoTest
 testing-KoTest-kotlin = "io.kotlintest:kotlintest-runner-junit4:3.4.2"
-testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.4.1"
+testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.4.2"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"

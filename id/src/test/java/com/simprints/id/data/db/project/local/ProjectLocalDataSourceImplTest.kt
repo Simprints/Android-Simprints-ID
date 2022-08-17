@@ -2,8 +2,8 @@ package com.simprints.id.data.db.project.local
 
 import com.google.common.truth.Truth
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.models.DbProject
-import com.simprints.id.data.db.subject.local.RealmWrapper
+import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbProject
 import io.mockk.*
 import io.realm.Realm
 import io.realm.RealmQuery

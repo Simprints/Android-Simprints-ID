@@ -1,19 +1,7 @@
 package com.simprints.id.data.db.project.local.models
 
 import com.simprints.id.data.db.project.domain.Project
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
-
-open class DbProject : RealmObject() {
-    @PrimaryKey
-    @Required var id: String = ""
-    @Required var name: String = ""
-    @Required var description: String = ""
-    @Required var creator: String = ""
-    @Required var imageBucket: String = ""
-    @Required var updatedAt: String = ""
-}
+import com.simprints.infra.realm.models.DbProject
 
 fun DbProject.fromDbToDomain(): Project = Project(
     id,

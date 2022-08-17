@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.alert
 
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.BluetoothSettings
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.Close
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.None

@@ -4,38 +4,9 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.tools.extensions.toRealmList
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
-import java.util.*
-
-open class DbSubject(
-    @PrimaryKey
-    @Required
-    var subjectId: String = "",
-
-    @Required
-    var projectId: String = "",
-
-    @Required
-    var attendantId: String = "",
-
-    @Required
-    var moduleId: String = "",
-
-    var createdAt: Date? = null,
-
-    var updatedAt: Date? = null,
-
-    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
-    var toSync: Boolean = false,
-
-    var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),
-
-    var faceSamples: RealmList<DbFaceSample> = RealmList()
-
-) : RealmObject()
+import com.simprints.infra.realm.models.DbFaceSample
+import com.simprints.infra.realm.models.DbFingerprintSample
+import com.simprints.infra.realm.models.DbSubject
 
 fun DbSubject.fromDbToDomain(): Subject =
     Subject(
@@ -59,6 +30,7 @@ fun Subject.fromDomainToDb(): DbSubject =
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
-        fingerprintSamples = fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList(),
+        fingerprintSamples = fingerprintSamples.map(FingerprintSample::fromDomainToDb)
+            .toRealmList(),
         faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
     )
