@@ -15,6 +15,7 @@ import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorkerTest
 import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
+import com.simprints.infra.config.ConfigManagerModule
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
@@ -39,6 +40,7 @@ import javax.inject.Singleton
         SafetyNetModule::class,
         TestSecurityModule::class,
         RealmModule::class,
+        ConfigManagerModule::class,
     ]
 )
 interface AppComponentForTests : AppComponent {
