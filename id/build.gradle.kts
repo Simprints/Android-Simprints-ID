@@ -9,6 +9,7 @@ plugins {
     id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.dagger.hilt.android")
 }
 
 apply {
@@ -137,6 +138,11 @@ dependencies {
     implementation(libs.fuzzywuzzy.core)
     implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
+
+    implementation(libs.hilt)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.kapt)
+    kapt(libs.hilt.compiler)
 
     // Firebase
     implementation(libs.firebase.storage)

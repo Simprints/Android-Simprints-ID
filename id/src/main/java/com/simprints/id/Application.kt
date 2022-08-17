@@ -1,12 +1,15 @@
 package com.simprints.id
 
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -16,8 +19,13 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import javax.inject.Inject
 
-open class Application : CoreApplication() {
+@HiltAndroidApp
+open class Application : CoreApplication(), Configuration.Provider {
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
@@ -52,6 +60,11 @@ open class Application : CoreApplication() {
         super.onCreate()
         initApplication()
     }
+
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     open fun initApplication() {
         createComponent()

@@ -20,6 +20,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
+
+    buildTypes {
+        getByName("release") {
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
+        }
+        getByName("staging") {
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+        }
+        getByName("debug") {
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+        }
+
+    }
 }
 
 
@@ -32,11 +45,15 @@ dependencies {
     implementation(project(":infrarealm"))
 
     implementation(libs.androidX.core)
+    implementation(libs.workManager.work)
+
     implementation(libs.datastore)
     implementation(libs.protobuf)
 
     implementation(libs.hilt)
+    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
+    kapt(libs.hilt.compiler)
 
     implementation(libs.jackson.core)
 
