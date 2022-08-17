@@ -19,23 +19,13 @@ class EventDownSyncScopeRepositoryImpl(
     private val dispatcher: DispatcherProvider
 ) : EventDownSyncScopeRepository {
 
-
     override suspend fun getDownSyncScope(
         modes: List<Modes>,
         selectedModuleIDs: List<String>,
         syncGroup: GROUP
     ): EventDownSyncScope {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
-
-        val possibleUserId: String = loginManager.getSignedInUserIdOrEmpty()
-
-        if (projectId.isBlank()) {
-            throw MissingArgumentForDownSyncScopeException("ProjectId required")
-        }
-
-        if (possibleUserId.isBlank()) {
-            throw MissingArgumentForDownSyncScopeException("UserId required")
-        }
+        val projectId = getProjectId()
+        val possibleUserId = getUserId()
 
         val syncScope = when (syncGroup) {
             GROUP.GLOBAL ->
@@ -52,6 +42,22 @@ class EventDownSyncScopeRepositoryImpl(
         return syncScope
     }
 
+    private fun getProjectId(): String {
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        if (projectId.isBlank()) {
+            throw MissingArgumentForDownSyncScopeException("ProjectId required")
+        }
+        return projectId
+    }
+
+    private fun getUserId(): String {
+        val possibleUserId: String = loginManager.getSignedInUserIdOrEmpty()
+        if (possibleUserId.isBlank()) {
+            throw MissingArgumentForDownSyncScopeException("UserId required")
+        }
+        return possibleUserId
+    }
+
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
         withContext(dispatcher.io()) {
             downSyncOperationOperationDao.insertOrUpdate(
@@ -65,7 +71,7 @@ class EventDownSyncScopeRepositoryImpl(
     override suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation {
         val uniqueOpId = syncScopeOperation.getUniqueKey()
         val state =
-            downSyncOperationOperationDao.load().toList().firstOrNull {
+            downSyncOperationOperationDao.load().firstOrNull {
                 it.id == uniqueOpId
             }
 
@@ -75,6 +81,15 @@ class EventDownSyncScopeRepositoryImpl(
             lastSyncTime = state?.lastUpdatedTime,
             state = state?.lastState
         )
+    }
+
+    override suspend fun deleteOperations(moduleIds: List<String>, modes: List<Modes>) {
+        withContext(dispatcher.io()) {
+            val scope = SubjectModuleScope(getProjectId(), moduleIds, modes)
+            scope.operations.forEach {
+                downSyncOperationOperationDao.delete(it.getUniqueKey())
+            }
+        }
     }
 
     override suspend fun deleteAll() {

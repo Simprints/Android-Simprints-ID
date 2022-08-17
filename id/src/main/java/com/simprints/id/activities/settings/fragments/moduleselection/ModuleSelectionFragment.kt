@@ -28,7 +28,6 @@ import com.simprints.id.activities.settings.fragments.moduleselection.tools.Modu
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.databinding.FragmentModuleSelectionBinding
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import javax.inject.Inject
@@ -49,11 +48,9 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     @Inject
-    lateinit var viewModelFactory: ModuleViewModelFactory
+    lateinit var viewModelFactory: ModuleSelectionViewModelFactory
     @Inject
     lateinit var preferencesManager: IdPreferencesManager
-    @Inject
-    lateinit var eventSyncManager: EventSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -61,7 +58,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     private val binding by viewBinding(FragmentModuleSelectionBinding::bind)
     private val viewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory).get(ModuleSelectionViewModel::class.java)
     }
 
     private var modules = emptyList<Module>()
@@ -94,13 +91,6 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
             binding.scrollView.isSmoothScrollingEnabled = false
             binding.scrollView.fullScroll(View.FOCUS_DOWN)
             binding.scrollView.isSmoothScrollingEnabled = true
-        }
-    }
-
-    private fun refreshSyncWorkers() {
-        with(eventSyncManager) {
-            stop()
-            sync()
         }
     }
 
@@ -243,7 +233,6 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     private fun handleModulesConfirmClick() {
         viewModel.saveModules(modules)
-        refreshSyncWorkers()
         activity?.finish()
     }
 

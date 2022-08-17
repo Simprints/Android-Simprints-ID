@@ -37,7 +37,7 @@ open class ModuleCountAdapter : RecyclerView.Adapter<ModuleCountViewHolder>() {
             return oldModules[oldItemPosition].name == newModules[newItemPosition].name
         }
 
-        override fun getOldListSize(): Int  =oldModules.size
+        override fun getOldListSize(): Int = oldModules.size
 
         override fun getNewListSize(): Int = newModules.size
 

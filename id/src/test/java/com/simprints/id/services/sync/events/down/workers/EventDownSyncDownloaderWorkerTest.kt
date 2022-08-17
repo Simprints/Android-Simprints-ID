@@ -22,10 +22,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -240,7 +237,14 @@ class EventDownSyncDownloaderWorkerTest {
         val syncCacheMock = mockk<EventSyncCache>()
         every { syncCacheMock.readProgress(any()) } returns progress
 
-        val workInfo = WorkInfo(UUID.randomUUID(), RUNNING, workDataOf(), listOf(), workDataOf(), 2)
+        val workInfo = WorkInfo(
+            UUID.randomUUID(),
+            RUNNING,
+            workDataOf(),
+            listOf(),
+            workDataOf(),
+            2
+        )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
 

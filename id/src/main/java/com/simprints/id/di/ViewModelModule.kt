@@ -20,7 +20,7 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.activities.settings.fingerselection.FingerSelectionViewModelFactory
-import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionViewModelFactory
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutViewModelFactory
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
@@ -47,8 +47,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 open class ViewModelModule {
 
     @Provides
-    open fun provideModuleViewModelFactory(repository: ModuleRepository) =
-        ModuleViewModelFactory(repository)
+    open fun provideModuleViewModelFactory(
+        repository: ModuleRepository,
+        eventSyncManager: EventSyncManager
+    ) =
+        ModuleSelectionViewModelFactory(repository, eventSyncManager)
 
     @Provides
     open fun provideConsentViewModelFactory(eventRepository: EventRepository) =
@@ -90,7 +93,6 @@ open class ViewModelModule {
         loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        eventSyncManager: EventSyncManager,
         dispatcher: DispatcherProvider
     ): SyncInformationViewModelFactory =
         SyncInformationViewModelFactory(

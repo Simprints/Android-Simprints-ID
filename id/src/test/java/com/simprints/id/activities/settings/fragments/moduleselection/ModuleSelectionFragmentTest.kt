@@ -1,11 +1,9 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
 import androidx.core.content.res.ResourcesCompat
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
 import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -57,14 +55,14 @@ class ModuleSelectionFragmentTest : BaseUnitTest() {
         )
     }
     @Test
-    fun onlaunchFragmentAssertGetFontIsCalled() {
+    fun onLaunchFragmentAssertGetFontIsCalled() {
         mockkStatic(ResourcesCompat::class)
         createAndStartActivity<ModuleSelectionActivity>()
         verify { ResourcesCompat.getFont(any(), any()) }
     }
 
     @Test(expected = Test.None::class)
-    fun onlaunchFragmentThrowGetFontExceptionContinuesExecution() {
+    fun onLaunchFragmentThrowGetFontExceptionContinuesExecution() {
         mockkStatic(ResourcesCompat::class)
         createAndStartActivity<ModuleSelectionActivity>()
         every { ResourcesCompat.getFont(any(), any()) } throws Exception()
