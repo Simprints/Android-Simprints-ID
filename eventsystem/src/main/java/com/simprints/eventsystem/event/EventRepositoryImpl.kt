@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Build.VERSION
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount

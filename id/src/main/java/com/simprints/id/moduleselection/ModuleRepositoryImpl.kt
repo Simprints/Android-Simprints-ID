@@ -1,6 +1,6 @@
 package com.simprints.id.moduleselection
 
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager

@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.subject.migration.oldschemas
+package com.simprints.infra.realm.migration.oldschemas
 
-object PeopleSchemaV2 {
+internal object PeopleSchemaV2 {
     const val UPDATE_FIELD: String = "updatedAt"
     const val ANDROID_ID_FIELD: String = "androidId"
     const val SYNC_INFO_LAST_UPDATE: String = "lastKnownPatientUpdatedAt"

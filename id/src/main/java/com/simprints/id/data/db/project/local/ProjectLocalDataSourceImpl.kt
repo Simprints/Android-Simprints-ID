@@ -1,10 +1,10 @@
 package com.simprints.id.data.db.project.local
 
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.fromDbToDomain
 import com.simprints.id.data.db.project.local.models.fromDomainToDb
-import com.simprints.id.data.db.subject.local.RealmWrapper
+import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbProject
 
 class ProjectLocalDataSourceImpl(
     private val realmWrapper: RealmWrapper

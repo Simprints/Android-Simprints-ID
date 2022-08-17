@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.activities.refusal
 
 import android.annotation.SuppressLint
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
