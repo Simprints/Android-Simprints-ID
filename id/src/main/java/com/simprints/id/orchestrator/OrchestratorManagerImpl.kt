@@ -102,8 +102,8 @@ open class OrchestratorManagerImpl(
                     startStep(potentialNextStep)
                 } else {
                     buildAppResponseAndUpdateDailyActivity()
-                    // Acquing location info could take long time. so we should cancel StoreUserLocationIntoCurrentSessionWorker
-                    // before returing to the caller app to avoid creating empty sessions.
+                    // Acquiring location info could take long time. so we should cancel StoreUserLocationIntoCurrentSessionWorker
+                    // before returning to the caller app to avoid creating empty sessions.
                     WorkManager.getInstance(appCtx).cancelAllWorkByTag(STORE_USER_LOCATION_WORKER_TAG)
                 }
             }
