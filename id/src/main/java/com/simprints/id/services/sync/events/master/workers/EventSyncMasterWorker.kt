@@ -9,6 +9,7 @@ import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -17,9 +18,6 @@ import com.simprints.id.services.sync.events.common.getUniqueSyncId
 import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
@@ -85,24 +83,26 @@ open class EventSyncMasterWorker(
             try {
                 crashlyticsLog("Start")
 
-                if (!preferenceManager.canSyncDataToSimprints() && isDownSyncOff()) return@withContext success(
-                    message = "Can't sync to SimprintsID, skip"
-                )
+                if (!preferenceManager.canSyncDataToSimprints() && !preferenceManager.canDownSyncEvents())
+                    return@withContext success(
+                        message = "Can't sync to SimprintsID, skip"
+                    )
 
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
                 timeHelper.now()
 
                 if (!isSyncRunning()) {
-                    val startSyncReporterWorker = eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                    val startSyncReporterWorker =
+                        eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
                     if (preferenceManager.canSyncDataToSimprints())
-                        workerChain += upSyncWorkersChain(uniqueSyncId).also {
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
                         }
 
-                    if (preferenceManager.eventDownSyncSetting != OFF)
-                        workerChain += downSyncWorkersChain(uniqueSyncId).also {
+                    if (preferenceManager.canDownSyncEvents())
+                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
                         }
 
@@ -130,25 +130,6 @@ open class EventSyncMasterWorker(
             }
         }
     }
-
-    private fun isDownSyncOff() = preferenceManager.eventDownSyncSetting == OFF
-
-    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> {
-        val downSyncChainRequired = isEventDownSyncAllowed()
-
-        return if (downSyncChainRequired) {
-            downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
-        } else {
-            emptyList()
-        }
-    }
-
-    private fun isEventDownSyncAllowed() = with(preferenceManager) {
-        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-    }
-
-    private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
-        upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun getLastSyncId(): String? {
         return syncWorkers.last()?.getUniqueSyncId()
