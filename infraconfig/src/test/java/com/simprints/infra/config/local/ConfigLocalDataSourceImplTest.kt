@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.project
+import com.simprints.infra.config.testtools.projectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -51,11 +52,21 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should save the project correctly`() = runTest(UnconfinedTestDispatcher()) {
-        val project = project
+        val projectToSave = project
 
-        configLocalDataSourceImpl.saveProject(project)
+        configLocalDataSourceImpl.saveProject(projectToSave)
         val savedProject = configLocalDataSourceImpl.getProject()
 
-        assertThat(savedProject).isEqualTo(project)
+        assertThat(savedProject).isEqualTo(projectToSave)
+    }
+
+    @Test
+    fun `should save the project configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+        val projectConfigurationToSave = projectConfiguration
+
+        configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
+        val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+
+        assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
     }
 }

@@ -18,9 +18,9 @@ data class ParentalConsentOptions(
     fun toDomain(): ConsentConfiguration.ConsentPromptConfiguration =
         ConsentConfiguration.ConsentPromptConfiguration(
             enrolmentVariant = if (consentParentEnrolOnly) {
-                ConsentConfiguration.ConsentEnrolmentVariant.STANDARD
-            } else {
                 ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY
+            } else {
+                ConsentConfiguration.ConsentEnrolmentVariant.STANDARD
             },
             dataSharedWithPartner = consentParentShareDataYes,
             dataUsedForRAndD = consentParentCollectYes,
