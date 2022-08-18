@@ -5,6 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.local.models.toDomain
 import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.project
@@ -69,4 +70,11 @@ class ConfigLocalDataSourceImplTest {
 
         assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
     }
+
+    @Test
+    fun `should return the default configuration when there is not configuration saved`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val projectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+            assertThat(projectConfiguration).isEqualTo(ConfigLocalDataSourceImpl.defaultProjectConfiguration.toDomain())
+        }
 }
