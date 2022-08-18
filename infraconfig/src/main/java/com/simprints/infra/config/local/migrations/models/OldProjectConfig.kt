@@ -1,7 +1,9 @@
 package com.simprints.infra.config.local.migrations.models
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.simprints.infra.config.domain.models.*
-import com.simprints.infra.network.json.JsonHelper
 import org.json.JSONObject
 
 internal data class OldProjectConfig(
@@ -71,7 +73,7 @@ internal data class OldProjectConfig(
             FaceConfiguration(
                 nbOfImagesToCapture = FaceNbOfFramesCaptured!!.toInt(),
                 qualityThreshold = FaceQualityThreshold.toInt(),
-                imageSavingStrategy = if (SaveFingerprintImagesStrategy.toBoolean()) {
+                imageSavingStrategy = if (SaveFaceImages.toBoolean()) {
                     FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
                 } else {
                     FaceConfiguration.ImageSavingStrategy.NEVER
@@ -115,7 +117,7 @@ internal data class OldProjectConfig(
                 firmwareVersions = if (Vero2FirmwareVersions.isNullOrEmpty()) {
                     emptyMap()
                 } else {
-                    fromJson(Vero2FirmwareVersions)
+                    ObjectMapper().readValue(Vero2FirmwareVersions)
                 },
             )
 
@@ -127,7 +129,7 @@ internal data class OldProjectConfig(
             displaySimprintsLogo = LogoExists.toBoolean(),
             allowParentalConsent = ConsentParentalExists.toBoolean(),
             generalPrompt = fromJson<GeneralConsentOptions>(ConsentGeneralOptions).toDomain(),
-            parentalPrompt = fromJson<ParentalConsentOptions>(ConsentGeneralOptions).toDomain(),
+            parentalPrompt = fromJson<ParentalConsentOptions>(ConsentParentalOptions).toDomain(),
         )
 
     private fun identificationConfiguration(): IdentificationConfiguration =
@@ -189,7 +191,7 @@ internal data class OldProjectConfig(
         }
 
     private inline fun <reified T> fromJson(json: String): T {
-        return JsonHelper.jackson.readValue(json, T::class.java)
+        return jacksonObjectMapper().readValue(json, T::class.java)
     }
 }
 

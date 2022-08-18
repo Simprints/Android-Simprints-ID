@@ -16,7 +16,7 @@ internal data class ApiVero2Configuration(
             imageSavingStrategy.toDomain(),
             captureStrategy.toDomain(),
             displayLiveFeedback,
-            firmwareVersions.map { it.key to it.value.toDomain() }.toMap()
+            firmwareVersions.mapValues { it.value.toDomain() }
         )
 
     @Keep

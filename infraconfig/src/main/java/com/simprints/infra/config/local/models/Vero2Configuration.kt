@@ -8,7 +8,7 @@ internal fun Vero2Configuration.toProto(): ProtoVero2Configuration =
         .setImageSavingStrategy(imageSavingStrategy.toProto())
         .setCaptureStrategy(captureStrategy.toProto())
         .setDisplayLiveFeedback(displayLiveFeedback)
-        .putAllFirmwareVersions(firmwareVersions.map { it.key to it.value.toProto() }.toMap())
+        .putAllFirmwareVersions(firmwareVersions.mapValues { it.value.toProto() })
         .build()
 
 internal fun Vero2Configuration.ImageSavingStrategy.toProto(): ProtoVero2Configuration.ImageSavingStrategy =
@@ -38,7 +38,7 @@ internal fun ProtoVero2Configuration.toDomain(): Vero2Configuration =
         imageSavingStrategy.toDomain(),
         captureStrategy.toDomain(),
         displayLiveFeedback,
-        firmwareVersionsMap.map { it.key to it.value.toDomain() }.toMap(),
+        firmwareVersionsMap.mapValues { it.value.toDomain() },
     )
 
 internal fun ProtoVero2Configuration.ImageSavingStrategy.toDomain(): Vero2Configuration.ImageSavingStrategy =

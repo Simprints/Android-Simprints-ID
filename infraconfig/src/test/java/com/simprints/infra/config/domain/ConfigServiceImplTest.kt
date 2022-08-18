@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.testtools.project
+import com.simprints.infra.config.testtools.projectConfiguration
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -42,7 +43,7 @@ class ConfigServiceImplTest {
         assertThat(receivedProject).isEqualTo(project)
         coVerify(exactly = 1) { localDataSource.getProject() }
         coVerify(exactly = 1) { localDataSource.saveProject(project) }
-        coVerify(exactly = 1) { remoteDataSource.getProject(any()) }
+        coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
     }
 
     @Test
@@ -52,6 +53,27 @@ class ConfigServiceImplTest {
 
         configServiceImpl.refreshProject(PROJECT_ID)
         coVerify(exactly = 1) { localDataSource.saveProject(project) }
-        coVerify(exactly = 1) { remoteDataSource.getProject(any()) }
+        coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
     }
+
+    @Test
+    fun `should get the project configuration locally`() = runTest {
+        coEvery { localDataSource.getProjectConfiguration() } returns projectConfiguration
+
+        val receivedProject = configServiceImpl.getConfiguration()
+
+        assertThat(receivedProject).isEqualTo(projectConfiguration)
+        coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
+    }
+
+    @Test
+    fun `refresh project configuration should get the project configuration remotely and save it`() =
+        runTest {
+            coEvery { localDataSource.saveProjectConfiguration(projectConfiguration) } returns Unit
+            coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } returns projectConfiguration
+
+            configServiceImpl.refreshConfiguration(PROJECT_ID)
+            coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
+            coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
+        }
 }

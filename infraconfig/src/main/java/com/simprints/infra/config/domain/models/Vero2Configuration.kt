@@ -24,8 +24,8 @@ data class Vero2Configuration(
 
     @Keep
     data class Vero2FirmwareVersions(
-        val cypress: String,
-        val stm: String,
-        val un20: String,
+        val cypress: String = "",
+        val stm: String = "",
+        val un20: String = "",
     )
 }
