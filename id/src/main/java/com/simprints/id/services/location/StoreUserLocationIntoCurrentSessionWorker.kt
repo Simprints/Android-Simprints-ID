@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+const val STORE_USER_LOCATION_WORKER_TAG = "StoreUserLocationWorkerTag"
+
 /**
  * Worker that collects user's last known location and save it into current session
  */
@@ -62,10 +64,12 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
     }
 
     private suspend fun saveUserLocation(lastLocation: android.location.Location) {
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-        currentSession.payload.location =
-            Location(lastLocation.latitude, lastLocation.longitude)
-        eventRepository.addOrUpdateEvent(currentSession)
-        Simber.d("Saving user's location into the current session")
+        if (!isStopped) { // Only store location if SID didn't yet sent the response to the calling app
+            val currentSession = eventRepository.getCurrentCaptureSessionEvent()
+            currentSession.payload.location =
+                Location(lastLocation.latitude, lastLocation.longitude)
+            eventRepository.addOrUpdateEvent(currentSession)
+            Simber.d("Saving user's location into the current session")
+        }
     }
 }
