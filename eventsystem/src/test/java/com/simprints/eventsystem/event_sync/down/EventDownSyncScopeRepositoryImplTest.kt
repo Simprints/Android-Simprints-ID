@@ -123,7 +123,6 @@ class EventDownSyncScopeRepositoryImplTest {
         }
     }
 
-
     @Test
     fun throwWhenProjectIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
@@ -176,7 +175,27 @@ class EventDownSyncScopeRepositoryImplTest {
     }
 
     @Test
-    fun deleteAll_shouldDeleteOpsFromDb() {
+    fun deleteOperations_shouldDeleteOpsFromDb() {
+        runBlocking {
+
+            eventDownSyncScopeRepository.deleteOperations(
+                DEFAULT_MODULES.toList(),
+                listOf(Modes.FINGERPRINT)
+            )
+
+            DEFAULT_MODULES.forEach { moduleId ->
+                val scope = SubjectModuleScope(
+                    DEFAULT_PROJECT_ID,
+                    listOf(moduleId),
+                    listOf(Modes.FINGERPRINT)
+                )
+                coVerify(exactly = 1) { downSyncOperationOperationDao.delete(scope.operations.first().getUniqueKey()) }
+            }
+        }
+    }
+
+    @Test
+    fun deleteAll_shouldDeleteAllOpsFromDb() {
         runBlocking {
 
             eventDownSyncScopeRepository.deleteAll()

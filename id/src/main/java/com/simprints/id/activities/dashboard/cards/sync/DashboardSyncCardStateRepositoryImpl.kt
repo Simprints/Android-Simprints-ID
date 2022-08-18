@@ -6,11 +6,10 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.tools.device.DeviceManager
@@ -201,9 +200,7 @@ class DashboardSyncCardStateRepositoryImpl(
     private suspend fun isModuleSelectionRequired() =
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private fun isDownSyncAllowed() = with(preferencesManager) {
-        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-    }
+    private fun isDownSyncAllowed() = preferencesManager.canDownSyncEvents()
 
     private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()
 

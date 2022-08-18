@@ -44,10 +44,9 @@ class PrivacyNoticeActivityTest {
             viewModelFactory
         }
     )
-
-    private val appModule = TestAppModule(app, deviceManagerRule = DependencyRule.ReplaceRule {
-        deviceManager
-    })
+    private val appModule by lazy {
+        TestAppModule(app, deviceManagerRule = DependencyRule.ReplaceRule { deviceManager })
+    }
 
     @Before
     fun setUp() {
@@ -55,11 +54,11 @@ class PrivacyNoticeActivityTest {
 
         every { viewModelFactory.create<PrivacyNoticeViewModel>(any(), any()) } returns viewModel
 
+        AndroidTestConfig(
+            appModule = appModule,
+            viewModelModule = testViewModelModule
+        ).initComponent().testAppComponent.inject(this)
 
-        app.component = AndroidTestConfig(appModule = appModule)
-            .componentBuilder()
-            .viewModelModule(testViewModelModule)
-            .build()
     }
 
     @Test
