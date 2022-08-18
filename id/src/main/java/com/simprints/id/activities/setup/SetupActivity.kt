@@ -32,6 +32,7 @@ import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
+import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
@@ -137,7 +138,10 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun collectLocationInBackground() {
-        val request = OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java).build()
+        val request =
+            OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java)
+                .addTag(STORE_USER_LOCATION_WORKER_TAG)
+                .build()
         WorkManager.getInstance(applicationContext).enqueue(request)
     }
 

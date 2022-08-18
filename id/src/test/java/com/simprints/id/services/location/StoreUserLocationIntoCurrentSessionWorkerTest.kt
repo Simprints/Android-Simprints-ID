@@ -48,7 +48,10 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        worker = TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(app).build()
+        worker = spyk( TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(
+            app, tags =
+            listOf(STORE_USER_LOCATION_WORKER_TAG)
+        ).build())
         worker.dispatcherProvider =dispatcherProvider
         app.component = mockk(relaxed = true)
         mockDependencies()
@@ -79,11 +82,19 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     }
 
     @Test (expected = Test.None::class)
-    fun `storeUserLocationIntoCurrentSession can't save event shouldn't crash the app`() = runBlocking {
+    fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() = runBlocking {
         every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
         coEvery {
             mockEventRepository.getCurrentCaptureSessionEvent()
         } throws Exception("No session capture event found")
+        worker.doWork()
+        coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
+    }
+
+    @Test
+    fun `storeUserLocationIntoCurrentSession can't save events if  the worker is canceled`() = runBlocking {
+        every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
+        every { worker.isStopped} returns true
         worker.doWork()
         coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
