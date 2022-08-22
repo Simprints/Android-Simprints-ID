@@ -33,8 +33,11 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Singleton
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class SecurityModule {
 

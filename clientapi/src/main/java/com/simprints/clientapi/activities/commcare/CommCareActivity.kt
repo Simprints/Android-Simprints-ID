@@ -14,6 +14,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import javax.inject.Inject
 
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
@@ -41,7 +42,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     private val action: CommCareAction
         get() = buildCommCareAction(intent.action)
 
-    override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
+    @Inject
+    override lateinit var presenter: CommCareContract.Presenter
 
     override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
         parametersOf(this)

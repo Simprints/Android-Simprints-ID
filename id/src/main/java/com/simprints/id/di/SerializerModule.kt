@@ -15,22 +15,15 @@ import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
 import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
-import com.simprints.id.tools.serializers.BooleanSerializer
-import com.simprints.id.tools.serializers.CosyncSerializer
-import com.simprints.id.tools.serializers.EnumSerializer
-import com.simprints.id.tools.serializers.IntegerSerializer
-import com.simprints.id.tools.serializers.LanguagesStringArraySerializer
-import com.simprints.id.tools.serializers.MapSerializer
-import com.simprints.id.tools.serializers.ModalitiesListSerializer
-import com.simprints.id.tools.serializers.ModuleNamesStringSetSerializer
-import com.simprints.id.tools.serializers.Serializer
-import com.simprints.id.tools.serializers.SimprintsSyncSerializer
+import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Named
 import javax.inject.Singleton
 
-
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 @JvmSuppressWildcards(false)
 class SerializerModule {
