@@ -23,8 +23,9 @@ import com.simprints.libsimprints.Tier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CommCarePresenter(
+class CommCarePresenter @Inject constructor(
     private val view: CommCareContract.View,
     private val action: CommCareAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,

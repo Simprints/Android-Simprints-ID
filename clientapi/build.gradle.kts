@@ -52,9 +52,12 @@ dependencies {
     implementation(project(":infrasecurity"))
     implementation(libs.libsimprints)
 
-    // Service Location
+    // Service Location & DI
     implementation(libs.koin.core)
     implementation(libs.koin.android)
+
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     // Support
     implementation(libs.androidX.appcompat)

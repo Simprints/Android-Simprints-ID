@@ -28,8 +28,11 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Named
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 class OrchestratorModule {
 

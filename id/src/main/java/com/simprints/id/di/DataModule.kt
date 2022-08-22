@@ -37,9 +37,12 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import java.net.URL
 import javax.inject.Singleton
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class DataModule {
 
