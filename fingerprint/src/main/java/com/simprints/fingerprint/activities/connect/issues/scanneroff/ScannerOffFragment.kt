@@ -26,6 +26,7 @@ class ScannerOffFragment : FingerprintFragment() {
     private val binding by viewBinding(FragmentScannerOffBinding::bind)
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
+    private var retryCounter = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_scanner_off, container, false)
@@ -47,13 +48,9 @@ class ScannerOffFragment : FingerprintFragment() {
         binding.scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
     }
 
-    private fun initRetryConnectBehaviour() {
-        connectScannerViewModel.retryConnect()
-        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
-            when (success) {
-                true -> handleScannerConnected()
-                false -> connectScannerViewModel.retryConnect()
-            }
+    private fun initTryAgainButton() {
+        binding.tryAgainButton.setOnClickListener {
+            retryConnect()
         }
     }
 
@@ -70,17 +67,17 @@ class ScannerOffFragment : FingerprintFragment() {
         }
     }
 
-    // The tryAgainButton doesn't actually do anything - we're already retrying in the background
-    // Show a progress bar to make it known that something is happening
-    private fun initTryAgainButton() {
-        binding.tryAgainButton.setOnClickListener {
-            binding.scannerOffProgressBar.visibility = View.VISIBLE
-            binding.tryAgainButton.visibility = View.INVISIBLE
-            binding.tryAgainButton.isEnabled = false
+    private fun initRetryConnectBehaviour() {
+        retryConnect()
+        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
+            when (success) {
+                true -> handleScannerConnectedEvent()
+                false -> handleScannerNotConnectedEvent()
+            }
         }
     }
 
-    private fun handleScannerConnected() {
+    private fun handleScannerConnectedEvent() {
         binding.apply {
             scannerOffProgressBar.visibility = View.INVISIBLE
             couldNotConnectTextView.visibility = View.INVISIBLE
@@ -91,6 +88,37 @@ class ScannerOffFragment : FingerprintFragment() {
         }
 
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
+    }
+
+    private fun handleScannerNotConnectedEvent() {
+        if (retryCounter < MAX_RETRY_COUNT) {
+            retryConnect()
+        } else {
+            setupTryAgainMode()
+        }
+    }
+
+    private fun retryConnect() {
+        retryCounter += 1
+        setupConnectingMode()
+        connectScannerViewModel.retryConnect()
+    }
+
+    private fun setupConnectingMode() {
+        binding.apply {
+            scannerOffProgressBar.visibility = View.VISIBLE
+            tryAgainButton.visibility = View.INVISIBLE
+            tryAgainButton.isEnabled = false
+        }
+    }
+
+    private fun setupTryAgainMode() {
+        retryCounter = 0
+        binding.apply {
+            scannerOffProgressBar.visibility = View.INVISIBLE
+            tryAgainButton.visibility = View.VISIBLE
+            tryAgainButton.isEnabled = true
+        }
     }
 
     private fun goToAppropriateIssueFragment(issue: ConnectScannerIssue) {
@@ -109,5 +137,6 @@ class ScannerOffFragment : FingerprintFragment() {
 
     companion object {
         private const val FINISHED_TIME_DELAY_MS = 1200L
+        private const val MAX_RETRY_COUNT = 5
     }
 }
