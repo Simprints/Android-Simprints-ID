@@ -2,15 +2,13 @@ package com.simprints.infra.login.network
 
 import android.content.Context
 import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.network.SimApiClient
-import com.simprints.infra.network.SimApiClientImpl
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
-import com.simprints.infra.network.url.BaseUrlProvider
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
 internal class SimApiClientFactoryImpl @Inject constructor(
-    private val baseUrlProvider: BaseUrlProvider,
+    private val simNetwork: SimNetwork,
     private val deviceId: String,
     private val ctx: Context,
     private val versionName: String,
@@ -20,22 +18,22 @@ internal class SimApiClientFactoryImpl @Inject constructor(
     // Not using `inline fun <reified T : SimRemoteInterface>` because it's not possible to
     // create an interface for that or mock it. SimApiClientFactory is injected everywhere, so it's important
     // that we are able to mock it.
-    override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimApiClient<T> {
-        return SimApiClientImpl(
+    override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
+        return simNetwork.getSimApiClient(
             remoteInterface,
             ctx,
-            baseUrlProvider.getApiBaseUrl(),
+            simNetwork.getApiBaseUrl(),
             deviceId,
             versionName,
             remoteDbManager.getCurrentToken(),
         )
     }
 
-    override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimApiClient<T> {
-        return SimApiClientImpl(
+    override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
+        return simNetwork.getSimApiClient(
             remoteInterface,
             ctx,
-            baseUrlProvider.getApiBaseUrl(),
+            simNetwork.getApiBaseUrl(),
             deviceId,
             versionName,
             null,

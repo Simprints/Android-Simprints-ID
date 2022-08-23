@@ -25,6 +25,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivityDashboardBinding
 import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
@@ -207,7 +208,7 @@ class DashboardActivity : BaseSplitActivity() {
         loadDailyActivity()
 
         // trigger sync ticker only when syncing to BFSID
-        if (settingsPreferencesManager.canSyncDataToSimprints() || settingsPreferencesManager.eventDownSyncSetting != EventDownSyncSetting.OFF) {
+        if (settingsPreferencesManager.canSyncDataToSimprints() || settingsPreferencesManager.canDownSyncEvents()) {
             startTickerToCheckIfSyncIsRequired()
         }
     }

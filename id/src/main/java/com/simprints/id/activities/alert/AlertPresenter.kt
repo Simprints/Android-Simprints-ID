@@ -1,6 +1,6 @@
 package com.simprints.id.activities.alert
 
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper

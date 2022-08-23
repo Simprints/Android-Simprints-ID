@@ -68,5 +68,8 @@ interface SettingsPreferencesManager {
 
 }
 
-fun SettingsPreferencesManager.canSyncDataToSimprints(): Boolean =
-    simprintsSyncSetting.name != SimprintsSyncSetting.SIM_SYNC_NONE.name
+fun SettingsPreferencesManager.canDownSyncEvents() =
+    eventDownSyncSetting != EventDownSyncSetting.OFF
+
+fun SettingsPreferencesManager.canSyncDataToSimprints() =
+    simprintsSyncSetting != SimprintsSyncSetting.SIM_SYNC_NONE

@@ -15,9 +15,10 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
+import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
@@ -40,6 +41,31 @@ class SyncInformationViewModel(
     val recordsToDelete = MutableLiveData<Int?>(null)
     val moduleCounts = MutableLiveData<List<ModuleCount>?>(null)
 
+    private var lastKnownEventSyncState: EventSyncState? = null
+
+    /**
+     * Calls fetchSyncInformation() when all workers are done.
+     * To determine this EventSyncState is checked to have all workers in Succeeded state.
+     * Also, to avoid consecutive calls with the same EventSyncState the last one is saved
+     * and compared with new one before evaluating it.
+     */
+    fun fetchSyncInformationIfNeeded(eventSyncState: EventSyncState) {
+        if (eventSyncState != lastKnownEventSyncState) {
+            val unfinishedDownSyncWorkers = eventSyncState.downSyncWorkersInfo.filter {
+                (it.state != EventSyncWorkerState.Succeeded)
+            }
+            val unfinishedUpSyncWorkers = eventSyncState.upSyncWorkersInfo.filter {
+                (it.state != EventSyncWorkerState.Succeeded)
+            }
+            val unfinishedWorkers = unfinishedDownSyncWorkers + unfinishedUpSyncWorkers
+            if (unfinishedWorkers.isEmpty()) {
+                fetchSyncInformation()
+            }
+
+            lastKnownEventSyncState = eventSyncState
+        }
+    }
+
     fun fetchSyncInformation() {
         viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
         viewModelScope.launch { recordsToUpSync.value = fetchAndUpdateRecordsToUpSyncCount() }
@@ -53,7 +79,6 @@ class SyncInformationViewModel(
         viewModelScope.launch(dispatchers.io()) {
             imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
         }
-        viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
         viewModelScope.launch { moduleCounts.value = fetchAndUpdateSelectedModulesCount() }
     }
 
@@ -88,10 +113,7 @@ class SyncInformationViewModel(
             null
         }
 
-    private fun isDownSyncAllowed() =
-        with(preferencesManager) {
-            eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
-        }
+    private fun isDownSyncAllowed() = preferencesManager.canDownSyncEvents()
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
@@ -104,7 +126,7 @@ class SyncInformationViewModel(
             var deletionsToDownload = 0
 
             downSyncScope.operations.forEach { syncOperation ->
-                val counts = downySyncHelper.countForDownSync(syncOperation)
+                val counts = downSyncHelper.countForDownSync(syncOperation)
                 creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }
                     ?.count ?: 0
                 deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }

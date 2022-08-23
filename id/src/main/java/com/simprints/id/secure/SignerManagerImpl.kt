@@ -9,7 +9,7 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 
 open class SignerManagerImpl(
     private val configManager: ConfigManager,
@@ -19,7 +19,7 @@ open class SignerManagerImpl(
     private val syncManager: SyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
-    private val baseUrlProvider: BaseUrlProvider,
+    private val simNetwork: SimNetwork,
     private val remoteConfigWrapper: RemoteConfigWrapper
 ) : SignerManager {
 
@@ -40,7 +40,7 @@ open class SignerManagerImpl(
         eventSyncManager.deleteSyncInfo()
         preferencesManager.clearAllSharedPreferences()
         longConsentRepository.deleteLongConsents()
-        baseUrlProvider.resetApiBaseUrl()
+        simNetwork.resetApiBaseUrl()
         remoteConfigWrapper.clearRemoteConfig()
     }
 

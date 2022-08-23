@@ -4,7 +4,7 @@ import com.simprints.id.data.file.FileUrl
 import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 
 class LongConsentRemoteDataSourceImpl(
     private val loginManager: LoginManager,
@@ -24,7 +24,7 @@ class LongConsentRemoteDataSourceImpl(
         return LongConsentRemoteDataSource.File(fileBytes)
     }
 
-    private suspend fun getLongConsentRemoteApi(): SimApiClient<FileUrlRemoteInterface> {
+    private suspend fun getLongConsentRemoteApi(): SimNetwork.SimApiClient<FileUrlRemoteInterface> {
         return loginManager.buildClient(FileUrlRemoteInterface::class)
     }
 

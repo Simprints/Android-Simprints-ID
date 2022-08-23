@@ -1,20 +1,14 @@
-package com.simprints.infra.network
+package com.simprints.infra.network.httpclient
 
 import android.content.Context
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.network.exceptions.RetryableCloudException
-import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
-import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 

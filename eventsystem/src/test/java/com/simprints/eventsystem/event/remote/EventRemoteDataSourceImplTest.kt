@@ -18,7 +18,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -43,7 +43,7 @@ class EventRemoteDataSourceImplTest {
     lateinit var loginManager: LoginManager
 
     @MockK
-    lateinit var simApiClient: SimApiClient<EventRemoteInterface>
+    lateinit var simApiClient: SimNetwork.SimApiClient<EventRemoteInterface>
 
     @MockK
     lateinit var eventRemoteInterface: EventRemoteInterface

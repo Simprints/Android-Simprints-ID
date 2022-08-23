@@ -18,11 +18,10 @@ import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.EXTRA
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import javax.inject.Inject
 
 class SyncInformationActivity : BaseSplitActivity() {
@@ -49,8 +48,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         title = getString(R.string.title_activity_sync_information)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(SyncInformationViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory)[SyncInformationViewModel::class.java]
 
         setTextInLayout()
         enableModuleSelectionButtonAndTabsIfNecessary()
@@ -59,8 +57,12 @@ class SyncInformationActivity : BaseSplitActivity() {
         setupClickListeners()
         observeUi()
         setupRecordsCountCards()
+    }
 
-        viewModel.fetchSyncInformation()
+    override fun onResume() {
+        super.onResume()
+
+        refreshSyncInformation()
     }
 
     private fun setTextInLayout() {
@@ -89,12 +91,16 @@ class SyncInformationActivity : BaseSplitActivity() {
                 return true
             }
             R.id.sync_redo -> {
-                viewModel.resetFetchingSyncInformation()
-                viewModel.fetchSyncInformation()
+                refreshSyncInformation()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun refreshSyncInformation() {
+        viewModel.resetFetchingSyncInformation()
+        viewModel.fetchSyncInformation()
     }
 
     private fun enableModuleSelectionButtonAndTabsIfNecessary() {
@@ -159,6 +165,10 @@ class SyncInformationActivity : BaseSplitActivity() {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
         }
+
+        eventSyncManager.getLastSyncState().observe(this) {
+            viewModel.fetchSyncInformationIfNeeded(it)
+        }
     }
 
     private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {
@@ -188,7 +198,7 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun setupRecordsCountCards() {
-        if (!isDownSyncAllowed()) {
+        if (!preferencesManager.canDownSyncEvents()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
             binding.recordsToDeleteCardView.visibility = View.GONE
         }
@@ -197,10 +207,6 @@ class SyncInformationActivity : BaseSplitActivity() {
             binding.recordsToUploadCardView.visibility = View.GONE
             binding.imagesToUploadCardView.visibility = View.GONE
         }
-    }
-
-    private fun isDownSyncAllowed() = with(preferencesManager) {
-        eventDownSyncSetting == ON || eventDownSyncSetting == EXTRA
     }
 
     companion object {

@@ -14,6 +14,9 @@ interface DbEventDownSyncOperationStateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(dbEventsDownSyncOperationState: DbEventsDownSyncOperationState)
 
+    @Query("delete from DbEventsDownSyncOperation where id = :id")
+    fun delete(id: String)
+
     @Query("delete from DbEventsDownSyncOperation")
     fun deleteAll()
 }

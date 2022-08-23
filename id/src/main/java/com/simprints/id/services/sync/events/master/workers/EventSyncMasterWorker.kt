@@ -90,7 +90,7 @@ open class EventSyncMasterWorker(
                         eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
                     if (configuration.canSyncDataToSimprints())
-                        workerChain += upSyncWorkersChain(uniqueSyncId).also {
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID).also {
                             Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
                         }
 
@@ -130,9 +130,6 @@ open class EventSyncMasterWorker(
         with(configManager.getProjectConfiguration().synchronization) {
             frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
         }
-
-    private suspend fun upSyncWorkersChain(uniqueSyncID: String): List<OneTimeWorkRequest> =
-        upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
     private fun getLastSyncId(): String? {
         return syncWorkers.last()?.getUniqueSyncId()

@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.subject.local
 
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
