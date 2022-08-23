@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "com.simprints.infra.config.local.models";
+option java_multiple_files = true;
+
+message ProtoDeviceConfiguration {
+    string language = 2;
+    repeated string module_selected = 3;
+}

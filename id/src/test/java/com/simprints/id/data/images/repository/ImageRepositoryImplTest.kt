@@ -1,4 +1,5 @@
 package com.simprints.id.data.images.repository
+
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.images.local.ImageLocalDataSource
 import com.simprints.id.data.images.model.Path
@@ -7,17 +8,18 @@ import com.simprints.id.data.images.remote.ImageRemoteDataSource
 import com.simprints.id.data.images.remote.UploadResult
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.FileInputStream
 
-@ExperimentalCoroutinesApi
 internal class ImageRepositoryImplTest {
 
-    @MockK lateinit var localDataSource: ImageLocalDataSource
-    @MockK lateinit var remoteDataSource: ImageRemoteDataSource
+    @MockK
+    lateinit var localDataSource: ImageLocalDataSource
+
+    @MockK
+    lateinit var remoteDataSource: ImageRemoteDataSource
 
     private lateinit var repository: ImageRepository
 
@@ -29,7 +31,7 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun withEmptyList_shouldConsiderUploadOperationSuccessful() = runBlockingTest {
+    fun withEmptyList_shouldConsiderUploadOperationSuccessful() = runTest {
         every { localDataSource.listImages() } returns emptyList()
 
         val successful = repository.uploadStoredImagesAndDelete()
@@ -38,7 +40,7 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun withAllFilesValid_shouldUploadAndDeleteSuccessfully() = runBlockingTest {
+    fun withAllFilesValid_shouldUploadAndDeleteSuccessfully() = runTest {
         configureLocalImageFiles(includeInvalidFile = false)
 
         val successful = repository.uploadStoredImagesAndDelete()
@@ -47,7 +49,7 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun shouldDeleteAnImageAfterTheUpload() = runBlockingTest {
+    fun shouldDeleteAnImageAfterTheUpload() = runTest {
         configureLocalImageFiles(includeInvalidFile = false)
 
         val successful = repository.uploadStoredImagesAndDelete()
@@ -58,7 +60,7 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun shouldDecryptImageBeforeUploading() = runBlockingTest {
+    fun shouldDecryptImageBeforeUploading() = runTest {
         configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
 
         repository.uploadStoredImagesAndDelete()

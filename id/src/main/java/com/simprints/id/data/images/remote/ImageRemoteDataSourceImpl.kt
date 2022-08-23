@@ -2,14 +2,14 @@ package com.simprints.id.data.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.images.model.SecuredImageRef
-import com.simprints.id.network.ImageUrlProvider
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 
 internal class ImageRemoteDataSourceImpl(
-    private val imageUrlProvider: ImageUrlProvider,
+    private val configManager: ConfigManager,
     private val loginManager: LoginManager
 ) : ImageRemoteDataSource {
 
@@ -21,8 +21,7 @@ internal class ImageRemoteDataSourceImpl(
         val firebaseProjectName = loginManager.getLegacyAppFallback().options.projectId
 
         return if (firebaseProjectName != null) {
-            val bucketUrl = imageUrlProvider.getImageStorageBucketUrl()
-                ?: return UploadResult(imageRef, UploadResult.Status.FAILED)
+            val bucketUrl = configManager.getProject(loginManager.signedInProjectId).imageBucket
 
             val rootRef = FirebaseStorage.getInstance(
                 loginManager.getLegacyAppFallback(),

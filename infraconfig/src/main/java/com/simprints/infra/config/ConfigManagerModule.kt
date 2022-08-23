@@ -8,11 +8,14 @@ import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.config.domain.ConfigServiceImpl
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.local.ConfigLocalDataSourceImpl
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration
 import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration
 import com.simprints.infra.config.local.migrations.ProjectRealmMigration
+import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.config.local.models.ProtoProjectConfiguration
-import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
+import com.simprints.infra.config.local.serializer.DeviceConfigurationSerializer
+import com.simprints.infra.config.local.serializer.ProjectConfigurationSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSourceImpl
@@ -28,6 +31,7 @@ import javax.inject.Singleton
 
 private const val PROJECT_DATA_STORE_FILE_NAME = "project_prefs.pb"
 private const val PROJECT_CONFIG_DATA_STORE_FILE_NAME = "project_config_prefs.pb"
+private const val DEVICE_CONFIG_DATA_STORE_FILE_NAME = "device_config_prefs.pb"
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -38,7 +42,6 @@ abstract class ConfigManagerModule {
 
     @Binds
     internal abstract fun provideConfigurationScheduler(configurationScheduler: ConfigurationSchedulerImpl): ConfigurationScheduler
-
 
     @Binds
     internal abstract fun provideConfigRepository(service: ConfigServiceImpl): ConfigService
@@ -69,14 +72,27 @@ object DataStoreModule {
 
     @Singleton
     @Provides
-    internal fun provideConfigurationProtoDataStore(
+    internal fun provideProjectConfigurationProtoDataStore(
         appContext: Context,
-        projectConfigRealmMigration: ProjectConfigSharedPrefsMigration
+        projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration
     ): DataStore<ProtoProjectConfiguration> {
         return DataStoreFactory.create(
-            serializer = ProjectConfigSerializer,
+            serializer = ProjectConfigurationSerializer,
             produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
-            migrations = listOf(projectConfigRealmMigration)
+            migrations = listOf(projectConfigSharedPrefsMigration)
+        )
+    }
+
+    @Singleton
+    @Provides
+    internal fun provideDeviceConfigurationProtoDataStore(
+        appContext: Context,
+        deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration
+    ): DataStore<ProtoDeviceConfiguration> {
+        return DataStoreFactory.create(
+            serializer = DeviceConfigurationSerializer,
+            produceFile = { appContext.dataStoreFile(DEVICE_CONFIG_DATA_STORE_FILE_NAME) },
+            migrations = listOf(deviceConfigSharedPrefsMigration)
         )
     }
 }

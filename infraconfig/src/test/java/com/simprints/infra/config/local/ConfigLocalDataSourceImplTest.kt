@@ -5,8 +5,10 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.local.models.toDomain
-import com.simprints.infra.config.local.serializer.ProjectConfigSerializer
+import com.simprints.infra.config.local.serializer.DeviceConfigurationSerializer
+import com.simprints.infra.config.local.serializer.ProjectConfigurationSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
@@ -23,6 +25,7 @@ class ConfigLocalDataSourceImplTest {
     companion object {
         private const val TEST_PROJECT_DATASTORE_NAME: String = "test_project_datastore"
         private const val TEST_CONFIG_DATASTORE_NAME: String = "test_config_datastore"
+        private const val TEST_DEVICE_CONFIG_DATASTORE_NAME: String = "test_device_config_datastore"
     }
 
     private val testContext = InstrumentationRegistry.getInstrumentation().targetContext
@@ -31,11 +34,19 @@ class ConfigLocalDataSourceImplTest {
         produceFile = { testContext.dataStoreFile(TEST_PROJECT_DATASTORE_NAME) }
     )
     private val testProjectConfigDataStore = DataStoreFactory.create(
-        serializer = ProjectConfigSerializer,
+        serializer = ProjectConfigurationSerializer,
         produceFile = { testContext.dataStoreFile(TEST_CONFIG_DATASTORE_NAME) }
     )
+    private val testDeviceConfigDataStore = DataStoreFactory.create(
+        serializer = DeviceConfigurationSerializer,
+        produceFile = { testContext.dataStoreFile(TEST_DEVICE_CONFIG_DATASTORE_NAME) }
+    )
     private val configLocalDataSourceImpl =
-        ConfigLocalDataSourceImpl(testProjectDataStore, testProjectConfigDataStore)
+        ConfigLocalDataSourceImpl(
+            testProjectDataStore,
+            testProjectConfigDataStore,
+            testDeviceConfigDataStore
+        )
 
     @After
     fun teardown() = runTest(UnconfinedTestDispatcher()) {
@@ -77,4 +88,15 @@ class ConfigLocalDataSourceImplTest {
             val projectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
             assertThat(projectConfiguration).isEqualTo(ConfigLocalDataSourceImpl.defaultProjectConfiguration.toDomain())
         }
+
+    @Test
+    fun `should update the device configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+        configLocalDataSourceImpl.updateDeviceConfiguration {
+            it.apply { it.language = "fr" }
+        }
+        val savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+        val expectedDeviceConfiguration = DeviceConfiguration("fr", listOf())
+
+        assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
 }

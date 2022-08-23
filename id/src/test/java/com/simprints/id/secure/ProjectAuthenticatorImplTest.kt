@@ -2,9 +2,10 @@ package com.simprints.id.secure
 
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
@@ -23,7 +24,7 @@ import java.io.IOException
 class ProjectAuthenticatorImplTest {
 
     @MockK
-    private lateinit var projectRepository: ProjectRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var longConsentRepositoryMock: LongConsentRepository
@@ -36,9 +37,6 @@ class ProjectAuthenticatorImplTest {
 
     @MockK
     private lateinit var signerManager: SignerManager
-
-    @MockK
-    private lateinit var preferencesManagerMock: IdPreferencesManager
 
     @MockK
     private lateinit var loginManager: LoginManager
@@ -127,6 +125,24 @@ class ProjectAuthenticatorImplTest {
         coVerify(exactly = 1) { secureDataManager.createLocalDatabaseKeyIfMissing(PROJECT_ID) }
     }
 
+    @Test
+    fun `authenticate should fetch the correct long consents`() =
+        runTest(StandardTestDispatcher()) {
+            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+
+            coVerify(exactly = 1) { longConsentRepositoryMock.deleteLongConsents() }
+            coVerify(exactly = 1) {
+                longConsentRepositoryMock.getLongConsentResultForLanguage(
+                    LANGUAGE_1
+                )
+            }
+            coVerify(exactly = 1) {
+                longConsentRepositoryMock.getLongConsentResultForLanguage(
+                    LANGUAGE_2
+                )
+            }
+            verify(exactly = 1) { LanguageHelper.setProperty("language").value(LANGUAGE_1) }
+        }
 
     @Test
     fun safetyNetFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
@@ -145,10 +161,9 @@ class ProjectAuthenticatorImplTest {
             loginManager,
             projectSecretManager,
             secureDataManager,
-            projectRepository,
+            configManager,
             signerManager,
             longConsentRepositoryMock,
-            preferencesManagerMock,
         )
     }
 
@@ -163,7 +178,6 @@ class ProjectAuthenticatorImplTest {
             PUBLIC_KEY,
             ""
         )
-        every { preferencesManagerMock.projectLanguages } returns emptyArray()
         coEvery {
             loginManager.requestAuthToken(
                 PROJECT_ID,
@@ -171,8 +185,21 @@ class ProjectAuthenticatorImplTest {
                 any()
             )
         } returns Token("", "", "", "")
-        coEvery { projectRepository.fetchProjectConfigurationAndSave(any()) } returns mockk()
-        every { preferencesManagerMock.projectLanguages } returns emptyArray()
+        coEvery { configManager.refreshProjectConfiguration(PROJECT_ID) } returns ProjectConfiguration(
+            PROJECT_ID,
+            general = GeneralConfiguration(
+                mockk(),
+                languageOptions = listOf(LANGUAGE_1, LANGUAGE_2),
+                defaultLanguage = LANGUAGE_1,
+                mockk(),
+                mockk(),
+            ),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+        )
         every { loginManager.requestAttestation(any()) } returns "google_attestation"
         LanguageHelper.prefs = mockk(relaxed = true)
     }
@@ -184,6 +211,8 @@ class ProjectAuthenticatorImplTest {
         private const val USER_ID = "user_id"
         private const val PROJECT_SECRET = "encrypted_project_secret"
         private const val DEVICE_ID = "device_id"
+        private const val LANGUAGE_1 = "en"
+        private const val LANGUAGE_2 = "fr"
     }
 
 }

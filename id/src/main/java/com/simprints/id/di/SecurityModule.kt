@@ -9,10 +9,8 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
@@ -75,18 +73,16 @@ open class SecurityModule {
         loginManager: LoginManager,
         projectSecretManager: ProjectSecretManager,
         secureDataManager: SecurityManager,
-        projectRepository: ProjectRepository,
+        configManager: ConfigManager,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: IdPreferencesManager,
     ): ProjectAuthenticator = ProjectAuthenticatorImpl(
         loginManager,
         projectSecretManager,
         secureDataManager,
-        projectRepository,
+        configManager,
         signerManager,
         longConsentRepository,
-        preferencesManager,
     )
 
     @Provides

@@ -24,7 +24,6 @@ import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
@@ -32,8 +31,6 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.network.ImageUrlProvider
-import com.simprints.id.network.ImageUrlProviderImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
 import com.simprints.id.orchestrator.PersonCreationEventHelper
@@ -85,15 +82,6 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
-
-    @Provides
-    open fun provideImageUrlProvider(
-        projectLocalDataSource: ProjectLocalDataSource,
-        loginManager: LoginManager
-    ): ImageUrlProvider = ImageUrlProviderImpl(
-        projectLocalDataSource,
-        loginManager
-    )
 
     @Provides
     @Singleton

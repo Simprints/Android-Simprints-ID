@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager

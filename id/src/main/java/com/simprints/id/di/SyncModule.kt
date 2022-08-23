@@ -19,7 +19,6 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -179,13 +178,13 @@ open class SyncModule {
         eventRepository: com.simprints.eventsystem.event.EventRepository,
         eventUpSyncScopeRepo: EventUpSyncScopeRepository,
         timerHelper: TimeHelper,
-        settingsPreferencesManager: SettingsPreferencesManager
+        configManager: ConfigManager
     ): EventUpSyncHelper =
         EventUpSyncHelperImpl(
             eventRepository,
             eventUpSyncScopeRepo,
             timerHelper,
-            settingsPreferencesManager
+            configManager
         )
 
     @Provides

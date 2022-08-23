@@ -1,5 +1,6 @@
 package com.simprints.infra.config
 
+import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 
@@ -17,12 +18,22 @@ interface ConfigManager {
     /**
      * get the project configuration locally
      */
-    suspend fun getConfiguration(): ProjectConfiguration
+    suspend fun getProjectConfiguration(): ProjectConfiguration
 
     /**
      * fetch the latest configuration of the project and save it locally
      */
-    suspend fun refreshConfiguration(projectId: String): ProjectConfiguration
+    suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration
+
+    /**
+     * fetch the current device configuration.
+     */
+    suspend fun getDeviceConfiguration(): DeviceConfiguration
+
+    /**
+     * update the device configuration
+     */
+    suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
 
     fun scheduleSyncConfiguration()
     fun cancelScheduledSyncConfiguration()

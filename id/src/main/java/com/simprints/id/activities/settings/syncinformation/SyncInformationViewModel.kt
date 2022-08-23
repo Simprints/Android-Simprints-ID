@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_DELETION
 import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_V2
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class SyncInformationViewModel(
     private val downySyncHelper: EventDownSyncHelper,
-    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val eventRepository: EventRepository,
     private val subjectRepository: SubjectRepository,
     private val preferencesManager: IdPreferencesManager,
     private val projectId: String,

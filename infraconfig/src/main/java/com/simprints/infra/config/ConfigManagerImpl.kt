@@ -1,10 +1,10 @@
 package com.simprints.infra.config
 
 import com.simprints.infra.config.domain.ConfigService
+import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.worker.ConfigurationScheduler
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
@@ -19,11 +19,17 @@ internal class ConfigManagerImpl @Inject constructor(
     override suspend fun getProject(projectId: String): Project =
         configRepository.getProject(projectId)
 
-    override suspend fun getConfiguration(): ProjectConfiguration =
+    override suspend fun getProjectConfiguration(): ProjectConfiguration =
         configRepository.getConfiguration()
 
-    override suspend fun refreshConfiguration(projectId: String): ProjectConfiguration =
+    override suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration =
         configRepository.refreshConfiguration(projectId)
+
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
+        configRepository.getDeviceConfiguration()
+
+    override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
+        configRepository.updateDeviceConfiguration(update)
 
     override fun scheduleSyncConfiguration() =
         configurationScheduler.scheduleSync()
