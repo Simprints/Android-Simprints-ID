@@ -20,7 +20,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
@@ -43,7 +43,7 @@ class TestSecurityModule(
         securityStateScheduler: SecurityStateScheduler,
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
-        baseUrlProvider: BaseUrlProvider,
+        simNetwork: SimNetwork,
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
@@ -55,7 +55,7 @@ class TestSecurityModule(
             securityStateScheduler,
             longConsentRepository,
             eventRepository,
-            baseUrlProvider,
+            simNetwork,
             remoteConfigWrapper
         )
     }

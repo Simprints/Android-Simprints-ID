@@ -19,6 +19,7 @@ import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsF
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
 import com.simprints.eventsystem.event.local.*
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
@@ -53,6 +54,7 @@ import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -143,10 +145,12 @@ open class AppModule {
     @Provides
     fun provideModuleRepository(
         preferencesManager: IdPreferencesManager,
-        subjectRepository: SubjectRepository
+        subjectRepository: SubjectRepository,
+        eventDownSyncScopeRepository: EventDownSyncScopeRepository
     ): ModuleRepository = ModuleRepositoryImpl(
         preferencesManager,
-        subjectRepository
+        subjectRepository,
+        eventDownSyncScopeRepository
     )
 
     @Provides
@@ -215,7 +219,7 @@ open class AppModule {
     @Provides
     @Named("EncryptedSharedPreferences")
     open fun provideEncryptedSharedPreferences(builder: SecurityManager): SharedPreferences =
-        builder.buildEncryptedSharedPreferences()
+        builder.buildEncryptedSharedPreferences(GLOBAL_SHARED_PREFS_FILENAME)
 
     @Provides
     fun provideHotCache(

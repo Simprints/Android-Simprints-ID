@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.core.analytics.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
@@ -29,7 +29,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.network.url.BaseUrlProvider
+import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 
 class LoginActivity : BaseSplitActivity() {
@@ -43,7 +43,7 @@ class LoginActivity : BaseSplitActivity() {
     lateinit var loginActivityHelper: LoginActivityHelper
 
     @Inject
-    lateinit var baseUrlProvider: BaseUrlProvider
+    lateinit var simNetwork: SimNetwork
 
     private val loginActRequest: LoginActivityRequest by lazy {
         intent.extras?.getParcelable<LoginActivityRequest>(LoginActivityRequest.BUNDLE_KEY)
@@ -59,7 +59,7 @@ class LoginActivity : BaseSplitActivity() {
 
         setContentView(binding.root)
 
-        baseUrlProvider.resetApiBaseUrl()
+        simNetwork.resetApiBaseUrl()
         viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
         observeSignInResult()
@@ -146,7 +146,7 @@ class LoginActivity : BaseSplitActivity() {
             Simber.d("QR code response: $qrCodeResponse")
             val projectId = qrCodeResponse.projectId
             val projectSecret = qrCodeResponse.projectSecret
-            baseUrlProvider.setApiBaseUrl(qrCodeResponse.apiBaseUrl)
+            simNetwork.setApiBaseUrl(qrCodeResponse.apiBaseUrl)
 
             updateProjectInfoOnTextFields(projectId, projectSecret)
             logMessageForCrashReport("QR scanning successful")

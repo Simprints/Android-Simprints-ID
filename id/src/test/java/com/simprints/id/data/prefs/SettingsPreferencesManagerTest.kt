@@ -6,8 +6,7 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_DEFAULT
 import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.prefs.settings.*
 import com.simprints.id.data.prefs.settings.fingerprint.models.FingerComparisonStrategy
 import com.simprints.id.domain.SimprintsSyncSetting
 import com.simprints.id.testtools.TestApplication
@@ -23,6 +22,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import javax.inject.Inject
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -96,7 +97,7 @@ class SettingsPreferencesManagerTest {
     }
 
     @Test
-    fun fetchingSimprintsSyncReturnsall() {
+    fun fetchingSimprintsSyncReturnsAll() {
         val simprintsSyncSetting = settingsPreferencesManager.simprintsSyncSetting
 
         assertThat(simprintsSyncSetting).isEqualTo(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_SETTINGS_DEFAULT)
@@ -115,6 +116,24 @@ class SettingsPreferencesManagerTest {
         val syncSetting = settingsPreferencesManager.simprintsSyncSetting
 
         assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ONLY_BIOMETRICS)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsOnlyAnalytics() {
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "ONLY_ANALYTICS"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_ONLY_ANALYTICS)
+    }
+
+    @Test
+    fun fetchingSimprintsSyncReturnsNone() {
+        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY) } returns "NONE"
+
+        val syncSetting = settingsPreferencesManager.simprintsSyncSetting
+
+        assertThat(syncSetting).isEqualTo(SimprintsSyncSetting.SIM_SYNC_NONE)
     }
 
     @Test
@@ -160,7 +179,6 @@ class SettingsPreferencesManagerTest {
         )
         settingsPreferencesManager.fingerComparisonStrategy =
             NON_DEFAULT_FINGERS_COMPARISON_STRATEGY
-
     }
 
     @Test
@@ -175,11 +193,88 @@ class SettingsPreferencesManagerTest {
 
     @Test
     fun fetchingOverridableRemoteConfigFingerIdMap_worksForNonDefaultValue() {
-        every { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_KEY) } returns NON_DEFAULT_FINGERS_TO_COLLECT_SERIALIZED
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGERPRINTS_TO_COLLECT_KEY)
+        } returns NON_DEFAULT_FINGERS_TO_COLLECT_SERIALIZED
 
         val fingerStatus = settingsPreferencesManager.fingerprintsToCollect
 
         assertThat(NON_DEFAULT_FINGERS_TO_COLLECT).isEqualTo(fingerStatus)
+    }
+
+    @Test
+    fun simprintsSyncSettingNone_returnsCorrectValuesForConvenienceMethods() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
+        } returns "NONE"
+
+        assertFalse { settingsPreferencesManager.canSyncDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncAllDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
+    }
+
+    @Test
+    fun simprintsSyncSettingAll_returnsCorrectValuesForConvenienceMethods() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
+        } returns "ALL"
+
+        assertTrue { settingsPreferencesManager.canSyncDataToSimprints() }
+        assertTrue { settingsPreferencesManager.canSyncAllDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
+    }
+
+    @Test
+    fun simprintsSyncSettingBiometrics_returnsCorrectValuesForConvenienceMethods() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
+        } returns "ONLY_BIOMETRICS"
+
+        assertTrue { settingsPreferencesManager.canSyncDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncAllDataToSimprints() }
+        assertTrue { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
+    }
+
+    @Test
+    fun simprintsSyncSettingAnalytics_returnsCorrectValuesForConvenienceMethods() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
+        } returns "ONLY_ANALYTICS"
+
+        assertTrue { settingsPreferencesManager.canSyncDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncAllDataToSimprints() }
+        assertFalse { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
+        assertTrue { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
+    }
+
+    @Test
+    fun simprintsCanDownSyncEvents_returnsFalseWhenOFF() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.PEOPLE_DOWN_SYNC_SETTING_KEY)
+        } returns "OFF"
+
+        assertFalse { settingsPreferencesManager.canDownSyncEvents() }
+    }
+
+    @Test
+    fun simprintsCanDownSyncEvents_returnsTrueWhenON() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.PEOPLE_DOWN_SYNC_SETTING_KEY)
+        } returns "ON"
+
+        assertTrue { settingsPreferencesManager.canDownSyncEvents() }
+    }
+
+    @Test
+    fun simprintsCanDownSyncEvents_returnsTrueWhenEXTRA() {
+        every {
+            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.PEOPLE_DOWN_SYNC_SETTING_KEY)
+        } returns "EXTRA"
+
+        assertTrue { settingsPreferencesManager.canDownSyncEvents() }
     }
 
     companion object {

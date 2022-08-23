@@ -22,8 +22,8 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.Succeeded
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
+import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
@@ -46,7 +46,7 @@ class SyncInformationViewModelTest {
     private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @MockK
-    lateinit var downySyncHelper: EventDownSyncHelper
+    lateinit var downSyncHelper: EventDownSyncHelper
 
     @MockK
     lateinit var eventRepository: EventRepository
@@ -76,7 +76,7 @@ class SyncInformationViewModelTest {
         UnitTestConfig().coroutinesMainThread()
         mockkStatic("com.simprints.id.data.prefs.settings.SettingsPreferencesManagerKt")
         viewModel = SyncInformationViewModel(
-            downySyncHelper,
+            downSyncHelper,
             eventRepository,
             subjectRepository,
             preferencesManager,
@@ -131,7 +131,7 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
         coEvery { subjectRepository.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
-        coEvery { downySyncHelper.countForDownSync(any()) } returns listOf(
+        coEvery { downSyncHelper.countForDownSync(any()) } returns listOf(
             EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
             EventCount(ENROLMENT_RECORD_DELETION, countInRemoteForDelete),
             EventCount(ENROLMENT_RECORD_MOVE, countInRemoteForMove)
@@ -233,8 +233,43 @@ class SyncInformationViewModelTest {
         every { imageRepository.getNumberOfImagesToUpload() } returns 0
 
         viewModel.fetchSyncInformation()
-        verify(exactly = 1) { preferencesManager.selectedModules }
+        verify(exactly = 2) { preferencesManager.selectedModules }
         verify(exactly = 0) { preferencesManager.moduleIdOptions }
+    }
+
+    @Test
+    fun fetchSyncInformationIfNeeded_fetchesWhenWorkersAreDone() {
+        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
+            buildSubjectsSyncState(Succeeded)
+        )
+        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
+
+        viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
+        coVerify(exactly = 2) { subjectRepository.count(any()) }
+    }
+
+    @Test
+    fun fetchSyncInformationIfNeeded_doesNotFetchWhenWorkersAreNotDone() {
+        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
+            buildInProgressSyncState()
+        )
+        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
+
+        viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
+        coVerify(exactly = 0) { subjectRepository.count(any()) }
+    }
+
+    @Test
+    fun fetchSyncInformationIfNeeded_fetchesOnlyOnceWhenConsecutiveCallsWithSameSyncState() {
+        every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
+            buildSubjectsSyncState(Succeeded)
+        )
+        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
+
+        viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
+        viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
+        viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
+        coVerify(exactly = 2) { subjectRepository.count(any()) }
     }
 
     private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =
@@ -242,9 +277,20 @@ class SyncInformationViewModelTest {
             syncId = "sync_id", progress = 1, total = 20,
             upSyncWorkersInfo = listOf(),
             downSyncWorkersInfo = listOf(
-                SyncWorkerInfo(
-                    DOWNLOADER, syncWorkerState
-                )
+                SyncWorkerInfo(DOWNLOADER, syncWorkerState)
+            )
+        )
+
+    private fun buildInProgressSyncState() =
+        EventSyncState(
+            syncId = "sync_id", progress = 1, total = 20,
+            upSyncWorkersInfo = listOf(
+                SyncWorkerInfo(UP_COUNTER, Succeeded),
+                SyncWorkerInfo(UPLOADER, Enqueued)
+            ),
+            downSyncWorkersInfo = listOf(
+                SyncWorkerInfo(DOWN_COUNTER, Succeeded),
+                SyncWorkerInfo(DOWNLOADER, Running)
             )
         )
 
