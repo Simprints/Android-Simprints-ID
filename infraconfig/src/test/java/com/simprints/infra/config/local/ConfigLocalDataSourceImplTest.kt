@@ -73,14 +73,44 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should save the project configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
-        val projectConfigurationToSave = projectConfiguration
+    fun `should save the project configuration and update the device configuration correctly`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val projectConfigurationToSave = projectConfiguration
 
-        configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
-        val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+            configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
+            val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+            val updatedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+            val expectedDeviceConfiguration = DeviceConfiguration(
+                language = projectConfiguration.general.defaultLanguage,
+                moduleSelected = listOf(),
+                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture
+            )
+            assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
+            assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+        }
 
-        assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
-    }
+    @Test
+    fun `should save the project configuration and only update the device configuration fingersToCollect if the device configuration has been overwritten`() =
+        runTest(UnconfinedTestDispatcher()) {
+            configLocalDataSourceImpl.updateDeviceConfiguration {
+                it.apply {
+                    it.language = "fr"
+                    it.moduleSelected = listOf("module1")
+                }
+            }
+            val projectConfigurationToSave = projectConfiguration
+
+            configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
+            val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+            val updatedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+            val expectedDeviceConfiguration = DeviceConfiguration(
+                language = "fr",
+                moduleSelected = listOf("module1"),
+                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture
+            )
+            assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
+            assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+        }
 
     @Test
     fun `should return the default configuration when there is not configuration saved`() =
@@ -95,7 +125,7 @@ class ConfigLocalDataSourceImplTest {
             it.apply { it.language = "fr" }
         }
         val savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
-        val expectedDeviceConfiguration = DeviceConfiguration("fr", listOf())
+        val expectedDeviceConfiguration = DeviceConfiguration("fr", listOf(), listOf())
 
         assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }

@@ -86,7 +86,7 @@ internal data class OldProjectConfig(
         else
             FingerprintConfiguration(
                 fingersToCapture = FingerprintsToCollect!!.split(",")
-                    .map { FingerprintConfiguration.Finger.valueOf(it) },
+                    .map { Finger.valueOf(it) },
                 qualityThreshold = FingerprintQualityThreshold.toInt(),
                 decisionPolicy = parseDecisionPolicy(FingerprintConfidenceThresholds!!),
                 allowedVeroGenerations = ScannerGenerations!!.split(",")

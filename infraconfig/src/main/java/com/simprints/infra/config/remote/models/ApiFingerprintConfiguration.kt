@@ -2,6 +2,7 @@ package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.domain.models.Finger as DomainFingerprint
 
 @Keep
 internal data class ApiFingerprintConfiguration(
@@ -38,18 +39,18 @@ internal data class ApiFingerprintConfiguration(
         RIGHT_4TH_FINGER,
         RIGHT_5TH_FINGER;
 
-        fun toDomain(): FingerprintConfiguration.Finger =
+        fun toDomain(): DomainFingerprint =
             when (this) {
-                LEFT_THUMB -> FingerprintConfiguration.Finger.LEFT_THUMB
-                LEFT_INDEX_FINGER -> FingerprintConfiguration.Finger.LEFT_INDEX_FINGER
-                LEFT_3RD_FINGER -> FingerprintConfiguration.Finger.LEFT_3RD_FINGER
-                LEFT_4TH_FINGER -> FingerprintConfiguration.Finger.LEFT_4TH_FINGER
-                LEFT_5TH_FINGER -> FingerprintConfiguration.Finger.LEFT_5TH_FINGER
-                RIGHT_THUMB -> FingerprintConfiguration.Finger.RIGHT_THUMB
-                RIGHT_INDEX_FINGER -> FingerprintConfiguration.Finger.RIGHT_INDEX_FINGER
-                RIGHT_3RD_FINGER -> FingerprintConfiguration.Finger.RIGHT_3RD_FINGER
-                RIGHT_4TH_FINGER -> FingerprintConfiguration.Finger.RIGHT_4TH_FINGER
-                RIGHT_5TH_FINGER -> FingerprintConfiguration.Finger.RIGHT_5TH_FINGER
+                LEFT_THUMB -> DomainFingerprint.LEFT_THUMB
+                LEFT_INDEX_FINGER -> DomainFingerprint.LEFT_INDEX_FINGER
+                LEFT_3RD_FINGER -> DomainFingerprint.LEFT_3RD_FINGER
+                LEFT_4TH_FINGER -> DomainFingerprint.LEFT_4TH_FINGER
+                LEFT_5TH_FINGER -> DomainFingerprint.LEFT_5TH_FINGER
+                RIGHT_THUMB -> DomainFingerprint.RIGHT_THUMB
+                RIGHT_INDEX_FINGER -> DomainFingerprint.RIGHT_INDEX_FINGER
+                RIGHT_3RD_FINGER -> DomainFingerprint.RIGHT_3RD_FINGER
+                RIGHT_4TH_FINGER -> DomainFingerprint.RIGHT_4TH_FINGER
+                RIGHT_5TH_FINGER -> DomainFingerprint.RIGHT_5TH_FINGER
             }
     }
 

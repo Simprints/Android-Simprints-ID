@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.testtools.protoProjectConfiguration
 import com.simprints.infra.login.LoginManager
@@ -339,9 +340,9 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val PROTO_FINGERPRINT_CONFIGURATION = ProtoFingerprintConfiguration.newBuilder()
             .addAllFingersToCapture(
                 listOf(
-                    ProtoFingerprintConfiguration.Finger.LEFT_INDEX_FINGER,
-                    ProtoFingerprintConfiguration.Finger.LEFT_INDEX_FINGER,
-                    ProtoFingerprintConfiguration.Finger.LEFT_THUMB
+                    ProtoFinger.LEFT_INDEX_FINGER,
+                    ProtoFinger.LEFT_INDEX_FINGER,
+                    ProtoFinger.LEFT_THUMB
                 )
             )
             .setQualityThreshold(60)

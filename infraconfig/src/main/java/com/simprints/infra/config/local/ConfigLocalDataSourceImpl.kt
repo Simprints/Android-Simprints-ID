@@ -11,8 +11,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     private val projectDataStore: DataStore<ProtoProject>,
     private val configDataStore: DataStore<ProtoProjectConfiguration>,
     private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>
-) :
-    ConfigLocalDataSource {
+) : ConfigLocalDataSource {
+
     override suspend fun saveProject(project: Project) {
         projectDataStore.updateData { project.toProto() }
     }
@@ -26,6 +26,27 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
     override suspend fun saveProjectConfiguration(config: ProjectConfiguration) {
         configDataStore.updateData { config.toProto() }
+        // We need to update the device configuration only for the non overwritten fields
+        deviceConfigDataStore.updateData { protoDeviceConfiguration ->
+            protoDeviceConfiguration.let {
+                val proto = it.toBuilder()
+                if (!protoDeviceConfiguration.language.isOverwritten) {
+                    proto
+                        .setLanguage(
+                            it.language.toBuilder().setLanguage(config.general.defaultLanguage)
+                        ).build()
+                }
+                if (!protoDeviceConfiguration.fingersToCollect.isOverwritten) {
+                    proto.setFingersToCollect(
+                        it.fingersToCollect
+                            .toBuilder()
+                            .addAllFingersToCollect(config.fingerprint?.fingersToCapture?.map { finger -> finger.toProto() }
+                                ?: listOf())
+                    ).build()
+                }
+                proto.build()
+            }
+        }
     }
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration =
@@ -35,7 +56,27 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         deviceConfigDataStore.data.first().toDomain()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
-        deviceConfigDataStore.updateData { update(it.toDomain()).toProto() }
+        deviceConfigDataStore.updateData { currentData ->
+            val updatedProto = update(currentData.toDomain()).toProto()
+            currentData
+                .toBuilder()
+                .mergeFrom(updatedProto)
+                .build()
+                .let {
+                    // We need to mark the fields that have been updated has overwritten to not
+                    // change them next time we refresh the project configuration.
+                    val proto = it.toBuilder()
+                    if (updatedProto.language.language != currentData.language.language) {
+                        proto.setLanguage(it.language.toBuilder().setIsOverwritten(true))
+                    }
+                    if (updatedProto.fingersToCollect.fingersToCollectList != currentData.fingersToCollect.fingersToCollectList) {
+                        proto.setFingersToCollect(
+                            it.fingersToCollect.toBuilder().setIsOverwritten(true)
+                        )
+                    }
+                    proto.build()
+                }
+        }
     }
 
     companion object {
@@ -52,8 +93,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 face = null,
                 fingerprint = FingerprintConfiguration(
                     fingersToCapture = listOf(
-                        FingerprintConfiguration.Finger.LEFT_THUMB,
-                        FingerprintConfiguration.Finger.LEFT_INDEX_FINGER
+                        Finger.LEFT_THUMB,
+                        Finger.LEFT_INDEX_FINGER
                     ),
                     qualityThreshold = 60,
                     decisionPolicy = DecisionPolicy(0, 0, 700),

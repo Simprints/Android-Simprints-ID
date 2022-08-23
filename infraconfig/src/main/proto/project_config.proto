@@ -39,26 +39,13 @@ message ProtoFaceConfiguration {
 }
 
 message ProtoFingerprintConfiguration {
-    repeated Finger fingers_to_capture = 1;
+    repeated ProtoFinger fingers_to_capture = 1;
     int32 quality_threshold = 2;
     ProtoDecisionPolicy decision_policy = 3;
     repeated VeroGeneration allowed_vero_generations = 4;
     FingerComparisonStrategy comparison_strategy_for_verification = 5;
     bool display_hand_icons = 6;
     optional ProtoVero2Configuration vero_2 = 7;
-
-    enum Finger {
-        LEFT_THUMB = 0;
-        LEFT_INDEX_FINGER = 1;
-        LEFT_3RD_FINGER = 2;
-        LEFT_4TH_FINGER = 3;
-        LEFT_5TH_FINGER = 4;
-        RIGHT_THUMB = 5;
-        RIGHT_INDEX_FINGER = 6;
-        RIGHT_3RD_FINGER = 7;
-        RIGHT_4TH_FINGER = 8;
-        RIGHT_5TH_FINGER = 9;
-    }
 
     enum VeroGeneration {
         VERO_1 = 0;
@@ -180,4 +167,17 @@ message ProtoDecisionPolicy {
     int32 low = 1;
     int32 medium = 2;
     int32 high = 3;
+}
+
+enum ProtoFinger {
+    LEFT_THUMB = 0;
+    LEFT_INDEX_FINGER = 1;
+    LEFT_3RD_FINGER = 2;
+    LEFT_4TH_FINGER = 3;
+    LEFT_5TH_FINGER = 4;
+    RIGHT_THUMB = 5;
+    RIGHT_INDEX_FINGER = 6;
+    RIGHT_3RD_FINGER = 7;
+    RIGHT_4TH_FINGER = 8;
+    RIGHT_5TH_FINGER = 9;
 }

@@ -1,6 +1,7 @@
 package com.simprints.infra.config.local.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.config.testtools.fingerprintConfiguration
 import com.simprints.infra.config.testtools.protoFingerprintConfiguration
@@ -17,16 +18,16 @@ class FingerprintConfigurationTest {
     @Test
     fun `should map correctly the Finger enums`() {
         val mapping = mapOf(
-            ProtoFingerprintConfiguration.Finger.LEFT_THUMB to FingerprintConfiguration.Finger.LEFT_THUMB,
-            ProtoFingerprintConfiguration.Finger.LEFT_INDEX_FINGER to FingerprintConfiguration.Finger.LEFT_INDEX_FINGER,
-            ProtoFingerprintConfiguration.Finger.LEFT_3RD_FINGER to FingerprintConfiguration.Finger.LEFT_3RD_FINGER,
-            ProtoFingerprintConfiguration.Finger.LEFT_4TH_FINGER to FingerprintConfiguration.Finger.LEFT_4TH_FINGER,
-            ProtoFingerprintConfiguration.Finger.LEFT_5TH_FINGER to FingerprintConfiguration.Finger.LEFT_5TH_FINGER,
-            ProtoFingerprintConfiguration.Finger.RIGHT_THUMB to FingerprintConfiguration.Finger.RIGHT_THUMB,
-            ProtoFingerprintConfiguration.Finger.RIGHT_INDEX_FINGER to FingerprintConfiguration.Finger.RIGHT_INDEX_FINGER,
-            ProtoFingerprintConfiguration.Finger.RIGHT_3RD_FINGER to FingerprintConfiguration.Finger.RIGHT_3RD_FINGER,
-            ProtoFingerprintConfiguration.Finger.RIGHT_4TH_FINGER to FingerprintConfiguration.Finger.RIGHT_4TH_FINGER,
-            ProtoFingerprintConfiguration.Finger.RIGHT_5TH_FINGER to FingerprintConfiguration.Finger.RIGHT_5TH_FINGER,
+            ProtoFinger.LEFT_THUMB to Finger.LEFT_THUMB,
+            ProtoFinger.LEFT_INDEX_FINGER to Finger.LEFT_INDEX_FINGER,
+            ProtoFinger.LEFT_3RD_FINGER to Finger.LEFT_3RD_FINGER,
+            ProtoFinger.LEFT_4TH_FINGER to Finger.LEFT_4TH_FINGER,
+            ProtoFinger.LEFT_5TH_FINGER to Finger.LEFT_5TH_FINGER,
+            ProtoFinger.RIGHT_THUMB to Finger.RIGHT_THUMB,
+            ProtoFinger.RIGHT_INDEX_FINGER to Finger.RIGHT_INDEX_FINGER,
+            ProtoFinger.RIGHT_3RD_FINGER to Finger.RIGHT_3RD_FINGER,
+            ProtoFinger.RIGHT_4TH_FINGER to Finger.RIGHT_4TH_FINGER,
+            ProtoFinger.RIGHT_5TH_FINGER to Finger.RIGHT_5TH_FINGER,
         )
 
         mapping.forEach {
