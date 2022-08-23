@@ -2,6 +2,7 @@ package com.simprints.clientapi.activities.commcare
 
 import android.content.Intent
 import android.os.Bundle
+import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
@@ -43,7 +44,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         get() = buildCommCareAction(intent.action)
 
     @Inject
-    override lateinit var presenter: CommCareContract.Presenter
+    lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
+
+    override val presenter: CommCareContract.Presenter = presenterFactory.create(this, action)
 
     override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
         parametersOf(this)
@@ -129,7 +132,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?) =
+    override fun returnConfirmation(
+        flowCompletedCheck: Boolean,
+        sessionId: String,
+        eventsJson: String?
+    ) =
         Intent().let {
             val data = Bundle().apply {
                 putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
@@ -144,7 +151,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     /**
      * Not being used because CommCare might use CoSync. Next method does the same but with a nullable eventsJson.
      */
-    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String) {
+    override fun returnErrorToClient(
+        errorResponse: ErrorResponse,
+        flowCompletedCheck: Boolean,
+        sessionId: String
+    ) {
         throw InvalidStateForIntentAction("Use the overloaded version with eventsJson")
     }
 
