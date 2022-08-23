@@ -21,12 +21,12 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override suspend fun cleanUp() {
-        Simber.i("Migration of configuration to Datastore done")
+        Simber.i("Migration of project configuration to Datastore done")
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.i("Start migration of configuration to Datastore")
+        Simber.i("Start migration of project configuration to Datastore")
         val projectSettingsJson = prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 

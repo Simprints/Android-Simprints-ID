@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.core.domain.common.GROUP
@@ -130,36 +129,36 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.recordsInLocal.observe(this, Observer {
+        viewModel.recordsInLocal.observe(this) {
             binding.totalRecordsCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
-        })
+        }
 
-        viewModel.recordsToUpSync.observe(this, Observer {
+        viewModel.recordsToUpSync.observe(this) {
             binding.recordsToUploadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToUploadCount, binding.recordsToUploadProgress)
-        })
+        }
 
-        viewModel.imagesToUpload.observe(this, Observer {
+        viewModel.imagesToUpload.observe(this) {
             binding.imagesToUploadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.imagesToUploadCount, binding.imagesToUploadProgress)
-        })
+        }
 
-        viewModel.recordsToDownSync.observe(this, Observer {
+        viewModel.recordsToDownSync.observe(this) {
             binding.recordsToDownloadCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
-        })
+        }
 
-        viewModel.recordsToDelete.observe(this, Observer {
+        viewModel.recordsToDelete.observe(this) {
             binding.recordsToDeleteCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
-        })
+        }
 
-        viewModel.moduleCounts.observe(this, Observer {
+        viewModel.moduleCounts.observe(this) {
             it?.let {
                 addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
             }
-        })
+        }
     }
 
     private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {

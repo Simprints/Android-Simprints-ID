@@ -11,12 +11,6 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.ProjectRepositoryImpl
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.SubjectRepositoryImpl
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
@@ -31,8 +25,7 @@ import com.simprints.id.data.license.remote.LicenseRemoteDataSource
 import com.simprints.id.data.license.remote.LicenseRemoteDataSourceImpl
 import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.license.repository.LicenseRepositoryImpl
-import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.network.ImageUrlProvider
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import dagger.Module
@@ -48,32 +41,6 @@ open class DataModule {
         loginManager: LoginManager,
         jsonHelper: JsonHelper
     ): EventRemoteDataSource = EventRemoteDataSourceImpl(loginManager, jsonHelper)
-
-    @Provides
-    open fun provideProjectLocalDataSource(
-        realmWrapper: RealmWrapper
-    ): ProjectLocalDataSource = ProjectLocalDataSourceImpl(
-        realmWrapper
-    )
-
-    @Provides
-    @Singleton
-    open fun provideProjectRemoteDataSource(
-        loginManager: LoginManager,
-    ): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(
-        loginManager
-    )
-
-    @Provides
-    open fun provideProjectRepository(
-        projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): ProjectRepository = ProjectRepositoryImpl(
-        projectLocalDataSource,
-        projectRemoteDataSource,
-        remoteConfigWrapper
-    )
 
     @Provides
     open fun provideSubjectRepository(
@@ -104,9 +71,9 @@ open class DataModule {
     @Provides
     open fun provideImageRepository(
         context: Context,
-        imageUrlProvider: ImageUrlProvider,
+        configManager: ConfigManager,
         loginManager: LoginManager
-    ): ImageRepository = ImageRepositoryImpl(context, imageUrlProvider, loginManager)
+    ): ImageRepository = ImageRepositoryImpl(context, configManager, loginManager)
 
     @Provides
     open fun provideLongConsentLocalDataSource(

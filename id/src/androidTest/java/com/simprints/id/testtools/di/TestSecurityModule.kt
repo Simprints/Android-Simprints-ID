@@ -6,8 +6,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.SecurityModule
 import com.simprints.id.secure.AuthenticationHelper
@@ -20,6 +18,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.security.SecurityManager
@@ -36,7 +35,7 @@ class TestSecurityModule(
 ) : SecurityModule() {
 
     override fun provideSignerManager(
-        projectRepository: ProjectRepository,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
@@ -48,7 +47,7 @@ class TestSecurityModule(
         remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
-            projectRepository,
+            configManager,
             loginManager,
             preferencesManager,
             eventSyncManager,
@@ -74,20 +73,18 @@ class TestSecurityModule(
         loginManager: LoginManager,
         projectSecretManager: ProjectSecretManager,
         secureDataManager: SecurityManager,
-        projectRepository: ProjectRepository,
+        configManager: ConfigManager,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: IdPreferencesManager,
     ): ProjectAuthenticator {
         return projectAuthenticatorRule.resolveDependency {
             super.provideProjectAuthenticator(
                 loginManager,
                 projectSecretManager,
                 secureDataManager,
-                projectRepository,
+                configManager,
                 signerManager,
                 longConsentRepository,
-                preferencesManager,
             )
         }
     }

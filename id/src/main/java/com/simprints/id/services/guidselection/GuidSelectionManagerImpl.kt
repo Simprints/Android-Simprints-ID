@@ -2,6 +2,7 @@ package com.simprints.id.services.guidselection
 
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
@@ -13,7 +14,7 @@ class GuidSelectionManagerImpl(
     val deviceId: String,
     val loginManager: LoginManager,
     private val timerHelper: TimeHelper,
-    val eventRepository: com.simprints.eventsystem.event.EventRepository
+    val eventRepository: EventRepository
 ) : GuidSelectionManager {
 
     override suspend fun handleConfirmIdentityRequest(request: GuidSelectionRequest) {

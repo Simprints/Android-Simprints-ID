@@ -143,7 +143,7 @@ class DebugActivity : BaseSplitActivity() {
         binding.syncConfig.setOnClickListener {
             binding.logs.append("\nGetting Configs from BFSID")
             runBlocking {
-                configManager.refreshConfiguration(loginManager.signedInProjectId)
+                configManager.refreshProjectConfiguration(loginManager.signedInProjectId)
             }
             binding.logs.append("\nGot Configs from BFSID")
         }

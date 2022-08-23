@@ -75,7 +75,7 @@ open class EventSyncMasterWorker(
         return withContext(dispatcher.io()) {
             try {
                 crashlyticsLog("Start")
-                val configuration = configManager.getConfiguration()
+                val configuration = configManager.getProjectConfiguration()
 
                 if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed()) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
@@ -127,7 +127,7 @@ open class EventSyncMasterWorker(
     }
 
     private suspend fun isEventDownSyncAllowed() =
-        with(configManager.getConfiguration().synchronization) {
+        with(configManager.getProjectConfiguration().synchronization) {
             frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
         }
 

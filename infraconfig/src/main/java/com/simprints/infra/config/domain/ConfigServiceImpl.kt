@@ -1,5 +1,6 @@
 package com.simprints.infra.config.domain
 
+import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.local.ConfigLocalDataSource
@@ -34,4 +35,10 @@ internal class ConfigServiceImpl @Inject constructor(
         remoteDataSource.getConfiguration(projectId).also {
             localDataSource.saveProjectConfiguration(it)
         }
+
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
+        localDataSource.getDeviceConfiguration()
+
+    override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
+        localDataSource.updateDeviceConfiguration(update)
 }
