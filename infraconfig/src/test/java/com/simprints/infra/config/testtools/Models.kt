@@ -106,7 +106,7 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
 )
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
-    listOf(FingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+    listOf(Finger.LEFT_3RD_FINGER),
     10,
     decisionPolicy,
     listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
@@ -116,7 +116,7 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
 )
 
 internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBuilder()
-    .addFingersToCapture(ProtoFingerprintConfiguration.Finger.LEFT_3RD_FINGER)
+    .addFingersToCapture(ProtoFinger.LEFT_3RD_FINGER)
     .setQualityThreshold(10)
     .setDecisionPolicy(protoDecisionPolicy)
     .addAllowedVeroGenerations(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
@@ -257,8 +257,15 @@ internal val protoProject = ProtoProject.newBuilder()
     .setImageBucket("url")
     .build()
 
-internal val deviceConfiguration = DeviceConfiguration("en", listOf("module1", "module2"))
+internal val deviceConfiguration =
+    DeviceConfiguration("en", listOf("module1", "module2"), listOf(Finger.LEFT_3RD_FINGER))
 internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
-    .setLanguage("en")
+    .setLanguage(
+        ProtoDeviceConfiguration.Language.newBuilder().setLanguage("en").build()
+    )
     .addAllModuleSelected(listOf("module1", "module2"))
+    .setFingersToCollect(
+        ProtoDeviceConfiguration.FingersToCollect.newBuilder()
+            .addAllFingersToCollect(listOf(ProtoFinger.LEFT_3RD_FINGER)).build()
+    )
     .build()
