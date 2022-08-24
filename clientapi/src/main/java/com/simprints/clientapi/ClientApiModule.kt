@@ -1,6 +1,5 @@
 package com.simprints.clientapi
 
-import android.content.Context
 import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.activities.commcare.CommCareContract
@@ -15,13 +14,10 @@ import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImpl
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.SubjectRepositoryImpl
-import com.simprints.id.di.EntryPointForDFMs
-import com.simprints.id.di.SerializerModule
-import com.simprints.infra.security.SecurityManager
+import com.simprints.id.di.*
+import com.simprints.infra.realm.RealmModule
+import com.simprints.infra.security.SecurityModule
 import dagger.Binds
-import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.assisted.AssistedFactory
@@ -30,7 +26,15 @@ import javax.inject.Singleton
 
 @Component(
     dependencies = [EntryPointForDFMs::class],
-    modules = [ClientApiModule::class, SerializerModule::class]
+    modules = [
+        ClientApiModule::class,
+        SerializerModule::class,
+        SecurityModule::class,
+        PreferencesModule::class,
+        AppModule::class,
+        DataModule::class,
+        RealmModule::class
+    ]
 )
 @Singleton
 interface ClientApiComponent {
@@ -40,7 +44,6 @@ interface ClientApiComponent {
 
     @Component.Builder
     interface Builder {
-        fun context(@BindsInstance context: Context): Builder
         fun appDependencies(moduleDependencies: EntryPointForDFMs): Builder
         fun build(): ClientApiComponent
     }
@@ -73,11 +76,5 @@ interface ClientApiModule {
     fun bindSharedPreferencesManager(impl: SharedPreferencesManagerImpl): SharedPreferencesManager
 
     @Binds
-    fun bindSubjectRepository(impl: SubjectRepositoryImpl): SubjectRepository
-
-    @Binds
     fun bindClientApiTimeHelper(impl: ClientApiTimeHelperImpl): ClientApiTimeHelper
-
-    @Binds
-    fun bindSecurityManager(impl: SecurityManager): SecurityManager
 }
