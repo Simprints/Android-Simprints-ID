@@ -8,6 +8,10 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsContract
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsPresenter
+import com.simprints.clientapi.activities.odk.OdkAction
+import com.simprints.clientapi.activities.odk.OdkActivity
+import com.simprints.clientapi.activities.odk.OdkContract
+import com.simprints.clientapi.activities.odk.OdkPresenter
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManagerImpl
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
@@ -60,7 +64,8 @@ interface ClientApiComponent {
     }
 
     fun inject(activity: CommCareActivity)
-    fun inject(action: LibSimprintsActivity)
+    fun inject(activity: LibSimprintsActivity)
+    fun inject(activity: OdkActivity)
 
     @Component.Builder
     interface Builder {
@@ -84,6 +89,14 @@ interface ClientApiComponent {
             view: LibSimprintsContract.View,
             action: LibSimprintsAction
         ): LibSimprintsPresenter
+    }
+
+    @AssistedFactory
+    interface OdkPresenterFactory {
+        fun create(
+            view: OdkContract.View,
+            action: OdkAction
+        ): OdkPresenter
     }
 
 }
@@ -110,9 +123,5 @@ class ClientApiDispatcherModule {
     @Provides
     @Singleton
     fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
-//
-//    @Provides
-//    @Singleton
-//    fun provideContext(): Application = Application()
 
 }
