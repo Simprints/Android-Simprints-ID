@@ -12,7 +12,6 @@ import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkEnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
-import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.id.Application
@@ -182,11 +181,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
             Identify -> intent.putExtra(ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
             Invalid -> intent.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unloadClientApiKoinModules()
     }
 
 }

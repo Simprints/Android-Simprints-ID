@@ -54,10 +54,7 @@ dependencies {
     implementation(project(":infranetwork"))
     implementation(libs.libsimprints)
 
-    // Service Location & DI
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
-
+    // DI
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 

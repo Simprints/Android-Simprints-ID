@@ -5,7 +5,6 @@ import android.os.Bundle
 import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
-import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
@@ -180,11 +179,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun injectSessionIdIntoIntent(sessionId: String) {
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unloadClientApiKoinModules()
     }
 
 }
