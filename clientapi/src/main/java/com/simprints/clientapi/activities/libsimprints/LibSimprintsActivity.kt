@@ -5,11 +5,11 @@ import android.os.Bundle
 import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Companion.buildLibSimprintsAction
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
+import com.simprints.id.Application
 import com.simprints.libsimprints.*
 import javax.inject.Inject
 
@@ -21,13 +21,15 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     @Inject
     lateinit var libSimprintsPresenterFactory: ClientApiComponent.LibSimprintsPresenterFactory
 
-    override val presenter: LibSimprintsContract.Presenter =libSimprintsPresenterFactory.create(this, action)
+    override val presenter: LibSimprintsContract.Presenter by lazy {
+        libSimprintsPresenterFactory.create(this, action)
+    }
 
     override val guidSelectionNotifier = DefaultGuidSelectionNotifier(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
         super.onCreate(savedInstanceState)
-        loadClientApiKoinModules()
     }
 
     override fun returnRegistration(
