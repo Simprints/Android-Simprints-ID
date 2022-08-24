@@ -103,7 +103,7 @@ open class AppModule {
     @Provides
     @Singleton
     // https://github.com/lyft/Kronos-Android
-    fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
+    fun provideTimeHelper(app: Context): TimeHelper = KronosTimeHelperImpl(
         AndroidClockFactory.createKronosClock(
             app,
             requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),

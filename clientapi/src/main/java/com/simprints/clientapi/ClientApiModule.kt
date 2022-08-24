@@ -14,17 +14,20 @@ import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImpl
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
+import com.simprints.id.Application
 import com.simprints.id.di.*
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.security.SecurityModule
-import dagger.Binds
-import dagger.Component
-import dagger.Module
+import dagger.*
 import dagger.assisted.AssistedFactory
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.migration.DisableInstallInCheck
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @Component(
@@ -39,17 +42,29 @@ import javax.inject.Singleton
         RealmModule::class,
         LoginManagerModule::class,
         SafetyNetModule::class,
-        NetworkModule::class
+        NetworkModule::class,
+        ClientApiDispatcherModule::class
     ]
 )
 @Singleton
 interface ClientApiComponent {
+
+    companion object {
+        fun getComponent(app: Application) =
+            DaggerClientApiComponent.builder().application(app).appDependencies(
+                EntryPointAccessors.fromApplication(
+                    app,
+                    EntryPointForDFMs::class.java
+                )
+            ).build()
+    }
 
     fun inject(activity: CommCareActivity)
     fun inject(action: LibSimprintsActivity)
 
     @Component.Builder
     interface Builder {
+        fun application(@BindsInstance context: Application): Builder
         fun appDependencies(moduleDependencies: EntryPointForDFMs): Builder
         fun build(): ClientApiComponent
     }
@@ -58,7 +73,8 @@ interface ClientApiComponent {
     interface CommCarePresenterFactory {
         fun create(
             view: CommCareContract.View,
-            action: CommCareAction
+            action: CommCareAction,
+            coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
         ): CommCarePresenter
     }
 
@@ -83,4 +99,20 @@ interface ClientApiModule {
 
     @Binds
     fun bindClientApiTimeHelper(impl: ClientApiTimeHelperImpl): ClientApiTimeHelper
+
+
+}
+
+@DisableInstallInCheck // This is a dagger module
+@Module
+class ClientApiDispatcherModule {
+
+    @Provides
+    @Singleton
+    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
+//
+//    @Provides
+//    @Singleton
+//    fun provideContext(): Application = Application()
+
 }

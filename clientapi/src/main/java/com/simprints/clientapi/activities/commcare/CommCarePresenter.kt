@@ -35,7 +35,7 @@ class CommCarePresenter @AssistedInject constructor(
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
     rootManager: SecurityManager,
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    @Assisted private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
