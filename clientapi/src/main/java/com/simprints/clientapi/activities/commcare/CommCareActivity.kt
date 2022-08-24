@@ -13,8 +13,6 @@ import com.simprints.id.Application
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 import javax.inject.Inject
 
 class CommCareActivity : RequestActivity(), CommCareContract.View {
@@ -46,11 +44,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     @Inject
     lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
 
-    override val presenter: CommCareContract.Presenter by lazy {  presenterFactory.create(this, action) }
-
-    override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
-        parametersOf(this)
+    override val presenter: CommCareContract.Presenter by lazy {
+        presenterFactory.create(this, action)
     }
+
+    override val guidSelectionNotifier = CommCareGuidSelectionNotifier(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ClientApiComponent.getComponent(applicationContext as Application).inject(this)
