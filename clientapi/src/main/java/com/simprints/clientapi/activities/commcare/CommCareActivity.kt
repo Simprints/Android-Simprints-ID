@@ -5,11 +5,11 @@ import android.os.Bundle
 import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
+import com.simprints.id.Application
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -46,15 +46,15 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     @Inject
     lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
 
-    override val presenter: CommCareContract.Presenter = presenterFactory.create(this, action)
+    override val presenter: CommCareContract.Presenter by lazy {  presenterFactory.create(this, action) }
 
     override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
         parametersOf(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
         super.onCreate(savedInstanceState)
-        loadClientApiKoinModules()
     }
 
     override fun returnRegistration(

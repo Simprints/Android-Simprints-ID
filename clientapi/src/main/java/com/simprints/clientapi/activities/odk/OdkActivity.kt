@@ -2,6 +2,7 @@ package com.simprints.clientapi.activities.odk
 
 import android.content.Intent
 import android.os.Bundle
+import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
@@ -11,12 +12,13 @@ import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkEnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
+import com.simprints.id.Application
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import javax.inject.Inject
 
 class OdkActivity : RequestActivity(), OdkContract.View {
 
@@ -65,7 +67,10 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     private val action: OdkAction
         get() = buildOdkAction(intent.action)
 
-    override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
+    @Inject
+    lateinit var presenterFactory: ClientApiComponent.OdkPresenterFactory
+
+    override val presenter: OdkContract.Presenter by lazy { presenterFactory.create(this, action) }
 
     override val guidSelectionNotifier: OdkGuidSelectionNotifier by inject {
         parametersOf(this)
@@ -81,8 +86,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         get() = OdkVerifyExtractor(intent, acceptableExtras)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
         super.onCreate(savedInstanceState)
-        loadClientApiKoinModules()
     }
 
     override fun returnRegistration(registrationId: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
