@@ -6,9 +6,10 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.domain.SimprintsSyncSetting
+import javax.inject.Inject
 
 
-class SharedPreferencesManagerImpl(
+class SharedPreferencesManagerImpl @Inject constructor(
     context: Context,
     private val corePreferencesManager: IdPreferencesManager
 ) : SharedPreferencesManager {

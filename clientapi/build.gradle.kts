@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":moduleapi"))
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
+    implementation(project(":infrarealm"))
     implementation(libs.libsimprints)
 
     // Service Location & DI
