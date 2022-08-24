@@ -4,6 +4,8 @@ import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
+import com.simprints.clientapi.activities.errors.ErrorContract
+import com.simprints.clientapi.activities.errors.ErrorPresenter
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsContract
@@ -97,6 +99,13 @@ interface ClientApiComponent {
             view: OdkContract.View,
             action: OdkAction
         ): OdkPresenter
+    }
+
+    @AssistedFactory
+    interface ErrorPresenterFactory {
+        fun create(
+            view: ErrorContract.View
+        ): ErrorPresenter
     }
 
 }
