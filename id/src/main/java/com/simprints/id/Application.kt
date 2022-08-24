@@ -16,8 +16,9 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import javax.inject.Inject
 
-open class Application : CoreApplication() {
+open class Application @Inject constructor() : CoreApplication() {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent

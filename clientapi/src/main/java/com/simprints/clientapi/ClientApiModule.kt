@@ -15,6 +15,9 @@ import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerIm
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.id.di.*
+import com.simprints.infra.login.LoginManagerModule
+import com.simprints.infra.login.SafetyNetModule
+import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.security.SecurityModule
 import dagger.Binds
@@ -33,7 +36,10 @@ import javax.inject.Singleton
         PreferencesModule::class,
         AppModule::class,
         DataModule::class,
-        RealmModule::class
+        RealmModule::class,
+        LoginManagerModule::class,
+        SafetyNetModule::class,
+        NetworkModule::class
     ]
 )
 @Singleton

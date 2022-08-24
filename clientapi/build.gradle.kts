@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
     implementation(project(":infrarealm"))
+    implementation(project(":infranetwork"))
     implementation(libs.libsimprints)
 
     // Service Location & DI
