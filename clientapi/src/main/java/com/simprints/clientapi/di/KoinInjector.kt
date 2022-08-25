@@ -70,7 +70,7 @@ object KoinInjector {
 
     private fun Module.defineBuildersForDomainManagers() {
         factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
-        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext(), get()) }
+        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
         buildClientApiSessionEventsManager()
     }
 
@@ -104,6 +104,7 @@ object KoinInjector {
             CommCarePresenter(
                 view,
                 action,
+                get(),
                 get(),
                 get(),
                 get(),

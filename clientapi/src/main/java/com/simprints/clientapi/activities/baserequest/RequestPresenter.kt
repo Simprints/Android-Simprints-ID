@@ -5,7 +5,6 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.data.sharedpreferences.*
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
@@ -16,6 +15,11 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
 import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.canCoSyncAllData
+import com.simprints.infra.config.domain.models.canCoSyncBiometricData
+import com.simprints.infra.config.domain.models.canCoSyncData
+import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -28,7 +32,7 @@ abstract class RequestPresenter(
     private val eventsManager: ClientApiSessionEventsManager,
     private val rootManager: SecurityManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
-    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val configManager: ConfigManager,
     private val sessionEventsManager: ClientApiSessionEventsManager
 ) : RequestContract.Presenter {
 
@@ -123,7 +127,7 @@ abstract class RequestPresenter(
         sessionId: String,
         jsonHelper: JsonHelper
     ): String? =
-        if (sharedPreferencesManager.canCoSyncData()) {
+        if (configManager.getProjectConfiguration().canCoSyncData()) {
             val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
             jsonHelper.toJson(CoSyncEvents(events))
         } else {
@@ -136,11 +140,9 @@ abstract class RequestPresenter(
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
+        val projectConfig = configManager.getProjectConfiguration()
 
-        val canCosyncData = sharedPreferencesManager.canCoSyncAllData()
-        val canCosyncBiometricData = sharedPreferencesManager.canCoSyncBiometricData()
-
-        if (!canCosyncData && !canCosyncBiometricData) return null
+        if (!projectConfig.canCoSyncAllData() && !projectConfig.canCoSyncBiometricData()) return null
 
         val recordCreationEvent =
             subjectRepository.load(
@@ -152,7 +154,7 @@ abstract class RequestPresenter(
                 .firstOrNull()
                 ?.fromSubjectToEnrolmentCreationEvent(
                     now = timeHelper.now(),
-                    modalities = sharedPreferencesManager.modalities,
+                    modalities = projectConfig.general.modalities,
                     encoder = encoder
                 )
                 ?: return null
@@ -164,7 +166,7 @@ abstract class RequestPresenter(
      * Delete the events if returning to a cosync app but not Simprints
      */
     override suspend fun deleteSessionEventsIfNeeded(sessionId: String) {
-        if (!sharedPreferencesManager.canSyncDataToSimprints()) {
+        if (!configManager.getProjectConfiguration().canSyncDataToSimprints()) {
             sessionEventsManager.deleteSessionEvents(sessionId)
         }
     }
