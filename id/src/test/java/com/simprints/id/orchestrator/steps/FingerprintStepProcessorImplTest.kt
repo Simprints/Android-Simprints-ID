@@ -3,8 +3,6 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.domain.common.GROUP
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
@@ -16,23 +14,30 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MA
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.config.ConfigManager
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
 import io.mockk.*
-import org.junit.After
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
 class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
-    private lateinit var preferencesManagerMock: IdPreferencesManager
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns mockk {
+                every { fingersToCapture } returns listOf()
+            }
+        }
+    }
 
-    private val fingerprintRequestFactory: FingerprintRequestFactory = FingerprintRequestFactoryImpl()
+    private val fingerprintRequestFactory: FingerprintRequestFactory =
+        FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor
 
     private val fingerprintResponseMock: IFingerprintResponse = mockk()
@@ -42,22 +47,10 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        preferencesManagerMock = mockk()
-
-        with(preferencesManagerMock) {
-            every { language } returns "en"
-            every { fingerprintsToCollect } returns listOf()
-            every { logoExists } returns true
-            every { organizationName } returns "some_org"
-            every { programName } returns "some_name"
-            every { matchGroup } returns GROUP.GLOBAL
-        }
-
         fingerprintStepProcess = FingerprintStepProcessorImpl(
             fingerprintRequestFactory,
-            preferencesManagerMock
+            configManager
         )
-
         mockFromModuleApiToDomainExt()
     }
 
@@ -74,7 +67,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldBuildTheRightStepForCapturing() {
+    fun stepProcessorShouldBuildTheRightStepForCapturing() = runTest {
         with(enrolAppRequest) {
             val step = fingerprintStepProcess.buildStepToCapture()
             verifyFingerprintIntent<FingerprintCaptureRequest>(step, CAPTURE.value)
@@ -100,11 +93,5 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         fingerprintStepProcess.processResult(0, Activity.RESULT_OK, result)
 
         verify(exactly = 0) { fingerprintResponseMock.fromModuleApiToDomain() }
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
-        unmockkAll()
     }
 }

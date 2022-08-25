@@ -11,7 +11,7 @@ class ModalityFlowConfirmIdentity(private val coreStepProcessor: CoreStepProcess
 
     override val steps: MutableList<Step> = mutableListOf()
 
-    override fun startFlow(appRequest: AppRequest) {
+    override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppConfirmIdentityRequest)
         steps.addAll(buildStepsList(appRequest))
     }

@@ -292,7 +292,7 @@ class CheckLoginFromIntentPresenter(
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             val projectConfiguration = configManager.getProjectConfiguration()
             currentSessionEvent.updateProjectId(signedProjectId)
-            currentSessionEvent.updateModalities(projectConfiguration.general.modalities.map { it.toEventModality() })
+            currentSessionEvent.updateModalities(projectConfiguration.general.modalities)
             eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
         val associatedEvents = eventRepository.getEventsFromSession(currentSessionEvent.id)
@@ -348,10 +348,4 @@ class CheckLoginFromIntentPresenter(
             Simber.tag(SESSION_ID, true).i(eventRepository.getCurrentCaptureSessionEvent().id)
         }
     }
-
-    private fun GeneralConfiguration.Modality.toEventModality(): Modality =
-        when (this) {
-            GeneralConfiguration.Modality.FACE -> Modality.FACE
-            GeneralConfiguration.Modality.FINGERPRINT -> Modality.FINGER
-        }
 }

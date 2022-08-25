@@ -3,13 +3,14 @@ package com.simprints.id.orchestrator
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
@@ -20,7 +21,7 @@ private const val TAG = "ENROLMENT"
 
 class EnrolmentHelperImpl(
     private val subjectRepository: SubjectRepository,
-    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
+    private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper
 ) : EnrolmentHelper {
 

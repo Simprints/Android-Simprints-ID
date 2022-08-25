@@ -4,7 +4,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
@@ -13,25 +17,23 @@ import org.junit.Test
 class AppResponseBuilderForIdentifyTest {
 
     companion object {
-        private val fingerprintConfidenceThresholds = mapOf(
-            FingerprintConfidenceThresholds.LOW to 15,
-            FingerprintConfidenceThresholds.MEDIUM to 30,
-            FingerprintConfidenceThresholds.HIGH to 40
-        )
-        private val faceConfidenceThresholds = mapOf(
-            FaceConfidenceThresholds.LOW to 15,
-            FaceConfidenceThresholds.MEDIUM to 30,
-            FaceConfidenceThresholds.HIGH to 40
-        )
+        private val fingerprintConfidenceDecisionPolicy = DecisionPolicy(15, 30, 40)
+        private val faceConfidenceDecisionPolicy = DecisionPolicy(15, 30, 40)
         private const val RETURN_ID_COUNT = 10
     }
 
-    private val responseBuilder =
-        AppResponseBuilderForIdentify(
-            fingerprintConfidenceThresholds,
-            faceConfidenceThresholds,
-            RETURN_ID_COUNT
-        )
+    private val projectConfiguration = mockk<ProjectConfiguration> {
+        every { identification } returns mockk {
+            every { maxNbOfReturnedCandidates } returns RETURN_ID_COUNT
+        }
+        every { face } returns mockk {
+            every { decisionPolicy } returns faceConfidenceDecisionPolicy
+        }
+        every { fingerprint } returns mockk {
+            every { decisionPolicy } returns fingerprintConfidenceDecisionPolicy
+        }
+    }
+    private val responseBuilder = AppResponseBuilderForIdentify(projectConfiguration)
 
     @Test
     fun withFingerprintOnlyStepsWithHighMatch_shouldBuildAppResponseBasedOnThresholds() {
@@ -46,9 +48,7 @@ class AppResponseBuilderForIdentifyTest {
             assertThat(response, instanceOf(AppIdentifyResponse::class.java))
             with(response as AppIdentifyResponse) {
                 assertThat(identifications.all {
-                    it.confidence >= fingerprintConfidenceThresholds.getValue(
-                        FingerprintConfidenceThresholds.HIGH
-                    )
+                    it.confidence >= fingerprintConfidenceDecisionPolicy.high
                 }).isTrue()
             }
         }
@@ -67,9 +67,7 @@ class AppResponseBuilderForIdentifyTest {
             assertThat(response, instanceOf(AppIdentifyResponse::class.java))
             with(response as AppIdentifyResponse) {
                 assertThat(identifications.all {
-                    it.confidence >= fingerprintConfidenceThresholds.getValue(
-                        FingerprintConfidenceThresholds.LOW
-                    )
+                    it.confidence >= fingerprintConfidenceDecisionPolicy.low
                 }).isTrue()
             }
         }
@@ -88,7 +86,7 @@ class AppResponseBuilderForIdentifyTest {
             assertThat(response, instanceOf(AppIdentifyResponse::class.java))
             with(response as AppIdentifyResponse) {
                 assertThat(identifications.all {
-                    it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
+                    it.confidence >= faceConfidenceDecisionPolicy.high
                 }).isTrue()
             }
         }
@@ -107,7 +105,7 @@ class AppResponseBuilderForIdentifyTest {
             assertThat(response, instanceOf(AppIdentifyResponse::class.java))
             with(response as AppIdentifyResponse) {
                 assertThat(identifications.all {
-                    it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.LOW)
+                    it.confidence >= faceConfidenceDecisionPolicy.low
                 }).isTrue()
             }
         }

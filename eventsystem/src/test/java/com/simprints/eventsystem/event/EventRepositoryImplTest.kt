@@ -1,8 +1,6 @@
 package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modes
-import com.simprints.infra.login.LoginManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
@@ -24,11 +22,13 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -39,9 +39,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
-import java.lang.IllegalArgumentException
 
-@ExperimentalCoroutinesApi
 class EventRepositoryImplTest {
 
     private lateinit var eventRepo: EventRepository
@@ -67,6 +65,9 @@ class EventRepositoryImplTest {
     @MockK
     lateinit var sessionDataCache: SessionDataCache
 
+    @MockK
+    lateinit var configManager: ConfigManager
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -74,6 +75,14 @@ class EventRepositoryImplTest {
         every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns mockk {
+                every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
+            }
+        }
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { language } returns LANGUAGE
+        }
 
         eventRepo = EventRepositoryImpl(
             DEVICE_ID,
@@ -85,8 +94,7 @@ class EventRepositoryImplTest {
             sessionEventValidatorsFactory,
             LIB_VERSION_NAME,
             sessionDataCache,
-            LANGUAGE,
-            listOf(Modes.FACE, Modes.FINGERPRINT)
+            configManager,
         )
 
         runBlocking {
@@ -558,29 +566,29 @@ class EventRepositoryImplTest {
     }
 
     @Test
-    fun `test removeLocationDataFromCurrentSession does nothing if location is null`()= runTest{
+    fun `test removeLocationDataFromCurrentSession does nothing if location is null`() = runTest {
         // Given
-        val sessionCaptureEvent = mockk<SessionCaptureEvent>{
+        val sessionCaptureEvent = mockk<SessionCaptureEvent> {
             every { payload.location } returns null
         }
         every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
-        coVerify (exactly = 0){eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)  }
+        coVerify(exactly = 0) { eventLocalDataSource.insertOrUpdate(sessionCaptureEvent) }
     }
 
     @Test
-    fun `test removeLocationDataFromCurrentSession remove location if location exist`()= runTest{
+    fun `test removeLocationDataFromCurrentSession remove location if location exist`() = runTest {
         // Given
-        val sessionCaptureEvent = mockk<SessionCaptureEvent>{
+        val sessionCaptureEvent = mockk<SessionCaptureEvent> {
             every { payload.location } returns mockk()
         }
         every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
-        coVerify {eventLocalDataSource.insertOrUpdate(sessionCaptureEvent)  }
+        coVerify { eventLocalDataSource.insertOrUpdate(sessionCaptureEvent) }
     }
 
     private fun mockSignedId() =

@@ -13,7 +13,7 @@ class ModalityFlowEnrolLastBiometrics(private val coreStepProcessor: CoreStepPro
 
     override val steps: MutableList<Step> = mutableListOf()
 
-    override fun startFlow(appRequest: AppRequest) {
+    override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppEnrolLastBiometricsRequest)
         steps.addAll(buildStepsList(appRequest, hotCache.load()))
     }

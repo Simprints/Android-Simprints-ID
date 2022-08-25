@@ -6,24 +6,26 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
-import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class ModalityFlowConfirmIdentityTest {
 
     private lateinit var modalityFlowConfirmIdentity: ModalityFlowConfirmIdentity
-    @MockK lateinit var coreProcessorMock: CoreStepProcessor
+
+    @MockK
+    lateinit var coreProcessorMock: CoreStepProcessor
 
     @Before
     fun setUp() {
@@ -32,8 +34,13 @@ class ModalityFlowConfirmIdentityTest {
     }
 
     @Test
-    fun startFlow_shouldBuildTheRightListOfSteps() {
-        val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
+    fun startFlow_shouldBuildTheRightListOfSteps() = runTest {
+        val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            GUID1,
+            GUID2
+        )
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
 
         assertThat(modalityFlowConfirmIdentity.steps).hasSize(1)
@@ -41,8 +48,13 @@ class ModalityFlowConfirmIdentityTest {
     }
 
     @Test
-    fun notStartedStep_getNextStepToLaunch_returnTheRightStep() {
-        val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
+    fun notStartedStep_getNextStepToLaunch_returnTheRightStep() = runTest {
+        val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            GUID1,
+            GUID2
+        )
         val step = mockk<Step>()
         every { step.getStatus() } returns Step.Status.NOT_STARTED
         every { coreProcessorMock.buildConfirmIdentityStep(any(), any(), any()) } returns step
@@ -55,21 +67,25 @@ class ModalityFlowConfirmIdentityTest {
     }
 
     @Test
-    fun givenAGuidSelectActivityResult_handleIt_shouldReturnTheRightResult() {
-        runBlocking {
-            val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
-            val step = mockk<Step>()
-            every { step.requestCode } returns CoreRequestCode.GUID_SELECTION_CODE.value
-            modalityFlowConfirmIdentity.steps.addAll(listOf(step))
+    fun givenAGuidSelectActivityResult_handleIt_shouldReturnTheRightResult() = runTest {
+        val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            GUID1,
+            GUID2
+        )
+        val step = mockk<Step>()
+        every { step.requestCode } returns CoreRequestCode.GUID_SELECTION_CODE.value
+        modalityFlowConfirmIdentity.steps.addAll(listOf(step))
 
-            modalityFlowConfirmIdentity.handleIntentResult(
-                appRequest.fromModuleApiToDomain(),
-                CoreRequestCode.GUID_SELECTION_CODE.value,
-                Activity.RESULT_OK,
-                null)
+        modalityFlowConfirmIdentity.handleIntentResult(
+            appRequest.fromModuleApiToDomain(),
+            CoreRequestCode.GUID_SELECTION_CODE.value,
+            Activity.RESULT_OK,
+            null
+        )
 
-            assertThat(step).isNotNull()
-            verify { coreProcessorMock.processResult(any()) }
-        }
+        assertThat(step).isNotNull()
+        verify { coreProcessorMock.processResult(any()) }
     }
 }

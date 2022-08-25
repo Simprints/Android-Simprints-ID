@@ -7,7 +7,6 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeActivityTest
 import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.di.*
-import com.simprints.infra.config.ConfigManagerModule
 import com.simprints.infra.config.DataStoreModule
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
@@ -33,8 +32,8 @@ import javax.inject.Singleton
         SafetyNetModule::class,
         com.simprints.infra.security.SecurityModule::class,
         RealmModule::class,
-        ConfigManagerModule::class,
-        DataStoreModule::class
+        DataStoreModule::class,
+        TestConfigManagerModule::class,
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {

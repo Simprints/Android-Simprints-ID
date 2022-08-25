@@ -14,7 +14,6 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
@@ -35,23 +34,23 @@ import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWor
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.logging.Simber
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
-@ExperimentalCoroutinesApi
 class SetupActivity : BaseSplitActivity() {
 
-    @Inject lateinit var viewModelFactory: SetupViewModelFactory
+    @Inject
+    lateinit var viewModelFactory: SetupViewModelFactory
 
     private lateinit var setupRequest: SetupRequest
     private lateinit var splitInstallManager: SplitInstallManager
     private val viewModel: SetupViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(SetupViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory)[SetupViewModel::class.java]
     }
     private val binding by viewBinding(ActivitySetupBinding::inflate)
 
@@ -79,7 +78,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun getRequiredModules() = setupRequest.modalitiesRequired.map {
         when (it) {
-            Modality.FINGER -> getString(R.string.module_feature_finger)
+            Modality.FINGERPRINT -> getString(R.string.module_feature_finger)
             Modality.FACE -> getString(R.string.module_feature_face)
         }
     }
@@ -124,7 +123,11 @@ class SetupActivity : BaseSplitActivity() {
     }
 
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSIONS_REQUEST_CODE -> {
@@ -137,7 +140,9 @@ class SetupActivity : BaseSplitActivity() {
     }
 
     private fun collectLocationInBackground() {
-        val request = OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java).build()
+        val request =
+            OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java)
+                .build()
         WorkManager.getInstance(applicationContext).enqueue(request)
     }
 
