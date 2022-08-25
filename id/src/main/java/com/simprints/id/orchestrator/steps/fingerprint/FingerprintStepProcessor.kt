@@ -11,7 +11,7 @@ import com.simprints.id.orchestrator.steps.Step
 interface FingerprintStepProcessor {
 
 
-    fun buildStepToCapture(): Step
+    suspend fun buildStepToCapture(): Step
 
     fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery): Step
 

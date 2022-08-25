@@ -320,7 +320,7 @@ class OrchestratorManagerImplTest {
 
     private fun buildOrchestratorManager(): OrchestratorManager {
         modalityFlowFactoryMock = mockk<ModalityFlowFactory>().apply {
-            every { this@apply.createModalityFlow(any()) } returns modalityFlowMock
+            coEvery { this@apply.createModalityFlow(any()) } returns modalityFlowMock
         }
         coEvery {
             appResponseFactoryMock.buildAppResponse(

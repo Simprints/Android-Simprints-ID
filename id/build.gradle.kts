@@ -225,6 +225,9 @@ dependencies {
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
 
+    androidTestImplementation(libs.testing.hilt)
+    kaptAndroidTest(libs.testing.hilt.kapt)
+
     androidTestImplementation(libs.testing.mockwebserver)
     androidTestImplementation(libs.testing.coroutines.test)
     androidTestImplementation(libs.testing.androidX.room)

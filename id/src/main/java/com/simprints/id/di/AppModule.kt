@@ -3,7 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.lyft.kronos.AndroidClockFactory
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -26,7 +25,6 @@ import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
@@ -123,7 +121,7 @@ open class AppModule {
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        idPreferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
@@ -139,8 +137,7 @@ open class AppModule {
             validatorFactory,
             VERSION_NAME,
             sessionDataCache,
-            idPreferencesManager.language,
-            idPreferencesManager.modalities.map { it.toMode() }
+            configManager,
         )
 
     @Provides

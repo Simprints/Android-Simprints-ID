@@ -15,7 +15,7 @@ class ModalityFlowFactoryImpl(
 ) : ModalityFlowFactory {
 
 
-    override fun createModalityFlow(appRequest: AppRequest): ModalityFlow =
+    override suspend fun createModalityFlow(appRequest: AppRequest): ModalityFlow =
         buildFlow(appRequest).also {
             it.startFlow(appRequest)
         }

@@ -3,19 +3,17 @@ package com.simprints.id.orchestrator.responsebuilders
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
-import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidenceForFace
-import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidenceForFingerprint
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidence
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 
-class AppResponseBuilderForVerify(
-    private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
-    private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>
-) : BaseAppResponseBuilder() {
+class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfiguration) :
+    BaseAppResponseBuilder() {
 
     override suspend fun buildAppResponse(
         modalities: List<GeneralConfiguration.Modality>,
@@ -64,9 +62,9 @@ class AppResponseBuilderForVerify(
             MatchResult(
                 it.personId, it.confidenceScore.toInt(),
                 Tier.computeTier(it.confidenceScore),
-                computeMatchConfidenceForFingerprint(
+                computeMatchConfidence(
                     it.confidenceScore.toInt(),
-                    fingerprintConfidenceThresholds
+                    projectConfiguration.fingerprint!!.decisionPolicy
                 )
             )
         }.first()
@@ -79,7 +77,10 @@ class AppResponseBuilderForVerify(
             MatchResult(
                 it.guidFound, it.confidence.toInt(),
                 Tier.computeTier(it.confidence),
-                computeMatchConfidenceForFace(it.confidence.toInt(), faceConfidenceThresholds)
+                computeMatchConfidence(
+                    it.confidence.toInt(),
+                    projectConfiguration.face!!.decisionPolicy
+                )
             )
         }.first()
 }
