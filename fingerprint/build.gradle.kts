@@ -87,6 +87,7 @@ dependencies {
     implementation(project(":fingerprintmatcher"))
     implementation(project(":fingerprintscanner"))
     implementation(project(":fingerprintscannermock"))
+    implementation(project(":infraconfig"))
     implementation(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))

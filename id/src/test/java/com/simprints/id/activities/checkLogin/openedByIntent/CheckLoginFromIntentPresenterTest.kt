@@ -2,8 +2,6 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
@@ -36,6 +34,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -318,8 +317,8 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
             coEvery { loginManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
             every { generalConfiguration.modalities } returns listOf(
-                GeneralConfiguration.Modality.FINGERPRINT,
-                GeneralConfiguration.Modality.FACE
+                Modality.FINGERPRINT,
+                Modality.FACE
             )
 
             presenter.handleSignedInUser()
@@ -339,7 +338,7 @@ class CheckLoginFromIntentPresenterTest {
                 GUID1,
                 DEFAULT_PROJECT_ID,
                 CREATED_AT,
-                listOf(FINGERPRINT, FACE),
+                listOf(Modality.FINGERPRINT, Modality.FACE),
                 appVersionNameArg,
                 libSimprintsVersionNameArg,
                 languageArg,
