@@ -52,6 +52,7 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
@@ -144,11 +145,11 @@ open class AppModule {
 
     @Provides
     fun provideModuleRepository(
-        preferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         subjectRepository: SubjectRepository,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository
     ): ModuleRepository = ModuleRepositoryImpl(
-        preferencesManager,
+        configManager,
         subjectRepository,
         eventDownSyncScopeRepository
     )
@@ -174,12 +175,12 @@ open class AppModule {
     open fun provideGuidFetchGuidHelper(
         downSyncHelper: EventDownSyncHelper,
         subjectRepository: SubjectRepository,
-        preferencesManager: IdPreferencesManager
+        configManager: ConfigManager
     ): FetchGuidHelper =
         FetchGuidHelperImpl(
             downSyncHelper,
             subjectRepository,
-            preferencesManager
+            configManager
         )
 
     @Provides

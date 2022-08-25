@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
@@ -19,6 +18,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 
 open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
@@ -31,33 +31,40 @@ open class OrchestratorManagerImpl(
     override val ongoingStep = MutableLiveData<Step?>()
     override val appResponse = MutableLiveData<AppResponse?>()
 
-    internal lateinit var modalities: List<Modality>
+    internal lateinit var modalities: List<GeneralConfiguration.Modality>
     internal var sessionId: String = ""
 
     private lateinit var modalitiesFlow: ModalityFlow
 
-    override suspend fun initialise(modalities: List<Modality>,
-                                    appRequest: AppRequest,
-                                    sessionId: String) {
+    override suspend fun initialise(
+        modalities: List<GeneralConfiguration.Modality>,
+        appRequest: AppRequest,
+        sessionId: String
+    ) {
         this.sessionId = sessionId
         hotCache.appRequest = appRequest
         this.modalities = modalities
-        modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
+        modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest)
         resetInternalState()
 
         proceedToNextStepOrAppResponse()
     }
 
-    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
+    override suspend fun handleIntentResult(
+        appRequest: AppRequest,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)
 
         if (appRequest !is AppRequest.AppRequestFollowUp) {
             val fingerprintCaptureCompleted =
-                !modalities.contains(Modality.FINGER) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }
+                !modalities.contains(GeneralConfiguration.Modality.FINGERPRINT) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }
                     .all { it.getResult() is FingerprintCaptureResponse }
 
             val faceCaptureCompleted =
-                !modalities.contains(Modality.FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }
+                !modalities.contains(GeneralConfiguration.Modality.FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }
                     .all { it.getResult() is FaceCaptureResponse }
 
 

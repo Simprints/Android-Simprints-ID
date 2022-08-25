@@ -22,8 +22,6 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
                                     private val fingerprintStepProcessor: FingerprintStepProcessor,
                                     private val faceStepProcessor: FaceStepProcessor,
-                                    private val timeHelper: TimeHelper,
-                                    private val eventRepository: EventRepository,
                                     private val consentRequired: Boolean,
                                     private val locationRequired: Boolean,
                                     private val modalities: List<Modality>,

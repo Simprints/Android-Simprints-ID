@@ -3,7 +3,7 @@ package com.simprints.infra.config.remote
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 
 internal class ConfigRemoteDataSourceImpl @Inject constructor(private val loginManager: LoginManager) :
@@ -15,6 +15,6 @@ internal class ConfigRemoteDataSourceImpl @Inject constructor(private val loginM
     override suspend fun getProject(projectId: String): Project =
         getApiClient().executeCall { it.getProject(projectId) }.toDomain()
 
-    private suspend fun getApiClient(): SimApiClient<ConfigRemoteInterface> =
+    private suspend fun getApiClient(): SimNetwork.SimApiClient<ConfigRemoteInterface> =
         loginManager.buildClient(ConfigRemoteInterface::class)
 }

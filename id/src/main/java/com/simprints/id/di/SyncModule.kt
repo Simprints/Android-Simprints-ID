@@ -18,7 +18,6 @@ import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStat
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -119,9 +118,9 @@ open class SyncModule {
     open fun provideDownSyncWorkerBuilder(
         downSyncScopeRepository: EventDownSyncScopeRepository,
         jsonHelper: JsonHelper,
-        preferencesManager: IdPreferencesManager
+        configManager: ConfigManager,
     ): EventDownSyncWorkersBuilder =
-        EventDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper, preferencesManager)
+        EventDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper, configManager)
 
 
     @Provides
@@ -159,7 +158,7 @@ open class SyncModule {
         eventRepository: com.simprints.eventsystem.event.EventRepository,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         subjectFactory: SubjectFactory,
-        preferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         timeHelper: TimeHelper,
         dispatcher: DispatcherProvider
     ): EventDownSyncHelper =
@@ -168,7 +167,7 @@ open class SyncModule {
             eventRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
-            preferencesManager,
+            configManager,
             timeHelper,
             dispatcher
         )

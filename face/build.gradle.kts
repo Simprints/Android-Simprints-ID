@@ -71,6 +71,7 @@ dependencies {
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":id"))
+    implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
 
     implementation(libs.cameraView)

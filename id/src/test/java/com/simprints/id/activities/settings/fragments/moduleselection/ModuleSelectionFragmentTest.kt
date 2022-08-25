@@ -17,13 +17,11 @@ import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(
     instrumentedPackages = ["androidx.loader.content"],
@@ -41,7 +39,10 @@ class ModuleSelectionFragmentTest : BaseUnitTest() {
     fun onLaunchModuleSelectionFragmentConfirmSearchViewIsVisible() {
         createAndStartActivity<ModuleSelectionActivity>()
         verifyConfirmationUIVisibility(R.id.searchView, ViewMatchers.Visibility.VISIBLE)
-        verifyConfirmationUIVisibility(androidx.appcompat.R.id.search_src_text, ViewMatchers.Visibility.VISIBLE)
+        verifyConfirmationUIVisibility(
+            androidx.appcompat.R.id.search_src_text,
+            ViewMatchers.Visibility.VISIBLE
+        )
     }
 
     @Test
@@ -54,6 +55,7 @@ class ModuleSelectionFragmentTest : BaseUnitTest() {
             matches(ViewMatchers.hasFocus())
         )
     }
+
     @Test
     fun onLaunchFragmentAssertGetFontIsCalled() {
         mockkStatic(ResourcesCompat::class)
@@ -68,7 +70,10 @@ class ModuleSelectionFragmentTest : BaseUnitTest() {
         every { ResourcesCompat.getFont(any(), any()) } throws Exception()
     }
 
-    private fun verifyConfirmationUIVisibility(id: Int, expectedVisibility: ViewMatchers.Visibility) {
+    private fun verifyConfirmationUIVisibility(
+        id: Int,
+        expectedVisibility: ViewMatchers.Visibility
+    ) {
         onView(withId(id)).check(
             matches(ViewMatchers.withEffectiveVisibility(expectedVisibility))
         )

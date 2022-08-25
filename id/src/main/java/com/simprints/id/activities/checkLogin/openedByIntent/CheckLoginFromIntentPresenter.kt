@@ -1,8 +1,11 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
@@ -24,6 +27,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -50,7 +54,10 @@ class CheckLoginFromIntentPresenter(
     private var setupFailed: Boolean = false
 
     @Inject
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    lateinit var recentEventsPreferencesManager: RecentEventsPreferencesManager
+
+    @Inject
+    lateinit var eventRepository: EventRepository
 
     @Inject
     lateinit var subjectLocalDataSource: SubjectLocalDataSource
@@ -81,7 +88,7 @@ class CheckLoginFromIntentPresenter(
     }
 
     private fun showConfirmationTextIfPossible() {
-        if (appRequest is AppConfirmIdentityRequest){
+        if (appRequest is AppConfirmIdentityRequest) {
             view.showConfirmationText()
         }
     }
@@ -169,7 +176,7 @@ class CheckLoginFromIntentPresenter(
         }
 
     private fun setLastUser() {
-        preferencesManager.lastUserUsed = appRequest.userId
+        recentEventsPreferencesManager.lastUserUsed = appRequest.userId
     }
 
     override suspend fun start() {
@@ -195,7 +202,7 @@ class CheckLoginFromIntentPresenter(
     private fun extractSessionParametersForAnalyticsManager() =
         with(appRequest) {
             if (this is AppRequestFlow) {
-                Simber.tag(AnalyticsUserProperties.USER_ID,true).i(userId)
+                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId)
                 Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
                 Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId)
                 Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
@@ -283,8 +290,9 @@ class CheckLoginFromIntentPresenter(
 
         val signedProjectId = loginManager.getSignedInProjectIdOrEmpty()
         if (signedProjectId != currentSessionEvent.payload.projectId) {
+            val projectConfiguration = configManager.getProjectConfiguration()
             currentSessionEvent.updateProjectId(signedProjectId)
-            currentSessionEvent.updateModalities(preferencesManager.modalities)
+            currentSessionEvent.updateModalities(projectConfiguration.general.modalities.map { it.toEventModality() })
             eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
         val associatedEvents = eventRepository.getEventsFromSession(currentSessionEvent.id)
@@ -306,14 +314,16 @@ class CheckLoginFromIntentPresenter(
         Simber.d("[CHECK_LOGIN] Updated Database count in current session")
     }
 
-    private fun initAnalyticsKeyInCrashManager() {
+    private suspend fun initAnalyticsKeyInCrashManager() {
+        val projectConfiguration = configManager.getProjectConfiguration()
+        val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
         Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
-        Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
+        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
-            .i(preferencesManager.eventDownSyncSetting.toString())
+            .i(projectConfiguration.synchronization.frequency.toString())
         Simber.tag(FINGERS_SELECTED, true)
-            .i(preferencesManager.fingerprintsToCollect.map { it.toString() }.toString())
+            .i(deviceConfiguration.fingersToCollect.map { it.toString() }.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 
@@ -338,4 +348,10 @@ class CheckLoginFromIntentPresenter(
             Simber.tag(SESSION_ID, true).i(eventRepository.getCurrentCaptureSessionEvent().id)
         }
     }
+
+    private fun GeneralConfiguration.Modality.toEventModality(): Modality =
+        when (this) {
+            GeneralConfiguration.Modality.FACE -> Modality.FACE
+            GeneralConfiguration.Modality.FINGERPRINT -> Modality.FINGER
+        }
 }

@@ -8,9 +8,9 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRe
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.infra.config.ConfigManager
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestViewModelModule(
@@ -25,11 +25,18 @@ class TestViewModelModule(
         dailyActivityRepository: DashboardDailyActivityRepository
     ): DashboardViewModelFactory {
         return dashboardViewModelFactoryRule.resolveDependency {
-            super.provideDashboardViewModelFactory(projectDetailsRepository, syncCardStateRepository, dailyActivityRepository)
+            super.provideDashboardViewModelFactory(
+                projectDetailsRepository,
+                syncCardStateRepository,
+                dailyActivityRepository
+            )
         }
     }
 
-    override fun provideLoginViewModelFactory(authenticationHelper: AuthenticationHelper, dispatcher: DispatcherProvider): LoginViewModelFactory {
+    override fun provideLoginViewModelFactory(
+        authenticationHelper: AuthenticationHelper,
+        dispatcher: DispatcherProvider
+    ): LoginViewModelFactory {
         return loginViewModelFactoryRule.resolveDependency {
             super.provideLoginViewModelFactory(authenticationHelper, dispatcher)
         }
@@ -37,14 +44,12 @@ class TestViewModelModule(
 
     override fun providePrivacyNoticeViewModelFactory(
         longConsentRepository: LongConsentRepository,
-        preferencesManager: IdPreferencesManager,
-        dispatcherProvider: DispatcherProvider
+        configManager: ConfigManager
     ): PrivacyNoticeViewModelFactory {
         return privacyViewModelFactoryRule.resolveDependency {
             super.providePrivacyNoticeViewModelFactory(
                 longConsentRepository,
-                preferencesManager,
-                dispatcherProvider
+                configManager
             )
         }
     }

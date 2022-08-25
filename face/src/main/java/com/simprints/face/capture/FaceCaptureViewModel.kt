@@ -3,7 +3,6 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -16,13 +15,19 @@ import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.models.FaceDetection
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FaceConfiguration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class FaceCaptureViewModel(
-    private val shouldSaveFaceImages: Boolean,
-    private val faceImageManager: FaceImageManager
+    private val configManager: ConfigManager,
+    private val faceImageManager: FaceImageManager,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
     var faceDetections = listOf<FaceDetection>()
 
@@ -48,15 +53,18 @@ class FaceCaptureViewModel(
     }
 
     fun flowFinished() {
-        if (shouldSaveFaceImages) {
-            saveFaceDetections()
-        }
+        viewModelScope.launch(dispatcher) {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            if (projectConfiguration.face?.imageSavingStrategy == FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN) {
+                saveFaceDetections()
+            }
 
-        val results = faceDetections.mapIndexed { index, detection ->
-            FaceCaptureResult(index, detection.toFaceSample())
-        }
+            val results = faceDetections.mapIndexed { index, detection ->
+                FaceCaptureResult(index, detection.toFaceSample())
+            }
 
-        finishFlowEvent.send(FaceCaptureResponse(results))
+            finishFlowEvent.send(FaceCaptureResponse(results))
+        }
     }
 
     fun captureFinished(newFaceDetections: List<FaceDetection>) {

@@ -90,9 +90,10 @@ open class EventSyncMasterWorker(
                         eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
                     if (configuration.canSyncDataToSimprints())
-                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID).also {
-                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
-                        }
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId)
+                            .also {
+                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
+                            }
 
                     if (configuration.isEventDownSyncAllowed())
                         workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId)

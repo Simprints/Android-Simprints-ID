@@ -3,6 +3,7 @@ package com.simprints.face.capture.livefeedback
 import android.graphics.RectF
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
 import com.simprints.core.tools.utils.randomUUID
@@ -14,25 +15,19 @@ import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
-import com.simprints.face.models.FaceDetection
-import com.simprints.face.models.FaceTarget
-import com.simprints.face.models.FloatRange
-import com.simprints.face.models.PreviewFrame
-import com.simprints.face.models.Size
-import com.simprints.face.models.SymmetricTarget
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import com.simprints.face.models.*
+import com.simprints.infra.config.ConfigManager
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
     private val frameProcessor: FrameProcessor,
-    private val qualityThreshold: Float,
+    private val configManager: ConfigManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
-    private val faceTimeHelper: FaceTimeHelper
+    private val faceTimeHelper: FaceTimeHelper,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -87,15 +82,18 @@ class LiveFeedbackFragmentViewModel(
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture() {
-        val sortedQualifyingCaptures = userCaptures
-            .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
-            .sortedByDescending { it.face?.quality }
-            .ifEmpty { listOf(fallbackCapture) }
+        viewModelScope.launch(dispatcher) {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            val sortedQualifyingCaptures = userCaptures
+                .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
+                .sortedByDescending { it.face?.quality }
+                .ifEmpty { listOf(fallbackCapture) }
 
-        sendAllCaptureEvents()
+            sendAllCaptureEvents()
 
-        capturingState.postValue(CapturingState.FINISHED)
-        mainVM.captureFinished(sortedQualifyingCaptures)
+            capturingState.postValue(CapturingState.FINISHED)
+            mainVM.captureFinished(sortedQualifyingCaptures)
+        }
     }
 
     private fun getFaceDetectionFromPotentialFace(
@@ -166,19 +164,27 @@ class LiveFeedbackFragmentViewModel(
     }
 
     private fun sendCaptureEvent(faceDetection: FaceDetection) {
-        val payloadId = randomUUID() // The payloads of these two events need to have the same ids
-        val faceCaptureEvent =
-            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold, payloadId)
+        viewModelScope.launch(dispatcher) {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            // The payloads of these two events need to have the same ids
+            val payloadId = randomUUID()
+            val faceCaptureEvent =
+                faceDetection.toFaceCaptureEvent(
+                    mainVM.attemptNumber,
+                    projectConfiguration.face!!.qualityThreshold.toFloat(),
+                    payloadId
+                )
 
-        val faceCaptureBiometricsEvent =
-            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent(
-                payloadId
-            ) else null
+            val faceCaptureBiometricsEvent =
+                if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent(
+                    payloadId
+                ) else null
 
-        faceSessionEventsManager.addEvent(faceCaptureEvent)
-        faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
+            faceSessionEventsManager.addEvent(faceCaptureEvent)
+            faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
 
-        faceDetection.id = faceCaptureEvent.id
+            faceDetection.id = faceCaptureEvent.id
+        }
     }
 
     /**

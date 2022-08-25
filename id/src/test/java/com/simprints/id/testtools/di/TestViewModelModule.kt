@@ -9,14 +9,17 @@ import com.simprints.id.activities.dashboard.cards.project.repository.DashboardP
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
 import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutViewModelFactory
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.di.DependencyRule
 
@@ -24,7 +27,10 @@ class TestViewModelModule(
     private val dashboardViewModelFactoryRule: DependencyRule = DependencyRule.RealRule,
     private val loginViewModelFactoryRule: DependencyRule = DependencyRule.RealRule,
     private val privacyViewModelFactoryRule: DependencyRule = DependencyRule.RealRule,
-    private val syncInformationViewModelFactorRule: DependencyRule = DependencyRule.RealRule
+    private val syncInformationViewModelFactorRule: DependencyRule = DependencyRule.RealRule,
+    private val consentViewModelFactoryRule: DependencyRule = DependencyRule.RealRule,
+    private val settingAboutModelFactoryRule: DependencyRule = DependencyRule.RealRule,
+    private val settingsPreferenceViewModelFactoryRule: DependencyRule = DependencyRule.RealRule,
 ) : ViewModelModule() {
 
     override fun provideDashboardViewModelFactory(
@@ -33,11 +39,18 @@ class TestViewModelModule(
         dailyActivityRepository: DashboardDailyActivityRepository
     ): DashboardViewModelFactory {
         return dashboardViewModelFactoryRule.resolveDependency {
-            super.provideDashboardViewModelFactory(projectDetailsRepository, syncCardStateRepository, dailyActivityRepository)
+            super.provideDashboardViewModelFactory(
+                projectDetailsRepository,
+                syncCardStateRepository,
+                dailyActivityRepository
+            )
         }
     }
 
-    override fun provideLoginViewModelFactory(authenticationHelper: AuthenticationHelper, dispatcher: DispatcherProvider): LoginViewModelFactory {
+    override fun provideLoginViewModelFactory(
+        authenticationHelper: AuthenticationHelper,
+        dispatcher: DispatcherProvider
+    ): LoginViewModelFactory {
         return loginViewModelFactoryRule.resolveDependency {
             super.provideLoginViewModelFactory(authenticationHelper, dispatcher)
         }
@@ -45,14 +58,12 @@ class TestViewModelModule(
 
     override fun providePrivacyNoticeViewModelFactory(
         longConsentRepository: LongConsentRepository,
-        preferencesManager: IdPreferencesManager,
-        dispatcherProvider: DispatcherProvider
+        configManager: ConfigManager,
     ): PrivacyNoticeViewModelFactory {
         return privacyViewModelFactoryRule.resolveDependency {
             super.providePrivacyNoticeViewModelFactory(
                 longConsentRepository,
-                preferencesManager,
-                dispatcherProvider
+                configManager
             )
         }
     }
@@ -61,23 +72,42 @@ class TestViewModelModule(
         downySyncHelper: EventDownSyncHelper,
         eventRepository: EventRepository,
         subjectRepository: SubjectRepository,
-        preferencesManager: IdPreferencesManager,
         loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        dispatcher: DispatcherProvider
+        configManager: ConfigManager,
     ): SyncInformationViewModelFactory {
         return syncInformationViewModelFactorRule.resolveDependency {
             super.provideSyncInformationViewModelFactory(
                 downySyncHelper,
                 eventRepository,
                 subjectRepository,
-                preferencesManager,
                 loginManager,
                 eventDownSyncScopeRepository,
                 imageRepository,
-                dispatcher
+                configManager,
             )
         }
     }
+
+    override fun provideConsentViewModelFactory(
+        configManager: ConfigManager,
+        eventRepository: EventRepository
+    ) =
+        consentViewModelFactoryRule.resolveDependency {
+            super.provideConsentViewModelFactory(configManager, eventRepository)
+        }
+
+    override fun provideSettingsAboutViewModelFactory(
+        configManager: ConfigManager,
+        signerManager: SignerManager
+    ): SettingsAboutViewModelFactory =
+        settingAboutModelFactoryRule.resolveDependency {
+            super.provideSettingsAboutViewModelFactory(configManager, signerManager)
+        }
+
+    override fun provideSettingsPreferenceViewModelFactory(configManager: ConfigManager): SettingsPreferenceViewModelFactory =
+        settingsPreferenceViewModelFactoryRule.resolveDependency {
+            super.provideSettingsPreferenceViewModelFactory(configManager)
+        }
 }

@@ -11,6 +11,7 @@ import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolAdjudicationAction
 import com.simprints.id.orchestrator.responsebuilders.adjudication.EnrolResponseAdjudicationHelper
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 
 class AppResponseFactoryImpl(
     private val enrolmentHelper: EnrolmentHelper,
@@ -22,7 +23,7 @@ class AppResponseFactoryImpl(
     private val enrolResponseAdjudicationHelper: EnrolResponseAdjudicationHelper
 ) : AppResponseFactory {
 
-    override suspend fun buildAppResponse(modalities: List<Modality>,
+    override suspend fun buildAppResponse(modalities: List<GeneralConfiguration.Modality>,
                                           appRequest: AppRequest,
                                           steps: List<Step>,
                                           sessionId: String): AppResponse =

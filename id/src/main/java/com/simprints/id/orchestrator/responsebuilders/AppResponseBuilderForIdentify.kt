@@ -1,6 +1,5 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
@@ -13,15 +12,20 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 
-class AppResponseBuilderForIdentify(private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
-                                    private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>,
-                                    private val returnIdentificationsCount: Int) : BaseAppResponseBuilder() {
+class AppResponseBuilderForIdentify(
+    private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
+    private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>,
+    private val returnIdentificationsCount: Int
+) : BaseAppResponseBuilder() {
 
-    override suspend fun buildAppResponse(modalities: List<Modality>,
-                                          appRequest: AppRequest,
-                                          steps: List<Step>,
-                                          sessionId: String): AppResponse {
+    override suspend fun buildAppResponse(
+        modalities: List<GeneralConfiguration.Modality>,
+        appRequest: AppRequest,
+        steps: List<Step>,
+        sessionId: String
+    ): AppResponse {
         super.getErrorOrRefusalResponseIfAny(steps)?.let {
             return it
         }
@@ -32,7 +36,7 @@ class AppResponseBuilderForIdentify(private val fingerprintConfidenceThresholds:
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildAppIdentifyResponseForFaceAndFinger(faceResponse, fingerprintResponse, sessionId)
+                buildAppIdentifyResponseForFaceAndFinger(fingerprintResponse, sessionId)
             }
             fingerprintResponse != null -> {
                 buildAppIdentifyResponseForFingerprint(fingerprintResponse, sessionId)
@@ -50,43 +54,61 @@ class AppResponseBuilderForIdentify(private val fingerprintConfidenceThresholds:
     private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceMatchResponse,
-                                                         fingerprintResponse: FingerprintMatchResponse,
-                                                         sessionId: String) =
+    private fun buildAppIdentifyResponseForFaceAndFinger(
+        fingerprintResponse: FingerprintMatchResponse,
+        sessionId: String
+    ) =
         AppIdentifyResponse(
             getSortedIdentificationsForFingerprint(fingerprintResponse),
-            sessionId)
+            sessionId
+        )
 
     private fun getSortedIdentificationsForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
         fingerprintResponse.result.map {
-            MatchResult(it.personId,
+            MatchResult(
+                it.personId,
                 it.confidenceScore.toInt(),
                 Tier.computeTier(it.confidenceScore),
-                computeMatchConfidenceForFingerprint(it.confidenceScore.toInt(), fingerprintConfidenceThresholds))
+                computeMatchConfidenceForFingerprint(
+                    it.confidenceScore.toInt(),
+                    fingerprintConfidenceThresholds
+                )
+            )
         }
 
-    private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
-                                                       sessionId: String): AppIdentifyResponse {
+    private fun buildAppIdentifyResponseForFingerprint(
+        fingerprintResponse: FingerprintMatchResponse,
+        sessionId: String
+    ): AppIdentifyResponse {
         val resultSortedByConfidence = buildResultsFromFingerprintMatchResponse(fingerprintResponse)
 
         return AppIdentifyResponse(resultSortedByConfidence.map {
-            MatchResult(it.personId,
+            MatchResult(
+                it.personId,
                 it.confidenceScore.toInt(),
                 Tier.computeTier(it.confidenceScore),
-                computeMatchConfidenceForFingerprint(it.confidenceScore.toInt(), fingerprintConfidenceThresholds))
+                computeMatchConfidenceForFingerprint(
+                    it.confidenceScore.toInt(),
+                    fingerprintConfidenceThresholds
+                )
+            )
         }, sessionId)
     }
 
-    private fun buildAppIdentifyResponseForFace(faceResponse: FaceMatchResponse,
-                                                sessionId: String): AppIdentifyResponse {
+    private fun buildAppIdentifyResponseForFace(
+        faceResponse: FaceMatchResponse,
+        sessionId: String
+    ): AppIdentifyResponse {
         val resultsSortedByConfidence = buildResultsFromFaceMatchResponse(faceResponse)
 
         return AppIdentifyResponse(
             resultsSortedByConfidence.map {
-                MatchResult(it.guidFound,
+                MatchResult(
+                    it.guidFound,
                     it.confidence.toInt(),
                     Tier.computeTier(it.confidence),
-                    computeMatchConfidenceForFace(it.confidence.toInt(), faceConfidenceThresholds))
+                    computeMatchConfidenceForFace(it.confidence.toInt(), faceConfidenceThresholds)
+                )
             },
             sessionId
         )
@@ -95,7 +117,9 @@ class AppResponseBuilderForIdentify(private val fingerprintConfidenceThresholds:
     private fun buildResultsFromFingerprintMatchResponse(fingerprintResponse: FingerprintMatchResponse): List<FingerprintMatchResult> {
 
         val lowFilteredResults = fingerprintResponse.result.filter {
-            it.confidenceScore > fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.LOW)
+            it.confidenceScore > fingerprintConfidenceThresholds.getValue(
+                FingerprintConfidenceThresholds.LOW
+            )
         }.take(returnIdentificationsCount).sortedByDescending { it.confidenceScore }
 
         return getFingerprintFilteredResultsWithHighConfidence(lowFilteredResults).ifEmpty {
@@ -105,7 +129,9 @@ class AppResponseBuilderForIdentify(private val fingerprintConfidenceThresholds:
 
     private fun getFingerprintFilteredResultsWithHighConfidence(lowFilteredResults: List<FingerprintMatchResult>): List<FingerprintMatchResult> =
         lowFilteredResults.filter {
-            it.confidenceScore >= fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
+            it.confidenceScore >= fingerprintConfidenceThresholds.getValue(
+                FingerprintConfidenceThresholds.HIGH
+            )
         }
 
     private fun buildResultsFromFaceMatchResponse(faceResponse: FaceMatchResponse): List<FaceMatchResult> {
