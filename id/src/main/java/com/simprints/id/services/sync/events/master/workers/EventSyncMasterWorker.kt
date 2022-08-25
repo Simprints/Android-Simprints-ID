@@ -9,9 +9,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.SynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -141,10 +139,4 @@ open class EventSyncMasterWorker(
     private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? {
         return syncWorkers?.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
     }
-
-    private fun ProjectConfiguration.canSyncDataToSimprints(): Boolean =
-        synchronization.up.simprints.kind != UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-
-    private fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean =
-        synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 }

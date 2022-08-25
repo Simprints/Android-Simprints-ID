@@ -7,13 +7,13 @@ import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.core.tools.extentions.safeSealedWhens
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -26,12 +26,12 @@ class OdkPresenter(
     private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     rootManager: SecurityManager,
-    sharedPreferencesManager: SharedPreferencesManager
+    configManager: ConfigManager
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     rootManager = rootManager,
-    sharedPreferencesManager = sharedPreferencesManager,
+    configManager = configManager,
     sessionEventsManager = sessionEventsManager
 ), OdkContract.Presenter {
 

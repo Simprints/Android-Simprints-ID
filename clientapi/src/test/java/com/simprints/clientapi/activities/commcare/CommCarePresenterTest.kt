@@ -1,55 +1,35 @@
 package com.simprints.clientapi.activities.commcare
 
 import com.google.common.truth.Truth
+import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
-import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
-import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
-import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
-import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
-import com.simprints.clientapi.domain.responses.EnrolResponse
-import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
-import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
-import com.simprints.clientapi.requestFactories.EnrolRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.*
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventLabels
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotlintest.shouldThrow
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
+import java.util.*
 
-@ExperimentalCoroutinesApi
 class CommCarePresenterTest {
 
     companion object {
@@ -59,11 +39,19 @@ class CommCarePresenterTest {
 
     private val view = mockk<CommCareActivity>()
     private val jsonHelper = JsonHelper
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { synchronization } returns mockk {
+                every { up } returns mockk {
+                    every { coSync } returns CoSyncUpSynchronizationConfiguration(NONE)
+                }
+            }
+        }
+    }
 
     @Before
     fun setup() {
         BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
-        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @Test
@@ -125,9 +113,9 @@ class CommCarePresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         every { view.confirmIdentityExtractor } returns confirmIdentify
         every { view.extras } returns mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
-        val sessionEventsManager =mockSessionManagerToCreateSession().also {
+        val sessionEventsManager = mockSessionManagerToCreateSession().also {
             coEvery { it.isSessionHasIdentificationCallback(any()) } returns true
-            coEvery { it.getCurrentSessionId() } returns  MOCK_SESSION_ID
+            coEvery { it.getCurrentSessionId() } returns MOCK_SESSION_ID
         }
 
         getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runBlocking { start() } }
@@ -331,32 +319,31 @@ class CommCarePresenterTest {
         }
     }
 
-    private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager>().apply {
-        coEvery { this@apply.getCurrentSessionId() } returns "session_id"
-        coEvery { this@apply.createSession(any()) } returns "session_id"
+    private fun mockSessionManagerToCreateSession() = mockk<ClientApiSessionEventsManager> {
+        coEvery { getCurrentSessionId() } returns "session_id"
+        coEvery { createSession(any()) } returns "session_id"
     }
 
-    private fun mockSharedPrefs(canCosync: Boolean = false) =
-        mockk<SharedPreferencesManager>().apply {
-            coEvery { this@apply.peekSessionId() } returns "sessionId"
-            coEvery { this@apply.popSessionId() } returns "sessionId"
-            coEvery { this@apply.canCoSyncData() } returns canCosync
+    private fun mockSharedPrefs() =
+        mockk<SharedPreferencesManager> {
+            coEvery { peekSessionId() } returns "sessionId"
+            coEvery { popSessionId() } returns "sessionId"
         }
 
     private fun getNewPresenter(
         action: CommCareAction,
         clientApiSessionEventsManager: ClientApiSessionEventsManager,
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
-        canCosync: Boolean = false
     ): CommCarePresenter = CommCarePresenter(
         view,
         action,
         clientApiSessionEventsManager,
-        mockSharedPrefs(canCosync),
+        mockSharedPrefs(),
         jsonHelper,
         mockk(),
         mockk(),
         mockk(),
+        configManager,
         coroutineScope
     )
 }

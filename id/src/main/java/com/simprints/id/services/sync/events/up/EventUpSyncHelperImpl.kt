@@ -7,8 +7,7 @@ import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector
@@ -66,13 +65,4 @@ class EventUpSyncHelperImpl(
         eventUpSyncScopeRepo.insertOrUpdate(lastOperation)
         this.emit(EventUpSyncProgress(lastOperation, count))
     }
-
-    private fun ProjectConfiguration.canSyncAllDataToSimprints(): Boolean =
-        synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-
-    private fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
-        synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
-
-    private fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
-        synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 }

@@ -3,42 +3,30 @@ package com.simprints.clientapi.controllers.core.eventData
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncAnalyticsData
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
-import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
-import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
+import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.canCoSyncAllData
+import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
+import com.simprints.infra.config.domain.models.canCoSyncBiometricData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl(
     private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
     private val hotCache: HotCache,
-    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val configManager: ConfigManager,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ClientApiSessionEventsManager {
 
@@ -127,15 +115,15 @@ class ClientApiSessionEventsManagerImpl(
 
     override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
         when {
-            sharedPreferencesManager.canCoSyncAllData() -> {
+            configManager.getProjectConfiguration().canCoSyncAllData() -> {
                 coreEventRepository.getEventsFromSession(sessionId)
             }
-            sharedPreferencesManager.canCoSyncBiometricData() -> {
+            configManager.getProjectConfiguration().canCoSyncBiometricData() -> {
                 coreEventRepository.getEventsFromSession(sessionId).filter {
                     it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                 }
             }
-            sharedPreferencesManager.canCoSyncAnalyticsData() -> {
+            configManager.getProjectConfiguration().canCoSyncAnalyticsData() -> {
                 coreEventRepository.getEventsFromSession(sessionId).filterNot {
                     it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                 }
@@ -161,17 +149,17 @@ class ClientApiSessionEventsManagerImpl(
     override suspend fun closeCurrentSessionNormally() {
         coreEventRepository.closeCurrentSession()
     }
-}
 
-fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
-    when (this) {
-        ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION -> CoreAlertScreenEventType.INVALID_INTENT_ACTION
-        ClientApiAlert.INVALID_METADATA -> CoreAlertScreenEventType.INVALID_METADATA
-        ClientApiAlert.INVALID_MODULE_ID -> CoreAlertScreenEventType.INVALID_MODULE_ID
-        ClientApiAlert.INVALID_PROJECT_ID -> CoreAlertScreenEventType.INVALID_PROJECT_ID
-        ClientApiAlert.INVALID_SELECTED_ID -> CoreAlertScreenEventType.INVALID_SELECTED_ID
-        ClientApiAlert.INVALID_SESSION_ID -> CoreAlertScreenEventType.INVALID_SESSION_ID
-        ClientApiAlert.INVALID_USER_ID -> CoreAlertScreenEventType.INVALID_USER_ID
-        ClientApiAlert.INVALID_VERIFY_ID -> CoreAlertScreenEventType.INVALID_VERIFY_ID
-        ClientApiAlert.ROOTED_DEVICE -> CoreAlertScreenEventType.UNEXPECTED_ERROR
-    }
+    private fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
+        when (this) {
+            ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION -> CoreAlertScreenEventType.INVALID_INTENT_ACTION
+            ClientApiAlert.INVALID_METADATA -> CoreAlertScreenEventType.INVALID_METADATA
+            ClientApiAlert.INVALID_MODULE_ID -> CoreAlertScreenEventType.INVALID_MODULE_ID
+            ClientApiAlert.INVALID_PROJECT_ID -> CoreAlertScreenEventType.INVALID_PROJECT_ID
+            ClientApiAlert.INVALID_SELECTED_ID -> CoreAlertScreenEventType.INVALID_SELECTED_ID
+            ClientApiAlert.INVALID_SESSION_ID -> CoreAlertScreenEventType.INVALID_SESSION_ID
+            ClientApiAlert.INVALID_USER_ID -> CoreAlertScreenEventType.INVALID_USER_ID
+            ClientApiAlert.INVALID_VERIFY_ID -> CoreAlertScreenEventType.INVALID_VERIFY_ID
+            ClientApiAlert.ROOTED_DEVICE -> CoreAlertScreenEventType.UNEXPECTED_ERROR
+        }
+}

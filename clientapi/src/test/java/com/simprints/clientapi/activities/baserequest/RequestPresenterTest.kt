@@ -3,9 +3,9 @@ package com.simprints.clientapi.activities.baserequest
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -13,12 +13,10 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class RequestPresenterTest {
 
     private val projectIdField = "some_project_id"
@@ -118,13 +116,13 @@ class ImplRequestPresenter(
     view: RequestContract.RequestView,
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
     rootManager: SecurityManager,
-    sharedPreferencesManager: SharedPreferencesManager,
+    configManager: ConfigManager,
     sessionEventsManager: ClientApiSessionEventsManager
 ) : RequestPresenter(
     view = view,
     eventsManager = clientApiSessionEventsManager,
     rootManager = rootManager,
-    sharedPreferencesManager = sharedPreferencesManager,
+    configManager = configManager,
     sessionEventsManager = sessionEventsManager
 ) {
 
