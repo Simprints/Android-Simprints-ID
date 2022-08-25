@@ -23,7 +23,6 @@ import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -53,7 +52,11 @@ class PrivacyNoticeActivityUnitTest {
     private val viewModelModule by lazy {
         TestViewModelModule(
             privacyViewModelFactoryRule = DependencyRule.ReplaceRule {
-                PrivacyNoticeViewModelFactory(longConsentRepository, configManager)
+                PrivacyNoticeViewModelFactory(
+                    longConsentRepository,
+                    configManager,
+                    testCoroutineRule.testCoroutineDispatcher
+                )
             }
         )
     }
@@ -81,7 +84,7 @@ class PrivacyNoticeActivityUnitTest {
 
     @Test
     fun withSuccessConfirmViews() {
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             coEvery {
                 longConsentRepository.getLongConsentResultForLanguage(LANGUAGE)
             } returns flowOf(
@@ -102,7 +105,7 @@ class PrivacyNoticeActivityUnitTest {
 
     @Test
     fun withBackendMaintenanceErrorConfirmViews() {
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             coEvery {
                 longConsentRepository.getLongConsentResultForLanguage(LANGUAGE)
             } returns flowOf(
@@ -125,7 +128,7 @@ class PrivacyNoticeActivityUnitTest {
 
     @Test
     fun withTimedBackendMaintenanceErrorConfirmViews() {
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             coEvery {
                 longConsentRepository.getLongConsentResultForLanguage(LANGUAGE)
             } returns flowOf(
