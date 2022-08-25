@@ -8,6 +8,8 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.infra.config.ConfigManager
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 class SyncInformationViewModelFactory(
     private val downySyncHelper: EventDownSyncHelper,
@@ -16,7 +18,8 @@ class SyncInformationViewModelFactory(
     private val projectId: String,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
-    private val configManager: ConfigManager
+    private val configManager: ConfigManager,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -29,7 +32,8 @@ class SyncInformationViewModelFactory(
                 projectId,
                 eventDownSyncScopeRepository,
                 imageRepository,
-                configManager
+                configManager,
+                dispatcher
             ) as T
         } else {
             throw IllegalArgumentException("ViewModel Not Found")

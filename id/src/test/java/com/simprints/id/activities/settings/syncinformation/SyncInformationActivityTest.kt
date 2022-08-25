@@ -65,6 +65,7 @@ class SyncInformationActivityTest {
                     eventDownSyncScopeRepository,
                     imageRepository,
                     configManager,
+                    testCoroutineRule.testCoroutineDispatcher,
                 )
             }
         )
