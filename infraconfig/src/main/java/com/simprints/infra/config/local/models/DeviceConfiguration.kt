@@ -9,7 +9,7 @@ internal fun DeviceConfiguration.toProto(): ProtoDeviceConfiguration =
                 .setLanguage(language)
                 .build()
         )
-        .addAllModuleSelected(moduleSelected)
+        .addAllModuleSelected(selectedModules)
         .setFingersToCollect(
             ProtoDeviceConfiguration.FingersToCollect.newBuilder()
                 .addAllFingersToCollect(fingersToCollect.map { it.toProto() })

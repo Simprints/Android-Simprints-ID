@@ -203,54 +203,6 @@ class SettingsPreferencesManagerTest {
     }
 
     @Test
-    fun simprintsSyncSettingNone_returnsCorrectValuesForConvenienceMethods() {
-        every {
-            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
-        } returns "NONE"
-
-        assertFalse { settingsPreferencesManager.canSyncDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncAllDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
-    }
-
-    @Test
-    fun simprintsSyncSettingAll_returnsCorrectValuesForConvenienceMethods() {
-        every {
-            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
-        } returns "ALL"
-
-        assertTrue { settingsPreferencesManager.canSyncDataToSimprints() }
-        assertTrue { settingsPreferencesManager.canSyncAllDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
-    }
-
-    @Test
-    fun simprintsSyncSettingBiometrics_returnsCorrectValuesForConvenienceMethods() {
-        every {
-            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
-        } returns "ONLY_BIOMETRICS"
-
-        assertTrue { settingsPreferencesManager.canSyncDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncAllDataToSimprints() }
-        assertTrue { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
-    }
-
-    @Test
-    fun simprintsSyncSettingAnalytics_returnsCorrectValuesForConvenienceMethods() {
-        every {
-            remoteConfigSpy.getString(SettingsPreferencesManagerImpl.SIMPRINTS_SYNC_KEY)
-        } returns "ONLY_ANALYTICS"
-
-        assertTrue { settingsPreferencesManager.canSyncDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncAllDataToSimprints() }
-        assertFalse { settingsPreferencesManager.canSyncBiometricDataToSimprints() }
-        assertTrue { settingsPreferencesManager.canSyncAnalyticsDataToSimprints() }
-    }
-
-    @Test
     fun simprintsCanDownSyncEvents_returnsFalseWhenOFF() {
         every {
             remoteConfigSpy.getString(SettingsPreferencesManagerImpl.PEOPLE_DOWN_SYNC_SETTING_KEY)

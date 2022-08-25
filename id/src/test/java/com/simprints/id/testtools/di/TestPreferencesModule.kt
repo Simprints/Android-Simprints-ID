@@ -70,5 +70,4 @@ class TestPreferencesModule(
             faceConfidenceThresholdsSerializer
         )
     }
-
 }

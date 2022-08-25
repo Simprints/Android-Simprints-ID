@@ -2,30 +2,41 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.prefs.IdPreferencesManager
+import androidx.lifecycle.viewModelScope
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class FingerSelectionViewModel(private val preferencesManager: IdPreferencesManager) : ViewModel() {
+class FingerSelectionViewModel(
+    private val configManager: ConfigManager,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ViewModel() {
 
     val items = MutableLiveData<List<FingerSelectionItem>>()
 
     private val _items: MutableList<FingerSelectionItem> = mutableListOf()
+    private var initialItems: List<FingerSelectionItem> = listOf()
 
-    private fun postUpdatedItems(block: MutableList<FingerSelectionItem>.() -> Unit) {
-        _items.block()
-        items.value = _items
+    private fun postUpdatedItems(block: suspend MutableList<FingerSelectionItem>.() -> Unit) {
+        viewModelScope.launch(dispatcher) {
+            _items.block()
+            items.value = _items
+        }
     }
 
     fun start() {
         postUpdatedItems {
-            addAll(determineFingerSelectionItemsFromPrefs())
+            initialItems = determineFingerSelectionItemsFromPrefs()
+            addAll(initialItems)
         }
     }
 
-    fun changeFingerSelection(itemIndex: Int, finger: FingerIdentifier) {
+    fun changeFingerSelection(itemIndex: Int, finger: Finger) {
         _items[itemIndex].finger = finger
     }
 
@@ -47,7 +58,7 @@ class FingerSelectionViewModel(private val preferencesManager: IdPreferencesMana
         postUpdatedItems {
             val fingerNotYetUsed = ORDERED_FINGERS.toMutableList().apply {
                 removeAll(this@postUpdatedItems.map { it.finger })
-            }.firstOrNull() ?: FingerIdentifier.LEFT_THUMB
+            }.firstOrNull() ?: Finger.LEFT_THUMB
             add(FingerSelectionItem(fingerNotYetUsed, QUANTITY_OPTIONS.first(), true))
         }
     }
@@ -56,14 +67,17 @@ class FingerSelectionViewModel(private val preferencesManager: IdPreferencesMana
         postUpdatedItems {
             clear()
             addAll(
-                preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()
-                    .apply {
-                        forEach { it.removable = false }
-                    })
+                configManager
+                    .getProjectConfiguration()
+                    .fingerprint!! // It will not be null as we have already checked that the modality Fingerprint is enabled
+                    .fingersToCapture
+                    .toFingerSelectionItems()
+                    .onEach { it.removable = false }
+            )
         }
     }
 
-    fun haveSettingsChanged() = determineFingerSelectionItemsFromPrefs() != _items.toList()
+    fun haveSettingsChanged() = initialItems != _items.toList()
 
     fun canSavePreference(): Boolean {
         val highestNumberOfFingersInItems =
@@ -73,25 +87,37 @@ class FingerSelectionViewModel(private val preferencesManager: IdPreferencesMana
     }
 
     fun savePreference() {
-        val fingerprintsToCollect = _items.toFingerIdentifiers()
-        preferencesManager.fingerprintsToCollect = fingerprintsToCollect
-        Simber.tag(FINGERS_SELECTED, true).i(fingerprintsToCollect.map { it.name }.toString())
+        viewModelScope.launch(dispatcher) {
+            val fingerprintsToCollect = _items.toFingerIdentifiers()
+            configManager.updateDeviceConfiguration {
+                it.apply {
+                    it.fingersToCollect = fingerprintsToCollect
+                }
+            }
+            initialItems = _items
+            Simber.tag(FINGERS_SELECTED, true).i(fingerprintsToCollect.map { it.name }.toString())
+        }
     }
 
-    private fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =
-        preferencesManager.fingerprintsToCollect.toFingerSelectionItems().also { savedPref ->
-            try {
-                preferencesManager.getRemoteConfigFingerprintsToCollect().toFingerSelectionItems()
-                    .map { it.finger }.distinct()
-                    .forEach { finger ->
-                        savedPref.firstOrNull { it.finger == finger }?.removable = false
-                    }
-            } catch (e: NoSuchPreferenceError) {
-                Simber.e(e)
+    private suspend fun determineFingerSelectionItemsFromPrefs(): List<FingerSelectionItem> =
+        configManager.getDeviceConfiguration().fingersToCollect.toFingerSelectionItems()
+            .also { savedPref ->
+                try {
+                    configManager
+                        .getProjectConfiguration()
+                        .fingerprint!!
+                        .fingersToCapture
+                        .toFingerSelectionItems()
+                        .map { it.finger }.distinct()
+                        .forEach { finger ->
+                            savedPref.firstOrNull { it.finger == finger }?.removable = false
+                        }
+                } catch (e: NoSuchPreferenceError) {
+                    Simber.e(e)
+                }
             }
-        }
 
-    private fun List<FingerIdentifier>.toFingerSelectionItems(): List<FingerSelectionItem> {
+    private fun List<Finger>.toFingerSelectionItems(): List<FingerSelectionItem> {
         val result = mutableListOf<FingerSelectionItem>()
         this.forEach {
             if (result.lastOrNull()?.finger == it) {
@@ -103,29 +129,29 @@ class FingerSelectionViewModel(private val preferencesManager: IdPreferencesMana
         return result
     }
 
-    private fun List<FingerSelectionItem>.toFingerIdentifiers(): List<FingerIdentifier> =
+    private fun List<FingerSelectionItem>.toFingerIdentifiers(): List<Finger> =
         flatMap { item ->
             List(item.quantity) { item.finger }
         }
 }
 
 data class FingerSelectionItem(
-    var finger: FingerIdentifier,
+    var finger: Finger,
     var quantity: Int,
     var removable: Boolean
 )
 
 val ORDERED_FINGERS = listOf(
-    FingerIdentifier.LEFT_THUMB,
-    FingerIdentifier.LEFT_INDEX_FINGER,
-    FingerIdentifier.LEFT_3RD_FINGER,
-    FingerIdentifier.LEFT_4TH_FINGER,
-    FingerIdentifier.LEFT_5TH_FINGER,
-    FingerIdentifier.RIGHT_THUMB,
-    FingerIdentifier.RIGHT_INDEX_FINGER,
-    FingerIdentifier.RIGHT_3RD_FINGER,
-    FingerIdentifier.RIGHT_4TH_FINGER,
-    FingerIdentifier.RIGHT_5TH_FINGER
+    Finger.LEFT_THUMB,
+    Finger.LEFT_INDEX_FINGER,
+    Finger.LEFT_3RD_FINGER,
+    Finger.LEFT_4TH_FINGER,
+    Finger.LEFT_5TH_FINGER,
+    Finger.RIGHT_THUMB,
+    Finger.RIGHT_INDEX_FINGER,
+    Finger.RIGHT_3RD_FINGER,
+    Finger.RIGHT_4TH_FINGER,
+    Finger.RIGHT_5TH_FINGER
 )
 
 val QUANTITY_OPTIONS = arrayOf(1, 2, 3, 4, 5)

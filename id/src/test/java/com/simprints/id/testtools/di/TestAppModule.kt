@@ -7,6 +7,7 @@ import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.local.EventDatabaseFactory
 import com.simprints.eventsystem.event.local.EventLocalDataSource
@@ -35,7 +36,7 @@ class TestAppModule(
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
-    private val sessionEventsManagerRule: DependencyRule = RealRule,
+    private val eventRepositoryRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
@@ -69,8 +70,8 @@ class TestAppModule(
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): com.simprints.eventsystem.event.EventRepository =
-        sessionEventsManagerRule.resolveDependency {
+    ): EventRepository =
+        eventRepositoryRule.resolveDependency {
             super.provideEventRepository(
                 ctx,
                 eventLocalDataSource,

@@ -42,7 +42,7 @@ import javax.inject.Singleton
         SafetyNetModule::class,
         TestSecurityModule::class,
         RealmModule::class,
-        ConfigManagerModule::class,
+        TestConfigManagerModule::class,
         DataStoreModule::class,
     ]
 )

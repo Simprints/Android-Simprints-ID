@@ -1,9 +1,7 @@
-
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.domain.modality.Modality
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
@@ -22,17 +20,26 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
-class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
-                             private val faceStepProcessor: FaceStepProcessor,
-                             private val coreStepProcessor: CoreStepProcessor,
-                             timeHelper: TimeHelper,
-                             eventRepository: com.simprints.eventsystem.event.EventRepository,
-                             consentRequired: Boolean,
-                             locationRequired: Boolean,
-                             private val modalities: List<Modality>,
-                             projectId: String,
-                             deviceId: String) :
-ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired, modalities, projectId, deviceId) {
+class ModalityFlowVerifyImpl(
+    private val fingerprintStepProcessor: FingerprintStepProcessor,
+    private val faceStepProcessor: FaceStepProcessor,
+    private val coreStepProcessor: CoreStepProcessor,
+    consentRequired: Boolean,
+    locationRequired: Boolean,
+    private val modalities: List<Modality>,
+    projectId: String,
+    deviceId: String
+) :
+    ModalityFlowBaseImpl(
+        coreStepProcessor,
+        fingerprintStepProcessor,
+        faceStepProcessor,
+        consentRequired,
+        locationRequired,
+        modalities,
+        projectId,
+        deviceId
+    ) {
 
     override fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppVerifyRequest)
@@ -58,7 +65,12 @@ ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProces
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
+    override suspend fun handleIntentResult(
+        appRequest: AppRequest,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Step? {
         require(appRequest is AppVerifyRequest)
 
         val result = when {
@@ -67,8 +79,16 @@ ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProces
                     completeAllStepsIfFetchGuidResponseAndFailed(it)
                 }
             }
-            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
-            isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
+            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(
+                requestCode,
+                resultCode,
+                data
+            )
+            isFaceResult(requestCode) -> faceStepProcessor.processResult(
+                requestCode,
+                resultCode,
+                data
+            )
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
@@ -82,7 +102,10 @@ ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProces
         }
     }
 
-    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
+    private fun buildQueryAndAddMatchingStepIfRequired(
+        result: Step.Result?,
+        appRequest: AppVerifyRequest
+    ) {
         if (result is FingerprintCaptureResponse) {
             val query = SubjectQuery(subjectId = appRequest.verifyGuid)
             addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)

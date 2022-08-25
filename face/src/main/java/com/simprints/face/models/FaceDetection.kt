@@ -74,6 +74,6 @@ data class FaceDetection(
         )
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING
-    fun isAboveQualityThreshold(qualityThreshold: Float): Boolean =
+    fun isAboveQualityThreshold(qualityThreshold: Int): Boolean =
         face?.let { it.quality > qualityThreshold } ?: false
 }

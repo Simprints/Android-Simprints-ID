@@ -8,9 +8,6 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.domain.modality.Modality.FACE
-import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
@@ -28,13 +25,13 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -45,7 +42,6 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
 class OrchestratorManagerImplTest {
@@ -54,16 +50,21 @@ class OrchestratorManagerImplTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    @MockK private lateinit var appResponseFactoryMock: AppResponseFactory
-    @MockK private lateinit var modalityFlowMock: ModalityFlow
-    @MockK private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
-    @MockK private lateinit var hotCache: HotCache
-    @MockK private lateinit var personCreationEventHelper: PersonCreationEventHelper
+    @MockK
+    private lateinit var appResponseFactoryMock: AppResponseFactory
+    @MockK
+    private lateinit var modalityFlowMock: ModalityFlow
+    @MockK
+    private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
+    @MockK
+    private lateinit var hotCache: HotCache
+    @MockK
+    private lateinit var personCreationEventHelper: PersonCreationEventHelper
 
     private lateinit var modalityFlowFactoryMock: ModalityFlowFactory
     private lateinit var orchestrator: OrchestratorManager
     private val mockSteps = mutableListOf<Step>()
-    private val modalities = listOf(FACE)
+    private val modalities = listOf(GeneralConfiguration.Modality.FACE)
 
     private val appEnrolRequest = AppEnrolRequest(
         "some_project_id",
@@ -135,33 +136,35 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Fingerprint only - Person Creation Event should be added after fingerprint capture`() = runTest {
-        with(orchestrator) {
-            mockFingerprintWithCaptureCompleted()
+    fun `Fingerprint only - Person Creation Event should be added after fingerprint capture`() =
+        runTest {
+            with(orchestrator) {
+                mockFingerprintWithCaptureCompleted()
 
-            handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+                handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
-            coVerify { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+                coVerify { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+            }
         }
-    }
 
     @Test
-    fun `Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return`() = runTest {
-        with(orchestrator) {
-            mockFingerprintWithCaptureCompleted(null)
+    fun `Fingerprint only - Person Creation Event should not be added if fingerprint capture didn't return`() =
+        runTest {
+            with(orchestrator) {
+                mockFingerprintWithCaptureCompleted(null)
 
-            handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+                handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
-            coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+                coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+            }
         }
-    }
 
     @Test
     fun `test person creation event should not be added for followup requests`() = runTest {
         with(orchestrator) {
             mockFingerprintWithCaptureCompleted(null)
 
-            handleIntentResult(followUpRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+            handleIntentResult(enrolLastBiometricsRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
             coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
         }
@@ -179,48 +182,52 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun `Face only - Person Creation Event should not be added if face capture didn't return`() = runTest {
-        with(orchestrator) {
-            mockFaceWithCaptureCompleted(null)
+    fun `Face only - Person Creation Event should not be added if face capture didn't return`() =
+        runTest {
+            with(orchestrator) {
+                mockFaceWithCaptureCompleted(null)
 
-            handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+                handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
-            coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+                coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+            }
         }
-    }
 
     @Test
-    fun `Face and Fingerprint - Person Creation Event should be if both captures are completed`() = runTest {
-        with(orchestrator) {
-            mockFaceAndFingerprintWithCaptureCompleted()
+    fun `Face and Fingerprint - Person Creation Event should be if both captures are completed`() =
+        runTest {
+            with(orchestrator) {
+                mockFaceAndFingerprintWithCaptureCompleted()
 
-            handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+                handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
-            coVerify { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+                coVerify { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+            }
         }
-    }
 
     @Test
-    fun `Face and Fingerprint - Person Creation Event should not be added if face capture didn't return`() = runTest {
-        with(orchestrator) {
-            mockFaceAndFingerprintWithCaptureCompleted(faceResult = null)
+    fun `Face and Fingerprint - Person Creation Event should not be added if face capture didn't return`() =
+        runTest {
+            with(orchestrator) {
+                mockFaceAndFingerprintWithCaptureCompleted(faceResult = null)
 
-            handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+                handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
-            coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+                coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+            }
         }
-    }
 
     @Test
-    fun `Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return`() = runTest {
-        with(orchestrator) {
-            mockFaceAndFingerprintWithCaptureCompleted(fingerprintResult = null)
+    fun `Face and Fingerprint - Person Creation Event should not be added if fingerprint capture didn't return`() =
+        runTest {
+            with(orchestrator) {
+                mockFaceAndFingerprintWithCaptureCompleted(fingerprintResult = null)
 
-            handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+                handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
 
-            coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+                coVerify(exactly = 0) { personCreationEventHelper.addPersonCreationEventIfNeeded(any()) }
+            }
         }
-    }
 
     @After
     fun tearDown() {
@@ -228,27 +235,34 @@ class OrchestratorManagerImplTest {
         stopKoin()
     }
 
-    private fun OrchestratorManager.mockFaceAndFingerprintWithCaptureCompleted(fingerprintResult: FingerprintCaptureResponse? = mockk(),
-                                                                               faceResult: FaceCaptureResponse? = mockk()) {
+    private fun OrchestratorManager.mockFaceAndFingerprintWithCaptureCompleted(
+        fingerprintResult: FingerprintCaptureResponse? = mockk(),
+        faceResult: FaceCaptureResponse? = mockk()
+    ) {
         mockSteps.clear()
         mockSteps.addFingerprintCaptureStep(fingerprintResult)
         mockSteps.addFaceCaptureStep(faceResult)
         every { modalityFlowMock.steps } answers { mockSteps }
-        startFlowForEnrol(listOf(FACE, FINGER))
+        startFlowForEnrol(
+            listOf(
+                GeneralConfiguration.Modality.FACE,
+                GeneralConfiguration.Modality.FINGERPRINT
+            )
+        )
     }
 
     private fun OrchestratorManager.mockFingerprintWithCaptureCompleted(result: FingerprintCaptureResponse? = mockk()) {
         mockSteps.clear()
         mockSteps.addFingerprintCaptureStep(result)
         every { modalityFlowMock.steps } answers { mockSteps }
-        startFlowForEnrol(listOf(FINGER))
+        startFlowForEnrol(listOf(GeneralConfiguration.Modality.FINGERPRINT))
     }
 
     private fun OrchestratorManager.mockFaceWithCaptureCompleted(result: FaceCaptureResponse? = mockk()) {
         mockSteps.clear()
         mockSteps.addFaceCaptureStep(result)
         every { modalityFlowMock.steps } answers { mockSteps }
-        startFlowForEnrol(listOf(FACE))
+        startFlowForEnrol(listOf(GeneralConfiguration.Modality.FACE))
     }
 
 
@@ -256,13 +270,34 @@ class OrchestratorManagerImplTest {
         verify(exactly = nTimes) { modalityFlowMock.getNextStepToLaunch() }
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        coVerify(exactly = 1) { modalityFlowMock.handleIntentResult(eq(enrolAppRequest), any(), any(), any()) }
+        coVerify(exactly = 1) {
+            modalityFlowMock.handleIntentResult(
+                eq(enrolAppRequest),
+                any(),
+                any(),
+                any()
+            )
+        }
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
-        coVerify(exactly = 0) { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) }
+        coVerify(exactly = 0) {
+            appResponseFactoryMock.buildAppResponse(
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        }
 
     private fun verifyOrchestratorTriedToBuildFinalAppResponse() =
-        coVerify(exactly = 1) { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) }
+        coVerify(exactly = 1) {
+            appResponseFactoryMock.buildAppResponse(
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        }
 
     private fun prepareModalFlowForFaceEnrol() {
         every { modalityFlowMock.getNextStepToLaunch() } answers {
@@ -285,9 +320,16 @@ class OrchestratorManagerImplTest {
 
     private fun buildOrchestratorManager(): OrchestratorManager {
         modalityFlowFactoryMock = mockk<ModalityFlowFactory>().apply {
-            every { this@apply.createModalityFlow(any(), any()) } returns modalityFlowMock
+            every { this@apply.createModalityFlow(any()) } returns modalityFlowMock
         }
-        coEvery { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) } returns mockk()
+        coEvery {
+            appResponseFactoryMock.buildAppResponse(
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        } returns mockk()
         return OrchestratorManagerImpl(
             modalityFlowFactoryMock,
             appResponseFactoryMock,
@@ -298,8 +340,9 @@ class OrchestratorManagerImplTest {
     }
 
     private fun OrchestratorManager.startFlowForEnrol(
-        modalities: List<Modality>,
-        sessionId: String = "") = runTest {
+        modalities: List<GeneralConfiguration.Modality>,
+        sessionId: String = ""
+    ) = runTest {
         initialise(modalities, appEnrolRequest, sessionId)
     }
 
@@ -317,7 +360,8 @@ class OrchestratorManagerImplTest {
             enrolAppRequest,
             requestCode,
             Activity.RESULT_OK,
-            Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))
+            Intent().putExtra(IFaceResponse.BUNDLE_KEY, response)
+        )
     }
 
     private fun MutableList<Step>.addFingerprintCaptureStep(result: Step.Result? = null) {

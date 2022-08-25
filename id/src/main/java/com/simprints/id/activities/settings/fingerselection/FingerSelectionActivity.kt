@@ -6,7 +6,6 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
@@ -85,7 +84,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
         configureToolbar()
 
         viewModel =
-            ViewModelProvider(this, viewModelFactory).get(FingerSelectionViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory)[FingerSelectionViewModel::class.java]
 
         initTextInLayout()
         initRecyclerView()
@@ -132,7 +131,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
     }
 
     private fun listenForItemChanges() {
-        viewModel.items.observe(this, Observer {
+        viewModel.items.observe(this) {
             fingerSelectionAdapter.notifyDataSetChanged()
             if (it.size >= MAXIMUM_NUMBER_OF_ITEMS) {
                 binding.addFingerButton.isEnabled = false
@@ -142,7 +141,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
                 binding.addFingerButton.isEnabled = true
                 binding.addFingerButton.background.colorFilter = null
             }
-        })
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

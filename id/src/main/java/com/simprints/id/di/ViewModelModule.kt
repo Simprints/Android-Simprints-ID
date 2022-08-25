@@ -28,7 +28,6 @@ import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -38,6 +37,7 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
@@ -54,8 +54,11 @@ open class ViewModelModule {
         ModuleSelectionViewModelFactory(repository, eventSyncManager)
 
     @Provides
-    open fun provideConsentViewModelFactory(eventRepository: EventRepository) =
-        ConsentViewModelFactory(eventRepository)
+    open fun provideConsentViewModelFactory(
+        configManager: ConfigManager,
+        eventRepository: EventRepository
+    ) =
+        ConsentViewModelFactory(configManager, eventRepository)
 
     @Provides
     open fun provideCoreExitFormViewModelFactory(eventRepository: EventRepository) =
@@ -89,41 +92,38 @@ open class ViewModelModule {
         downySyncHelper: EventDownSyncHelper,
         eventRepository: EventRepository,
         subjectRepository: SubjectRepository,
-        preferencesManager: IdPreferencesManager,
         loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
-        dispatcher: DispatcherProvider
+        configManager: ConfigManager,
     ): SyncInformationViewModelFactory =
         SyncInformationViewModelFactory(
             downySyncHelper,
             eventRepository,
             subjectRepository,
-            preferencesManager,
             loginManager.getSignedInProjectIdOrEmpty(),
             eventDownSyncScopeRepository,
             imageRepository,
-            dispatcher
+            configManager
         )
 
     @Provides
     open fun provideFingerSelectionViewModelFactory(
-        preferencesManager: IdPreferencesManager
-    ) = FingerSelectionViewModelFactory(preferencesManager)
+        configManager: ConfigManager
+    ) = FingerSelectionViewModelFactory(configManager)
 
     @Provides
     open fun providePrivacyNoticeViewModelFactory(
         longConsentRepository: LongConsentRepository,
-        preferencesManager: IdPreferencesManager,
-        dispatcherProvider: DispatcherProvider
-    ) = PrivacyNoticeViewModelFactory(longConsentRepository, preferencesManager, dispatcherProvider)
+        configManager: ConfigManager,
+    ) = PrivacyNoticeViewModelFactory(longConsentRepository, configManager)
 
     @Provides
     open fun provideEnrolLastBiometricsViewModel(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper,
-        preferencesManager: IdPreferencesManager
-    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, preferencesManager)
+        configManager: ConfigManager
+    ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, configManager)
 
     @ExperimentalCoroutinesApi
     @Provides
@@ -132,15 +132,16 @@ open class ViewModelModule {
     ) = SetupViewModelFactory(deviceManager)
 
     @Provides
-    open fun provideSettingsPreferenceViewModelFactory(): SettingsPreferenceViewModelFactory {
-        return SettingsPreferenceViewModelFactory()
+    open fun provideSettingsPreferenceViewModelFactory(configManager: ConfigManager): SettingsPreferenceViewModelFactory {
+        return SettingsPreferenceViewModelFactory(configManager)
     }
 
     @Provides
     open fun provideSettingsAboutViewModelFactory(
+        configManager: ConfigManager,
         signerManager: SignerManager
     ): SettingsAboutViewModelFactory {
-        return SettingsAboutViewModelFactory(signerManager)
+        return SettingsAboutViewModelFactory(configManager, signerManager)
     }
 
     @Provides
@@ -155,13 +156,13 @@ open class ViewModelModule {
     fun provideOrchestratorViewModelFactory(
         orchestratorManager: OrchestratorManager,
         orchestratorEventsHelper: OrchestratorEventsHelper,
-        preferenceManager: IdPreferencesManager,
+        configManager: ConfigManager,
         eventRepository: EventRepository
     ): OrchestratorViewModelFactory {
         return OrchestratorViewModelFactory(
             orchestratorManager,
             orchestratorEventsHelper,
-            preferenceManager.modalities,
+            configManager,
             eventRepository,
             DomainToModuleApiAppResponse
         )

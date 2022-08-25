@@ -6,7 +6,6 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
-import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -24,7 +23,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FACE_ACTIVITY_NAME
@@ -44,15 +43,27 @@ class ModalityFlowEnrolImplTest {
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
-    private val timeHelper = TestTimeHelperImpl()
-    @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
-    @MockK lateinit var faceStepProcessor: FaceStepProcessor
-    @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var fingerprintStepMock: Step
-    @MockK lateinit var faceStepMock: Step
-    @MockK lateinit var consentStepMock: Step
-    @MockK lateinit var setupStepMock: Step
-    @MockK lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+
+    @MockK
+    lateinit var fingerprintStepProcessor: FingerprintStepProcessor
+
+    @MockK
+    lateinit var faceStepProcessor: FaceStepProcessor
+
+    @MockK
+    lateinit var coreStepProcessor: CoreStepProcessor
+
+    @MockK
+    lateinit var fingerprintStepMock: Step
+
+    @MockK
+    lateinit var faceStepMock: Step
+
+    @MockK
+    lateinit var consentStepMock: Step
+
+    @MockK
+    lateinit var setupStepMock: Step
 
     @Before
     fun setUp() {
@@ -181,25 +192,49 @@ class ModalityFlowEnrolImplTest {
     }
 
     @Test
-    fun enrolmentPlusForFinger_shouldAddMatchStepAfterCapture() = runBlockingTest {
+    fun enrolmentPlusForFinger_shouldAddMatchStepAfterCapture() = runTest {
         val fingerprintCaptureResponse = mockk<FingerprintCaptureResponse>()
-        buildModalityFlowEnrol(consentRequired = false, modalities = listOf(FINGER), isEnrolmentPlus = true)
+        buildModalityFlowEnrol(
+            consentRequired = false,
+            modalities = listOf(FINGER),
+            isEnrolmentPlus = true
+        )
         val appRequest = buildAppEnrolRequest()
-        every { fingerprintStepProcessor.processResult(any(), any(), any()) } returns fingerprintCaptureResponse
+        every {
+            fingerprintStepProcessor.processResult(
+                any(),
+                any(),
+                any()
+            )
+        } returns fingerprintCaptureResponse
 
-        modalityFlowEnrol.handleIntentResult(appRequest, FingerprintRequestCode.CAPTURE.value, Activity.RESULT_OK, mockk())
+        modalityFlowEnrol.handleIntentResult(
+            appRequest,
+            FingerprintRequestCode.CAPTURE.value,
+            Activity.RESULT_OK,
+            mockk()
+        )
 
         verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any()) }
     }
 
     @Test
-    fun enrolmentPlusForFace_shouldAddMatchStepAfterCapture() = runBlockingTest {
+    fun enrolmentPlusForFace_shouldAddMatchStepAfterCapture() = runTest {
         val faceCaptureResponse = mockk<FaceCaptureResponse>()
-        buildModalityFlowEnrol(consentRequired = false, modalities = listOf(FACE), isEnrolmentPlus = true)
+        buildModalityFlowEnrol(
+            consentRequired = false,
+            modalities = listOf(FACE),
+            isEnrolmentPlus = true
+        )
         val appRequest = buildAppEnrolRequest()
         every { faceStepProcessor.processResult(any(), any(), any()) } returns faceCaptureResponse
 
-        modalityFlowEnrol.handleIntentResult(appRequest, FaceRequestCode.CAPTURE.value, Activity.RESULT_OK, mockk())
+        modalityFlowEnrol.handleIntentResult(
+            appRequest,
+            FaceRequestCode.CAPTURE.value,
+            Activity.RESULT_OK,
+            mockk()
+        )
 
         verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any()) }
     }
@@ -207,12 +242,16 @@ class ModalityFlowEnrolImplTest {
     private fun buildAppEnrolRequest() =
         AppEnrolRequest(PROJECT_ID, "userId", "moduleId", "metadata")
 
-    private fun buildModalityFlowEnrol(consentRequired: Boolean,
-                                       modalities: List<Modality>,
-                                       isEnrolmentPlus: Boolean = false) {
-        modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, eventRepository, consentRequired, locationRequired = true,
+    private fun buildModalityFlowEnrol(
+        consentRequired: Boolean,
+        modalities: List<Modality>,
+        isEnrolmentPlus: Boolean = false
+    ) {
+        modalityFlowEnrol = ModalityFlowEnrolImpl(
+            fingerprintStepProcessor, faceStepProcessor,
+            coreStepProcessor, consentRequired, locationRequired = true,
             modalities = modalities, projectId = PROJECT_ID, deviceId = "deviceId",
-            isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL)
+            isEnrolmentPlus = isEnrolmentPlus, matchGroup = GROUP.GLOBAL
+        )
     }
 }

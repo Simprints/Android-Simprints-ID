@@ -5,8 +5,6 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER
@@ -31,15 +29,27 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 class ModalityFlowIdentifyImplTest {
 
     private lateinit var modalityFlowIdentify: ModalityFlowIdentifyImpl
-    private val timeHelper: TimeHelper = TestTimeHelperImpl()
-    @MockK lateinit var fingerprintStepProcessor: FingerprintStepProcessor
-    @MockK lateinit var faceStepProcessor: FaceStepProcessor
-    @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-    @MockK lateinit var fingerprintStepMock: Step
-    @MockK lateinit var faceStepMock: Step
-    @MockK lateinit var consentStepMock: Step
-    @MockK lateinit var setupStepMock: Step
+
+    @MockK
+    lateinit var fingerprintStepProcessor: FingerprintStepProcessor
+
+    @MockK
+    lateinit var faceStepProcessor: FaceStepProcessor
+
+    @MockK
+    lateinit var coreStepProcessor: CoreStepProcessor
+
+    @MockK
+    lateinit var fingerprintStepMock: Step
+
+    @MockK
+    lateinit var faceStepMock: Step
+
+    @MockK
+    lateinit var consentStepMock: Step
+
+    @MockK
+    lateinit var setupStepMock: Step
 
     @Before
     fun setUp() {
@@ -167,8 +177,10 @@ class ModalityFlowIdentifyImplTest {
         assertThat(step.activityName).isEqualTo(activityName)
 
     private fun buildModalityFlowIdentify(consentRequired: Boolean, modalities: List<Modality>) {
-        modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, GROUP.GLOBAL, timeHelper, eventRepository, consentRequired, true,
-            modalities,"projectId", "deviceId")
+        modalityFlowIdentify = ModalityFlowIdentifyImpl(
+            fingerprintStepProcessor, faceStepProcessor,
+            coreStepProcessor, GROUP.GLOBAL, consentRequired, true,
+            modalities, "projectId", "deviceId"
+        )
     }
 }

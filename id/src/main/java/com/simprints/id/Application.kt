@@ -91,7 +91,7 @@ open class Application : CoreApplication() { //, Configuration.Provider {
         startKoin {
             androidLogger()
             androidContext(this@Application)
-            loadKoinModules(listOf(module(override = true) {
+            loadKoinModules(listOf(module {
                 this.defineBuildersForCoreManagers()
             }))
         }
@@ -109,6 +109,7 @@ open class Application : CoreApplication() { //, Configuration.Provider {
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
         factory { component.getLoginManager() }
+        factory { component.getConfigManager() }
         factory { component.getLicenseRepository() }
         factory { component.getIdPreferencesManager() }
         factory { component.getSecurityManager() }

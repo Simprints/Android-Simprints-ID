@@ -25,6 +25,7 @@ import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.PreviewFrame
 import com.simprints.face.models.Size
+import com.simprints.infra.config.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.CapturingSlot
@@ -44,6 +45,10 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class LiveFeedbackFragmentViewModelTest {
 
+    companion object {
+        private const val QUALITY_THRESHOLD = -1
+    }
+
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -54,20 +59,27 @@ class LiveFeedbackFragmentViewModelTest {
         every { attemptNumber } returns 0
         every { samplesToCapture } returns 2
     }
-    private val qualityThreshold = -1f
+    private val configManager: ConfigManager = mockk {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { face } returns mockk {
+                every { qualityThreshold } returns QUALITY_THRESHOLD
+            }
+        }
+    }
     private val faceDetector: FaceDetector = mockk()
     private val frameProcessor: FrameProcessor = mockk()
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
-    private val faceTimeHelper: FaceTimeHelper = mockk() {
+    private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
     }
     private val viewModel = LiveFeedbackFragmentViewModel(
         mainVM,
         faceDetector,
         frameProcessor,
-        qualityThreshold,
+        configManager,
         faceSessionEventsManager,
-        faceTimeHelper
+        faceTimeHelper,
+        testCoroutineRule.testCoroutineDispatcher
     )
 
     private val rectF: RectF = mockk()
@@ -216,7 +228,7 @@ class LiveFeedbackFragmentViewModelTest {
                     assertThat(endTime).isEqualTo(3)
                     assertThat(isFallback).isEqualTo(false)
                     assertThat(attemptNb).isEqualTo(0)
-                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(qualityThreshold).isEqualTo(QUALITY_THRESHOLD)
                     assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
                     assertThat(eventFace).isNotNull()
                     eventFace?.let {
@@ -231,7 +243,6 @@ class LiveFeedbackFragmentViewModelTest {
                 with(faceCaptureBiometricsEvent1) {
                     assertThat(startTime).isEqualTo(2)
                     assertThat(endTime).isEqualTo(0)
-                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
                     assertThat(eventFace).isNotNull()
                     assertThat(eventFace.format).isEqualTo(FaceTemplateFormat.MOCK)
                 }
@@ -243,7 +254,7 @@ class LiveFeedbackFragmentViewModelTest {
                     assertThat(endTime).isEqualTo(5)
                     assertThat(isFallback).isEqualTo(false)
                     assertThat(attemptNb).isEqualTo(0)
-                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(qualityThreshold).isEqualTo(QUALITY_THRESHOLD)
                     assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
                     assertThat(eventFace).isNotNull()
                     eventFace?.let {
@@ -258,7 +269,6 @@ class LiveFeedbackFragmentViewModelTest {
                 with(faceCaptureBiometricsEvent2) {
                     assertThat(startTime).isEqualTo(4)
                     assertThat(endTime).isEqualTo(0)
-                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
                     assertThat(eventFace).isNotNull()
                     eventFace.let {
                         assertThat(it.format).isEqualTo(FaceTemplateFormat.MOCK)
@@ -272,7 +282,7 @@ class LiveFeedbackFragmentViewModelTest {
                     assertThat(endTime).isEqualTo(1)
                     assertThat(isFallback).isEqualTo(true)
                     assertThat(attemptNb).isEqualTo(0)
-                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
+                    assertThat(qualityThreshold).isEqualTo(QUALITY_THRESHOLD)
                     assertThat(result).isEqualTo(FaceCaptureEvent.Result.VALID)
                     assertThat(eventFace).isNotNull()
                     eventFace?.let {
@@ -287,7 +297,6 @@ class LiveFeedbackFragmentViewModelTest {
                 with(faceCaptureBiometricsEvent3) {
                     assertThat(startTime).isEqualTo(0)
                     assertThat(endTime).isEqualTo(0)
-                    assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
                     assertThat(eventFace).isNotNull()
                     assertThat(eventFace.format).isEqualTo(FaceTemplateFormat.MOCK)
 
