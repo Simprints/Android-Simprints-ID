@@ -59,7 +59,6 @@ class LibSimprintsPresenterTest {
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
         coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"
-        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @Test
