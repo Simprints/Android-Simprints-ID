@@ -6,7 +6,7 @@ import com.simprints.infra.config.testtools.apiProjectConfiguration
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.SimApiClient
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -25,7 +25,7 @@ class ConfigRemoteDataSourceImplTest {
     }
 
     private val remoteInterface = mockk<ConfigRemoteInterface>()
-    private val simApiClient = mockk<SimApiClient<ConfigRemoteInterface>>()
+    private val simApiClient = mockk<SimNetwork.SimApiClient<ConfigRemoteInterface>>()
     private val loginManager = mockk<LoginManager>()
     private val configRemoteDataSourceImpl = ConfigRemoteDataSourceImpl(loginManager)
 
