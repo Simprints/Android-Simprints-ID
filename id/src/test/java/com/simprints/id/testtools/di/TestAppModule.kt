@@ -21,6 +21,7 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.di.DependencyRule
@@ -65,7 +66,7 @@ class TestAppModule(
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        idPreferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
@@ -76,7 +77,7 @@ class TestAppModule(
                 ctx,
                 eventLocalDataSource,
                 eventRemoteDataSource,
-                idPreferencesManager,
+                configManager,
                 loginManager,
                 timeHelper,
                 validatorFactory,
