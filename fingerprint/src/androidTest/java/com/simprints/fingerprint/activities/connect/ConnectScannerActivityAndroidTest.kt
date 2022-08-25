@@ -33,6 +33,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.connect.issues.scanneroff.ScannerOffFragment.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -54,6 +55,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
+import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
@@ -94,7 +96,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     private val scannerManager: ScannerManager =
         spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
             every { checkBluetoothStatus() } returns Completable.complete()
-            every { initScanner() } returns Completable.complete()
+            every { initScanner() } returns Completable.timer(SCANNER_INIT_DELAY, TimeUnit.MILLISECONDS)
         }
     private val nfcManager: NfcManager = mockk()
 
@@ -151,7 +153,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun onScannerOff_scannerOffFragmentMakesOnly5ConnectionAttemptsAtATime() {
+    fun onScannerOff_scannerOffFragmentMakesOnlyMaxConnectionAttemptsAtATime() {
         // Setup connection attempts to be unsuccessful
         every { scanner.setUiIdle() } throws UnknownScannerIssueException()
 
@@ -171,8 +173,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         // Verify it immediately starts connection attempts
         onView(withId(R.id.scannerOffProgressBar)).check(matches(isDisplayed()))
         onView(withId(R.id.tryAgainButton)).check(matches(not(isDisplayed())))
-        waitOnUi(500)
-        var retryCounter = 5
+        waitOnUi(MAX_RETRY_COUNT * SCANNER_INIT_DELAY + 500)
+        var retryCounter = MAX_RETRY_COUNT
         verify(exactly = retryCounter) { viewModelMock.retryConnect() }
 
         // Verify connection attempts stop after 5 unsuccessful ones
@@ -184,8 +186,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         onView(withId(R.id.tryAgainButton)).perform(ViewActions.click())
         onView(withId(R.id.scannerOffProgressBar)).check(matches(isDisplayed()))
         onView(withId(R.id.tryAgainButton)).check(matches(not(isDisplayed())))
-        waitOnUi(500)
-        retryCounter += 5
+        waitOnUi(MAX_RETRY_COUNT * SCANNER_INIT_DELAY + 500)
+        retryCounter += MAX_RETRY_COUNT
         verify(exactly = retryCounter) { viewModelMock.retryConnect() }
 
         // Then it stops again
@@ -223,6 +225,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     companion object {
+        private const val SCANNER_INIT_DELAY = 100L
+
         private fun connectScannerTaskRequest() =
             ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 

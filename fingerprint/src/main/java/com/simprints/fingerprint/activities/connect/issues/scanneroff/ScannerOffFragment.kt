@@ -137,6 +137,6 @@ class ScannerOffFragment : FingerprintFragment() {
 
     companion object {
         private const val FINISHED_TIME_DELAY_MS = 1200L
-        private const val MAX_RETRY_COUNT = 5
+        const val MAX_RETRY_COUNT = 5
     }
 }
