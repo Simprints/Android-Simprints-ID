@@ -74,8 +74,8 @@ class ConnectScannerViewModel(
         startSetup()
     }
 
-    fun retryConnect(attempts: Int) {
-        remainingConnectionAttempts = attempts - 1
+    fun startRetryingToConnect() {
+        remainingConnectionAttempts = MAX_RETRY_COUNT - 1
         retryConnect()
     }
 
@@ -325,6 +325,7 @@ class ConnectScannerViewModel(
 
     companion object {
         const val NUMBER_OF_STEPS = 8
+        const val MAX_RETRY_COUNT = 5
         private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }
