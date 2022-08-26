@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
@@ -161,6 +162,7 @@ interface AppComponent {
     fun getPersonRepository(): SubjectRepository
     fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
+    fun getRecentEventsPreferencesManager(): RecentEventsPreferencesManager
     fun getPreferencesManager(): PreferencesManager
     fun getIdPreferencesManager(): IdPreferencesManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
