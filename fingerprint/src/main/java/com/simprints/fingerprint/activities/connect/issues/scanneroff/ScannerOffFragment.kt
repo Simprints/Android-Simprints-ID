@@ -26,7 +26,6 @@ class ScannerOffFragment : FingerprintFragment() {
     private val binding by viewBinding(FragmentScannerOffBinding::bind)
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
-    private var retryCounter = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_scanner_off, container, false)
@@ -39,6 +38,7 @@ class ScannerOffFragment : FingerprintFragment() {
 
         initTryAgainButton()
         initCouldNotConnectTextView()
+        initViewModelObservation()
         initRetryConnectBehaviour()
     }
 
@@ -61,6 +61,21 @@ class ScannerOffFragment : FingerprintFragment() {
             binding.couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             binding.couldNotConnectTextView.visibility = View.VISIBLE
         }
+    }
+
+    private fun initViewModelObservation() {
+        connectScannerViewModel.isConnecting.observe(viewLifecycleOwner) { isConnecting ->
+            if (isConnecting) {
+                setupConnectingMode()
+            } else {
+                setupTryAgainMode()
+            }
+        }
+        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
+            if (success) {
+                handleScannerConnectedEvent()
+            }
+        }
         connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
             connectScannerViewModel.stopConnectingAndResetState()
             goToAppropriateIssueFragment(it)
@@ -69,12 +84,10 @@ class ScannerOffFragment : FingerprintFragment() {
 
     private fun initRetryConnectBehaviour() {
         retryConnect()
-        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
-            when (success) {
-                true -> handleScannerConnectedEvent()
-                false -> handleScannerNotConnectedEvent()
-            }
-        }
+    }
+
+    private fun retryConnect() {
+        connectScannerViewModel.retryConnect(MAX_RETRY_COUNT)
     }
 
     private fun handleScannerConnectedEvent() {
@@ -90,20 +103,6 @@ class ScannerOffFragment : FingerprintFragment() {
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
     }
 
-    private fun handleScannerNotConnectedEvent() {
-        if (retryCounter < MAX_RETRY_COUNT) {
-            retryConnect()
-        } else {
-            setupTryAgainMode()
-        }
-    }
-
-    private fun retryConnect() {
-        retryCounter += 1
-        setupConnectingMode()
-        connectScannerViewModel.retryConnect()
-    }
-
     private fun setupConnectingMode() {
         binding.apply {
             scannerOffProgressBar.visibility = View.VISIBLE
@@ -113,7 +112,6 @@ class ScannerOffFragment : FingerprintFragment() {
     }
 
     private fun setupTryAgainMode() {
-        retryCounter = 0
         binding.apply {
             scannerOffProgressBar.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE

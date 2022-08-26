@@ -16,6 +16,7 @@ import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
@@ -323,6 +324,19 @@ class ConnectScannerViewModelTest : KoinTest {
         viewModel.finishConnectActivity()
 
         finishObserver.assertEventReceived()
+    }
+
+    @Test
+    fun retryConnectWithMaxAttempts_scannerConnectFails_makesNoMoreThanRequestedAttempts() {
+        setupBluetooth(numberOfPairedScanners = 1)
+        val scannerWrapper = mockScannerWrapper(VERO_1, UnknownScannerIssueException())
+        every { scannerFactory.create(any()) } returns scannerWrapper
+
+        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        val connectionAttempts = 5
+        viewModel.retryConnect(connectionAttempts)
+
+        verify(exactly = connectionAttempts) { scannerWrapper.connect() }
     }
 
     private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
