@@ -3,14 +3,42 @@ package com.simprints.infra.config.remote.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.testtools.*
+import com.simprints.infra.config.testtools.apiDecisionPolicy
 import com.simprints.infra.config.testtools.apiFingerprintConfiguration
+import com.simprints.infra.config.testtools.decisionPolicy
 import com.simprints.infra.config.testtools.fingerprintConfiguration
+import com.simprints.infra.config.testtools.vero2Configuration
 import org.junit.Test
 
 class ApiFingerprintConfigurationTest {
 
     @Test
     fun `should map correctly the model`() {
+        assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
+    }
+
+    @Test
+    fun `should map correctly the model when the vero2 is missing`() {
+        val apiFingerprintConfiguration = ApiFingerprintConfiguration(
+            listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+            10,
+            apiDecisionPolicy,
+            listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
+            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            true,
+            null,
+        )
+        val fingerprintConfiguration = FingerprintConfiguration(
+            listOf(Finger.LEFT_3RD_FINGER),
+            10,
+            decisionPolicy,
+            listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
+            FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            true,
+            null,
+        )
+
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
     }
 

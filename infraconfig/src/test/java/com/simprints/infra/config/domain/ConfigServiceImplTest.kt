@@ -1,8 +1,10 @@
 package com.simprints.infra.config.domain
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
+import com.simprints.infra.config.testtools.deviceConfiguration
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
 import io.mockk.coEvery
@@ -17,7 +19,7 @@ class ConfigServiceImplTest {
         private const val PROJECT_ID = "projectId"
     }
 
-    private val localDataSource = mockk<ConfigLocalDataSource>()
+    private val localDataSource = mockk<ConfigLocalDataSource>(relaxed = true)
     private val remoteDataSource = mockk<ConfigRemoteDataSource>()
     private val configServiceImpl = ConfigServiceImpl(localDataSource, remoteDataSource)
 
@@ -76,4 +78,22 @@ class ConfigServiceImplTest {
             coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
             coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
         }
+
+    @Test
+    fun `getDeviceConfiguration should call the correct method`() = runTest {
+        coEvery { localDataSource.getDeviceConfiguration() } returns deviceConfiguration
+
+        val gottenDeviceConfiguration = configServiceImpl.getDeviceConfiguration()
+        assertThat(gottenDeviceConfiguration).isEqualTo(deviceConfiguration)
+    }
+
+    @Test
+    fun `updateDeviceConfiguration should call the correct method`() = runTest {
+        val update: (c: DeviceConfiguration) -> DeviceConfiguration = {
+            it
+        }
+
+        configServiceImpl.updateDeviceConfiguration(update)
+        coVerify(exactly = 1) { localDataSource.updateDeviceConfiguration(update) }
+    }
 }

@@ -18,7 +18,13 @@ internal val apiConsentConfiguration = ApiConsentConfiguration(
         privacyRights = true,
         confirmation = true,
     ),
-    parentalPrompt = null,
+    parentalPrompt = ApiConsentConfiguration.ConsentPromptConfiguration(
+        enrolmentVariant = ApiConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+        dataSharedWithPartner = true,
+        dataUsedForRAndD = false,
+        privacyRights = false,
+        confirmation = true,
+    ),
 )
 
 internal val consentConfiguration = ConsentConfiguration(
@@ -34,7 +40,13 @@ internal val consentConfiguration = ConsentConfiguration(
         privacyRights = true,
         confirmation = true,
     ),
-    parentalPrompt = null,
+    parentalPrompt = ConsentConfiguration.ConsentPromptConfiguration(
+        enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+        dataSharedWithPartner = true,
+        dataUsedForRAndD = false,
+        privacyRights = false,
+        confirmation = true,
+    ),
 )
 internal val protoConsentConfiguration = ProtoConsentConfiguration.newBuilder()
     .setProgramName("programName")
@@ -48,6 +60,15 @@ internal val protoConsentConfiguration = ProtoConsentConfiguration.newBuilder()
             .setDataSharedWithPartner(true)
             .setDataUsedForRAndD(false)
             .setPrivacyRights(true)
+            .setConfirmation(true)
+            .build()
+    )
+    .setParentalPrompt(
+        ProtoConsentConfiguration.ConsentPromptConfiguration.newBuilder()
+            .setEnrolmentVariant(ProtoConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY)
+            .setDataSharedWithPartner(true)
+            .setDataUsedForRAndD(false)
+            .setPrivacyRights(false)
             .setConfirmation(true)
             .build()
     )

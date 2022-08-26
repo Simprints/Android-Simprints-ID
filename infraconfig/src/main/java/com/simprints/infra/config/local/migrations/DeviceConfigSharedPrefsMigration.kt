@@ -1,6 +1,7 @@
 package com.simprints.infra.config.local.migrations
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
@@ -42,7 +43,8 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
                 val isOverridden = prefs.getBoolean(FINGERS_TO_COLLECT_OVERRIDDEN_KEY, false)
                 proto.fingersToCollect = ProtoDeviceConfiguration.FingersToCollect.newBuilder()
                     .addAllFingersToCollect(
-                        fingersToCollect.split(",")
+                        fingersToCollect
+                            .split(",")
                             .map { finger -> Finger.valueOf(finger).toProto() }
                     )
                     .setIsOverwritten(isOverridden)
@@ -63,10 +65,20 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
         private const val PREF_MODE = Context.MODE_PRIVATE
-        private const val LANGUAGE_KEY = "SelectedLanguage"
-        private const val LANGUAGE_OVERRIDDEN_KEY = "SelectedLanguage_isOverridden"
-        private const val SELECTED_MODULES_KEY = "SelectedModules"
-        private const val FINGERS_TO_COLLECT_KEY = "FingerprintsToCollect"
-        private const val FINGERS_TO_COLLECT_OVERRIDDEN_KEY = "FingerprintsToCollect_isOverridden"
+
+        @VisibleForTesting
+        const val LANGUAGE_KEY = "SelectedLanguage"
+
+        @VisibleForTesting
+        const val LANGUAGE_OVERRIDDEN_KEY = "SelectedLanguage_isOverridden"
+
+        @VisibleForTesting
+        const val SELECTED_MODULES_KEY = "SelectedModules"
+
+        @VisibleForTesting
+        const val FINGERS_TO_COLLECT_KEY = "FingerprintsToCollect"
+
+        @VisibleForTesting
+        const val FINGERS_TO_COLLECT_OVERRIDDEN_KEY = "FingerprintsToCollect_isOverridden"
     }
 }

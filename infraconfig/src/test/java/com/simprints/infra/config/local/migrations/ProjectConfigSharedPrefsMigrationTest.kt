@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.testtools.protoProjectConfiguration
 import com.simprints.infra.login.LoginManager

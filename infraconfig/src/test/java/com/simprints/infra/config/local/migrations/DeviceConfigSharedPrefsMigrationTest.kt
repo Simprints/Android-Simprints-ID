@@ -2,9 +2,9 @@ package com.simprints.infra.config.local.migrations
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
+import com.simprints.infra.config.local.models.ProtoFinger
 import com.simprints.infra.config.testtools.protoDeviceConfiguration
 import com.simprints.infra.login.LoginManager
 import io.mockk.every
@@ -16,7 +16,7 @@ import org.junit.Test
 class DeviceConfigSharedPrefsMigrationTest {
 
     private val ctx = mockk<Context>()
-    private val preferences = mockk<SharedPreferences>()
+    private val preferences = mockk<SharedPreferences>(relaxed = true)
     private val loginManager = mockk<LoginManager>()
     private lateinit var deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration
 
@@ -58,7 +58,88 @@ class DeviceConfigSharedPrefsMigrationTest {
         }
 
     @Test
-    fun `should migrate the fields that exists`() = runTest {
+    fun `should migrate the language when it exists`() = runTest {
+        every {
+            preferences.getString(
+                DeviceConfigSharedPrefsMigration.LANGUAGE_KEY,
+                ""
+            )
+        } returns LANGUAGE
+        every {
+            preferences.getBoolean(
+                DeviceConfigSharedPrefsMigration.LANGUAGE_OVERRIDDEN_KEY,
+                false
+            )
+        } returns true
 
+        val deviceConfiguration =
+            deviceConfigSharedPrefsMigration.migrate(ProtoDeviceConfiguration.getDefaultInstance())
+
+        val expectedDeviceConfiguration = ProtoDeviceConfiguration
+            .newBuilder()
+            .setLanguage(
+                ProtoDeviceConfiguration.Language.newBuilder().setLanguage(LANGUAGE)
+                    .setIsOverwritten(true)
+            )
+            .build()
+        assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
+
+    @Test
+    fun `should migrate the fingersToCollect when it exists`() = runTest {
+        every {
+            preferences.getString(
+                DeviceConfigSharedPrefsMigration.FINGERS_TO_COLLECT_KEY,
+                ""
+            )
+        } returns "LEFT_THUMB,LEFT_THUMB,LEFT_INDEX_FINGER"
+        every {
+            preferences.getBoolean(
+                DeviceConfigSharedPrefsMigration.FINGERS_TO_COLLECT_OVERRIDDEN_KEY,
+                false
+            )
+        } returns true
+
+        val deviceConfiguration =
+            deviceConfigSharedPrefsMigration.migrate(ProtoDeviceConfiguration.getDefaultInstance())
+
+        val expectedDeviceConfiguration = ProtoDeviceConfiguration
+            .newBuilder()
+            .setFingersToCollect(
+                ProtoDeviceConfiguration.FingersToCollect.newBuilder()
+                    .addAllFingersToCollect(
+                        listOf(
+                            ProtoFinger.LEFT_THUMB,
+                            ProtoFinger.LEFT_THUMB,
+                            ProtoFinger.LEFT_INDEX_FINGER
+                        )
+                    )
+                    .setIsOverwritten(true)
+            )
+            .build()
+        assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
+
+    @Test
+    fun `should migrate the selectedModules when it exists`() = runTest {
+        every {
+            preferences.getString(
+                DeviceConfigSharedPrefsMigration.SELECTED_MODULES_KEY,
+                ""
+            )
+        } returns "module1|module2"
+
+        val deviceConfiguration =
+            deviceConfigSharedPrefsMigration.migrate(ProtoDeviceConfiguration.getDefaultInstance())
+
+        val expectedDeviceConfiguration = ProtoDeviceConfiguration
+            .newBuilder()
+            .addAllModuleSelected(listOf("module1","module2"))
+            .build()
+        assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
+
+    companion object {
+        private const val LANGUAGE = "fr"
     }
 }

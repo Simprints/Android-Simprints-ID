@@ -9,6 +9,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -18,12 +19,13 @@ class ConfigurationWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val loginManager: LoginManager,
     private val configService: ConfigService,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CoroutineWorker(context, params) {
 
     private val tag = ConfigurationWorker::class.java.name
 
     override suspend fun doWork(): Result =
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             try {
                 val projectId = loginManager.getSignedInProjectIdOrEmpty()
 

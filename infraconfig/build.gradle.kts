@@ -1,5 +1,4 @@
 import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.plugins
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
@@ -14,6 +13,7 @@ plugins {
 
 apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+    from("${rootDir}${File.separator}ci${File.separator}scanning${File.separator}jacoco.gradle")
 }
 
 android {

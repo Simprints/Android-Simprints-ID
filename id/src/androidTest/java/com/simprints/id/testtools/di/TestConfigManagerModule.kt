@@ -18,6 +18,6 @@ object TestConfigManagerModule {
 
     @Singleton
     @Provides
-    fun provideConfigManager(): ConfigManager = mockk()
+    fun provideConfigManager(): ConfigManager = mockk(relaxed = true)
 
 }
