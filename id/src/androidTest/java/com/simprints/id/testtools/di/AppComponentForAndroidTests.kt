@@ -6,6 +6,7 @@ import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivityTest
 import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
+import com.simprints.id.activities.settings.SettingsPreferenceFragmentTest
 import com.simprints.id.di.*
 import com.simprints.infra.config.DataStoreModule
 import com.simprints.infra.login.LoginManagerModule
@@ -57,6 +58,7 @@ interface AppComponentForAndroidTests : AppComponent {
     }
 
     fun inject(loginActivityAndroidTest: LoginActivityAndroidTest)
+    fun inject(settingsPreferenceFragmentTest: SettingsPreferenceFragmentTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
     fun inject(privacyNoticeActivityTest: PrivacyNoticeActivityTest)
