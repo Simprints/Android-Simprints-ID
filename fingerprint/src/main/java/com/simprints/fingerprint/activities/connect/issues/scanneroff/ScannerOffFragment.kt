@@ -39,7 +39,7 @@ class ScannerOffFragment : FingerprintFragment() {
         initTryAgainButton()
         initCouldNotConnectTextView()
         initViewModelObservation()
-        initRetryConnectBehaviour()
+        initRetryConnectionBehaviour()
     }
 
     private fun setTextInLayout() {
@@ -50,7 +50,7 @@ class ScannerOffFragment : FingerprintFragment() {
 
     private fun initTryAgainButton() {
         binding.tryAgainButton.setOnClickListener {
-            retryConnect()
+            startRetryingToConnect()
         }
     }
 
@@ -82,12 +82,12 @@ class ScannerOffFragment : FingerprintFragment() {
         }
     }
 
-    private fun initRetryConnectBehaviour() {
-        retryConnect()
+    private fun initRetryConnectionBehaviour() {
+        startRetryingToConnect()
     }
 
-    private fun retryConnect() {
-        connectScannerViewModel.retryConnect(MAX_RETRY_COUNT)
+    private fun startRetryingToConnect() {
+        connectScannerViewModel.startRetryingToConnect()
     }
 
     private fun handleScannerConnectedEvent() {
@@ -135,6 +135,5 @@ class ScannerOffFragment : FingerprintFragment() {
 
     companion object {
         private const val FINISHED_TIME_DELAY_MS = 1200L
-        const val MAX_RETRY_COUNT = 5
     }
 }
