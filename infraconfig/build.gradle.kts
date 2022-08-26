@@ -13,7 +13,6 @@ plugins {
 
 apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
-    from("${rootDir}${File.separator}ci${File.separator}scanning${File.separator}jacoco.gradle")
 }
 
 android {
