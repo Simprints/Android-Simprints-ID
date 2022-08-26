@@ -11,8 +11,8 @@ internal class ConfigurationSchedulerImpl @Inject constructor(context: Context) 
 
     companion object {
         const val WORK_NAME = "project-configuration-work"
-        const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
-        val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+        private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
+        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
     private val workManager = WorkManager.getInstance(context)

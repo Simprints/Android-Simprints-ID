@@ -1,49 +1,52 @@
 package com.simprints.infra.config.local.migrations.models
 
+import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.simprints.infra.config.domain.models.*
 import org.json.JSONObject
 
+@Keep
 internal data class OldProjectConfig(
-    private val CaptureFingerprintStrategy: String?,
-    private val ConsentRequired: String,
-    private val SaveFingerprintImagesStrategy: String?,
-    private val Vero2FirmwareVersions: String?,
-    private val FingerprintQualityThreshold: String?,
-    private val FingerprintsToCollect: String?,
-    private val ConsentParentalExists: String,
-    private val MaxNbOfModules: String,
-    private val FaceQualityThreshold: String?,
-    private val LogoExists: String,
-    private val EnrolmentPlus: String,
-    private val FingerComparisonStrategyForVerification: String?,
-    private val FingerStatus: String?,
-    private val ScannerGenerations: String?,
-    private val FaceNbOfFramesCaptured: String?,
-    private val ProjectSpecificMode: String,
-    private val OrganizationName: String,
-    private val SelectedLanguage: String,
-    private val ProjectLanguages: String,
-    private val FingerprintLiveFeedbackOn: String?,
-    private val FaceConfidenceThresholds: String?,
-    private val MatchGroup: String,
-    private val SyncDestination: String,
-    private val SimprintsSync: String?,
-    private val LocationRequired: String,
-    private val FingerImagesExist: String?,
-    private val ConsentParentalOptions: String,
-    private val SaveFaceImages: String?,
-    private val ConsentGeneralOptions: String,
-    private val DownSyncSetting: String,
-    private val CoSync: String?,
-    private val ModuleIdOptions: String,
-    private val FingerprintConfidenceThresholds: String?,
-    private val ProgramName: String,
-    private val SyncGroup: String,
-    private val NbOfIdsInt: String,
-    private val Modality: String,
+    @JsonProperty("CaptureFingerprintStrategy") private val captureFingerprintStrategy: String?,
+    @JsonProperty("ConsentRequired") private val consentRequired: String,
+    @JsonProperty("SaveFingerprintImagesStrategy") private val saveFingerprintImagesStrategy: String?,
+    @JsonProperty("Vero2FirmwareVersions") private val vero2FirmwareVersions: String?,
+    @JsonProperty("FingerprintQualityThreshold") private val fingerprintQualityThreshold: String?,
+    @JsonProperty("FingerprintsToCollect") private val fingerprintsToCollect: String?,
+    @JsonProperty("ConsentParentalExists") private val consentParentalExists: String,
+    @JsonProperty("MaxNbOfModules") private val maxNbOfModules: String,
+    @JsonProperty("FaceQualityThreshold") private val faceQualityThreshold: String?,
+    @JsonProperty("LogoExists") private val logoExists: String,
+    @JsonProperty("EnrolmentPlus") private val enrolmentPlus: String,
+    @JsonProperty("FingerComparisonStrategyForVerification") private val fingerComparisonStrategyForVerification: String?,
+    @JsonProperty("FingerStatus") private val fingerStatus: String?,
+    @JsonProperty("ScannerGenerations") private val scannerGenerations: String?,
+    @JsonProperty("FaceNbOfFramesCaptured") private val faceNbOfFramesCaptured: String?,
+    @JsonProperty("ProjectSpecificMode") private val projectSpecificMode: String,
+    @JsonProperty("OrganizationName") private val organizationName: String,
+    @JsonProperty("SelectedLanguage") private val selectedLanguage: String,
+    @JsonProperty("ProjectLanguages") private val projectLanguages: String,
+    @JsonProperty("FingerprintLiveFeedbackOn") private val fingerprintLiveFeedbackOn: String?,
+    @JsonProperty("FaceConfidenceThresholds") private val faceConfidenceThresholds: String?,
+    @JsonProperty("MatchGroup") private val matchGroup: String,
+    @JsonProperty("SyncDestination") private val syncDestination: String,
+    @JsonProperty("SimprintsSync") private val simprintsSync: String?,
+    @JsonProperty("LocationRequired") private val locationRequired: String,
+    @JsonProperty("FingerImagesExist") private val fingerImagesExist: String?,
+    @JsonProperty("ConsentParentalOptions") private val consentParentalOptions: String,
+    @JsonProperty("SaveFaceImages") private val saveFaceImages: String?,
+    @JsonProperty("ConsentGeneralOptions") private val consentGeneralOptions: String,
+    @JsonProperty("DownSyncSetting") private val downSyncSetting: String,
+    @JsonProperty("CoSync") private val coSync: String?,
+    @JsonProperty("ModuleIdOptions") private val moduleIdOptions: String,
+    @JsonProperty("FingerprintConfidenceThresholds") private val fingerprintConfidenceThresholds: String?,
+    @JsonProperty("ProgramName") private val programName: String,
+    @JsonProperty("SyncGroup") private val syncGroup: String,
+    @JsonProperty("NbOfIdsInt") private val nbOfIdsInt: String,
+    @JsonProperty("Modality") private val modality: String,
 ) {
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(
@@ -58,91 +61,91 @@ internal data class OldProjectConfig(
 
     private fun generalConfiguration(): GeneralConfiguration =
         GeneralConfiguration(
-            modalities = Modality.split(",")
+            modalities = modality.split(",")
                 .map { if (it == "FINGER") "FINGERPRINT" else it }
                 .map { GeneralConfiguration.Modality.valueOf(it) },
-            languageOptions = ProjectLanguages.split(","),
-            defaultLanguage = SelectedLanguage,
-            collectLocation = LocationRequired.toBoolean(),
-            duplicateBiometricEnrolmentCheck = EnrolmentPlus.toBoolean(),
+            languageOptions = projectLanguages.split(","),
+            defaultLanguage = selectedLanguage,
+            collectLocation = locationRequired.toBoolean(),
+            duplicateBiometricEnrolmentCheck = enrolmentPlus.toBoolean(),
         )
 
     private fun faceConfiguration(): FaceConfiguration? =
-        if (FaceQualityThreshold == null) null
+        if (faceQualityThreshold == null) null
         else
             FaceConfiguration(
-                nbOfImagesToCapture = FaceNbOfFramesCaptured!!.toInt(),
-                qualityThreshold = FaceQualityThreshold.toInt(),
-                imageSavingStrategy = if (SaveFaceImages.toBoolean()) {
+                nbOfImagesToCapture = faceNbOfFramesCaptured!!.toInt(),
+                qualityThreshold = faceQualityThreshold.toInt(),
+                imageSavingStrategy = if (saveFaceImages.toBoolean()) {
                     FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
                 } else {
                     FaceConfiguration.ImageSavingStrategy.NEVER
                 },
-                decisionPolicy = parseDecisionPolicy(FaceConfidenceThresholds!!),
+                decisionPolicy = parseDecisionPolicy(faceConfidenceThresholds!!),
             )
 
     private fun fingerprintConfiguration(): FingerprintConfiguration? =
-        if (FingerprintQualityThreshold == null) null
+        if (fingerprintQualityThreshold == null) null
         else
             FingerprintConfiguration(
-                fingersToCapture = FingerprintsToCollect!!.split(",")
+                fingersToCapture = fingerprintsToCollect!!.split(",")
                     .map { Finger.valueOf(it) },
-                qualityThreshold = FingerprintQualityThreshold.toInt(),
-                decisionPolicy = parseDecisionPolicy(FingerprintConfidenceThresholds!!),
-                allowedVeroGenerations = ScannerGenerations!!.split(",")
+                qualityThreshold = fingerprintQualityThreshold.toInt(),
+                decisionPolicy = parseDecisionPolicy(fingerprintConfidenceThresholds!!),
+                allowedVeroGenerations = scannerGenerations!!.split(",")
                     .map { FingerprintConfiguration.VeroGeneration.valueOf(it) },
-                comparisonStrategyForVerification = FingerComparisonStrategyForVerification?.let {
+                comparisonStrategyForVerification = fingerComparisonStrategyForVerification?.let {
                     FingerprintConfiguration.FingerComparisonStrategy.valueOf(
                         it
                     )
                 } ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                displayHandIcons = FingerImagesExist.toBoolean(),
+                displayHandIcons = fingerImagesExist.toBoolean(),
                 vero2 = vero2Configuration(),
             )
 
     private fun vero2Configuration(): Vero2Configuration? =
-        if (CaptureFingerprintStrategy == null) null
+        if (captureFingerprintStrategy == null) null
         else
             Vero2Configuration(
                 captureStrategy = Vero2Configuration.CaptureStrategy.valueOf(
-                    CaptureFingerprintStrategy
+                    captureFingerprintStrategy
                 ),
-                displayLiveFeedback = FingerprintLiveFeedbackOn.toBoolean(),
-                imageSavingStrategy = when (SaveFingerprintImagesStrategy) {
+                displayLiveFeedback = fingerprintLiveFeedbackOn.toBoolean(),
+                imageSavingStrategy = when (saveFingerprintImagesStrategy) {
                     "NEVER" -> Vero2Configuration.ImageSavingStrategy.NEVER
                     "WSQ_15" -> Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
                     "WSQ_15_EAGER" -> Vero2Configuration.ImageSavingStrategy.EAGER
                     else -> Vero2Configuration.ImageSavingStrategy.NEVER
                 },
-                firmwareVersions = if (Vero2FirmwareVersions.isNullOrEmpty()) {
+                firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
                     emptyMap()
                 } else {
-                    ObjectMapper().readValue(Vero2FirmwareVersions)
+                    ObjectMapper().readValue(vero2FirmwareVersions)
                 },
             )
 
     private fun consentConfiguration(): ConsentConfiguration =
         ConsentConfiguration(
-            programName = ProgramName,
-            organizationName = OrganizationName,
-            collectConsent = ConsentRequired.toBoolean(),
-            displaySimprintsLogo = LogoExists.toBoolean(),
-            allowParentalConsent = ConsentParentalExists.toBoolean(),
-            generalPrompt = fromJson<GeneralConsentOptions>(ConsentGeneralOptions).toDomain(),
-            parentalPrompt = fromJson<ParentalConsentOptions>(ConsentParentalOptions).toDomain(),
+            programName = programName,
+            organizationName = organizationName,
+            collectConsent = consentRequired.toBoolean(),
+            displaySimprintsLogo = logoExists.toBoolean(),
+            allowParentalConsent = consentParentalExists.toBoolean(),
+            generalPrompt = fromJson<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
+            parentalPrompt = fromJson<ParentalConsentOptions>(consentParentalOptions).toDomain(),
         )
 
     private fun identificationConfiguration(): IdentificationConfiguration =
         IdentificationConfiguration(
-            maxNbOfReturnedCandidates = NbOfIdsInt.toInt(),
+            maxNbOfReturnedCandidates = nbOfIdsInt.toInt(),
             poolType = IdentificationConfiguration.PoolType.valueOf(
-                if (MatchGroup == "GLOBAL") "PROJECT" else MatchGroup
+                if (matchGroup == "GLOBAL") "PROJECT" else matchGroup
             ),
         )
 
     private fun synchronizationConfiguration(): SynchronizationConfiguration =
         SynchronizationConfiguration(
-            frequency = when (DownSyncSetting) {
+            frequency = when (downSyncSetting) {
                 "OFF" -> SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
                 "ON" -> SynchronizationConfiguration.Frequency.PERIODICALLY
                 "EXTRA" -> SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
@@ -150,34 +153,34 @@ internal data class OldProjectConfig(
             },
             up = UpSynchronizationConfiguration(
                 simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-                    kind = if (SimprintsSync == null) {
-                        if (SyncDestination.contains("SIMPRINTS")) {
+                    kind = if (simprintsSync == null) {
+                        if (syncDestination.contains("SIMPRINTS")) {
                             UpSynchronizationConfiguration.UpSynchronizationKind.ALL
                         } else {
                             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
                         }
                     } else {
-                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(SimprintsSync)
+                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(simprintsSync)
                     }
                 ),
                 coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
-                    kind = if (CoSync == null) {
-                        if (SyncDestination.contains("COMMCARE")) {
+                    kind = if (coSync == null) {
+                        if (syncDestination.contains("COMMCARE")) {
                             UpSynchronizationConfiguration.UpSynchronizationKind.ALL
                         } else {
                             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
                         }
                     } else {
-                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(CoSync)
+                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(coSync)
                     }
                 )
             ),
             down = DownSynchronizationConfiguration(
                 partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(
-                    if (SyncGroup == "GLOBAL") "PROJECT" else SyncGroup
+                    if (syncGroup == "GLOBAL") "PROJECT" else syncGroup
                 ),
-                maxNbOfModules = MaxNbOfModules.toInt(),
-                moduleOptions = ModuleIdOptions.split("|")
+                maxNbOfModules = maxNbOfModules.toInt(),
+                moduleOptions = moduleIdOptions.split("|")
             ),
         )
 

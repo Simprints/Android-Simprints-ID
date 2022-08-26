@@ -14,6 +14,29 @@ class ApiConsentConfigurationTest {
     }
 
     @Test
+    fun `should map correctly the model when the prompts are missing`() {
+        val apiConsentConfiguration = ApiConsentConfiguration(
+            programName = "programName",
+            organizationName = "organizationName",
+            collectConsent = true,
+            displaySimprintsLogo = false,
+            allowParentalConsent = false,
+            generalPrompt = null,
+            parentalPrompt = null,
+        )
+        val consentConfiguration = ConsentConfiguration(
+            programName = "programName",
+            organizationName = "organizationName",
+            collectConsent = true,
+            displaySimprintsLogo = false,
+            allowParentalConsent = false,
+            generalPrompt = null,
+            parentalPrompt = null,
+        )
+        assertThat(apiConsentConfiguration.toDomain()).isEqualTo(consentConfiguration)
+    }
+
+    @Test
     fun `should map correctly the ConsentEnrolmentVariant enums`() {
         val mapping = mapOf(
             ApiConsentConfiguration.ConsentEnrolmentVariant.STANDARD to ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
