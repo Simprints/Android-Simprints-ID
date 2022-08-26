@@ -101,6 +101,7 @@ open class Application : CoreApplication() { //, Configuration.Provider {
         factory { component.getPreferencesManager() }
         factory { component.getSessionEventsManager() }
         factory { component.getTimeHelper() }
+        factory { component.getRecentEventsPreferencesManager() }
         factory { component.getFingerprintRecordLocalDataSource() }
         factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
