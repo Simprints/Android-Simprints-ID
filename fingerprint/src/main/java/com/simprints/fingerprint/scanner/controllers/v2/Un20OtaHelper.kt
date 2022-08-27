@@ -42,32 +42,18 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
      * @param scanner the connected scanner expected to be in root mode
      * @param macAddress the scanner's macAddress
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String): Flow<Un20OtaStep> = flow {
+    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<Un20OtaStep> = flow {
         enterMainMode(scanner)
         turnOnUn20BeforeTransfer(scanner)
-        transferFirmwareBytes(scanner)
+        transferFirmwareBytes(scanner, firmwareVersion)
         awaitCacheCommit()
         turnOffUn20AfterTransfer(scanner)
         turnOnUn20AfterTransfer(scanner)
-        validateRunningFirmwareVersion(scanner)
+        validateRunningFirmwareVersion(scanner, firmwareVersion)
         reconnectScannerAfterValidating(scanner, macAddress)
         updateFirmwareVersion(scanner)
     }
-/*
- fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Observable<Un20OtaStep> =
-        Observable.just<Un20OtaStep>(Un20OtaStep.EnteringMainMode)
-            .concatWith(scanner.enterMainMode().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20BeforeTransfer)
-            .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.CommencingTransfer)
-            .concatWith(scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes(firmwareVersion)).map { Un20OtaStep.TransferInProgress(it) })
-            .concatWith(emitStep(Un20OtaStep.AwaitingCacheCommit))
-            .concatWith(waitCacheCommitTime() thenEmitStep Un20OtaStep.TurningOffUn20AfterTransfer)
-            .concatWith(scanner.turnUn20OffAndAwaitStateChangeEvent().addSmallDelay() thenEmitStep Un20OtaStep.TurningOnUn20AfterTransfer)
-            .concatWith(scanner.turnUn20OnAndAwaitStateChangeEvent() thenEmitStep Un20OtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateUn20FirmwareVersion(firmwareVersion, scanner) thenEmitStep Un20OtaStep.ReconnectingAfterValidating)
-            .concatWith(rxCompletable { connectionHelper.reconnect(scanner, macAddress) }.addSmallDelay() thenEmitStep Un20OtaStep.UpdatingUnifiedVersionInformation)
-            .concatWith(updateUnifiedVersionInformation(scanner))
 
- */
     private suspend fun Un20Step.enterMainMode(scanner: Scanner) {
         emit(Un20OtaStep.EnteringMainMode)
         scanner.enterMainMode().await()
@@ -79,9 +65,9 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
         scanner.turnUn20OnAndAwaitStateChangeEvent().await()
     }
 
-    private suspend fun Un20Step.transferFirmwareBytes(scanner: Scanner) {
+    private suspend fun Un20Step.transferFirmwareBytes(scanner: Scanner ,firmwareVersion: String) {
         emit(Un20OtaStep.CommencingTransfer)
-        scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes())
+        scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes( firmwareVersion))
             .map { Un20OtaStep.TransferInProgress(it) }
             .asFlow()
             .collect { emit(it) }
@@ -103,9 +89,9 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
         scanner.turnUn20OnAndAwaitStateChangeEvent().await()
     }
 
-    private suspend fun Un20Step.validateRunningFirmwareVersion(scanner: Scanner) {
+    private suspend fun Un20Step.validateRunningFirmwareVersion(scanner: Scanner, firmwareVersion: String) {
         emit(Un20OtaStep.ValidatingNewFirmwareVersion)
-        validateUn20FirmwareVersion(firmwareVersion: String, scanner)
+        validateUn20FirmwareVersion(scanner, firmwareVersion)
     }
 
     private suspend fun Un20Step.reconnectScannerAfterValidating(scanner: Scanner, macAddress: String) {
@@ -119,7 +105,7 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
         updateUnifiedVersionInformation(scanner)
     }
 
-    private suspend fun validateUn20FirmwareVersion(scanner: Scanner) =
+    private suspend fun validateUn20FirmwareVersion(scanner: Scanner, firmwareVersion: String) =
         scanner.getUn20AppVersion().flatMapCompletable {
             val actualFirmwareVersion = it.versionAsString
             if (firmwareVersion != actualFirmwareVersion) {
