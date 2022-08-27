@@ -11,8 +11,7 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
 
 /**
@@ -23,8 +22,7 @@ class ScannerInitialSetupHelper(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
     private val fingerprintPreferenceManager: FingerprintPreferencesManager,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource,
-    private val timeScheduler: Scheduler = Schedulers.io()
+    private val firmwareLocalDataSource: FirmwareLocalDataSource
 ) {
 
     private lateinit var scannerVersion: ScannerVersion
@@ -58,7 +56,7 @@ class ScannerInitialSetupHelper(
         scanner.enterMainMode().await()
         delay(100) // Speculatively needed
         val batteryInfo = getBatteryInfo(scanner, withBatteryInfo)
-        ifAvailableOtasPrepareScannerThenThrow(scanner, macAddress, batteryInfo)
+        ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, batteryInfo)
     }
 
 
