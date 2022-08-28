@@ -60,7 +60,6 @@ class ConnectScannerViewModel(
 
     fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
-        start()
     }
 
     fun start(){
@@ -113,13 +112,15 @@ class ConnectScannerViewModel(
     }
 
     private suspend fun connectToVero() {
-        postProgressAndMessage(step = 4,
-       messageRes = R.string.connect_scanner_bt_connect)
+        postProgressAndMessage(
+            step = 4,
+            messageRes = R.string.connect_scanner_bt_connect
+        )
 
-        scannerManager.scanner .connect()
+        scannerManager.scanner.connect()
 
-            addBluetoothConnectivityEvent()
-       logMessageForCrashReport("ScannerManager: connectToVero")
+        addBluetoothConnectivityEvent()
+        logMessageForCrashReport("ScannerManager: connectToVero")
     }
 
     private suspend fun setupVero() {
@@ -214,7 +215,7 @@ class ConnectScannerViewModel(
     private fun setLastConnectedScannerInfo() {
         preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
         preferencesManager.lastScannerVersion =
-            scannerManager.scanner?.versionInformation()?.hardwareVersion ?: ""
+            scannerManager.scanner.versionInformation().hardwareVersion 
     }
 
     private fun handleSetupFinished() {
