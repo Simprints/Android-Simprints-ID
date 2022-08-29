@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
@@ -17,6 +16,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.*
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.common.mock.MockTimer
 import io.mockk.*
@@ -47,11 +47,7 @@ class OtaViewModelTest {
         every { scanner } returns scannerMock
     }
 
-    private val mockDispatcher = mockk<DispatcherProvider> {
-        every { main() } returns testCoroutineRule.testCoroutineDispatcher
-        every { default() } returns testCoroutineRule.testCoroutineDispatcher
-        every { io() } returns testCoroutineRule.testCoroutineDispatcher
-    }
+    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val fingerprintManager: FingerprintPreferencesManager = mockk(relaxed = true) {
         every { lastScannerVersion } returns HARDWARE_VERSION
@@ -62,7 +58,7 @@ class OtaViewModelTest {
         scannerManager,
         sessionEventsManagerMock,
         timeHelperMock,
-        mockDispatcher,
+        dispatcherProvider,
        fingerprintManager
     )
 
