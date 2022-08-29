@@ -8,11 +8,10 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertThat
@@ -32,20 +31,11 @@ import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.id.Application
-import com.simprints.testtools.android.getResourceString
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
-import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.mock.MockTimer
 import io.mockk.*
 import io.reactivex.Completable
-import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -55,7 +45,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
@@ -85,18 +74,10 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>().apply {
         every { isLiveFeedbackAvailable() } returns false
-        every { connect() } returns Completable.complete()
-        every { versionInformation() } returns ScannerVersion(
-            hardwareVersion = "",
-            generation = ScannerGeneration.VERO_1,
-            firmware = ScannerFirmwareVersions("", "", "")
-        )
-        every { setup() } returns Completable.complete()
     }
     private val scannerManager: ScannerManager =
         spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
             every { checkBluetoothStatus() } returns Completable.complete()
-            every { initScanner() } returns Completable.timer(SCANNER_INIT_DELAY, TimeUnit.MILLISECONDS)
         }
     private val nfcManager: NfcManager = mockk()
 
@@ -153,50 +134,6 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun onScannerOff_scannerOffFragmentMakesOnlyMaxConnectionAttemptsAtATime() {
-        // Setup connection attempts to be unsuccessful
-        every { scanner.setUiIdle() } throws UnknownScannerIssueException()
-
-        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
-
-        val scannerId = "123"
-        viewModelMock.showScannerErrorDialogWithScannerId.postEvent(scannerId)
-
-        onView(withResourceName("alertTitle"))
-            .check(matches(withText(getResourceString(R.string.scanner_id_confirmation_message).format(scannerId))))
-
-        onView(withText(getResourceString(R.string.scanner_confirmation_yes)))
-            .perform(ViewActions.click())
-
-        // Verify ScannerOffFragment is displayed
-        onView(withId(R.id.scannerOffTitleTextView)).check(matches(isDisplayed()))
-        // Verify it immediately starts connection attempts
-        onView(withId(R.id.scannerOffProgressBar)).check(matches(isDisplayed()))
-        onView(withId(R.id.tryAgainButton)).check(matches(not(isDisplayed())))
-        waitOnUi(MAX_RETRY_COUNT * SCANNER_INIT_DELAY + 500)
-        var retryCounter = MAX_RETRY_COUNT
-        verify(exactly = retryCounter) { viewModelMock.retryConnect() }
-
-        // Verify connection attempts stop after 5 unsuccessful ones
-        onView(withId(R.id.scannerOffProgressBar)).check(matches(not(isDisplayed())))
-        onView(withId(R.id.tryAgainButton)).check(matches(isDisplayed()))
-        verify(exactly = retryCounter) { viewModelMock.retryConnect() }
-
-        // Clicking "Try again" starts 5 new connection attempts
-        onView(withId(R.id.tryAgainButton)).perform(ViewActions.click())
-        onView(withId(R.id.scannerOffProgressBar)).check(matches(isDisplayed()))
-        onView(withId(R.id.tryAgainButton)).check(matches(not(isDisplayed())))
-        waitOnUi(MAX_RETRY_COUNT * SCANNER_INIT_DELAY + 500)
-        retryCounter += MAX_RETRY_COUNT
-        verify(exactly = retryCounter) { viewModelMock.retryConnect() }
-
-        // Then it stops again
-        onView(withId(R.id.scannerOffProgressBar)).check(matches(not(isDisplayed())))
-        onView(withId(R.id.tryAgainButton)).check(matches(isDisplayed()))
-        verify(exactly = retryCounter) { viewModelMock.retryConnect() }
-    }
-
-    @Test
     fun pressBack_handlesAPILevel() {
         val backButtonBehaviourLiveData =
             MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
@@ -225,8 +162,6 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private const val SCANNER_INIT_DELAY = 100L
-
         private fun connectScannerTaskRequest() =
             ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
