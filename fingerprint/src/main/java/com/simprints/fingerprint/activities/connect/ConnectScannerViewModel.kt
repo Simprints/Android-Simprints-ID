@@ -215,7 +215,7 @@ class ConnectScannerViewModel(
     private fun setLastConnectedScannerInfo() {
         preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
         preferencesManager.lastScannerVersion =
-            scannerManager.scanner.versionInformation().hardwareVersion 
+            scannerManager.scanner.versionInformation().hardwareVersion
     }
 
     private fun handleSetupFinished() {
