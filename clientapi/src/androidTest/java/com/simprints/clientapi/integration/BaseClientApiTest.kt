@@ -18,9 +18,8 @@ import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
-import org.koin.test.KoinTest
 
-open class BaseClientApiTest : KoinTest {
+open class BaseClientApiTest {
 
     internal val projectIdField = "projectId" to "xppPLwmR2eUmyN6LS3SN"
     internal val userIdField = "userId" to "some_user_id"

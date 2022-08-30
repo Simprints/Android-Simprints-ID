@@ -1,13 +1,11 @@
 package com.simprints.clientapi.activities.commcare
 
-import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.robots.commCare
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.libsimprints.Constants.*
 import io.mockk.coEvery
@@ -16,8 +14,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class CommCareActivityTest : BaseClientApiTest() {
@@ -34,10 +30,6 @@ class CommCareActivityTest : BaseClientApiTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        loadKoinModules(module {
-            factory { (_: Context) -> mockk<CommCareGuidSelectionNotifier>(relaxed = true) }
-            factory { clientApiSessionEventsManager }
-        })
         rule.launchActivity(buildIntent())
     }
 
