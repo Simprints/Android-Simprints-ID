@@ -18,8 +18,6 @@ import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 
 open class BaseClientApiTest : KoinTest {
@@ -53,11 +51,6 @@ open class BaseClientApiTest : KoinTest {
     @Before
     open fun setUp() {
         Intents.init()
-
-        KoinInjector.loadClientApiKoinModules()
-        loadKoinModules(module {
-            factory { buildDummySessionEventsManagerMock() }
-        })
     }
 
     private fun buildDummySessionEventsManagerMock(): EventRepository {
@@ -80,7 +73,6 @@ open class BaseClientApiTest : KoinTest {
     @After
     fun tearDown() {
         Intents.release()
-        KoinInjector.unloadClientApiKoinModules()
     }
 
     companion object {
