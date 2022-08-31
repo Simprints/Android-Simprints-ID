@@ -175,6 +175,7 @@ dependencies {
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.live.data)
+    androidTestImplementation(libs.testing.coroutines.test)
 
     // Mocking and assertion frameworks
     androidTestImplementation(libs.testing.mockk.core)
