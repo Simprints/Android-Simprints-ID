@@ -5,11 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.robots.odk
-import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.libsimprints.Constants.*
-import io.mockk.coEvery
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,23 +19,10 @@ class OdkActivityTest : BaseClientApiTest() {
     @JvmField
     val rule = ActivityTestRule(OdkActivity::class.java, INITIAL_TOUCH_MODE, LAUNCH_ACTIVITY)
 
-    private  val clientApiSessionEventsManager: ClientApiSessionEventsManager = mockk(relaxed = true){
-        coEvery { isSessionHasIdentificationCallback("sessionId") } returns true
-        coEvery { getCurrentSessionId() } returns "sessionId"
-
-    }
     @Before
     override fun setUp() {
         super.setUp()
         rule.launchActivity(buildIntent())
-    }
-
-    @Test
-    fun withConfirmIdentityIntent_shouldDisplayToastMessage() {
-        odk {
-        } assert {
-            toastMessageIsDisplayed()
-        }
     }
 
     @Test

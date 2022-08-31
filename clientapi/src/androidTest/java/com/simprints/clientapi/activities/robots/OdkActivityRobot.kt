@@ -7,7 +7,6 @@ import com.simprints.clientapi.activities.odk.OdkActivityTest
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkEnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
-import io.mockk.verify
 
 fun OdkActivityTest.odk(func: OdkActivityRobot.() -> Unit) = OdkActivityRobot(rule).apply(func)
 
@@ -20,10 +19,6 @@ class OdkActivityRobot(private val rule: ActivityTestRule<OdkActivity>) {
 }
 
 class OdkActivityAssertions(private val rule: ActivityTestRule<OdkActivity>) {
-
-    fun toastMessageIsDisplayed() {
-        verify(exactly = 1) { rule.activity.guidSelectionNotifier.showMessage() }
-    }
 
     fun enrolExtractorIsOdkEnrolExtractor() {
         assertThat(rule.activity.enrolExtractor).isInstanceOf(OdkEnrolExtractor::class.java)

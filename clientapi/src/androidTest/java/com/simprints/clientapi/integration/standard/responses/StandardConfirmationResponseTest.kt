@@ -19,7 +19,7 @@ class StandardConfirmationResponseTest : BaseStandardClientApiTest() {
     override fun setUp() {
         super.setUp()
     }
-    
+
     @Test
     fun appModuleSendsAStandardConfirmationAppResponse_shouldReturnAStandardConfirmationResponse() {
         val appIdentificationOutcomeResponse = AppConfirmationResponse(true)
