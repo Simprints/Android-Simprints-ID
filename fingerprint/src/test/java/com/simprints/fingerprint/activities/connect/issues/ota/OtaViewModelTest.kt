@@ -65,9 +65,9 @@ class OtaViewModelTest {
     @Before
     fun setup() {
 
-        coEvery { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
-        coEvery { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
-        coEvery { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()    }
+        every { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
+        every { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
+        every { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()    }
 
     @Test
     fun oneOta_updatesStateCorrectlyAndSavesEvent() {

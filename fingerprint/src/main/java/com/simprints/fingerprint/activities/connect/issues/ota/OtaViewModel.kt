@@ -89,7 +89,7 @@ class OtaViewModel(
         }
     }
 
-    private suspend fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
+    private fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
         val otaStartedTime = timeHelper.now()
         return when (this) {
             AvailableOta.CYPRESS ->

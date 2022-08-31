@@ -53,9 +53,9 @@ interface ScannerWrapper {
     fun batteryInformation(): BatteryInfo
 
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    suspend fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep>
+    fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    suspend fun performStmOta(firmwareVersion: String): Flow<StmOtaStep>
+    fun performStmOta(firmwareVersion: String): Flow<StmOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    suspend fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep>
+    fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep>
 }

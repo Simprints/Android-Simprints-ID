@@ -283,15 +283,15 @@ class ScannerWrapperV2(
         }
     }
 
-    override suspend fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep> =
+    override fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep> =
             cypressOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
                 .mapPotentialErrorFromScanner()
 
-    override suspend fun performStmOta(firmwareVersion: String): Flow<StmOtaStep> =
+    override fun performStmOta(firmwareVersion: String): Flow<StmOtaStep> =
             stmOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
                 .mapPotentialErrorFromScanner()
 
-    override suspend fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep> =
+    override fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep> =
              un20OtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
                 .mapPotentialErrorFromScanner()
 

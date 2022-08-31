@@ -46,7 +46,7 @@ class ConnectionHelper(
      * @throws BluetoothNotEnabledException if bluetooth is not turned on
      * @throws BluetoothNotSupportedException if bluetooth is not supported on this device (e.g. an emulator)
      */
-    suspend fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<Unit> =
+    fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<Unit> =
         establishConnectedSocket(macAddress, maxRetries).map { socket ->
             connectScannerObjectWithSocket(scanner, socket)
         }
@@ -84,10 +84,7 @@ class ConnectionHelper(
 
 
     private suspend fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket) {
-
         Simber.d("Socket connected. Setting up scanner...")
-
-        // TODO update [Scanner] class to use Coroutines
         scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
     }
 
