@@ -30,10 +30,7 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAd
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -349,7 +346,7 @@ class ConnectScannerViewModelTest : KoinTest {
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.startRetryingToConnect()
 
-        verify(exactly = MAX_RETRY_COUNT) { scannerWrapper.connect() }
+        coVerify(exactly = MAX_RETRY_COUNT) { scannerWrapper.connect() }
     }
 
     private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
