@@ -8,6 +8,7 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 import com.simprints.fingerprintscanner.v1.Scanner
@@ -36,6 +37,40 @@ class ScannerWrapperV1Test {
         scannerWrapper = ScannerWrapperV1(scanner)
     }
 
+    @Test(expected = ScannerOperationInterruptedException::class)
+    fun `test captureFingerprint ScannerOperationInterruptedException`()= runTest {
+        mockScannerError(SCANNER_ERROR.INTERRUPTED)
+        startCapturing()
+   }
+
+    @Test(expected = NoFingerDetectedException::class)
+    fun `test captureFingerprint NoFingerDetectedException`() = runTest{
+        mockScannerError(SCANNER_ERROR.UN20_SDK_ERROR)
+        startCapturing()
+    }
+
+    @Test(expected =ScannerDisconnectedException::class)
+    fun `test captureFingerprint ScannerDisconnectedException`()= runTest{
+        mockScannerError(SCANNER_ERROR.INVALID_STATE)
+        startCapturing()
+    }
+
+    @Test(expected = UnexpectedScannerException::class)
+    fun `test captureFingerprint UnexpectedScannerException`() = runTest{
+        mockScannerError(SCANNER_ERROR.BLUETOOTH_DISABLED)
+        startCapturing()
+    }
+
+
+    @Test(expected = Test.None::class)
+    fun `should complete successfully when the sensor shuts down without errors`()= runTest {
+        // Given
+        every { scanner.un20Shutdown(capture(captureCallback)) } answers {
+            captureCallback.captured.onSuccess()
+        }
+        // When
+       scannerWrapper.sensorShutDown()
+    }
     @Test
     fun shouldRead_scannerVersion_correctlyFormatted_withNewApiFormat() {
         // Given
@@ -97,6 +132,27 @@ class ScannerWrapperV1Test {
 
             assertThrows<UnknownScannerIssueException> { scannerWrapper.sensorWakeUp() }
         }
+    @Test(expected = UnknownScannerIssueException::class)
+    fun `should throw unknown scanner exception when the sensor wakeUp completes with an error`() =
+        runTest{
+        // Given
+        every { scanner.un20Wakeup(capture(captureCallback)) } answers {
+            captureCallback.captured.onFailure(SCANNER_ERROR.UN20_INVALID_STATE)
+        }
+        // When
+         scannerWrapper.sensorWakeUp()
+        }
+
+   @Test(expected = ScannerLowBatteryException::class)
+    fun `should throw low-battery exception when the sensor wakeUp completes with low-voltage error`() =
+       runTest{
+        // Given
+        every { scanner.un20Wakeup(capture(captureCallback)) } answers {
+            captureCallback.captured.onFailure(SCANNER_ERROR.UN20_LOW_VOLTAGE)
+        }
+        // When
+         scannerWrapper.sensorWakeUp()
+      }
 
     @Test
     fun `should throw BluetoothNotEnabledException when BLUETOOTH_DISABLED scanner error is returned during connection`() =
@@ -160,4 +216,17 @@ class ScannerWrapperV1Test {
 
             assertThrows<UnknownScannerIssueException> { scannerWrapper.connect() }
         }
+
+    private fun mockScannerError(scannerError: SCANNER_ERROR) {
+        every { scanner.startContinuousCapture(any(), any(), capture(captureCallback)) } answers {
+            captureCallback.captured.onFailure(scannerError)
+
+        }
+    }
+    private suspend fun startCapturing() = scannerWrapper.captureFingerprint(
+        CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI,
+        CollectFingerprintsViewModel.scanningTimeoutMs.toInt(),
+        60
+    )
+
 }

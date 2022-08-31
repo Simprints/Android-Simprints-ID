@@ -145,14 +145,31 @@ class ScannerWrapperV2Test {
         }
     }
 
-    @Test
-    fun `should throw UnexpectedScannerException when trying to acquire fingerprint image and save fingerprint strategy is NEVER`() = runTest {
-        assertThrows<IllegalArgumentException> {
+    @Test(expected = IllegalArgumentException::class)
+    fun `should throw UnexpectedScannerException when trying to acquire fingerprint image and save fingerprint strategy is NEVER`() =
+        runTest {
             scannerWrapper.acquireImage(
                 SaveFingerprintImagesStrategy.NEVER
             )
+
         }
-    }
+
+    @Test(expected = UnexpectedScannerException::class)
+    fun `should throw UnexpectedScannerException when DPI_UNSUPPORTED error is returned during capture`() =
+        runTest {
+            every { scannerV2.captureFingerprint(any()) } returns Single.just(
+                CaptureFingerprintResult.DPI_UNSUPPORTED
+            )
+            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+            every { scannerV2.getImageQualityScore() } returns Maybe.empty()
+            // When
+            scannerWrapper.captureFingerprint(
+                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
+                timeOutMs = 30000,
+                qualityThreshold = 7
+            )
+        }
+
 
     @Test
     fun `should return correct capture response when capture result and image quality are OK`() = runTest {

@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -44,7 +45,6 @@ import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.Application
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
@@ -98,14 +98,18 @@ class CollectFingerprintsActivityTest : KoinTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+    private val mockDispatcher = mockk<DispatcherProvider> {
+        every { main() } returns testCoroutineRule.testCoroutineDispatcher
+        every { default() } returns testCoroutineRule.testCoroutineDispatcher
+        every { io() } returns testCoroutineRule.testCoroutineDispatcher
+    }
     private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     private val vm: CollectFingerprintsViewModel = spyk(
         CollectFingerprintsViewModel(
             scannerManager, preferencesManager, imageManager,timeHelper,
             sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests,
-            mockCoroutineScope,dispatcherProvider
+            mockCoroutineScope,mockDispatcher
         )
     ) {
         every { start(any()) } just Runs
