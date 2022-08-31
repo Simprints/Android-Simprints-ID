@@ -68,8 +68,9 @@ class ConnectScannerViewModel(
 
     fun start(){
         runBlocking { startSetup() }
-     }fun retryConnect() {
-        startSetup()
+     }
+    fun retryConnect() {
+        runBlocking {startSetup()}
     }
 
     fun startRetryingToConnect() {
