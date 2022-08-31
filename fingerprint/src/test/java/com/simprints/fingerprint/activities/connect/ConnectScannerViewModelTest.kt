@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -17,6 +18,7 @@ import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
@@ -336,6 +338,18 @@ class ConnectScannerViewModelTest : KoinTest {
         viewModel.finishConnectActivity()
 
         finishObserver.assertEventReceived()
+    }
+
+    @Test
+    fun startRetryingToConnect_scannerConnectFails_makesNoMoreThanMaxRetryAttempts() {
+        setupBluetooth(numberOfPairedScanners = 1)
+        val scannerWrapper = mockScannerWrapper(VERO_1, UnknownScannerIssueException())
+        every { scannerFactory.create(any()) } returns scannerWrapper
+
+        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        viewModel.startRetryingToConnect()
+
+        verify(exactly = MAX_RETRY_COUNT) { scannerWrapper.connect() }
     }
 
     private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
