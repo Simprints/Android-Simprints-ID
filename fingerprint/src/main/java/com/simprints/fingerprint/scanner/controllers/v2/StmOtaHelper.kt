@@ -43,7 +43,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
      * @param scanner the connected scanner expected to be in root mode
      * @param macAddress the scanner's mac address
      */
-    suspend fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<StmOtaStep> = flow {
+    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<StmOtaStep> = flow {
         // enter stm ota mode, which
         // will trigger scanner restart
         enterStmOtaMode(scanner)
