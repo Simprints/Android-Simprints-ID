@@ -220,6 +220,24 @@ class EventMigration7to8 : Migration(7, 8) {
         val createdAt = payload.getLong("createdAt")
         val eventId = randomUUID()
 
+        val faceCaptureBiometricsEvent = createFaceCaptureBiometricsEvent(
+            eventId = eventId,
+            labelsObject = labelsObject,
+            createdAt = createdAt,
+            faceObject = faceObject,
+            payloadId = payloadId
+        )
+
+        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
+    }
+
+    private fun createFaceCaptureBiometricsEvent(
+        eventId: String,
+        labelsObject: JSONObject,
+        createdAt: Long,
+        faceObject: JSONObject,
+        payloadId: String?
+    ): ContentValues {
         val event =
             "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
                 faceObject.getDouble("yaw")
@@ -233,7 +251,7 @@ class EventMigration7to8 : Migration(7, 8) {
                 faceObject.getString("format")
             }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}".trimIndent()
 
-        val faceCaptureBiometricsEvent = ContentValues().apply {
+        return ContentValues().apply {
             this.put("id", eventId)
             this.put("projectId", labelsObject.optString("projectId"))
             this.put("sessionId", labelsObject.optString("sessionId"))
@@ -244,8 +262,6 @@ class EventMigration7to8 : Migration(7, 8) {
             this.put("endedAt", 0)
             this.put("sessionIsClosed", 0)
         }
-
-        database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
     }
 
     /**
