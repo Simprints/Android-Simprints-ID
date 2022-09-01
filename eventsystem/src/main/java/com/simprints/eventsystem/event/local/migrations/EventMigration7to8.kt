@@ -28,7 +28,7 @@ class EventMigration7to8 : Migration(7, 8) {
             while (it.moveToNext()) {
                 try {
                     val id = it.getStringWithColumnName(DB_ID_FIELD)
-                    createAndInsertFingerprintCaptureBiometricsEventValues(database, it)
+                    createAndInsertFingerprintCaptureBiometricsEventValues(database, it, id)
                     migrateFingerprintCaptureEventPayloadType(it, database, id)
                 } catch (t: Throwable) {
                     Simber.e(
@@ -45,11 +45,11 @@ class EventMigration7to8 : Migration(7, 8) {
 
     private fun createAndInsertFingerprintCaptureBiometricsEventValues(
         database: SupportSQLiteDatabase,
-        cursor: Cursor?
+        cursor: Cursor?,
+        payloadId: String?
     ) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
-        val payloadId = payload.getString("id")
         val labelsObject = originalObject.getJSONObject("labels")
         val sessionId = labelsObject.getString("sessionId")
 
@@ -159,8 +159,6 @@ class EventMigration7to8 : Migration(7, 8) {
         id: String?
     ) {
         val json = JSONObject(it?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
-        // In the previous system, the event and the payload have matching ids, which is not what we want here
-        json.put(DB_ID_FIELD, randomUUID())
 
         val payload = json.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
         payload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
@@ -260,8 +258,6 @@ class EventMigration7to8 : Migration(7, 8) {
     ) {
 
         val json = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
-        // In the previous system, the event and the payload have matching ids, which is not what we want here
-        json.put(DB_ID_FIELD, randomUUID())
 
         val payload = json.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
         payload.put(VERSION_PAYLOAD_NAME, NEW_EVENT_VERSION_VALUE)
