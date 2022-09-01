@@ -53,6 +53,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -71,9 +72,7 @@ class EventMigration7To8Test {
             type = EventType.FINGERPRINT_CAPTURE,
         )
 
-        assertThat(fingerprintCaptureEvent.labels).isEqualTo(expectedFingerprintCaptureEvent.labels)
-        assertThat(fingerprintCaptureEvent.payload).isEqualTo(expectedFingerprintCaptureEvent.payload)
-        assertThat(fingerprintCaptureEvent.type).isEqualTo(expectedFingerprintCaptureEvent.type)
+        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
 
         val fingerprintCaptureBiometricsEventJson = MigrationTestingTools
             .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
@@ -138,6 +137,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -156,9 +156,7 @@ class EventMigration7To8Test {
             type = EventType.FINGERPRINT_CAPTURE,
         )
 
-        assertThat(fingerprintCaptureEvent.labels).isEqualTo(expectedFingerprintCaptureEvent.labels)
-        assertThat(fingerprintCaptureEvent.payload).isEqualTo(expectedFingerprintCaptureEvent.payload)
-        assertThat(fingerprintCaptureEvent.type).isEqualTo(expectedFingerprintCaptureEvent.type)
+        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
 
         val fingerprintCaptureBiometricsEventJson = MigrationTestingTools
             .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
@@ -223,6 +221,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -241,9 +240,7 @@ class EventMigration7To8Test {
             type = EventType.FINGERPRINT_CAPTURE,
         )
 
-        assertThat(fingerprintCaptureEvent.labels).isEqualTo(expectedFingerprintCaptureEvent.labels)
-        assertThat(fingerprintCaptureEvent.payload).isEqualTo(expectedFingerprintCaptureEvent.payload)
-        assertThat(fingerprintCaptureEvent.type).isEqualTo(expectedFingerprintCaptureEvent.type)
+        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
@@ -278,6 +275,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -296,9 +294,7 @@ class EventMigration7To8Test {
             type = EventType.FINGERPRINT_CAPTURE,
         )
 
-        assertThat(fingerprintCaptureEvent.labels).isEqualTo(expectedFingerprintCaptureEvent.labels)
-        assertThat(fingerprintCaptureEvent.payload).isEqualTo(expectedFingerprintCaptureEvent.payload)
-        assertThat(fingerprintCaptureEvent.type).isEqualTo(expectedFingerprintCaptureEvent.type)
+        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
@@ -325,6 +321,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFaceCaptureEvent = FaceCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -344,9 +341,7 @@ class EventMigration7To8Test {
             type = EventType.FACE_CAPTURE,
         )
 
-        assertThat(faceCaptureEvent.labels).isEqualTo(expectedFaceCaptureEvent.labels)
-        assertThat(faceCaptureEvent.payload).isEqualTo(expectedFaceCaptureEvent.payload)
-        assertThat(faceCaptureEvent.type).isEqualTo(expectedFaceCaptureEvent.type)
+        assertThat(faceCaptureEvent).isEqualTo(expectedFaceCaptureEvent)
 
         val faceCaptureBiometricsEventJson = MigrationTestingTools
             .retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
@@ -401,6 +396,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFaceCaptureEvent = FaceCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -420,9 +416,7 @@ class EventMigration7To8Test {
             type = EventType.FACE_CAPTURE,
         )
 
-        assertThat(faceCaptureEvent.labels).isEqualTo(expectedFaceCaptureEvent.labels)
-        assertThat(faceCaptureEvent.payload).isEqualTo(expectedFaceCaptureEvent.payload)
-        assertThat(faceCaptureEvent.type).isEqualTo(expectedFaceCaptureEvent.type)
+        assertThat(faceCaptureEvent).isEqualTo(expectedFaceCaptureEvent)
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
@@ -449,6 +443,7 @@ class EventMigration7To8Test {
         )
 
         val expectedFaceCaptureEvent = FaceCaptureEvent(
+            id = eventId,
             labels = EventLabels(
                 projectId = PROJECT_ID,
                 sessionId = SESSION_ID,
@@ -468,9 +463,7 @@ class EventMigration7To8Test {
             type = EventType.FACE_CAPTURE,
         )
 
-        assertThat(faceCaptureEvent.labels).isEqualTo(expectedFaceCaptureEvent.labels)
-        assertThat(faceCaptureEvent.payload).isEqualTo(expectedFaceCaptureEvent.payload)
-        assertThat(faceCaptureEvent.type).isEqualTo(expectedFaceCaptureEvent.type)
+        assertThat(faceCaptureEvent).isEqualTo(expectedFaceCaptureEvent)
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools
