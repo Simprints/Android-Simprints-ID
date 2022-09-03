@@ -47,7 +47,7 @@ dependencies {
     // multiple modules
     implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.12")
     implementation("com.google.firebase:firebase-analytics-ktx:21.1.0")
-    implementation("com.google.firebase:firebase-perf:20.1.0")
+    implementation("com.google.firebase:firebase-perf:20.1.1")
 
     //4.7.1 breaks realm:
     // https://github.com/realm/realm-java/issues/6153
