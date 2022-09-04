@@ -37,8 +37,8 @@ data class Step(
         this.status = status
     }
 
-    override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.run {
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.run {
             writeString(id)
             writeInt(requestCode)
             writeString(activityName)
