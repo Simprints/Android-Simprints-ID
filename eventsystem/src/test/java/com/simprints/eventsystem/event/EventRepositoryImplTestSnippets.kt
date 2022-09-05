@@ -45,7 +45,7 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
 
     // Mock query for open sessions
     coEvery {
-        eventLocalDataSource.loadAllSessions(false)
+        eventLocalDataSource.loadOpenedSessions()
     } returns flowOf(oldOpenSession)
 
     return oldOpenSession
@@ -55,7 +55,7 @@ fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): Sess
 fun EventRepositoryImplTest.mockDbToBeEmpty() {
     coEvery { eventLocalDataSource.count(type = SESSION_CAPTURE) } returns 0
     coEvery {
-        eventLocalDataSource.loadAllSessions(any())
+        eventLocalDataSource.loadOpenedSessions()
     } returns flowOf()
 }
 
@@ -120,7 +120,7 @@ fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
     val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
 
     coEvery {
-        eventLocalDataSource.loadAllSessions(true)
+        eventLocalDataSource.loadOpenedSessions()
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
 
     coEvery {
@@ -144,7 +144,7 @@ fun EventRepositoryImplTest.mockDbToLoadInvalidSessions(
     val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
 
     coEvery {
-        eventLocalDataSource.loadAllSessions(true)
+        eventLocalDataSource.loadOpenedSessions()
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
 
     coEvery {
