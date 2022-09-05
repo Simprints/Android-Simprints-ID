@@ -111,7 +111,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
         ))
     }
 
-    override suspend fun sensorShutDown() = suspendCoroutine<Unit> { cont ->
+    override suspend fun sensorShutDown() = suspendCoroutine { cont ->
         scannerV1.un20Shutdown(ScannerCallbackWrapper(
             success = { cont.resume(Unit) },
             failure = { cont.resumeWithException(UnknownScannerIssueException.forScannerError(it)) }
@@ -171,7 +171,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): AcquireImageResponse =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
 
-    override suspend fun setUiIdle() = suspendCoroutine<Unit> { cont ->
+    override suspend fun setUiIdle() = suspendCoroutine { cont ->
         scannerV1.resetUI(ScannerCallbackWrapper(
             success = {
                 cont.resume(Unit)

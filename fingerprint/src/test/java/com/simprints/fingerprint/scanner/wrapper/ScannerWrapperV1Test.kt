@@ -1,9 +1,10 @@
 package com.simprints.fingerprint.scanner.wrapper
 
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
+import com.simprints.fingerprint.scanner.domain.BatteryInfo.Companion.UNKNOWN
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
@@ -15,6 +16,7 @@ import com.simprints.fingerprintscanner.v1.Scanner
 import com.simprints.fingerprintscanner.v1.ScannerCallback
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
@@ -108,7 +110,7 @@ class ScannerWrapperV1Test {
 
     @Test
     fun `test imageTransfer shouldn't  be supported in v1  scanners`() {
-        Truth.assertThat(scannerWrapper.isImageTransferSupported()).isFalse()
+        assertThat(scannerWrapper.isImageTransferSupported()).isFalse()
     }
 
     @Test
@@ -216,6 +218,67 @@ class ScannerWrapperV1Test {
 
             assertThrows<UnknownScannerIssueException> { scannerWrapper.connect() }
         }
+
+    @Test
+    fun `test batteryInformation should return UNKNOWN`(){
+        assertThat(scannerWrapper.batteryInformation()).isEqualTo(UNKNOWN)
+    }
+
+
+    @Test
+    fun `should throw the correct corresponding errors when scanner disconnection fails`() =
+        runTest {
+            coEvery { scanner.disconnect(any()) } answers {
+                throw ScannerDisconnectedException()
+            } andThenThrows (UnexpectedScannerException("Scanner cannot disconnect"))
+
+            assertThrows<ScannerDisconnectedException> { scannerWrapper.disconnect() }
+            assertThrows<UnexpectedScannerException> { scannerWrapper.disconnect() }
+        }
+
+    @Test
+    fun `should success scanner disconnection completes`() = runTest {
+        coEvery { scanner.disconnect(any())} answers {
+            val scannerCallback = args.first() as ScannerCallback
+            scannerCallback.onSuccess()
+        }
+        scannerWrapper.disconnect()
+    }
+
+    @Test
+    fun `should throw the correct corresponding errors when scanner connection fails`() = runTest {
+        coEvery { scanner.connect(any()) } answers {
+            throw ScannerDisconnectedException()
+        } andThenAnswer {
+            throw ScannerNotPairedException()
+        } andThenAnswer {
+            throw BluetoothNotEnabledException()
+        } andThenThrows (BluetoothNotSupportedException())
+
+        assertThrows<ScannerDisconnectedException> { scannerWrapper.connect() }
+        assertThrows<ScannerNotPairedException> { scannerWrapper.connect() }
+        assertThrows<BluetoothNotEnabledException> { scannerWrapper.connect() }
+        assertThrows<BluetoothNotSupportedException> { scannerWrapper.connect() }
+    }
+
+    @Test(expected = Test.None::class)
+    fun `should complete if no connection errors `() = runTest {
+        coEvery { scanner.connect( any()) } answers {
+          val callback= args[0] as  ScannerCallback
+          callback.onSuccess()
+        }
+        scannerWrapper.connect()
+    }
+
+    @Test(expected = UnknownScannerIssueException::class)
+    fun `should throw ScannerDisconnectedException if getUn20Status throws IO`() = runTest {
+        every { scanner.un20Wakeup(any()) } answers {
+                val callback=args[0]as ScannerCallback
+            callback.onFailure(SCANNER_ERROR.IO_ERROR)
+        }
+        scannerWrapper.sensorWakeUp()
+    }
+
 
     private fun mockScannerError(scannerError: SCANNER_ERROR) {
         every { scanner.startContinuousCapture(any(), any(), capture(captureCallback)) } answers {
