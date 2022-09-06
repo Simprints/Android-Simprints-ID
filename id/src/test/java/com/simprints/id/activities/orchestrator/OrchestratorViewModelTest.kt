@@ -50,6 +50,7 @@ class OrchestratorViewModelTest {
     @Before
     fun setUp() {
         UnitTestConfig()
+            .rescheduleRxMainThread()
             .coroutinesMainThread()
 
         MockKAnnotations.init(this, relaxed = true)
