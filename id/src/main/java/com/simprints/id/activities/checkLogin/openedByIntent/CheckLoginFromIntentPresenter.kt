@@ -25,6 +25,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.PROJECT_ID
@@ -307,9 +308,10 @@ class CheckLoginFromIntentPresenter(
     }
 
     private fun initAnalyticsKeyInCrashManager() {
-        Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
         Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
+        Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
         Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
+        Simber.tag(DEVICE_ID, true).i(deviceId)
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(preferencesManager.eventDownSyncSetting.toString())
         Simber.tag(FINGERS_SELECTED, true)
