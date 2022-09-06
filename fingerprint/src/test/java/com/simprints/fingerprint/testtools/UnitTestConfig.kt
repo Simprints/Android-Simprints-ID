@@ -8,14 +8,10 @@ import org.junit.runner.Description
 object UnitTestConfig : BaseUnitTestConfig() {
 
     fun fullSetup() =
-        rescheduleRxMainThread()
-            .coroutinesMainThread()
+            coroutinesMainThread()
             .startKoin()
             .acquireFingerprintModules()
 
-    override fun rescheduleRxMainThread() = also {
-        super.rescheduleRxMainThread()
-    }
 
     override fun coroutinesMainThread() = also {
         super.coroutinesMainThread()
