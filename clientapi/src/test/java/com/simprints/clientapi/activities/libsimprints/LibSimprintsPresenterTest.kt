@@ -43,7 +43,7 @@ class LibSimprintsPresenterTest {
 
     @Before
     fun setup() {
-        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
+        BaseUnitTestConfig().coroutinesMainThread()
         MockKAnnotations.init(this, relaxed = true)
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID

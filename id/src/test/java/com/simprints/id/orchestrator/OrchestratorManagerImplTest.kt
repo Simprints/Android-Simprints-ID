@@ -87,7 +87,6 @@ class OrchestratorManagerImplTest {
 
         UnitTestConfig()
             .coroutinesMainThread()
-            .rescheduleRxMainThread()
 
         Intents.init()
 
