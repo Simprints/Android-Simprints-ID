@@ -101,9 +101,9 @@ class ConnectScannerViewModel(
     }
 
     fun stopConnectingAndResetState() {
-        progress.value = 0
-        message.value = R.string.connect_scanner_bt_connect
-        backButtonBehaviour.value = BackButtonBehaviour.EXIT_FORM
+        progress.postValue(0)
+        message.postValue( R.string.connect_scanner_bt_connect)
+        backButtonBehaviour.postValue( BackButtonBehaviour.EXIT_FORM)
     }
 
     private suspend fun disconnectVero() {
