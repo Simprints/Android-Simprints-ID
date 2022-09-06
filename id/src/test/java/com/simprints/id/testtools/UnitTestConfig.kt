@@ -37,17 +37,10 @@ class UnitTestConfig(
     private lateinit var testAppComponent: AppComponentForTests
 
     @ExperimentalCoroutinesApi
-    fun fullSetup() =
-        rescheduleRxMainThread()
-            .coroutinesMainThread()
+    fun fullSetup() =coroutinesMainThread()
             .setupFirebase()
             .setupWorkManager()
             .initComponent()
-
-    @ExperimentalCoroutinesApi
-    override fun rescheduleRxMainThread() = also {
-        super.rescheduleRxMainThread()
-    }
 
     @ExperimentalCoroutinesApi
     override fun coroutinesMainThread() = also {

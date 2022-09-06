@@ -20,7 +20,6 @@ class ErrorPresenterTest {
         MockKAnnotations.init(this, relaxed = true)
 
         BaseUnitTestConfig()
-            .rescheduleRxMainThread()
             .coroutinesMainThread()
     }
 
