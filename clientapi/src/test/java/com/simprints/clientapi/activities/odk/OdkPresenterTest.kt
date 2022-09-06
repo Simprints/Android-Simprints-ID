@@ -37,6 +37,7 @@ class OdkPresenterTest {
     @Before
     fun setup() {
         BaseUnitTestConfig()
+            .rescheduleRxMainThread()
             .coroutinesMainThread()
 
 
