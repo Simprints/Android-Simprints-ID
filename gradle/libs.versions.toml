@@ -9,7 +9,7 @@ espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.5.1"
 androidx_room_version = "2.4.3"
-androidx_camerax_version = "1.2.0-alpha04"
+androidx_camerax_version = "1.2.0-beta01"
 dagger_version = "2.43.2"
 work_version = "2.7.1"
 location_services_version = "20.0.0"
@@ -99,8 +99,8 @@ playcore-core = "com.google.android.play:core:1.10.3"
 playcore-core_ktx = "com.google.android.play:core-ktx:1.8.1"
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth-ktx:21.0.7"
-firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.1"
+firebase-auth = "com.google.firebase:firebase-auth-ktx:21.0.8"
+firebase-storage = "com.google.firebase:firebase-storage-ktx:20.0.2"
 firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.1.0"
 
 #Retrofit
