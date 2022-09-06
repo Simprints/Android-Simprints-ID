@@ -107,6 +107,10 @@ dependencies {
     implementation(libs.androidX.navigation.ui)
     implementation(libs.workManager.work)
 
+    // RxJava
+
+
+
     // Splitties
     implementation(libs.splitties.core)
     // Koin
