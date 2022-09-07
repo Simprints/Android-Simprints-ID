@@ -43,9 +43,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     @Inject
     lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
 
-    override val presenter: CommCareContract.Presenter by lazy {
-        presenterFactory.create(this, action)
-    }
+    override val presenter: CommCareContract.Presenter = presenterFactory.create(this, action)
 
     override val guidSelectionNotifier = CommCareGuidSelectionNotifier(this)
 
