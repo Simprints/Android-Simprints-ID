@@ -121,8 +121,6 @@ interface ClientApiModule {
 
     @Binds
     fun bindClientApiTimeHelper(impl: ClientApiTimeHelperImpl): ClientApiTimeHelper
-
-
 }
 
 @DisableInstallInCheck // This is a dagger module
