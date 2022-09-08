@@ -4,6 +4,14 @@ import android.bluetooth.BluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 
+@Suppress("unused")
+/**
+ * Android record bluetooth adapter could be used to debug scanner issues
+ *
+ * @property adapter
+ * @property fileWithFakeBytes
+ * @constructor Create empty Android record bluetooth adapter
+ */
 class AndroidRecordBluetoothAdapter(private val adapter: BluetoothAdapter?,
                                     private val fileWithFakeBytes: String?): ComponentBluetoothAdapter {
 

@@ -38,7 +38,8 @@ class ScannerOffFragment : FingerprintFragment() {
 
         initTryAgainButton()
         initCouldNotConnectTextView()
-        initRetryConnectBehaviour()
+        initViewModelObservation()
+        initRetryConnectionBehaviour()
     }
 
     private fun setTextInLayout() {
@@ -47,13 +48,9 @@ class ScannerOffFragment : FingerprintFragment() {
         binding.scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
     }
 
-    private fun initRetryConnectBehaviour() {
-        connectScannerViewModel.retryConnect()
-        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
-            when (success) {
-                true -> handleScannerConnected()
-                false -> connectScannerViewModel.retryConnect()
-            }
+    private fun initTryAgainButton() {
+        binding.tryAgainButton.setOnClickListener {
+            startRetryingToConnect()
         }
     }
 
@@ -64,23 +61,36 @@ class ScannerOffFragment : FingerprintFragment() {
             binding.couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             binding.couldNotConnectTextView.visibility = View.VISIBLE
         }
+    }
+
+    private fun initViewModelObservation() {
+        connectScannerViewModel.isConnecting.observe(viewLifecycleOwner) { isConnecting ->
+            if (isConnecting) {
+                setupConnectingMode()
+            } else {
+                setupTryAgainMode()
+            }
+        }
+        connectScannerViewModel.scannerConnected.fragmentObserveEventWith { success ->
+            if (success) {
+                handleScannerConnectedEvent()
+            }
+        }
         connectScannerViewModel.connectScannerIssue.fragmentObserveEventWith {
             connectScannerViewModel.stopConnectingAndResetState()
             goToAppropriateIssueFragment(it)
         }
     }
 
-    // The tryAgainButton doesn't actually do anything - we're already retrying in the background
-    // Show a progress bar to make it known that something is happening
-    private fun initTryAgainButton() {
-        binding.tryAgainButton.setOnClickListener {
-            binding.scannerOffProgressBar.visibility = View.VISIBLE
-            binding.tryAgainButton.visibility = View.INVISIBLE
-            binding.tryAgainButton.isEnabled = false
-        }
+    private fun initRetryConnectionBehaviour() {
+        startRetryingToConnect()
     }
 
-    private fun handleScannerConnected() {
+    private fun startRetryingToConnect() {
+        connectScannerViewModel.startRetryingToConnect()
+    }
+
+    private fun handleScannerConnectedEvent() {
         binding.apply {
             scannerOffProgressBar.visibility = View.INVISIBLE
             couldNotConnectTextView.visibility = View.INVISIBLE
@@ -91,6 +101,22 @@ class ScannerOffFragment : FingerprintFragment() {
         }
 
         Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
+    }
+
+    private fun setupConnectingMode() {
+        binding.apply {
+            scannerOffProgressBar.visibility = View.VISIBLE
+            tryAgainButton.visibility = View.INVISIBLE
+            tryAgainButton.isEnabled = false
+        }
+    }
+
+    private fun setupTryAgainMode() {
+        binding.apply {
+            scannerOffProgressBar.visibility = View.INVISIBLE
+            tryAgainButton.visibility = View.VISIBLE
+            tryAgainButton.isEnabled = true
+        }
     }
 
     private fun goToAppropriateIssueFragment(issue: ConnectScannerIssue) {

@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
@@ -45,6 +46,8 @@ class ConnectScannerViewModel(
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
+    private val _isConnecting = MutableLiveData(false)
+    val isConnecting: LiveData<Boolean> = _isConnecting
     val backButtonBehaviour: MutableLiveData<BackButtonBehaviour> =
         MutableLiveData(BackButtonBehaviour.EXIT_FORM)
 
@@ -57,6 +60,7 @@ class ConnectScannerViewModel(
     val showScannerErrorDialogWithScannerId = MutableLiveData<LiveDataEventWithContent<String>>()
 
     private var setupFlow: Disposable? = null
+    private var remainingConnectionAttempts = 0
 
     fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
@@ -66,8 +70,18 @@ class ConnectScannerViewModel(
         startSetup()
     }
 
+    fun retryConnect() {
+        startSetup()
+    }
+
+    fun startRetryingToConnect() {
+        remainingConnectionAttempts = MAX_RETRY_COUNT - 1
+        retryConnect()
+    }
+
     @SuppressLint("CheckResult")
     private fun startSetup() {
+        _isConnecting.postValue(true)
         stopConnectingAndResetState()
         setupFlow = disconnectVero()
             .andThen(checkIfBluetoothIsEnabled())
@@ -77,9 +91,16 @@ class ConnectScannerViewModel(
             .andThen(resetVeroUI())
             .andThen(wakeUpVero())
             .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { manageVeroErrors(it) }, onComplete = {
-                handleSetupFinished()
-            })
+            .subscribeBy(
+                onError = {
+                    _isConnecting.postValue(false)
+                    manageVeroErrors(it)
+                },
+                onComplete = {
+                    _isConnecting.postValue(false)
+                    handleSetupFinished()
+                }
+            )
     }
 
     fun stopConnectingAndResetState() {
@@ -167,6 +188,10 @@ class ConnectScannerViewModel(
         if (e !is FingerprintSafeException) {
             Simber.e(e)
         }
+        if (remainingConnectionAttempts > 0) {
+            remainingConnectionAttempts--
+            retryConnect()
+        }
     }
 
     private fun launchAlertOrScannerIssueOrShowDialog(e: Throwable) {
@@ -223,10 +248,6 @@ class ConnectScannerViewModel(
         Simber.tag(SCANNER_ID, true).i(scannerManager.currentScannerId ?: "")
 
         scannerConnected.postEvent(true)
-    }
-
-    fun retryConnect() {
-        startSetup()
     }
 
     fun handleScannerDisconnectedYesClick() {
@@ -304,6 +325,7 @@ class ConnectScannerViewModel(
 
     companion object {
         const val NUMBER_OF_STEPS = 8
+        const val MAX_RETRY_COUNT = 5
         private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }
