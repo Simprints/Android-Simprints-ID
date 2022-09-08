@@ -5,6 +5,8 @@ import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
+import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
 import io.reactivex.exceptions.UndeliverableException
@@ -58,6 +60,7 @@ open class Application : CoreApplication() {
         handleUndeliverableExceptionInRxJava()
         initKoin()
         SimberBuilder.initialize(this)
+        Simber.tag(DEVICE_ID, true).i(deviceId)
     }
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
