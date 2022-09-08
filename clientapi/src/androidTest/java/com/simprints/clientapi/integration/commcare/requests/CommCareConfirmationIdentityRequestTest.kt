@@ -8,17 +8,13 @@ import androidx.test.espresso.intent.matcher.BundleMatchers
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.activities.commcare.CommCarePresenter
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.integration.AppConfirmIdentityRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.clientapi.integration.value
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.moduleapi.app.requests.IAppRequest
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers
 import org.junit.Before
@@ -44,28 +40,27 @@ class CommCareConfirmationIdentityRequestTest : BaseCommCareClientApiTest() {
 
     @Test
     fun callingAppSendsAnConfirmRequest_shouldLaunchAnAppConfirmRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareConfirmIntentRequest)
+// TODO WIP on injecting tests
 
-        ActivityScenario.launch<CommCareActivity>(commCareConfirmIntentRequest.apply {
-            action = COMMCARE_CONFIRM_IDENTITY_ACTION
-        }).onActivity {
-
-
-            val presenterMock = CommCarePresenter(
-                it,
-                CommCareAction.buildCommCareAction(COMMCARE_CONFIRM_IDENTITY_ACTION),
-                clientApiSessionEventsManager,
-                mockk(),
-                JsonHelper,
-                mockk(),
-                mockk(),
-                mockk()
-            )
-
-            it.presenterFactory = mockk(relaxed = true) {
-                every { create(any(), any()) } returns presenterMock
-            }
-        }
+//        ActivityScenario.launch<CommCareActivity>(commCareConfirmIntentRequest.apply {
+//            action = COMMCARE_CONFIRM_IDENTITY_ACTION
+//        }).onActivity {
+//
+//            val presenterMock = CommCarePresenter(
+//                it,
+//                CommCareAction.buildCommCareAction(COMMCARE_CONFIRM_IDENTITY_ACTION),
+//                clientApiSessionEventsManager,
+//                mockk(),
+//                JsonHelper,
+//                mockk(),
+//                mockk(),
+//                mockk()
+//            )
+//
+//            it.presenterFactory = mockk(relaxed = true) {
+//                every { create(any(), any()) } returns presenterMock
+//            }
+//        }
 
         val expectedAppRequest = AppConfirmIdentityRequest(
             projectIdField.value(),
@@ -83,6 +78,7 @@ class CommCareConfirmationIdentityRequestTest : BaseCommCareClientApiTest() {
                 )
             )
         )
+
     }
 
     @Test

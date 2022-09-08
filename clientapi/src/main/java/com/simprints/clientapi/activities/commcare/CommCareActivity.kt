@@ -43,7 +43,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     @Inject
     lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
 
-    override val presenter: CommCareContract.Presenter = presenterFactory.create(this, action)
+    override val presenter: CommCareContract.Presenter by lazy {
+        presenterFactory.create(this, action)
+    }
 
     override val guidSelectionNotifier = CommCareGuidSelectionNotifier(this)
 
@@ -178,5 +180,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     override fun injectSessionIdIntoIntent(sessionId: String) {
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
     }
-
 }
+
+
