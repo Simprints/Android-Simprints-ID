@@ -10,7 +10,6 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.local.models.DbEvent
-import com.simprints.eventsystem.event.local.models.fromDbToDomain
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -21,6 +20,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import io.mockk.MockKAnnotations
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -85,17 +85,20 @@ class EventRoomDaoTest {
     }
 
     @Test
-    fun loadAllSessions() {
-        runBlocking {
-            val closedEvent = event.copy(
-                id = randomUUID(),
-                sessionIsClosed = true
-            )
-            addIntoDb(event, closedEvent)
-            verifyEvents(listOf(event), eventDao.loadAllSessions(false))
-            verifyEvents(listOf(closedEvent), eventDao.loadAllSessions(true))
-        }
+    fun `test loadOpenedSessions`() = runTest {
+        addIntoDb(event)
+        val result = eventDao.loadOpenedSessions()
+        assertThat(result).containsExactlyElementsIn(listOf(event))
     }
+
+    @Test
+    fun `test loadOpenedSessions return nothing if all sessions are closed`() = runTest {
+        val closedSessionEvent = event.copy(sessionIsClosed = true)
+        addIntoDb(closedSessionEvent)
+        val result = eventDao.loadOpenedSessions()
+        assertThat(result).isEmpty()
+    }
+
 
     @Test
     fun loadAllClosedSessionIds() {
@@ -125,7 +128,10 @@ class EventRoomDaoTest {
             )
 
             addIntoDb(event, closedEvent)
-            verifyEvents(listOf(closedEvent), eventDao.loadOldSubjectCreationEvents(DEFAULT_PROJECT_ID))
+            verifyEvents(
+                listOf(closedEvent),
+                eventDao.loadOldSubjectCreationEvents(DEFAULT_PROJECT_ID)
+            )
         }
     }
 
