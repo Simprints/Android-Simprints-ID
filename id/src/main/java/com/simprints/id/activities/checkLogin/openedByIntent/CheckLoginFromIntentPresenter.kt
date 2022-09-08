@@ -307,8 +307,8 @@ class CheckLoginFromIntentPresenter(
     }
 
     private fun initAnalyticsKeyInCrashManager() {
-        Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
         Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
+        Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
         Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(preferencesManager.eventDownSyncSetting.toString())
