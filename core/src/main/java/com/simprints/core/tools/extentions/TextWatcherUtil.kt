@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.core.tools.extentions
 
 import android.text.Editable
 import android.text.TextWatcher

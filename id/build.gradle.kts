@@ -84,7 +84,8 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":face", ":clientapi"))
+    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":clientapi"))
+
     lint {
         warning += setOf("InvalidPackage")
     }
