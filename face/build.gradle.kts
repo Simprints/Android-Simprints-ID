@@ -1,7 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    id("com.android.dynamic-feature")
+    id("com.android.library")
     id("kotlin-android")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
@@ -70,12 +70,18 @@ dependencies {
     )
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":id"))
+
     implementation(project(":infralogging"))
+    implementation(project(":core"))
+    implementation(project(":eventsystem"))
 
     implementation(libs.cameraView)
     implementation(libs.circleImageView)
+    
+    implementation(libs.androidX.navigation.fragment)
+    implementation(libs.androidX.navigation.ui)
 
+    implementation(libs.playcore.core.ktx)
 
     // Fragment
     implementation(libs.androidX.ui.fragment)
