@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- This language is Afghan Farsi - more commonly known as Dari -->
+    <!-- Note: this file was added as pre- Android 7.0 was not correctly finding the fa-rAF language
+        This should always be an exact copy of the fa-rAF strings file
+        If actually wanting Iranian Farsi, then additional workarounds will be required -->
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- App Name -->
+    <!-- Activity Titles -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="alert_title">هشدار</string>
+
+
+    <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
+
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
+    <!-- Loading Messages-->
+
+
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <!-- Button Labels -->
+    <string name="cancel_button" tools:ignore="ButtonCase">لغو کردن</string>
+    <string name="ok">اوکی</string>
+    <!-- Content Descriptions -->
+
+
+    <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
+    <!-- Sync Button Text -->
+    <!-- Toast Messages -->
+    <!-- Finger Names -->
+    <string name="l_5_finger_name">انگشت پنجم دست چپ</string>
+    <string name="l_4_finger_name">انگشت چهارم دست چپ</string>
+    <string name="l_3_finger_name">انگشت سوم دست چپ</string>
+    <string name="l_2_finger_name">انگشت شهادت دست چپ</string>
+    <string name="l_1_finger_name">انگشت کلان دست چپ</string>
+    <string name="r_1_finger_name">انگشت کلان دست راست</string>
+    <string name="r_2_finger_name">انگشت شهادت دست راست</string>
+    <string name="r_3_finger_name">انگشت سوم دست راست</string>
+    <string name="r_4_finger_name">انگشت چهارم دست راست</string>
+    <string name="r_5_finger_name">انگشت پنجم دست راست</string>
+
+
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <!-- Loading text -->
+
+
+    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- Error Message Titles -->
+    <string name="configuration_error_title">خطا در تنظیمات</string>
+    <string name="verify_guid_not_found_title">شخص دریافت نشد</string>
+    <string name="error_occurred_title">اشتباه رخ داد</string>
+    <!-- Error Message Text -->
+    <string name="verify_guid_not_found_online_message">شخص که برای تشخیص انتخاب شده در دیتابیس موجود نمیباشد</string>
+    <string name="verify_guid_not_found_offline_message">معلومات شخص را نتوانستیم پیدا کنیم، لطفاً خود را مطمئن سازید که با انترنت وصل هستید و دوباره کوشش کنید</string>
+    <string name="unforeseen_error_message">معذرت میخواهیم، خطای غیر مترقبه رخ داده، برای دوام برنامه را بند کنید</string>
+    <!-- Button Labels For Error Messages -->
+    <string name="close">بند کردن</string>
+    <string name="try_again_label">لطفا دوباره تلاش کنید</string>
+    <string name="settings_label">تنظیمات تیلفون</string>
+    <!-- Content Descriptions -->
+
+
+    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
+    <!-- Screen Text -->
+    <string name="preference_app_version_title">نسخه اپلیکیشن:</string>
+    <string name="preference_scanner_version_title">نسخه یا نوع اسکنر :</string>
+    <!-- Button Labels -->
+    <!-- Recovery dialogs -->
+
+
+    <!-- SettingsActivity : the detailed settings screen -->
+    <!-- Setting Labels -->
+
+
+    <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
+    <!-- Screen Text -->
+    <string name="why_did_you_skip_fingerprinting">چرا شما از دادن نشان انگشت اجتناب کردید؟</string>
+    <!-- Button Labels -->
+    <string name="button_submit">سپردن</string>
+    <string name="button_scan_prints">اسکن نمودن نشان انگشتان</string>
+    <!-- Refusal Selection Points -->
+    <!-- Text Prompt -->
+    <string name="hint_other_reason">معلومات بیشتر</string>
+
+
+    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent -->
+
+    <plurals name="test_loaded_candidates">
+        <item quantity="one"> فرد یا اشتراک کننده آماده است %d</item>
+        <item quantity="other"> افراد یا اشتراک کنندگان آماده شدند %d</item>
+    </plurals>
+
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">شامل شدن</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">مشخص کردن</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">تشخیص</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
+
+</resources>
