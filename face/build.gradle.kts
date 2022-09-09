@@ -74,6 +74,7 @@ dependencies {
     implementation(project(":infralogging"))
     implementation(project(":core"))
     implementation(project(":eventsystem"))
+    implementation(project(":infraresources"))
 
     implementation(libs.cameraView)
     implementation(libs.circleImageView)

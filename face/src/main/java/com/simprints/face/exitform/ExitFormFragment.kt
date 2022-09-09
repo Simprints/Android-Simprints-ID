@@ -17,7 +17,7 @@ import com.simprints.face.databinding.FragmentExitFormBinding
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import com.simprints.core.R as IDR
+import com.simprints.infraresources.R as IDR
 
 class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 

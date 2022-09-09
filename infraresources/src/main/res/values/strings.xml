@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Dynamic module names -->
+    <string name="title_face" translatable="false">Face</string>
+    <string name="title_fingerprint" translatable="false">Fingerprint</string>
+    <string name="module_feature_finger" translatable="false">fingerprint</string>
+    <string name="module_feature_face" translatable="false">face</string>
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- App Name -->
+    <string name="app_name" translatable="false">Simprints ID</string>
+    <!-- Activity Titles -->
+    <string name="title_activity_front" translatable="false">Simprints ID</string>
+    <string name="settings_title">Settings</string>
+    <string name="alert_title">Alert</string>
+
+
+    <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
+
+    <!-- Version Names -->
+    <string name="front_simprintsId_version" translatable="false">Simprints ID: %1$s</string>
+    <!-- App Titles -->
+    <string name="simprints_label" translatable="false">Simprints</string>
+    <string name="libsimprints_label" translatable="false">LibSimprints</string>
+    <!-- Content Descriptions -->
+    <string name="launch_background_description" translatable="false">Simprints\' logo as background image</string>
+
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
+    <!-- First argument in consent text should always be program name, second is modality specific access/use case text -->
+    <string name="consent_enrol_only">I\'d like to %2$s to enrol you in %1$s.&#160;</string>
+    <string name="consent_enrol">I\'d like to %2$s to enrol you in %1$s and identify you in the future.&#160;</string>
+    <string name="consent_id_verify">I\'d like to %2$s to find your records for %1$s.&#160;</string>
+    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your %1$s and current location.&#160;</string>
+    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your %2$s and current location.&#160;</string>
+    <string name="consent_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
+    <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.&#160;</string>
+    <string name="consent_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+
+    <string name="consent_parental_enrol_only">I\'d like to %2$s to enrol them in %1$s.&#160;</string>
+    <string name="consent_parental_enrol">I\'d like to %2$s to enrol them in %1$s and identify them in the future.&#160;</string>
+    <string name="consent_parental_id_verify">I\'d like to %2$s to find their records for %1$s.&#160;</string>
+    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.&#160;</string>
+    <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
+    <string name="consent_parental_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+
+    <string name="biometrics_general_fingerprint">use your fingerprints</string>
+    <string name="biometric_general_face">take photographs of your face</string>
+    <string name="biometrics_access_fingerprint">fingerprint information</string>
+    <string name="biometrics_access_face">photographs</string>
+    <string name="biometrics_access_fingerprint_face">fingerprint information, photographs</string>
+    <string name="biometrics_parental_fingerprint">use your child\'s fingerprints</string>
+    <string name="biometrics_parental_face">take photographs of your child\'s face</string>
+
+    <string name="biometric_concat_modalities">and</string>
+    <!-- Loading Messages-->
+    <string name="launch_consent_decline_button">Decline</string>
+    <string name="launch_consent_accept_button">Accept</string>
+    <string name="consent_general_title">General Consent</string>
+    <string name="consent_parental_title">Parental Consent</string>
+    <string name="privacy_notice_text">Privacy Notice</string>
+
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <!-- Button Labels -->
+    <string name="cancel_button" tools:ignore="ButtonCase">Cancel</string>
+    <string name="ok">OK</string>
+    <!-- Content Descriptions -->
+
+    <!--SyncerSync Button Text -->
+    <!-- Toast Messages -->
+    <!-- Finger Names -->
+    <string name="l_5_finger_name">Left Fifth Finger</string>
+    <string name="l_4_finger_name">Left Fourth Finger</string>
+    <string name="l_3_finger_name">Left Third Finger</string>
+    <string name="l_2_finger_name">Left Index Finger</string>
+    <string name="l_1_finger_name">Left Thumb</string>
+    <string name="r_1_finger_name">Right Thumb</string>
+    <string name="r_2_finger_name">Right Index Finger</string>
+    <string name="r_3_finger_name">Right Third Finger</string>
+    <string name="r_4_finger_name">Right Fourth Finger</string>
+    <string name="r_5_finger_name">Right Fifth Finger</string>
+    <!-- Content descriptions -->
+
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <!-- Loading text -->
+    <string name="test_loaded_candidates_quantity_key" translatable="false">test_loaded_candidates</string>
+    <plurals name="test_loaded_candidates">
+        <item quantity="one">Loaded %d candidate.</item>
+        <item quantity="other">Loaded %d candidates.</item>
+    </plurals>
+
+    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- Error Message Titles -->
+    <string name="configuration_error_title">Configuration Error</string>
+    <string name="verify_guid_not_found_title">Person not found</string>
+    <string name="error_occurred_title">Error occurred</string>
+    <string name="alert_try_again">Try again</string>
+    <string name="enrol_last_biometrics_alert_title">Unable to save</string>
+    <string name="modality_installation_offline_title">Error in downloading modalities</string>
+    <string name="feature_not_downloaded_title">Simprints download incomplete</string>
+
+    <!-- Error Message Text -->
+    <string name="different_projectId_message">A configuration error has occurred (different Project Id), please sign out from the home screen or contact your system administrator</string>
+    <string name="different_userId_message">A configuration error has occurred (different User Id), please sign out from the home screen or contact your system administrator</string>
+    <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
+    <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
+    <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
+    <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
+    <string name="enrol_last_biometrics_alert_message">1. Failed to save %1$s record \n 2. Tap close</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+    <string name="modality_installation_offline">Check Wi-Fi or mobile data is turned on in settings to complete download</string>
+    <string name="feature_not_downloaded">To use Simprints please continue and download the %1$s</string>
+    <string name="fingerprint_feature_alert">fingerprint feature</string>
+    <string name="face_feature_alert">face feature</string>
+    <string name="fingerprint_face_feature_alert">fingerprint and face features</string>
+
+    <!-- Button Labels For Error Messages -->
+    <string name="close">CLOSE</string>
+    <string name="try_again_label">Try Again</string>
+    <string name="settings_label">Phone settings</string>
+    <!-- Content Descriptions -->
+
+
+    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
+    <!-- Screen Text -->
+    <!-- Button Labels -->
+    <!-- Recovery dialogs -->
+
+
+    <!-- SettingsActivity : the detailed settings screen -->
+    <!-- Setting Labels -->
+
+
+    <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
+    <!-- Screen Text -->
+    <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
+    <!-- Button Labels -->
+    <string name="button_submit">Submit</string>
+    <string name="button_scan_prints">Scan Fingerprints</string>
+    <!-- Text Prompt -->
+    <string name="hint_other_reason">Additional Information</string>
+
+
+    <!-- Long Consent Activity : the screen where the user can find the long consent form -->
+    <string name="long_consent_download_button_text">Download Privacy Notice</string>
+    <string name="long_consent_downloading">Downloading Privacy Notice</string>
+    <string name="long_consent_failed_to_download">Failed to download privacy notice.</string>
+
+    <!-- LoginActivity -->
+    <!-- TODO: what about translation? -->
+    <string name="empty" translatable="false" />
+    <string name="simprints_logo">Simprints Logo</string>
+    <string name="scan_qr">Scan QR</string>
+    <string name="login_id_hint">Project ID</string>
+    <string name="login_secret_hint">Project key</string>
+    <string name="login_user_id_hint">User ID</string>
+    <string name="login_title">Request Project credentials</string>
+    <string name="requestLogin_message">You need to login. Please use your client app to open Simprints ID and log in.</string>
+    <string name="requestLogin_title">Login Required</string>
+    <string name="device_id">DeviceID: %s</string>
+    <string name="login">Login</string>
+    <!-- QR code scanning messages -->
+    <string name="login_qr_code_scanning_problem">A problem occurred while scanning the QR code</string>
+    <string name="login_invalid_qr_code">The scanned QR code is invalid.</string>
+    <!-- sign-in toast messages -->
+    <string name="login_missing_credentials">Missing credentials. Please check the User ID, Project ID, and key, and try again.</string>
+    <string name="login_invalid_credentials">Invalid credentials. Please check the Project ID and key</string>
+    <string name="login_project_id_intent_mismatch">Project ID different from that supplied in intent. Please contact your system administrator.</string>
+    <string name="login_no_network">Currently offline. Please check your internet connection.</string>
+    <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
+
+
+    <!-- Dashboard Activity -->
+    <string name="dashboard_label">Dashboard</string>
+    <string name="logout">Logout</string>
+    <string name="confirmation_logout_title">Logout</string>
+    <string name="confirmation_logout_message">Do you want to logout?</string>
+    <string name="confirmation_logout_cancel">Cancel</string>
+
+    <string name="records_up_to_date">All records are updated</string>
+
+    <string name="dashboard_sync_card_complete">Sync complete</string>
+    <string name="dashboard_sync_card_incomplete">Sync incomplete</string>
+    <string name="dashboard_sync_card_connecting">Connecting</string>
+    <string name="dashboard_sync_card_progress">Syncing… %1$s</string>
+    <string name="dashboard_sync_card_sync_button">Sync now</string>
+    <string name="dashboard_sync_card_failed_message">Sync failed. Please contact your supervisor</string>
+    <string name="dashboard_sync_card_no_modules_message">Please select modules to sync</string>
+    <string name="dashboard_sync_card_no_modules_button">Modules</string>
+    <string name="dashboard_sync_card_offline_message">Please turn on internet connection in settings</string>
+    <string name="dashboard_sync_card_offline_button">Settings</string>
+    <string name="dashboard_sync_card_too_many_modules_message">Too many modules have been downloaded.</string>
+
+    <string name="dashboard_card_sync_title">Sync status</string>
+    <string name="dashboard_card_sync_last_sync">Last sync: %1$s</string>
+
+    <string name="dashboard_card_scanner_used">Scanner used: %1$s</string>
+    <string name="dashboard_card_current_user">Current user: %1$s</string>
+    <string name="dashboard_card_calculating">Calculating…</string>
+    <string name="dashboard_card_activity">Activity: %1$s</string>
+
+    <plurals name="dashboard_card_enrolments">
+        <item quantity="one">Enrolment</item>
+        <item quantity="other">Enrolments</item>
+    </plurals>
+    <plurals name="dashboard_card_identifications">
+        <item quantity="one">Identification</item>
+        <item quantity="other">Identifications</item>
+    </plurals>
+    <plurals name="dashboard_card_verifications">
+        <item quantity="one">Verification</item>
+        <item quantity="other">Verifications</item>
+    </plurals>
+
+    <string name="menu_privacy_notice">Privacy Notice</string>
+    <string name="privacy_notice_title">Privacy Notice</string>
+
+    <string name="menu_settings">Settings</string>
+
+    <!--Maintenance mode errors-->
+    <string name="error_backend_maintenance_message">The system is currently offline for maintenance. Please try again later.</string>
+    <string name="error_backend_maintenance_with_time_message">The system is currently offline for maintenance. Please try again after %s</string>
+
+    <!--Settings Activity-->
+    <string name="title_activity_settings">Settings</string>
+    <string name="settings_general">GENERAL</string>
+    <string name="settings_app_details">APP DETAILS</string>
+    <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
+    <string name="settings_too_many_modules_toast">Invalid Selection. Please select no more than %1$d modules.</string>
+    <string name="settings_invalid_selection">Invalid Selection</string>
+    <string name="title_activity_settings_about">About</string>
+    <string name="title_activity_sync_information">Sync Information</string>
+
+    <!--Settings Preferences titles and summaries-->
+    <string name="preference_app_details_title">About</string>
+    <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
+    <string name="preference_logout_title">Log Out</string>
+    <string name="preference_select_language_title">Language</string>
+    <string name="preference_select_fingers_title">Select default fingers</string>
+    <string name="preference_select_modules_title">Select modules</string>
+    <string name="preference_app_version_title">App Version</string>
+    <string name="preference_sync_information_title">Sync Information</string>
+    <string name="preference_scanner_version_title">Scanner Version</string>
+    <string name="preference_device_id_title">Device ID</string>
+    <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
+    <string name="preference_summary_sync_information">Further details on sync</string>
+    <string name="preferences_general_key">preferences_general</string>
+    <string name="preferences_app_details_key">app_details_key</string>
+
+    <!-- Finger Selection Activity -->
+    <string name="finger_selection_activity_title">Select Fingers</string>
+    <string name="finger_selection_confirm_dialog_text">Save settings?</string>
+    <string name="finger_selection_confirm_dialog_yes">Save</string>
+    <string name="finger_selection_confirm_dialog_no">Cancel</string>
+    <string name="finger_selection_finger_label">Finger</string>
+    <string name="finger_selection_quantity_label">Quantity</string>
+    <string name="finger_selection_reset">Reset</string>
+    <string name="finger_selection_add_finger">+ Add Finger</string>
+    <string name="finger_selection_invalid">Invalid Selection - there is more than 5 of one finger</string>
+
+    <!--Sync Information Activity-->
+    <string name="select_modules_button_title">Select modules</string>
+    <string name="sync_info_records_to_upload">Records to upload</string>
+    <string name="sync_info_records_to_download">Records to download</string>
+    <string name="sync_info_records_to_delete">Records to delete</string>
+    <string name="sync_info_total_records_on_device">Total records on device</string>
+    <string name="sync_info_selected_modules">Selected modules</string>
+    <string name="sync_info_unselected_modules">Unselected modules</string>
+    <string name="sync_info_total_records">Total records</string>
+    <string name="sync_info_images_to_upload">Images to upload</string>
+    <string name="re_fetch_sync_info" translatable="false">Re-fetch Sync Info</string>
+
+    <string name="progress_sync_overlay">Syncing…</string>
+    <string name="calculating_overlay">Calculating…</string>
+
+    <!--Exit form-->
+    <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
+    <string name="refusal_toast_submit">Please submit form</string>
+    <string name="refusal_religious_concerns">Religious concerns</string>
+    <string name="refusal_data_concerns">Does not want to give data</string>
+    <string name="refusal_does_not_have_permission">Does not have permission</string>
+    <string name="refusal_app_not_working">App not working</string>
+    <string name="refusal_person_not_present">Person not present</string>
+    <string name="refusal_too_young">Too young</string>
+    <string name="refusal_other">Other</string>
+    <string name="exit_form_return_to_simprints">Return to Simprints</string>
+    <string name="exit_form_capture_face">Capture face</string>
+    <string name="why_did_you_skip_biometrics">Why did you skip biometrics?</string>
+    <string name="why_did_you_skip_face_capture">Why did you skip face capture?</string>
+    <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
+    <!-- region Module selection -->
+    <string name="hint_search_modules">Search modules</string>
+    <string name="no_modules_selected">No modules selected</string>
+    <string name="no_results">No results</string>
+    <string name="selected_modules">Selected modules</string>
+    <string name="confirm_module_selection_title">Modules selected</string>
+    <string name="confirm_module_selection_yes">Confirm</string>
+    <string name="confirm_module_selection_cancel">Cancel</string>
+    <string name="dashboard_sync_card_try_again_button">Try again</string>
+    <string name="enrol_last_biometrics_success">Successful enrolment</string>
+    <!-- endregion -->
+    <string name="toast_login_failed">Login failed. Please contact your supervisor.</string>
+
+    <!--SetupActivity-->
+    <string name="modality_starting_download">Starting download…</string>
+    <string name="modality_downloading">Downloading… %1$s</string>
+    <string name="modality_installing">Installing…</string>
+    <string name="modality_download_taking_longer">Download taking longer than expected…</string>
+    <string name="confirmation_sent">Confirmation sent</string>
+    <string name="redirecting_you_back">Redirecting you back</string>
+
+</resources>
