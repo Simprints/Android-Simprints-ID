@@ -166,19 +166,17 @@ class LiveFeedbackFragmentViewModel(
     }
 
     private fun sendCaptureEvent(faceDetection: FaceDetection) {
-        val payloadId = randomUUID() // The payloads of these two events need to have the same ids
         val faceCaptureEvent =
-            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold, payloadId)
+            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
 
         val faceCaptureBiometricsEvent =
-            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent(
-                payloadId
-            ) else null
+            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID)
+                faceDetection.toFaceCaptureBiometricsEvent()
+            else
+                null
 
         faceSessionEventsManager.addEvent(faceCaptureEvent)
         faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
-
-        faceDetection.id = faceCaptureEvent.id
     }
 
     /**
