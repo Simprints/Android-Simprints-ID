@@ -14,6 +14,7 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.infraresources.R as resources
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
