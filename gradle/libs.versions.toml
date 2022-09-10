@@ -37,7 +37,7 @@ kotlin-coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlin-coroutinesPlayServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlin_coroutine_version" }
 kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4"
 #AndroidX
-androidX-core = "androidx.core:core-ktx:1.8.0"
+androidX-core = "androidx.core:core-ktx:1.9.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
 androidX-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "app_compat_version" }
 androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "androidx_room_version" }
