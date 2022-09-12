@@ -1,4 +1,4 @@
-package com.simprints.id.data.license.remote
+package com.simprints.infralicense.remote
 
 sealed class ApiLicenseResult {
     data class Success(val licenseJson: String) : ApiLicenseResult()

@@ -1,9 +1,9 @@
-package com.simprints.id.data.license.repository
+package com.simprints.infralicense.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.license.local.LicenseLocalDataSource
-import com.simprints.id.data.license.remote.ApiLicenseResult
-import com.simprints.id.data.license.remote.LicenseRemoteDataSource
+import com.simprints.infralicense.local.LicenseLocalDataSource
+import com.simprints.infralicense.remote.ApiLicenseResult
+import com.simprints.infralicense.remote.LicenseRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -12,7 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
+import java.util.*
 
 class LicenseRepositoryImplTest {
     private val license = UUID.randomUUID().toString()

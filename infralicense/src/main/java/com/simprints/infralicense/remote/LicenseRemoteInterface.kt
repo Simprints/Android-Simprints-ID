@@ -1,4 +1,4 @@
-package com.simprints.id.data.license.remote
+package com.simprints.infralicense.remote
 
 import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET
