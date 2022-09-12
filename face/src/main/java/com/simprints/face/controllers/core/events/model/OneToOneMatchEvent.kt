@@ -2,7 +2,6 @@ package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
 import com.simprints.face.exceptions.FaceUnexpectedException
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import java.io.Serializable
 import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
