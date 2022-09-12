@@ -1,4 +1,4 @@
-package com.simprints.infralicense.repository
+package com.simprints.infralicense
 
 import androidx.annotation.Keep
 

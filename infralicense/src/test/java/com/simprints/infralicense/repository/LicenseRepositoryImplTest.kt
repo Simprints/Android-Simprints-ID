@@ -1,6 +1,9 @@
 package com.simprints.infralicense.repository
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infralicense.LicenseRepositoryImpl
+import com.simprints.infralicense.LicenseState
+import com.simprints.infralicense.LicenseVendor
 import com.simprints.infralicense.local.LicenseLocalDataSource
 import com.simprints.infralicense.remote.ApiLicenseResult
 import com.simprints.infralicense.remote.LicenseRemoteDataSource

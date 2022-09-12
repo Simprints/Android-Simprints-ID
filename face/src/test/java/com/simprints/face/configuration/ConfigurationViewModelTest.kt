@@ -2,9 +2,9 @@ package com.simprints.face.configuration
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infralicense.repository.LicenseRepository
-import com.simprints.infralicense.repository.LicenseState
-import com.simprints.infralicense.repository.LicenseVendor
+import com.simprints.infralicense.LicenseRepository
+import com.simprints.infralicense.LicenseState
+import com.simprints.infralicense.LicenseVendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
