@@ -38,7 +38,6 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.ProjectAuthenticatorImpl
@@ -62,6 +61,7 @@ import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infralicense.LicenseModule
+import com.simprints.infralicense.repository.LicenseRepository
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
