@@ -1,16 +1,17 @@
-package com.simprints.id.data.license.local
+package com.simprints.infralicense.local
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
-import com.simprints.id.data.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
-import com.simprints.id.data.license.local.LicenseLocalDataSource.Companion.LICENSE_NAME
 import com.simprints.infra.logging.Simber
+import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
+import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSE_NAME
 import java.io.File
+import javax.inject.Inject
 
-class LicenseLocalDataSourceImpl(val context: Context) : LicenseLocalDataSource {
+class LicenseLocalDataSourceImpl @Inject constructor(val context: Context) : LicenseLocalDataSource {
     private val licensePath = "${context.filesDir}/${LICENSES_FOLDER}/${LICENSE_NAME}"
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 

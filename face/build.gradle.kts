@@ -75,6 +75,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":eventsystem"))
     implementation(project(":infraresources"))
+    implementation(project(":infralicense"))
 
     implementation(libs.cameraView)
     implementation(libs.circleImageView)

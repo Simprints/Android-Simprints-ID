@@ -1,17 +1,18 @@
-package com.simprints.id.data.license.remote
+package com.simprints.infralicense.remote
 
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infralicense.repository.LicenseVendor
 import okhttp3.ResponseBody
 import retrofit2.HttpException
+import javax.inject.Inject
 
-class LicenseRemoteDataSourceImpl(
+class LicenseRemoteDataSourceImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
