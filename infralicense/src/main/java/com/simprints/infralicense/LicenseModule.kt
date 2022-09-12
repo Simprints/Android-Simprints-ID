@@ -16,13 +16,12 @@ import dagger.hilt.android.components.ActivityComponent
 abstract class LicenseModule {
 
     @Binds
-    abstract fun provideLicenseLocalDataSource(impl: LicenseLocalDataSourceImpl): LicenseLocalDataSource
+   internal abstract fun bindLicenseRepository(impl: LicenseRepositoryImpl): LicenseRepository
 
     @Binds
-    abstract fun provideLicenseRemoteDataSource(impl: LicenseRemoteDataSourceImpl): LicenseRemoteDataSource
+    abstract fun bindLicenseLocalDataSource(impl: LicenseLocalDataSourceImpl): LicenseLocalDataSource
 
     @Binds
-    abstract fun provideLicenseRepository(impl: LicenseRepositoryImpl): LicenseRepository
-
+    abstract fun bindLicenseRemoteDataSource(impl: LicenseRemoteDataSourceImpl): LicenseRemoteDataSource
 
 }
