@@ -1,4 +1,4 @@
-package com.simprints.id.data.license.local
+package com.simprints.infralicense
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
