@@ -69,6 +69,7 @@ definitions:
                     - ./gradlew infranetwork:jacocoTestReport
                     - ./gradlew infrarealm:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
+                    - ./gradlew infralicense:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
