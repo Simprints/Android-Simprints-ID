@@ -1,4 +1,4 @@
-package com.simprints.infralicense.repository
+package com.simprints.infralicense
 
 import com.simprints.infralicense.local.LicenseLocalDataSource
 import com.simprints.infralicense.remote.ApiLicenseResult
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class LicenseRepositoryImpl @Inject constructor(
+internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseLocalDataSource: LicenseLocalDataSource,
     private val licenseRemoteDataSource: LicenseRemoteDataSource
 ) : LicenseRepository {

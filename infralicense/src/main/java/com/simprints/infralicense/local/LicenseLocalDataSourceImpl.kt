@@ -11,7 +11,7 @@ import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSE
 import java.io.File
 import javax.inject.Inject
 
-class LicenseLocalDataSourceImpl @Inject constructor(val context: Context) : LicenseLocalDataSource {
+internal class LicenseLocalDataSourceImpl @Inject constructor(val context: Context) : LicenseLocalDataSource {
     private val licensePath = "${context.filesDir}/${LICENSES_FOLDER}/${LICENSE_NAME}"
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 
