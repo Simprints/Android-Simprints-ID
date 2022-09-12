@@ -15,4 +15,4 @@ include ':id',
     ':infralogin',
     ':infranetwork',
     ':infrarealm',
-    ':infrasecurity'
+    ':infralicense'
