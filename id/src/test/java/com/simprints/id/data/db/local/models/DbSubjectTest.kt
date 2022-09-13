@@ -5,8 +5,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFaceSample
-import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFaceSample
