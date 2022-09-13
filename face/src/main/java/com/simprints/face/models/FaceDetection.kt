@@ -7,7 +7,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import java.util.UUID
+import java.util.*
 
 data class FaceDetection(
     val frame: PreviewFrame,

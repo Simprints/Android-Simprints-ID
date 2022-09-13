@@ -12,7 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
+import java.util.*
 
 class LicenseRepositoryImplTest {
     private val license = UUID.randomUUID().toString()
