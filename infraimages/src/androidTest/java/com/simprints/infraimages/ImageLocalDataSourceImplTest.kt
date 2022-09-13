@@ -1,12 +1,13 @@
-package com.simprints.id.data.images.local
+package com.simprints.infraimages
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.id.data.images.model.Path
-import com.simprints.id.data.images.model.SecuredImageRef
+import com.simprints.infraimages.local.ImageLocalDataSourceImpl
+import com.simprints.infraimages.model.Path
+import com.simprints.infraimages.model.SecuredImageRef
 import org.junit.Before
 import org.junit.Test
 import java.io.File
