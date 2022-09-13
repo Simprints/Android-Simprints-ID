@@ -14,6 +14,8 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
@@ -106,9 +108,11 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateRemoteDataSource(
         loginManager: LoginManager,
+        settingsPreferencesManager: SettingsPreferencesManager,
         context: Context
     ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
         loginManager,
+        settingsPreferencesManager,
         context.deviceId
     )
 
@@ -137,10 +141,12 @@ open class SecurityModule {
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
         subjectRepository: SubjectRepository,
+        enrolmentRecordScheduler: EnrolmentRecordScheduler,
         signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
         subjectRepository,
+        enrolmentRecordScheduler,
         signerManager
     )
 
