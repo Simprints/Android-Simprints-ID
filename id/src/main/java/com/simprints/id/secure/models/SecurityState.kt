@@ -3,7 +3,11 @@ package com.simprints.id.secure.models
 import androidx.annotation.Keep
 
 @Keep
-data class SecurityState(val deviceId: String, val status: Status) {
+data class SecurityState(
+    val deviceId: String,
+    val status: Status,
+    val mustSyncEnrolmentRecord: SyncEnrolmentRecord? = null
+) {
 
     @Keep
     enum class Status {

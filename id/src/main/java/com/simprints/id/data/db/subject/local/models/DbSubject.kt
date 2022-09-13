@@ -7,10 +7,11 @@ import com.simprints.id.tools.extensions.toRealmList
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbSubject
+import java.util.*
 
 fun DbSubject.fromDbToDomain(): Subject =
     Subject(
-        subjectId = subjectId,
+        subjectId = subjectId.toString(),
         projectId = projectId,
         attendantId = attendantId,
         moduleId = moduleId,
@@ -23,7 +24,7 @@ fun DbSubject.fromDbToDomain(): Subject =
 
 fun Subject.fromDomainToDb(): DbSubject =
     DbSubject(
-        subjectId = subjectId,
+        subjectId = UUID.fromString(subjectId),
         projectId = projectId,
         attendantId = attendantId,
         moduleId = moduleId,

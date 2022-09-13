@@ -6,7 +6,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -69,17 +68,23 @@ class DebugActivity : BaseSplitActivity() {
 
         setContentView(binding.root)
 
-        eventSyncManager.getLastSyncState().observe(this, Observer {
-            val states = (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
+        eventSyncManager.getLastSyncState().observe(this) {
+            val states =
+                (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
             val message =
                 "${it.syncId.takeLast(5)} - " +
                     "${states.toDebugActivitySyncState().name} - " +
                     "${it.progress}/${it.total}"
 
-            val ssb = SpannableStringBuilder(coloredText("\n$message", Color.parseColor(getRandomColor())))
+            val ssb = SpannableStringBuilder(
+                coloredText(
+                    "\n$message",
+                    Color.parseColor(getRandomColor())
+                )
+            )
 
             binding.logs.append(ssb)
-        })
+        }
 
         binding.syncSchedule.setOnClickListener {
             eventSyncManager.scheduleSync()
@@ -137,16 +142,17 @@ class DebugActivity : BaseSplitActivity() {
         }
 
         wm.getWorkInfosForUniqueWorkLiveData(RemoteConfigSchedulerImpl.WORK_NAME_ONE_TIME)
-            .observe(this, Observer { workInfos ->
+            .observe(this) { workInfos ->
                 binding.logs.append(
                     workInfos.joinToString("", "\n") { workInfo ->
                         "${workInfo.id.toString().take(5)} - ${workInfo.state}"
                     }
                 )
-            })
+            }
     }
 
-    private fun getRandomColor(): String = arrayOf("red", "black", "purple", "green", "blue").random()
+    private fun getRandomColor(): String =
+        arrayOf("red", "black", "purple", "green", "blue").random()
 
     private fun coloredText(text: String, color: Int): SpannableString {
         val spannableString = SpannableString(text)

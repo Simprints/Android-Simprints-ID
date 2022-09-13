@@ -20,6 +20,8 @@ import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordSchedulerImpl
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
@@ -200,4 +202,8 @@ open class SyncModule {
     @Provides
     fun provideRemoteConfigScheduler(context: Context): RemoteConfigScheduler =
         RemoteConfigSchedulerImpl(context)
+
+    @Provides
+    fun provideEnrolmentRecordScheduler(context: Context): EnrolmentRecordScheduler =
+        EnrolmentRecordSchedulerImpl(context)
 }
