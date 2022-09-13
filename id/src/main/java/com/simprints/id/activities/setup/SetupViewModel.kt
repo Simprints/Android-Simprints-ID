@@ -9,9 +9,9 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.model.SplitInstallErrorCode.NO_ERROR
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.*
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ID_SETUP
 import com.simprints.id.activities.setup.SetupActivity.ViewState.*
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ID_SETUP
 import com.simprints.infra.logging.PerformanceMonitor
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.ExperimentalCoroutinesApi

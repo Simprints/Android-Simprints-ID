@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
@@ -10,6 +9,7 @@ import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.Authent
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.toDomainResult
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException

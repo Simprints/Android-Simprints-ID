@@ -112,9 +112,8 @@ dependencies {
     implementation(project(":infranetwork"))
     implementation(project(":infrarealm"))
     implementation(project(":infrasecurity"))
-    implementation(project(":infraresources"))
     implementation(project(":infralicense"))
-
+    implementation(project(":infraresources"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)

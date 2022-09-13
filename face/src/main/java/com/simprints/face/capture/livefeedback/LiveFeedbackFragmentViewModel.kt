@@ -14,12 +14,7 @@ import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
-import com.simprints.face.models.FaceDetection
-import com.simprints.face.models.FaceTarget
-import com.simprints.face.models.FloatRange
-import com.simprints.face.models.PreviewFrame
-import com.simprints.face.models.Size
-import com.simprints.face.models.SymmetricTarget
+import com.simprints.face.models.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

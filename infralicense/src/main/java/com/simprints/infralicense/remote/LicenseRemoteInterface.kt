@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface LicenseRemoteInterface : SimRemoteInterface {
+internal interface LicenseRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/devices/{deviceId}/licenses")
     suspend fun getLicense(
         @Path("projectId") projectId: String,
