@@ -8,30 +8,17 @@ import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
 import com.simprints.clientapi.data.sharedpreferences.canCoSyncAnalyticsData
 import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
+import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.NFC_NOT_ENABLED
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
-import com.simprints.eventsystem.event.domain.models.EventLabels
-import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
-import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -39,7 +26,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
+import java.util.*
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
 
 @ExperimentalCoroutinesApi

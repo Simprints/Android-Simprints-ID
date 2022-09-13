@@ -6,7 +6,7 @@ import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
-import java.util.UUID
+import java.util.*
 
 @Keep
 data class FaceOnboardingCompleteEvent(
