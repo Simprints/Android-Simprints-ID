@@ -10,7 +10,7 @@ import com.simprints.infraimages.model.SecuredImageRef
  * @property status
  *           the outcome of the operation, either successful or failed
  */
-data class UploadResult(val image: SecuredImageRef, val status: Status) {
+internal data class UploadResult(val image: SecuredImageRef, val status: Status) {
 
     fun isUploadSuccessful() = status == Status.SUCCESSFUL
 

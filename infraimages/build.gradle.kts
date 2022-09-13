@@ -35,4 +35,12 @@ dependencies {
     implementation(libs.androidX.security)
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.kotlin.coroutinesPlayServices)
+
+    testImplementation(project(":testtools"))
+
+    testImplementation(libs.testing.androidX.ext.junit)
+    testImplementation(libs.testing.junit)
+    testImplementation(libs.testing.truth)
+    testImplementation(libs.testing.mockk.core)
+    testImplementation(libs.testing.coroutines.test)
 }
