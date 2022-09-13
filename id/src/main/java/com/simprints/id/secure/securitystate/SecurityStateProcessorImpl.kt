@@ -5,6 +5,7 @@ import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.infra.logging.Simber
 
 class SecurityStateProcessorImpl(
     private val imageRepository: ImageRepository,
@@ -16,10 +17,11 @@ class SecurityStateProcessorImpl(
     override suspend fun processSecurityState(securityState: SecurityState) {
         if (securityState.status.isCompromisedOrProjectEnded())
             deleteLocalDataAndSignOut()
-        if (securityState.mustSyncEnrolmentRecord != null) {
+        if (securityState.mustUpSyncEnrolmentRecords != null) {
+            Simber.i("subject ids ${securityState.mustUpSyncEnrolmentRecords.subjectIds.size}")
             enrolmentRecordScheduler.upload(
-                securityState.mustSyncEnrolmentRecord.id,
-                securityState.mustSyncEnrolmentRecord.subjectIds
+                securityState.mustUpSyncEnrolmentRecords.id,
+                securityState.mustUpSyncEnrolmentRecords.subjectIds
             )
         }
     }

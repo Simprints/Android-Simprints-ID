@@ -21,6 +21,7 @@ import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.config.RemoteConfigSchedulerImpl
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
@@ -37,6 +38,9 @@ class DebugActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var remoteConfigScheduler: RemoteConfigScheduler
+
+    @Inject
+    lateinit var securityStateScheduler: SecurityStateScheduler
 
     @Inject
     lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
@@ -88,6 +92,10 @@ class DebugActivity : BaseSplitActivity() {
 
         binding.syncSchedule.setOnClickListener {
             eventSyncManager.scheduleSync()
+        }
+
+        binding.syncDevice.setOnClickListener {
+            securityStateScheduler.getSecurityStateCheck()
         }
 
         binding.syncStart.setOnClickListener {

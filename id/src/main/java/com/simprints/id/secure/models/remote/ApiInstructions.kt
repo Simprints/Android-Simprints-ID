@@ -1,10 +1,10 @@
 package com.simprints.id.secure.models.remote
 
 import androidx.annotation.Keep
-import com.simprints.id.secure.models.SyncEnrolmentRecord
+import com.simprints.id.secure.models.UpSyncEnrolmentRecords
 
 @Keep
-data class ApiSyncEnrolmentRecord(val id: String, val subjectIds: List<String>)
+data class ApiUpSyncEnrolmentRecords(val id: String, val subjectIds: List<String> = listOf())
 
-fun ApiSyncEnrolmentRecord.fromApiToDomain(): SyncEnrolmentRecord =
-    SyncEnrolmentRecord(id, subjectIds)
+fun ApiUpSyncEnrolmentRecords.fromApiToDomain(): UpSyncEnrolmentRecords =
+    UpSyncEnrolmentRecords(id, subjectIds)

@@ -6,7 +6,7 @@ import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.SecurityState.Status.*
-import com.simprints.id.secure.models.SyncEnrolmentRecord
+import com.simprints.id.secure.models.UpSyncEnrolmentRecords
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -47,7 +47,7 @@ class SecurityStateProcessorImplTest {
     fun `when there is an instruction it should schedule a work to upload the enrolment records`() =
         runTest {
             val securityState =
-                SecurityState(DEVICE_ID, RUNNING, SyncEnrolmentRecord("id", listOf("subject1")))
+                SecurityState(DEVICE_ID, RUNNING, UpSyncEnrolmentRecords("id", listOf("subject1")))
 
             securityStateProcessor.processSecurityState(securityState)
 
