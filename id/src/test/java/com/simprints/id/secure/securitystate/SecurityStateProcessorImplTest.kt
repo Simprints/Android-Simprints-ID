@@ -1,9 +1,9 @@
 package com.simprints.id.secure.securitystate
 
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.infraimages.ImageRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
