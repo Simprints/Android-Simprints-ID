@@ -1,14 +1,15 @@
-package com.simprints.id.data.images.remote
+package com.simprints.infraimages.remote
 
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.data.images.model.SecuredImageRef
 import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import com.simprints.infraimages.model.SecuredImageRef
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
+import javax.inject.Inject
 
-internal class ImageRemoteDataSourceImpl(
+internal class ImageRemoteDataSourceImpl @Inject constructor(
     private val imageUrlProvider: ImageUrlProvider,
     private val loginManager: LoginManager
 ) : ImageRemoteDataSource {

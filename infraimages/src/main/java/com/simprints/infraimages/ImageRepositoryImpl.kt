@@ -1,17 +1,18 @@
-package com.simprints.id.data.images.repository
+package com.simprints.infraimages
 
 import android.content.Context
-import com.simprints.id.data.images.local.ImageLocalDataSource
-import com.simprints.id.data.images.local.ImageLocalDataSourceImpl
-import com.simprints.id.data.images.model.Path
-import com.simprints.id.data.images.model.SecuredImageRef
-import com.simprints.id.data.images.remote.ImageRemoteDataSource
-import com.simprints.id.data.images.remote.ImageRemoteDataSourceImpl
 import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import com.simprints.infraimages.local.ImageLocalDataSource
+import com.simprints.infraimages.local.ImageLocalDataSourceImpl
+import com.simprints.infraimages.model.Path
+import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infraimages.remote.ImageRemoteDataSource
+import com.simprints.infraimages.remote.ImageRemoteDataSourceImpl
+import javax.inject.Inject
 
-class ImageRepositoryImpl internal constructor(
+class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
