@@ -46,9 +46,7 @@ class SyncInformationActivityTest {
     }
 
     private val dataModule by lazy {
-        TestDataModule(
-            imageRepositoryRule = DependencyRule.MockkRule
-        )
+        TestDataModule()
     }
 
     @get:Rule
