@@ -79,6 +79,7 @@ definitions:
                     - infranetwork/build/reports/**
                     - infrarealm/build/reports/**
                     - infrasecurity/build/reports/**
+                    - infralicense/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
