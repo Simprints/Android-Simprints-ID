@@ -7,7 +7,7 @@ import com.simprints.id.secure.models.SecurityState
 data class ApiSecurityState(
     val deviceId: String,
     val status: Status,
-    val mustSyncEnrolmentRecord: ApiSyncEnrolmentRecord
+    val mustUpSyncEnrolmentRecords: ApiUpSyncEnrolmentRecords? = null
 ) {
 
     @Keep
@@ -21,7 +21,7 @@ data class ApiSecurityState(
 fun ApiSecurityState.fromApiToDomain() = SecurityState(
     deviceId,
     status.fromApiToDomain(),
-    mustSyncEnrolmentRecord.fromApiToDomain(),
+    mustUpSyncEnrolmentRecords?.fromApiToDomain(),
 )
 
 fun ApiSecurityState.Status.fromApiToDomain(): SecurityState.Status =

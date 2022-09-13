@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
-import com.simprints.id.secure.models.SyncEnrolmentRecord
+import com.simprints.id.secure.models.UpSyncEnrolmentRecords
 import com.simprints.id.secure.models.remote.ApiSecurityState
-import com.simprints.id.secure.models.remote.ApiSyncEnrolmentRecord
+import com.simprints.id.secure.models.remote.ApiUpSyncEnrolmentRecords
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -60,7 +60,7 @@ class SecurityStateRemoteDataSourceImplTest {
                 DEVICE_ID,
                 PREVIOUS_INSTRUCTION_ID,
             )
-        } returns ApiSecurityState(DEVICE_ID, ApiSecurityState.Status.PROJECT_ENDED, ApiSyncEnrolmentRecord("id1", listOf("subject1")))
+        } returns ApiSecurityState(DEVICE_ID, ApiSecurityState.Status.PROJECT_ENDED, ApiUpSyncEnrolmentRecords("id1", listOf("subject1")))
 
         val securityState = securityStateRemoteDataSource.getSecurityState()
 
@@ -68,7 +68,7 @@ class SecurityStateRemoteDataSourceImplTest {
             SecurityState(
                 DEVICE_ID,
                 SecurityState.Status.PROJECT_ENDED,
-                SyncEnrolmentRecord("id1", listOf("subject1"))
+                UpSyncEnrolmentRecords("id1", listOf("subject1"))
             )
         )
     }

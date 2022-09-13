@@ -236,6 +236,7 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
                 SubjectsSchemaV13.TMP_SUBJECT_ID_FIELD,
                 SubjectsSchemaV13.SUBJECT_ID_FIELD
             )
+            ?.markAsRequired(SubjectsSchemaV13.SUBJECT_ID_FIELD)
             ?.addPrimaryKey(SubjectsSchemaV13.SUBJECT_ID_FIELD)
     }
 

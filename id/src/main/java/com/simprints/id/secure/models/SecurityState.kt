@@ -6,7 +6,7 @@ import androidx.annotation.Keep
 data class SecurityState(
     val deviceId: String,
     val status: Status,
-    val mustSyncEnrolmentRecord: SyncEnrolmentRecord? = null
+    val mustUpSyncEnrolmentRecords: UpSyncEnrolmentRecords? = null
 ) {
 
     @Keep

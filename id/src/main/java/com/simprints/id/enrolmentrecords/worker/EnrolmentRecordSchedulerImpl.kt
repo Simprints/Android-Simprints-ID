@@ -6,7 +6,7 @@ import androidx.work.*
 class EnrolmentRecordSchedulerImpl(context: Context) : EnrolmentRecordScheduler {
 
     companion object {
-        private const val WORK_NAME = "remote-config-work-one-time"
+        private const val WORK_NAME = "upload-enrolment-record-work-one-time"
         const val INPUT_ID_NAME = "INPUT_ID_NAME"
         const val INPUT_SUBJECT_IDS_NAME = "INPUT_SUBJECT_IDS_NAME"
     }

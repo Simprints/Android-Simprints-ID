@@ -25,7 +25,7 @@ class EnrolmentRecordWorker(context: Context, params: WorkerParameters) :
     lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     override suspend fun doWork(): Result {
-        getComponent<RemoteConfigWorker> { it.inject(this@EnrolmentRecordWorker) }
+        getComponent<EnrolmentRecordWorker> { it.inject(this@EnrolmentRecordWorker) }
 
         return withContext(dispatcherProvider.io()) {
             try {
