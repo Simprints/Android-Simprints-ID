@@ -19,6 +19,8 @@ import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import com.simprints.infraresources.R as IDR
+
 
 /**
  * This fragment is show when an Over The Air update fails,
@@ -52,11 +54,11 @@ class OtaFailedFragment : FingerprintFragment() {
             otaFailedInstructionsTextView.text = if (fetchOtaResult?.isMaintenanceMode == true) {
                 if (fetchOtaResult.estimatedOutage != null && fetchOtaResult.estimatedOutage != 0L) {
                     getString(
-                        com.simprints.id.R.string.error_backend_maintenance_with_time_message,
+                        IDR.string.error_backend_maintenance_with_time_message,
                         getFormattedEstimatedOutage(fetchOtaResult.estimatedOutage)
                     )
                 } else {
-                    getString(com.simprints.id.R.string.error_backend_maintenance_message)
+                    getString(IDR.string.error_backend_maintenance_message)
                 }
             } else getString(R.string.ota_failed_instructions)
             continueButton.text = getString(R.string.continue_button)

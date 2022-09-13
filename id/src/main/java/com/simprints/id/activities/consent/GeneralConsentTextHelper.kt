@@ -3,7 +3,7 @@ package com.simprints.id.activities.consent
 import android.content.Context
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.R
+import com.simprints.infraresources.R
 import com.simprints.id.data.consent.shortconsent.GeneralConsentOptions
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType

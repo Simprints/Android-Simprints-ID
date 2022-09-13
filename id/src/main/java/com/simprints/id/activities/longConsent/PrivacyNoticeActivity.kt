@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.databinding.ActivityPrivacyNoticeBinding
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import javax.inject.Inject
+import com.simprints.infraresources.R as IDR
 
 class PrivacyNoticeActivity : BaseSplitActivity() {
 
@@ -49,7 +49,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         supportActionBar?.run {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = getString(R.string.privacy_notice_title)
+            title = getString(IDR.string.privacy_notice_title)
         }
     }
 
@@ -103,11 +103,11 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
 
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) {
                 getString(
-                    R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                    IDR.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
                         estimatedOutage
                     )
                 )
-            } else getString(R.string.error_backend_maintenance_message)
+            } else getString(IDR.string.error_backend_maintenance_message)
         }
     }
 
@@ -142,18 +142,18 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             longConsentTextView.isVisible = false
 
             longConsentHeader.isVisible = true
-            longConsentHeader.text = getString(R.string.long_consent_downloading)
+            longConsentHeader.text = getString(IDR.string.long_consent_downloading)
 
             longConsentDownloadProgressBar.isVisible = true
         }
     }
 
     private fun showDownloadErrorToast() {
-        showToast(R.string.long_consent_failed_to_download)
+        showToast(IDR.string.long_consent_failed_to_download)
     }
 
     private fun showUserOfflineToast() {
-        showToast(R.string.login_no_network)
+        showToast(IDR.string.login_no_network)
     }
 
 }

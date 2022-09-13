@@ -13,12 +13,12 @@ import android.widget.ImageView
 import android.widget.Spinner
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.simprints.id.R
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
 import com.simprints.id.databinding.ItemFingerSelectionBinding
 import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
+import com.simprints.infraresources.R as IDR
 
 class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
                                  private val getItems: () -> List<FingerSelectionItem>,
@@ -125,14 +125,14 @@ class FingerIdAdapter(context: Context, private val getItems: () -> List<FingerS
 
 fun FingerIdentifier.toString(context: Context) =
     context.getString(when (this) {
-        LEFT_THUMB -> R.string.l_1_finger_name
-        LEFT_INDEX_FINGER -> R.string.l_2_finger_name
-        LEFT_3RD_FINGER -> R.string.l_3_finger_name
-        LEFT_4TH_FINGER -> R.string.l_4_finger_name
-        LEFT_5TH_FINGER -> R.string.l_5_finger_name
-        RIGHT_THUMB -> R.string.r_1_finger_name
-        RIGHT_INDEX_FINGER -> R.string.r_2_finger_name
-        RIGHT_3RD_FINGER -> R.string.r_3_finger_name
-        RIGHT_4TH_FINGER -> R.string.r_4_finger_name
-        RIGHT_5TH_FINGER -> R.string.r_5_finger_name
+        LEFT_THUMB -> IDR.string.l_1_finger_name
+        LEFT_INDEX_FINGER -> IDR.string.l_2_finger_name
+        LEFT_3RD_FINGER -> IDR.string.l_3_finger_name
+        LEFT_4TH_FINGER -> IDR.string.l_4_finger_name
+        LEFT_5TH_FINGER -> IDR.string.l_5_finger_name
+        RIGHT_THUMB -> IDR.string.r_1_finger_name
+        RIGHT_INDEX_FINGER -> IDR.string.r_2_finger_name
+        RIGHT_3RD_FINGER -> IDR.string.r_3_finger_name
+        RIGHT_4TH_FINGER -> IDR.string.r_4_finger_name
+        RIGHT_5TH_FINGER -> IDR.string.r_5_finger_name
     })

@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -31,6 +30,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
+import com.simprints.infraresources.R as IDR
 
 class LoginActivity : BaseSplitActivity() {
 
@@ -74,12 +74,12 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun setUpTexts() {
         binding.apply {
-            loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
-            loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
-            loginButtonScanQr.text = getString(R.string.scan_qr)
-            loginButtonSignIn.text = getString(R.string.login)
-            loginEditTextProjectId.hint = getString(R.string.login_id_hint)
-            loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
+            loginEditTextUserId.hint = getString(IDR.string.login_user_id_hint)
+            loginEditTextProjectSecret.hint = getString(IDR.string.login_secret_hint)
+            loginButtonScanQr.text = getString(IDR.string.scan_qr)
+            loginButtonSignIn.text = getString(IDR.string.login)
+            loginEditTextProjectId.hint = getString(IDR.string.login_id_hint)
+            loginImageViewLogo.contentDescription = getString(IDR.string.simprints_logo)
         }
     }
 
@@ -162,11 +162,11 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private fun showErrorForInvalidQRCode() {
-        showToast(R.string.login_invalid_qr_code)
+        showToast(IDR.string.login_invalid_qr_code)
     }
 
     private fun showErrorForQRCodeFailed() {
-        showToast(R.string.login_qr_code_scanning_problem)
+        showToast(IDR.string.login_qr_code_scanning_problem)
     }
 
     private fun logMessageForCrashReport(message: String) {
@@ -199,12 +199,12 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleMissingCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_missing_credentials)
+        showToast(IDR.string.login_missing_credentials)
     }
 
     private fun handleProjectIdMismatch() {
         progressDialog.dismiss()
-        showToast(R.string.login_project_id_intent_mismatch)
+        showToast(IDR.string.login_project_id_intent_mismatch)
     }
 
     private fun handleSignInSuccess() {
@@ -215,18 +215,18 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleSignInFailedNoConnection() {
         progressDialog.dismiss()
-        showToast(R.string.login_no_network)
+        showToast(IDR.string.login_no_network)
     }
 
     private fun handleSignInFailedInvalidCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_invalid_credentials)
+        showToast(IDR.string.login_invalid_credentials)
     }
 
     private fun handleSignInFailedServerError() {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        showToast(R.string.login_server_error)
+        showToast(IDR.string.login_server_error)
     }
 
     private fun handleSignInFailedBackendMaintenanceError(estimatedOutage: Long?) {
@@ -234,10 +234,10 @@ class LoginActivity : BaseSplitActivity() {
         binding.apply {
             errorCard.isVisible = true
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
-                R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                IDR.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
                     estimatedOutage
                 )
-            ) else getString(R.string.error_backend_maintenance_message)
+            ) else getString(IDR.string.error_backend_maintenance_message)
         }
     }
 

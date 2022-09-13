@@ -9,6 +9,7 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.databinding.SettingsToolbarBinding
+import com.simprints.infraresources.R as IDR
 
 
 class SettingsAboutActivity : BaseSplitActivity() {
@@ -26,7 +27,7 @@ class SettingsAboutActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = getString(R.string.title_activity_settings_about)
+        title = getString(IDR.string.title_activity_settings_about)
 
         setContentView(binding.root)
         setSupportActionBar(binding.settingsToolbar)
