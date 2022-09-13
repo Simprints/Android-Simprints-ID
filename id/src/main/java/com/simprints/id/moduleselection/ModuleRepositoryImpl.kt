@@ -1,12 +1,12 @@
 package com.simprints.id.moduleselection
 
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.domain.modality.toMode
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
 

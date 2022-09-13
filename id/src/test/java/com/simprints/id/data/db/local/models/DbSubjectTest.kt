@@ -9,6 +9,8 @@ import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFaceSample
 import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFingerprintSample
 import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
+import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFaceSample
+import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomFingerprintSample
 import org.junit.Test
 import java.util.*
 

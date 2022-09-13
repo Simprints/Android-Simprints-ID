@@ -1,6 +1,5 @@
 package com.simprints.id.tools.utils
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
