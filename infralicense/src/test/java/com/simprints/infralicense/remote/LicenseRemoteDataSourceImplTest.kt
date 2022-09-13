@@ -7,7 +7,7 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infralicense.repository.LicenseVendor
+import com.simprints.infralicense.LicenseVendor
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.coEvery
 import io.mockk.mockk

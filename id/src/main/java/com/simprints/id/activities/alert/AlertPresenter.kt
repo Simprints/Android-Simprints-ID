@@ -1,6 +1,5 @@
 package com.simprints.id.activities.alert
 
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
@@ -14,6 +13,7 @@ import com.simprints.id.domain.alert.AlertActivityViewModel.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 

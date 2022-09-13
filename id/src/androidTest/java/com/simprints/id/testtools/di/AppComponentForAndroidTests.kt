@@ -11,6 +11,7 @@ import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
+import com.simprints.infralicense.LicenseModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -31,6 +32,7 @@ import javax.inject.Singleton
         SafetyNetModule::class,
         com.simprints.infra.security.SecurityModule::class,
         RealmModule::class,
+        LicenseModule::class
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {

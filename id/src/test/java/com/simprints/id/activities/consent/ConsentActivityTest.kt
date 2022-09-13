@@ -11,14 +11,14 @@ import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
-import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.TestAppModule
+import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
 import com.simprints.testtools.common.syntax.assertThrows

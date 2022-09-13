@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.subject.local
 
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -10,6 +9,7 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbSubject

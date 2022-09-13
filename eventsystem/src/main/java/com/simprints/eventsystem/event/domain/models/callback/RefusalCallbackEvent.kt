@@ -6,7 +6,7 @@ import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_REFUSAL
-import java.util.UUID
+import java.util.*
 
 @Keep
 data class RefusalCallbackEvent(

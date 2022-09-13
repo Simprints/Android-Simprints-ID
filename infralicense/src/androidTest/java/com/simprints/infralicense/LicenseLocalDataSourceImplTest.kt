@@ -1,9 +1,12 @@
-package com.simprints.id.data.license.local
+package com.simprints.infralicense
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infralicense.local.LicenseLocalDataSource
+import com.simprints.infralicense.local.LicenseLocalDataSourceImpl
+import com.simprints.infralicense.local.MasterKeyHelper
 import io.mockk.every
 import io.mockk.spyk
 import org.junit.Before
@@ -16,7 +19,7 @@ class LicenseLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val filesFolder = "${app.filesDir}/${LicenseLocalDataSource.LICENSES_FOLDER}"
     private val filePath = "$filesFolder/${LicenseLocalDataSource.LICENSE_NAME}"
-    private val licenseLocalDataSourceImpl = spyk(LicenseLocalDataSourceImpl(app))
+    private val licenseLocalDataSourceImpl = spyk(LicenseLocalDataSourceImpl(app, MasterKeyHelper()))
 
     @Before
     fun setUp() {

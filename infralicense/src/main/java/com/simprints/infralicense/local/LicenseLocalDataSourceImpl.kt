@@ -2,18 +2,18 @@ package com.simprints.infralicense.local
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKeys
-import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.simprints.infra.logging.Simber
 import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
 import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSE_NAME
 import java.io.File
 import javax.inject.Inject
 
-class LicenseLocalDataSourceImpl @Inject constructor(val context: Context) : LicenseLocalDataSource {
+internal class LicenseLocalDataSourceImpl @Inject constructor(
+    private val context: Context,
+    private val keyHelper: MasterKeyHelper
+) : LicenseLocalDataSource {
+
     private val licensePath = "${context.filesDir}/${LICENSES_FOLDER}/${LICENSE_NAME}"
-    private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 
     init {
         createDirectoryIfNonExistent(licensePath)
@@ -27,7 +27,8 @@ class LicenseLocalDataSourceImpl @Inject constructor(val context: Context) : Lic
         val file = File(licensePath)
 
         return try {
-            getEncryptedFile(file).openFileOutput().use { it.write(license.toByteArray()) }
+            keyHelper.getEncryptedFileBuilder(file, context).openFileOutput()
+                .use { it.write(license.toByteArray()) }
         } catch (t: Throwable) {
             Simber.e(t)
         }
@@ -59,18 +60,10 @@ class LicenseLocalDataSourceImpl @Inject constructor(val context: Context) : Lic
 
     private fun getFileFromStorage(): String? = try {
         val file = File(licensePath)
-        val encryptedFile = getEncryptedFile(file)
+        val encryptedFile = keyHelper.getEncryptedFileBuilder(file, context)
         encryptedFile.openFileInput().use { String(it.readBytes()) }
     } catch (t: Throwable) {
         null
     }
-
-    private fun getEncryptedFile(file: File): EncryptedFile =
-        EncryptedFile.Builder(
-            file,
-            context,
-            masterKeyAlias,
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-        ).build()
 
 }

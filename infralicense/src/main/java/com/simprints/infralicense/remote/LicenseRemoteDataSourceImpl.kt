@@ -7,12 +7,12 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infralicense.repository.LicenseVendor
+import com.simprints.infralicense.LicenseVendor
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import javax.inject.Inject
 
-class LicenseRemoteDataSourceImpl @Inject constructor(
+internal class LicenseRemoteDataSourceImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {

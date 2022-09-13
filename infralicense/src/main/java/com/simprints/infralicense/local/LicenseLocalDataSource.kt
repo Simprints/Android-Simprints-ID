@@ -1,8 +1,10 @@
 package com.simprints.infralicense.local
 
-interface LicenseLocalDataSource {
+internal interface LicenseLocalDataSource {
     fun getLicense(): String?
+
     fun saveLicense(license: String)
+
     fun deleteCachedLicense()
 
     companion object {

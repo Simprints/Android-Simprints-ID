@@ -7,9 +7,9 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.infra.logging.Simber
-import com.simprints.infralicense.repository.LicenseRepository
-import com.simprints.infralicense.repository.LicenseState
-import com.simprints.infralicense.repository.LicenseVendor
+import com.simprints.infralicense.LicenseRepository
+import com.simprints.infralicense.LicenseState
+import com.simprints.infralicense.LicenseVendor
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
