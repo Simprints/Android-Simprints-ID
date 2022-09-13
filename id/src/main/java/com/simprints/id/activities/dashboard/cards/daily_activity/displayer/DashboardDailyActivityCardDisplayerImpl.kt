@@ -10,6 +10,7 @@ import com.simprints.core.tools.extentions.nand
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
+import com.simprints.infraresources.R as IDR
 
 class DashboardDailyActivityCardDisplayerImpl(
     private val timeHelper: TimeHelper
@@ -33,7 +34,7 @@ class DashboardDailyActivityCardDisplayerImpl(
 
     private fun View.setTitle() {
         val date = timeHelper.getCurrentDateAsString()
-        val text = String.format(resources.getString(R.string.dashboard_card_activity), date)
+        val text = String.format(resources.getString(IDR.string.dashboard_card_activity), date)
         findViewById<TextView>(R.id.dashboard_daily_activity_card_title).text = text
     }
 
@@ -46,7 +47,7 @@ class DashboardDailyActivityCardDisplayerImpl(
             ).text = "$enrolmentsCount"
 
             val labelText = context.resources.getQuantityString(
-                R.plurals.dashboard_card_enrolments,
+                IDR.plurals.dashboard_card_enrolments,
                 enrolmentsCount
             )
 
@@ -66,7 +67,7 @@ class DashboardDailyActivityCardDisplayerImpl(
             ).text = "$identificationsCount"
 
             val labelText = context.resources.getQuantityString(
-                R.plurals.dashboard_card_identifications,
+                IDR.plurals.dashboard_card_identifications,
                 identificationsCount
             )
 
@@ -87,7 +88,7 @@ class DashboardDailyActivityCardDisplayerImpl(
             ).text = "$verificationsCount"
 
             val labelText = context.resources.getQuantityString(
-                R.plurals.dashboard_card_verifications,
+                IDR.plurals.dashboard_card_verifications,
                 verificationsCount
             )
 

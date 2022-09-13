@@ -61,6 +61,7 @@ import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infralicense.LicenseModule
+import com.simprints.infralicense.LicenseRepository
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

@@ -17,6 +17,7 @@ import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
 import javax.inject.Inject
+import com.simprints.infraresources.R as IDR
 
  class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
@@ -55,23 +56,23 @@ import javax.inject.Inject
     }
 
     private fun setTextInLayout() {
-        getPreferenceForGeneralCategory()?.title = getString(R.string.settings_general)
-        getPreferenceForAppDetailsCategory()?.title = getString(R.string.settings_app_details)
+        getPreferenceForGeneralCategory()?.title = getString(IDR.string.settings_general)
+        getPreferenceForAppDetailsCategory()?.title = getString(IDR.string.settings_app_details)
     }
 
     private fun initTextInLayout() {
-        getPreferenceForLanguage()?.title = getString(R.string.preference_select_language_title)
+        getPreferenceForLanguage()?.title = getString(IDR.string.preference_select_language_title)
         getPreferenceForDefaultFingers()?.apply {
-            title = getString(R.string.preference_select_fingers_title)
-            summary = getString(R.string.preference_summary_settings_fingers)
+            title = getString(IDR.string.preference_select_fingers_title)
+            summary = getString(IDR.string.preference_summary_settings_fingers)
         }
 
         getPreferenceForSyncInformation()?.apply {
-            title = getString(R.string.preference_sync_information_title)
-            summary = getString(R.string.preference_summary_sync_information)
+            title = getString(IDR.string.preference_sync_information_title)
+            summary = getString(IDR.string.preference_summary_sync_information)
         }
 
-        getPreferenceForAbout()?.title = getString(R.string.preference_app_details_title)
+        getPreferenceForAbout()?.title = getString(IDR.string.preference_app_details_title)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -123,13 +124,13 @@ import javax.inject.Inject
         findPreference(getKeyForGeneralPreferenceCategory())
 
     private fun getKeyForGeneralPreferenceCategory() =
-        getString(R.string.preferences_general_key)
+        getString(IDR.string.preferences_general_key)
 
     private fun getPreferenceForAppDetailsCategory(): Preference? =
         findPreference(getKeyForAppDetailsPreferenceCategory())
 
     private fun getKeyForAppDetailsPreferenceCategory() =
-        getString(R.string.preferences_app_details_key)
+        getString(IDR.string.preferences_app_details_key)
 
      fun getPreferenceForLanguage(): Preference? =
          findPreference(getKeyForLanguagePreference())

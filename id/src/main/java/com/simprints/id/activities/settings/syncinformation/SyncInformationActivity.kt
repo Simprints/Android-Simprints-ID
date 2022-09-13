@@ -14,7 +14,6 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.infraresources.R as resources
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
@@ -24,6 +23,7 @@ import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import javax.inject.Inject
+import com.simprints.infraresources.R as IDR
 
 class SyncInformationActivity : BaseSplitActivity() {
 
@@ -46,7 +46,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
 
-        title = getString(R.string.title_activity_sync_information)
+        title = getString(IDR.string.title_activity_sync_information)
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this, viewModelFactory)[SyncInformationViewModel::class.java]
@@ -68,16 +68,16 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun setTextInLayout() {
         binding.moduleSelectionButton.text =
-            getString(R.string.select_modules_button_title)
+            getString(IDR.string.select_modules_button_title)
         binding.recordsToUploadText.text =
-            getString(R.string.sync_info_records_to_upload)
+            getString(IDR.string.sync_info_records_to_upload)
         binding.recordsToDownloadText.text =
-            getString(R.string.sync_info_records_to_download)
+            getString(IDR.string.sync_info_records_to_download)
         binding.recordsToDeleteText.text =
-            getString(R.string.sync_info_records_to_delete)
+            getString(IDR.string.sync_info_records_to_delete)
         binding.totalRecordsOnDeviceText.text =
-            getString(R.string.sync_info_total_records_on_device)
-        binding.imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
+            getString(IDR.string.sync_info_total_records_on_device)
+        binding.imagesToUploadText.text = getString(IDR.string.sync_info_images_to_upload)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -191,7 +191,7 @@ class SyncInformationActivity : BaseSplitActivity() {
         }
 
         val totalRecordsEntry =
-            ModuleCount(getString(R.string.sync_info_total_records),
+            ModuleCount(getString(IDR.string.sync_info_total_records),
                 moduleCounts.sumOf { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 

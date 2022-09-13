@@ -24,6 +24,7 @@ import kotlinx.coroutines.channels.ticker
 import splitties.systemservices.layoutInflater
 import java.util.*
 import kotlin.math.min
+import com.simprints.infraresources.R as IDR
 
 
 class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSyncCardDisplayer {
@@ -67,7 +68,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun createViewForSyncState(layout: Int, root: ViewGroup) =
         root.context.layoutInflater.inflate(layout, root, false).also {
             it.visibility = GONE
-            it.textViewCardTitle().text = it.context.getString(R.string.dashboard_card_sync_title)
+            it.textViewCardTitle().text = it.context.getString(IDR.string.dashboard_card_sync_title)
         }
 
     override fun displayState(syncCardState: DashboardSyncCardState) {
@@ -115,7 +116,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
             progressCardConnectingProgress().visibility = GONE
             withVisible(progressCardStateText()) {
                 setTextColor(context.getColorStateList(R.color.simprints_green_dark))
-                text = context.getString(R.string.dashboard_sync_card_complete)
+                text = context.getString(IDR.string.dashboard_sync_card_complete)
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(100, 100)
@@ -129,7 +130,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
         withVisible(viewForConnectingState) {
             withVisible(progressCardStateText()) {
                 textColor = getDefaultGrayTextColor(viewForConnectingState)
-                text = context.getString(R.string.dashboard_sync_card_connecting)
+                text = context.getString(IDR.string.dashboard_sync_card_connecting)
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
@@ -150,7 +151,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
                     ""
                 }
                 text = String.format(
-                    context.getString(R.string.dashboard_sync_card_progress),
+                    context.getString(IDR.string.dashboard_sync_card_progress),
                     percentageText
                 )
                 textColor = getDefaultGrayTextColor(viewForConnectingState)
@@ -165,10 +166,10 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareSyncOfflineView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForOfflineState) {
             with(titleCardOffline()) {
-                text = context.getString(R.string.dashboard_sync_card_offline_message)
+                text = context.getString(IDR.string.dashboard_sync_card_offline_message)
             }
             with(buttonOpenSettings()) {
-                text = context.getString(R.string.dashboard_sync_card_offline_button)
+                text = context.getString(IDR.string.dashboard_sync_card_offline_button)
                 setOnClickListener {
                     userWantsToOpenSettings.send()
                 }
@@ -179,11 +180,11 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareNoModulesStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForNoModulesState) {
             with(titleCardSelectModule()) {
-                text = context.getString(R.string.dashboard_sync_card_no_modules_message)
+                text = context.getString(IDR.string.dashboard_sync_card_no_modules_message)
             }
             with(buttonSelectModule()) {
                 text =
-                    context.getString(R.string.dashboard_sync_card_no_modules_button).capitalize()
+                    context.getString(IDR.string.dashboard_sync_card_no_modules_button).capitalize()
                 setOnClickListener {
                     userWantsToSelectAModule.send()
                 }
@@ -195,10 +196,10 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareTryAgainStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForTryAgainState) {
             with(titleCardTryAgain()) {
-                text = context.getString(R.string.dashboard_sync_card_incomplete)
+                text = context.getString(IDR.string.dashboard_sync_card_incomplete)
             }
             with(buttonProgressSync()) {
-                text = context.getString(R.string.dashboard_sync_card_try_again_button).capitalize()
+                text = context.getString(IDR.string.dashboard_sync_card_try_again_button).capitalize()
                 setOnClickListener {
                     userWantsToSync.send()
                 }
@@ -209,7 +210,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareSyncDefaultStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForDefaultState) {
             withVisible(buttonDefaultSync()) {
-                text = context.getString(R.string.dashboard_sync_card_sync_button).capitalize()
+                text = context.getString(IDR.string.dashboard_sync_card_sync_button).capitalize()
                 setOnClickListener {
                     userWantsToSync.send()
                 }
@@ -223,11 +224,11 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
                 text =
                     if (syncCardState.estimatedOutage != null && syncCardState.estimatedOutage != 0L) {
                         context.getString(
-                            R.string.error_backend_maintenance_with_time_message,
+                            IDR.string.error_backend_maintenance_with_time_message,
                             getFormattedEstimatedOutage(syncCardState.estimatedOutage)
                         )
                     } else {
-                        context.getString(R.string.error_backend_maintenance_message)
+                        context.getString(IDR.string.error_backend_maintenance_message)
                     }
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
@@ -236,7 +237,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareSyncTooManyRequestsView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForSyncFailedState) {
             titleCardFailed().apply {
-                text = context.getString(R.string.dashboard_sync_card_too_many_modules_message)
+                text = context.getString(IDR.string.dashboard_sync_card_too_many_modules_message)
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
@@ -244,7 +245,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
     private fun prepareSyncFailedStateView(syncCardState: DashboardSyncCardState): View =
         withVisible(viewForSyncFailedState) {
             titleCardFailed().apply {
-                text = context.getString(R.string.dashboard_sync_card_failed_message)
+                text = context.getString(IDR.string.dashboard_sync_card_failed_message)
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
@@ -260,7 +261,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
             val lastSyncTimeText = timeHelper.readableBetweenNowAndTime(it)
             textView.visibility = VISIBLE
             textView.text = String.format(
-                ctx.getString(R.string.dashboard_card_sync_last_sync),
+                ctx.getString(IDR.string.dashboard_card_sync_last_sync),
                 lastSyncTimeText
             )
         } ?: run { textView.visibility = GONE }
