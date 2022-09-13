@@ -27,7 +27,6 @@ import com.simprints.id.activities.settings.syncinformation.SyncInformationViewM
 import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.moduleselection.ModuleRepository
@@ -39,6 +38,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.login.LoginManager
+import com.simprints.infraimages.ImageRepository
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
