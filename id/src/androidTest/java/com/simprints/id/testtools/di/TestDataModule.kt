@@ -10,10 +10,8 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
-import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.testtools.common.di.DependencyRule
@@ -65,14 +63,6 @@ class TestDataModule(
             subjectLocalDataSource,
             eventRemoteDataSource
         )
-    }
-
-    override fun provideImageRepository(
-        context: Context,
-        imageUrlProvider: ImageUrlProvider,
-        loginManager: LoginManager
-    ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, imageUrlProvider, loginManager)
     }
 
     override fun provideLongConsentLocalDataSource(
