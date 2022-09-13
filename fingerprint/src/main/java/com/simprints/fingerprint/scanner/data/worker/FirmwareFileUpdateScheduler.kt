@@ -23,7 +23,7 @@ class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: 
     private fun scheduleWork() {
         WorkManager
             .getInstance(context)
-            .enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, buildWork())
+            .enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.REPLACE, buildWork())
     }
 
     private fun cancelWork() {
