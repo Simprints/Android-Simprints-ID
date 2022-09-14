@@ -38,6 +38,8 @@ dependencies {
 
     testImplementation(project(":testtools"))
 
+    testImplementation(libs.testing.androidX.core.testing)
+    testImplementation(libs.firebase.auth)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
