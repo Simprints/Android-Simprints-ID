@@ -3,22 +3,17 @@ package com.simprints.core.domain.fingerprint
 import android.os.Parcelable
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize
 data class FingerprintSample(
+    val id: String = UUID.randomUUID().toString(),
     val fingerIdentifier: IFingerIdentifier,
     val template: ByteArray,
     val templateQualityScore: Int,
     val format: IFingerprintTemplateFormat
 ) : Parcelable {
-
-    @IgnoredOnParcel
-    val id: String by lazy {
-        UUID.nameUUIDFromBytes(template).toString()
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
