@@ -8,11 +8,11 @@ import java.util.*
 
 @Parcelize
 data class FingerprintSample(
-    val id: String = UUID.randomUUID().toString(),
     val fingerIdentifier: IFingerIdentifier,
     val template: ByteArray,
     val templateQualityScore: Int,
-    val format: IFingerprintTemplateFormat
+    val format: IFingerprintTemplateFormat,
+    val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
