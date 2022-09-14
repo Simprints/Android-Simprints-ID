@@ -7,9 +7,9 @@ import java.util.*
 
 @Parcelize
 data class FaceSample(
-    val id: String = UUID.randomUUID().toString(),
     val template: ByteArray,
-    val format: IFaceTemplateFormat
+    val format: IFaceTemplateFormat,
+    val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
