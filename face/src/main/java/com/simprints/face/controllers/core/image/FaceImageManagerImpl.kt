@@ -1,7 +1,6 @@
 package com.simprints.face.controllers.core.image
 
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.infra.logging.Simber
@@ -29,7 +28,7 @@ class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
         try {
             val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
 
-            val projectId = (currentSession.payload as SessionCapturePayload).projectId
+            val projectId = currentSession.payload.projectId
             val sessionId = currentSession.id
             CorePath(arrayOf(
                 PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FACES_PATH, "$captureEventId.jpg"

@@ -68,6 +68,10 @@ data class Path(val parts: Array<String>) : Parcelable {
 
     override fun hashCode(): Int = parts.contentHashCode() * 2 + 27
 
+    override fun toString(): String {
+        return super.toString()
+    }
+
     companion object {
         /**
          * Joins two paths
