@@ -31,6 +31,7 @@ dependencies {
 
     // Firebase
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.auth)
 
     implementation(libs.androidX.security)
     implementation(libs.kotlin.coroutinesAndroid)
@@ -39,7 +40,6 @@ dependencies {
     testImplementation(project(":testtools"))
 
     testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.firebase.auth)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
