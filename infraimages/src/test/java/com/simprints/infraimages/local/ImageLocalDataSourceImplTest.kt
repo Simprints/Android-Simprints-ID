@@ -63,7 +63,26 @@ class ImageLocalDataSourceImplTest {
 
         val images = localSource.listImages()
 
-       assert(images.isEmpty())
+        assert(images.isEmpty())
+    }
+
+    @Test
+    fun `checking decrypting the files opens the file stream`() {
+        val file = File("testpath")
+        val mockFile = mockk<EncryptedFile>()
+
+        val encryptedFileMock = mockk<MasterKeyHelper>() {
+            every { getEncryptedFileBuilder(any(), any()) } returns mockFile
+        }
+
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk() {
+            every { filesDir } returns file
+        }, encryptedFileMock)
+
+        val fileName = Path("testDir/Images")
+        localSource.decryptImage(SecuredImageRef(fileName))
+
+        verify(exactly = 1) { mockFile.openFileInput() }
     }
 
     @Test
