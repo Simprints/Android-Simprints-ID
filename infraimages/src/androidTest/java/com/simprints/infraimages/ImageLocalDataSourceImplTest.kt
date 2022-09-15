@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.security.MasterKeyHelper
 import com.simprints.infraimages.local.ImageLocalDataSourceImpl
 import com.simprints.infraimages.model.Path
 import com.simprints.infraimages.model.SecuredImageRef
@@ -25,7 +26,7 @@ class ImageLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
     private val path = Path("test/$FILE_NAME")
-    private val imageLocalDataSource = ImageLocalDataSourceImpl(app)
+    private val imageLocalDataSource = ImageLocalDataSourceImpl(app, MasterKeyHelper())
 
     @Before
     fun setUp() {
