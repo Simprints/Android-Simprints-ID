@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
     implementation(project(":core"))
+    implementation(project(":infrasecurity"))
 
     implementation(libs.androidX.core)
 

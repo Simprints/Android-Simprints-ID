@@ -1,4 +1,4 @@
-package com.simprints.infralicense.local
+package com.simprints.infra.security
 
 import android.content.Context
 import androidx.security.crypto.EncryptedFile

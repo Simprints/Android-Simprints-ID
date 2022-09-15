@@ -1,14 +1,16 @@
-package com.simprints.infralicense.local
+package com.simprints.infraimages.local
 
 import androidx.security.crypto.EncryptedFile
 import com.simprints.infra.security.MasterKeyHelper
+import com.simprints.infraimages.model.Path
+import com.simprints.infraimages.model.SecuredImageRef
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
 import java.io.File
 
-class LicenseLocalDataSourceImplTest {
+class ImageLocalDataSourceImplTest {
 
     @Test
     fun `check file directory is created`() {
@@ -16,11 +18,11 @@ class LicenseLocalDataSourceImplTest {
         val path = "testpath"
         val file = File(path)
 
-        LicenseLocalDataSourceImpl(context = mockk() {
+        ImageLocalDataSourceImpl(ctx = mockk() {
             every { filesDir } returns file
         }, mockk())
 
-        assert(File("${path}/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
+        assert(File(path).exists())
     }
 
     @Test
@@ -33,19 +35,20 @@ class LicenseLocalDataSourceImplTest {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = LicenseLocalDataSourceImpl(context = mockk() {
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk() {
             every { filesDir } returns file
         }, encryptedFileMock)
 
 
-        val fileName = "testfile"
-        localSource.saveLicense(fileName)
+        val fileName = Path("testDir/Images")
+        val imageBytes = byteArrayOf()
+        localSource.encryptAndStoreImage(imageBytes, fileName)
 
         verify(exactly = 1) { mockFile.openFileOutput() }
     }
 
     @Test
-    fun `check getting the file requests the created file`() {
+    fun `checking listing files without saving returns empty list`() {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -54,14 +57,13 @@ class LicenseLocalDataSourceImplTest {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = LicenseLocalDataSourceImpl(context = mockk() {
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk() {
             every { filesDir } returns file
         }, encryptedFileMock)
 
-        localSource.getLicense()
+        val images = localSource.listImages()
 
-        verify(exactly = 1) { encryptedFileMock.getEncryptedFileBuilder(any(), any()) }
-        verify(exactly = 1) { mockFile.openFileInput() }
+       assert(images.isEmpty())
     }
 
     @Test
@@ -70,14 +72,13 @@ class LicenseLocalDataSourceImplTest {
         val path = "testpath"
         val file = File(path)
 
-        val localsource = LicenseLocalDataSourceImpl(context = mockk() {
+        val localsource = ImageLocalDataSourceImpl(ctx = mockk() {
             every { filesDir } returns file
         }, mockk())
 
-        localsource.deleteCachedLicense()
+        localsource.deleteImage(SecuredImageRef(Path("${path}/Image")))
 
-        assert(!File("${path}/${LicenseLocalDataSource.LICENSES_FOLDER}/${LicenseLocalDataSource.LICENSE_NAME}").exists())
+        assert(!File("${path}/Image").exists())
     }
-
 
 }
