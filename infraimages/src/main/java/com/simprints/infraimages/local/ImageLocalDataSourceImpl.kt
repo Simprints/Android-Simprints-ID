@@ -1,11 +1,8 @@
 package com.simprints.infraimages.local
 
 import android.content.Context
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-import androidx.security.crypto.MasterKeys
-import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.MasterKeyHelper
 import com.simprints.infraimages.model.Path
 import com.simprints.infraimages.model.SecuredImageRef
 import java.io.File
@@ -14,7 +11,8 @@ import java.io.FileNotFoundException
 import javax.inject.Inject
 
 internal class ImageLocalDataSourceImpl @Inject constructor(
-    private val ctx: Context
+    private val ctx: Context,
+    private val keyHelper: MasterKeyHelper
 ) : ImageLocalDataSource {
 
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
@@ -22,8 +20,6 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
     init {
         createDirectoryIfNonExistent(imageRootPath)
     }
-
-    private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 
     override fun encryptAndStoreImage(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
         val fullPath = Path.combine(imageRootPath, relativePath).compose()
@@ -37,7 +33,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             if (relativePath.compose().isEmpty())
                 throw FileNotFoundException()
 
-            getEncryptedFile(file).openFileOutput().use { stream ->
+            keyHelper.getEncryptedFileBuilder(file, ctx).openFileOutput().use { stream ->
                 stream.write(imageBytes)
                 val subsetToRemove = Path.parse(imageRootPath)
                 val path = Path.parse(file.path).remove(subsetToRemove)
@@ -52,7 +48,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
     override fun decryptImage(image: SecuredImageRef): FileInputStream? {
         val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
-        val encryptedFile = getEncryptedFile(file)
+        val encryptedFile = keyHelper.getEncryptedFileBuilder(file, ctx)
         return try {
             encryptedFile.openFileInput()
         } catch (t: Throwable) {
@@ -88,19 +84,11 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             directory.mkdirs()
     }
 
-    private fun getEncryptedFile(file: File): EncryptedFile =
-        EncryptedFile.Builder(
-            file,
-            ctx,
-            masterKeyAlias,
-            AES256_GCM_HKDF_4KB
-        ).build()
-
     private fun buildAbsolutePath(path: Path): String {
         return Path.combine(imageRootPath, path).compose()
     }
 
-    private companion object {
+    companion object {
         const val IMAGES_FOLDER = "images"
     }
 

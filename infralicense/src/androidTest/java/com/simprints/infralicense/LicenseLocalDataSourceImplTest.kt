@@ -6,7 +6,6 @@ import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infralicense.local.LicenseLocalDataSource
 import com.simprints.infralicense.local.LicenseLocalDataSourceImpl
-import com.simprints.infralicense.local.MasterKeyHelper
 import io.mockk.every
 import io.mockk.spyk
 import org.junit.Before

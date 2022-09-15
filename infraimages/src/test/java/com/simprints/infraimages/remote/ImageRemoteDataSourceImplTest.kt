@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.FileInputStream
 
+@Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
 class ImageRemoteDataSourceImplTest {
 
@@ -26,10 +27,11 @@ class ImageRemoteDataSourceImplTest {
         mockkStatic("kotlinx.coroutines.tasks.TasksKt")
     }
 
-    @Test
-    fun `test image upload flow`() = runTest() {
 
-        val imgUrlProviderMock = mockk<ImageUrlProvider>() {
+    @Test
+    fun `test image upload flow`() = runTest {
+
+        val imgUrlProviderMock = mockk<ImageUrlProvider> {
             coEvery { getImageStorageBucketUrl() } returns "gs://`simprints-dev.appspot.com"
         }
 
@@ -38,30 +40,20 @@ class ImageRemoteDataSourceImplTest {
             every { getLegacyAppFallback().options.projectId } returns "projectId"
         }
 
-        val storageMock = mockk<FirebaseStorage>(relaxed = true) {
-            every { reference } returns mockk()
-
-            every { reference.child(any()) } returns mockk(relaxed = true) {
-                every { reference.path } returns "testPath"
-
-                coEvery { reference.putStream(any()).await() } coAnswers {
-                    mockk {
-                        every { task.isSuccessful } returns true
-                    }
-                }
-            }
-        }
+        val storageMock = setupStorageMock()
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
         val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, loginManagerMock)
         val imageStreamMock = mockk<FileInputStream>(relaxed = true)
-        
+
         val securedImageRefMock = mockk<SecuredImageRef>(relaxed = true) {
             every { relativePath.parts } returns arrayOf("Test1")
         }
 
-        remoteDataSource.uploadImage(imageStreamMock, securedImageRefMock)
+        val result = remoteDataSource.uploadImage(imageStreamMock, securedImageRefMock)
+
+        assert(result.isUploadSuccessful())
     }
 
     @Test
@@ -94,6 +86,21 @@ class ImageRemoteDataSourceImplTest {
         val rtn = remoteDataSource.uploadImage(mockk(), mockk())
 
         assert(!rtn.isUploadSuccessful())
+    }
+
+    private fun setupStorageMock() = mockk<FirebaseStorage>(relaxed = true) {
+        every { reference } returns mockk {
+            every { child(any()) } returns mockk {
+                every { path } returns "testPath"
+                every { putStream(any()) } returns mockk {
+                    coEvery { await() } returns mockk {
+                        every { task } returns mockk {
+                            every { isSuccessful } returns true
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
