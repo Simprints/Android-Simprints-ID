@@ -26,6 +26,8 @@ import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
 import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSource
+import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSourceImpl
 import com.simprints.id.network.ImageUrlProvider
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
@@ -132,4 +134,7 @@ open class DataModule {
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
 
+    @Provides
+    fun provideEnrolmentRecordRemoteDataSource(loginManager: LoginManager): EnrolmentRecordRemoteDataSource =
+        EnrolmentRecordRemoteDataSourceImpl(loginManager)
 }
