@@ -23,7 +23,7 @@ import io.realm.Realm
 import io.realm.RealmQuery
 import io.realm.RealmResults
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,7 +64,7 @@ open class SubjectLocalDataSourceImplTest {
         } answers { blockCapture.captured.invoke(realm) }
 
 
-        val realmResults: RealmResults<DbSubject> = mockk() {
+        val realmResults: RealmResults<DbSubject> = mockk {
             every { iterator() } answers {
                 localSubjects.map { it.fromDomainToDb() }.iterator() as MutableIterator<DbSubject>
             }
@@ -74,7 +74,7 @@ open class SubjectLocalDataSourceImplTest {
             }
         }
         val captureUserId = slot<String>()
-        val query: RealmQuery<DbSubject> = mockk() {
+        val query: RealmQuery<DbSubject> = mockk {
             every {
                 equalTo(eq(SubjectLocalDataSourceImpl.USER_ID_FIELD), capture(captureUserId))
             } answers {
@@ -95,7 +95,7 @@ open class SubjectLocalDataSourceImplTest {
 
 
     @Test
-    fun givenOneRecordSaved_countShouldReturnOne() = runBlocking {
+    fun givenOneRecordSaved_countShouldReturnOne() = runTest {
         saveFakePerson(getFakePerson())
 
         val count = subjectLocalDataSource.count()
@@ -103,7 +103,7 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenManyPeopleSaved_countShouldReturnMany() = runBlocking {
+    fun givenManyPeopleSaved_countShouldReturnMany() = runTest {
         saveFakePeople(getRandomPeople(20))
 
         val count = subjectLocalDataSource.count()
@@ -111,7 +111,7 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenManyPeopleSaved_countByProjectIdShouldReturnTheRightTotal() = runBlocking {
+    fun givenManyPeopleSaved_countByProjectIdShouldReturnTheRightTotal() = runTest {
         saveFakePeople(getRandomPeople(20))
 
         val count = subjectLocalDataSource.count()
@@ -121,7 +121,7 @@ open class SubjectLocalDataSourceImplTest {
 
     @Test
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
-        runBlocking {
+        runTest {
             assertThrows<InvalidQueryToLoadRecordsException> {
                 (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(
                     mockk()
@@ -132,7 +132,7 @@ open class SubjectLocalDataSourceImplTest {
 
 
     @Test
-    fun givenManyPeopleSaved_loadShouldReturnThem() = runBlocking {
+    fun givenManyPeopleSaved_loadShouldReturnThem() = runTest {
         val fakePerson = getFakePerson()
         saveFakePerson(fakePerson)
 
@@ -143,7 +143,7 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByUserIdShouldReturnTheRightPeople() = runBlocking {
+    fun givenManyPeopleSaved_loadByUserIdShouldReturnTheRightPeople() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
@@ -155,7 +155,7 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByModuleIdShouldReturnTheRightPeople() = runBlocking {
+    fun givenManyPeopleSaved_loadByModuleIdShouldReturnTheRightPeople() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
@@ -166,7 +166,7 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun performSubjectCreationAction() = runBlocking {
+    fun performSubjectCreationAction() = runTest {
         val subject = getFakePerson()
         subjectLocalDataSource.performActions(
             listOf(SubjectAction.Creation(subject.fromDbToDomain()))
@@ -176,18 +176,18 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun performSubjectDeletionAction() = runBlocking {
+    fun performSubjectDeletionAction() = runTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
         subjectLocalDataSource.performActions(
-            listOf(SubjectAction.Deletion(subject.subjectId))
+            listOf(SubjectAction.Deletion(subject.subjectId.toString()))
         )
         val peopleCount = subjectLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
     }
 
     @Test
-    fun performNoAction() = runBlocking {
+    fun performNoAction() = runTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
         subjectLocalDataSource.performActions(
@@ -198,7 +198,7 @@ open class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun shouldDeleteAllSubjects() = runBlocking {
+    fun shouldDeleteAllSubjects() = runTest {
         saveFakePeople(getRandomPeople(5))
 
         subjectLocalDataSource.deleteAll()
@@ -206,7 +206,6 @@ open class SubjectLocalDataSourceImplTest {
         val peopleCount = subjectLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
     }
-
 
     private fun getFakePerson(): DbSubject =
         SubjectsGeneratorUtils.getRandomSubject().fromDomainToDb()

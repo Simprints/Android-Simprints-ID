@@ -44,6 +44,7 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
                 9 -> migrateTo10(realm.schema)
                 10 -> migrateTo11(realm.schema)
                 11 -> migrateTo12(realm.schema)
+                12 -> migrateTo13(realm.schema)
             }
         }
     }
@@ -221,6 +222,24 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
         schema.get(PeopleSchemaV7.FACE_TABLE)
             ?.addPrimaryKey(PeopleSchemaV7.FACE_FIELD_ID)
     }
+
+    private fun migrateTo13(schema: RealmSchema) {
+        schema
+            .get(SubjectsSchemaV13.SUBJECT_TABLE)
+            ?.addField(SubjectsSchemaV13.TMP_SUBJECT_ID_FIELD, UUID::class.java)
+            ?.transform { obj: DynamicRealmObject ->
+                val subjectId = obj.getString(SubjectsSchemaV13.SUBJECT_ID_FIELD)
+                obj.setUUID(SubjectsSchemaV13.TMP_SUBJECT_ID_FIELD, UUID.fromString(subjectId))
+            }
+            ?.removeField(SubjectsSchemaV13.SUBJECT_ID_FIELD)
+            ?.renameField(
+                SubjectsSchemaV13.TMP_SUBJECT_ID_FIELD,
+                SubjectsSchemaV13.SUBJECT_ID_FIELD
+            )
+            ?.markAsRequired(SubjectsSchemaV13.SUBJECT_ID_FIELD)
+            ?.addPrimaryKey(SubjectsSchemaV13.SUBJECT_ID_FIELD)
+    }
+
 
     private inline fun <reified T> RealmObjectSchema.addNewField(
         name: String,

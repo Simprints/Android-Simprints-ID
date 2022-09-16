@@ -48,7 +48,7 @@ fun List<FingerprintSample>.uniqueId(): String? {
     }
 }
 
-private fun List<FingerprintSample>.concatTemplates(): ByteArray {
+fun List<FingerprintSample>.concatTemplates(): ByteArray {
     return this.sortedBy { it.templateQualityScore }.fold(byteArrayOf()) { acc, sample ->
         acc + sample.template
     }
