@@ -9,7 +9,7 @@ import java.util.*
 open class DbSubject(
     @PrimaryKey
     @Required
-    var subjectId: String = "",
+    var subjectId: UUID = UUID.randomUUID(),
 
     @Required
     var projectId: String = "",
