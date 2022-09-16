@@ -1,4 +1,4 @@
-package com.simprints.infralicense.local
+package com.simprints.infra.license.local
 
 import androidx.security.crypto.EncryptedFile
 import io.mockk.every

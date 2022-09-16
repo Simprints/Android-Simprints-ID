@@ -1,8 +1,8 @@
-package com.simprints.infralicense.remote
+package com.simprints.infra.license.remote
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.simprints.infralicense.LicenseVendor
+import com.simprints.infra.license.LicenseVendor
 
 /**
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.

@@ -1,12 +1,12 @@
-package com.simprints.infralicense
+package com.simprints.infra.license
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infralicense.local.LicenseLocalDataSource
-import com.simprints.infralicense.local.LicenseLocalDataSourceImpl
-import com.simprints.infralicense.local.MasterKeyHelper
+import com.simprints.infra.license.local.LicenseLocalDataSource
+import com.simprints.infra.license.local.LicenseLocalDataSourceImpl
+import com.simprints.infra.license.local.MasterKeyHelper
 import io.mockk.every
 import io.mockk.spyk
 import org.junit.Before

@@ -1,12 +1,12 @@
-package com.simprints.infralicense.repository
+package com.simprints.infra.license.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infralicense.LicenseRepositoryImpl
-import com.simprints.infralicense.LicenseState
-import com.simprints.infralicense.LicenseVendor
-import com.simprints.infralicense.local.LicenseLocalDataSource
-import com.simprints.infralicense.remote.ApiLicenseResult
-import com.simprints.infralicense.remote.LicenseRemoteDataSource
+import com.simprints.infra.license.LicenseRepositoryImpl
+import com.simprints.infra.license.LicenseState
+import com.simprints.infra.license.LicenseVendor
+import com.simprints.infra.license.local.LicenseLocalDataSource
+import com.simprints.infra.license.remote.ApiLicenseResult
+import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

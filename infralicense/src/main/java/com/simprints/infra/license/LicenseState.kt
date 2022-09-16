@@ -1,4 +1,4 @@
-package com.simprints.infralicense
+package com.simprints.infra.license
 
 sealed class LicenseState {
     object Started : LicenseState()
