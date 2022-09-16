@@ -29,6 +29,9 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
+import com.simprints.id.enrolmentrecords.EnrolmentRecordRepository
+import com.simprints.id.enrolmentrecords.EnrolmentRecordRepositoryImpl
+import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
@@ -256,6 +259,14 @@ open class AppModule {
         encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =
         PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
+
+    @Provides
+    fun provideEnrolmentRecordRepository(
+        context: Context,
+        remoteDataSource: EnrolmentRecordRemoteDataSource,
+        subjectRepository: SubjectRepository,
+    ): EnrolmentRecordRepository =
+        EnrolmentRecordRepositoryImpl(context, remoteDataSource, subjectRepository)
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
