@@ -3,7 +3,7 @@ package com.simprints.infra.images.local
 import androidx.security.crypto.EncryptedFile
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.security.MasterKeyHelper
+import com.simprints.infra.security.cryptography.MasterKeyHelper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

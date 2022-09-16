@@ -8,7 +8,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.security.MasterKeyHelper
+import com.simprints.infra.security.cryptography.MasterKeyHelper
 import org.junit.Before
 import org.junit.Test
 import java.io.File
