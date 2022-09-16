@@ -11,7 +11,6 @@ import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -33,6 +32,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
