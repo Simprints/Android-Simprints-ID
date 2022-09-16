@@ -1,4 +1,4 @@
-package com.simprints.infra.security
+package com.simprints.infra.security.cryptography
 
 import android.content.Context
 import androidx.security.crypto.EncryptedFile

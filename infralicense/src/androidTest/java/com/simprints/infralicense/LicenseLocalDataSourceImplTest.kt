@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.security.MasterKeyHelper
+import com.simprints.infra.security.cryptography.MasterKeyHelper
 import com.simprints.infralicense.local.LicenseLocalDataSource
 import com.simprints.infralicense.local.LicenseLocalDataSourceImpl
 import io.mockk.every

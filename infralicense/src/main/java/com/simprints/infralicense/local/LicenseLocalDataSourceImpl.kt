@@ -3,7 +3,7 @@ package com.simprints.infralicense.local
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.MasterKeyHelper
+import com.simprints.infra.security.cryptography.MasterKeyHelper
 import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
 import com.simprints.infralicense.local.LicenseLocalDataSource.Companion.LICENSE_NAME
 import java.io.File

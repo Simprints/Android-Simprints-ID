@@ -2,7 +2,7 @@ package com.simprints.infra.images.local
 
 import android.content.Context
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.MasterKeyHelper
+import com.simprints.infra.security.cryptography.MasterKeyHelper
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import java.io.File
