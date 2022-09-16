@@ -4,7 +4,11 @@ import androidx.annotation.Keep
 import com.simprints.id.secure.models.SecurityState
 
 @Keep
-data class ApiSecurityState(val deviceId: String, val status: Status) {
+data class ApiSecurityState(
+    val deviceId: String,
+    val status: Status,
+    val mustUpSyncEnrolmentRecords: ApiUpSyncEnrolmentRecords? = null
+) {
 
     @Keep
     enum class Status {
@@ -16,7 +20,8 @@ data class ApiSecurityState(val deviceId: String, val status: Status) {
 
 fun ApiSecurityState.fromApiToDomain() = SecurityState(
     deviceId,
-    status.fromApiToDomain()
+    status.fromApiToDomain(),
+    mustUpSyncEnrolmentRecords?.fromApiToDomain(),
 )
 
 fun ApiSecurityState.Status.fromApiToDomain(): SecurityState.Status =
