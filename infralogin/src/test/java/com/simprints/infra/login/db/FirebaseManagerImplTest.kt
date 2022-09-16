@@ -1,6 +1,7 @@
 package com.simprints.infra.login.db
 
 import android.content.Context
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.tasks.Tasks
@@ -23,7 +24,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class FirebaseManagerImplTest {
 
     companion object {
@@ -57,7 +60,7 @@ class FirebaseManagerImplTest {
     @Test
     fun `signIn should throw a NetworkConnectionException if Firebase throws FirebaseNetworkException`() =
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.signInWithCustomToken(any()) } throws FirebaseNetworkException("")
+            every { firebaseAuth.signInWithCustomToken(any()) } throws FirebaseNetworkException("Failed")
 
             assertThrows<NetworkConnectionException> {
                 firebaseManagerImpl.signIn(mockk(relaxed = true))
@@ -86,7 +89,7 @@ class FirebaseManagerImplTest {
     @Test
     fun `signOut should throw a NetworkConnectionException if Firebase throws FirebaseNetworkException`() =
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.signOut() } throws FirebaseNetworkException("")
+            every { firebaseAuth.signOut() } throws FirebaseNetworkException("Failed")
 
             assertThrows<NetworkConnectionException> {
                 firebaseManagerImpl.signOut()
@@ -124,7 +127,7 @@ class FirebaseManagerImplTest {
     @Test
     fun `getCurrentToken throws NetworkConnectionException if Firebase throws FirebaseNetworkException`() {
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNetworkException("")
+            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNetworkException("Failed")
             assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
         }
     }
@@ -140,7 +143,7 @@ class FirebaseManagerImplTest {
     @Test
     fun `getCurrentToken throws RemoteDbNotSignedInException if FirebaseNoSignedInUserException`() {
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNoSignedInUserException("")
+            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNoSignedInUserException("Failed")
             assertThrows<RemoteDbNotSignedInException> { firebaseManagerImpl.getCurrentToken() }
         }
     }

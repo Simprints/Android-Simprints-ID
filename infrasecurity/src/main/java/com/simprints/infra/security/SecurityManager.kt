@@ -1,8 +1,11 @@
 package com.simprints.infra.security
 
+import android.content.Context
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedFile
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.infra.security.keyprovider.LocalDbKey
+import java.io.File
 
 interface SecurityManager {
 
@@ -26,5 +29,7 @@ interface SecurityManager {
      * @throws RootedDeviceException
      */
     fun checkIfDeviceIsRooted()
+
+    fun getEncryptedFileBuilder(file: File, context: Context): EncryptedFile
 
 }

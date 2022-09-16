@@ -37,7 +37,6 @@ import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.ProjectAuthenticatorImpl
@@ -61,6 +60,8 @@ import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.ImagesModule
 import com.simprints.infralicense.LicenseModule
 import com.simprints.infralicense.LicenseRepository
 import dagger.BindsInstance
@@ -83,7 +84,8 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         SafetyNetModule::class,
         SecurityManagerModule::class,
         RealmModule::class,
-        LicenseModule::class
+        LicenseModule::class,
+        ImagesModule::class
     ]
 )
 @Singleton

@@ -73,6 +73,7 @@ dependencies {
     implementation(project(":id"))
     implementation(project(":infralogging"))
     implementation(project(":infralicense"))
+    implementation(project(":infraimages"))
 
     implementation(libs.cameraView)
     implementation(libs.circleImageView)

@@ -1,5 +1,6 @@
 package com.simprints.id.network
 
+import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.infra.login.LoginManager
 
