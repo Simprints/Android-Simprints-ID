@@ -1,7 +1,7 @@
 package com.simprints.infra.license.local
 
 import androidx.security.crypto.EncryptedFile
-import com.simprints.infra.security.cryptography.MasterKeyHelper
+import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -29,11 +29,11 @@ class LicenseLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper>() {
+        val encryptedFileMock = mockk<SecurityManager> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = LicenseLocalDataSourceImpl(context = mockk() {
+        val localSource = LicenseLocalDataSourceImpl(context = mockk {
             every { filesDir } returns file
         }, encryptedFileMock)
 
@@ -50,7 +50,7 @@ class LicenseLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper>() {
+        val encryptedFileMock = mockk<SecurityManager>() {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 

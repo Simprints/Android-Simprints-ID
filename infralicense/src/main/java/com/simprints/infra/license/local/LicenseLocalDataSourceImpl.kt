@@ -2,15 +2,16 @@ package com.simprints.infra.license.local
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
 import com.simprints.infra.license.local.LicenseLocalDataSource.Companion.LICENSE_NAME
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.SecurityManager
 import java.io.File
 import javax.inject.Inject
 
 internal class LicenseLocalDataSourceImpl @Inject constructor(
     private val context: Context,
-    private val keyHelper: MasterKeyHelper
+    private val keyHelper: SecurityManager
 ) : LicenseLocalDataSource {
 
     private val licensePath = "${context.filesDir}/${LICENSES_FOLDER}/${LICENSE_NAME}"
