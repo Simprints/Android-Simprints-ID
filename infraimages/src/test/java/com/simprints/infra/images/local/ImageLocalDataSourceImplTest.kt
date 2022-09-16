@@ -1,9 +1,9 @@
 package com.simprints.infra.images.local
 
 import androidx.security.crypto.EncryptedFile
-import com.simprints.infra.security.MasterKeyHelper
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.security.MasterKeyHelper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -18,7 +18,7 @@ class ImageLocalDataSourceImplTest {
         val path = "testpath"
         val file = File(path)
 
-        ImageLocalDataSourceImpl(ctx = mockk() {
+        ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
         }, mockk())
 
@@ -31,11 +31,11 @@ class ImageLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper>() {
+        val encryptedFileMock = mockk<MasterKeyHelper> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk() {
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
         }, encryptedFileMock)
 
@@ -53,11 +53,11 @@ class ImageLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper>() {
+        val encryptedFileMock = mockk<MasterKeyHelper> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk() {
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
         }, encryptedFileMock)
 
@@ -71,11 +71,11 @@ class ImageLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper>() {
+        val encryptedFileMock = mockk<MasterKeyHelper> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk() {
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
         }, encryptedFileMock)
 
@@ -91,11 +91,11 @@ class ImageLocalDataSourceImplTest {
         val path = "testpath"
         val file = File(path)
 
-        val localsource = ImageLocalDataSourceImpl(ctx = mockk() {
+        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
         }, mockk())
 
-        localsource.deleteImage(SecuredImageRef(Path("${path}/Image")))
+        localSource.deleteImage(SecuredImageRef(Path("${path}/Image")))
 
         assert(!File("${path}/Image").exists())
     }
