@@ -1,4 +1,4 @@
-package com.simprints.infralicense.local
+package com.simprints.infra.license.local
 
 internal interface LicenseLocalDataSource {
     fun getLicense(): String?

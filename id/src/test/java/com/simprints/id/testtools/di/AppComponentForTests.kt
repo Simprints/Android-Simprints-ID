@@ -20,8 +20,8 @@ import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
+import com.simprints.infra.license.LicenseModule
 import com.simprints.infra.images.ImagesModule
-import com.simprints.infralicense.LicenseModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

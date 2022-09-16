@@ -1,4 +1,4 @@
-package com.simprints.infralicense.remote
+package com.simprints.infra.license.remote
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.logging.Simber
@@ -7,7 +7,7 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infralicense.LicenseVendor
+import com.simprints.infra.license.LicenseVendor
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import javax.inject.Inject

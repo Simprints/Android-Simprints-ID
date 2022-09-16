@@ -1,9 +1,9 @@
-package com.simprints.infralicense
+package com.simprints.infra.license
 
-import com.simprints.infralicense.local.LicenseLocalDataSource
-import com.simprints.infralicense.local.LicenseLocalDataSourceImpl
-import com.simprints.infralicense.remote.LicenseRemoteDataSource
-import com.simprints.infralicense.remote.LicenseRemoteDataSourceImpl
+import com.simprints.infra.license.local.LicenseLocalDataSource
+import com.simprints.infra.license.local.LicenseLocalDataSourceImpl
+import com.simprints.infra.license.remote.LicenseRemoteDataSource
+import com.simprints.infra.license.remote.LicenseRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
