@@ -1,10 +1,10 @@
 package com.simprints.infra.images.local
 
 import android.content.Context
-import com.simprints.infra.logging.Simber
-import com.simprints.infra.security.cryptography.MasterKeyHelper
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.SecurityManager
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 internal class ImageLocalDataSourceImpl @Inject constructor(
     private val ctx: Context,
-    private val keyHelper: MasterKeyHelper
+    private val keyHelper: SecurityManager
 ) : ImageLocalDataSource {
 
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"

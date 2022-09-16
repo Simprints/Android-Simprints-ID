@@ -1,8 +1,8 @@
-package com.simprints.infralicense
+package com.simprints.infra.license
 
-import com.simprints.infralicense.local.LicenseLocalDataSource
-import com.simprints.infralicense.remote.ApiLicenseResult
-import com.simprints.infralicense.remote.LicenseRemoteDataSource
+import com.simprints.infra.license.local.LicenseLocalDataSource
+import com.simprints.infra.license.remote.ApiLicenseResult
+import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow

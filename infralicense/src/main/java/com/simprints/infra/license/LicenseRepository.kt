@@ -1,4 +1,4 @@
-package com.simprints.infralicense
+package com.simprints.infra.license
 
 import kotlinx.coroutines.flow.Flow
 

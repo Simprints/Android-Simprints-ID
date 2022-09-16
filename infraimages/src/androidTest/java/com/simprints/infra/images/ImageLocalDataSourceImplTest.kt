@@ -8,7 +8,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.security.cryptography.MasterKeyHelper
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -26,7 +26,7 @@ class ImageLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
     private val path = Path("test/$FILE_NAME")
-    private val imageLocalDataSource = ImageLocalDataSourceImpl(app, MasterKeyHelper())
+    private val imageLocalDataSource = ImageLocalDataSourceImpl(app, mockk())
 
     @Before
     fun setUp() {
