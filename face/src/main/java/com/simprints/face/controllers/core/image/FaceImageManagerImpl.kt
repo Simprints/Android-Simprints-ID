@@ -4,8 +4,8 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.infra.logging.Simber
-import com.simprints.infraimages.ImageRepository
-import com.simprints.infraimages.model.Path as CorePath
+import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.model.Path as CorePath
 
 class FaceImageManagerImpl(private val coreImageRepository: ImageRepository,
                            private val coreEventRepository: EventRepository

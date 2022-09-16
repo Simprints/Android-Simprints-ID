@@ -38,7 +38,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.login.LoginManager
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi

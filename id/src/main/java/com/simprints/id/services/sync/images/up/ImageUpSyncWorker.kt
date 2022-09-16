@@ -5,7 +5,7 @@ import androidx.work.WorkerParameters
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.Application
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

@@ -24,7 +24,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue

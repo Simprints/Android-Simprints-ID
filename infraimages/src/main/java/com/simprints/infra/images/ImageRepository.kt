@@ -1,7 +1,7 @@
-package com.simprints.infraimages
+package com.simprints.infra.images
 
-import com.simprints.infraimages.model.Path
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.model.Path
+import com.simprints.infra.images.model.SecuredImageRef
 
 /**
  * Repository for handling local and remote image file operations

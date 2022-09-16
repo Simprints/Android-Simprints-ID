@@ -1,10 +1,10 @@
-package com.simprints.infraimages.local
+package com.simprints.infra.images.local
 
 import android.content.Context
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.MasterKeyHelper
-import com.simprints.infraimages.model.Path
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.model.Path
+import com.simprints.infra.images.model.SecuredImageRef
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

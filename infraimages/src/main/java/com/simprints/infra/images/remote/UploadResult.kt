@@ -1,6 +1,6 @@
-package com.simprints.infraimages.remote
+package com.simprints.infra.images.remote
 
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.model.SecuredImageRef
 
 /**
  * An upload result

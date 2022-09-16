@@ -1,9 +1,9 @@
 package com.simprints.face.controllers.core.image
 
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.infraimages.ImageRepository
-import com.simprints.infraimages.model.Path
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.model.Path
+import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

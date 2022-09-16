@@ -1,4 +1,4 @@
-package com.simprints.infraimages.model
+package com.simprints.infra.images.model
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

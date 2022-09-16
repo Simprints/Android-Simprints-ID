@@ -16,7 +16,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestDataModule
 import com.simprints.id.testtools.di.TestViewModelModule
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.di.DependencyRule
