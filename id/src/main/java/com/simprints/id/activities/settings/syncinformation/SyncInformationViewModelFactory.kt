@@ -8,7 +8,7 @@ import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 
 class SyncInformationViewModelFactory(
     private val downySyncHelper: EventDownSyncHelper,

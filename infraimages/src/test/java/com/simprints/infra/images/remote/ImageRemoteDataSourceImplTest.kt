@@ -1,10 +1,10 @@
-package com.simprints.infraimages.remote
+package com.simprints.infra.images.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.infra.login.LoginManager
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

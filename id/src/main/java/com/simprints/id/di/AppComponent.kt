@@ -59,8 +59,8 @@ import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
-import com.simprints.infraimages.ImageRepository
-import com.simprints.infraimages.ImagesModule
+import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.ImagesModule
 import com.simprints.infralicense.LicenseModule
 import com.simprints.infralicense.LicenseRepository
 import dagger.BindsInstance

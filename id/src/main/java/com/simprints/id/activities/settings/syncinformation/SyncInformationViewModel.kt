@@ -16,7 +16,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.infra.logging.Simber
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 

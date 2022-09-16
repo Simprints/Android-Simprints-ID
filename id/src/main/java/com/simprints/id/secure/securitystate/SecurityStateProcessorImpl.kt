@@ -3,7 +3,7 @@ package com.simprints.id.secure.securitystate
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 
 class SecurityStateProcessorImpl(
     private val imageRepository: ImageRepository,

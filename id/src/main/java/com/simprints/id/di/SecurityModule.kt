@@ -30,7 +30,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.security.SecurityManager
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

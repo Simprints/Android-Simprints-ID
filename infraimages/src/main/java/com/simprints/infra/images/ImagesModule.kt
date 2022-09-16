@@ -1,9 +1,9 @@
-package com.simprints.infraimages
+package com.simprints.infra.images
 
-import com.simprints.infraimages.local.ImageLocalDataSource
-import com.simprints.infraimages.local.ImageLocalDataSourceImpl
-import com.simprints.infraimages.remote.ImageRemoteDataSource
-import com.simprints.infraimages.remote.ImageRemoteDataSourceImpl
+import com.simprints.infra.images.local.ImageLocalDataSource
+import com.simprints.infra.images.local.ImageLocalDataSourceImpl
+import com.simprints.infra.images.remote.ImageRemoteDataSource
+import com.simprints.infra.images.remote.ImageRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

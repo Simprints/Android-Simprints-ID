@@ -17,7 +17,7 @@ import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.infra.login.LoginManager
-import com.simprints.infraimages.ImageRepository
+import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestViewModelModule(

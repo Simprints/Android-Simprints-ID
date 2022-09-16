@@ -1,10 +1,10 @@
-package com.simprints.infraimages.remote
+package com.simprints.infra.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.model.SecuredImageRef
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 import javax.inject.Inject

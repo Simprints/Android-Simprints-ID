@@ -8,7 +8,7 @@ import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
 import com.simprints.id.data.db.subject.domain.fromModuleApiToDomain
 import com.simprints.id.domain.moduleapi.images.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.images.fromModuleApiToDomain
-import com.simprints.infraimages.model.SecuredImageRef
+import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
