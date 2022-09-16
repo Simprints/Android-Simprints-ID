@@ -16,4 +16,5 @@ include ':id',
     ':infranetwork',
     ':infrarealm',
     ':infrasecurity',
-    ':infralicense'
+    ':infralicense',
+    ':infraimages'

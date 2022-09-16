@@ -1,6 +1,7 @@
 package com.simprints.infralicense.local
 
 import androidx.security.crypto.EncryptedFile
+import com.simprints.infra.security.cryptography.MasterKeyHelper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
