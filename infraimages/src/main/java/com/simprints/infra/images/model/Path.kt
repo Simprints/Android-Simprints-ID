@@ -53,7 +53,7 @@ data class Path(val parts: Array<String>) : Parcelable {
      */
     fun remove(subset: Array<String>): Path {
         val resultParts = parts.toMutableList().apply {
-            removeAll(subset)
+            removeAll(subset.toSet())
         }.toTypedArray()
 
         return Path(resultParts)
