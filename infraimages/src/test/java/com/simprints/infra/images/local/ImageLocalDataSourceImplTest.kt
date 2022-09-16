@@ -3,7 +3,7 @@ package com.simprints.infra.images.local
 import androidx.security.crypto.EncryptedFile
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.security.cryptography.MasterKeyHelper
+import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -31,7 +31,7 @@ class ImageLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper> {
+        val encryptedFileMock = mockk<SecurityManager> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
@@ -53,7 +53,7 @@ class ImageLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper> {
+        val encryptedFileMock = mockk<SecurityManager> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
@@ -71,7 +71,7 @@ class ImageLocalDataSourceImplTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<MasterKeyHelper> {
+        val encryptedFileMock = mockk<SecurityManager> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 

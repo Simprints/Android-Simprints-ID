@@ -6,7 +6,7 @@ import androidx.security.crypto.MasterKeys
 import java.io.File
 import javax.inject.Inject
 
-class MasterKeyHelper @Inject constructor() {
+internal class MasterKeyHelper @Inject constructor() {
 
     private fun getMasterKeyAlias() = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
