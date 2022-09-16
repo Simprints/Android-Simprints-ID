@@ -1,4 +1,4 @@
-package com.simprints.infralicense.remote
+package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
@@ -7,7 +7,7 @@ import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infralicense.LicenseVendor
+import com.simprints.infra.license.LicenseVendor
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.coEvery
 import io.mockk.mockk
