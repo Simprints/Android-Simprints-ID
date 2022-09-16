@@ -1,6 +1,6 @@
 package com.simprints.id.domain.moduleapi.images
 
-import com.simprints.id.data.images.model.Path
+import com.simprints.infra.images.model.Path
 import com.simprints.moduleapi.common.IPath
 import kotlinx.parcelize.Parcelize
 
