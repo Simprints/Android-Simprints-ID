@@ -16,7 +16,7 @@ buildscript {
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:7.2.2")
+        classpath("com.android.tools.build:gradle:7.3.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
 
         // CI Scanning & Retry
