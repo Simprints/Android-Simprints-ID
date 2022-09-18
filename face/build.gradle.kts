@@ -75,7 +75,9 @@ dependencies {
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
 
-    implementation(libs.cameraView)
+    implementation(libs.cameraView){
+        exclude("androidx.exifinterface")
+    }
     implementation(libs.circleImageView)
 
 
@@ -88,7 +90,9 @@ dependencies {
 
     // Android X
     implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.cameraX.core)
+    implementation(libs.androidX.cameraX.core){
+        exclude("androidx.exifinterface")
+    }
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
