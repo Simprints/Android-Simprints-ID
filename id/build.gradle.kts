@@ -80,6 +80,7 @@ android {
         resources.excludes.add("META-INF/AL2.0")
         resources.excludes.add("META-INF/LGPL2.1")
         resources.excludes.add("META-INF/licenses/ASM")
+        resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
     }
 
     buildFeatures.viewBinding = true

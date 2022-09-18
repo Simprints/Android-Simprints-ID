@@ -170,9 +170,9 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
-                    - ./gradlew :clientapi:projectHealth
-                    - ./gradlew :face:projectHealth
-                    - ./gradlew :fingerprint:projectHealth
+#                    - ./gradlew :clientapi:projectHealth
+#                    - ./gradlew :face:projectHealth
+#                    - ./gradlew :fingerprint:projectHealth
                     - ./gradlew :fingerprintscanner:projectHealth
                     - ./gradlew :fingerprintmatcher:projectHealth
                     - ./gradlew :fingerprintscannermock:projectHealth
