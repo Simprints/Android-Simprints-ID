@@ -19,7 +19,7 @@ import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppModule
-import com.simprints.id.network.ImageUrlProvider
+import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager

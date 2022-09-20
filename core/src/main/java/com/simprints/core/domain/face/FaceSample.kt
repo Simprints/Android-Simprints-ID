@@ -2,17 +2,15 @@ package com.simprints.core.domain.face
 
 import android.os.Parcelable
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize
-data class FaceSample(val template: ByteArray, val format: IFaceTemplateFormat) : Parcelable {
-
-    @IgnoredOnParcel
-    val id: String by lazy {
-        UUID.nameUUIDFromBytes(template).toString()
-    }
+data class FaceSample(
+    val template: ByteArray,
+    val format: IFaceTemplateFormat,
+    val id: String = UUID.randomUUID().toString(),
+) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -43,8 +41,8 @@ fun List<FaceSample>.uniqueId(): String? {
     }
 }
 
-private fun List<FaceSample>.concatTemplates(): ByteArray {
-    return this.sortedBy { it.template.hashCode() }.fold(byteArrayOf(), { acc, sample ->
+fun List<FaceSample>.concatTemplates(): ByteArray {
+    return this.sortedBy { it.template.hashCode() }.fold(byteArrayOf()) { acc, sample ->
         acc + sample.template
-    })
+    }
 }

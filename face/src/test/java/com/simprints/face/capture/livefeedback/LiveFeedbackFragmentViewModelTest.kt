@@ -17,6 +17,7 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.Event
+import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEvent
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
@@ -50,7 +51,7 @@ class LiveFeedbackFragmentViewModelTest {
     private val faceDetector: FaceDetector = mockk()
     private val frameProcessor: FrameProcessor = mockk()
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
-    private val faceTimeHelper: FaceTimeHelper = mockk() {
+    private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
     }
     private val viewModel = LiveFeedbackFragmentViewModel(
@@ -203,7 +204,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureEvent1) {
+                with(it as FaceCaptureEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[1]?.id)
                     assertThat(startTime).isEqualTo(2)
                     assertThat(endTime).isEqualTo(3)
                     assertThat(isFallback).isEqualTo(false)
@@ -220,7 +222,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureBiometricsEvent1) {
+                with(it as FaceCaptureBiometricsEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[1]?.id)
                     assertThat(startTime).isEqualTo(2)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
@@ -230,7 +233,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureEvent2) {
+                with(it as FaceCaptureEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[2]?.id)
                     assertThat(startTime).isEqualTo(4)
                     assertThat(endTime).isEqualTo(5)
                     assertThat(isFallback).isEqualTo(false)
@@ -247,7 +251,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureBiometricsEvent2) {
+                with(it as FaceCaptureBiometricsEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[2]?.id)
                     assertThat(startTime).isEqualTo(4)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
@@ -259,7 +264,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureEvent3) {
+                with(it as FaceCaptureEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[0]?.id)
                     assertThat(startTime).isEqualTo(0)
                     assertThat(endTime).isEqualTo(1)
                     assertThat(isFallback).isEqualTo(true)
@@ -276,7 +282,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureBiometricsEvent3) {
+                with(it as FaceCaptureBiometricsEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[0]?.id)
                     assertThat(startTime).isEqualTo(0)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(qualityThreshold).isEqualTo(this@LiveFeedbackFragmentViewModelTest.qualityThreshold)
