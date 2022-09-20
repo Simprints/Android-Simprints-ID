@@ -23,10 +23,9 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
-import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.images.repository.ImageRepositoryImpl
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.network.ImageUrlProvider
+import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSource
+import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSourceImpl
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import dagger.Module
@@ -96,13 +95,6 @@ open class DataModule {
     ): FaceIdentityLocalDataSource = subjectLocalDataSource
 
     @Provides
-    open fun provideImageRepository(
-        context: Context,
-        imageUrlProvider: ImageUrlProvider,
-        loginManager: LoginManager
-    ): ImageRepository = ImageRepositoryImpl(context, imageUrlProvider, loginManager)
-
-    @Provides
     open fun provideLongConsentLocalDataSource(
         context: Context,
         loginManager: LoginManager
@@ -132,4 +124,7 @@ open class DataModule {
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
 
+    @Provides
+    fun provideEnrolmentRecordRemoteDataSource(loginManager: LoginManager): EnrolmentRecordRemoteDataSource =
+        EnrolmentRecordRemoteDataSourceImpl(loginManager)
 }

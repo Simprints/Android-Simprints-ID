@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
-import com.simprints.core.tools.utils.randomUUID
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -161,19 +160,17 @@ class LiveFeedbackFragmentViewModel(
     }
 
     private fun sendCaptureEvent(faceDetection: FaceDetection) {
-        val payloadId = randomUUID() // The payloads of these two events need to have the same ids
         val faceCaptureEvent =
-            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold, payloadId)
+            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
 
         val faceCaptureBiometricsEvent =
-            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent(
-                payloadId
-            ) else null
+            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID)
+                faceDetection.toFaceCaptureBiometricsEvent()
+            else
+                null
 
         faceSessionEventsManager.addEvent(faceCaptureEvent)
         faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
-
-        faceDetection.id = faceCaptureEvent.id
     }
 
     /**
