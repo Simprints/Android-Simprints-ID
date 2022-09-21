@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.Application
@@ -14,6 +13,7 @@ import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 import com.simprints.id.services.guidselection.GuidSelectionManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

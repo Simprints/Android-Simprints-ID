@@ -2,7 +2,6 @@ package com.simprints.face.orchestrator
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
@@ -15,6 +14,7 @@ import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.error.ErrorType
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse

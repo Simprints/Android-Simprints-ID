@@ -56,6 +56,10 @@ android {
 
     buildFeatures.viewBinding = true
 
+    packagingOptions {
+           resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
+    }
+
 }
 
 repositories {
@@ -90,6 +94,7 @@ dependencies {
     implementation(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
+    implementation(project(":infraimages"))
 
     // Kotlin
     implementation(libs.kotlin.reflect)

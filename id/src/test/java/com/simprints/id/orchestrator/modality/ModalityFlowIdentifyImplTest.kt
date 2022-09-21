@@ -6,7 +6,6 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER
@@ -20,6 +19,7 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.SETUP_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.testtools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

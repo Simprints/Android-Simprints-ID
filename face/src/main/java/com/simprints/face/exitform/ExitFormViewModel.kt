@@ -2,7 +2,6 @@ package com.simprints.face.exitform
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
@@ -11,6 +10,7 @@ import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 import com.simprints.face.controllers.core.events.model.RefusalEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 
 class ExitFormViewModel(

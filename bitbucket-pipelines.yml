@@ -69,6 +69,8 @@ definitions:
                     - ./gradlew infranetwork:jacocoTestReport
                     - ./gradlew infrarealm:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
+                    - ./gradlew infralicense:jacocoTestReport
+                    - ./gradlew infraimages:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
@@ -78,6 +80,8 @@ definitions:
                     - infranetwork/build/reports/**
                     - infrarealm/build/reports/**
                     - infrasecurity/build/reports/**
+                    - infralicense/build/reports/**
+                    - infraimages/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -166,9 +170,9 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
-                    - ./gradlew :clientapi:projectHealth
-                    - ./gradlew :face:projectHealth
-                    - ./gradlew :fingerprint:projectHealth
+#                    - ./gradlew :clientapi:projectHealth
+#                    - ./gradlew :face:projectHealth
+#                    - ./gradlew :fingerprint:projectHealth
                     - ./gradlew :fingerprintscanner:projectHealth
                     - ./gradlew :fingerprintmatcher:projectHealth
                     - ./gradlew :fingerprintscannermock:projectHealth
@@ -358,7 +362,6 @@ flows:
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-module-unit-tests
-                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate

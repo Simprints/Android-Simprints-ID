@@ -5,7 +5,6 @@ import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.modality.Modality.FACE
 import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
@@ -14,6 +13,7 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.verifyAppRequest
+import com.simprints.id.testtools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

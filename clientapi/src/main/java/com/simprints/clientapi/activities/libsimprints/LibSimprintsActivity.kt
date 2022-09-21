@@ -8,8 +8,8 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Compan
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
-import com.simprints.id.Application
 import com.simprints.libsimprints.*
+import com.simprints.id.Application
 import javax.inject.Inject
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {

@@ -7,7 +7,7 @@ import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
-import java.util.UUID
+import java.util.*
 
 @Keep
 data class FaceCaptureConfirmationEvent(
