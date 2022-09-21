@@ -2,18 +2,17 @@ package com.simprints.clientapi.activities.commcare
 
 import android.content.Intent
 import android.os.Bundle
+import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
+import com.simprints.id.Application
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
+import javax.inject.Inject
 
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
@@ -41,15 +40,18 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     private val action: CommCareAction
         get() = buildCommCareAction(intent.action)
 
-    override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
+    @Inject
+    lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
 
-    override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
-        parametersOf(this)
+    override val presenter: CommCareContract.Presenter by lazy {
+        presenterFactory.create(this, action)
     }
 
+    override val guidSelectionNotifier = CommCareGuidSelectionNotifier(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
         super.onCreate(savedInstanceState)
-        loadClientApiKoinModules()
     }
 
     override fun returnRegistration(
@@ -127,7 +129,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(flowCompletedCheck: Boolean, sessionId: String, eventsJson: String?) =
+    override fun returnConfirmation(
+        flowCompletedCheck: Boolean,
+        sessionId: String,
+        eventsJson: String?
+    ) =
         Intent().let {
             val data = Bundle().apply {
                 putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
@@ -142,7 +148,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     /**
      * Not being used because CommCare might use CoSync. Next method does the same but with a nullable eventsJson.
      */
-    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean, sessionId: String) {
+    override fun returnErrorToClient(
+        errorResponse: ErrorResponse,
+        flowCompletedCheck: Boolean,
+        sessionId: String
+    ) {
         throw InvalidStateForIntentAction("Use the overloaded version with eventsJson")
     }
 
@@ -170,10 +180,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     override fun injectSessionIdIntoIntent(sessionId: String) {
         intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unloadClientApiKoinModules()
-    }
-
 }
+
+
