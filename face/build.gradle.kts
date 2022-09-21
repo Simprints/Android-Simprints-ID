@@ -46,6 +46,9 @@ android {
     }
 
     buildFeatures.viewBinding = true
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
+    }
 }
 repositories {
     maven(url = "https://jitpack.io")
@@ -72,8 +75,12 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":id"))
     implementation(project(":infralogging"))
+    implementation(project(":infralicense"))
+    implementation(project(":infraimages"))
 
-    implementation(libs.cameraView)
+    implementation(libs.cameraView){
+        exclude("androidx.exifinterface")
+    }
     implementation(libs.circleImageView)
 
 
@@ -86,7 +93,9 @@ dependencies {
 
     // Android X
     implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.cameraX.core)
+    implementation(libs.androidX.cameraX.core){
+        exclude("androidx.exifinterface")
+    }
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)

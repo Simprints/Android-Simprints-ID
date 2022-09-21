@@ -9,6 +9,7 @@ import com.simprints.core.tools.utils.LanguageHelper.SHARED_PREFS_LANGUAGE_KEY
 import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
+import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
@@ -383,6 +384,12 @@ open class SettingsPreferencesManagerImpl(
             faceConfidenceThresholdsSerializer
         )
 
+    override var lastInstructionId: String by PrimitivePreference(
+        prefs,
+        LAST_INSTRUCTION_ID_KEY,
+        LAST_INSTRUCTION_ID_DEFAULT
+    )
+
     override fun getRemoteConfigStringPreference(key: String) = remoteConfigWrapper.getString(key)
         ?: throw NoSuchPreferenceError.forKey(key)
 
@@ -512,6 +519,9 @@ open class SettingsPreferencesManagerImpl(
 
         const val VERO2_FIRMWARE_VERSIONS_KEY = "Vero2FirmwareVersions"
         const val VERO2_FIRMWARE_VERSIONS_DEFAULT = ""
+
+        const val LAST_INSTRUCTION_ID_KEY = "LastInstructionId"
+        const val LAST_INSTRUCTION_ID_DEFAULT = ""
 
     }
 

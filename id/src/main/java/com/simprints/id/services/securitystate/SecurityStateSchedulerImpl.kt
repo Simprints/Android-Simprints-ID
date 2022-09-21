@@ -9,6 +9,16 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
 
     private val workManager = WorkManager.getInstance(context)
 
+    override fun getSecurityStateCheck() {
+        workManager.enqueueUniqueWork(
+            WORK_NAME_ONE_TIME,
+            ExistingWorkPolicy.KEEP,
+            OneTimeWorkRequestBuilder<SecurityStateWorker>()
+                .setConstraints(workerConstraints())
+                .build()
+        )
+    }
+
     override fun scheduleSecurityStateCheck() {
         workManager.enqueueUniquePeriodicWork(
             WORK_NAME,
@@ -22,12 +32,9 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
     }
 
     private fun buildWork(): PeriodicWorkRequest {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
 
         return PeriodicWorkRequestBuilder<SecurityStateWorker>(REPEAT_INTERVAL, TimeUnit.MINUTES)
-            .setConstraints(constraints)
+            .setConstraints(workerConstraints())
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
                 PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
@@ -35,8 +42,14 @@ class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
             ).build()
     }
 
+    private fun workerConstraints(): Constraints =
+        Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
     private companion object {
         const val WORK_NAME = "security-status-check-work"
+        const val WORK_NAME_ONE_TIME = "security-status-check-work-one-time"
         const val REPEAT_INTERVAL = BuildConfig.SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES
     }
 

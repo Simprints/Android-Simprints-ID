@@ -1,11 +1,9 @@
 package com.simprints.id.domain.moduleapi.app
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppResponse
 import org.junit.Test
 
 class DomainToModuleApiAppResponseTest {

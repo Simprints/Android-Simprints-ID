@@ -19,8 +19,8 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCapt
 import com.simprints.id.orchestrator.cache.HotCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
 import javax.inject.Inject
+import kotlinx.coroutines.flow.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl @Inject constructor(
