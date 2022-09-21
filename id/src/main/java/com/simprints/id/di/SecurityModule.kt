@@ -35,8 +35,11 @@ import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Singleton
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class SecurityModule {
 

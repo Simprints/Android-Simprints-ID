@@ -9,6 +9,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
@@ -19,7 +20,8 @@ import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-open class Application : CoreApplication() {
+@HiltAndroidApp
+open class Application: CoreApplication() {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
