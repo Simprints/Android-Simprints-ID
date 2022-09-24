@@ -71,7 +71,7 @@ androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", ver
 androidX-navigation-dynamicfeatures = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "androidx_navigation_version" }
 
 #Annotation
-androidX-annotation-annotation = "androidx.annotation:annotation:1.4.0"
+androidX-annotation-annotation = "androidx.annotation:annotation:1.5.0"
 
 #sqlite
 androidX-sqlite = "androidx.sqlite:sqlite:2.2.0"
