@@ -1,11 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.GROUP
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.domain.modality.Modality.FACE
-import com.simprints.core.domain.modality.Modality.FINGER
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER
@@ -26,7 +21,6 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.*
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.login.LoginManager
-import com.simprints.id.testtools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
