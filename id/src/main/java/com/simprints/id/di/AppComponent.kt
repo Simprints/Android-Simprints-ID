@@ -38,8 +38,6 @@ import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.license.repository.LicenseRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.secure.ProjectAuthenticatorImpl
@@ -47,6 +45,7 @@ import com.simprints.id.services.config.RemoteConfigWorker
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
@@ -65,6 +64,10 @@ import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.license.LicenseModule
+import com.simprints.infra.license.LicenseRepository
+import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.ImagesModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -84,6 +87,8 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         NetworkModule::class,
         SafetyNetModule::class,
         SecurityManagerModule::class,
+        LicenseModule::class,
+        ImagesModule::class,
         RealmModule::class,
         ConfigManagerModule::class,
         DataStoreModule::class
@@ -155,6 +160,7 @@ interface AppComponent {
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(preferencesManager: IdPreferencesManager)
     fun inject(remoteConfigWorker: RemoteConfigWorker)
+    fun inject(enrolmentRecordWorker: EnrolmentRecordWorker)
     fun inject(storeUserLocationIntoCurrentSessionWorker: StoreUserLocationIntoCurrentSessionWorker)
 
     fun getSessionEventsManager(): EventRepository

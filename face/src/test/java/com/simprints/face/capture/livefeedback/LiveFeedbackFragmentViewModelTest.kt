@@ -17,6 +17,7 @@ import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.Event
+import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEvent
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
@@ -28,15 +29,7 @@ import com.simprints.face.models.Size
 import com.simprints.infra.config.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.CapturingSlot
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
-import io.mockk.verifySequence
+import io.mockk.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -223,7 +216,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureEvent1) {
+                with(it as FaceCaptureEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[1]?.id)
                     assertThat(startTime).isEqualTo(2)
                     assertThat(endTime).isEqualTo(3)
                     assertThat(isFallback).isEqualTo(false)
@@ -240,7 +234,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureBiometricsEvent1) {
+                with(it as FaceCaptureBiometricsEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[1]?.id)
                     assertThat(startTime).isEqualTo(2)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(eventFace).isNotNull()
@@ -249,7 +244,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureEvent2) {
+                with(it as FaceCaptureEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[2]?.id)
                     assertThat(startTime).isEqualTo(4)
                     assertThat(endTime).isEqualTo(5)
                     assertThat(isFallback).isEqualTo(false)
@@ -266,7 +262,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureBiometricsEvent2) {
+                with(it as FaceCaptureBiometricsEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[2]?.id)
                     assertThat(startTime).isEqualTo(4)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(eventFace).isNotNull()
@@ -277,7 +274,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureEvent3) {
+                with(it as FaceCaptureEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[0]?.id)
                     assertThat(startTime).isEqualTo(0)
                     assertThat(endTime).isEqualTo(1)
                     assertThat(isFallback).isEqualTo(true)
@@ -294,7 +292,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
             faceSessionEventsManager.addEvent(match {
-                with(faceCaptureBiometricsEvent3) {
+                with(it as FaceCaptureBiometricsEvent) {
+                    assertThat(payloadId).isEqualTo(currentDetectionObserver.observedValues[0]?.id)
                     assertThat(startTime).isEqualTo(0)
                     assertThat(endTime).isEqualTo(0)
                     assertThat(eventFace).isNotNull()

@@ -2,6 +2,8 @@ package com.simprints.id.orchestrator
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
+import androidx.work.WorkManager
+import com.simprints.core.domain.modality.Modality
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
@@ -18,6 +20,8 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
+import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
+import splitties.init.appCtx
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 
 open class OrchestratorManagerImpl(
@@ -106,6 +110,9 @@ open class OrchestratorManagerImpl(
                     startStep(potentialNextStep)
                 } else {
                     buildAppResponseAndUpdateDailyActivity()
+                    // Acquiring location info could take long time. so we should cancel StoreUserLocationIntoCurrentSessionWorker
+                    // before returning to the caller app to avoid creating empty sessions.
+                    WorkManager.getInstance(appCtx).cancelAllWorkByTag(STORE_USER_LOCATION_WORKER_TAG)
                 }
             }
         }

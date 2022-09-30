@@ -1,6 +1,6 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
-import java.util.Date
+import java.util.*
 
 sealed class DashboardSyncCardState(open val lastTimeSyncSucceed: Date?) {
 

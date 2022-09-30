@@ -1,6 +1,10 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality.FACE
+import com.simprints.core.domain.modality.Modality.FINGER
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
@@ -15,6 +19,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.*
 import com.simprints.infra.login.LoginManager
+import com.simprints.id.testtools.TestTimeHelperImpl
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

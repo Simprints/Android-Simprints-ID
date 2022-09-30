@@ -10,8 +10,9 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
@@ -30,10 +31,14 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Singleton
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class SecurityModule {
 
@@ -103,9 +108,11 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateRemoteDataSource(
         loginManager: LoginManager,
+        settingsPreferencesManager: SettingsPreferencesManager,
         context: Context
     ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
         loginManager,
+        settingsPreferencesManager,
         context.deviceId
     )
 
@@ -134,10 +141,12 @@ open class SecurityModule {
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
         subjectRepository: SubjectRepository,
+        enrolmentRecordScheduler: EnrolmentRecordScheduler,
         signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
         subjectRepository,
+        enrolmentRecordScheduler,
         signerManager
     )
 

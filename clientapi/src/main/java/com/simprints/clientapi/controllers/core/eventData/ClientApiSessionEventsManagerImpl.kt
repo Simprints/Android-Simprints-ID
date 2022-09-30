@@ -19,10 +19,11 @@ import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
-class ClientApiSessionEventsManagerImpl(
+class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
     private val hotCache: HotCache,

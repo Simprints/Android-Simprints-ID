@@ -28,6 +28,7 @@ import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -39,10 +40,14 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class ViewModelModule {
 

@@ -5,8 +5,6 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.activities.odk.getConfidencesFlagsString
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest

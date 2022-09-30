@@ -19,6 +19,9 @@ import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
+import com.simprints.id.services.config.RemoteConfigScheduler
+import com.simprints.id.services.config.RemoteConfigSchedulerImpl
+import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
@@ -41,7 +44,7 @@ class DebugActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var loginManager: LoginManager
-
+    lateinit var securityStateScheduler: SecurityStateScheduler
     @Inject
     lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
 
@@ -92,6 +95,10 @@ class DebugActivity : BaseSplitActivity() {
 
         binding.syncSchedule.setOnClickListener {
             eventSyncManager.scheduleSync()
+        }
+
+        binding.syncDevice.setOnClickListener {
+            securityStateScheduler.getSecurityStateCheck()
         }
 
         binding.syncStart.setOnClickListener {
@@ -147,6 +154,15 @@ class DebugActivity : BaseSplitActivity() {
             }
             binding.logs.append("\nGot Configs from BFSID")
         }
+
+        wm.getWorkInfosForUniqueWorkLiveData(RemoteConfigSchedulerImpl.WORK_NAME_ONE_TIME)
+            .observe(this) { workInfos ->
+                binding.logs.append(
+                    workInfos.joinToString("", "\n") { workInfo ->
+                        "${workInfo.id.toString().take(5)} - ${workInfo.state}"
+                    }
+                )
+            }
     }
 
     private fun getRandomColor(): String =

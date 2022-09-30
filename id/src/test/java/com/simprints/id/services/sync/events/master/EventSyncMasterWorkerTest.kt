@@ -8,6 +8,8 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.services.sync.events.common.*
+import com.simprints.id.domain.SimprintsSyncSetting
+import com.simprints.id.domain.CosyncSetting
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType

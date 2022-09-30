@@ -45,7 +45,10 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class SyncModule {
 

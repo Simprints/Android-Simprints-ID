@@ -6,8 +6,9 @@ import com.simprints.core.tools.time.TimeHelper
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class KronosTimeHelperImpl(private val clock: KronosClock) : TimeHelper {
+class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) : TimeHelper {
 
     init {
         clock.syncInBackground()

@@ -1,8 +1,8 @@
 package com.simprints.clientapi.clientrequests.builders
 
+import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import org.junit.Assert
 
 class ConfirmIdentifyBuilderTest : SimprintsRequestBuilderTest(ConfirmIdentityFactory) {
