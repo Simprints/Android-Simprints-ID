@@ -18,6 +18,8 @@ import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStat
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -196,4 +198,8 @@ open class SyncModule {
     @Provides
     open fun provideImageUpSyncScheduler(context: Context): ImageUpSyncScheduler =
         ImageUpSyncSchedulerImpl(context)
+
+    @Provides
+    fun provideEnrolmentRecordScheduler(context: Context): EnrolmentRecordScheduler =
+        EnrolmentRecordSchedulerImpl(context)
 }
