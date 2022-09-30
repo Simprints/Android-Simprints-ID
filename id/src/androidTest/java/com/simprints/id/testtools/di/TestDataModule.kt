@@ -7,9 +7,7 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.di.DataModule
-import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.testtools.common.di.DependencyRule
@@ -31,14 +29,6 @@ class TestDataModule(
             subjectLocalDataSource,
             eventRemoteDataSource
         )
-    }
-
-    override fun provideImageRepository(
-        context: Context,
-        configManager: ConfigManager,
-        loginManager: LoginManager
-    ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, configManager, loginManager)
     }
 
     override fun provideLongConsentLocalDataSource(

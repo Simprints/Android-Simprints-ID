@@ -1,6 +1,5 @@
 package com.simprints.id.activities.alert
 
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository

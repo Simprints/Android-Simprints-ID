@@ -19,8 +19,6 @@ import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.config.RemoteConfigScheduler
-import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
@@ -155,7 +153,7 @@ class DebugActivity : BaseSplitActivity() {
             binding.logs.append("\nGot Configs from BFSID")
         }
 
-        wm.getWorkInfosForUniqueWorkLiveData(RemoteConfigSchedulerImpl.WORK_NAME_ONE_TIME)
+        wm.getWorkInfosForUniqueWorkLiveData("project-configuration-work")
             .observe(this) { workInfos ->
                 binding.logs.append(
                     workInfos.joinToString("", "\n") { workInfo ->
