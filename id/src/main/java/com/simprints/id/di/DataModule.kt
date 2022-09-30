@@ -95,6 +95,6 @@ open class DataModule {
         EventSyncStatusDatabase.getDatabase(ctx)
 
     @Provides
-    fun provideEnrolmentRecordRemoteDataSource(loginManager: LoginManager): EnrolmentRecordRemoteDataSource =
+    open fun provideEnrolmentRecordRemoteDataSource(loginManager: LoginManager): EnrolmentRecordRemoteDataSource =
         EnrolmentRecordRemoteDataSourceImpl(loginManager)
 }
