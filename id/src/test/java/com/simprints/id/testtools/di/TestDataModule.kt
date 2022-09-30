@@ -7,10 +7,7 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
-import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.testtools.common.di.DependencyRule

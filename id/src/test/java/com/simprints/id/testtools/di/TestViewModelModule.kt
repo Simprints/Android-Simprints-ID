@@ -14,8 +14,6 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.SignerManager
