@@ -5,61 +5,16 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImpl.Companion.SESSION_ID
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImpl.Companion.SHARED_PREF_KEY
-import com.simprints.id.data.prefs.IdPreferencesManager
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Test
 
 class SharedPreferencesManagerImplTest {
 
     @Test
-    fun `sync settings should call the core preferences manager`() {
-
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
-
-        val preferencesManagerImpl =
-            SharedPreferencesManagerImpl(mockk(relaxed = true), idPreferenceSpy)
-
-        @Suppress("UNUSED_VARIABLE")
-        val settings = preferencesManagerImpl.simprintsSyncSetting
-
-        verify(exactly = 1) { idPreferenceSpy.simprintsSyncSetting }
-    }
-
-    @Test
-    fun `co sync settings should call the core preferences manager`() {
-
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
-
-        val preferencesManagerImpl =
-            SharedPreferencesManagerImpl(mockk(relaxed = true), idPreferenceSpy)
-
-        @Suppress("UNUSED_VARIABLE")
-        val settings = preferencesManagerImpl.cosyncSyncSettings
-
-        verify(exactly = 1) { idPreferenceSpy.cosyncSyncSetting }
-    }
-
-    @Test
-    fun `modalities settings should call the core preferences manager`() {
-
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
-
-        val preferencesManagerImpl =
-            SharedPreferencesManagerImpl(mockk(relaxed = true), idPreferenceSpy)
-
-        @Suppress("UNUSED_VARIABLE")
-        val settings = preferencesManagerImpl.modalities
-
-        verify(exactly = 1) { idPreferenceSpy.modalities }
-    }
-
-    @Test
     fun `stash session ID should put session ID in shared prefs`() {
 
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
         val sharedPrefSpy = mockk<SharedPreferences>()
 
         val contextMock = mockk<Context>(relaxed = true) {
@@ -68,7 +23,7 @@ class SharedPreferencesManagerImplTest {
 
 
         val preferencesManagerImpl =
-            SharedPreferencesManagerImpl(contextMock, idPreferenceSpy)
+            SharedPreferencesManagerImpl(contextMock)
 
         val sessionID = "session_id"
 
@@ -80,7 +35,6 @@ class SharedPreferencesManagerImplTest {
     @Test
     fun `peek session ID should return session ID from shared prefs`() {
 
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
         val sharedPrefSpy = mockk<SharedPreferences>()
 
         val contextMock = mockk<Context>(relaxed = true) {
@@ -89,7 +43,7 @@ class SharedPreferencesManagerImplTest {
 
 
         val preferencesManagerImpl =
-            SharedPreferencesManagerImpl(contextMock, idPreferenceSpy)
+            SharedPreferencesManagerImpl(contextMock)
 
         preferencesManagerImpl.peekSessionId()
 
@@ -99,7 +53,6 @@ class SharedPreferencesManagerImplTest {
     @Test
     fun `pop session ID should pop session ID in shared prefs`() {
 
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
         val sharedPrefSpy = mockk<SharedPreferences>()
 
         val contextMock = mockk<Context>(relaxed = true) {
@@ -108,7 +61,7 @@ class SharedPreferencesManagerImplTest {
 
 
         val preferencesManagerImpl =
-            SharedPreferencesManagerImpl(contextMock, idPreferenceSpy)
+            SharedPreferencesManagerImpl(contextMock)
         
         preferencesManagerImpl.popSessionId()
 
@@ -118,12 +71,9 @@ class SharedPreferencesManagerImplTest {
 
     @Test
     fun `shared prefs should be private`() {
-
-        val idPreferenceSpy = spyk<IdPreferencesManager>()
-
         val contextMock = mockk<Context>(relaxed = true)
 
-        SharedPreferencesManagerImpl(contextMock, idPreferenceSpy)
+        SharedPreferencesManagerImpl(contextMock)
 
         verify(exactly = 1) {
             contextMock.getSharedPreferences(

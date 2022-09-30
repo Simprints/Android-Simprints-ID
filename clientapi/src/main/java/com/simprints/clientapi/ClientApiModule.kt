@@ -22,6 +22,8 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.id.Application
 import com.simprints.id.di.*
+import com.simprints.infra.config.ConfigManagerModule
+import com.simprints.infra.config.DataStoreModule
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
@@ -49,7 +51,9 @@ import javax.inject.Singleton
         LoginManagerModule::class,
         SafetyNetModule::class,
         NetworkModule::class,
-        ClientApiDispatcherModule::class
+        ClientApiDispatcherModule::class,
+        ConfigManagerModule::class,
+        DataStoreModule::class
     ]
 )
 @Singleton
