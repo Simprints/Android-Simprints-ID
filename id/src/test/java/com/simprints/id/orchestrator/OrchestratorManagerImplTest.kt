@@ -8,6 +8,10 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.WorkManager
+import com.simprints.core.domain.modality.Modality
+import com.simprints.core.domain.modality.Modality.FACE
+import com.simprints.core.domain.modality.Modality.FINGER
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
@@ -23,6 +27,7 @@ import com.simprints.id.orchestrator.steps.Step.Status.*
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
+import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -41,6 +46,7 @@ import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
+import splitties.init.appCtx
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
@@ -76,6 +82,11 @@ class OrchestratorManagerImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        mockkStatic(WorkManager::class)
+        mockkStatic("splitties.init.AppCtxKt")
+        every { appCtx } returns mockk()
+
+        every { WorkManager.getInstance(any()) } returns workManagerMock
 
         UnitTestConfig()
             .coroutinesMainThread()
@@ -110,6 +121,7 @@ class OrchestratorManagerImplTest {
         }
 
         verifyOrchestratorTriedToBuildFinalAppResponse()
+        verifyOrchestratorTriedToCancelAllLocationWorkers()
     }
 
     @Test
@@ -290,14 +302,9 @@ class OrchestratorManagerImplTest {
         }
 
     private fun verifyOrchestratorTriedToBuildFinalAppResponse() =
-        coVerify(exactly = 1) {
-            appResponseFactoryMock.buildAppResponse(
-                any(),
-                any(),
-                any(),
-                any()
-            )
-        }
+        coVerify(exactly = 1) { appResponseFactoryMock.buildAppResponse(any(), any(), any(), any()) }
+    private fun  verifyOrchestratorTriedToCancelAllLocationWorkers()=
+        verify(exactly = 1) { workManagerMock.cancelAllWorkByTag(STORE_USER_LOCATION_WORKER_TAG) }
 
     private fun prepareModalFlowForFaceEnrol() {
         every { modalityFlowMock.getNextStepToLaunch() } answers {

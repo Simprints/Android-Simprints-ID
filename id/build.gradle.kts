@@ -9,7 +9,7 @@ plugins {
     id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-  //  id("com.google.dagger.hilt.android")
+    id("dagger.hilt.android.plugin")
 }
 
 apply {
@@ -81,6 +81,7 @@ android {
         resources.excludes.add("META-INF/AL2.0")
         resources.excludes.add("META-INF/LGPL2.1")
         resources.excludes.add("META-INF/licenses/ASM")
+        resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
     }
 
     buildFeatures.viewBinding = true
@@ -113,6 +114,8 @@ dependencies {
     implementation(project(":infranetwork"))
     implementation(project(":infrarealm"))
     implementation(project(":infrasecurity"))
+    implementation(project(":infralicense"))
+    implementation(project(":infraimages"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
@@ -133,8 +136,15 @@ dependencies {
 
     implementation(libs.rxJava2.core)
     kapt(libs.androidX.room.compiler)
-    kapt(libs.dagger.compiler)
+
+
+    // Service Location & DI
+    implementation(libs.koin.core)
     implementation(libs.koin.android)
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
+    kapt(libs.dagger.compiler)
+
     implementation(libs.fuzzywuzzy.core)
     implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)

@@ -5,13 +5,11 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.local.models.DbEvent
+import com.simprints.eventsystem.event.local.models.fromDbToDomain
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -45,15 +43,27 @@ class EventLocalDataSourceImplTest {
     }
 
     @Test
-    fun loadWithAQuery() {
-        runBlocking {
+    fun loadWithAQuery() = runTest {
+        eventLocalDataSource.loadAll()
 
-            eventLocalDataSource.loadAll()
-
-            coVerify {
-                eventDao.loadAll()
-            }
+        coVerify {
+            eventDao.loadAll()
         }
+    }
+
+    @Test
+    fun loadOpenedSessions() = runTest {
+        mockkStatic("com.simprints.eventsystem.event.local.models.DbEventKt")
+        val dbSessionCaptureEvent = mockk<DbEvent>{
+            every { type } returns  SESSION_CAPTURE
+            every { fromDbToDomain() } returns mockk()
+        }
+        coEvery { eventDao.loadOpenedSessions() } returns listOf(dbSessionCaptureEvent)
+        eventLocalDataSource.loadOpenedSessions()
+
+        coVerify { eventDao.loadOpenedSessions() }
+        verify { dbSessionCaptureEvent.fromDbToDomain()  }
+
     }
 
     @Test

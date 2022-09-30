@@ -269,14 +269,25 @@ open class EventRepositoryImpl(
         eventLocalDataSource.delete(eventsIds)
     }
 
-    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
+    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
+        reportException {
+            cachedCaptureSessionEvent()
+                ?: localCaptureSessionEvent()
+                ?: createSession()
+
+        }
+
+    private fun cachedCaptureSessionEvent() =
         sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
-            .firstOrNull()
-            ?: loadSessions(false).firstOrNull()?.also { session ->
-                loadEventsIntoCache(session.id)
+            .maxByOrNull {
+                it.payload.createdAt
             }
-            ?: createSession()
-    }
+
+    private suspend fun localCaptureSessionEvent() =
+        loadOpenedSessions().firstOrNull()?.also { session ->
+            loadEventsIntoCache(session.id)
+        }
+
 
     override suspend fun getEventsFromSession(sessionId: String): Flow<Event> =
         reportException {
@@ -295,7 +306,7 @@ open class EventRepositoryImpl(
      */
     private suspend fun closeAllSessions(reason: Reason) {
         sessionDataCache.eventCache.clear()
-        loadSessions(false).collect { closeSession(it, reason) }
+        loadOpenedSessions().collect { closeSession(it, reason) }
     }
 
     override suspend fun closeCurrentSession(reason: Reason?) {
@@ -318,8 +329,8 @@ open class EventRepositoryImpl(
         saveEvent(sessionCaptureEvent, sessionCaptureEvent)
     }
 
-    private suspend fun loadSessions(isClosed: Boolean): Flow<SessionCaptureEvent> {
-        return eventLocalDataSource.loadAllSessions(isClosed).map { it as SessionCaptureEvent }
+    private suspend fun loadOpenedSessions(): Flow<SessionCaptureEvent> {
+        return eventLocalDataSource.loadOpenedSessions().map { it as SessionCaptureEvent }
     }
 
     private suspend fun loadEventsIntoCache(sessionId: String) {

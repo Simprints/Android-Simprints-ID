@@ -7,7 +7,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import java.util.UUID
+import java.util.*
 
 data class FaceDetection(
     val frame: PreviewFrame,
@@ -54,7 +54,7 @@ data class FaceDetection(
             face?.format?.fromDomainToModuleApi() ?: IFaceTemplateFormat.RANK_ONE_1_23
         )
 
-    fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float, payloadId: String): FaceCaptureEvent =
+    fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float): FaceCaptureEvent =
         FaceCaptureEvent(
             detectionStartTime,
             detectionEndTime,
@@ -63,14 +63,14 @@ data class FaceDetection(
             FaceCaptureEvent.Result.fromFaceDetectionStatus(status),
             isFallback,
             FaceCaptureEvent.EventFace.fromFaceDetectionFace(face),
-            payloadId = payloadId
+            payloadId = id
         )
 
-    fun toFaceCaptureBiometricsEvent(payloadId: String): FaceCaptureBiometricsEvent =
+    fun toFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent =
         FaceCaptureBiometricsEvent(
             startTime = detectionStartTime,
             eventFace = FaceCaptureBiometricsEvent.EventFace.fromFaceDetectionFace(face)!!,
-            payloadId = payloadId
+            payloadId = id
         )
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING

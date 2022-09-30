@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.id.data.license.repository.LicenseRepository
-import com.simprints.id.data.license.repository.LicenseState
-import com.simprints.id.data.license.repository.LicenseVendor
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.license.LicenseRepository
+import com.simprints.infra.license.LicenseState
+import com.simprints.infra.license.LicenseVendor
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch

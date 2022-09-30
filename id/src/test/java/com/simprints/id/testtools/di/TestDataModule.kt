@@ -8,6 +8,7 @@ import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSou
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.data.images.repository.ImageRepository
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
@@ -19,8 +20,7 @@ class TestDataModule(
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
-    private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
+    private val personRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
 
     override fun provideSubjectRepository(
@@ -31,14 +31,6 @@ class TestDataModule(
             subjectLocalDataSource,
             eventRemoteDataSource
         )
-    }
-
-    override fun provideImageRepository(
-        context: Context,
-        configManager: ConfigManager,
-        loginManager: LoginManager
-    ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, configManager, loginManager)
     }
 
     override fun provideLongConsentLocalDataSource(

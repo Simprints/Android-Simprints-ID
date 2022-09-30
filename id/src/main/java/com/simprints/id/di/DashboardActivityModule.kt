@@ -24,7 +24,10 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class DashboardActivityModule {
 

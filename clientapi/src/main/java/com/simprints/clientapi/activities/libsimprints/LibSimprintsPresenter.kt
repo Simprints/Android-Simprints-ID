@@ -22,13 +22,15 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LibSimprintsPresenter(
-    private val view: LibSimprintsContract.View,
-    private val action: LibSimprintsAction,
+class LibSimprintsPresenter @AssistedInject constructor(
+    @Assisted private val view: LibSimprintsContract.View,
+    @Assisted private val action: LibSimprintsAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     rootManager: SecurityManager,
     private val timeHelper: ClientApiTimeHelper,

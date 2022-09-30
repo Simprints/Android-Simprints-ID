@@ -22,6 +22,7 @@ import io.mockk.mockk
 import io.realm.Realm
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -129,7 +130,8 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count(SubjectQuery(subjectId = fakePerson.subjectId))
+        val count =
+            subjectLocalDataSource.count(SubjectQuery(subjectId = fakePerson.subjectId.toString()))
         assertThat(count).isEqualTo(1)
     }
 
@@ -161,8 +163,14 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         ).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
-                verifyIdentity(fakePerson1, find { it.patientId == fakePerson1.subjectId }!!)
-                verifyIdentity(fakePerson2, find { it.patientId == fakePerson2.subjectId }!!)
+                verifyIdentity(
+                    fakePerson1,
+                    find { it.patientId == fakePerson1.subjectId.toString() }!!
+                )
+                verifyIdentity(
+                    fakePerson2,
+                    find { it.patientId == fakePerson2.subjectId.toString() }!!
+                )
             }
         }
     }
@@ -178,8 +186,14 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         val faceRecords = faceIdentityDataSource.loadFaceIdentities(SubjectQuery()).toList()
         realm.executeTransaction {
             with(faceRecords) {
-                verifyIdentity(fakePerson1, find { it.personId == fakePerson1.subjectId }!!)
-                verifyIdentity(fakePerson2, find { it.personId == fakePerson2.subjectId }!!)
+                verifyIdentity(
+                    fakePerson1,
+                    find { it.personId == fakePerson1.subjectId.toString() }!!
+                )
+                verifyIdentity(
+                    fakePerson2,
+                    find { it.personId == fakePerson2.subjectId.toString() }!!
+                )
             }
         }
     }
@@ -237,7 +251,7 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePerson(realm, subject2)
 
         subjectLocalDataSource.delete(
-            listOf(SubjectQuery(subjectId = subject1.subjectId))
+            listOf(SubjectQuery(subjectId = subject1.subjectId.toString()))
         )
 
         val peopleCount = subjectLocalDataSource.count()
@@ -254,14 +268,57 @@ class SubjectLocalDataSourceImplTest : RealmTestsBase() {
         assertThat(peopleCount).isEqualTo(0)
     }
 
+    @Test
+    fun shouldSortBySubjects() = runTest {
+        val subjects = getRandomPeople(10)
+        val sortedSubjects = subjects.sortedBy { it.subjectId }
+
+        saveFakePeople(realm, subjects)
+
+        var receivedSubjects = subjectLocalDataSource.load(SubjectQuery(sort = true)).toList()
+        assertThat(receivedSubjects).isEqualTo(sortedSubjects)
+
+        subjectLocalDataSource.deleteAll()
+        // Reinsert in another order to ensure
+
+        saveFakePeople(realm, subjects.sortedBy { it.attendantId })
+
+        receivedSubjects = subjectLocalDataSource.load(SubjectQuery(sort = true)).toList()
+        assertThat(receivedSubjects).isEqualTo(sortedSubjects)
+    }
+
+    @Test
+    fun shouldReturnTheSubjectsInSubjectIds() = runTest {
+        val subjects = getRandomPeople(10)
+        saveFakePeople(realm, subjects)
+
+        val expectedSubjects = subjects.slice(IntRange(0, 2))
+        val receivedSubjects = subjectLocalDataSource.load(
+            SubjectQuery(subjectIds = expectedSubjects.map { it.subjectId })
+        ).toList()
+        assertThat(receivedSubjects).isEqualTo(expectedSubjects)
+    }
+
+    @Test
+    fun shouldReturnTheSubjectsAfterTheGivenOne() = runTest {
+        val subjects = getRandomPeople(10).sortedBy { it.subjectId }
+        saveFakePeople(realm, subjects)
+
+        val expectedSubjects = subjects.slice(IntRange(5, 9))
+        val receivedSubjects = subjectLocalDataSource.load(
+            SubjectQuery(afterSubjectId = subjects[4].subjectId)
+        ).toList()
+        assertThat(receivedSubjects).isEqualTo(expectedSubjects)
+    }
+
     private fun verifyIdentity(subject: DbSubject, fingerprintIdentity: FingerprintIdentity) {
         assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(subject.fingerprintSamples.count())
-        assertThat(fingerprintIdentity.patientId).isEqualTo(subject.subjectId)
+        assertThat(fingerprintIdentity.patientId).isEqualTo(subject.subjectId.toString())
     }
 
     private fun verifyIdentity(subject: DbSubject, faceIdentity: FaceIdentity) {
         assertThat(faceIdentity.faces.count()).isEqualTo(subject.faceSamples.count())
-        assertThat(faceIdentity.personId).isEqualTo(subject.subjectId)
+        assertThat(faceIdentity.personId).isEqualTo(subject.subjectId.toString())
     }
 
 }

@@ -53,7 +53,7 @@ class FetchGuidHelperImplTest {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
             }
         }
-        runBlocking {
+        runTest {
             mockProgressEmission(emptyList())
         }
     }
@@ -72,7 +72,14 @@ class FetchGuidHelperImplTest {
 
             fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
 
-            coVerify { subjectRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, GUID1)) }
+            coVerify {
+                subjectRepository.load(
+                    SubjectQuery(
+                        DEFAULT_PROJECT_ID,
+                        GUID1
+                    )
+                )
+            }
         }
     }
 
@@ -96,7 +103,7 @@ class FetchGuidHelperImplTest {
 
     @Test
     fun fetchGuid_subjectNotPresentInLocalDb_shouldFetchRemotely() {
-        runBlocking {
+        runTest {
             coEvery {
                 subjectRepository.load(
                     SubjectQuery(
@@ -127,7 +134,7 @@ class FetchGuidHelperImplTest {
 
     @Test
     fun fetchGuid_afterFetchingRemotely_shouldTryLoadingTheSubjectFromTheDb() {
-        runBlocking {
+        runTest {
             coEvery {
                 subjectRepository.load(
                     SubjectQuery(
@@ -154,7 +161,7 @@ class FetchGuidHelperImplTest {
 
     @Test
     fun fetchGuid_afterFetchingRemotely_shouldReturnSubjectIfItWasFetched() {
-        runBlocking {
+        runTest {
             coEvery {
                 subjectRepository.load(
                     SubjectQuery(
@@ -181,7 +188,7 @@ class FetchGuidHelperImplTest {
 
     @Test
     fun fetchGuid_anythingGoesWrong_shouldReturnNotFound() {
-        runBlocking {
+        runTest {
             coEvery {
                 subjectRepository.load(
                     SubjectQuery(
@@ -197,24 +204,22 @@ class FetchGuidHelperImplTest {
     }
 
     @Test
-    fun fetchGuid_downSyncFails_shouldReturnNotFound() {
-        runBlocking {
-            coEvery {
-                subjectRepository.load(
-                    SubjectQuery(
-                        DEFAULT_PROJECT_ID,
-                        GUID1
-                    )
+    fun fetchGuid_downSyncFails_shouldReturnNotFound() = runTest {
+        coEvery {
+            subjectRepository.load(
+                SubjectQuery(
+                    DEFAULT_PROJECT_ID,
+                    GUID1
                 )
-            } throws Throwable("IO exception")
-            val channel = Channel<EventDownSyncProgress>()
-            coEvery { downSyncHelper.downSync(any(), any()) } returns channel
-            channel.close()
+            )
+        } throws Throwable("IO exception")
+        val channel = Channel<EventDownSyncProgress>()
+        coEvery { downSyncHelper.downSync(any(), any()) } returns channel
+        channel.close()
 
-            val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+        val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
 
-            assertThat(result).isEqualTo(SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE))
-        }
+        assertThat(result).isEqualTo(SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE))
     }
 
     private suspend fun mockProgressEmission(progressEvents: List<EventDownSyncProgress>) {

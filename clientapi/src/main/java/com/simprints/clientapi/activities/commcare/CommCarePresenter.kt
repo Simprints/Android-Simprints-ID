@@ -21,13 +21,15 @@ import com.simprints.infra.security.SecurityManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CommCarePresenter(
-    private val view: CommCareContract.View,
-    private val action: CommCareAction,
+class CommCarePresenter @AssistedInject constructor(
+    @Assisted private val view: CommCareContract.View,
+    @Assisted private val action: CommCareAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     private val sharedPreferencesManager: SharedPreferencesManager,
     private val jsonHelper: JsonHelper,
@@ -35,7 +37,7 @@ class CommCarePresenter(
     private val timeHelper: ClientApiTimeHelper,
     rootManager: SecurityManager,
     configManager: ConfigManager,
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    @Assisted private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,

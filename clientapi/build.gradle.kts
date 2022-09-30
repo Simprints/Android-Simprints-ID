@@ -16,6 +16,9 @@ sonarqube {
 }
 
 android {
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
+    }
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -51,11 +54,13 @@ dependencies {
     implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
+    implementation(project(":infrarealm"))
+    implementation(project(":infranetwork"))
     implementation(libs.libsimprints)
 
-    // Service Location
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
+    // DI
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     // Support
     implementation(libs.androidX.appcompat)
@@ -86,7 +91,6 @@ dependencies {
 
 
     testImplementation(libs.testing.espresso.intents)
-    testImplementation(libs.testing.koin)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.core)
@@ -100,9 +104,7 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
 
-    androidTestImplementation(libs.testing.koin)
     androidTestImplementation(libs.testing.truth)
-
 }
 
 configurations {
