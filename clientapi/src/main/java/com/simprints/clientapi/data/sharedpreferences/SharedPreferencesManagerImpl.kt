@@ -2,21 +2,15 @@ package com.simprints.clientapi.data.sharedpreferences
 
 import android.content.Context
 import androidx.core.content.edit
-import com.simprints.core.domain.modality.Modality
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.domain.CosyncSetting
-import com.simprints.id.domain.SimprintsSyncSetting
 import javax.inject.Inject
 
-class SharedPreferencesManagerImpl(context: Context) : SharedPreferencesManager {
-
 class SharedPreferencesManagerImpl @Inject constructor(
-    context: Context,
-    private val corePreferencesManager: IdPreferencesManager
+    context: Context
 ) : SharedPreferencesManager {
 
     companion object {
-        internal const val SHARED_PREF_KEY = "client_api_shared_pref_80094647-bf24-4927-a527-c77b9664a250"
+        internal const val SHARED_PREF_KEY =
+            "client_api_shared_pref_80094647-bf24-4927-a527-c77b9664a250"
 
         internal const val SESSION_ID = "session_id"
     }
