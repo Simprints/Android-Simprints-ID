@@ -15,19 +15,9 @@ class SecurityStateRepositoryImpl(
     private val localDataSource: SecurityStateLocalDataSource
 ) : SecurityStateRepository {
 
-    override var securityStatusChannel: Channel<SecurityState.Status> = Channel(Channel.CONFLATED)
-
-    init {
-        CoroutineScope(Dispatchers.Main).launch {
-            val securityStatus = localDataSource.securityStatus
-            securityStatusChannel.update(securityStatus)
-        }
-    }
-
-    override suspend fun getSecurityState(): SecurityState {
+    override suspend fun getSecurityStatusFromRemote(): SecurityState {
         return remoteDataSource.getSecurityState().also {
             localDataSource.securityStatus = it.status
-            securityStatusChannel.update(it.status)
         }
     }
 
