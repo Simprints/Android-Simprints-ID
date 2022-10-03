@@ -186,6 +186,9 @@ class DebugActivity : BaseSplitActivity() {
     private fun setSecurityStatus(status: SecurityState.Status) {
         lifecycleScope.launch {
             securityStateRepository.securityStatus=status
+            securityStateProcessor.processSecurityState(
+                SecurityState("device-id", status)
+            )
         }
     }
 
