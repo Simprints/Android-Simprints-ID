@@ -115,11 +115,7 @@ class CheckLoginFromIntentPresenterTest {
 
             securityStateRepository = securityStateRepositoryMock
             val channel = Channel<Status>(capacity = Channel.UNLIMITED)
-            coEvery { securityStateRepositoryMock.securityStatusChannel } returns channel
-            runBlocking {
-                channel.send(RUNNING)
-                channel.close()
-            }
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns RUNNING
 
             appRequest = AppVerifyRequest(
                 DEFAULT_PROJECT_ID,
