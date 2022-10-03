@@ -19,7 +19,6 @@ import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.securitystate.SecurityStateScheduler
