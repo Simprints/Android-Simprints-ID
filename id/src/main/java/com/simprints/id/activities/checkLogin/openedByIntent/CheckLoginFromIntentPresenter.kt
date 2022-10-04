@@ -1,7 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -27,7 +26,6 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
-import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -237,7 +235,9 @@ class CheckLoginFromIntentPresenter(
             )
 
     private fun matchProjectIdsOrThrow(storedProjectId: String, intentProjectId: String): Boolean =
-        storedProjectId == intentProjectId ||
+        if (storedProjectId == intentProjectId)
+            true
+        else
             throw DifferentProjectIdSignedInException()
 
     /** @throws DifferentUserIdSignedInException */
