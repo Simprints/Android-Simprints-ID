@@ -14,12 +14,9 @@ import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
-import com.simprints.infra.config.ConfigManager
 import com.simprints.face.models.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import com.simprints.infra.config.ConfigManager
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LiveFeedbackFragmentViewModel(
@@ -103,7 +100,7 @@ class LiveFeedbackFragmentViewModel(
         previewFrame: PreviewFrame
     ): FaceDetection {
         return if (potentialFace == null) {
-            FaceDetection(previewFrame, potentialFace, FaceDetection.Status.NOFACE)
+            FaceDetection(previewFrame, null, FaceDetection.Status.NOFACE)
         } else {
             getFaceDetection(potentialFace, previewFrame)
         }
@@ -169,18 +166,14 @@ class LiveFeedbackFragmentViewModel(
         viewModelScope.launch(dispatcher) {
             val projectConfiguration = configManager.getProjectConfiguration()
             // The payloads of these two events need to have the same ids
-            val payloadId = randomUUID()
             val faceCaptureEvent =
                 faceDetection.toFaceCaptureEvent(
                     mainVM.attemptNumber,
                     projectConfiguration.face!!.qualityThreshold.toFloat(),
-                    payloadId
                 )
 
             val faceCaptureBiometricsEvent =
-                if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent(
-                    payloadId
-                ) else null
+                if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent() else null
 
             faceSessionEventsManager.addEvent(faceCaptureEvent)
             faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
