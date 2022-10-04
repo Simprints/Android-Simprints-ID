@@ -31,8 +31,8 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
-import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
+import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired

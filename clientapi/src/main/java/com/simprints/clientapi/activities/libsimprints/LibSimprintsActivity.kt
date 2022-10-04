@@ -2,33 +2,33 @@ package com.simprints.clientapi.activities.libsimprints
 
 import android.content.Intent
 import android.os.Bundle
+import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Companion.buildLibSimprintsAction
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
-import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Verification
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
+import com.simprints.libsimprints.*
+import com.simprints.id.Application
+import javax.inject.Inject
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     private val action: LibSimprintsAction
         get() = buildLibSimprintsAction(intent.action)
 
-    override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
+    @Inject
+    lateinit var libSimprintsPresenterFactory: ClientApiComponent.LibSimprintsPresenterFactory
+
+    override val presenter: LibSimprintsContract.Presenter by lazy {
+        libSimprintsPresenterFactory.create(this, action)
+    }
 
     override val guidSelectionNotifier = DefaultGuidSelectionNotifier(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
         super.onCreate(savedInstanceState)
-        loadClientApiKoinModules()
     }
 
     override fun returnRegistration(
@@ -130,11 +130,6 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
             }
         )
         finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unloadClientApiKoinModules()
     }
 
 }

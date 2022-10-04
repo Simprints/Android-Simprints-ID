@@ -3,7 +3,6 @@ package com.simprints.face.match
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -21,6 +20,7 @@ import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.match.rankone.RankOneFaceMatcher
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

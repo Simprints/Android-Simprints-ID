@@ -12,12 +12,12 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestViewModelModule(

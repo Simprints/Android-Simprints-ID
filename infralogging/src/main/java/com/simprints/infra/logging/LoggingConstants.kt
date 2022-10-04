@@ -9,9 +9,10 @@ object LoggingConstants {
      * merged into a single set a keys on the next Firebase overhaul.
      */
     object CrashReportingCustomKeys {
-        const val PROJECT_ID = "Project ID"
         const val USER_ID = "User ID"
+        const val PROJECT_ID = "Project ID"
         const val MODULE_IDS = "Module IDs"
+        const val DEVICE_ID = "Device ID"
         const val SUBJECTS_DOWN_SYNC_TRIGGERS = "People down sync triggers"
         const val SESSION_ID = "Session ID"
         const val FINGERS_SELECTED = "Fingers selected"
@@ -29,6 +30,7 @@ object LoggingConstants {
 
     enum class CrashReportTag {
         LOGIN,
+        LOGOUT,
         SCANNER_SETUP,
         SYNC,
         SESSION,

@@ -8,7 +8,6 @@ import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
-import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -19,6 +18,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex

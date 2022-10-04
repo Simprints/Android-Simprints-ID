@@ -9,13 +9,11 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.infra.realm.RealmWrapper
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.images.repository.ImageRepository
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
-import com.simprints.id.network.ImageUrlProvider
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.realm.RealmWrapper
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.mockk
 
@@ -26,8 +24,7 @@ class TestDataModule(
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
-    private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
+    private val personRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
 
     override fun provideProjectLocalDataSource(
@@ -65,14 +62,6 @@ class TestDataModule(
             subjectLocalDataSource,
             eventRemoteDataSource
         )
-    }
-
-    override fun provideImageRepository(
-        context: Context,
-        imageUrlProvider: ImageUrlProvider,
-        loginManager: LoginManager
-    ): ImageRepository = imageRepositoryRule.resolveDependency {
-        super.provideImageRepository(context, imageUrlProvider, loginManager)
     }
 
     override fun provideLongConsentLocalDataSource(

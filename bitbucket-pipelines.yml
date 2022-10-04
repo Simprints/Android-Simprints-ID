@@ -69,6 +69,8 @@ definitions:
                     - ./gradlew infranetwork:jacocoTestReport
                     - ./gradlew infrarealm:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
+                    - ./gradlew infralicense:jacocoTestReport
+                    - ./gradlew infraimages:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
@@ -78,6 +80,8 @@ definitions:
                     - infranetwork/build/reports/**
                     - infrarealm/build/reports/**
                     - infrasecurity/build/reports/**
+                    - infralicense/build/reports/**
+                    - infraimages/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -166,9 +170,9 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew :eventsystem:projectHealth
                     - ./gradlew :core:projectHealth
-                    - ./gradlew :clientapi:projectHealth
-                    - ./gradlew :face:projectHealth
-                    - ./gradlew :fingerprint:projectHealth
+#                    - ./gradlew :clientapi:projectHealth
+#                    - ./gradlew :face:projectHealth
+#                    - ./gradlew :fingerprint:projectHealth
                     - ./gradlew :fingerprintscanner:projectHealth
                     - ./gradlew :fingerprintmatcher:projectHealth
                     - ./gradlew :fingerprintscannermock:projectHealth
@@ -198,8 +202,8 @@ definitions:
                     - ./gradlew id:assembleDebugAndroidTest
                     - mv id/build/outputs/apk/androidTest/debug/id-debug-androidTest.apk id-debug-androidTest.apk
                     # Build Client API Android Test APK
-                    - ./gradlew clientapi:assembleDebugAndroidTest
-                    - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk
+                    # - ./gradlew clientapi:assembleDebugAndroidTest
+                    # - mv clientapi/build/outputs/apk/androidTest/debug/clientapi-debug-androidTest.apk clientapi-debug-androidTest.apk
                     # Build Fingerprint Android Test APK
                     - ./gradlew fingerprint:assembleDebugAndroidTest
                     - mv fingerprint/build/outputs/apk/androidTest/debug/fingerprint-debug-androidTest.apk fingerprint-debug-androidTest.apk
@@ -212,7 +216,7 @@ definitions:
                 artifacts:
                     - universal.apk
                     - id-debug-androidTest.apk
-                    - clientapi-debug-androidTest.apk
+                    # - clientapi-debug-androidTest.apk
                     - fingerprint-debug-androidTest.apk
                     - face-debug-androidTest.apk
 
@@ -227,7 +231,7 @@ definitions:
                     - bash ./ci/pipeline/setup_gcloud
                     - mv ./*.apk ./ci/firebasetestlab/
                     - cd ./ci/firebasetestlab/
-                    - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk clientapi:clientapi-debug-androidTest.apk face:face-debug-androidTest.apk
+                    - ./run_all_android_tests universal.apk id:id-debug-androidTest.apk fingerprint:fingerprint-debug-androidTest.apk face:face-debug-androidTest.apk
                 artifacts:
                     - ci/pipeline/test-reports/**
 
@@ -358,7 +362,6 @@ flows:
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-module-unit-tests
-                    -   step: *dependency-health-check
                     -   step: *build-and-sign-universal-apk
             -   parallel:
                     -   step: *upload-sonar-scan-and-check-quality-gate

@@ -12,12 +12,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
 
-class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
-                          val subjectRepository: SubjectRepository,
-                          val preferencesManager: IdPreferencesManager
+class FetchGuidHelperImpl(
+    private val downSyncHelper: EventDownSyncHelper,
+    val subjectRepository: SubjectRepository,
+    val preferencesManager: IdPreferencesManager
 ) : FetchGuidHelper {
 
-    override suspend fun loadFromRemoteIfNeeded(coroutineScope: CoroutineScope, projectId: String, subjectId: String): SubjectFetchResult {
+    override suspend fun loadFromRemoteIfNeeded(
+        coroutineScope: CoroutineScope,
+        projectId: String,
+        subjectId: String
+    ): SubjectFetchResult {
         return try {
             val subjectResultFromDB = fetchFromLocalDb(projectId, subjectId)
             Simber.d("[FETCH_GUID] Fetching $subjectId")
@@ -57,8 +62,13 @@ class FetchGuidHelperImpl(private val downSyncHelper: EventDownSyncHelper,
         }
     }
 
-    private suspend fun fetchFromLocalDb(projectId: String, subjectId: String): SubjectFetchResult? {
-        val subject = subjectRepository.load(SubjectQuery(projectId = projectId, subjectId = subjectId)).toList().firstOrNull()
+    private suspend fun fetchFromLocalDb(
+        projectId: String,
+        subjectId: String
+    ): SubjectFetchResult? {
+        val subject = subjectRepository.load(
+            SubjectQuery(projectId = projectId, subjectId = subjectId)
+        ).toList().firstOrNull()
         return subject?.let {
             SubjectFetchResult(subject, LOCAL)
         }

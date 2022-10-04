@@ -23,7 +23,6 @@ class SecurityStateRepositoryImplTest {
 
     @MockK lateinit var mockRemoteDataSource: SecurityStateRemoteDataSource
     @MockK lateinit var mockLocalDataSource: SecurityStateLocalDataSource
-    @MockK lateinit var mockChannel: Channel<SecurityState.Status>
 
     private lateinit var repository: SecurityStateRepositoryImpl
 
@@ -32,9 +31,7 @@ class SecurityStateRepositoryImplTest {
         MockKAnnotations.init(this)
         Dispatchers.setMain(Dispatchers.Unconfined)
 
-        repository = SecurityStateRepositoryImpl(mockRemoteDataSource, mockLocalDataSource).apply {
-            securityStatusChannel = mockChannel
-        }
+        repository = SecurityStateRepositoryImpl(mockRemoteDataSource, mockLocalDataSource)
     }
 
     @Test
@@ -42,7 +39,7 @@ class SecurityStateRepositoryImplTest {
         val expected = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
         coEvery { mockRemoteDataSource.getSecurityState() } returns expected
 
-        val securityState = repository.getSecurityState()
+        val securityState = repository.getSecurityStatusFromRemote()
 
         assertThat(securityState).isEqualTo(expected)
     }
@@ -53,7 +50,7 @@ class SecurityStateRepositoryImplTest {
         val state = SecurityState(DEVICE_ID, status)
         coEvery { mockRemoteDataSource.getSecurityState() } returns state
 
-        repository.getSecurityState()
+        repository.getSecurityStatusFromRemote()
 
         verify { mockLocalDataSource.securityStatus = status }
     }
@@ -65,7 +62,7 @@ class SecurityStateRepositoryImplTest {
         } throws SyncCloudIntegrationException(cause = Exception())
 
         runBlocking {
-            repository.getSecurityState()
+            repository.getSecurityStatusFromRemote()
         }
     }
 
@@ -74,7 +71,7 @@ class SecurityStateRepositoryImplTest {
         coEvery { mockRemoteDataSource.getSecurityState() } throws HttpException(mockk())
 
         runBlocking {
-            repository.getSecurityState()
+            repository.getSecurityStatusFromRemote()
         }
     }
 
@@ -83,9 +80,10 @@ class SecurityStateRepositoryImplTest {
         val securityState = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
         coEvery { mockRemoteDataSource.getSecurityState() } returns securityState
 
-        repository.getSecurityState()
+       val remoteState = repository.getSecurityStatusFromRemote()
 
-        coVerify { mockChannel.send(securityState.status) }
+        assertThat(securityState).isEqualTo(remoteState
+        )
     }
 
     @After

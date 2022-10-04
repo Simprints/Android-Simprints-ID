@@ -12,11 +12,7 @@ import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
-import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
-import com.simprints.moduleapi.face.responses.IFaceConfigurationResponse
-import com.simprints.moduleapi.face.responses.IFaceErrorReason
-import com.simprints.moduleapi.face.responses.IFaceErrorResponse
-import com.simprints.moduleapi.face.responses.IFaceMatchResponse
+import com.simprints.moduleapi.face.responses.*
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
@@ -24,7 +20,7 @@ import io.mockk.mockk
 import io.mockk.spyk
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
+import java.util.*
 
 class FaceOrchestratorViewModelTest {
     private val viewModel = spyk(FaceOrchestratorViewModel())

@@ -13,7 +13,6 @@ import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
