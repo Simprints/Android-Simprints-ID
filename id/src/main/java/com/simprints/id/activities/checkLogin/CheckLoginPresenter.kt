@@ -81,11 +81,10 @@ abstract class CheckLoginPresenter(
         LanguageHelper.language = configManager.getProjectConfiguration().general.defaultLanguage
     }
 
-    private suspend fun checkStatusForDeviceAndProject() {
-        for (status in securityStateRepository.securityStatusChannel) {
-            if (status.isCompromisedOrProjectEnded())
-                handleNotSignedInUser()
-        }
+    private fun checkStatusForDeviceAndProject() {
+        val status = securityStateRepository.getSecurityStatusFromLocal()
+        if (status.isCompromisedOrProjectEnded())
+            handleNotSignedInUser()
     }
 
     abstract fun handleNotSignedInUser()

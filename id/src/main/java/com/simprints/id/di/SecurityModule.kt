@@ -71,7 +71,7 @@ open class SecurityModule {
     open fun provideLoginActivityHelper(
         securityStateRepository: SecurityStateRepository,
         jsonHelper: JsonHelper
-    ): LoginActivityHelper = LoginActivityHelperImpl(securityStateRepository, jsonHelper)
+    ): LoginActivityHelper = LoginActivityHelperImpl(jsonHelper)
 
     @Provides
     open fun provideProjectAuthenticator(

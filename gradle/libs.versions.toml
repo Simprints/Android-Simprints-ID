@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "1.7.10"
+kotlin_version = "1.7.20"
 androidx_navigation_version = "2.5.2"
 kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.5.1"
@@ -201,8 +201,8 @@ testing-Mockito-inline = { module = "org.mockito:mockito-inline", version.ref = 
 testing-Mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito_version" } #Required to use Mock in AndroidTests
 testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 #Testing-Mockk
-testing-Mockk-core = "io.mockk:mockk:1.13.1"
-testing-Mockk-android = "io.mockk:mockk-android:1.13.1"
+testing-Mockk-core = "io.mockk:mockk:1.13.2"
+testing-Mockk-android = "io.mockk:mockk-android:1.13.2"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
