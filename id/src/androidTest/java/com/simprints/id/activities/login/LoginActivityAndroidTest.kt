@@ -85,7 +85,6 @@ class LoginActivityAndroidTest {
     fun withMissingCredentials_clickSignIn_shouldShowToast() {
         loginActivity {
             withMandatoryCredentialsMissing()
-            withSecurityStatusRunning()
         } clickSignIn {
             missingCredentialsToastIsDisplayed()
         }
@@ -98,7 +97,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdNotMatching()
             typeProjectId("invalid_project_id")
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             projectIdMismatchToastIsDisplayed()
         }
@@ -113,7 +111,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             userIsSignedIn()
         }
@@ -128,7 +125,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             offlineToastIsDisplayed()
         }
@@ -143,7 +139,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             onView(withId(R.id.errorTextView)).check(
                 matches(
@@ -166,7 +161,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             onView(withId(R.id.errorTextView)).check(
                 matches(
@@ -189,7 +183,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             invalidCredentialsToastIsDisplayed()
         }
@@ -204,7 +197,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             serverErrorToastIsDisplayed()
         }
@@ -219,7 +211,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             alertScreenIsLaunched()
         }
@@ -234,7 +225,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             alertScreenIsLaunched()
         }
@@ -249,7 +239,6 @@ class LoginActivityAndroidTest {
             withSuppliedProjectIdAndIntentProjectIdMatching()
             typeProjectId(VALID_PROJECT_ID)
             typeProjectSecret(VALID_PROJECT_SECRET)
-            withSecurityStatusRunning()
         } clickSignIn {
             alertScreenIsLaunched()
         }
