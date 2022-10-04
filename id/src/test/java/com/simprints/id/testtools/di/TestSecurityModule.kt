@@ -1,6 +1,8 @@
 package com.simprints.id.testtools.di
 
+import android.content.Context
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedFile
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityModule
 import com.simprints.infra.security.keyprovider.LocalDbKey
@@ -9,6 +11,7 @@ import dagger.Module
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.testing.TestInstallIn
 import io.mockk.mockk
+import java.io.File
 import javax.inject.Inject
 
 @Module
@@ -36,6 +39,8 @@ class MockSecurityManager @Inject constructor(): SecurityManager {
     override fun checkIfDeviceIsRooted() {
 
     }
+
+    override fun getEncryptedFileBuilder(file: File, context: Context): EncryptedFile = mockk()
 
 
 }

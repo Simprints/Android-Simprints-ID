@@ -65,6 +65,12 @@
                 android:text="Sync Config" />
 
             <Button
+                android:id="@+id/syncDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sync Device" />
+
+            <Button
                 android:id="@+id/syncStop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

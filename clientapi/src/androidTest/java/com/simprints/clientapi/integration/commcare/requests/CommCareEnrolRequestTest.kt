@@ -11,8 +11,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppEnrolRequest
 import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
-import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.clientapi.integration.value
+import com.simprints.moduleapi.app.requests.IAppRequest
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test

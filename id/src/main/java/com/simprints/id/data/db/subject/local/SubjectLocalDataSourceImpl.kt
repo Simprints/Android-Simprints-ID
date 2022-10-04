@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.subject.local
 
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.id.data.db.subject.domain.FaceIdentity
 import com.simprints.id.data.db.subject.domain.FingerprintIdentity
 import com.simprints.id.data.db.subject.domain.Subject
@@ -10,16 +9,20 @@ import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbSubject
 import io.realm.Realm
+import io.realm.RealmAny
 import io.realm.RealmQuery
+import io.realm.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
+import java.util.*
 
 class SubjectLocalDataSourceImpl(
     private val realmWrapper: RealmWrapper
@@ -100,7 +103,12 @@ class SubjectLocalDataSourceImpl(
                             realm.insertOrUpdate(action.subject.fromDomainToDb())
                         }
                         is Deletion -> {
-                            realm.buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                            realm.buildRealmQueryForSubject(
+                                query = SubjectQuery(
+                                    subjectId =
+                                    action.subjectId
+                                )
+                            )
                                 .findAll()
                                 .deleteAllFromRealm()
                         }
@@ -114,8 +122,23 @@ class SubjectLocalDataSourceImpl(
         where(DbSubject::class.java)
             .apply {
                 query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, it) }
+                query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, UUID.fromString(it)) }
+                query.subjectIds?.let { subjectIds ->
+                    this.`in`(
+                        SUBJECT_ID_FIELD,
+                        subjectIds.map { RealmAny.valueOf(UUID.fromString(it)) }.toTypedArray()
+                    )
+                }
                 query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
                 query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
+                query.afterSubjectId?.let {
+                    this.greaterThan(
+                        SUBJECT_ID_FIELD,
+                        UUID.fromString(it)
+                    )
+                }
+
+                if (query.sort)
+                    this.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
             }
 }

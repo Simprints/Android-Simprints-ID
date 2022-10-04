@@ -1,8 +1,8 @@
 package com.simprints.id.data.consent.longconsent.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.LoginManager
 import com.simprints.id.tools.utils.FileUtil
+import com.simprints.infra.login.LoginManager
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.After

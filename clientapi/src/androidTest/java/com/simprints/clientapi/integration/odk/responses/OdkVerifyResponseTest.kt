@@ -5,14 +5,10 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.integration.AppMatchResult
-import com.simprints.clientapi.integration.AppVerifyResponse
-import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
-import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.clientapi.integration.key
-import com.simprints.clientapi.integration.value
 import com.simprints.moduleapi.app.responses.IAppMatchConfidence
+import com.simprints.moduleapi.app.responses.IAppResponseTier
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*

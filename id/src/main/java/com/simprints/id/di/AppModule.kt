@@ -29,11 +29,14 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
+import com.simprints.id.enrolmentrecords.EnrolmentRecordRepository
+import com.simprints.id.enrolmentrecords.EnrolmentRecordRepositoryImpl
+import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.id.network.ImageUrlProvider
+import com.simprints.core.sharedinterfaces.ImageUrlProvider
 import com.simprints.id.network.ImageUrlProviderImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
@@ -60,11 +63,14 @@ import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class AppModule {
 
@@ -100,7 +106,7 @@ open class AppModule {
     @Provides
     @Singleton
     // https://github.com/lyft/Kronos-Android
-    fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
+    fun provideTimeHelper(app: Context): TimeHelper = KronosTimeHelperImpl(
         AndroidClockFactory.createKronosClock(
             app,
             requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),
@@ -256,6 +262,14 @@ open class AppModule {
         encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =
         PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
+
+    @Provides
+    fun provideEnrolmentRecordRepository(
+        context: Context,
+        remoteDataSource: EnrolmentRecordRemoteDataSource,
+        subjectRepository: SubjectRepository,
+    ): EnrolmentRecordRepository =
+        EnrolmentRecordRepositoryImpl(context, remoteDataSource, subjectRepository)
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
