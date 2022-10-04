@@ -154,10 +154,8 @@ class ConsentActivity : BaseSplitActivity() {
 
         binding.consentTextHolderView.text = generalConsentText
 
-        if (!consentConfiguration.allowParentalConsent) {
-            if(binding.tabHost.tabCount >= 2) { // The tab may already be removed.
-                binding.tabHost.removeTabAt(1)
-            }
+        if (!consentConfiguration.allowParentalConsent && binding.tabHost.tabCount >= 2) { // The tab may already be removed.
+            binding.tabHost.removeTabAt(1)
         }
 
         binding.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {

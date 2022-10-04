@@ -1,6 +1,5 @@
 package com.simprints.id.activities.fetchguid
 
-import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
@@ -11,7 +10,6 @@ import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
