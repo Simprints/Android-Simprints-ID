@@ -172,11 +172,10 @@ class LiveFeedbackFragmentViewModel(
                     projectConfiguration.face!!.qualityThreshold.toFloat(),
                 )
 
-            val faceCaptureBiometricsEvent =
-                if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID) faceDetection.toFaceCaptureBiometricsEvent() else null
-
             faceSessionEventsManager.addEvent(faceCaptureEvent)
-            faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
+
+            if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID)
+                faceSessionEventsManager.addEvent(faceDetection.toFaceCaptureBiometricsEvent())
 
             faceDetection.id = faceCaptureEvent.id
         }
