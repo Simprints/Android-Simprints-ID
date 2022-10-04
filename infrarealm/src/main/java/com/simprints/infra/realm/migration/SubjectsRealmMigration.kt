@@ -1,9 +1,6 @@
 package com.simprints.infra.realm.migration
 
 import com.simprints.infra.realm.migration.oldschemas.*
-import com.simprints.infra.realm.models.DbFaceSample
-import com.simprints.infra.realm.models.DbFingerprintSample
-import com.simprints.infra.realm.models.DbSubject
 import io.realm.*
 import io.realm.FieldAttribute.REQUIRED
 import java.util.*
@@ -231,7 +228,7 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             ?.addField(SubjectsSchemaV12.TMP_HAS_PARENT, Boolean::class.java)
 
         // Through the subjects table mark all samples which have a parent
-        realm.where(DbSubject::class.simpleName!!)
+        realm.where(SubjectsSchemaV10.SUBJECT_TABLE)
             .findAll().forEach { subject ->
                 subject.getList(PeopleSchemaV7.PERSON_FIELD_FACE_SAMPLES)
                     .forEach { faceSample ->
@@ -244,11 +241,11 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             }
 
         // Delete all orphans (kind of mean thing to do but needed nonetheless :) )
-        realm.where(DbFaceSample::class.simpleName!!)
+        realm.where(PeopleSchemaV7.FACE_TABLE)
             .notEqualTo(SubjectsSchemaV12.TMP_HAS_PARENT, true)
             .findAll()
             .deleteAllFromRealm()
-        realm.where(DbFingerprintSample::class.simpleName!!)
+        realm.where(PeopleSchemaV7.FINGERPRINT_TABLE)
             .notEqualTo(SubjectsSchemaV12.TMP_HAS_PARENT, true)
             .findAll()
             .deleteAllFromRealm()
