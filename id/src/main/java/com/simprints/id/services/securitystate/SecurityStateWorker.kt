@@ -28,7 +28,7 @@ class SecurityStateWorker(
             crashlyticsLog("Fetching security state")
 
             try {
-                val securityState = repository.getSecurityStatusFromRemote()
+                val securityState = repository.getSecurityState()
                 securityStateProcessor.processSecurityState(securityState)
                 success()
             } catch (t: Throwable) {
