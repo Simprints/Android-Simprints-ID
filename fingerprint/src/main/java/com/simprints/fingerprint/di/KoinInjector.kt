@@ -199,8 +199,6 @@ object KoinInjector {
         }
         single<EncodingUtils> { EncodingUtilsImpl }
 
-        viewModel { OrchestratorViewModel(get(), get(), get(), get(), get()) }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel {
             OrchestratorViewModel(
                 get(),
