@@ -32,7 +32,7 @@ import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCAN
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class ConnectScannerViewModel(
     private val scannerManager: ScannerManager,
@@ -67,10 +67,10 @@ class ConnectScannerViewModel(
     }
 
     fun start(){
-        runBlocking { startSetup() }
+        viewModelScope.launch { startSetup() }
      }
     fun retryConnect() {
-        runBlocking {startSetup()}
+        viewModelScope.launch { startSetup() }
     }
 
     fun startRetryingToConnect() {
@@ -82,7 +82,7 @@ class ConnectScannerViewModel(
         _isConnecting.postValue(true)
         stopConnectingAndResetState()
 
-        viewModelScope.launch(dispatcherProvider.io()) {
+        withContext(dispatcherProvider.io()) {
             try {
                 disconnectVero()
                 checkIfBluetoothIsEnabled()
