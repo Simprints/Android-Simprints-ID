@@ -1,38 +1,46 @@
 package com.simprints.fingerprint.scanner.data
 
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
+import com.simprints.fingerprint.scanner.domain.versions.getAvailableVersionsForDownload
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import io.mockk.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class FirmwareRepositoryTest {
 
     private val firmwareLocalDataSourceMock: FirmwareLocalDataSource = mockk(relaxUnitFun = true)
     private val firmwareRemoteDataSourceMock: FirmwareRemoteDataSource = mockk()
-    private val fingerprintPreferencesMock: FingerprintPreferencesManager = mockk()
+    private val vero2Configuration = mockk<Vero2Configuration>()
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns mockk {
+                every { vero2 } returns vero2Configuration
+            }
+        }
+    }
 
     private val firmwareFileUpdater =
-        FirmwareRepository(
-            firmwareRemoteDataSourceMock, firmwareLocalDataSourceMock,
-            fingerprintPreferencesMock
-        )
+        FirmwareRepository(firmwareRemoteDataSourceMock, firmwareLocalDataSourceMock, configManager)
 
     @Before
     fun setup() {
-        every { fingerprintPreferencesMock.scannerHardwareRevisions } returns RESPONSE_MAP
+        every { vero2Configuration.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_HIGH,
+                STM_VERSION_HIGH,
+                UN20_VERSION_HIGH
+            )
+        )
     }
 
     @Test
     fun updateStoredFirmwareFilesWithLatest_versionsAvailable_downloadsAndSavesFiles() =
-        runBlockingTest {
+        runTest {
             coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
@@ -68,7 +76,7 @@ class FirmwareRepositoryTest {
 
     @Test
     fun updateStoredFirmwareFilesWithLatest_noVersionsAvailable_downloadsNoFiles() =
-        runBlockingTest {
+        runTest {
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
@@ -99,7 +107,7 @@ class FirmwareRepositoryTest {
 
     @Test
     fun updateStoredFirmwareFilesWithLatest_onlyOneVersionsAvailable_downloadsOtherFiles() =
-        runBlockingTest {
+        runTest {
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW_UN20_HIGH
@@ -127,12 +135,12 @@ class FirmwareRepositoryTest {
         }
 
     @Test
-    fun `test cleanUpOldFirmwareFiles should remove all low version firmwares`() {
+    fun `test cleanUpOldFirmwareFiles should remove all low version firmwares`() = runTest {
         //Given
         every {
             firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
         } returns SCANNER_VERSIONS_LOW_AND_HIGH
-        firmwareLocalDataSourceMock.apply{
+        firmwareLocalDataSourceMock.apply {
             every { deleteCypressFirmware(any()) } returns true
             every { deleteStmFirmware(any()) } returns true
             every { deleteUn20Firmware(any()) } returns true
@@ -148,21 +156,23 @@ class FirmwareRepositoryTest {
     }
 
     @Test
-    fun `test cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() {
-        //Given
-        every {
-            firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
-        } returns SCANNER_VERSIONS_HIGH
+    fun `test cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() =
+        runTest {
+            //Given
+            every {
+                firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
+            } returns SCANNER_VERSIONS_HIGH
 
-        // When
-        firmwareFileUpdater.cleanUpOldFirmwareFiles()
-        // Then
-        verify (exactly = 0){
-            firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
-            firmwareLocalDataSourceMock.deleteStmFirmware(CYPRESS_VERSION_LOW)
-            firmwareLocalDataSourceMock.deleteUn20Firmware(CYPRESS_VERSION_LOW)
+            // When
+            firmwareFileUpdater.cleanUpOldFirmwareFiles()
+            // Then
+            verify(exactly = 0) {
+                firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
+                firmwareLocalDataSourceMock.deleteStmFirmware(CYPRESS_VERSION_LOW)
+                firmwareLocalDataSourceMock.deleteUn20Firmware(CYPRESS_VERSION_LOW)
+            }
         }
-    }
+
     companion object {
         private const val HARDWARE_VERSION = "E-1"
         private const val CYPRESS_VERSION_LOW = "1.E-1.0"
@@ -172,18 +182,13 @@ class FirmwareRepositoryTest {
         private const val UN20_VERSION_LOW = "1.E-1.2"
         private const val UN20_VERSION_HIGH = "1.E-1.3"
 
-
-        private val scannerFirmwareVersions =
-            ScannerFirmwareVersions(
-                cypress = CYPRESS_VERSION_HIGH,
-                stm = STM_VERSION_HIGH,
-                un20 = UN20_VERSION_HIGH,
+        private val RESPONSE_MAP = mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_HIGH,
+                STM_VERSION_HIGH,
+                UN20_VERSION_HIGH
             )
-        private val RESPONSE_MAP = ScannerHardwareRevisions().apply {
-            put(HARDWARE_VERSION, scannerFirmwareVersions)
-        }
-
-
+        )
         private val SCANNER_VERSIONS_LOW = mapOf(
             DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
             DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),

@@ -115,7 +115,7 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun start_bluetoothOff_sendsBluetoothOffIssueEvent() {
         setupBluetooth(isEnabled = false)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
@@ -128,7 +128,7 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun start_bluetoothNotSupported_sendsBluetoothNotSupportedAlert() {
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(
             VERO_2,
             connectFailException = BluetoothNotSupportedException()
         )
@@ -144,7 +144,7 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerProgressObserver = viewModel.progress.testObserver()
@@ -167,7 +167,7 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun startVero2_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerProgressObserver = viewModel.progress.testObserver()
@@ -274,7 +274,7 @@ class ConnectScannerViewModelTest : KoinTest {
     @Test
     fun start_scannerConnectFailsWithDisconnectedException_sendsScannerConnectedFailedEvent() {
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(
             VERO_2,
             ScannerDisconnectedException()
         )
@@ -291,7 +291,7 @@ class ConnectScannerViewModelTest : KoinTest {
     fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEvent() {
         val error = Error("Oops")
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, error)
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, error)
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val launchAlertObserver = viewModel.launchAlert.testObserver()
@@ -307,7 +307,7 @@ class ConnectScannerViewModelTest : KoinTest {
     fun start_scannerConnectThrowsOtaAvailableException_sendsOtaAvailableScannerIssue() {
         val e = OtaAvailableException(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
         setupBluetooth(numberOfPairedScanners = 1)
-        every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, e)
+        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, e)
 
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.start()
@@ -367,7 +367,7 @@ class ConnectScannerViewModelTest : KoinTest {
     fun startRetryingToConnect_scannerConnectFails_makesNoMoreThanMaxRetryAttempts() {
         setupBluetooth(numberOfPairedScanners = 1)
         val scannerWrapper = mockScannerWrapper(VERO_1, UnknownScannerIssueException())
-        every { scannerFactory.create(any()) } returns scannerWrapper
+        coEvery { scannerFactory.create(any()) } returns scannerWrapper
 
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.startRetryingToConnect()
@@ -378,9 +378,9 @@ class ConnectScannerViewModelTest : KoinTest {
     private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
         every { bluetoothAdapter.isEnabled() } returns isEnabled
         when (numberOfPairedScanners) {
-            0 -> every { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
-            1 -> every { pairingManager.getPairedScannerAddressToUse() } returns DummyBluetoothDevice.random().address
-            else -> every { pairingManager.getPairedScannerAddressToUse() } throws MultiplePossibleScannersPairedException()
+            0 -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
+            1 -> coEvery { pairingManager.getPairedScannerAddressToUse() } returns DummyBluetoothDevice.random().address
+            else -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws MultiplePossibleScannersPairedException()
         }
     }
 
