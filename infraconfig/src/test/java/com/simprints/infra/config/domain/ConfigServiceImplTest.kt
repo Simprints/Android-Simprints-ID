@@ -7,6 +7,7 @@ import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.testtools.deviceConfiguration
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -46,6 +47,19 @@ class ConfigServiceImplTest {
         coVerify(exactly = 1) { localDataSource.getProject() }
         coVerify(exactly = 1) { localDataSource.saveProject(project) }
         coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
+    }
+
+    @Test
+    fun `should throw the exception if there is an issue`() = runTest {
+        val exception = Exception("exception")
+        coEvery { localDataSource.getProject() } throws exception
+
+        val receivedException = assertThrows<Exception> { configServiceImpl.getProject(PROJECT_ID) }
+
+        assertThat(receivedException).isEqualTo(exception)
+        coVerify(exactly = 1) { localDataSource.getProject() }
+        coVerify(exactly = 0) { localDataSource.saveProject(project) }
+        coVerify(exactly = 0) { remoteDataSource.getProject(PROJECT_ID) }
     }
 
     @Test
