@@ -2,34 +2,39 @@ package com.simprints.fingerprint.scanner.data.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.scanner.data.FirmwareTestData
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class FirmwareRemoteDataSourceTest {
     private val fingerprintFileDownloaderMock: FingerprintFileDownloader = mockk()
-    private val fingerprintPreferencesMock: FingerprintPreferencesManager = mockk()
+    private val fingerprintPreferencesMock = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns mockk {
+                every { vero2 } returns mockk {
+                    every { firmwareVersions } returns RESPONSE_MAP
+                }
+            }
+        }
+    }
 
     private val firmwareRemoteDataSource =
         FirmwareRemoteDataSource(fingerprintFileDownloaderMock, fingerprintPreferencesMock)
 
     @Before
     fun setup() {
-        every { fingerprintPreferencesMock.scannerHardwareRevisions } returns RESPONSE_MAP
         coEvery { fingerprintFileDownloaderMock.getFileUrl(any()) } returns SOME_URL
     }
 
     @Test
-    fun getDownloadableFirmwares_correctlyCallsApiAndTransformsResponse() = runBlockingTest {
+    fun getDownloadableFirmwares_correctlyCallsApiAndTransformsResponse() = runTest {
 
         val response = firmwareRemoteDataSource.getDownloadableFirmwares(
             HARDWARE_VERSION,
@@ -40,7 +45,7 @@ class FirmwareRemoteDataSourceTest {
     }
 
     @Test
-    fun downloadFile_correctlyForwardsDownload() = runBlockingTest {
+    fun downloadFile_correctlyForwardsDownload() = runTest {
         coEvery { fingerprintFileDownloaderMock.download(eq(SOME_URL)) } returns SOME_BIN
 
         val bytes = firmwareRemoteDataSource.downloadFirmware(
@@ -60,15 +65,13 @@ class FirmwareRemoteDataSourceTest {
         private const val STM_VERSION_HIGH = "1.E-1.2"
         private const val UN20_VERSION_HIGH = "1.E-1.3"
 
-        private val scannerFirmwareVersions =
-            ScannerFirmwareVersions(
-                cypress = CYPRESS_VERSION_HIGH,
-                stm = STM_VERSION_HIGH,
-                un20 = UN20_VERSION_HIGH,
+        private val RESPONSE_MAP = mapOf(
+            FirmwareTestData.HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_HIGH,
+                STM_VERSION_HIGH,
+                UN20_VERSION_HIGH
             )
-        private val RESPONSE_MAP = ScannerHardwareRevisions().apply {
-            put(HARDWARE_VERSION, scannerFirmwareVersions)
-        }
+        )
 
         private const val SOME_URL = "some.url.com"
         private val SOME_BIN = byteArrayOf(0x00, 0x01, 0x02)
