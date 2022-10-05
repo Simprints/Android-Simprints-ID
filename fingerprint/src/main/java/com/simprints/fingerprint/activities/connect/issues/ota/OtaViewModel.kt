@@ -3,8 +3,10 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -19,16 +21,18 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.launch
 import kotlin.concurrent.schedule
 
 class OtaViewModel(
     private val scannerManager: ScannerManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
+    private val dispatcherProvider: DispatcherProvider,
     private val fingerprintPreferenceManager: FingerprintPreferencesManager
 ) : ViewModel() {
 
@@ -43,10 +47,23 @@ class OtaViewModel(
     @SuppressLint("CheckResult")
     fun startOta(availableOtas: List<AvailableOta>, currentRetryAttempt: Int) {
         remainingOtas.addAll(availableOtas)
-        Observable.concat(availableOtas.map {
-            it.toScannerObservable().doOnComplete { remainingOtas.remove(it) }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-            onNext = { otaStep ->
+        viewModelScope.launch(dispatcherProvider.io()) {
+            try {
+                availableOtas.asFlow()
+                    .flatMapConcat {
+                        it.toFlowOfSteps().onCompletion { error ->
+                            if (error == null) {
+                                remainingOtas.remove(it)
+                            }
+                        }
+                    }
+                    .onCompletion { error ->
+                        if (error == null) {
+                            progress.postValue(1f)
+                            otaComplete.postEvent()
+                        }
+                    }
+            .collect { otaStep ->
                 Simber.d(otaStep.toString())
                 currentStep = otaStep
                 progress.postValue(
@@ -55,13 +72,11 @@ class OtaViewModel(
                         availableOtas.size
                     )
                 )
-            },
-            onComplete = {
-                progress.postValue(1f)
-                otaComplete.postEvent()
-            },
-            onError = { handleScannerError(it, currentRetryAttempt) }
-        )
+            }
+            } catch (ex: Throwable) {
+                handleScannerError(ex, currentRetryAttempt)
+        }
+        }
     }
 
     private fun targetVersions(availableOta: AvailableOta): String {
@@ -74,20 +89,23 @@ class OtaViewModel(
         }
     }
 
-    private fun AvailableOta.toScannerObservable(): Observable<out OtaStep> = Observable.defer {
+    private fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
         val otaStartedTime = timeHelper.now()
-        when (this) {
-            AvailableOta.CYPRESS -> scannerManager.scannerObservable {
-                performCypressOta(targetVersions(AvailableOta.CYPRESS))
+        return when (this) {
+            AvailableOta.CYPRESS ->
+                scannerManager.scanner.performCypressOta(targetVersions(AvailableOta.CYPRESS))
+            AvailableOta.STM ->
+                scannerManager.scanner.performStmOta(targetVersions(AvailableOta.STM))
+            AvailableOta.UN20 ->
+                scannerManager.scanner.performUn20Ota(targetVersions(AvailableOta.UN20))
+        }.onCompletion { error ->
+            if (error == null) {
+                saveOtaEventInSession(this@toFlowOfSteps, otaStartedTime)
+            } else {
+                saveOtaEventInSession(this@toFlowOfSteps, otaStartedTime, error)
+                throw error
             }
-            AvailableOta.STM -> scannerManager.scannerObservable {
-                performStmOta(targetVersions(AvailableOta.STM))
-            }
-            AvailableOta.UN20 -> scannerManager.scannerObservable {
-                performUn20Ota(targetVersions(AvailableOta.UN20))
-            }
-        }.doOnComplete { saveOtaEventInSession(this, otaStartedTime) }
-            .doOnError { saveOtaEventInSession(this, otaStartedTime, it) }
+        }
     }
 
     private fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {

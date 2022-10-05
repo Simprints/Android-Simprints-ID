@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.activities.connect
 
 import android.content.Intent
-import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
@@ -33,9 +32,10 @@ import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.Application
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.mock.MockTimer
 import io.mockk.*
-import io.reactivex.Completable
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -61,6 +61,11 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     private lateinit var viewModelMock: ConnectScannerViewModel
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
 
     private val mockTimer = MockTimer()
     private val timeHelper: FingerprintTimeHelper = mockk(relaxed = true) {
@@ -76,22 +81,26 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         every { isLiveFeedbackAvailable() } returns false
     }
     private val scannerManager: ScannerManager =
-        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
-            every { checkBluetoothStatus() } returns Completable.complete()
+        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())){
+            coEvery { checkBluetoothStatus() } just Runs
         }
     private val nfcManager: NfcManager = mockk()
 
     @Before
     fun setUp() {
-        scannerManager.scanner = scanner
+       every {  scannerManager.scanner} returns  scanner
 
         viewModelMock = spyk(
             ConnectScannerViewModel(
-                scannerManager, timeHelper, sessionEventsManager, preferencesManager, nfcManager
+                scannerManager,
+                timeHelper,
+                sessionEventsManager,
+                preferencesManager,
+                nfcManager,
+                dispatcherProvider
             )
-        ) {
+        ){
             every { start() } just Runs
-            every { init(any()) } just Runs
             connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
         }
         loadKoinModules(module {
@@ -134,9 +143,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     @Test
-    fun pressBack_handlesAPILevel() {
-        val backButtonBehaviourLiveData =
-            MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
+    fun pressBack_launchesRefusalActivity() {
+        val backButtonBehaviourLiveData = MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
 
         Intents.init()
@@ -145,13 +153,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
         onView(isRoot()).perform(ViewActions.pressBack())
 
-        /**
-         * If the API is above 31 the back button will exit the permissions dialog
-         */
-        if (Build.VERSION.SDK_INT < 31)
-            intended(hasComponent(RefusalActivity::class.java.name))
-        else
-            intended(hasComponent(AlertActivity::class.java.name))
+        intended(hasComponent(RefusalActivity::class.java.name))
 
         Intents.release()
     }
