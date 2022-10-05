@@ -114,8 +114,6 @@ interface AppComponent {
 
         fun build(): AppComponent
     }
-
-    fun getCustomWorkerFactory(): CustomWorkerFactory
     fun getOrchestratorComponent(): OrchestratorComponent.Builder
 
     fun inject(app: Application)

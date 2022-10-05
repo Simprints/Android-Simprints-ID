@@ -1,8 +1,6 @@
 package com.simprints.id
 
 import android.content.Context
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
@@ -84,7 +82,6 @@ open class Application : CoreApplication() {
         handleUndeliverableExceptionInRxJava()
         createApplicationCoroutineScope()
         initKoin()
-        initWorkerManagerConfiguration()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceId)
     }
@@ -118,13 +115,6 @@ open class Application : CoreApplication() {
                 }
             }))
         }
-    }
-
-    private fun initWorkerManagerConfiguration() {
-        val workManagerConfig = Configuration.Builder()
-            .setWorkerFactory(component.getCustomWorkerFactory())
-            .build()
-        WorkManager.initialize(this, workManagerConfig)
     }
 
     private fun Module.defineBuildersForCoreManagers() {
