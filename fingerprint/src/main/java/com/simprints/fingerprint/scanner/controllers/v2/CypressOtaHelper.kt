@@ -6,37 +6,82 @@ import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
+import com.simprints.fingerprint.tools.extensions.delayForOneSecond
 import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 
+
+private typealias CypressStep = FlowCollector<CypressOtaStep>
+
+/**
+ * This class handles Cypress (bluetooth) over the air firmware update, on the fingerprint scanner.
+ * It establishes connection to a scanner, in root-mode, and loads the updated firmware bytes on
+ * the connected Vero 2 scanner.
+ *
+ * @param connectionHelper  for connection operations on the scanner
+ * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
+ */
 class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
-                       private val firmwareLocalDataSource: FirmwareLocalDataSource,
-                       private val timeScheduler: Scheduler = Schedulers.io()) {
+                       private val firmwareLocalDataSource: FirmwareLocalDataSource) {
 
     private var newFirmwareVersion: CypressExtendedFirmwareVersion? = null
 
     /**
-     * Expects a connected scanner in root mode
+     * This function is responsible for performing Cypress firmware updates on Vero 2 Scanner, and
+     * emits a sequence of each step [CypressOtaStep] being processed.
+     *
      * If completes successfully, will finish with a connected scanner in root mode
+     *
+     * @param scanner the connected scanner expected to be in root mode
+     * @param macAddress the scanner's mac address
+     *
+     * @return  a flow of [CypressOtaStep] which represents the sequence of update steps being taken
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Observable<CypressOtaStep> =
-        Observable.just<CypressOtaStep>(CypressOtaStep.EnteringOtaMode)
-            .concatWith(scanner.enterCypressOtaMode().addSmallDelay() thenEmitStep CypressOtaStep.CommencingTransfer)
-            .concatWith(scanner.startCypressOta(firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)).map { CypressOtaStep.TransferInProgress(it) })
-            .concatWith(emitStep(CypressOtaStep.ReconnectingAfterTransfer))
-            .concatWith(connectionHelper.reconnect(scanner, macAddress).addSmallDelay() thenEmitStep CypressOtaStep.ValidatingNewFirmwareVersion)
-            .concatWith(validateCypressFirmwareVersion(firmwareVersion, scanner) thenEmitStep CypressOtaStep.UpdatingUnifiedVersionInformation)
-            .concatWith(updateUnifiedVersionInformation(scanner))
+    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<CypressOtaStep> = flow {
+        enterCypressOtaMode(scanner)
+        transferFirmwareBytes(scanner,firmwareVersion)
+        reconnectAfterTransfer(scanner, macAddress)
+        validateRunningFirmwareVersion(scanner,firmwareVersion)
+        updateFirmwareVersionInfo(scanner)
+    }
 
-    private fun Completable.addSmallDelay() = delay(1, TimeUnit.SECONDS, timeScheduler)
+    private suspend fun CypressStep.enterCypressOtaMode(scanner: Scanner) {
+        emit(CypressOtaStep.EnteringOtaMode)
+        scanner.enterCypressOtaMode().await()
+        delayForOneSecond()
+    }
 
-    private fun validateCypressFirmwareVersion(firmwareVersion: String, scanner: Scanner): Completable =
+    private suspend fun CypressStep.transferFirmwareBytes(scanner: Scanner, firmwareVersion: String) {
+        emit(CypressOtaStep.CommencingTransfer)
+        scanner.startCypressOta(firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion))
+            .map { CypressOtaStep.TransferInProgress(it) }
+            .asFlow()
+            .collect { emit(it) }
+    }
+
+    private suspend fun CypressStep.reconnectAfterTransfer(scanner: Scanner, macAddress: String) {
+        emit(CypressOtaStep.ReconnectingAfterTransfer)
+        connectionHelper.reconnect(scanner, macAddress)
+        delayForOneSecond()
+    }
+
+    private suspend fun CypressStep.validateRunningFirmwareVersion(scanner: Scanner,firmwareVersion: String) {
+        emit(CypressOtaStep.ValidatingNewFirmwareVersion)
+        validateCypressFirmwareVersion(scanner,firmwareVersion)
+    }
+
+    private suspend fun CypressStep.updateFirmwareVersionInfo(scanner: Scanner) {
+        emit(CypressOtaStep.UpdatingUnifiedVersionInformation)
+        updateUnifiedVersionInformation(scanner)
+    }
+
+    private suspend fun validateCypressFirmwareVersion(scanner: Scanner, firmwareVersion: String) =
         scanner.getCypressExtendedFirmwareVersion().flatMapCompletable {
             val actualFirmwareVersion = it.versionAsString
             if (firmwareVersion != actualFirmwareVersion) {
@@ -45,9 +90,9 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
                 newFirmwareVersion = it
                 Completable.complete()
             }
-        }
+        }.await()
 
-    private fun updateUnifiedVersionInformation(scanner: Scanner): Completable =
+    private suspend fun updateUnifiedVersionInformation(scanner: Scanner) =
         scanner.getVersionInformation().flatMapCompletable {
             newFirmwareVersion?.let { newFirmwareVersion ->
                 val oldVersion = it.toScannerVersion()
@@ -55,11 +100,9 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
 
                 scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
             } ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
-        }
+        }.await()
 
     private fun ScannerVersion.updatedWithCypressVersion(cypressFirmware: CypressExtendedFirmwareVersion) =
         copy(firmware = firmware.copy(cypress = cypressFirmware.versionAsString))
 
-    private fun emitStep(step: CypressOtaStep) = Single.just(step)
-    private infix fun Completable.thenEmitStep(step: CypressOtaStep) = andThen(emitStep(step))
 }
