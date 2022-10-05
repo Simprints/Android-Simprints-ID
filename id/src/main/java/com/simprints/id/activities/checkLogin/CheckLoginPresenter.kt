@@ -78,7 +78,7 @@ abstract class CheckLoginPresenter(
     /*We need to override the language in LanguageHelper as it uses the SharedPreferences directly
       rather than using PreferencesManager.*/
     private suspend fun setLanguageInHelper() {
-        LanguageHelper.language = configManager.getProjectConfiguration().general.defaultLanguage
+        LanguageHelper.language = configManager.getDeviceConfiguration().language
     }
 
     private fun checkStatusForDeviceAndProject() {

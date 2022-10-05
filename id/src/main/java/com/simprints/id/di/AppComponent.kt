@@ -40,12 +40,12 @@ import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordWorker
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.config.RemoteConfigWorker
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.services.securitystate.SecurityStateWorker
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker
@@ -57,6 +57,10 @@ import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.ConfigManagerModule
 import com.simprints.infra.config.DataStoreModule
+import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.ImagesModule
+import com.simprints.infra.license.LicenseModule
+import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
@@ -64,10 +68,6 @@ import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
-import com.simprints.infra.license.LicenseModule
-import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.ImagesModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -91,7 +91,7 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         ImagesModule::class,
         RealmModule::class,
         ConfigManagerModule::class,
-        DataStoreModule::class
+        DataStoreModule::class,
     ]
 )
 @Singleton
@@ -115,6 +115,7 @@ interface AppComponent {
         fun build(): AppComponent
     }
 
+    fun getCustomWorkerFactory(): CustomWorkerFactory
     fun getOrchestratorComponent(): OrchestratorComponent.Builder
 
     fun inject(app: Application)
@@ -179,5 +180,4 @@ interface AppComponent {
     fun getConfigManager(): ConfigManager
     fun getSecurityManager(): SecurityManager
     fun getRealmWrapper(): RealmWrapper
-
 }
