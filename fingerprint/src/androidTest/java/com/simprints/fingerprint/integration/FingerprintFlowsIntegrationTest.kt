@@ -65,7 +65,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
             single<ScannerFactory> {
                 spyk(ScannerFactoryImpl(
                     bluetoothAdapter = simulatedBluetoothAdapter,
-                    preferencesManager = mockk(relaxed = true),
+                    configManager = mockk(relaxed = true),
                     scannerUiHelper = mockk(relaxed = true),
                     serialNumberConverter = mockk(relaxed = true),
                     scannerGenerationDeterminer = mockk(relaxed = true),
@@ -75,7 +75,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
                     stmOtaHelper = mockk(relaxed = true),
                     un20OtaHelper = mockk(relaxed = true)
                 )).apply {
-                    every { create(any()) } answers {
+                    coEvery { create(any()) } answers {
                         val macAddress = args[0] as String
                         when (simulationMode) {
                             SimulationMode.V1 -> createScannerV1(macAddress)
