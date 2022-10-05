@@ -3,7 +3,7 @@ package com.simprints.infra.config.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import dagger.assisted.Assisted
@@ -19,7 +19,7 @@ class ConfigurationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val loginManager: LoginManager,
-    private val configManager: ConfigManager,
+    private val configService: ConfigService,
 ) : CoroutineWorker(context, params) {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -35,7 +35,7 @@ class ConfigurationWorker @AssistedInject constructor(
                     return@withContext Result.failure()
                 }
 
-                configManager.refreshProjectConfiguration(projectId)
+                configService.refreshConfiguration(projectId)
                 Simber.tag(tag).i("Successfully refresh the project configuration")
                 Result.success()
             } catch (e: Exception) {
