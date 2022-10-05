@@ -172,12 +172,12 @@ class ScannerWrapperV2(
         }.await()
 
     override suspend fun captureFingerprint(
-        captureFingerprintStrategy: CaptureFingerprintStrategy,
+        captureFingerprintStrategy: CaptureFingerprintStrategy?,
         timeOutMs: Int,
         qualityThreshold: Int
     ): CaptureFingerprintResponse =
         scannerV2
-            .captureFingerprint(captureFingerprintStrategy.deduceCaptureDpi())
+            .captureFingerprint(captureFingerprintStrategy!!.deduceCaptureDpi())
             .ensureCaptureResultOkOrError()
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException()))
@@ -242,9 +242,8 @@ class ScannerWrapperV2(
             }
         }
 
-    override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): AcquireImageResponse =
-        (saveFingerprintImagesStrategy
-            .deduceImageAcquisitionFormat()?.let {
+    override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?): AcquireImageResponse =
+        (saveFingerprintImagesStrategy!!.deduceImageAcquisitionFormat()?.let {
                 scannerV2.acquireImage(it)
                     .map { imageBytes ->
                         AcquireImageResponse(imageBytes.image)
