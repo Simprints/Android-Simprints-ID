@@ -1,77 +1,103 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.infra.logging.Simber
-import io.reactivex.Completable
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.util.UUID
-import java.util.concurrent.TimeUnit
+import java.util.*
 
 /**
- * Helper class for connecting to a Vero 2 with retries.
- * Holds a reference to the [ComponentBluetoothSocket] so that it can be disconnected later.
+ * This is a helper class used to establish bluetooth socket connection, between the android
+ * device and the Vero 2 scanner. It also handles retries and reconnections to the scanner.
+ *
+ * @param bluetoothAdapter  a reference to the [ComponentBluetoothSocket] for connecting and
+ *         disconnecting from the bluetooth socket.
+ * @param dispatcher  a [DispatcherProvider] for specifying which context a coroutine should run
  */
-class ConnectionHelper(private val bluetoothAdapter: ComponentBluetoothAdapter,
-                       private val timeScheduler: Scheduler = Schedulers.io()) {
+class ConnectionHelper(
+    private val bluetoothAdapter: ComponentBluetoothAdapter,
+    private val dispatcher: DispatcherProvider) {
 
     private var socket: ComponentBluetoothSocket? = null
 
     /**
+     * This method establishes socket connection to the given scanner object, using the provided
+     * scanner's mac address and the bluetooth socket [ComponentBluetoothSocket].
+     *
+     * @param scanner   the scanner object that will be connected to via bluetooth socket
+     * @param macAddress  the string value representing the scanner's mac address
+     *
+     * @return  a flow [Flow] representing the connection process that could occur multiple times
+     *                 with retries, hence a flow is primarily used to handle connection retries
+     *
      * @throws ScannerDisconnectedException if could not connect with the scanner
      * @throws ScannerNotPairedException if attempted to connect to a scanner that is not paired
      * @throws BluetoothNotEnabledException if bluetooth is not turned on
      * @throws BluetoothNotSupportedException if bluetooth is not supported on this device (e.g. an emulator)
      */
-    fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Completable =
-        establishConnectedSocket(macAddress, maxRetries)
-            .flatMapCompletable { socket -> connectScannerObjectWithSocket(scanner, socket) }
+    fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<Unit> =
+        establishConnectedSocket(macAddress, maxRetries).map { socket ->
+            connectScannerObjectWithSocket(scanner, socket)
+        }
 
-    private fun establishConnectedSocket(macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Single<ComponentBluetoothSocket> =
-        Single.fromCallable {
+    private fun establishConnectedSocket(macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<ComponentBluetoothSocket> =
+        getPairedDevice(macAddress)
+            .map(::initiateAndReturnSocketConnection)
+            .retry(maxRetries)
+
+    private fun getPairedDevice(macAddress: String): Flow<ComponentBluetoothDevice> =
+        flow {
             if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
             if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
 
             val device = bluetoothAdapter.getRemoteDevice(macAddress)
 
             if (!device.isBonded()) throw ScannerNotPairedException()
-            device
-        }.flatMap { device ->
-            Single.fromCallable {
-                try {
-                    Simber.d("Attempting connect...")
-                    val socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
-                    bluetoothAdapter.cancelDiscovery()
-                    socket.connect()
-                    this.socket = socket
-                    socket
-                } catch (e: IOException) {
-                    throw ScannerDisconnectedException()
-                }
-            }.retry(maxRetries)
+            emit(device)
         }
 
-    private fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket): Completable {
-        Simber.d("Socket connected. Setting up scanner...")
-        return scanner.connect(socket.getInputStream(), socket.getOutputStream())
+    private suspend fun initiateAndReturnSocketConnection(device: ComponentBluetoothDevice): ComponentBluetoothSocket {
+        try {
+            Simber.d("Attempting connect...")
+            val socket = withContext(dispatcher.io()) {
+                device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
+            }
+            bluetoothAdapter.cancelDiscovery()
+            withContext(dispatcher.io()) { socket.connect() }
+            this.socket = socket
+            return socket
+        } catch (e: IOException) {
+            throw ScannerDisconnectedException()
+        }
     }
 
-    fun disconnectScanner(scanner: Scanner): Completable =
-        scanner.disconnect()
-            .doOnComplete { socket?.close() }
 
-    fun reconnect(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Completable =
+    private suspend fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket) {
+        Simber.d("Socket connected. Setting up scanner...")
+        scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
+    }
+
+    suspend fun disconnectScanner(scanner: Scanner) {
+        scanner.disconnect().await()
+        socket?.close()
+    }
+
+    suspend fun reconnect(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES) {
         disconnectScanner(scanner)
-            .delay(RECONNECT_DELAY_MS, TimeUnit.MILLISECONDS, timeScheduler)
-            .andThen(connectScanner(scanner, macAddress, maxRetries))
+        delay(RECONNECT_DELAY_MS)
+        connectScanner(scanner, macAddress, maxRetries).collect()
+    }
 
     companion object {
         val DEFAULT_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
