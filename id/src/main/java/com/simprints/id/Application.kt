@@ -1,6 +1,8 @@
 package com.simprints.id
 
 import android.content.Context
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
@@ -21,7 +23,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 @HiltAndroidApp
-open class Application: CoreApplication() {
+open class Application : CoreApplication() {
 
 //    @Inject
 //    lateinit var workerFactory: HiltWorkerFactory
@@ -65,10 +67,12 @@ open class Application: CoreApplication() {
 //            .setWorkerFactory(workerFactory)
 //            .build()
 
+
     open fun initApplication() {
         createComponent()
         handleUndeliverableExceptionInRxJava()
         initKoin()
+        initWorkerManagerConfiguration()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceId)
     }
@@ -99,6 +103,13 @@ open class Application: CoreApplication() {
                 this.defineBuildersForCoreManagers()
             }))
         }
+    }
+
+    private fun initWorkerManagerConfiguration() {
+        val workManagerConfig = Configuration.Builder()
+            .setWorkerFactory(component.getCustomWorkerFactory())
+            .build()
+        WorkManager.initialize(this, workManagerConfig)
     }
 
     private fun Module.defineBuildersForCoreManagers() {
