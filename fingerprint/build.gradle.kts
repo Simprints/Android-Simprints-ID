@@ -114,11 +114,6 @@ dependencies {
     implementation(libs.workManager.work)
 
     // RxJava
-    implementation(libs.rxJava2.permissions)
-
-    implementation(libs.rxJava2.android)
-    implementation(libs.rxJava2.core)
-    implementation(libs.rxJava2.kotlin)
 
 
 
@@ -181,6 +176,7 @@ dependencies {
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.live.data)
+    androidTestImplementation(libs.testing.coroutines.test)
 
     // Mocking and assertion frameworks
     androidTestImplementation(libs.testing.mockk.core)
