@@ -2,7 +2,7 @@ package com.simprints.infra.config.worker
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.ConfigService
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.testtools.projectConfiguration
 import com.simprints.infra.login.LoginManager
 import io.mockk.coEvery
@@ -18,7 +18,7 @@ class ConfigurationWorkerTest {
     }
 
     private val loginManager = mockk<LoginManager>()
-    private val configService = mockk<ConfigService>()
+    private val configService = mockk<ConfigManager>()
     private val configurationWorker =
         ConfigurationWorker(mockk(), mockk(relaxed = true), loginManager, configService)
 
@@ -33,7 +33,7 @@ class ConfigurationWorkerTest {
     @Test
     fun `should fail if the config service throws an exception`() = runTest {
         every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
-        coEvery { configService.refreshConfiguration(PROJECT_ID) } throws Exception()
+        coEvery { configService.refreshProjectConfiguration(PROJECT_ID) } throws Exception()
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -42,7 +42,7 @@ class ConfigurationWorkerTest {
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
         every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
-        coEvery { configService.refreshConfiguration(PROJECT_ID) } returns projectConfiguration
+        coEvery { configService.refreshProjectConfiguration(PROJECT_ID) } returns projectConfiguration
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())

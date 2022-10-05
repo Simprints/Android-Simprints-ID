@@ -208,7 +208,7 @@ object KoinInjector {
                 get(qualifier = named(Application.APPLICATION_COROUTINE_SCOPE))
             )
         }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
                 get(),
