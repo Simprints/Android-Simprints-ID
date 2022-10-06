@@ -20,7 +20,7 @@ class EnrolmentRecordSchedulerImplTest {
     }
 
     private val ctx = mockk<Context>()
-    private val workManager = mockk<WorkManager>()
+    private val workManager = mockk<WorkManager>(relaxed = true)
     private lateinit var enrolmentRecordSchedulerImpl: EnrolmentRecordSchedulerImpl
 
     @Before
