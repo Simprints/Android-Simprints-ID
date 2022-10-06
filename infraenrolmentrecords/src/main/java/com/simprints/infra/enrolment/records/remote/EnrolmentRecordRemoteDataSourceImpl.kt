@@ -9,11 +9,14 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 
-internal class EnrolmentRecordRemoteDataSourceImpl @Inject constructor(
+internal class EnrolmentRecordRemoteDataSourceImpl(
     private val loginManager: LoginManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
 ) :
     EnrolmentRecordRemoteDataSource {
+
+    @Inject
+    constructor(loginManager: LoginManager) : this(loginManager, EncodingUtilsImpl)
 
     override suspend fun uploadRecords(subjects: List<Subject>) {
         val projectId = loginManager.getSignedInProjectIdOrEmpty()
