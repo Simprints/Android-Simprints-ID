@@ -2,7 +2,7 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import java.io.Serializable
 import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
 

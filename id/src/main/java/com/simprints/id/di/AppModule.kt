@@ -24,11 +24,7 @@ import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
-import com.simprints.id.enrolmentrecords.EnrolmentRecordRepository
-import com.simprints.id.enrolmentrecords.EnrolmentRecordRepositoryImpl
-import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
@@ -54,6 +50,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
@@ -111,15 +108,13 @@ open class AppModule {
     open fun provideDbEventDatabaseFactory(
         ctx: Context,
         secureDataManager: SecurityManager,
-    ): EventDatabaseFactory =
-        DbEventDatabaseFactoryImpl(ctx, secureDataManager)
+    ): EventDatabaseFactory = DbEventDatabaseFactoryImpl(ctx, secureDataManager)
 
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(
         factory: EventDatabaseFactory
-    ): EventLocalDataSource =
-        EventLocalDataSourceImpl(factory)
+    ): EventLocalDataSource = EventLocalDataSourceImpl(factory)
 
     @Provides
     @Singleton
@@ -132,29 +127,26 @@ open class AppModule {
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): EventRepository =
-        EventRepositoryImpl(
-            ctx.deviceId,
-            ctx.packageVersionName,
-            loginManager,
-            eventLocalDataSource,
-            eventRemoteDataSource,
-            timeHelper,
-            validatorFactory,
-            VERSION_NAME,
-            sessionDataCache,
-            configManager,
-        )
+    ): EventRepository = EventRepositoryImpl(
+        ctx.deviceId,
+        ctx.packageVersionName,
+        loginManager,
+        eventLocalDataSource,
+        eventRemoteDataSource,
+        timeHelper,
+        validatorFactory,
+        VERSION_NAME,
+        sessionDataCache,
+        configManager,
+    )
 
     @Provides
     fun provideModuleRepository(
         configManager: ConfigManager,
-        subjectRepository: SubjectRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository
     ): ModuleRepository = ModuleRepositoryImpl(
-        configManager,
-        subjectRepository,
-        eventDownSyncScopeRepository
+        configManager, enrolmentRecordManager, eventDownSyncScopeRepository
     )
 
     @Provides
@@ -163,13 +155,9 @@ open class AppModule {
         loginManager: LoginManager,
         timeHelper: TimeHelper,
         eventRepository: EventRepository
-    ): GuidSelectionManager =
-        GuidSelectionManagerImpl(
-            context.deviceId,
-            loginManager,
-            timeHelper,
-            eventRepository
-        )
+    ): GuidSelectionManager = GuidSelectionManagerImpl(
+        context.deviceId, loginManager, timeHelper, eventRepository
+    )
 
     @Provides
     open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
@@ -177,14 +165,11 @@ open class AppModule {
     @Provides
     open fun provideGuidFetchGuidHelper(
         downSyncHelper: EventDownSyncHelper,
-        subjectRepository: SubjectRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
         configManager: ConfigManager
-    ): FetchGuidHelper =
-        FetchGuidHelperImpl(
-            downSyncHelper,
-            subjectRepository,
-            configManager
-        )
+    ): FetchGuidHelper = FetchGuidHelperImpl(
+        downSyncHelper, enrolmentRecordManager, configManager
+    )
 
     @Provides
     open fun provideDeviceManager(connectivityHelper: ConnectivityHelper): DeviceManager =
@@ -199,9 +184,7 @@ open class AppModule {
 
     @Provides
     open fun provideCameraHelper(
-        context: Context,
-        previewBuilder: QrPreviewBuilder,
-        cameraFocusManager: CameraFocusManager
+        context: Context, previewBuilder: QrPreviewBuilder, cameraFocusManager: CameraFocusManager
     ): CameraHelper = CameraHelperImpl(context, previewBuilder, cameraFocusManager)
 
     @Provides
@@ -236,26 +219,16 @@ open class AppModule {
 
     @Provides
     fun provideEnrolmentHelper(
-        subjectRepository: SubjectRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
         eventRepository: EventRepository,
         timeHelper: TimeHelper
-    ): EnrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, timeHelper)
+    ): EnrolmentHelper = EnrolmentHelperImpl(enrolmentRecordManager, eventRepository, timeHelper)
 
     @Provides
     fun providePersonCreationEventHelper(
-        eventRepository: EventRepository,
-        timeHelper: TimeHelper,
-        encodingUtils: EncodingUtils
+        eventRepository: EventRepository, timeHelper: TimeHelper, encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =
         PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
-
-    @Provides
-    fun provideEnrolmentRecordRepository(
-        context: Context,
-        remoteDataSource: EnrolmentRecordRemoteDataSource,
-        subjectRepository: SubjectRepository,
-    ): EnrolmentRecordRepository =
-        EnrolmentRecordRepositoryImpl(context, remoteDataSource, subjectRepository)
 
     @Provides
     open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()

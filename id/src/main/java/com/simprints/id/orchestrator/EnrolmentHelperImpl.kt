@@ -6,12 +6,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
-import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -20,7 +20,7 @@ import java.util.*
 private const val TAG = "ENROLMENT"
 
 class EnrolmentHelperImpl(
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper
 ) : EnrolmentHelper {
@@ -30,7 +30,7 @@ class EnrolmentHelperImpl(
         registerEvent(subject)
 
         Simber.tag(TAG).d("Create a subject record")
-        subjectRepository.performActions(listOf(SubjectAction.Creation(subject)))
+        enrolmentRecordManager.performActions(listOf(SubjectAction.Creation(subject)))
 
         Simber.tag(TAG).d("Done!")
     }

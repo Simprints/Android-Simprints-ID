@@ -7,7 +7,7 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 
 interface RequestContract {
 
@@ -55,7 +55,7 @@ interface RequestContract {
         fun getProjectIdFromRequest(): String
         suspend fun getEnrolmentCreationEventForSubject(
             subjectId: String,
-            subjectRepository: SubjectRepository,
+            enrolmentRecordManager: EnrolmentRecordManager,
             timeHelper: ClientApiTimeHelper,
             jsonHelper: JsonHelper
         ): String?

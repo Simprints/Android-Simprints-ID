@@ -18,10 +18,10 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.id.testtools.SubjectsGeneratorUtils
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.enrolment.records.domain.models.Subject
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -117,7 +117,7 @@ class EnrolLastBiometricsViewModelTest {
     fun getNextStep_enrolNeverHappened_shouldProduceSuccessState() {
         runTest {
             every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns false
-            val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
+            val newEnrolment = mockk<Subject>()
             every {
                 enrolHelper.buildSubject(
                     any(),
@@ -156,7 +156,7 @@ class EnrolLastBiometricsViewModelTest {
         runTest {
             every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
             val lowerThanHighConfidenceScore = 39f
-            val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
+            val newEnrolment = mockk<Subject>()
             every {
                 enrolHelper.buildSubject(
                     any(),
@@ -198,7 +198,7 @@ class EnrolLastBiometricsViewModelTest {
         runTest {
             every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
             val lowerThanHighConfidenceScore = 39f
-            val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
+            val newEnrolment = mockk<Subject>()
             every {
                 enrolHelper.buildSubject(
                     any(),

@@ -23,7 +23,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
@@ -35,6 +34,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -63,7 +63,7 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var appComponent: AppComponent
 
     @MockK
-    lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -97,8 +97,8 @@ class CheckLoginFromIntentPresenterTest {
             appComponent,
             testCoroutineRule.testCoroutineDispatcher
         ).apply {
-            subjectLocalDataSource = subjectLocalDataSourceMock
-            coEvery { subjectLocalDataSource.count(any()) } returns 0
+            enrolmentRecordManager = this@CheckLoginFromIntentPresenterTest.enrolmentRecordManager
+            coEvery { enrolmentRecordManager.count(any()) } returns 0
 
             recentEventsPreferencesManager = recentEventsPreferencesManagerMock
 
@@ -123,7 +123,6 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
 
             securityStateRepository = securityStateRepositoryMock
-            val channel = Channel<Status>(capacity = Channel.UNLIMITED)
             coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns RUNNING
 
             appRequest = AppVerifyRequest(
@@ -310,7 +309,7 @@ class CheckLoginFromIntentPresenterTest {
             val session = createSessionCaptureEvent(projectId = GUID1)
             coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns session
             coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
-            coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
+            coEvery { enrolmentRecordManager.count(any()) } returns subjectCount
             coEvery { loginManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
             every { generalConfiguration.modalities } returns listOf(
                 Modality.FINGERPRINT,
@@ -361,7 +360,7 @@ class CheckLoginFromIntentPresenterTest {
                 session,
                 callout
             )
-            coEvery { subjectLocalDataSourceMock.count(any()) } returns 2
+            coEvery { enrolmentRecordManager.count(any()) } returns 2
 
             presenter.appRequest = AppVerifyRequest(
                 DEFAULT_PROJECT_ID,

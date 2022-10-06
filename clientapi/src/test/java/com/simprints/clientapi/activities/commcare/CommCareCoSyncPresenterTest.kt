@@ -25,13 +25,13 @@ import com.simprints.eventsystem.event.domain.models.callback.VerificationCallba
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.libsimprints.Constants
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import io.kotlintest.shouldThrow
@@ -166,8 +166,8 @@ class CommCareCoSyncPresenterTest {
                     emptyList(),
                     emptyList()
                 )
-            val subjectRepository = mockk<SubjectRepository>()
-            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+            val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
+            coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
 
             val prefs = mockk<SharedPreferencesManager> {
                 coEvery { peekSessionId() } returns sessionId
@@ -194,7 +194,7 @@ class CommCareCoSyncPresenterTest {
             getNewPresenter(
                 Enrol,
                 sessionEventsManagerMock,
-                subjectRepository = subjectRepository,
+                enrolmentRecordManager = enrolmentRecordManager,
                 coroutineScope = this,
                 sharedPreferencesManager = prefs,
                 configManager = configManager,
@@ -242,8 +242,8 @@ class CommCareCoSyncPresenterTest {
                     emptyList(),
                     emptyList()
                 )
-            val subjectRepository = mockk<SubjectRepository>()
-            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+            val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
+            coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
 
             val prefs = mockk<SharedPreferencesManager> {
                 coEvery { peekSessionId() } returns "sessionId"
@@ -265,7 +265,7 @@ class CommCareCoSyncPresenterTest {
             getNewPresenter(
                 Enrol,
                 sessionEventsManagerMock,
-                subjectRepository = subjectRepository,
+                enrolmentRecordManager = enrolmentRecordManager,
                 coroutineScope = this,
                 sharedPreferencesManager = prefs,
                 configManager = configManager
@@ -317,8 +317,8 @@ class CommCareCoSyncPresenterTest {
                     emptyList(),
                     emptyList()
                 )
-            val subjectRepository = mockk<SubjectRepository>()
-            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+            val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
+            coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
 
             val prefs = mockk<SharedPreferencesManager> {
                 coEvery { peekSessionId() } returns "sessionId"
@@ -338,7 +338,7 @@ class CommCareCoSyncPresenterTest {
             getNewPresenter(
                 Enrol,
                 sessionEventsManagerMock,
-                subjectRepository = subjectRepository,
+                enrolmentRecordManager = enrolmentRecordManager,
                 coroutineScope = this,
                 sharedPreferencesManager = prefs,
                 configManager = configManager
@@ -713,7 +713,7 @@ class CommCareCoSyncPresenterTest {
         action: CommCareAction,
         clientApiSessionEventsManager: ClientApiSessionEventsManager,
         sharedPreferencesManager: SharedPreferencesManager = mockSharedPrefs(),
-        subjectRepository: SubjectRepository = mockk(),
+        enrolmentRecordManager: EnrolmentRecordManager = mockk(),
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         configManager: ConfigManager = mockk(),
     ): CommCarePresenter = CommCarePresenter(
@@ -722,7 +722,7 @@ class CommCareCoSyncPresenterTest {
         clientApiSessionEventsManager,
         sharedPreferencesManager,
         jsonHelper,
-        subjectRepository,
+        enrolmentRecordManager,
         mockTimeHelper(),
         mockk(),
         configManager,

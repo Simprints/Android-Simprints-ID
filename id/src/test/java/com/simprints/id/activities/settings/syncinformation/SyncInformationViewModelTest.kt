@@ -11,7 +11,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncState
@@ -20,12 +19,13 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Frequency.PERIODICALLY
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
@@ -53,7 +53,7 @@ class SyncInformationViewModelTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var subjectRepository: SubjectRepository
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -82,7 +82,7 @@ class SyncInformationViewModelTest {
         viewModel = SyncInformationViewModel(
             downSyncHelper,
             eventRepository,
-            subjectRepository,
+            enrolmentRecordManager,
             projectId,
             eventDownSyncScopeRepository,
             imageRepository,
@@ -139,7 +139,7 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns localCount
+        coEvery { enrolmentRecordManager.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { downSyncHelper.countForDownSync(any()) } returns listOf(
             EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
@@ -177,7 +177,7 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns localCount
+        coEvery { enrolmentRecordManager.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         viewModel.fetchSyncInformation()
@@ -210,7 +210,7 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns localCount
+        coEvery { enrolmentRecordManager.count(any()) } returns localCount
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 any(),
@@ -237,7 +237,7 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any()) } returns 0
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns 0
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns 0
+        coEvery { enrolmentRecordManager.count(any()) } returns 0
         every { imageRepository.getNumberOfImagesToUpload() } returns 0
 
         viewModel.fetchSyncInformation()
@@ -252,7 +252,7 @@ class SyncInformationViewModelTest {
         every { deviceConfiguration.selectedModules } returns listOf(DEFAULT_MODULE_ID)
 
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
-        coVerify(exactly = 2) { subjectRepository.count(any()) }
+        coVerify(exactly = 2) { enrolmentRecordManager.count(any()) }
     }
 
     @Test
@@ -263,7 +263,7 @@ class SyncInformationViewModelTest {
         every { deviceConfiguration.selectedModules } returns listOf(DEFAULT_MODULE_ID)
 
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
-        coVerify(exactly = 0) { subjectRepository.count(any()) }
+        coVerify(exactly = 0) { enrolmentRecordManager.count(any()) }
     }
 
     @Test
@@ -276,7 +276,7 @@ class SyncInformationViewModelTest {
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
-        coVerify(exactly = 2) { subjectRepository.count(any()) }
+        coVerify(exactly = 2) { enrolmentRecordManager.count(any()) }
     }
 
     private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =

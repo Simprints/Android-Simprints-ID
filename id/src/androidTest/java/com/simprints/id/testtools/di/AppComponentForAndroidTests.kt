@@ -8,12 +8,13 @@ import com.simprints.id.activities.qrcapture.QrCaptureActivityAndroidTest
 import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.di.*
 import com.simprints.infra.config.DataStoreModule
+import com.simprints.infra.enrolment.records.EnrolmentRecordsModule
+import com.simprints.infra.images.ImagesModule
+import com.simprints.infra.license.LicenseModule
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
-import com.simprints.infra.license.LicenseModule
-import com.simprints.infra.images.ImagesModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -37,7 +38,8 @@ import javax.inject.Singleton
         DataStoreModule::class,
         TestConfigManagerModule::class,
         LicenseModule::class,
-        ImagesModule::class
+        ImagesModule::class,
+        EnrolmentRecordsModule::class,
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {

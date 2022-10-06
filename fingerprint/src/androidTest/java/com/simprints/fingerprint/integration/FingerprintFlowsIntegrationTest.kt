@@ -21,7 +21,7 @@ import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.SimulationMode
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
