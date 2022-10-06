@@ -13,7 +13,6 @@ import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -25,7 +24,6 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-@ExperimentalCoroutinesApi
 internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var worker: StoreUserLocationIntoCurrentSessionWorker
@@ -43,11 +41,13 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        worker = spyk( TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(
-            app, tags =
-            listOf(STORE_USER_LOCATION_WORKER_TAG)
-        ).build())
-        worker.dispatcherProvider =dispatcherProvider
+        worker = spyk(
+            TestListenableWorkerBuilder<StoreUserLocationIntoCurrentSessionWorker>(
+                app, tags =
+                listOf(STORE_USER_LOCATION_WORKER_TAG)
+            ).build()
+        )
+        worker.dispatcherProvider = dispatcherProvider
         app.component = mockk(relaxed = true)
         mockDependencies()
     }
@@ -76,22 +76,24 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
         coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 
-    @Test (expected = Test.None::class)
-    fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() = runBlocking {
-        every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
-        coEvery {
-            mockEventRepository.getCurrentCaptureSessionEvent()
-        } throws Exception("No session capture event found")
-        worker.doWork()
-        coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
-    }
+    @Test(expected = Test.None::class)
+    fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() =
+        runBlocking {
+            every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
+            coEvery {
+                mockEventRepository.getCurrentCaptureSessionEvent()
+            } throws Exception("No session capture event found")
+            worker.doWork()
+            coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
+        }
 
     @Test
-    fun `storeUserLocationIntoCurrentSession can't save events if  the worker is canceled`() = runBlocking {
-        every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
-        every { worker.isStopped} returns true
-        worker.doWork()
-        coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
-    }
+    fun `storeUserLocationIntoCurrentSession can't save events if  the worker is canceled`() =
+        runBlocking {
+            every { mockLocationManager.requestLocation(any()) } returns flowOf(TestData.buildFakeLocation())
+            every { worker.isStopped } returns true
+            worker.doWork()
+            coVerify(exactly = 0) { mockEventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
+        }
 
 }
