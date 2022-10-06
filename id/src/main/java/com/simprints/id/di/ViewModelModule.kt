@@ -175,12 +175,14 @@ open class ViewModelModule {
     open fun provideDashboardViewModelFactory(
         projectDetailsRepository: DashboardProjectDetailsRepository,
         syncCardStateRepository: DashboardSyncCardStateRepository,
-        dailyActivityRepository: DashboardDailyActivityRepository
+        dailyActivityRepository: DashboardDailyActivityRepository,
+        configManager: ConfigManager,
     ): DashboardViewModelFactory {
         return DashboardViewModelFactory(
             projectDetailsRepository,
             syncCardStateRepository,
-            dailyActivityRepository
+            dailyActivityRepository,
+            configManager
         )
     }
 }

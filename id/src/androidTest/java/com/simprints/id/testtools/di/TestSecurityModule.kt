@@ -6,7 +6,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.SecurityModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.ProjectAuthenticator
@@ -44,7 +43,6 @@ class TestSecurityModule(
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
         simNetwork: SimNetwork,
-        remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = signerManagerRule.resolveDependency {
         super.provideSignerManager(
             configManager,
@@ -56,7 +54,6 @@ class TestSecurityModule(
             longConsentRepository,
             eventRepository,
             simNetwork,
-            remoteConfigWrapper
         )
     }
 

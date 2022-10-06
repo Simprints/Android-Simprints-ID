@@ -110,4 +110,13 @@ class ConfigServiceImplTest {
         configServiceImpl.updateDeviceConfiguration(update)
         coVerify(exactly = 1) { localDataSource.updateDeviceConfiguration(update) }
     }
+
+    @Test
+    fun `clearData should clear all the data`() = runTest {
+        configServiceImpl.clearData()
+
+        coVerify(exactly = 1) { localDataSource.clearProject() }
+        coVerify(exactly = 1) { localDataSource.clearProjectConfiguration() }
+        coVerify(exactly = 1) { localDataSource.clearDeviceConfiguration() }
+    }
 }

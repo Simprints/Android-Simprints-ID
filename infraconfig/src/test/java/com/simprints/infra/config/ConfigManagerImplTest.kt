@@ -86,4 +86,10 @@ class ConfigManagerImplTest {
 
         coVerify(exactly = 1) { configurationScheduler.cancelScheduledSync() }
     }
+
+    @Test
+    fun `clearData should call the correct method`() = runTest {
+       configManager.clearData()
+        coVerify(exactly = 1) { configRepository.clearData() }
+    }
 }

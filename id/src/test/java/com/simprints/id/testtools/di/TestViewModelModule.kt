@@ -36,13 +36,15 @@ class TestViewModelModule(
     override fun provideDashboardViewModelFactory(
         projectDetailsRepository: DashboardProjectDetailsRepository,
         syncCardStateRepository: DashboardSyncCardStateRepository,
-        dailyActivityRepository: DashboardDailyActivityRepository
+        dailyActivityRepository: DashboardDailyActivityRepository,
+        configManager: ConfigManager,
     ): DashboardViewModelFactory {
         return dashboardViewModelFactoryRule.resolveDependency {
             super.provideDashboardViewModelFactory(
                 projectDetailsRepository,
                 syncCardStateRepository,
-                dailyActivityRepository
+                dailyActivityRepository,
+                configManager
             )
         }
     }

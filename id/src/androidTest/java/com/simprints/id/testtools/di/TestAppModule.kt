@@ -25,7 +25,6 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class TestAppModule(
     app: Application,
@@ -125,7 +124,6 @@ class TestAppModule(
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun provideQrCodeProducer(
         qrCodeDetector: QrCodeDetector,
     ): QrCodeProducer = qrCodeProducerRule.resolveDependency {

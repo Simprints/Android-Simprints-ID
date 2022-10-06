@@ -4,7 +4,6 @@ import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -47,9 +46,6 @@ class SignerManagerImplTest {
     @MockK
     lateinit var mockSimNetwork: SimNetwork
 
-    @MockK
-    lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
-
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token(
@@ -72,7 +68,6 @@ class SignerManagerImplTest {
             mockSecurityStateScheduler,
             mockLongConsentRepository,
             mockSimNetwork,
-            mockRemoteConfigWrapper
         )
     }
 
@@ -194,10 +189,10 @@ class SignerManagerImplTest {
     }
 
     @Test
-    fun signOut_clearRemoteConfig() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_clearConfiguration() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        coVerify { mockRemoteConfigWrapper.clearRemoteConfig() }
+        coVerify { configManager.clearData() }
     }
 
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)

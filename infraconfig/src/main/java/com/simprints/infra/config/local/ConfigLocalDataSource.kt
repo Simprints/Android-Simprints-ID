@@ -10,11 +10,17 @@ internal interface ConfigLocalDataSource {
 
     suspend fun getProject(): Project
 
+    suspend fun clearProject()
+
     suspend fun saveProjectConfiguration(config: ProjectConfiguration)
 
     suspend fun getProjectConfiguration(): ProjectConfiguration
 
+    suspend fun clearProjectConfiguration()
+
     suspend fun getDeviceConfiguration(): DeviceConfiguration
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
+
+    suspend fun clearDeviceConfiguration()
 }
