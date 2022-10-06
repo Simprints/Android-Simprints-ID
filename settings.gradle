@@ -18,3 +18,4 @@ include ':id',
     ':infrasecurity',
     ':infralicense',
     ':infraimages'
+include ':infraenrolmentrecords'

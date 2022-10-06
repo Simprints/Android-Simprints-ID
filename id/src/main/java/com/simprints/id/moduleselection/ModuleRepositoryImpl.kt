@@ -1,18 +1,18 @@
 package com.simprints.id.moduleselection
 
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
 
 class ModuleRepositoryImpl(
     private val configManager: ConfigManager,
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository
 ) : ModuleRepository {
 
@@ -47,7 +47,7 @@ class ModuleRepositoryImpl(
         val queries = unselectedModules.map {
             SubjectQuery(moduleId = it.name)
         }
-        subjectRepository.delete(queries)
+        enrolmentRecordManager.delete(queries)
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future

@@ -59,7 +59,7 @@ class SettingsPreferenceViewModelTest {
         val updatedLanguage = "en"
         viewModel.updateLanguagePreference(updatedLanguage)
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf()))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(),""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
         assertThat(updatedConfig.language).isEqualTo(updatedLanguage)

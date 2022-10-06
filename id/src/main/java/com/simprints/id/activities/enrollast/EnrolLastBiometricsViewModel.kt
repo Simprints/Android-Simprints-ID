@@ -8,7 +8,6 @@ import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorExc
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Failed
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Success
-import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -19,6 +18,7 @@ import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequ
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.logging.Simber
 
 class EnrolLastBiometricsViewModel(

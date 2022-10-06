@@ -86,7 +86,8 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = projectConfiguration.general.defaultLanguage,
                 selectedModules = listOf(),
-                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture
+                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture,
+                lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
@@ -109,7 +110,8 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = "fr",
                 selectedModules = listOf("module1"),
-                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture
+                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture,
+                lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
@@ -132,7 +134,8 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = projectConfiguration.general.defaultLanguage,
                 selectedModules = listOf("module1"),
-                fingersToCollect = listOf(Finger.LEFT_THUMB)
+                fingersToCollect = listOf(Finger.LEFT_THUMB),
+                lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
@@ -157,7 +160,8 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = generalConfiguration.defaultLanguage,
                 selectedModules = listOf(),
-                fingersToCollect = listOf()
+                fingersToCollect = listOf(),
+                lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfigurationToSave)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
@@ -189,7 +193,7 @@ class ConfigLocalDataSourceImplTest {
         }
         val savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
         val expectedDeviceConfiguration =
-            DeviceConfiguration("fr", listOf(), listOf(Finger.LEFT_THUMB))
+            DeviceConfiguration("fr", listOf(), listOf(Finger.LEFT_THUMB), "")
 
         assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }

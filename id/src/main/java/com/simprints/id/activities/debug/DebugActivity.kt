@@ -14,7 +14,6 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.id.Application
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
@@ -24,6 +23,7 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -42,7 +42,8 @@ class DebugActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var loginManager: LoginManager
-    lateinit var securityStateScheduler: SecurityStateScheduler
+    private lateinit var securityStateScheduler: SecurityStateScheduler
+
     @Inject
     lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
 
@@ -56,7 +57,7 @@ class DebugActivity : BaseSplitActivity() {
     lateinit var eventLocalDataSource: EventLocalDataSource
 
     @Inject
-    lateinit var subjectRepository: SubjectRepository
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @Inject
     lateinit var dispatcher: DispatcherProvider
@@ -114,7 +115,7 @@ class DebugActivity : BaseSplitActivity() {
                     eventSyncManager.stop()
                     eventLocalDataSource.deleteAll()
                     dbEventDownSyncOperationStateDao.deleteAll()
-                    subjectRepository.deleteAll()
+                    enrolmentRecordManager.deleteAll()
                     wm.pruneWork()
                 }
             }
@@ -133,7 +134,7 @@ class DebugActivity : BaseSplitActivity() {
             lifecycleScope.launch {
                 withContext(dispatcher.main()) {
                     val logStringBuilder = StringBuilder()
-                    logStringBuilder.append("\nSubjects ${subjectRepository.count()}")
+                    logStringBuilder.append("\nSubjects ${enrolmentRecordManager.count()}")
 
                     val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
@@ -189,7 +190,7 @@ class DebugActivity : BaseSplitActivity() {
 
     private fun setSecurityStatus(status: SecurityState.Status) {
         lifecycleScope.launch {
-            securityStateRepository.securityStatus=status
+            securityStateRepository.securityStatus = status
             securityStateProcessor.processSecurityState(
                 SecurityState("device-id", status)
             )

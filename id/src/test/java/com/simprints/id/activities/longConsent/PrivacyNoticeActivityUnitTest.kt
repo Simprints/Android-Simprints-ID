@@ -45,7 +45,8 @@ class PrivacyNoticeActivityUnitTest {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
             LANGUAGE,
             listOf(),
-            listOf()
+            listOf(),
+            ""
         )
     }
 

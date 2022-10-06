@@ -107,7 +107,8 @@ class DashboardSyncCardStateRepositoryImplTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(),
-            listOf()
+            listOf(),
+            ""
         )
         every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
         every { synchronizationConfiguration.down } returns mockk {
@@ -128,7 +129,8 @@ class DashboardSyncCardStateRepositoryImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(),
-                listOf()
+                listOf(),
+                ""
             )
             every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
             every { synchronizationConfiguration.down } returns mockk {
@@ -148,7 +150,8 @@ class DashboardSyncCardStateRepositoryImplTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(),
-            listOf()
+            listOf(),
+            ""
         )
         every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
         every { synchronizationConfiguration.down } returns mockk {
@@ -168,7 +171,8 @@ class DashboardSyncCardStateRepositoryImplTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID),
-            listOf()
+            listOf(),
+            ""
         )
         every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
         every { synchronizationConfiguration.down } returns mockk {
@@ -188,7 +192,8 @@ class DashboardSyncCardStateRepositoryImplTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(),
-            listOf()
+            listOf(),
+            ""
         )
         every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
         every { synchronizationConfiguration.down } returns mockk {

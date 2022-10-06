@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -10,6 +9,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 

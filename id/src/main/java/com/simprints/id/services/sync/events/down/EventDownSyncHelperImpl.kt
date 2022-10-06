@@ -15,20 +15,20 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
-import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
 
 class EventDownSyncHelperImpl(
-    val subjectRepository: SubjectRepository,
+    private val subjectRepository: EnrolmentRecordManager,
     val eventRepository: EventRepository,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,

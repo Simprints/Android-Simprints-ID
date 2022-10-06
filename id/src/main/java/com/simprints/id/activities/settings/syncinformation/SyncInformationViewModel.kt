@@ -7,8 +7,6 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
@@ -16,6 +14,8 @@ import com.simprints.id.tools.extensions.toGroup
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 class SyncInformationViewModel(
     private val downySyncHelper: EventDownSyncHelper,
     private val eventRepository: EventRepository,
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
     private val projectId: String,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
@@ -102,7 +102,7 @@ class SyncInformationViewModel(
     }
 
     private suspend fun fetchLocalRecordCount() =
-        subjectRepository.count(SubjectQuery(projectId = projectId))
+        enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
 
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
@@ -152,7 +152,7 @@ class SyncInformationViewModel(
         configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
                 it,
-                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it))
+                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it))
             )
         }
 
