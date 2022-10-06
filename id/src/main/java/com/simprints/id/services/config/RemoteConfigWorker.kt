@@ -12,7 +12,7 @@ class RemoteConfigWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params) {
 
     companion object {
-        private const val WORK_NAME = "remote-config-work"
+        const val WORK_NAME = "remote-config-work"
     }
 
     private val workManager = WorkManager.getInstance(context)

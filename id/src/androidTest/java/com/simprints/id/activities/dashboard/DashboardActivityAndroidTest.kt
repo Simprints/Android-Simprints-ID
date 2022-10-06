@@ -1,13 +1,14 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -16,6 +17,7 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.android.waitOnUi
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -24,9 +26,16 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class DashboardActivityAndroidTest {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     lateinit var mockViewModelFactory: DashboardViewModelFactory
@@ -44,7 +53,7 @@ class DashboardActivityAndroidTest {
         MockKAnnotations.init(this, relaxed = true)
         every {
             mockViewModelFactory.create<DashboardViewModel>(
-                any()
+                any(), any()
             )
         } returns mockViewModel
 
@@ -52,16 +61,6 @@ class DashboardActivityAndroidTest {
             appModule = appModule,
             viewModelModule = buildViewModelModule()
         ).initComponent().testAppComponent.inject(this)
-    }
-
-    @Test
-    fun withConsentRequiredDisabled_shouldNotShowPrivacyNoticeMenuItem() {
-        ActivityScenario.launch(DashboardActivity::class.java)
-        every { mockViewModel.consentRequiredLiveData } returns MutableLiveData<Boolean>(false)
-
-        openActionBarOverflowOrOptionsMenu(app.applicationContext)
-
-        onView(withText("Privacy Notice")).check(doesNotExist())
     }
 
     @Test
