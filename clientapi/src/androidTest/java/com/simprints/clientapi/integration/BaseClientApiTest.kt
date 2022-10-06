@@ -8,7 +8,6 @@ import android.os.Parcelable
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import com.simprints.clientapi.di.KoinInjector
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -19,11 +18,8 @@ import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.junit.After
 import org.junit.Before
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 
-open class BaseClientApiTest : KoinTest {
+open class BaseClientApiTest {
 
     internal val projectIdField = "projectId" to "xppPLwmR2eUmyN6LS3SN"
     internal val userIdField = "userId" to "some_user_id"
@@ -54,11 +50,6 @@ open class BaseClientApiTest : KoinTest {
     @Before
     open fun setUp() {
         Intents.init()
-
-        KoinInjector.loadClientApiKoinModules()
-        loadKoinModules(module {
-            factory { buildDummySessionEventsManagerMock() }
-        })
     }
 
     private fun buildDummySessionEventsManagerMock(): EventRepository {
@@ -81,7 +72,6 @@ open class BaseClientApiTest : KoinTest {
     @After
     fun tearDown() {
         Intents.release()
-        KoinInjector.unloadClientApiKoinModules()
     }
 
     companion object {

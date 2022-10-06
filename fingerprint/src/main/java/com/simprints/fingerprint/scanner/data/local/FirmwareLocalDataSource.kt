@@ -37,15 +37,54 @@ class FirmwareLocalDataSource(private val context: Context,private val fileUtil:
         return fileUtil.readBytes(file)
     }
 
+    /**
+     * This method is responsible for saving the provided Cypress firmware bytes, with the specified
+     * version [ChipFirmwareVersion], to the cypress directory by delegating execution to the
+     * [saveFirmwareBytes] method.
+     *
+     * @param version  the new [ChipFirmwareVersion] being saved
+     * @param bytes   the firmware bytes to be saved to the file system
+     *
+     * @see [saveFirmwareBytes]
+     */
     fun saveCypressFirmwareBytes(version: String, bytes: ByteArray) =
         saveFirmwareBytes(CYPRESS_DIR, version, bytes)
 
+    /**
+     * This method is responsible for saving the provided Stm firmware bytes, with the specified
+     * version [ChipFirmwareVersion], to the Stm directory, by delegating execution to the
+     * [saveFirmwareBytes] method.
+     *
+     * @param version  the new [ChipFirmwareVersion] being saved
+     * @param bytes   the firmware bytes to be saved to the file system
+     *
+     * @see [saveFirmwareBytes]
+     */
     fun saveStmFirmwareBytes(version: String, bytes: ByteArray) =
         saveFirmwareBytes(STM_DIR, version, bytes)
 
+    /**
+     * This method is responsible for saving the provided Un20 firmware bytes, with the specified
+     * version [ChipFirmwareVersion], to the Un20 directory, by delegating execution to the
+     * [saveFirmwareBytes] method.
+     *
+     * @param version  the new [ChipFirmwareVersion] being saved
+     * @param bytes   the firmware bytes to be saved to the file system
+     *
+     * @see [saveFirmwareBytes]
+     */
     fun saveUn20FirmwareBytes(version: String, bytes: ByteArray) =
         saveFirmwareBytes(UN20_DIR, version, bytes)
 
+    /**
+     * This method is responsible for saving the provided firmware bytes, to the specified
+     * directory and deletes previously existing versions of files located within the same
+     * directory.
+     *
+     * @param chipDirName  the name of the directory where the firmware binary will be saved
+     * @param version  the new [ChipFirmwareVersion] being saved
+     * @param bytes   the binary data to be saved to the file system
+     */
     private fun saveFirmwareBytes(chipDirName: String, version: String, bytes: ByteArray) {
         Simber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/$version")
         fileUtil.writeBytes(getFile(chipDirName, version),bytes)

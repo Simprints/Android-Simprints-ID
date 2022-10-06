@@ -18,10 +18,12 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Named
 import javax.inject.Singleton
 
-
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 @JvmSuppressWildcards(false)
 class SerializerModule {

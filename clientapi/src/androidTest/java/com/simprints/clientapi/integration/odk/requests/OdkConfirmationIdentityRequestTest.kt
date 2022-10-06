@@ -19,8 +19,6 @@ import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class OdkConfirmationIdentityRequestTest : BaseOdkClientApiTest() {
@@ -32,9 +30,6 @@ class OdkConfirmationIdentityRequestTest : BaseOdkClientApiTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        loadKoinModules(module {
-            factory { clientApiSessionEventsManager }
-        })
         val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
         Intents.intending(IntentMatchers.hasAction(APP_CONFIRM_ACTION)).respondWith(intentResultOk)
     }
