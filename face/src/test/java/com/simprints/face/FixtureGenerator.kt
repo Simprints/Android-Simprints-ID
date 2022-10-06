@@ -6,7 +6,7 @@ import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.detection.Face
 import com.simprints.face.models.FaceDetection
-import com.simprints.id.tools.utils.generateSequenceN
+import com.simprints.core.tools.utils.generateSequenceN
 import java.util.*
 import kotlin.random.Random
 

@@ -16,7 +16,11 @@ class FaceImageManagerImplTest {
     @Test
     fun `save image should call the event and image repos`() = runTest {
 
-        val expectedPath = Path("projects/projectId/sessions/sessionId/faces/captureEventId.jpg")
+        val expectedPath = Path(
+            arrayOf(
+                "projects", "projectId", "sessions", "sessionId", "faces", "captureEventId.jpg"
+            )
+        )
 
         val imageRepo = mockk<ImageRepository> {
             every { storeImageSecurely(any(), any()) } returns SecuredImageRef(expectedPath)

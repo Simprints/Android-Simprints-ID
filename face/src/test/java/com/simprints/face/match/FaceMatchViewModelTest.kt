@@ -14,7 +14,7 @@ import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
-import com.simprints.id.tools.utils.generateSequenceN
+import com.simprints.core.tools.utils.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*

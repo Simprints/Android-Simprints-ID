@@ -3,7 +3,7 @@ package com.simprints.face.match
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator
 import com.simprints.face.match.mock.MockFaceMatcher
-import com.simprints.id.tools.utils.generateSequenceN
+import com.simprints.core.tools.utils.generateSequenceN
 import io.mockk.coEvery
 import io.mockk.spyk
 import kotlinx.coroutines.test.runBlockingTest
