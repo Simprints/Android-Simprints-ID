@@ -1,4 +1,4 @@
-package com.simprints.id.tools.utils
+package com.simprints.core.tools.utils
 
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.take
