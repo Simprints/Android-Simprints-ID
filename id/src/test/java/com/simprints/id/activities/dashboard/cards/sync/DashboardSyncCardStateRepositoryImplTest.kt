@@ -4,14 +4,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.sampledata.SampleDefaults
+import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
@@ -20,13 +17,14 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.U
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -50,10 +48,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     lateinit var deviceManager: DeviceManager
 
     @MockK
-    lateinit var preferencesManager: IdPreferencesManager
-
-    @MockK
-    lateinit var downSyncScopeRepository: EventDownSyncScopeRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var cacheSync: EventSyncCache
@@ -65,6 +60,7 @@ class DashboardSyncCardStateRepositoryImplTest {
     private lateinit var syncStateLiveData: MutableLiveData<EventSyncState>
     private val syncId = UUID.randomUUID().toString()
     private val lastSyncTime = Date()
+    private val synchronizationConfiguration = mockk<SynchronizationConfiguration>()
 
     @Before
     fun setUp() {
@@ -74,14 +70,9 @@ class DashboardSyncCardStateRepositoryImplTest {
         syncStateLiveData = MutableLiveData()
         every { deviceManager.isConnectedLiveData } returns isConnectedUpdates
         every { eventSyncManager.getLastSyncState() } returns syncStateLiveData
-        coEvery {
-            downSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns SampleDefaults.projectDownSyncScope
-        every { preferencesManager.selectedModules } returns emptySet()
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns synchronizationConfiguration
+        }
         every { cacheSync.readLastSuccessfulSyncTime() } returns lastSyncTime
         every { eventSyncManager.hasSyncEverRunBefore() } returns true
 
@@ -110,18 +101,18 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun downSyncSettingIsOnAndModulesEmpty_syncStateShouldBeSelectModules() = runTest(
+    fun frequencyIsPeriodicallyAndModulesEmpty_syncStateShouldBeSelectModules() = runTest(
         UnconfinedTestDispatcher()
     ) {
-        every { preferencesManager.selectedModules } returns emptySet()
-        coEvery {
-            downSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns SampleDefaults.modulesDownSyncScope
-        every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.ON
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(),
+            listOf()
+        )
+        every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
+        every { synchronizationConfiguration.down } returns mockk {
+            every { partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+        }
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.getOrAwaitValue()
@@ -130,38 +121,39 @@ class DashboardSyncCardStateRepositoryImplTest {
     }
 
     @Test
-    fun downSyncSettingIsExtraAndModulesEmpty_syncStateShouldBeSelectModules() = runTest(
-        UnconfinedTestDispatcher()
-    ) {
-        every { preferencesManager.selectedModules } returns emptySet()
-        coEvery {
-            downSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
+    fun frequencyIsPeriodicallyAndOnSessionStartAndModulesEmpty_syncStateShouldBeSelectModules() =
+        runTest(
+            UnconfinedTestDispatcher()
+        ) {
+            coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+                "",
+                listOf(),
+                listOf()
             )
-        } returns SampleDefaults.modulesDownSyncScope
-        every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.EXTRA
+            every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
+            every { synchronizationConfiguration.down } returns mockk {
+                every { partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+            }
 
-        dashboardSyncCardStateRepository.syncIfRequired()
-        val tester = syncCardTestLiveData.getOrAwaitValue()
+            dashboardSyncCardStateRepository.syncIfRequired()
+            val tester = syncCardTestLiveData.getOrAwaitValue()
 
-        assertThat(tester).isEqualTo(SyncHasNoModules(lastSyncTime))
-    }
+            assertThat(tester).isEqualTo(SyncHasNoModules(lastSyncTime))
+        }
 
     @Test
-    fun downSyncSettingIsOffAndModulesEmpty_syncStateShouldBeConnecting() = runTest(
+    fun frequencyIsOnlyPeriodicallyUpSyncAndModulesEmpty_syncStateShouldBeConnecting() = runTest(
         UnconfinedTestDispatcher()
     ) {
-        every { preferencesManager.selectedModules } returns emptySet()
-        coEvery {
-            downSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns SampleDefaults.modulesDownSyncScope
-        every { preferencesManager.eventDownSyncSetting } returns EventDownSyncSetting.OFF
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(),
+            listOf()
+        )
+        every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+        every { synchronizationConfiguration.down } returns mockk {
+            every { partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+        }
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.getOrAwaitValue()
@@ -173,14 +165,15 @@ class DashboardSyncCardStateRepositoryImplTest {
     fun modulesSelectedWithSyncByModule_syncStateShouldBeConnecting() = runTest(
         UnconfinedTestDispatcher()
     ) {
-        every { preferencesManager.selectedModules } returns setOf(SampleDefaults.DEFAULT_MODULE_ID)
-        coEvery {
-            downSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns SampleDefaults.modulesDownSyncScope
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(DEFAULT_MODULE_ID),
+            listOf()
+        )
+        every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
+        every { synchronizationConfiguration.down } returns mockk {
+            every { partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+        }
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.getOrAwaitValue()
@@ -192,14 +185,15 @@ class DashboardSyncCardStateRepositoryImplTest {
     fun noModulesSelectedWithSyncByProject_syncStateShouldBeConnecting() = runTest(
         UnconfinedTestDispatcher()
     ) {
-        every { preferencesManager.selectedModules } returns emptySet()
-        coEvery {
-            downSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns SampleDefaults.projectDownSyncScope
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(),
+            listOf()
+        )
+        every { synchronizationConfiguration.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
+        every { synchronizationConfiguration.down } returns mockk {
+            every { partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        }
 
         dashboardSyncCardStateRepository.syncIfRequired()
         val tester = syncCardTestLiveData.getOrAwaitValue()
@@ -441,8 +435,7 @@ class DashboardSyncCardStateRepositoryImplTest {
         DashboardSyncCardStateRepositoryImpl(
             eventSyncManager,
             deviceManager,
-            preferencesManager,
-            downSyncScopeRepository,
+            configManager,
             cacheSync,
             specificTimeHelper
         )

@@ -11,7 +11,7 @@ import com.simprints.id.orchestrator.steps.Step
  */
 interface FaceStepProcessor {
 
-    fun buildCaptureStep(): Step
+    suspend fun buildCaptureStep(): Step
 
     fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: SubjectQuery): Step
 

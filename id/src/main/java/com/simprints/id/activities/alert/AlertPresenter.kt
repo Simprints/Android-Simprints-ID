@@ -1,34 +1,45 @@
 package com.simprints.id.activities.alert
 
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
+import com.simprints.id.R
 import com.simprints.infraresources.R
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertActivityViewModel.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FACE
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+// TODO refactor to use ViewModel in order to remove the runBlocking
 class AlertPresenter(
     val view: AlertContract.View,
     val component: AppComponent,
-    private val alertType: AlertType
+    private val alertType: AlertType,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AlertContract.Presenter {
 
     @Inject
     lateinit var eventRepository: EventRepository
+
     @Inject
-    lateinit var preferencesManager: IdPreferencesManager
+    lateinit var configManager: ConfigManager
+
     @Inject
     lateinit var timeHelper: TimeHelper
+
     @Inject
     lateinit var exitFormHelper: ExitFormHelper
 
@@ -93,49 +104,53 @@ class AlertPresenter(
         }
     }
 
-    private fun getParamsForLastBiometricsFailedAlert() = with(preferencesManager.modalities) {
-        when {
-            isFingerprintAndFace() -> {
-                listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param))
-            }
-            isFace() -> {
-                listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param))
-            }
-            isFingerprint() -> {
-                listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param))
-            }
-            else -> {
-                emptyList()
+    private fun getParamsForLastBiometricsFailedAlert() = runBlocking(dispatcher) {
+        with(configManager.getProjectConfiguration().general.modalities) {
+            when {
+                isFingerprintAndFace() -> {
+                    listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_all_param))
+                }
+                isFace() -> {
+                    listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_face_param))
+                }
+                isFingerprint() -> {
+                    listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param))
+                }
+                else -> {
+                    emptyList()
+                }
             }
         }
     }
 
-    private fun getParamsForModalityDownloadCancelledAlert() = with(preferencesManager.modalities) {
-        when {
-            isFingerprintAndFace() -> {
-                listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert))
-            }
-            isFace() -> {
-                listOf(view.getTranslatedString(R.string.face_feature_alert))
-            }
-            isFingerprint() -> {
-                listOf(view.getTranslatedString(R.string.fingerprint_feature_alert))
-            }
-            else -> {
-                emptyList()
+    private fun getParamsForModalityDownloadCancelledAlert() = runBlocking(dispatcher) {
+        with(configManager.getProjectConfiguration().general.modalities) {
+            when {
+                isFingerprintAndFace() -> {
+                    listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert))
+                }
+                isFace() -> {
+                    listOf(view.getTranslatedString(R.string.face_feature_alert))
+                }
+                isFingerprint() -> {
+                    listOf(view.getTranslatedString(R.string.fingerprint_feature_alert))
+                }
+                else -> {
+                    emptyList()
+                }
             }
         }
     }
 
     private fun List<Modality>.isFingerprintAndFace() = containsAll(
         listOf(
-            Modality.FACE,
-            Modality.FINGER
+            FACE,
+            FINGERPRINT
         )
     )
 
-    private fun List<Modality>.isFingerprint() = contains(Modality.FINGER) && this.size == 1
-    private fun List<Modality>.isFace() = contains(Modality.FACE) && this.size == 1
+    private fun List<Modality>.isFingerprint() = contains(FINGERPRINT) && this.size == 1
+    private fun List<Modality>.isFace() = contains(FACE) && this.size == 1
 
     override fun handleButtonClick(buttonAction: ButtonAction) {
         when (buttonAction) {
@@ -166,7 +181,10 @@ class AlertPresenter(
     }
 
     private fun startExitFormActivity() {
-        view.startExitForm(exitFormHelper.getExitFormActivityClassFromModalities(preferencesManager.modalities))
+        runBlocking {
+            val modalities = configManager.getProjectConfiguration().general.modalities
+            view.startExitForm(exitFormHelper.getExitFormActivityClassFromModalities(modalities))
+        }
     }
 
     private fun logToCrashReport() {

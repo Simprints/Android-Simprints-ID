@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -25,9 +24,9 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.databinding.FragmentModuleSelectionBinding
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import javax.inject.Inject
@@ -50,8 +49,9 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     @Inject
     lateinit var viewModelFactory: ModuleSelectionViewModelFactory
+
     @Inject
-    lateinit var preferencesManager: IdPreferencesManager
+    lateinit var eventSyncManager: EventSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -59,10 +59,12 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     private val binding by viewBinding(FragmentModuleSelectionBinding::bind)
     private val viewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(ModuleSelectionViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory)[ModuleSelectionViewModel::class.java]
     }
 
     private var modules = emptyList<Module>()
+    private var modulesToSelect = emptyList<Module>()
+    private var maxNumberOfModules = 0
     private var rvModules: RecyclerView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,6 +97,13 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
         }
     }
 
+    private fun refreshSyncWorkers() {
+        with(eventSyncManager) {
+            stop()
+            sync()
+        }
+    }
+
     override fun onChipClick(module: Module) {
         updateSelectionIfPossible(module)
     }
@@ -114,14 +123,19 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     private fun fetchData() {
-        viewModel.modulesList.observe(viewLifecycleOwner, Observer { modules ->
+        viewModel.modulesList.observe(viewLifecycleOwner) { modules ->
             this.modules = modules
+            this.modulesToSelect = modules
             adapter.submitList(modules.getUnselected())
             configureSearchView()
             configureTextViewVisibility()
             displaySelectedModules()
             rvModules?.requestFocus()
-        })
+        }
+
+        viewModel.maxNumberOfModules.observe(viewLifecycleOwner) { maxNumberOfModules ->
+            this.maxNumberOfModules = maxNumberOfModules
+        }
     }
 
     private fun configureSearchView() {
@@ -151,7 +165,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     private fun displaySelectedModules() {
         val displayedModuleNames = chipHelper.findSelectedModuleNames(binding.chipGroup)
 
-        modules.forEach { module ->
+        modulesToSelect.forEach { module ->
             val isModuleDisplayed = displayedModuleNames.contains(module.name)
             val isModuleSelected = module.isSelected
 
@@ -178,31 +192,29 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
-        queryListener.searchResults.observe(viewLifecycleOwner, Observer { searchResults ->
+        queryListener.searchResults.observe(viewLifecycleOwner) { searchResults ->
             adapter.submitList(searchResults)
             binding.txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
             rvModules?.scrollToPosition(0)
-        })
+        }
     }
 
     private fun updateSelectionIfPossible(lastModuleChanged: Module) {
-        val maxSelectedModules = viewModel.getMaxNumberOfModules()
-
-        val selectedModulesSize = modules.getSelected().size
+        val selectedModulesSize = modulesToSelect.getSelected().size
         val noModulesSelected = lastModuleChanged.isSelected && selectedModulesSize == 1
         val tooManyModulesSelected = !lastModuleChanged.isSelected
-            && selectedModulesSize == maxSelectedModules
+            && selectedModulesSize == maxNumberOfModules
 
         when {
             noModulesSelected -> notifyNoModulesSelected()
-            tooManyModulesSelected -> notifyTooManyModulesSelected(maxSelectedModules)
+            tooManyModulesSelected -> notifyTooManyModulesSelected(maxNumberOfModules)
             else -> handleModuleSelected(lastModuleChanged)
         }
     }
 
     private fun handleModuleSelected(lastModuleChanged: Module) {
         lastModuleChanged.isSelected = !lastModuleChanged.isSelected
-        viewModel.updateModules(modules)
+        viewModel.updateModules(modulesToSelect)
     }
 
     private fun notifyNoModulesSelected() {
@@ -219,21 +231,22 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
         }
     }
 
-    private fun isModuleSelectionChanged() = with(modules.filter { it.isSelected }) {
+    private fun isModuleSelectionChanged() = with(modulesToSelect.filter { it.isSelected }) {
         when {
-            isEmpty() && preferencesManager.selectedModules.isEmpty() -> false
-            else -> map { it.name }.toSet() != preferencesManager.selectedModules
+            isEmpty() && modulesToSelect.isEmpty() -> false
+            else -> map { it.name }.toSet() != modulesToSelect
         }
     }
 
     private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
-        modules.filter { it.isSelected }.forEach { module ->
+        modulesToSelect.filter { it.isSelected }.forEach { module ->
             append(module.name + "\n")
         }
     }.toString()
 
     private fun handleModulesConfirmClick() {
-        viewModel.saveModules(modules)
+        viewModel.saveModules(modulesToSelect)
+        refreshSyncWorkers()
         activity?.finish()
     }
 
@@ -259,7 +272,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
         }
     }
 
-    private fun isNoModulesSelected() = modules.none { it.isSelected }
+    private fun isNoModulesSelected() = modulesToSelect.none { it.isSelected }
 
     private fun List<Module>.getSelected() = filter { it.isSelected }
 

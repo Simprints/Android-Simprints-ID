@@ -27,6 +27,8 @@ import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
@@ -38,12 +40,20 @@ class ConnectScannerViewModel(
     private val scannerManager: ScannerManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val preferencesManager: FingerprintPreferencesManager,
+    private val recentEventsPreferencesManager: FingerprintPreferencesManager,
+    private val configManager: ConfigManager,
     private val nfcManager: NfcManager,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
+    lateinit var configuration: FingerprintConfiguration
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
+
+    init {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            configuration = configManager.getProjectConfiguration().fingerprint!!
+        }
+    }
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
@@ -66,9 +76,10 @@ class ConnectScannerViewModel(
         this.connectMode = connectMode
     }
 
-    fun start(){
+    fun start() {
         viewModelScope.launch { startSetup() }
-     }
+    }
+
     fun retryConnect() {
         viewModelScope.launch { startSetup() }
     }
@@ -77,6 +88,7 @@ class ConnectScannerViewModel(
         remainingConnectionAttempts = MAX_RETRY_COUNT - 1
         retryConnect()
     }
+
     @SuppressLint("CheckResult")
     private suspend fun startSetup() {
         _isConnecting.postValue(true)
@@ -93,7 +105,7 @@ class ConnectScannerViewModel(
                 wakeUpVero()
                 _isConnecting.postValue(false)
                 handleSetupFinished()
-            } catch (ex : Throwable) {
+            } catch (ex: Throwable) {
                 _isConnecting.postValue(false)
                 manageVeroErrors(ex)
             }
@@ -102,8 +114,8 @@ class ConnectScannerViewModel(
 
     fun stopConnectingAndResetState() {
         progress.postValue(0)
-        message.postValue( R.string.connect_scanner_bt_connect)
-        backButtonBehaviour.postValue( BackButtonBehaviour.EXIT_FORM)
+        message.postValue(R.string.connect_scanner_bt_connect)
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
     }
 
     private suspend fun disconnectVero() {
@@ -173,7 +185,7 @@ class ConnectScannerViewModel(
         }
     }
 
-    private fun postProgressAndMessage(step: Int,  @StringRes messageRes: Int) {
+    private fun postProgressAndMessage(step: Int, @StringRes messageRes: Int) {
         val progress = computeProgress(step)
         this.progress.postValue(progress)
         this.message.postValue(messageRes)
@@ -218,7 +230,7 @@ class ConnectScannerViewModel(
 
     private fun determineAppropriateScannerIssueForPairing(): ConnectScannerIssue {
         val couldNotBeVero1 =
-            !preferencesManager.scannerGenerations.contains(ScannerGeneration.VERO_1)
+            !configuration.allowedVeroGenerations.contains(FingerprintConfiguration.VeroGeneration.VERO_1)
 
         return if (couldNotBeVero1 && nfcManager.doesDeviceHaveNfcCapability()) {
             if (nfcManager.isNfcEnabled()) {
@@ -232,8 +244,8 @@ class ConnectScannerViewModel(
     }
 
     private fun setLastConnectedScannerInfo() {
-        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
-        preferencesManager.lastScannerVersion =
+        recentEventsPreferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
+        recentEventsPreferencesManager.lastScannerVersion =
             scannerManager.scanner.versionInformation().hardwareVersion
     }
 

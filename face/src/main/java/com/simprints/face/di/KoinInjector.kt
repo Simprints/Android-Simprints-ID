@@ -12,8 +12,6 @@ import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.controllers.core.image.FaceImageManagerImpl
-import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManager
-import com.simprints.face.controllers.core.preferencesManager.FacePreferencesManagerImpl
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.repository.FaceDbManagerImpl
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
@@ -76,14 +74,13 @@ object KoinInjector {
     }
 
     private fun buildKoinModule() =
-        module(override = true) {
+        module {
             defineBuildersForFaceManagers()
             defineBuildersForDomainClasses()
             defineBuildersForViewModels()
         }
 
     private fun Module.defineBuildersForFaceManagers() {
-        factory<FacePreferencesManager> { FacePreferencesManagerImpl(get()) }
         factory<FaceImageManager> { FaceImageManagerImpl(get(), get()) }
         factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
         factory<FaceDbManager> { FaceDbManagerImpl(get()) }
@@ -104,7 +101,7 @@ object KoinInjector {
         viewModel { FaceOrchestratorViewModel() }
         viewModel {
             FaceCaptureViewModel(
-                get<FacePreferencesManager>().shouldSaveFaceImages,
+                get(),
                 get()
             )
         }
@@ -123,7 +120,7 @@ object KoinInjector {
                 mainVM,
                 get(),
                 get(),
-                get<FacePreferencesManager>().qualityThreshold,
+                get(),
                 get(),
                 get()
             )

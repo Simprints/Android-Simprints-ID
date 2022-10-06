@@ -2,9 +2,9 @@ package com.simprints.id.activities.setup
 
 import android.Manifest
 import com.google.common.truth.Truth
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 
 import org.junit.Test
 
@@ -14,7 +14,7 @@ class PermissionsHelperTest {
     fun `extractPermissionsFromRequest success`() {
         // Given
         val request =
-            SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
+            SetupRequest(listOf(Modality.FINGERPRINT, Modality.FACE), listOf(SetupPermission.LOCATION))
         // When
         val result=  PermissionsHelper.extractPermissionsFromRequest(request)
         // Then
@@ -25,7 +25,7 @@ class PermissionsHelperTest {
     fun `extractPermissionsFromRequest for  empty permissions`() {
         // Given
         val request =
-            SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf())
+            SetupRequest(listOf(Modality.FINGERPRINT, Modality.FACE), listOf())
         // When
         val result=  PermissionsHelper.extractPermissionsFromRequest(request)
         // Then

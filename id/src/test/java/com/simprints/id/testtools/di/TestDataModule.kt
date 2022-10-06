@@ -5,12 +5,8 @@ import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.di.DataModule
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
@@ -18,41 +14,11 @@ import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.mockk
 
 class TestDataModule(
-    private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
-    private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentRepositoryRule: DependencyRule = DependencyRule.RealRule,
     private val longConsentLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule
 ) : DataModule() {
-
-    override fun provideProjectLocalDataSource(
-        realmWrapper: RealmWrapper
-    ): ProjectLocalDataSource =
-        projectLocalDataSourceRule.resolveDependency {
-            super.provideProjectLocalDataSource(
-                realmWrapper
-            )
-        }
-
-    override fun provideProjectRemoteDataSource(loginManager: LoginManager): ProjectRemoteDataSource =
-        projectRemoteDataSourceRule.resolveDependency {
-            super.provideProjectRemoteDataSource(loginManager)
-        }
-
-    override fun provideProjectRepository(
-        projectLocalDataSource: ProjectLocalDataSource,
-        projectRemoteDataSource: ProjectRemoteDataSource,
-        remoteConfigWrapper: RemoteConfigWrapper
-    ): ProjectRepository = projectRepositoryRule.resolveDependency {
-        super.provideProjectRepository(
-            projectLocalDataSource,
-            projectRemoteDataSource,
-            remoteConfigWrapper
-        )
-    }
-
 
     override fun provideSubjectRepository(
         subjectLocalDataSource: SubjectLocalDataSource,

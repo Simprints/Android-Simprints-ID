@@ -2,9 +2,9 @@ package com.simprints.infra.images.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.core.sharedinterfaces.ImageUrlProvider
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.login.LoginManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -31,13 +31,14 @@ class ImageRemoteDataSourceImplTest {
     @Test
     fun `test image upload flow`() = runTest {
 
-        val imgUrlProviderMock = mockk<ImageUrlProvider> {
-            coEvery { getImageStorageBucketUrl() } returns "gs://`simprints-dev.appspot.com"
+        val imgUrlProviderMock = mockk<ConfigManager> {
+            coEvery { getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
         }
 
         val loginManagerMock = mockk<LoginManager>(relaxed = true) {
             every { getLegacyAppFallback() } returns mockk(relaxed = true)
             every { getLegacyAppFallback().options.projectId } returns "projectId"
+            every { getSignedInProjectIdOrEmpty() } returns "projectId"
         }
 
         val storageMock = setupStorageMock()
@@ -59,7 +60,7 @@ class ImageRemoteDataSourceImplTest {
     @Test
     fun `null project returns failed upload`() = runTest {
 
-        val imgUrlProviderMock = mockk<ImageUrlProvider>()
+        val imgUrlProviderMock = mockk<ConfigManager>()
 
         val loginManagerMock = mockk<LoginManager>(relaxed = true) {
             every { getLegacyAppFallback().options.projectId } returns null
@@ -74,8 +75,8 @@ class ImageRemoteDataSourceImplTest {
     @Test
     fun `null storage bucket returns failed upload`() = runTest {
 
-        val imgUrlProviderMock = mockk<ImageUrlProvider>() {
-            coEvery { getImageStorageBucketUrl() } returns null
+        val imgUrlProviderMock = mockk<ConfigManager> {
+            coEvery { getProject(any()).imageBucket } returns ""
         }
 
         val loginManagerMock = mockk<LoginManager>(relaxed = true) {

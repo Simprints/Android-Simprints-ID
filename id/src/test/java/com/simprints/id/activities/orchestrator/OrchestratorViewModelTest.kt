@@ -3,7 +3,7 @@ package com.simprints.id.activities.orchestrator
 import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.simprints.core.domain.modality.Modality.FACE
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -18,6 +18,8 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.ENROL
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
@@ -31,13 +33,20 @@ class OrchestratorViewModelTest {
     val rule = InstantTaskExecutorRule()
 
     @MockK
-    private lateinit var eventRepositoryMock: com.simprints.eventsystem.event.EventRepository
+    private lateinit var eventRepositoryMock: EventRepository
+
     @MockK
     private lateinit var orchestratorEventsHelperMock: OrchestratorEventsHelper
+
     @MockK
     private lateinit var orchestratorManagerMock: OrchestratorManager
+
     @MockK
     private lateinit var domainToModuleApiConverter: DomainToModuleApiAppResponse
+
+    @MockK
+    private lateinit var configManager: ConfigManager
+
     private lateinit var liveDataAppResponse: MutableLiveData<AppResponse>
     private lateinit var liveDataNextIntent: MutableLiveData<Step>
 
@@ -61,9 +70,11 @@ class OrchestratorViewModelTest {
         configureMocks()
 
         vm = OrchestratorViewModel(
-            orchestratorManagerMock, orchestratorEventsHelperMock, listOf(
-                FACE
-            ), eventRepositoryMock, domainToModuleApiConverter
+            orchestratorManagerMock,
+            orchestratorEventsHelperMock,
+            configManager,
+            eventRepositoryMock,
+            domainToModuleApiConverter
         )
     }
 
@@ -72,6 +83,11 @@ class OrchestratorViewModelTest {
         coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns fakeSession
         every { orchestratorManagerMock.appResponse } returns liveDataAppResponse
         every { orchestratorManagerMock.ongoingStep } returns liveDataNextIntent
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns mockk {
+                every { modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+            }
+        }
     }
 
     @Test
@@ -80,7 +96,7 @@ class OrchestratorViewModelTest {
             vm.startModalityFlow(enrolAppRequest)
             coVerify(exactly = 1) {
                 orchestratorManagerMock.initialise(
-                    listOf(FACE),
+                    listOf(GeneralConfiguration.Modality.FACE),
                     enrolAppRequest,
                     fakeSession.id
                 )
@@ -127,7 +143,6 @@ class OrchestratorViewModelTest {
     }
 
     companion object {
-        const val SOME_SESSION_ID = "some_session_id"
         const val REQUEST_CODE = 0
     }
 }

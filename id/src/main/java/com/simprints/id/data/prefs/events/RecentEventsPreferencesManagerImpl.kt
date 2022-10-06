@@ -4,6 +4,7 @@ import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 
+// TODO replace with datastore
 class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
     : RecentEventsPreferencesManager {
 

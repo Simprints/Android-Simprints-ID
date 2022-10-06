@@ -16,7 +16,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.domain.modality.Modality
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.id.Application
@@ -24,21 +23,26 @@ import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
+import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestPreferencesModule
+import com.simprints.id.testtools.di.TestViewModelModule
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.verify
-import kotlinx.coroutines.runBlocking
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -53,27 +57,27 @@ class AlertActivityTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @Inject
-    lateinit var eventEventManagerMock: EventRepository
-    @Inject
-    lateinit var preferencesManagerSpy: IdPreferencesManager
+    lateinit var configManager: ConfigManager
 
-    private val preferencesModule by lazy {
-        TestPreferencesModule(
-            settingsPreferencesManagerRule = DependencyRule.SpykRule
-        )
-    }
+    private val generalConfiguration = mockk<GeneralConfiguration>()
+    private val eventRepository = mockk<EventRepository>(relaxed = true)
 
     private val module by lazy {
         TestAppModule(
             app,
-            sessionEventsManagerRule = DependencyRule.MockkRule
+            eventRepositoryRule = DependencyRule.ReplaceRule {
+                eventRepository
+            },
         )
     }
 
     @Before
     fun setUp() {
-        UnitTestConfig(module, preferencesModule).fullSetup().inject(this)
+        UnitTestConfig(module, viewModelModule = TestViewModelModule()).initComponent().inject(this)
         Intents.init()
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns generalConfiguration
+        }
     }
 
     @Test
@@ -81,7 +85,7 @@ class AlertActivityTest {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        verify(atLeast = 1) { runBlocking { eventEventManagerMock.addOrUpdateEvent(any<AlertScreenEvent>()) } }
+        coVerify(atLeast = 1) { eventRepository.addOrUpdateEvent(any<AlertScreenEvent>()) }
     }
 
     @Test
@@ -106,6 +110,66 @@ class AlertActivityTest {
     fun safetyNetError_theRightAlertShouldAppear() {
         launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+    }
+
+    @Test
+    fun fingerprintModalityDownloadCancelled_theRightAlertShouldAppear() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
+        launchAlertActivity(AlertActRequest(AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED))
+        ensureAlertScreenLaunched(
+            AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED,
+            "fingerprint feature"
+        )
+    }
+
+    @Test
+    fun faceModalityDownloadCancelled_theRightAlertShouldAppear() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
+        launchAlertActivity(AlertActRequest(AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED))
+        ensureAlertScreenLaunched(
+            AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED,
+            "face feature"
+        )
+    }
+
+    @Test
+    fun bothModalitiesModalityDownloadCancelled_theRightAlertShouldAppear() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
+        launchAlertActivity(AlertActRequest(AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED))
+        ensureAlertScreenLaunched(
+            AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED,
+            "fingerprint and face features"
+        )
+    }
+
+    @Test
+    fun fingerprintEnrolLastBiometricsFailed_theRightAlertShouldAppear() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
+        launchAlertActivity(AlertActRequest(AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED))
+        ensureAlertScreenLaunched(
+            AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED,
+            "Fingerprint"
+        )
+    }
+
+    @Test
+    fun faceEnrolLastBiometricsFailed_theRightAlertShouldAppear() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
+        launchAlertActivity(AlertActRequest(AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED))
+        ensureAlertScreenLaunched(
+            AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED,
+            "Face"
+        )
+    }
+
+    @Test
+    fun bothModalitiesEnrolLastBiometricsFailed_theRightAlertShouldAppear() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
+        launchAlertActivity(AlertActRequest(AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED))
+        ensureAlertScreenLaunched(
+            AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED,
+            "Face/Fingerprint"
+        )
     }
 
     @Test
@@ -164,15 +228,38 @@ class AlertActivityTest {
     }
 
     @Test
-    fun guidNotFoundOffline_userClicksBack_shouldStartExitForm() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FINGER)
-
+    fun fingerprintGuidNotFoundOffline_userClicksBack_shouldStartExitForm() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
         val scenario = launchAlertActivity(AlertActRequest(AlertType.GUID_NOT_FOUND_OFFLINE))
         ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)
         pressBackUnconditionally()
 
         scenario.onActivity {
             assertActivityStarted(FingerprintExitFormActivity::class.java, it)
+        }
+    }
+
+    @Test
+    fun faceGuidNotFoundOffline_userClicksBack_shouldStartExitForm() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.GUID_NOT_FOUND_OFFLINE))
+        ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)
+        pressBackUnconditionally()
+
+        scenario.onActivity {
+            assertActivityStarted(FaceExitFormActivity::class.java, it)
+        }
+    }
+
+    @Test
+    fun bothModalitiesGuidNotFoundOffline_userClicksBack_shouldStartExitForm() {
+        every { generalConfiguration.modalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.GUID_NOT_FOUND_OFFLINE))
+        ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)
+        pressBackUnconditionally()
+
+        scenario.onActivity {
+            assertActivityStarted(CoreExitFormActivity::class.java, it)
         }
     }
 
@@ -188,12 +275,26 @@ class AlertActivityTest {
         })
 
 
-    private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
+    private fun ensureAlertScreenLaunched(
+        alertActivityViewModel: AlertActivityViewModel,
+        vararg messageArgs: Any?
+    ) {
         onView(withId(R.id.alertTitle))
             .check(matches(withText(alertActivityViewModel.title)))
 
         onView(withId(R.id.message))
-            .check(matches(withText(alertActivityViewModel.message)))
+            .check(
+                matches(
+                    withText(
+                        String.format(
+                            app.getString(
+                                alertActivityViewModel.message,
+                                *messageArgs
+                            )
+                        )
+                    )
+                )
+            )
 
         onView(withId(R.id.alertImage)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
     }

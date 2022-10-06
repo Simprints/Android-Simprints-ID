@@ -7,7 +7,6 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSim
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
@@ -15,6 +14,7 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -36,12 +36,12 @@ class LibSimprintsPresenter @AssistedInject constructor(
     private val timeHelper: ClientApiTimeHelper,
     private val subjectRepository: SubjectRepository,
     private val jsonHelper: JsonHelper,
-    sharedPreferencesManager: SharedPreferencesManager
+    configManager: ConfigManager
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     rootManager = rootManager,
-    sharedPreferencesManager = sharedPreferencesManager,
+    configManager = configManager,
     sessionEventsManager = sessionEventsManager
 ), LibSimprintsContract.Presenter {
 
@@ -75,7 +75,9 @@ class LibSimprintsPresenter @AssistedInject constructor(
             sessionEventsManager.closeCurrentSessionNormally()
 
             view.returnRegistration(
-                Registration(enrol.guid), currentSessionId, flowCompletedCheck,
+                Registration(enrol.guid),
+                currentSessionId,
+                flowCompletedCheck,
                 getEventsJsonForSession(currentSessionId, jsonHelper),
                 getEnrolmentCreationEventForSubject(
                     enrol.guid,
@@ -99,7 +101,9 @@ class LibSimprintsPresenter @AssistedInject constructor(
                         it.confidenceScore,
                         it.tier.fromDomainToLibsimprintsTier()
                     )
-                }), identify.sessionId, flowCompletedCheck,
+                }),
+                identify.sessionId,
+                flowCompletedCheck,
                 getEventsJsonForSession(identify.sessionId, jsonHelper)
             )
         }

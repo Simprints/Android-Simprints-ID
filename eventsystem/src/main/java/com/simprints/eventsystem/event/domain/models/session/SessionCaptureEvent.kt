@@ -1,14 +1,12 @@
 package com.simprints.eventsystem.event.domain.models.session
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.domain.modality.Modes
-import com.simprints.core.domain.modality.toMode
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventPayload
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import java.util.*
 
 @Keep
@@ -23,7 +21,7 @@ data class SessionCaptureEvent(
         id: String,
         projectId: String,
         createdAt: Long,
-        modalities: List<Modes>,
+        modalities: List<Modality>,
         appVersionName: String,
         libVersionName: String,
         language: String,
@@ -59,7 +57,7 @@ data class SessionCaptureEvent(
         val id: String,
         var projectId: String,
         override val createdAt: Long,
-        var modalities: List<Modes>,
+        var modalities: List<Modality>,
         val appVersionName: String,
         val libVersionName: String,
         val language: String,
@@ -82,6 +80,6 @@ data class SessionCaptureEvent(
     }
 
     fun updateModalities(modalities: List<Modality>) {
-        payload.modalities = modalities.map { it.toMode() }
+        payload.modalities = modalities
     }
 }

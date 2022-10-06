@@ -14,18 +14,18 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
-import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.id.testtools.SubjectsGeneratorUtils
-import io.mockk.MockKAnnotations
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DecisionPolicy
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import io.mockk.coEvery
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,40 +34,65 @@ import org.junit.rules.TestRule
 class EnrolLastBiometricsViewModelTest {
 
     companion object {
-        private val fingerprintConfidenceThresholds = mapOf(
-            FingerprintConfidenceThresholds.LOW to 15,
-            FingerprintConfidenceThresholds.MEDIUM to 30,
-            FingerprintConfidenceThresholds.HIGH to 40
-        )
-        private val faceConfidenceThresholds = mapOf(
-            FaceConfidenceThresholds.LOW to 15,
-            FaceConfidenceThresholds.MEDIUM to 30,
-            FaceConfidenceThresholds.HIGH to 40
-        )
+        private val fingerprintConfidenceDecisionPolicy = DecisionPolicy(15, 30, 40)
+        private val faceConfidenceDecisionPolicy = DecisionPolicy(15, 30, 40)
     }
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    lateinit var viewModel: EnrolLastBiometricsViewModel
     private val stepsWithLastEnrolBiometrics = listOf(
-        Step(GUID1, 0, "activity_name", "key", mockk<EnrolLastBiometricsRequest>(), EnrolLastBiometricsResponse(GUID1), COMPLETED))
+        Step(
+            GUID1,
+            0,
+            "activity_name",
+            "key",
+            mockk<EnrolLastBiometricsRequest>(),
+            EnrolLastBiometricsResponse(GUID1),
+            COMPLETED
+        )
+    )
 
-    private val appRequestWithPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, stepsWithLastEnrolBiometrics, GUID1)
-    private val appRequestWithoutPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, emptyList(), GUID1)
+    private val appRequestWithPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(
+        DEFAULT_PROJECT_ID,
+        DEFAULT_USER_ID,
+        DEFAULT_MODULE_ID,
+        stepsWithLastEnrolBiometrics,
+        GUID1
+    )
+    private val appRequestWithoutPastEnrolLastBiometricSteps = EnrolLastBiometricsRequest(
+        DEFAULT_PROJECT_ID,
+        DEFAULT_USER_ID,
+        DEFAULT_MODULE_ID,
+        emptyList(),
+        GUID1
+    )
 
-    @MockK lateinit var timeHelper: TimeHelper
-    @MockK lateinit var enrolHelper: EnrolmentHelper
+
+    private val generalConfiguration = mockk<GeneralConfiguration>()
+    private val timeHelper = mockk<TimeHelper>(relaxed = true)
+    private val enrolHelper = mockk<EnrolmentHelper>()
+    private val configManager = mockk<ConfigManager>()
+
+    private val viewModel = EnrolLastBiometricsViewModel(enrolHelper, timeHelper, configManager)
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns generalConfiguration
+            every { fingerprint } returns mockk {
+                every { decisionPolicy } returns fingerprintConfidenceDecisionPolicy
+            }
+            every { face } returns mockk {
+                every { decisionPolicy } returns faceConfidenceDecisionPolicy
+            }
+        }
     }
 
     @Test
     fun getNextStep_enrolFails_shouldProduceFailedState() {
-        runBlocking {
-            buildViewModel()
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns false
             val request = mockk<EnrolLastBiometricsRequest>()
             every { request.previousSteps } throws Throwable("No steps from previous run")
             viewModel.processEnrolLastBiometricsRequest(request)
@@ -77,8 +102,8 @@ class EnrolLastBiometricsViewModelTest {
 
     @Test
     fun getNextStep_enrolAlreadyHappened_shouldProduceSuccessState() {
-        runBlocking {
-            buildViewModel()
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns false
             viewModel.processEnrolLastBiometricsRequest(appRequestWithPastEnrolLastBiometricSteps)
 
             with(viewModel.getViewStateLiveData()) {
@@ -90,10 +115,19 @@ class EnrolLastBiometricsViewModelTest {
 
     @Test
     fun getNextStep_enrolNeverHappened_shouldProduceSuccessState() {
-        runBlocking {
-            buildViewModel()
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns false
             val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
-            every { enrolHelper.buildSubject(any(), any(), any(), any(), any(), any()) } returns newEnrolment
+            every {
+                enrolHelper.buildSubject(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns newEnrolment
 
             viewModel.processEnrolLastBiometricsRequest(appRequestWithoutPastEnrolLastBiometricSteps)
 
@@ -106,8 +140,8 @@ class EnrolLastBiometricsViewModelTest {
 
     @Test
     fun fingerprintWithEnrolmentPlus_processRequestWithHighConfidenceInPreviousSteps_shouldFail() {
-        runBlocking {
-            buildViewModel(isEnrolmentPlus = true)
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
             val highConfidenceScore = 40f
             viewModel.processEnrolLastBiometricsRequest(
                 buildRequestWithFingerprintPreviousStepsHavingAHighConfidence(highConfidenceScore)
@@ -119,13 +153,24 @@ class EnrolLastBiometricsViewModelTest {
 
     @Test
     fun fingerprintWithEnrolmentPlus_processRequestWithLessThanHighConfidenceInPreviousSteps_shouldSucceedWithRegistration() {
-        runBlocking {
-            buildViewModel(isEnrolmentPlus = true)
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
             val lowerThanHighConfidenceScore = 39f
             val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
-            every { enrolHelper.buildSubject(any(), any(), any(), any(), any(), any()) } returns newEnrolment
+            every {
+                enrolHelper.buildSubject(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns newEnrolment
             viewModel.processEnrolLastBiometricsRequest(
-                buildRequestWithFingerprintPreviousStepsHavingAHighConfidence(lowerThanHighConfidenceScore)
+                buildRequestWithFingerprintPreviousStepsHavingAHighConfidence(
+                    lowerThanHighConfidenceScore
+                )
             )
 
             with(viewModel.getViewStateLiveData()) {
@@ -137,8 +182,8 @@ class EnrolLastBiometricsViewModelTest {
 
     @Test
     fun faceWithEnrolmentPlus_processRequestWithHighConfidenceInPreviousSteps_shouldFail() {
-        runBlocking {
-            buildViewModel(isEnrolmentPlus = true)
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
             val highConfidenceScore = 40f
             viewModel.processEnrolLastBiometricsRequest(
                 buildRequestWithFacePreviousStepsHavingAHighConfidence(highConfidenceScore)
@@ -150,11 +195,20 @@ class EnrolLastBiometricsViewModelTest {
 
     @Test
     fun faceWithEnrolmentPlus_processRequestWithLessThanHighConfidenceInPreviousSteps_shouldSucceedWithRegistration() {
-        runBlocking {
-            buildViewModel(isEnrolmentPlus = true)
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
             val lowerThanHighConfidenceScore = 39f
             val newEnrolment = SubjectsGeneratorUtils.getRandomSubject()
-            every { enrolHelper.buildSubject(any(), any(), any(), any(), any(), any()) } returns newEnrolment
+            every {
+                enrolHelper.buildSubject(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns newEnrolment
             viewModel.processEnrolLastBiometricsRequest(
                 buildRequestWithFacePreviousStepsHavingAHighConfidence(lowerThanHighConfidenceScore)
             )
@@ -166,14 +220,11 @@ class EnrolLastBiometricsViewModelTest {
         }
     }
 
-    private fun buildViewModel(isEnrolmentPlus: Boolean = false) {
-        viewModel = EnrolLastBiometricsViewModel(enrolHelper, timeHelper,
-            fingerprintConfidenceThresholds, faceConfidenceThresholds, isEnrolmentPlus)
-    }
-
     private fun buildRequestWithFingerprintPreviousStepsHavingAHighConfidence(confidence: Float) =
-        EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, buildFingerprintMatchStepsWithConfidence(confidence), GUID1)
+        EnrolLastBiometricsRequest(
+            DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID, buildFingerprintMatchStepsWithConfidence(confidence), GUID1
+        )
 
     private fun buildFingerprintMatchStepsWithConfidence(confidence: Float) = listOf(
         Step(
@@ -181,16 +232,20 @@ class EnrolLastBiometricsViewModelTest {
             activityName = "com.simprints.id.MyFingerprintActivity",
             bundleKey = "BUNDLE_KEY",
             request = mockk(),
-            result = FingerprintMatchResponse(listOf(
-                FingerprintMatchResult("person_id", confidence)
-            )),
+            result = FingerprintMatchResponse(
+                listOf(
+                    FingerprintMatchResult("person_id", confidence)
+                )
+            ),
             status = COMPLETED
         )
     )
 
     private fun buildRequestWithFacePreviousStepsHavingAHighConfidence(confidence: Float) =
-        EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, buildFaceMatchStepsWithConfidence(confidence), GUID1)
+        EnrolLastBiometricsRequest(
+            DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID, buildFaceMatchStepsWithConfidence(confidence), GUID1
+        )
 
     private fun buildFaceMatchStepsWithConfidence(confidence: Float) = listOf(
         Step(
@@ -198,9 +253,11 @@ class EnrolLastBiometricsViewModelTest {
             activityName = "com.simprints.id.MyFaceActivity",
             bundleKey = "BUNDLE_KEY",
             request = mockk(),
-            result = FaceMatchResponse(listOf(
-                FaceMatchResult(guidFound = "person_id", confidence = confidence)
-            )),
+            result = FaceMatchResponse(
+                listOf(
+                    FaceMatchResult(guidFound = "person_id", confidence = confidence)
+                )
+            ),
             status = COMPLETED
         )
     )

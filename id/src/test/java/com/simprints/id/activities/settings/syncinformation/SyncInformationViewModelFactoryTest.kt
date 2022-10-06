@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.syncinformation
 
+import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
 import io.mockk.mockk
@@ -15,7 +16,6 @@ class SyncInformationViewModelFactoryTest {
                 mockk(relaxed = true),
                 mockk(relaxed = true),
                 mockk(relaxed = true),
-                mockk(relaxed = true),
                 DEFAULT_PROJECT_ID,
                 mockk(relaxed = true),
                 mockk(relaxed = true),
@@ -24,14 +24,13 @@ class SyncInformationViewModelFactoryTest {
         )
 
         val viewModel = factory.create(SyncInformationViewModel::class.java)
-        assert(viewModel is SyncInformationViewModel)
+        assertThat(viewModel).isInstanceOf(SyncInformationViewModel::class.java)
     }
 
     @Test
     fun `calling create on different class should throw exception`() {
         val factory = spyk(
             SyncInformationViewModelFactory(
-                mockk(relaxed = true),
                 mockk(relaxed = true),
                 mockk(relaxed = true),
                 mockk(relaxed = true),
@@ -45,7 +44,7 @@ class SyncInformationViewModelFactoryTest {
         var exception: Exception? = null
         try {
             factory.create(LoginViewModel::class.java)
-        } catch (ex: Exception){
+        } catch (ex: Exception) {
             exception = ex
         }
         assert(exception is IllegalArgumentException)

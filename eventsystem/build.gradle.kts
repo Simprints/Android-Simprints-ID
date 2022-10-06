@@ -41,6 +41,7 @@ android {
 dependencies {
     api(project(":core"))
     api(project(":moduleapi"))
+    implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
     api(project(":infranetwork"))

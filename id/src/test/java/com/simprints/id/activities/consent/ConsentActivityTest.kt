@@ -3,36 +3,35 @@ package com.simprints.id.activities.consent
 import android.content.Intent
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.material.tabs.TabLayout
-import com.simprints.core.domain.modality.Modality
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestPreferencesModule
-import com.simprints.testtools.common.di.DependencyRule.MockkRule
-import com.simprints.testtools.common.di.DependencyRule.SpykRule
+import com.simprints.id.testtools.di.TestViewModelModule
+import com.simprints.infra.config.domain.models.ConsentConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import javax.inject.Inject
-
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -40,32 +39,48 @@ class ConsentActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject
-    lateinit var preferencesManagerSpy: IdPreferencesManager
+    private var modalities = emptyList<GeneralConfiguration.Modality>()
 
-    private val preferencesModule by lazy {
-        TestPreferencesModule(
-            settingsPreferencesManagerRule = SpykRule
+    private val consentConfiguration = mockk<ConsentConfiguration>()
+    private val viewModel = mockk<ConsentViewModel>()
+
+    private val consentViewModelFactory = mockk<ConsentViewModelFactory>()
+
+    private val viewModelModule by lazy {
+        TestViewModelModule(
+            consentViewModelFactoryRule = DependencyRule.ReplaceRule {
+                consentViewModelFactory
+            }
         )
     }
 
     private val module by lazy {
-        TestAppModule(
-            app,
-            dbManagerRule = MockkRule,
-            sessionEventsLocalDbManagerRule = MockkRule
-        )
+        TestAppModule(app)
     }
 
-    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        UnitTestConfig(module, preferencesModule).fullSetup().inject(this)
+        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup().inject(this)
+
+        every { consentViewModelFactory.create<ConsentViewModel>(any(), any()) } returns viewModel
+        every { viewModel.modalities } returns mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<List<GeneralConfiguration.Modality>>>().onChanged(modalities)
+            }
+        }
+        every { viewModel.consentConfiguration } returns mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<ConsentConfiguration>>().onChanged(consentConfiguration)
+            }
+        }
     }
 
     @Test
     fun consentDeclineOnMultipleModalities_shouldLaunchCoreExitFormActivity() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE, Modality.FINGER)
+        modalities = listOf(
+            GeneralConfiguration.Modality.FACE,
+            GeneralConfiguration.Modality.FINGERPRINT
+        )
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -76,7 +91,7 @@ class ConsentActivityTest {
 
     @Test
     fun consentDeclineOnFingerprintModalityOnly_shouldLaunchFingerprintExitFormActivity() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FINGER)
+        modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT)
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -87,7 +102,7 @@ class ConsentActivityTest {
 
     @Test
     fun consentDeclineOnFaceModalityOnly_shouldLaunchCoreExitFormActivity() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -98,8 +113,8 @@ class ConsentActivityTest {
 
     @Test
     fun `declining on parental tab should still exit correctly`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -111,8 +126,8 @@ class ConsentActivityTest {
 
     @Test
     fun `declining on un-known tab should throw error`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -123,18 +138,26 @@ class ConsentActivityTest {
 
     @Test
     fun `general consent text should show first`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.programName } returns "this program"
+        every { consentConfiguration.generalPrompt } returns ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
-        assert(activity.tabHost.selectedTabPosition == 0)
-        assert(activity.consentTextHolderView.text.contains(GEN_CONSENT_HINT))
+        assertThat(activity.tabHost.selectedTabPosition).isEqualTo(0)
+        assertThat(activity.consentTextHolderView.text.toString()).contains(GEN_CONSENT_HINT)
     }
 
     @Test
     fun `parental tab click should select correct tab`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -142,7 +165,7 @@ class ConsentActivityTest {
 
         activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                assert(tab.position == ConsentActivity.PARENTAL_CONSENT_TAB_TAG)
+                assertThat(tab.position).isEqualTo(ConsentActivity.PARENTAL_CONSENT_TAB_TAG)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -152,8 +175,8 @@ class ConsentActivityTest {
 
     @Test
     fun `general tab click should select correct tab`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
@@ -162,8 +185,8 @@ class ConsentActivityTest {
 
         activity.tabHost.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                assert(tab.position == ConsentActivity.GENERAL_CONSENT_TAB_TAG)
-                assert(activity.consentTextHolderView.text.contains(GEN_CONSENT_HINT))
+                assertThat(tab.position).isEqualTo(ConsentActivity.GENERAL_CONSENT_TAB_TAG)
+                assertThat(activity.consentTextHolderView.text.toString()).contains(GEN_CONSENT_HINT)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -173,55 +196,65 @@ class ConsentActivityTest {
 
     @Test
     fun `selecting parental consent should set correct text`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
+        every { consentConfiguration.parentalPrompt } returns ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
         activity.tabHost.getTabAt(1)!!.select()
 
-        assert(activity.tabHost.selectedTabPosition == 1)
-        assert(
-            activity.consentTextHolderView.text.contains(PARENTAL_CONSENT_HINT)
-        )
+        assertThat(activity.tabHost.selectedTabPosition).isEqualTo(1)
+        assertThat(activity.consentTextHolderView.text.toString()).contains(PARENTAL_CONSENT_HINT)
     }
 
     @Test
     fun `re-selecting a tab shouldn't change the text`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
+        every { consentConfiguration.parentalPrompt } returns ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
         activity.tabHost.getTabAt(1)!!.select()
         activity.tabHost.getTabAt(1)!!.select()
 
-        assert(activity.tabHost.selectedTabPosition == 1)
-        assert(
-            activity.consentTextHolderView.text.contains(PARENTAL_CONSENT_HINT)
-        )
+        assertThat(activity.tabHost.selectedTabPosition).isEqualTo(1)
+        assertThat(activity.consentTextHolderView.text.toString()).contains(PARENTAL_CONSENT_HINT)
     }
 
     @Test
     fun `no parental consent should remove tab`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns false
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns false
 
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
-        assert(activity.tabHost.tabCount == 1)
+        assertThat(activity.tabHost.tabCount).isEqualTo(1)
     }
 
     @Test
     fun `existing parental consent should leave tab`() {
-        every { preferencesManagerSpy.modalities } returns listOf(Modality.FACE)
-        every { preferencesManagerSpy.parentalConsentExists } returns true
+        modalities = listOf(GeneralConfiguration.Modality.FACE)
+        every { consentConfiguration.allowParentalConsent } returns true
 
         val controller = createRoboConsentActivity(getIntentForConsentAct())
         val activity = controller.get()
 
-        assert(activity.tabHost.tabCount == 2)
+        assertThat(activity.tabHost.tabCount).isEqualTo(2)
     }
 
     private fun createRoboConsentActivity(intent: Intent) = createActivity<ConsentActivity>(intent)

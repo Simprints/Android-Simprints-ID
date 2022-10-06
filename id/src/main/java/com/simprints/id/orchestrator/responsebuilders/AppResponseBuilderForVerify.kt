@@ -1,24 +1,26 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
-import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidenceForFace
-import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidenceForFingerprint
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence.Companion.computeMatchConfidence
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 
-class AppResponseBuilderForVerify(private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
-                                  private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>) : BaseAppResponseBuilder() {
+class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfiguration) :
+    BaseAppResponseBuilder() {
 
-    override suspend fun buildAppResponse(modalities: List<Modality>,
-                                          appRequest: AppRequest,
-                                          steps: List<Step>,
-                                          sessionId: String): AppResponse {
+    override suspend fun buildAppResponse(
+        modalities: List<GeneralConfiguration.Modality>,
+        appRequest: AppRequest,
+        steps: List<Step>,
+        sessionId: String
+    ): AppResponse {
         super.getErrorOrRefusalResponseIfAny(steps)?.let {
             return it
         }
@@ -29,7 +31,7 @@ class AppResponseBuilderForVerify(private val fingerprintConfidenceThresholds: M
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildAppVerifyResponseForFingerprintAndFace(faceResponse, fingerprintResponse)
+                buildAppVerifyResponseForFingerprintAndFace(fingerprintResponse)
             }
             fingerprintResponse != null -> {
                 buildAppVerifyResponseForFingerprint(fingerprintResponse)
@@ -47,8 +49,9 @@ class AppResponseBuilderForVerify(private val fingerprintConfidenceThresholds: M
     private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceMatchResponse,
-                                                            fingerprintResponse: FingerprintMatchResponse) =
+    private fun buildAppVerifyResponseForFingerprintAndFace(
+        fingerprintResponse: FingerprintMatchResponse
+    ) =
         AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
 
     private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
@@ -56,9 +59,14 @@ class AppResponseBuilderForVerify(private val fingerprintConfidenceThresholds: M
 
     private fun getMatchResultForFingerprintResponse(fingerprintResponse: FingerprintMatchResponse) =
         fingerprintResponse.result.map {
-            MatchResult(it.personId, it.confidenceScore.toInt(),
+            MatchResult(
+                it.personId, it.confidenceScore.toInt(),
                 Tier.computeTier(it.confidenceScore),
-                computeMatchConfidenceForFingerprint(it.confidenceScore.toInt(), fingerprintConfidenceThresholds))
+                computeMatchConfidence(
+                    it.confidenceScore.toInt(),
+                    projectConfiguration.fingerprint!!.decisionPolicy
+                )
+            )
         }.first()
 
     private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse) =
@@ -66,8 +74,13 @@ class AppResponseBuilderForVerify(private val fingerprintConfidenceThresholds: M
 
     private fun getMatchResultForFaceResponse(faceResponse: FaceMatchResponse) =
         faceResponse.result.map {
-            MatchResult(it.guidFound, it.confidence.toInt(),
+            MatchResult(
+                it.guidFound, it.confidence.toInt(),
                 Tier.computeTier(it.confidence),
-                computeMatchConfidenceForFace(it.confidence.toInt(), faceConfidenceThresholds))
+                computeMatchConfidence(
+                    it.confidence.toInt(),
+                    projectConfiguration.face!!.decisionPolicy
+                )
+            )
         }.first()
 }
