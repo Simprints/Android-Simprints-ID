@@ -7,12 +7,10 @@ import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.common.di.DependencyRule.SpykRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /*
 * A base class to be used in all unit tests.
  */
-@ExperimentalCoroutinesApi
 open class BaseUnitTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

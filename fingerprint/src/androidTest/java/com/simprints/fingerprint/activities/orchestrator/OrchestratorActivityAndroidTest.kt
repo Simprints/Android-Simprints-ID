@@ -75,7 +75,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
 
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
-        verify { firmwareFileUpdateSchedulerMock.scheduleOrCancelWorkIfNecessary() }
+        coVerify { firmwareFileUpdateSchedulerMock.scheduleOrCancelWorkIfNecessary() }
 
         every { orchestratorMock.isFinished() } returns true
 

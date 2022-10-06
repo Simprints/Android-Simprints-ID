@@ -1,6 +1,7 @@
 package com.simprints.id.services.guidselection
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
@@ -29,7 +30,7 @@ class GuidSelectionManagerImplTest {
     @MockK
     private lateinit var timerHelper: TimeHelper
     @MockK
-    private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    private lateinit var eventRepository: EventRepository
 
     @Before
     fun setUp() {

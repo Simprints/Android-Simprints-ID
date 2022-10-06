@@ -1,10 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.domain.modality.Modality.FACE
-import com.simprints.core.domain.modality.Modality.FINGER
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
@@ -13,10 +9,18 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.verifyAppRequest
-import com.simprints.id.testtools.TestTimeHelperImpl
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ConsentConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.*
+import com.simprints.infra.login.LoginManager
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FACE_ACTIVITY_NAME
@@ -33,17 +37,35 @@ class ModalityFlowVerifyImplTest {
         const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT = 6
     }
 
-    private lateinit var modalityFlowVerify: ModalityFlowVerifyImpl
-    private val timeHelper: TimeHelper = TestTimeHelperImpl()
-    @MockK private lateinit var fingerprintStepProcessor: FingerprintStepProcessor
-    @MockK lateinit var faceStepProcessor: FaceStepProcessor
-    @MockK lateinit var coreStepProcessor: CoreStepProcessor
-    @MockK lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-    @MockK lateinit var fingerprintStepMock: Step
-    @MockK lateinit var faceStepMock: Step
-    @MockK lateinit var verifyCoreStepMock: Step
-    @MockK lateinit var consentCoreStepMock: Step
-    @MockK lateinit var setupCoreStepMock: Step
+    private lateinit var modalityFlowVerify: ModalityFlowVerify
+    @MockK
+    private lateinit var fingerprintStepProcessor: FingerprintStepProcessor
+    @MockK
+    lateinit var faceStepProcessor: FaceStepProcessor
+    @MockK
+    lateinit var coreStepProcessor: CoreStepProcessor
+    @MockK
+    lateinit var fingerprintStepMock: Step
+    @MockK
+    lateinit var faceStepMock: Step
+    @MockK
+    lateinit var verifyCoreStepMock: Step
+    @MockK
+    lateinit var consentCoreStepMock: Step
+    @MockK
+    lateinit var setupCoreStepMock: Step
+
+    private val generalConfiguration = mockk<GeneralConfiguration>()
+    private val consentConfiguration = mockk<ConsentConfiguration>()
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { general } returns generalConfiguration
+            every { consent } returns consentConfiguration
+        }
+    }
+    private val loginManager = mockk<LoginManager> {
+        every { signedInProjectId } returns ModalityFlowEnrolImplTest.PROJECT_ID
+    }
 
     @Before
     fun setUp() {
@@ -55,8 +77,8 @@ class ModalityFlowVerifyImplTest {
         every { consentCoreStepMock.activityName } returns CONSENT_ACTIVITY_NAME
         every { setupCoreStepMock.activityName } returns SETUP_ACTIVITY_NAME
 
-        every { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
-        every { faceStepProcessor.buildCaptureStep() } returns faceStepMock
+        coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
+        coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildFetchGuidStep(any(), any()) } returns verifyCoreStepMock
@@ -65,7 +87,7 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFace_shouldStartWithCaptureSteps() {
+    fun identifyForFace_shouldStartWithCaptureSteps() = runTest {
         buildModalityFlowVerify(true, listOf(FACE))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
@@ -80,8 +102,8 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFingerprint_shouldStartWithCaptureSteps() {
-        buildModalityFlowVerify(true, listOf(FINGER))
+    fun identifyForFingerprint_shouldStartWithCaptureSteps() = runTest {
+        buildModalityFlowVerify(true, listOf(FINGERPRINT))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
         with(modalityFlowVerify.steps) {
@@ -95,8 +117,8 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFaceFingerprint_shouldStartWithCaptureSteps() {
-        buildModalityFlowVerify(true, listOf(FACE, FINGER))
+    fun identifyForFaceFingerprint_shouldStartWithCaptureSteps() = runTest {
+        buildModalityFlowVerify(true, listOf(FACE, FINGERPRINT))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
         with(modalityFlowVerify.steps) {
@@ -112,8 +134,8 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFingerprintFace_shouldStartWithCaptureSteps() {
-        buildModalityFlowVerify(true, listOf(FINGER, FACE))
+    fun identifyForFingerprintFace_shouldStartWithCaptureSteps() = runTest {
+        buildModalityFlowVerify(true, listOf(FINGERPRINT, FACE))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
         with(modalityFlowVerify.steps) {
@@ -129,7 +151,7 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFaceWithoutConsent_shouldStartWithCaptureSteps() {
+    fun identifyForFaceWithoutConsent_shouldStartWithCaptureSteps() = runTest {
         buildModalityFlowVerify(false, listOf(FACE))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
@@ -143,8 +165,8 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFingerprintWithoutConsent_shouldStartWithCaptureSteps() {
-        buildModalityFlowVerify(false, listOf(FINGER))
+    fun identifyForFingerprintWithoutConsent_shouldStartWithCaptureSteps() = runTest {
+        buildModalityFlowVerify(false, listOf(FINGERPRINT))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
         with(modalityFlowVerify.steps) {
@@ -157,8 +179,8 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFaceFingerprintWithoutConsent_shouldStartWithCaptureSteps() {
-        buildModalityFlowVerify(false, listOf(FACE, FINGER))
+    fun identifyForFaceFingerprintWithoutConsent_shouldStartWithCaptureSteps() = runTest {
+        buildModalityFlowVerify(false, listOf(FACE, FINGERPRINT))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
         with(modalityFlowVerify.steps) {
@@ -173,8 +195,8 @@ class ModalityFlowVerifyImplTest {
     }
 
     @Test
-    fun identifyForFingerprintFaceWithoutConsent_shouldStartWithCaptureSteps() {
-        buildModalityFlowVerify(false, listOf(FINGER, FACE))
+    fun identifyForFingerprintFaceWithoutConsent_shouldStartWithCaptureSteps() = runTest {
+        buildModalityFlowVerify(false, listOf(FINGERPRINT, FACE))
         modalityFlowVerify.startFlow(verifyAppRequest)
 
         with(modalityFlowVerify.steps) {
@@ -191,9 +213,18 @@ class ModalityFlowVerifyImplTest {
     private fun verifyStepWasAdded(step: Step, activityName: String) =
         assertThat(step.activityName).isEqualTo(activityName)
 
-    private fun buildModalityFlowVerify(consentRequired: Boolean, modalities: List<Modality>) {
-        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, timeHelper, eventRepository, consentRequired, true,
-            modalities,"projectId", "deviceId")
+    private fun buildModalityFlowVerify(collectConsent: Boolean, modalities: List<Modality>) {
+        every { generalConfiguration.collectLocation } returns true
+        every { generalConfiguration.modalities } returns modalities
+        every { consentConfiguration.collectConsent } returns collectConsent
+
+        modalityFlowVerify = ModalityFlowVerify(
+            fingerprintStepProcessor,
+            faceStepProcessor,
+            coreStepProcessor,
+            configManager,
+            loginManager,
+            "deviceId"
+        )
     }
 }

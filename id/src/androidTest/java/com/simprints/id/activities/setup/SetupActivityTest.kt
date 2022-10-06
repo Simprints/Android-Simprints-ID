@@ -11,13 +11,13 @@ import androidx.work.WorkRequest
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.common.truth.Truth
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.Application
 import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.requests.SetupRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.di.TestAppModule
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -67,7 +67,10 @@ class SetupActivityTest {
     fun launchSetupActivityWithLocationPermissions_shouldFinishWithSuccess() {
 
         val request =
-            SetupRequest(listOf(Modality.FINGER, Modality.FACE), listOf(SetupPermission.LOCATION))
+            SetupRequest(
+                listOf(Modality.FINGERPRINT, Modality.FACE),
+                listOf(SetupPermission.LOCATION)
+            )
         val intent = Intent().apply {
             setClassName(
                 ApplicationProvider.getApplicationContext<android.app.Application>().packageName,

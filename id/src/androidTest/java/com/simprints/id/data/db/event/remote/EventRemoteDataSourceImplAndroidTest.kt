@@ -4,8 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -52,6 +50,7 @@ import com.simprints.id.testtools.SubjectsGeneratorUtils
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.apiclient.SimApiClientImpl
@@ -570,7 +569,7 @@ class EventRemoteDataSourceImplAndroidTest {
             id = randomUUID(),
             projectId = testProject.id,
             createdAt = CREATED_AT,
-            modalities = listOf(FINGERPRINT, FACE),
+            modalities = listOf(Modality.FINGERPRINT, Modality.FACE),
             appVersionName = "appVersionName",
             libVersionName = "libSimprintsVersionName",
             language = "EN",

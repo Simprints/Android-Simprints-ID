@@ -13,17 +13,17 @@ import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress
 import com.simprints.id.testtools.TestData.defaultSubject
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +39,7 @@ class FetchGuidHelperImplTest {
     lateinit var subjectRepository: SubjectRepository
 
     @MockK
-    lateinit var preferencesManager: IdPreferencesManager
+    lateinit var configManager: ConfigManager
 
     private lateinit var downloadEventsChannel: Channel<EventDownSyncProgress>
     private val op = projectDownSyncScope.operations.first()
@@ -47,8 +47,12 @@ class FetchGuidHelperImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, subjectRepository, preferencesManager)
-        coEvery { preferencesManager.modalities } returns listOf(Modality.FINGER)
+        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, subjectRepository, configManager)
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns mockk {
+                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            }
+        }
         runTest {
             mockProgressEmission(emptyList())
         }

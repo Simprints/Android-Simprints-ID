@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.BuildConfig
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -19,8 +21,8 @@ import java.util.concurrent.TimeUnit
 class EventSyncManagerImpl(
     private val ctx: Context,
     private val eventSyncStateProcessor: EventSyncStateProcessor,
-    private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-    private val upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+    private val downSyncScopeRepository: EventDownSyncScopeRepository,
+    private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
     private val dispatcher: DispatcherProvider
 ) : EventSyncManager {
@@ -55,7 +57,8 @@ class EventSyncManagerImpl(
         wm.enqueueUniquePeriodicWork(
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
             ExistingPeriodicWorkPolicy.KEEP,
-            buildPeriodicRequest())
+            buildPeriodicRequest()
+        )
 
     }
 
@@ -80,7 +83,11 @@ class EventSyncManagerImpl(
             .build() as OneTimeWorkRequest
 
     private fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(EventSyncMasterWorker::class.java, SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(
+            EventSyncMasterWorker::class.java,
+            SYNC_REPEAT_INTERVAL,
+            SYNC_REPEAT_UNIT
+        )
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForBackgroundSyncMasterWorker()

@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
@@ -11,6 +10,8 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
 
@@ -21,7 +22,7 @@ import kotlinx.coroutines.rx2.await
 class ScannerInitialSetupHelper(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
-    private val fingerprintPreferenceManager: FingerprintPreferencesManager,
+    private val configManager: ConfigManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource
 ) {
 
@@ -56,28 +57,48 @@ class ScannerInitialSetupHelper(
         scanner.enterMainMode().await()
         delay(100) // Speculatively needed
         val batteryInfo = getBatteryInfo(scanner, withBatteryInfo)
-        ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, batteryInfo)
+        ifAvailableOtasPrepareScannerThenThrow(
+            scannerVersion.hardwareVersion,
+            scanner,
+            macAddress,
+            batteryInfo
+        )
     }
 
 
-
-    private suspend fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): BatteryInfo {
+    private suspend fun getBatteryInfo(
+        scanner: Scanner,
+        withBatteryInfo: (BatteryInfo) -> Unit
+    ): BatteryInfo {
         val batteryPercent = scanner.getBatteryPercentCharge().await()
         val batteryVoltage = scanner.getBatteryVoltageMilliVolts().await()
         val batteryMilliAmps = scanner.getBatteryCurrentMilliAmps().await()
         val batteryTemperature = scanner.getBatteryTemperatureDeciKelvin().await()
 
-        return BatteryInfo(batteryPercent, batteryVoltage, batteryMilliAmps, batteryTemperature).also {
+        return BatteryInfo(
+            batteryPercent,
+            batteryVoltage,
+            batteryMilliAmps,
+            batteryTemperature
+        ).also {
             withBatteryInfo(it)
         }
     }
 
-    private suspend fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo) {
-        val availableVersions = fingerprintPreferenceManager.scannerHardwareRevisions[hardwareVersion]
+    private suspend fun ifAvailableOtasPrepareScannerThenThrow(
+        hardwareVersion: String,
+        scanner: Scanner,
+        macAddress: String,
+        batteryInfo: BatteryInfo
+    ) {
+        val availableVersions =
+            configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.get(
+                hardwareVersion
+            )
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
         val requiresOtaUpdate = availableOtas.isNotEmpty()
-                && !batteryInfo.isLowBattery()
-                && !batteryLevelChecker.isLowBattery()
+            && !batteryInfo.isLowBattery()
+            && !batteryLevelChecker.isLowBattery()
 
         if (requiresOtaUpdate) {
             connectionHelper.reconnect(scanner, macAddress)
@@ -87,7 +108,7 @@ class ScannerInitialSetupHelper(
 
     private fun determineAvailableOtas(
         current: ScannerFirmwareVersions,
-        available: ScannerFirmwareVersions?
+        available: Vero2Configuration.Vero2FirmwareVersions?
     ): List<AvailableOta> {
         if (available == null) {
             return emptyList()

@@ -4,24 +4,22 @@ import com.google.common.truth.Truth
 import com.simprints.fingerprint.scanner.data.FirmwareTestData
 import com.simprints.fingerprint.scanner.data.FirmwareTestData.SCANNER_VERSIONS_HIGH
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
-import org.junit.Before
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import org.junit.Test
 
 class ScannerHardwareRevisionsTest {
 
-    @Before
-    fun setUp() {
-    }
-
     @Test
     fun `test getDownloadableFirmwares with empty local ScannerFirmwareVersions `() {
-
         //Given
         val scannerHardwareRevisions = FirmwareTestData.RESPONSE_HARDWARE_REVISIONS_MAP
         val local = emptyMap<DownloadableFirmwareVersion.Chip, Set<String>>()
         // When
         val result =
-            scannerHardwareRevisions.getAvailableVersionsForDownload(FirmwareTestData.HARDWARE_VERSION, local)
+            scannerHardwareRevisions.getAvailableVersionsForDownload(
+                FirmwareTestData.HARDWARE_VERSION,
+                local
+            )
         // Then
         Truth.assertThat(result.size).isEqualTo(3)
     }
@@ -34,7 +32,10 @@ class ScannerHardwareRevisionsTest {
         val local = SCANNER_VERSIONS_HIGH
         // When
         val result =
-            scannerHardwareRevisions.getAvailableVersionsForDownload(FirmwareTestData.HARDWARE_VERSION, local)
+            scannerHardwareRevisions.getAvailableVersionsForDownload(
+                FirmwareTestData.HARDWARE_VERSION,
+                local
+            )
         // Then
         Truth.assertThat(result.size).isEqualTo(0)
     }
@@ -43,11 +44,14 @@ class ScannerHardwareRevisionsTest {
     fun `test getDownloadableFirmwares with empty ScannerHardwareRevisions`() {
 
         //Given
-        val scannerHardwareRevisions = ScannerHardwareRevisions()
+        val scannerHardwareRevisions = mapOf<String, Vero2Configuration.Vero2FirmwareVersions>()
         val local = SCANNER_VERSIONS_HIGH
         // When
         val result =
-            scannerHardwareRevisions.getAvailableVersionsForDownload(FirmwareTestData.HARDWARE_VERSION, local)
+            scannerHardwareRevisions.getAvailableVersionsForDownload(
+                FirmwareTestData.HARDWARE_VERSION,
+                local
+            )
         // Then
         Truth.assertThat(result.size).isEqualTo(0)
     }

@@ -18,12 +18,8 @@ import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStat
 import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordSchedulerImpl
-import com.simprints.id.services.config.RemoteConfigScheduler
-import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -46,6 +42,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
@@ -102,11 +99,11 @@ open class SyncModule {
     open fun provideSyncManager(
         eventSyncManager: EventSyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler,
-        remoteConfigScheduler: RemoteConfigScheduler
+        configManager: ConfigManager,
     ): SyncManager = SyncSchedulerImpl(
         eventSyncManager,
         imageUpSyncScheduler,
-        remoteConfigScheduler
+        configManager
     )
 
     @Provides
@@ -126,9 +123,9 @@ open class SyncModule {
     open fun provideDownSyncWorkerBuilder(
         downSyncScopeRepository: EventDownSyncScopeRepository,
         jsonHelper: JsonHelper,
-        preferencesManager: IdPreferencesManager
+        configManager: ConfigManager,
     ): EventDownSyncWorkersBuilder =
-        EventDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper, preferencesManager)
+        EventDownSyncWorkersBuilderImpl(downSyncScopeRepository, jsonHelper, configManager)
 
 
     @Provides
@@ -166,7 +163,7 @@ open class SyncModule {
         eventRepository: com.simprints.eventsystem.event.EventRepository,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         subjectFactory: SubjectFactory,
-        preferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         timeHelper: TimeHelper,
         dispatcher: DispatcherProvider
     ): EventDownSyncHelper =
@@ -175,7 +172,7 @@ open class SyncModule {
             eventRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
-            preferencesManager,
+            configManager,
             timeHelper,
             dispatcher
         )
@@ -185,13 +182,13 @@ open class SyncModule {
         eventRepository: com.simprints.eventsystem.event.EventRepository,
         eventUpSyncScopeRepo: EventUpSyncScopeRepository,
         timerHelper: TimeHelper,
-        settingsPreferencesManager: SettingsPreferencesManager
+        configManager: ConfigManager
     ): EventUpSyncHelper =
         EventUpSyncHelperImpl(
             eventRepository,
             eventUpSyncScopeRepo,
             timerHelper,
-            settingsPreferencesManager
+            configManager
         )
 
     @Provides
@@ -201,10 +198,6 @@ open class SyncModule {
     @Provides
     open fun provideImageUpSyncScheduler(context: Context): ImageUpSyncScheduler =
         ImageUpSyncSchedulerImpl(context)
-
-    @Provides
-    fun provideRemoteConfigScheduler(context: Context): RemoteConfigScheduler =
-        RemoteConfigSchedulerImpl(context)
 
     @Provides
     fun provideEnrolmentRecordScheduler(context: Context): EnrolmentRecordScheduler =

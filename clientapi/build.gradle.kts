@@ -51,6 +51,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":id"))
     implementation(project(":moduleapi"))
+    implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
     implementation(project(":infrarealm"))

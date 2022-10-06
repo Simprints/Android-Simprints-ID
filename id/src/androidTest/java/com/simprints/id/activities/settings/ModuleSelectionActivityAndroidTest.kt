@@ -8,30 +8,27 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaListInteractions.clickListItem
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.di.TestPreferencesModule
-import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.infra.config.ConfigManager
+import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
 class ModuleSelectionActivityAndroidTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-    private val preferencesModule = TestPreferencesModule(
-        settingsPreferencesManagerRule = DependencyRule.SpykRule
-    )
 
-    private lateinit var preferencesManagerSpy: IdPreferencesManager
+    lateinit var configManager: ConfigManager
 
-    private val moduleOptions = setOf("a", "b", "c", "d", "e")
-    private val selectedModules = setOf("b")
+    private val moduleIdsOptions = listOf("a", "b", "c", "d", "e")
+    private val selectedModuleIds = listOf("b")
 
     @Before
     fun setUp() {
-        AndroidTestConfig(preferencesModule = preferencesModule).fullSetup().inject(this)
-        preferencesManagerSpy = app.component.getIdPreferencesManager()
+        AndroidTestConfig().fullSetup().inject(this)
+        configManager = app.component.getConfigManager()
     }
 
     @Test
@@ -83,25 +80,35 @@ class ModuleSelectionActivityAndroidTest {
 
 
     private fun launchWithModulesSelected() {
-        every {
-            preferencesManagerSpy.moduleIdOptions
-        } returns moduleOptions
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns mockk {
+                every { down } returns mockk {
+                    every { moduleOptions } returns moduleIdsOptions
+                    every { maxNbOfModules } returns 6
+                }
+            }
+        }
 
-        every {
-            preferencesManagerSpy.selectedModules
-        } returns selectedModules
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns selectedModuleIds
+        }
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
 
     private fun launchWithoutModulesSelected() {
-        every {
-            preferencesManagerSpy.moduleIdOptions
-        } returns moduleOptions
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns mockk {
+                every { down } returns mockk {
+                    every { moduleOptions } returns moduleIdsOptions
+                    every { maxNbOfModules } returns 6
+                }
+            }
+        }
 
-        every {
-            preferencesManagerSpy.selectedModules
-        } returns emptySet()
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf()
+        }
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }

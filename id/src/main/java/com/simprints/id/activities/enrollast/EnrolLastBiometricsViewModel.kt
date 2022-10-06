@@ -14,30 +14,36 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
-import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.logging.Simber
 
-class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
-                                   val timeHelper: TimeHelper,
-                                   private val fingerprintConfidenceThresholds: Map<FingerprintConfidenceThresholds, Int>,
-                                   private val faceConfidenceThresholds: Map<FaceConfidenceThresholds, Int>,
-                                   private val isEnrolmentPlus: Boolean) : ViewModel() {
+class EnrolLastBiometricsViewModel(
+    private val enrolmentHelper: EnrolmentHelper,
+    private val timeHelper: TimeHelper,
+    private val configManager: ConfigManager
+) : ViewModel() {
 
     fun getViewStateLiveData(): LiveData<ViewState> = viewStateLiveData
     private val viewStateLiveData = MutableLiveData<ViewState>()
 
     suspend fun processEnrolLastBiometricsRequest(enrolLastBiometricsRequest: EnrolLastBiometricsRequest) {
         viewStateLiveData.value = try {
+            val projectConfiguration = configManager.getProjectConfiguration()
             val steps = enrolLastBiometricsRequest.previousSteps
-            val previousLastEnrolmentResult = steps.firstOrNull { it.request is EnrolLastBiometricsRequest }?.getResult()
+            val previousLastEnrolmentResult =
+                steps.firstOrNull { it.request is EnrolLastBiometricsRequest }?.getResult()
             if (previousLastEnrolmentResult is EnrolLastBiometricsResponse) {
                 previousLastEnrolmentResult.newSubjectId?.let { Success(it) } ?: Failed
             } else {
-                performEnrolmentIfRequiredAndGetViewState(steps, enrolLastBiometricsRequest)
+                performEnrolmentIfRequiredAndGetViewState(
+                    projectConfiguration,
+                    steps,
+                    enrolLastBiometricsRequest
+                )
             }
         } catch (t: Throwable) {
             Simber.e(t)
@@ -45,41 +51,55 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
         }
     }
 
-    private suspend fun performEnrolmentIfRequiredAndGetViewState(steps: List<Step>,
-                                                          enrolLastBiometricsRequest: EnrolLastBiometricsRequest): ViewState {
-        return if (isEnrolmentPlus) {
+    private suspend fun performEnrolmentIfRequiredAndGetViewState(
+        configuration: ProjectConfiguration,
+        steps: List<Step>,
+        enrolLastBiometricsRequest: EnrolLastBiometricsRequest
+    ): ViewState {
+        return if (configuration.general.duplicateBiometricEnrolmentCheck) {
             val results = steps.map { it.getResult() }
             val fingerprintResponse = getFingerprintMatchResponseFromSteps(results)
             val faceResponse = getFaceMatchResponseFromSteps(results)
-            processResponsesAndGetViewState(fingerprintResponse, faceResponse, enrolLastBiometricsRequest, steps)
+            processResponsesAndGetViewState(
+                configuration,
+                fingerprintResponse,
+                faceResponse,
+                enrolLastBiometricsRequest,
+                steps
+            )
         } else {
             buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
         }
     }
 
-    private suspend fun processResponsesAndGetViewState(fingerprintResponse: FingerprintMatchResponse?,
-                                                        faceResponse: FaceMatchResponse?, enrolLastBiometricsRequest: EnrolLastBiometricsRequest, steps: List<Step>): ViewState {
+    private suspend fun processResponsesAndGetViewState(
+        configuration: ProjectConfiguration,
+        fingerprintResponse: FingerprintMatchResponse?,
+        faceResponse: FaceMatchResponse?,
+        enrolLastBiometricsRequest: EnrolLastBiometricsRequest,
+        steps: List<Step>
+    ): ViewState {
         return when {
             /**
              * We would only process the fingerprint response in a multi-modal flow until a
             proper results combining mechanism is in place
              */
             fingerprintResponse != null && faceResponse != null -> {
-                if (isAnyResponseWithHighConfidence(fingerprintResponse)) {
+                if (isAnyResponseWithHighConfidence(configuration, fingerprintResponse)) {
                     Failed
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             fingerprintResponse != null -> {
-                if (isAnyResponseWithHighConfidence(fingerprintResponse)) {
+                if (isAnyResponseWithHighConfidence(configuration, fingerprintResponse)) {
                     Failed
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             faceResponse != null -> {
-                if (isAnyResponseWithHighConfidence(faceResponse)) {
+                if (isAnyResponseWithHighConfidence(configuration, faceResponse)) {
                     Failed
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
@@ -89,24 +109,33 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
         }
     }
 
-    private suspend fun buildSubjectAndGetViewState(enrolLastBiometricsRequest: EnrolLastBiometricsRequest, steps: List<Step>): ViewState {
+    private suspend fun buildSubjectAndGetViewState(
+        enrolLastBiometricsRequest: EnrolLastBiometricsRequest,
+        steps: List<Step>
+    ): ViewState {
         return try {
             val subject = enrolLastBiometricsRequest.buildSubject(steps)
             enrolmentHelper.enrol(subject)
             Success(subject.subjectId)
-        } catch (e: EnrolmentEventValidatorException){
+        } catch (e: EnrolmentEventValidatorException) {
             Failed
         }
     }
 
-    private fun isAnyResponseWithHighConfidence(fingerprintResponse: FingerprintMatchResponse) =
+    private fun isAnyResponseWithHighConfidence(
+        configuration: ProjectConfiguration,
+        fingerprintResponse: FingerprintMatchResponse
+    ) =
         fingerprintResponse.result.any {
-            it.confidenceScore >= fingerprintConfidenceThresholds.getValue(FingerprintConfidenceThresholds.HIGH)
+            it.confidenceScore >= configuration.fingerprint!!.decisionPolicy.high
         }
 
-    private fun isAnyResponseWithHighConfidence(faceResponse: FaceMatchResponse) =
+    private fun isAnyResponseWithHighConfidence(
+        configuration: ProjectConfiguration,
+        faceResponse: FaceMatchResponse
+    ) =
         faceResponse.result.any {
-            it.confidence >= faceConfidenceThresholds.getValue(FaceConfidenceThresholds.HIGH)
+            it.confidence >= configuration.face!!.decisionPolicy.high
         }
 
     private fun getFingerprintMatchResponseFromSteps(results: List<Step.Result?>) =
@@ -122,7 +151,8 @@ class EnrolLastBiometricsViewModel(private val enrolmentHelper: EnrolmentHelper,
             moduleId,
             getCaptureResponse<FingerprintCaptureResponse>(steps),
             getCaptureResponse<FaceCaptureResponse>(steps),
-            timeHelper)
+            timeHelper
+        )
     }
 
     private inline fun <reified T> getCaptureResponse(steps: List<Step>) =

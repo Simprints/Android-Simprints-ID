@@ -1,18 +1,19 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
+import com.simprints.infra.config.domain.models.Finger
 
 interface FingerprintRequestFactory {
 
-    fun buildFingerprintCaptureRequest(prefs: IdPreferencesManager): FingerprintCaptureRequest
+    fun buildFingerprintCaptureRequest(fingersToCapture: List<Finger>): FingerprintCaptureRequest
 
-    fun buildFingerprintMatchRequest(probeSamples: List<FingerprintCaptureSample>,
-                                     query: SubjectQuery
+    fun buildFingerprintMatchRequest(
+        probeSamples: List<FingerprintCaptureSample>,
+        query: SubjectQuery
     ): FingerprintMatchRequest
 
     fun buildFingerprintConfigurationRequest(): FingerprintConfigurationRequest

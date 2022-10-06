@@ -10,14 +10,18 @@ import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
+import com.simprints.infra.config.ConfigManager
 
 /**
  * Helper class for handling MAC addresses and pairing programmatically.
  */
-class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdapter,
-                            private val preferencesManager: FingerprintPreferencesManager,
-                            private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
-                            private val serialNumberConverter: SerialNumberConverter) {
+class ScannerPairingManager(
+    private val bluetoothAdapter: ComponentBluetoothAdapter,
+    private val recentEventsPreferencesManager: FingerprintPreferencesManager,
+    private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
+    private val serialNumberConverter: SerialNumberConverter,
+    private val configManager: ConfigManager
+) {
 
     /**
      * Turns user entered text into a valid serial number, e.g. "003456" -> "SP003456"
@@ -40,8 +44,9 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
      * @throws ScannerNotPairedException
      * @throws MultiplePossibleScannersPairedException
      */
-    fun getPairedScannerAddressToUse(): String {
-        val validPairedScanners = getPairedScannerAddresses().filter { isScannerGenerationValidForProject(it) }
+    suspend fun getPairedScannerAddressToUse(): String {
+        val validPairedScanners =
+            getPairedScannerAddresses().filter { isScannerGenerationValidForProject(it) }
         return when (validPairedScanners.size) {
             0 -> throw ScannerNotPairedException()
             1 -> validPairedScanners.first()
@@ -49,16 +54,18 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
         }
     }
 
-    private fun isScannerGenerationValidForProject(address: String): Boolean =
-        preferencesManager.scannerGenerations.contains(
+    private suspend fun isScannerGenerationValidForProject(address: String): Boolean =
+        configManager.getProjectConfiguration().fingerprint?.allowedVeroGenerations?.contains(
             scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
                 serialNumberConverter.convertMacAddressToSerialNumber(address)
-            ))
+            )
+        ) ?: false
 
     private fun deduceScannerFromLastScannerUsed(pairedScanners: List<String>): String {
-        val lastSerialNumberUsed = preferencesManager.lastScannerUsed
+        val lastSerialNumberUsed = recentEventsPreferencesManager.lastScannerUsed
         if (isScannerSerialNumber(lastSerialNumberUsed)) {
-            val lastAddressUsed = serialNumberConverter.convertSerialNumberToMacAddress(lastSerialNumberUsed)
+            val lastAddressUsed =
+                serialNumberConverter.convertSerialNumberToMacAddress(lastSerialNumberUsed)
             if (pairedScanners.contains(lastAddressUsed)) {
                 return lastAddressUsed
             } else {
@@ -84,12 +91,21 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
     private fun isScannerSerialNumber(serialNumber: String): Boolean =
         SERIAL_NUMBER_REGEX.matches(serialNumber)
 
-    fun bluetoothPairStateChangeReceiver(onPairSuccess: () -> Unit, onPairFailed: () -> Unit): BroadcastReceiver =
+    fun bluetoothPairStateChangeReceiver(
+        onPairSuccess: () -> Unit,
+        onPairFailed: () -> Unit
+    ): BroadcastReceiver =
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
                 if (intent.action == ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED) {
-                    val bondState = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_BOND_STATE, ComponentBluetoothDevice.BOND_NONE)
-                    val failReason = intent.getIntExtra(ComponentBluetoothDevice.EXTRA_REASON, ComponentBluetoothDevice.BOND_SUCCESS)
+                    val bondState = intent.getIntExtra(
+                        ComponentBluetoothDevice.EXTRA_BOND_STATE,
+                        ComponentBluetoothDevice.BOND_NONE
+                    )
+                    val failReason = intent.getIntExtra(
+                        ComponentBluetoothDevice.EXTRA_REASON,
+                        ComponentBluetoothDevice.BOND_SUCCESS
+                    )
                     val pairSucceeded = bondState == ComponentBluetoothDevice.BOND_BONDED
                     val pairingFailed = bondState == ComponentBluetoothDevice.BOND_NONE
                         && failReason != ComponentBluetoothDevice.BOND_SUCCESS
@@ -105,7 +121,8 @@ class ScannerPairingManager(private val bluetoothAdapter: ComponentBluetoothAdap
 
     companion object {
         private const val MAC_ADDRESS_PREFIX = "F0:AC:D7:C"
-        private val SCANNER_ADDRESS_REGEX = Regex("""$MAC_ADDRESS_PREFIX[0-9A-F]:[0-9A-F]{2}:[0-9A-F]{2}""")
+        private val SCANNER_ADDRESS_REGEX =
+            Regex("""$MAC_ADDRESS_PREFIX[0-9A-F]:[0-9A-F]{2}:[0-9A-F]{2}""")
         private const val SERIAL_PREFIX = "SP"
         private val SERIAL_NUMBER_REGEX = Regex("""^$SERIAL_PREFIX[0-9]{6}$""")
 

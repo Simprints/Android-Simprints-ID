@@ -14,24 +14,35 @@ import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequ
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import io.mockk.mockk
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class AppResponseBuilderForEnrolLastBiometricsTest {
 
     @Test
     fun givenAnAppBuilder_withAValidLastBiometricStepResult_shouldBuildAppResponse() {
-        runBlockingTest {
+        runTest {
             val lastEnBuilderForEnrolLastBiometrics = AppResponseBuilderForEnrolLastBiometrics()
             val step = Step(
                 requestCode = CoreRequestCode.LAST_BIOMETRICS_CORE.value,
                 activityName = CoreStepProcessorImpl.LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
                 bundleKey = CoreResponse.CORE_STEP_BUNDLE,
-                request = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, emptyList(), GUID1),
+                request = EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    emptyList(),
+                    GUID1
+                ),
                 status = Step.Status.NOT_STARTED
             )
             step.setResult(EnrolLastBiometricsResponse(GUID1))
-            val response = lastEnBuilderForEnrolLastBiometrics.buildAppResponse(mockk(), mockk(), listOf(step), GUID1) as AppEnrolResponse
+            val response = lastEnBuilderForEnrolLastBiometrics.buildAppResponse(
+                mockk(),
+                mockk(),
+                listOf(step),
+                GUID1
+            ) as AppEnrolResponse
 
             assertThat(response.guid).isEqualTo(GUID1)
         }
@@ -39,16 +50,27 @@ class AppResponseBuilderForEnrolLastBiometricsTest {
 
     @Test
     fun givenAnAppBuilder_withAnInvalidLastBiometricStepResult_shouldBuildAppResponse() {
-        runBlockingTest {
+        runTest {
             val lastEnBuilderForEnrolLastBiometrics = AppResponseBuilderForEnrolLastBiometrics()
             val step = Step(
                 requestCode = CoreRequestCode.LAST_BIOMETRICS_CORE.value,
                 activityName = CoreStepProcessorImpl.LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
                 bundleKey = CoreResponse.CORE_STEP_BUNDLE,
-                request = EnrolLastBiometricsRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, emptyList(), GUID1),
+                request = EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    emptyList(),
+                    GUID1
+                ),
                 status = Step.Status.NOT_STARTED
             )
-            val response = lastEnBuilderForEnrolLastBiometrics.buildAppResponse(mockk(), mockk(), listOf(step), GUID1)
+            val response = lastEnBuilderForEnrolLastBiometrics.buildAppResponse(
+                mockk(),
+                mockk(),
+                listOf(step),
+                GUID1
+            )
 
             assertThat(response).isInstanceOf(AppErrorResponse::class.java)
         }

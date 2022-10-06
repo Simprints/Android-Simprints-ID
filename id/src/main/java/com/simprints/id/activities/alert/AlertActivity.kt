@@ -32,7 +32,8 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType
-    @Inject lateinit var exitFormHelper: ExitFormHelper
+    @Inject
+    lateinit var exitFormHelper: ExitFormHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,12 +59,25 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
         component.inject(this)
     }
 
-    override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
-    override fun setLayoutBackgroundColor(@ColorInt color: Int) = binding.alertLayout.setBackgroundColor(color)
-    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = binding.alertLeftButton.setBackgroundColor(color)
-    override fun setRightButtonBackgroundColor(@ColorInt color: Int) = binding.alertRightButton.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) { binding.alertTitle.text = getString(stringRes) }
-    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = binding.alertImage.setImageResource(drawableId)
+    override fun getColorForColorRes(@ColorRes colorRes: Int) =
+        ResourcesCompat.getColor(resources, colorRes, null)
+
+    override fun setLayoutBackgroundColor(@ColorInt color: Int) =
+        binding.alertLayout.setBackgroundColor(color)
+
+    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) =
+        binding.alertLeftButton.setBackgroundColor(color)
+
+    override fun setRightButtonBackgroundColor(@ColorInt color: Int) =
+        binding.alertRightButton.setBackgroundColor(color)
+
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) {
+        binding.alertTitle.text = getString(stringRes)
+    }
+
+    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) =
+        binding.alertImage.setImageResource(drawableId)
+
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
             binding.hintGraphic.setImageResource(alertHintDrawableId)
@@ -72,7 +86,7 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int,  params: Array<Any>) {
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int, params: Array<Any>) {
         binding.message.text = String.format(getString(stringRes), *params)
     }
 
@@ -84,7 +98,10 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) =
         initButtonWithButtonAction(binding.alertRightButton, rightButtonAction)
 
-    private fun initButtonWithButtonAction(button: TextView, buttonAction: AlertActivityViewModel.ButtonAction) {
+    private fun initButtonWithButtonAction(
+        button: TextView,
+        buttonAction: AlertActivityViewModel.ButtonAction
+    ) {
         if (buttonAction !is AlertActivityViewModel.ButtonAction.None) {
             button.text = getString(buttonAction.buttonText)
             button.setOnClickListener { viewPresenter.handleButtonClick(buttonAction) }
@@ -108,7 +125,10 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override fun closeActivityAfterCloseButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.CLOSE))
+            putExtra(
+                AlertActResponse.BUNDLE_KEY,
+                AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.CLOSE)
+            )
         })
 
         finish()
@@ -116,7 +136,7 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode) {
+        when (requestCode) {
             WIFI_SETTINGS_REQUEST_CODE -> finishWithTryAgain()
             CoreRequestCode.EXIT_FORM.value -> {
                 exitFormHelper.buildExitFormResponseForCore(data)?.let {
@@ -128,7 +148,10 @@ class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     override fun finishWithTryAgain() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.TRY_AGAIN))
+            putExtra(
+                AlertActResponse.BUNDLE_KEY,
+                AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.TRY_AGAIN)
+            )
         })
 
         finish()

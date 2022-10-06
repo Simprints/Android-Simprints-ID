@@ -3,13 +3,14 @@ package com.simprints.id.services.sync.events.down
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.modulesDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.eventsystem.sampledata.SampleDefaults.userDownSyncScope
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
@@ -18,44 +19,61 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloade
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
-import io.mockk.MockKAnnotations
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import io.mockk.coEvery
-import io.mockk.impl.annotations.MockK
-import io.mockk.verify
-import kotlinx.coroutines.test.StandardTestDispatcher
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class EventDownSyncWorkersBuilderImplTest {
 
-    private lateinit var eventDownSyncWorkersBuilder: EventDownSyncWorkersBuilder
+    companion object {
+        private val SELECTED_MODULE = listOf("MODULE_1")
+    }
 
-    @MockK
-    lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
-
-    @MockK
-    lateinit var mockPreferencesManager: IdPreferencesManager
+    private var generalConfiguration = mockk<GeneralConfiguration>()
+    private var downSyncConfiguration = mockk<DownSynchronizationConfiguration>()
+    private val configManager = mockk<ConfigManager>()
+    private val eventDownSyncScopeRepository = mockk<EventDownSyncScopeRepository>()
+    private lateinit var eventDownSyncWorkersBuilder: EventDownSyncWorkersBuilderImpl
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            SELECTED_MODULE,
+            listOf()
+        )
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns generalConfiguration
+            every { synchronization } returns mockk {
+                every { down } returns downSyncConfiguration
+            }
+        }
 
         eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilderImpl(
             eventDownSyncScopeRepository,
             JsonHelper,
-            mockPreferencesManager
+            configManager
         )
     }
 
     @Test
     fun builder_forProjectDownSync_shouldReturnTheRightWorkers() =
-        runTest(StandardTestDispatcher()) {
+        runTest(UnconfinedTestDispatcher()) {
+            every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
             coEvery {
                 eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
+                    listOf(Modes.FINGERPRINT),
+                    SELECTED_MODULE,
+                    GROUP.GLOBAL,
                 )
             } returns projectDownSyncScope
 
@@ -69,31 +87,36 @@ class EventDownSyncWorkersBuilderImplTest {
         }
 
     @Test
-    fun builder_forUserDownSync_shouldReturnTheRightWorkers() = runTest(StandardTestDispatcher()) {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns userDownSyncScope
+    fun builder_forUserDownSync_shouldReturnTheRightWorkers() =
+        runTest(UnconfinedTestDispatcher()) {
+            every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.USER
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    listOf(Modes.FINGERPRINT),
+                    SELECTED_MODULE,
+                    GROUP.USER
+                )
+            } returns userDownSyncScope
 
-        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
-        chain.assertNumberOfDownSyncDownloaderWorkers(1)
-        chain.assertNumberOfDownSyncCountWorkers(1)
-        chain.assertDownSyncDownloaderWorkerInput(userDownSyncScope)
-        chain.assertDownSyncCountWorkerInput(userDownSyncScope)
-        assertThat(chain.size).isEqualTo(2)
-    }
+            val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+            chain.assertNumberOfDownSyncDownloaderWorkers(1)
+            chain.assertNumberOfDownSyncCountWorkers(1)
+            chain.assertDownSyncDownloaderWorkerInput(userDownSyncScope)
+            chain.assertDownSyncCountWorkerInput(userDownSyncScope)
+            assertThat(chain.size).isEqualTo(2)
+        }
 
     @Test
     fun builder_forModuleDownSync_shouldReturnTheRightWorkers() =
-        runTest(StandardTestDispatcher()) {
+        runTest(UnconfinedTestDispatcher()) {
+            every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
             coEvery {
                 eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
+                    listOf(Modes.FINGERPRINT),
+                    SELECTED_MODULE,
+                    GROUP.MODULE
                 )
             } returns modulesDownSyncScope
 
@@ -106,29 +129,15 @@ class EventDownSyncWorkersBuilderImplTest {
         }
 
     @Test
-    fun builder_forModuleDownSync_shouldOnlySyncSelectedModules() =
-        runTest(StandardTestDispatcher()) {
-            coEvery {
-                eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
-                )
-            } returns modulesDownSyncScope
-
-            eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
-            verify(exactly = 1) { mockPreferencesManager.selectedModules }
-            verify(exactly = 0) { mockPreferencesManager.moduleIdOptions }
-        }
-
-    @Test
     fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() =
-        runTest(StandardTestDispatcher()) {
+        runTest(UnconfinedTestDispatcher()) {
+            every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+            every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
             coEvery {
                 eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
+                    listOf(Modes.FACE),
+                    SELECTED_MODULE,
+                    GROUP.GLOBAL
                 )
             } returns projectDownSyncScope
             val uniqueSyncId = "uniqueSyncId"
@@ -143,12 +152,14 @@ class EventDownSyncWorkersBuilderImplTest {
 
     @Test
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() =
-        runTest(StandardTestDispatcher()) {
+        runTest(UnconfinedTestDispatcher()) {
+            every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
             coEvery {
                 eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
+                    listOf(Modes.FINGERPRINT),
+                    SELECTED_MODULE,
+                    GROUP.GLOBAL
                 )
             } returns projectDownSyncScope
 

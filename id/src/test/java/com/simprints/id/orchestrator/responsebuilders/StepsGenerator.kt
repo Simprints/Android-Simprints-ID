@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -18,11 +17,12 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.Finger
 import io.mockk.mockk
 
 fun mockFingerprintCaptureStep(): Step {
     val request = FingerprintCaptureRequest(
-        fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+        fingerprintsToCapture = listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER)
     )
 
     return Step(
@@ -34,9 +34,9 @@ fun mockFingerprintCaptureStep(): Step {
             captureResult =
             listOf(
                 FingerprintCaptureResult(
-                    FingerIdentifier.LEFT_THUMB,
+                    Finger.LEFT_THUMB,
                     FingerprintCaptureSample(
-                        FingerIdentifier.LEFT_THUMB,
+                        Finger.LEFT_THUMB,
                         templateQualityScore = 10,
                         template = "template".toByteArray(),
                         format = FingerprintTemplateFormat.ISO_19794_2
@@ -79,7 +79,12 @@ fun mockFaceCaptureStep(): Step {
         listOf(
             FaceCaptureResult(
                 index = 0,
-                result = FaceCaptureSample("faceId", "faceId".toByteArray(), null, FaceTemplateFormat.RANK_ONE_1_23)
+                result = FaceCaptureSample(
+                    "faceId",
+                    "faceId".toByteArray(),
+                    null,
+                    FaceTemplateFormat.RANK_ONE_1_23
+                )
             )
         )
     )

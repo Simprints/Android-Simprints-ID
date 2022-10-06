@@ -17,10 +17,8 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.databinding.FragmentFingerBinding
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FingerFragment : FingerprintFragment() {
@@ -28,13 +26,15 @@ class FingerFragment : FingerprintFragment() {
     private val vm: CollectFingerprintsViewModel by sharedViewModel()
     private val binding by viewBinding(FragmentFingerBinding::bind)
 
-    private val fingerprintPreferencesManager: FingerprintPreferencesManager by inject()
-
     private lateinit var fingerId: FingerIdentifier
 
     private lateinit var timeoutBars: List<ScanningTimeoutBar>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_finger, container, false)
         fingerId = FingerIdentifier.values()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
             ?: throw IllegalArgumentException()]
@@ -59,24 +59,40 @@ class FingerFragment : FingerprintFragment() {
     private fun initTimeoutBars() {
         vm.state().fingerStates.find { it.id == fingerId }?.run {
             timeoutBars = List(captures.size) {
-                ProgressBar(requireContext(), null, android.R.attr.progressBarStyleHorizontal).apply {
-                    progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
-                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f / captures.size)
+                ProgressBar(
+                    requireContext(),
+                    null,
+                    android.R.attr.progressBarStyleHorizontal
+                ).apply {
+                    progressDrawable =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        1f / captures.size
+                    )
                         .apply { if (it != 0) marginStart = PROGRESS_BAR_MARGIN }
                 }
             }.map { progressBar ->
                 binding.progressBarContainer.addView(progressBar)
                 if (vm.isImageTransferRequired()) {
-                    ScanningWithImageTransferTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs, CollectFingerprintsViewModel.imageTransferTimeoutMs)
+                    ScanningWithImageTransferTimeoutBar(
+                        progressBar,
+                        CollectFingerprintsViewModel.scanningTimeoutMs,
+                        CollectFingerprintsViewModel.imageTransferTimeoutMs
+                    )
                 } else {
-                    ScanningOnlyTimeoutBar(progressBar, CollectFingerprintsViewModel.scanningTimeoutMs)
+                    ScanningOnlyTimeoutBar(
+                        progressBar,
+                        CollectFingerprintsViewModel.scanningTimeoutMs
+                    )
                 }
             }
         }
     }
 
     private fun updateOrHideFingerImageAccordingToSettings() {
-        if (fingerprintPreferencesManager.fingerImagesExist) {
+        if (vm.configuration.displayHandIcons) {
             binding.fingerImage.visibility = View.VISIBLE
             binding.fingerImage.setImageResource(fingerId.fingerDrawable())
         } else {
@@ -92,8 +108,14 @@ class FingerFragment : FingerprintFragment() {
     private fun CollectFingerprintsState.updateFingerCaptureNumberText() {
         fingerStates.find { it.id == fingerId }?.run {
             if (isMultiCapture()) {
-                binding.fingerCaptureNumberText.setTextColor(resources.getColor(nameTextColour(), null))
-                binding.fingerCaptureNumberText.text = getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
+                binding.fingerCaptureNumberText.setTextColor(
+                    resources.getColor(
+                        nameTextColour(),
+                        null
+                    )
+                )
+                binding.fingerCaptureNumberText.text =
+                    getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
                 binding.fingerCaptureNumberText.visibility = View.VISIBLE
             } else {
                 binding.fingerCaptureNumberText.visibility = View.GONE
@@ -104,14 +126,24 @@ class FingerFragment : FingerprintFragment() {
     private fun CollectFingerprintsState.updateFingerResultText() {
         fingerStates.find { it.id == fingerId }?.run {
             binding.fingerResultText.text = getString(currentCapture().resultTextId())
-            binding.fingerResultText.setTextColor(resources.getColor(currentCapture().resultTextColour(), null))
+            binding.fingerResultText.setTextColor(
+                resources.getColor(
+                    currentCapture().resultTextColour(),
+                    null
+                )
+            )
         }
     }
 
     private fun CollectFingerprintsState.updateFingerDirectionText() {
         fingerStates.find { it.id == fingerId }?.run {
             binding.fingerDirectionText.text = getString(directionTextId(isOnLastFinger()))
-            binding.fingerDirectionText.setTextColor(resources.getColor(directionTextColour(), null))
+            binding.fingerDirectionText.setTextColor(
+                resources.getColor(
+                    directionTextColour(),
+                    null
+                )
+            )
         }
     }
 
@@ -123,20 +155,32 @@ class FingerFragment : FingerprintFragment() {
                         is CaptureState.NotCollected,
                         is CaptureState.Skipped -> {
                             handleCancelled()
-                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
+                            progressBar.progressDrawable = ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.timer_progress_bar
+                            )
                         }
                         is CaptureState.Scanning -> startTimeoutBar()
                         is CaptureState.TransferringImage -> handleScanningFinished()
                         is CaptureState.NotDetected -> {
                             handleCancelled()
-                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bad)
+                            progressBar.progressDrawable = ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.timer_progress_bad
+                            )
                         }
                         is CaptureState.Collected -> if (fingerState.scanResult.isGoodScan()) {
                             handleCancelled()
-                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_good)
+                            progressBar.progressDrawable = ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.timer_progress_good
+                            )
                         } else {
                             handleCancelled()
-                            progressBar.progressDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bad)
+                            progressBar.progressDrawable = ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.timer_progress_bad
+                            )
                         }
                     }
                 }

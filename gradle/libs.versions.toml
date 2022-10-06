@@ -28,6 +28,9 @@ fragment_version = "1.5.3"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
 hilt_version = "2.44"
+hilt_androidx_version = "1.0.0"
+datastore_version = "1.0.0"
+protobuf_version = "3.18.0"
 
 
 [libraries]
@@ -157,9 +160,17 @@ simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher
 #hilt
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
 hilt-kapt = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt_version" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt_androidx_version" }
+hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt_androidx_version" }
 
 testing-hilt = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt_version" }
 testing-hilt-kapt = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_version" }
+
+#Datastore
+datastore = { module = "androidx.datastore:datastore", version.ref = "datastore_version" }
+
+#Protobuf
+protobuf = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf_version" }
 
 #Testing
 testing-junit = "junit:junit:4.13.2"
