@@ -79,7 +79,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun getRequiredModules() = setupRequest.modalitiesRequired.map {
         when (it) {
-            Modality.FINGER -> getString(IDR.string.module_feature_finger)
+            Modality.FINGERPRINT -> getString(IDR.string.module_feature_finger)
             Modality.FACE -> getString(IDR.string.module_feature_face)
         }
     }
