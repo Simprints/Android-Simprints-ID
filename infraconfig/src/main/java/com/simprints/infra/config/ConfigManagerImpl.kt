@@ -37,4 +37,6 @@ internal class ConfigManagerImpl @Inject constructor(
     override fun cancelScheduledSyncConfiguration() =
         configurationScheduler.cancelScheduledSync()
 
+    override suspend fun clearData() =
+        configRepository.clearData()
 }

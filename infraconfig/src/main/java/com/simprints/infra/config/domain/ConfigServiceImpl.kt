@@ -41,4 +41,10 @@ internal class ConfigServiceImpl @Inject constructor(
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         localDataSource.updateDeviceConfiguration(update)
+
+    override suspend fun clearData() {
+        localDataSource.clearProject()
+        localDataSource.clearProjectConfiguration()
+        localDataSource.clearDeviceConfiguration()
+    }
 }

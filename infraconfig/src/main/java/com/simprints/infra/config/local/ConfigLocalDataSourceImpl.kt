@@ -24,6 +24,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
             }
         }
 
+    override suspend fun clearProject() {
+        projectDataStore.updateData { it.toBuilder().clear().build() }
+    }
+
     override suspend fun saveProjectConfiguration(config: ProjectConfiguration) {
         configDataStore.updateData { config.toProto() }
         // We need to update the device configuration only for the non overwritten fields
@@ -52,6 +56,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     override suspend fun getProjectConfiguration(): ProjectConfiguration =
         configDataStore.data.first().toDomain()
 
+    override suspend fun clearProjectConfiguration() {
+        configDataStore.updateData { it.toBuilder().clear().build() }
+    }
+
     override suspend fun getDeviceConfiguration(): DeviceConfiguration =
         deviceConfigDataStore.data.first().toDomain()
 
@@ -77,6 +85,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     proto.build()
                 }
         }
+    }
+
+    override suspend fun clearDeviceConfiguration() {
+        deviceConfigDataStore.updateData { it.toBuilder().clear().build() }
     }
 
     companion object {

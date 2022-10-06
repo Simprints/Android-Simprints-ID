@@ -12,4 +12,5 @@ interface ConfigService {
     suspend fun refreshConfiguration(projectId: String): ProjectConfiguration
     suspend fun getDeviceConfiguration(): DeviceConfiguration
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
+    suspend fun clearData()
 }

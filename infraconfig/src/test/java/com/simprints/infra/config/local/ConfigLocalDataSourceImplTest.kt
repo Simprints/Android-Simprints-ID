@@ -13,14 +13,6 @@ import com.simprints.infra.config.local.serializer.DeviceConfigurationSerializer
 import com.simprints.infra.config.local.serializer.ProjectConfigurationSerializer
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.*
-import com.simprints.infra.config.testtools.consentConfiguration
-import com.simprints.infra.config.testtools.faceConfiguration
-import com.simprints.infra.config.testtools.fingerprintConfiguration
-import com.simprints.infra.config.testtools.generalConfiguration
-import com.simprints.infra.config.testtools.identificationConfiguration
-import com.simprints.infra.config.testtools.project
-import com.simprints.infra.config.testtools.projectConfiguration
-import com.simprints.infra.config.testtools.synchronizationConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -73,6 +65,14 @@ class ConfigLocalDataSourceImplTest {
         val savedProject = configLocalDataSourceImpl.getProject()
 
         assertThat(savedProject).isEqualTo(projectToSave)
+    }
+
+    @Test
+    fun `should clear the project correctly`() = runTest(UnconfinedTestDispatcher()) {
+        configLocalDataSourceImpl.saveProject(project)
+        configLocalDataSourceImpl.clearProject()
+
+        assertThrows<NoSuchElementException> { configLocalDataSourceImpl.getProject() }
     }
 
     @Test
@@ -141,7 +141,7 @@ class ConfigLocalDataSourceImplTest {
     @Test
     fun `should save the project configuration and update the device configuration correctly with an empty list of fingersToCollect if fingerprint config is missing`() =
         runTest(UnconfinedTestDispatcher()) {
-            val projectConfigurationToSave =  ProjectConfiguration(
+            val projectConfigurationToSave = ProjectConfiguration(
                 "projectId",
                 generalConfiguration,
                 faceConfiguration,
@@ -171,6 +171,15 @@ class ConfigLocalDataSourceImplTest {
         }
 
     @Test
+    fun `should clear the project configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+        configLocalDataSourceImpl.saveProjectConfiguration(projectConfiguration)
+        configLocalDataSourceImpl.clearProjectConfiguration()
+
+        val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+        assertThat(savedProjectConfiguration.projectId).isEqualTo("")
+    }
+
+    @Test
     fun `should update the device configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
         configLocalDataSourceImpl.updateDeviceConfiguration {
             it.apply {
@@ -183,5 +192,14 @@ class ConfigLocalDataSourceImplTest {
             DeviceConfiguration("fr", listOf(), listOf(Finger.LEFT_THUMB))
 
         assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
+
+    @Test
+    fun `should clear the device configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+        configLocalDataSourceImpl.updateDeviceConfiguration { it.apply { it.language = "fr" } }
+        configLocalDataSourceImpl.clearDeviceConfiguration()
+
+        val savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+        assertThat(savedDeviceConfiguration.language).isEqualTo("")
     }
 }

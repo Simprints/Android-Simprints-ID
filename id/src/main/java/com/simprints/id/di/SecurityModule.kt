@@ -10,7 +10,6 @@ import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.*
@@ -54,7 +53,6 @@ open class SecurityModule {
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
         simNetwork: SimNetwork,
-        remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
         configManager,
         loginManager,
@@ -64,7 +62,6 @@ open class SecurityModule {
         securityStateScheduler,
         longConsentRepository,
         simNetwork,
-        remoteConfigWrapper
     )
 
     @Provides

@@ -35,6 +35,11 @@ interface ConfigManager {
      */
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
 
+    /**
+     * clears the project, project configuration and device configuration
+     */
+    suspend fun clearData()
+
     fun scheduleSyncConfiguration()
     fun cancelScheduledSyncConfiguration()
 }

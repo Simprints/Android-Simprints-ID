@@ -39,7 +39,6 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
 import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordWorker
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.config.RemoteConfigWorker
@@ -114,6 +113,7 @@ interface AppComponent {
 
         fun build(): AppComponent
     }
+
     fun getOrchestratorComponent(): OrchestratorComponent.Builder
 
     fun inject(app: Application)
@@ -171,7 +171,6 @@ interface AppComponent {
     fun getPreferencesManager(): PreferencesManager
     fun getIdPreferencesManager(): IdPreferencesManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
-    fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getImageRepository(): ImageRepository
     fun getLicenseRepository(): LicenseRepository
     fun getLoginManager(): LoginManager

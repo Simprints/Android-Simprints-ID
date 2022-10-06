@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -22,7 +21,6 @@ open class SignerManagerImpl(
     private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
     private val simNetwork: SimNetwork,
-    private val remoteConfigWrapper: RemoteConfigWrapper
 ) : SignerManager {
 
     override suspend fun signIn(projectId: String, userId: String, token: Token) {
@@ -43,7 +41,7 @@ open class SignerManagerImpl(
         preferencesManager.clearAllSharedPreferences()
         longConsentRepository.deleteLongConsents()
         simNetwork.resetApiBaseUrl()
-        remoteConfigWrapper.clearRemoteConfig()
+        configManager.clearData()
 
         Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
     }
