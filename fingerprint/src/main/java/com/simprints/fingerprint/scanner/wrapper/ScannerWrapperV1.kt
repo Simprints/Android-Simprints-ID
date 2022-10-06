@@ -127,7 +127,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
 
     override fun isLiveFeedbackAvailable(): Boolean = false
 
-    override suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int) =
+    override suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy?, timeOutMs: Int, qualityThreshold: Int) =
         suspendCancellableCoroutine { cont ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, cont))
 
@@ -168,7 +168,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
         }
     }
 
-    override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): AcquireImageResponse =
+    override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?): AcquireImageResponse =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
 
     override suspend fun setUiIdle() = suspendCoroutine { cont ->

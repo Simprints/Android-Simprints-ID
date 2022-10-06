@@ -38,7 +38,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private val serialNumberConverter: SerialNumberConverter by inject()
     private val timeHelper: FingerprintTimeHelper by inject()
     private val sessionManager: FingerprintSessionEventsManager by inject()
-    private val preferencesManager: FingerprintPreferencesManager by inject()
+    private val recentEventsPreferencesManager: FingerprintPreferencesManager by inject()
 
     private val bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
         onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
@@ -126,7 +126,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private fun checkIfNowBondedToChosenScannerThenProceed() {
         val macAddress = viewModel.awaitingToPairToMacAddress.value?.peekContent()
         if (macAddress!= null && scannerPairingManager.isAddressPaired(macAddress)) {
-            preferencesManager.lastScannerUsed = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+            recentEventsPreferencesManager.lastScannerUsed = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             retryConnectAndFinishFragment()
         } else {
             handlePairingAttemptFailed()

@@ -1,40 +1,26 @@
 package com.simprints.id.activities.consent
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.R
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.infra.config.domain.models.ConsentConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ParentalConsentTextHelperTest {
 
-    private val context = ApplicationProvider.getApplicationContext() as TestApplication
-    private val request = AskConsentRequest(ConsentType.ENROL)
-
-    private val fingerprintConsentText = "use your child's fingerprints"
-    private val faceConsentText = "take photographs of your child's face"
-    private val defaultParentalConfigOptions = """
-            {
-              "consent_parent_enrol_only": false,
-              "consent_parent_enrol": true,
-              "consent_parent_id_verify": true,
-              "consent_parent_share_data_no": true,
-              "consent_parent_share_data_yes": false,
-              "consent_parent_collect_yes": true,
-              "consent_parent_privacy_rights": true,
-              "consent_parent_confirmation": true
-            }
-        """.trimIndent()
-
+    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val modalitiesUseCaseText = String.format(
+        "%s %s %s", context.getString(R.string.biometrics_parental_fingerprint),
+        context.getString(R.string.biometric_concat_modalities),
+        context.getString(R.string.biometrics_parental_face)
+    )
 
     companion object {
         private const val PROGRAM_NAME = "program_name"
@@ -42,133 +28,408 @@ class ParentalConsentTextHelperTest {
     }
 
     @Test
-    fun `should return consent text only containing consent for fingerprint modality when only fingerprint is used`() {
-        // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
-            defaultParentalConfigOptions,
+    fun `should return the correct consent for an enrol only with one modality`() {
+        val request = AskConsentRequest(ConsentType.ENROL)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
-            listOf(Modality.FINGER),
-            JsonHelper
-        )
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
 
-        // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val expectedString = context
+            .getString(R.string.consent_parental_enrol_only)
+            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
 
-
-        // assert that it contains fingerprint and not face consent
-        assertThat(parentalConsentText).contains(fingerprintConsentText)
-        assertThat(parentalConsentText).doesNotContain(faceConsentText)
+        assertThat(parentalConsentText).contains(expectedString)
     }
 
     @Test
-    fun `should return consent text only containing consent for face modality when only face is used`() {
-        // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
-            defaultParentalConfigOptions,
+    fun `should return the correct consent for an enrol only with two modalities`() {
+        val request = AskConsentRequest(ConsentType.ENROL)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
-            listOf(Modality.FACE),
-            JsonHelper
-        )
+            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE)
+        ).assembleText(request, context)
 
-        // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val expectedString = context
+            .getString(R.string.consent_parental_enrol_only)
+            .format(PROGRAM_NAME, modalitiesUseCaseText)
 
-
-        // assert that it contains face and not fingerprint consent
-        assertThat(parentalConsentText).contains(faceConsentText)
-        assertThat(parentalConsentText).doesNotContain(fingerprintConsentText)
+        assertThat(parentalConsentText).contains(expectedString)
     }
 
     @Test
-    fun `should return consent text containing consent for both fingerprint and face modalities, when both are used`() {
-        val consentTextForBoth = "$fingerprintConsentText and $faceConsentText"
-
-        // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
-            defaultParentalConfigOptions,
+    fun `should return the correct consent for a standard enrol with one modality`() {
+        val request = AskConsentRequest(ConsentType.ENROL)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
-            listOf(Modality.FINGER, Modality.FACE),
-            JsonHelper
-        )
+            listOf(GeneralConfiguration.Modality.FACE)
+        ).assembleText(request, context)
 
-        // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val expectedString = context
+            .getString(R.string.consent_parental_enrol)
+            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_face))
 
-
-        // assert that it contains consent text for both modalities
-        assertThat(parentalConsentText).contains(consentTextForBoth)
+        assertThat(parentalConsentText).contains(expectedString)
     }
 
     @Test
-    fun `should return consent text containing associated 'consent_parent_collect_yes' string resource value, when consent_parent_collect_yes config flag is true`() {
-        val associatedConsentText = "Simprints will also use the data for research purposes."
-
-        // remote config - with consent_parent_collect_yes set to true
-        val jsonConfigWithParentConsentTrue = """
-            {
-              "consent_parent_enrol_only": false,
-              "consent_parent_enrol": true,
-              "consent_parent_id_verify": true,
-              "consent_parent_share_data_no": true,
-              "consent_parent_share_data_yes": false,
-              "consent_parent_collect_yes": true,
-              "consent_parent_privacy_rights": true,
-              "consent_parent_confirmation": true
-            }
-        """.trimIndent()
-
-        // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
-            jsonConfigWithParentConsentTrue,
+    fun `should return the correct consent for a standard enrol with two modalities`() {
+        val request = AskConsentRequest(ConsentType.ENROL)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
-            listOf(Modality.FACE),
-            JsonHelper
-        )
+            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE)
+        ).assembleText(request, context)
 
-        // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val expectedString = context
+            .getString(R.string.consent_parental_enrol)
+            .format(PROGRAM_NAME, modalitiesUseCaseText)
 
-
-        // assertion
-        assertThat(parentalConsentText).contains(associatedConsentText)
+        assertThat(parentalConsentText).contains(expectedString)
     }
 
     @Test
-    fun `should return consent text without associated 'consent_parent_collect_yes' string resource value, when consent_parent_collect_yes config flag is false`() {
-        val associatedConsentText = "Simprints will also use the data for research purposes."
-
-        // remote config - with consent_parent_collect_yes set to false
-        val jsonConfigWithParentConsentTrue = """
-            {
-              "consent_parent_enrol_only": false,
-              "consent_parent_enrol": true,
-              "consent_parent_id_verify": true,
-              "consent_parent_share_data_no": true,
-              "consent_parent_share_data_yes": false,
-              "consent_parent_collect_yes": false,
-              "consent_parent_privacy_rights": true,
-              "consent_parent_confirmation": true
-            }
-        """.trimIndent()
-
-        // create text helper to assemble text
-        val parentalConsentTextHelper = ParentalConsentTextHelper(
-            jsonConfigWithParentConsentTrue,
+    fun `should return the correct consent for a verification`() {
+        val request = AskConsentRequest(ConsentType.VERIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
             PROGRAM_NAME,
             ORGANIZATION_NAME,
-            listOf(Modality.FACE),
-            JsonHelper
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_id_verify)
+            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
+
+        assertThat(parentalConsentText).contains(expectedString)
+    }
+
+    @Test
+    fun `should return the correct consent for an identification with one modality`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
         )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
 
-        // format entire object to get consent text message
-        val parentalConsentText = parentalConsentTextHelper.assembleText(request, context)
+        val expectedString = context
+            .getString(R.string.consent_parental_id_verify)
+            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
 
+        assertThat(parentalConsentText).contains(expectedString)
+    }
 
-        // assertion
-        assertThat(parentalConsentText).doesNotContain(associatedConsentText)
+    @Test
+    fun `should return the correct consent for an identification with two modalities`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_id_verify)
+            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
+
+        assertThat(parentalConsentText).contains(expectedString)
+    }
+
+    @Test
+    fun `should add the correct string when the data is not shared with partner for fingerprint`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_share_data_no)
+            .format(context.getString(R.string.biometrics_access_fingerprint))
+
+        assertThat(parentalConsentText).contains(expectedString)
+        assertThat(parentalConsentText).doesNotContain(ORGANIZATION_NAME)
+    }
+
+    @Test
+    fun `should add the correct string when the data is not shared with partner for face`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FACE)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_share_data_no)
+            .format(context.getString(R.string.biometrics_access_face))
+
+        assertThat(parentalConsentText).contains(expectedString)
+        assertThat(parentalConsentText).doesNotContain(ORGANIZATION_NAME)
+    }
+
+    @Test
+    fun `should add the correct string when the data is not shared with partner for face and fingerprint`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_share_data_no)
+            .format(context.getString(R.string.biometrics_access_fingerprint_face))
+
+        assertThat(parentalConsentText).contains(expectedString)
+        assertThat(parentalConsentText).doesNotContain(ORGANIZATION_NAME)
+    }
+
+    @Test
+    fun `should add the correct string when the data is shared with partner for fingerprint`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = true,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_share_data_yes)
+            .format(ORGANIZATION_NAME, context.getString(R.string.biometrics_access_fingerprint))
+
+        assertThat(parentalConsentText).contains(expectedString)
+    }
+
+    @Test
+    fun `should add the correct string when the data is used for R&D`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = true,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_collect_yes)
+
+        assertThat(parentalConsentText).contains(expectedString)
+    }
+
+    @Test
+    fun `should not add the string when the data is not used for R&D`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_collect_yes)
+
+        assertThat(parentalConsentText).doesNotContain(expectedString)
+    }
+
+    @Test
+    fun `should add the correct string when the privacy right is required`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = true,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_privacy_rights)
+
+        assertThat(parentalConsentText).contains(expectedString)
+    }
+
+    @Test
+    fun `should not add the string when the privacy right is not required`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_privacy_rights)
+
+        assertThat(parentalConsentText).doesNotContain(expectedString)
+    }
+
+    @Test
+    fun `should add the correct string when the confirmation is required`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = true,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_confirmation)
+            .format(context.getString(R.string.biometrics_parental_fingerprint))
+
+        assertThat(parentalConsentText).contains(expectedString)
+    }
+
+    @Test
+    fun `should not add the string when the confirmation is not required`() {
+        val request = AskConsentRequest(ConsentType.IDENTIFY)
+        val prompt = ConsentConfiguration.ConsentPromptConfiguration(
+            enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+            dataSharedWithPartner = false,
+            dataUsedForRAndD = false,
+            privacyRights = false,
+            confirmation = false,
+        )
+        val parentalConsentText = ParentalConsentTextHelper(
+            prompt,
+            PROGRAM_NAME,
+            ORGANIZATION_NAME,
+            listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        ).assembleText(request, context)
+
+        val expectedString = context
+            .getString(R.string.consent_parental_confirmation)
+
+        assertThat(parentalConsentText).doesNotContain(expectedString)
     }
 }

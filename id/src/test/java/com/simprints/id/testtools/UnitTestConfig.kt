@@ -9,9 +9,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.testtools.di.*
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 class UnitTestConfig(
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
@@ -36,7 +34,6 @@ class UnitTestConfig(
 
     private lateinit var testAppComponent: AppComponentForTests
 
-    @ExperimentalCoroutinesApi
     fun fullSetup() =
         rescheduleRxMainThread()
             .coroutinesMainThread()
@@ -44,12 +41,10 @@ class UnitTestConfig(
             .setupWorkManager()
             .initComponent()
 
-    @ExperimentalCoroutinesApi
     override fun rescheduleRxMainThread() = also {
         super.rescheduleRxMainThread()
     }
 
-    @ExperimentalCoroutinesApi
     override fun coroutinesMainThread() = also {
         super.coroutinesMainThread()
     }
@@ -70,7 +65,7 @@ class UnitTestConfig(
     }
 
 
-    private fun initComponent(): AppComponentForTests {
+    fun initComponent(): AppComponentForTests {
         testAppComponent = DaggerAppComponentForTests.builder()
             .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutRealm)

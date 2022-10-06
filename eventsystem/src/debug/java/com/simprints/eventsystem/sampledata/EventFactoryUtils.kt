@@ -9,70 +9,32 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
+import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
-import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
-import com.simprints.eventsystem.event.domain.models.CompletionCheckEvent
-import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
-import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV1
-import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
-import com.simprints.eventsystem.event.domain.models.EventLabels
-import com.simprints.eventsystem.event.domain.models.FingerComparisonStrategy
-import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
-import com.simprints.eventsystem.event.domain.models.IntentParsingEvent
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
-import com.simprints.eventsystem.event.domain.models.InvalidIntentEvent
-import com.simprints.eventsystem.event.domain.models.MatchEntry
 import com.simprints.eventsystem.event.domain.models.Matcher.RANK_ONE
 import com.simprints.eventsystem.event.domain.models.Matcher.SIM_AFIS
-import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
-import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent
-import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
-import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
-import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
-import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent
-import com.simprints.eventsystem.event.domain.models.SuspiciousIntentEvent
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
 import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
-import com.simprints.eventsystem.event.domain.models.callback.CallbackComparisonScore
-import com.simprints.eventsystem.event.domain.models.callback.ConfirmationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.EnrolmentCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
+import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
-import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.RefusalCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.VerificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
+import com.simprints.eventsystem.event.domain.models.callout.*
+import com.simprints.eventsystem.event.domain.models.face.*
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -80,16 +42,9 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.domain.models.subject.BiometricReference
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.eventsystem.event.domain.models.subject.FaceReference
-import com.simprints.eventsystem.event.domain.models.subject.FaceTemplate
-import com.simprints.eventsystem.event.domain.models.subject.FingerprintReference
-import com.simprints.eventsystem.event.domain.models.subject.FingerprintTemplate
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -99,14 +54,13 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import kotlin.random.Random
-
-
 
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
 
@@ -174,7 +128,7 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
 
 fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
     val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
-        yaw = 1.0f ,
+        yaw = 1.0f,
         roll = 0.0f,
         template = "template",
         quality = 1.0f,
@@ -233,7 +187,7 @@ fun createSessionCaptureEvent(
         id,
         projectId,
         createdAt,
-        listOf(FINGERPRINT, FACE),
+        listOf(Modality.FINGERPRINT, Modality.FACE),
         appVersionNameArg,
         libSimprintsVersionNameArg,
         languageArg,

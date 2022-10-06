@@ -109,6 +109,7 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     api(project(":infralogin"))
+    implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrarealm"))
@@ -147,6 +148,11 @@ dependencies {
     implementation(libs.fuzzywuzzy.core)
     implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
+
+//    implementation(libs.hilt)
+//    implementation(libs.hilt.work)
+//    kapt(libs.hilt.kapt)
+//    kapt(libs.hilt.compiler)
 
     // Firebase
     implementation(libs.firebase.storage)
@@ -228,6 +234,9 @@ dependencies {
     androidTestImplementation(libs.testing.truth)
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
+
+    androidTestImplementation(libs.testing.hilt)
+    kaptAndroidTest(libs.testing.hilt.kapt)
 
     androidTestImplementation(libs.testing.mockwebserver)
     androidTestImplementation(libs.testing.coroutines.test)

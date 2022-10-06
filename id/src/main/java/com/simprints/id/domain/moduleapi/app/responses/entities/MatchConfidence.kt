@@ -1,7 +1,6 @@
 package com.simprints.id.domain.moduleapi.app.responses.entities
 
-import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
-import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
+import com.simprints.infra.config.domain.models.DecisionPolicy
 
 enum class MatchConfidence {
     NONE,
@@ -10,21 +9,11 @@ enum class MatchConfidence {
     HIGH;
 
     companion object {
-        fun computeMatchConfidenceForFingerprint(confidenceScore: Int,
-                                                 fingerprintScores: Map<FingerprintConfidenceThresholds, Int>) =
+        fun computeMatchConfidence(confidenceScore: Int, policy: DecisionPolicy) =
             when {
-                confidenceScore < fingerprintScores.getValue(FingerprintConfidenceThresholds.LOW) -> NONE
-                confidenceScore < fingerprintScores.getValue(FingerprintConfidenceThresholds.MEDIUM) -> LOW
-                confidenceScore < fingerprintScores.getValue(FingerprintConfidenceThresholds.HIGH) -> MEDIUM
-                else -> HIGH
-            }
-
-        fun computeMatchConfidenceForFace(confidenceScore: Int,
-                                          faceScores: Map<FaceConfidenceThresholds, Int>) =
-            when {
-                confidenceScore < faceScores.getValue(FaceConfidenceThresholds.LOW) -> NONE
-                confidenceScore < faceScores.getValue(FaceConfidenceThresholds.MEDIUM) -> LOW
-                confidenceScore < faceScores.getValue(FaceConfidenceThresholds.HIGH) -> MEDIUM
+                confidenceScore < policy.low -> NONE
+                confidenceScore < policy.medium -> LOW
+                confidenceScore < policy.high -> MEDIUM
                 else -> HIGH
             }
     }

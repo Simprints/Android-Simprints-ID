@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.livedata.LiveDataEventObserver
@@ -24,15 +23,11 @@ import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.settings.canDownSyncEvents
-import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivityDashboardBinding
 import com.simprints.id.databinding.ActivityDashboardCardDailyActivityBinding
 import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -59,15 +54,13 @@ class DashboardActivity : BaseSplitActivity() {
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 
-    @Inject
-    lateinit var settingsPreferencesManager: SettingsPreferencesManager
-
     private lateinit var viewModel: DashboardViewModel
     private val binding by viewBinding(ActivityDashboardBinding::inflate)
 
     // set bindings for included layouts
     private val projectDetailsBinding: ActivityDashboardCardProjectDetailsBinding by lazy { binding.dashboardProjectDetails }
     private val dailyActivityBinding: ActivityDashboardCardDailyActivityBinding by lazy { binding.dashboardDailyActivity }
+    private var menu: Menu? = null
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -76,6 +69,7 @@ class DashboardActivity : BaseSplitActivity() {
         private const val TIME_FOR_CHECK_IF_SYNC_REQUIRED = 1 * ONE_MINUTE
     }
 
+    @ObsoleteCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val component = (application as Application).component
@@ -85,10 +79,9 @@ class DashboardActivity : BaseSplitActivity() {
         title = getString(R.string.dashboard_label)
 
         setupActionBar()
-        viewModel = ViewModelProvider(this, viewModelFactory).get(
-            DashboardViewModel::class.java
-        )
+        viewModel = ViewModelProvider(this, viewModelFactory)[DashboardViewModel::class.java]
         setupCards()
+        observeConfiguration()
         observeCardData()
         loadDailyActivity()
     }
@@ -128,28 +121,36 @@ class DashboardActivity : BaseSplitActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
 
-        menu?.run {
-            this.findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG_MODE
+        menu.run {
+            findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG_MODE
 
             findItem(R.id.menuSettings).title =
                 getString(R.string.menu_settings)
 
             with(findItem(R.id.menuPrivacyNotice)) {
                 title = getString(R.string.menu_privacy_notice)
-                isVisible = settingsPreferencesManager.consentRequired
             }
         }
 
+        this.menu = menu
         return true
     }
 
     private fun setupCards() {
         projectDetailsCardDisplayer.initRoot(projectDetailsBinding.dashboardProjectDetailsCard)
         dailyActivityCardDisplayer.initRoot(dailyActivityBinding.dashboardDailyActivityCardRoot)
+    }
 
-        // init sync-card only when syncing to BFSID is allowed
-        if (settingsPreferencesManager.canSyncDataToSimprints() || settingsPreferencesManager.eventDownSyncSetting != EventDownSyncSetting.OFF) {
-            syncCardDisplayer.initRoot(binding.dashboardSyncCard)
+    @ObsoleteCoroutinesApi
+    private fun observeConfiguration() {
+        viewModel.syncToBFSIDAllowed.observe(this) {
+            if (it) {
+                syncCardDisplayer.initRoot(binding.dashboardSyncCard)
+                startTickerToCheckIfSyncIsRequired()
+            }
+        }
+        viewModel.consentRequiredLiveData.observe(this) {
+            this.menu?.findItem(R.id.menuPrivacyNotice)?.isVisible = it
         }
     }
 
@@ -159,15 +160,15 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun observeForProjectDetails() {
-        viewModel.getProjectDetails().observe(this, Observer {
+        viewModel.getProjectDetails().observe(this) {
             projectDetailsCardDisplayer.displayProjectDetails(it)
-        })
+        }
     }
 
     private fun observeForSyncCardState() {
-        viewModel.syncCardStateLiveData.observe(this, Observer {
+        viewModel.syncCardStateLiveData.observe(this) {
             syncCardDisplayer.displayState(it)
-        })
+        }
 
         syncCardDisplayer.userWantsToOpenSettings.observe(this, LiveDataEventObserver {
             openSettings()
@@ -202,15 +203,9 @@ class DashboardActivity : BaseSplitActivity() {
         startActivity(Intent(this, ModuleSelectionActivity::class.java))
     }
 
-    @ObsoleteCoroutinesApi
     override fun onResume() {
         super.onResume()
         loadDailyActivity()
-
-        // trigger sync ticker only when syncing to BFSID
-        if (settingsPreferencesManager.canSyncDataToSimprints() || settingsPreferencesManager.canDownSyncEvents()) {
-            startTickerToCheckIfSyncIsRequired()
-        }
     }
 
     @ObsoleteCoroutinesApi

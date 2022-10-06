@@ -1,25 +1,26 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.livedata.getOrAwaitValue
+import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import org.junit.After
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ModuleSelectionViewModelTest {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
     private val repository: ModuleRepository = mockk()
     private val eventSyncManager: EventSyncManager = mockk()
@@ -28,7 +29,20 @@ class ModuleSelectionViewModelTest {
     @Before
     fun setUp() {
         configureMockRepository()
-        viewModel = ModuleSelectionViewModel(repository, eventSyncManager)
+        viewModel = ModuleSelectionViewModel(repository, eventSyncManager, UnconfinedTestDispatcher())
+    }
+
+    @Test
+    fun `should initialize the live data with the correct values`() {
+        assertThat(viewModel.maxNumberOfModules.getOrAwaitValue()).isEqualTo(5)
+        assertThat(viewModel.modulesList.getOrAwaitValue()).isEqualTo(
+            listOf(
+                Module("a", false),
+                Module("b", true),
+                Module("c", true),
+                Module("d", false)
+            )
+        )
     }
 
     @Test
@@ -40,7 +54,7 @@ class ModuleSelectionViewModelTest {
             Module("d", false)
         )
 
-        val actual = viewModel.modulesList.value
+        val actual = viewModel.modulesList.getOrAwaitValue()
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -95,18 +109,8 @@ class ModuleSelectionViewModelTest {
         coVerify(exactly = 1) { eventSyncManager.sync() }
     }
 
-    @Test
-    fun shouldReturnMaxNumberOfModules() {
-        assertThat(viewModel.getMaxNumberOfModules()).isEqualTo(5)
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
-    }
-
     private fun configureMockRepository() {
-        every {
+        coEvery {
             repository.getModules()
         } returns listOf(
             Module("a", false),
@@ -114,7 +118,7 @@ class ModuleSelectionViewModelTest {
             Module("c", true),
             Module("d", false)
         )
-        every {
+        coEvery {
             repository.getMaxNumberOfModules()
         } returns 5
     }

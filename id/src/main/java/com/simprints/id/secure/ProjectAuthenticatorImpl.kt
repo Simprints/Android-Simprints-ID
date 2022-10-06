@@ -2,9 +2,9 @@ package com.simprints.id.secure
 
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthRequest
@@ -18,10 +18,9 @@ class ProjectAuthenticatorImpl(
     private val loginManager: LoginManager,
     private val projectSecretManager: ProjectSecretManager,
     private val secureDataManager: SecurityManager,
-    private val projectRepository: ProjectRepository,
+    private val configManager: ConfigManager,
     private val signerManager: SignerManager,
     private val longConsentRepository: LongConsentRepository,
-    private val preferencesManager: IdPreferencesManager,
 ) : ProjectAuthenticator {
 
     override suspend fun authenticate(
@@ -35,9 +34,9 @@ class ProjectAuthenticatorImpl(
             .makeAuthRequest(nonceScope)
             .signIn(nonceScope.projectId, nonceScope.userId)
 
-        projectRepository.fetchProjectConfigurationAndSave(nonceScope.projectId)
+        val config = configManager.refreshProjectConfiguration(nonceScope.projectId)
 
-        updateLanguageAndReturnProjectLanguages().fetchProjectLongConsentTexts()
+        updateLanguageAndReturnProjectLanguages(config).fetchProjectLongConsentTexts()
     }
 
     private suspend fun prepareAuthRequestParameters(
@@ -94,16 +93,16 @@ class ProjectAuthenticatorImpl(
         secureDataManager.createLocalDatabaseKeyIfMissing(projectId)
     }
 
-    private fun updateLanguageAndReturnProjectLanguages(): Array<String> {
+    private fun updateLanguageAndReturnProjectLanguages(config: ProjectConfiguration): List<String> {
         /*We need to override the language in the helper as the language context is initialised in Application
          in attachBaseContext() which is  called before initialising dagger component.
          Thus we cannot use preferences manager to get the language.*/
-        LanguageHelper.language = preferencesManager.language
+        LanguageHelper.language = config.general.defaultLanguage
 
-        return preferencesManager.projectLanguages
+        return config.general.languageOptions
     }
 
-    private suspend fun Array<String>.fetchProjectLongConsentTexts() {
+    private suspend fun List<String>.fetchProjectLongConsentTexts() {
         longConsentRepository.deleteLongConsents()
         forEach { language ->
             longConsentRepository.getLongConsentResultForLanguage(language).catch { Simber.e(it) }

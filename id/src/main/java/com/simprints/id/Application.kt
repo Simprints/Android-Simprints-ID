@@ -24,7 +24,10 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 @HiltAndroidApp
-open class Application: CoreApplication() {
+open class Application : CoreApplication() {
+
+//    @Inject
+//    lateinit var workerFactory: HiltWorkerFactory
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
@@ -68,6 +71,12 @@ open class Application: CoreApplication() {
         initApplication()
     }
 
+//    override fun getWorkManagerConfiguration() =
+//        Configuration.Builder()
+//            .setWorkerFactory(workerFactory)
+//            .build()
+
+
     open fun initApplication() {
         createComponent()
         handleUndeliverableExceptionInRxJava()
@@ -99,7 +108,7 @@ open class Application: CoreApplication() {
         startKoin {
             androidLogger()
             androidContext(this@Application)
-            loadKoinModules(listOf(module(override = true) {
+            loadKoinModules(listOf(module {
                 this.defineBuildersForCoreManagers()
                 single(qualifier = named(APPLICATION_COROUTINE_SCOPE)) {
                     applicationScope
@@ -112,14 +121,15 @@ open class Application: CoreApplication() {
         factory { component.getPreferencesManager() }
         factory { component.getSessionEventsManager() }
         factory { component.getTimeHelper() }
+        factory { component.getRecentEventsPreferencesManager() }
         factory { component.getFingerprintRecordLocalDataSource() }
         factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
-        factory { component.getRemoteConfigWrapper() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
         factory { component.getLoginManager() }
+        factory { component.getConfigManager() }
         factory { component.getLicenseRepository() }
         factory { component.getIdPreferencesManager() }
         factory { component.getSecurityManager() }

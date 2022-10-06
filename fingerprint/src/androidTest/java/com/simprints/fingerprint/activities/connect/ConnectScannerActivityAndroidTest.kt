@@ -24,13 +24,14 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
-import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.Application
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
@@ -72,34 +73,43 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         every { newTimer() } returns mockTimer
     }
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val preferencesManager: FingerprintPreferencesManager = mockk(relaxed = true) {
-        every { qualityThreshold } returns 60
-        every { liveFeedbackOn } returns false
-        every { saveFingerprintImagesStrategy.isImageTransferRequired() } returns true
+    private val recentEventsPreferencesManager: FingerprintPreferencesManager =
+        mockk(relaxed = true) {}
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns mockk {
+                every { qualityThreshold } returns 60
+                every { vero2 } returns mockk {
+                    every { displayLiveFeedback } returns false
+                    every { imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.EAGER
+                }
+            }
+        }
     }
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>().apply {
         every { isLiveFeedbackAvailable() } returns false
     }
     private val scannerManager: ScannerManager =
-        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())){
+        spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
             coEvery { checkBluetoothStatus() } just Runs
         }
     private val nfcManager: NfcManager = mockk()
 
     @Before
     fun setUp() {
-       every {  scannerManager.scanner} returns  scanner
+        every { scannerManager.scanner } returns scanner
 
         viewModelMock = spyk(
             ConnectScannerViewModel(
                 scannerManager,
                 timeHelper,
                 sessionEventsManager,
-                preferencesManager,
+                recentEventsPreferencesManager,
+                configManager,
                 nfcManager,
                 dispatcherProvider
             )
-        ){
+        ) {
             every { start() } just Runs
             connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
         }
@@ -144,7 +154,8 @@ class ConnectScannerActivityAndroidTest : KoinTest {
 
     @Test
     fun pressBack_launchesRefusalActivity() {
-        val backButtonBehaviourLiveData = MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
+        val backButtonBehaviourLiveData =
+            MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
         every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
 
         Intents.init()

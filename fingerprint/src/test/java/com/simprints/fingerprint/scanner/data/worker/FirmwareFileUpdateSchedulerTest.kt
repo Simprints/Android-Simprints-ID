@@ -1,9 +1,10 @@
 package com.simprints.fingerprint.scanner.data.worker
 
 import androidx.work.WorkManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -11,9 +12,15 @@ import org.junit.Test
 class FirmwareFileUpdateSchedulerTest {
 
     private val workManagerMock = mockk<WorkManager>()
-    private val preferencesManagerMock = mockk<FingerprintPreferencesManager>()
+    private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns fingerprintConfiguration
+        }
+    }
 
-    private val firmwareFileUpdateScheduler = FirmwareFileUpdateScheduler(mockk(), preferencesManagerMock)
+    private val firmwareFileUpdateScheduler =
+        FirmwareFileUpdateScheduler(mockk(), configManager)
 
     @Before
     fun setUp() {
@@ -22,8 +29,10 @@ class FirmwareFileUpdateSchedulerTest {
     }
 
     @Test
-    fun projectIsOnVero2Only_schedulesWork() {
-        every { preferencesManagerMock.scannerGenerations } returns listOf(ScannerGeneration.VERO_2)
+    fun projectIsOnVero2Only_schedulesWork() = runTest {
+        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
+            FingerprintConfiguration.VeroGeneration.VERO_2
+        )
         every { workManagerMock.enqueueUniquePeriodicWork(any(), any(), any()) } returns mockk()
 
         firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
@@ -32,8 +41,11 @@ class FirmwareFileUpdateSchedulerTest {
     }
 
     @Test
-    fun projectIsBothVero1AndVero2_schedulesWork() {
-        every { preferencesManagerMock.scannerGenerations } returns listOf(ScannerGeneration.VERO_1, ScannerGeneration.VERO_2)
+    fun projectIsBothVero1AndVero2_schedulesWork() = runTest {
+        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
+            FingerprintConfiguration.VeroGeneration.VERO_1,
+            FingerprintConfiguration.VeroGeneration.VERO_2
+        )
         every { workManagerMock.enqueueUniquePeriodicWork(any(), any(), any()) } returns mockk()
 
         firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
@@ -42,8 +54,10 @@ class FirmwareFileUpdateSchedulerTest {
     }
 
     @Test
-    fun projectIsOnVero1Only_cancelsScheduledWork() {
-        every { preferencesManagerMock.scannerGenerations } returns listOf(ScannerGeneration.VERO_1)
+    fun projectIsOnVero1Only_cancelsScheduledWork() = runTest {
+        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
+            FingerprintConfiguration.VeroGeneration.VERO_1
+        )
         every { workManagerMock.cancelUniqueWork(any()) } returns mockk()
 
         firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()

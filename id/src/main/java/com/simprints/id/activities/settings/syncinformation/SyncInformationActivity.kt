@@ -9,7 +9,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
@@ -17,20 +16,17 @@ import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canDownSyncEvents
-import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import javax.inject.Inject
 
 class SyncInformationActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var viewModelFactory: SyncInformationViewModelFactory
-
-    @Inject
-    lateinit var preferencesManager: IdPreferencesManager
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
@@ -51,12 +47,10 @@ class SyncInformationActivity : BaseSplitActivity() {
         viewModel = ViewModelProvider(this, viewModelFactory)[SyncInformationViewModel::class.java]
 
         setTextInLayout()
-        enableModuleSelectionButtonAndTabsIfNecessary()
         setupAdapters()
         setupToolbar()
         setupClickListeners()
         observeUi()
-        setupRecordsCountCards()
     }
 
     override fun onResume() {
@@ -103,8 +97,8 @@ class SyncInformationActivity : BaseSplitActivity() {
         viewModel.fetchSyncInformation()
     }
 
-    private fun enableModuleSelectionButtonAndTabsIfNecessary() {
-        if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
+    private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
+        if (isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
             binding.modulesTabHost.visibility = View.VISIBLE
         } else {
@@ -120,8 +114,9 @@ class SyncInformationActivity : BaseSplitActivity() {
         }
     }
 
-    private fun isModuleSyncAndModuleIdOptionsNotEmpty() =
-        preferencesManager.moduleIdOptions.isNotEmpty() && preferencesManager.syncGroup == GROUP.MODULE
+    private fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
+        synchronizationConfiguration.down.moduleOptions.isNotEmpty() &&
+            synchronizationConfiguration.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun setupToolbar() {
         setSupportActionBar(binding.syncInfoToolbar)
@@ -135,6 +130,11 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
+        viewModel.synchronizationConfiguration.observe(this) {
+            enableModuleSelectionButtonAndTabsIfNecessary(it)
+            setupRecordsCountCards(it)
+        }
+
         viewModel.recordsInLocal.observe(this) {
             binding.totalRecordsCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
@@ -197,17 +197,23 @@ class SyncInformationActivity : BaseSplitActivity() {
         moduleCountAdapter.submitList(moduleCountsArray)
     }
 
-    private fun setupRecordsCountCards() {
-        if (!preferencesManager.canDownSyncEvents()) {
+    private fun setupRecordsCountCards(synchronizationConfiguration: SynchronizationConfiguration) {
+        if (!synchronizationConfiguration.canDownSyncEvents()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
             binding.recordsToDeleteCardView.visibility = View.GONE
         }
 
-        if (!preferencesManager.canSyncDataToSimprints()) {
+        if (!synchronizationConfiguration.canSyncDataToSimprints()) {
             binding.recordsToUploadCardView.visibility = View.GONE
             binding.imagesToUploadCardView.visibility = View.GONE
         }
     }
+
+    private fun SynchronizationConfiguration.canDownSyncEvents(): Boolean =
+        frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+
+    private fun SynchronizationConfiguration.canSyncDataToSimprints(): Boolean =
+        up.simprints.kind != UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 
     companion object {
         private const val TOTAL_RECORDS_INDEX = 0

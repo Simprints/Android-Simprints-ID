@@ -10,6 +10,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SessionCaptureEventSample
 import com.simprints.eventsystem.sampledata.eventLabels
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import org.junit.Test
 
 class SessionCaptureEventTest {
@@ -48,5 +49,20 @@ class SessionCaptureEventTest {
             assertThat(databaseInfo).isEqualTo(databaseInfoArg)
             assertThat(location).isEqualTo(locationArg)
         }
+    }
+
+    @Test
+    fun `updateProjectId should update the project id in the session`() {
+        val session = SessionCaptureEventSample.getEvent(eventLabels)
+        session.updateProjectId("anotherProjectId")
+        assertThat(session.payload.projectId).isEqualTo("anotherProjectId")
+        assertThat(session.labels.projectId).isEqualTo("anotherProjectId")
+    }
+
+    @Test
+    fun `updateModalities should update the modalities id in the session`() {
+        val session = SessionCaptureEventSample.getEvent(eventLabels)
+        session.updateModalities(listOf(GeneralConfiguration.Modality.FACE))
+        assertThat(session.payload.modalities).isEqualTo(listOf(GeneralConfiguration.Modality.FACE))
     }
 }

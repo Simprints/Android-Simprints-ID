@@ -3,17 +3,23 @@ package com.simprints.fingerprint.scanner.data.worker
 import android.content.Context
 import androidx.work.*
 import com.simprints.fingerprint.BuildConfig
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import java.util.concurrent.TimeUnit
 
 /**
  * Schedules the [FirmwareFileUpdateWorker] as necessary.
  */
-class FirmwareFileUpdateScheduler(val context: Context, val preferencesManager: FingerprintPreferencesManager) {
+class FirmwareFileUpdateScheduler(
+    private val context: Context,
+    private val configManager: ConfigManager
+) {
 
-    fun scheduleOrCancelWorkIfNecessary() {
-        if (preferencesManager.scannerGenerations.contains(ScannerGeneration.VERO_2)) {
+    suspend fun scheduleOrCancelWorkIfNecessary() {
+        if (configManager.getProjectConfiguration().fingerprint?.allowedVeroGenerations?.contains(
+                FingerprintConfiguration.VeroGeneration.VERO_2
+            ) == true
+        ) {
             scheduleWork()
         } else {
             cancelWork()

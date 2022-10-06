@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
 import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -10,24 +9,30 @@ import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
+import com.simprints.infra.config.ConfigManager
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
 class FaceStepProcessorImpl(
     private val faceRequestFactory: FaceRequestFactory,
-    private val prefs: IdPreferencesManager
+    private val configManager: ConfigManager,
 ) : FaceStepProcessor {
 
     companion object {
         const val ACTIVITY_CLASS_NAME = "com.simprints.face.orchestrator.FaceOrchestratorActivity"
     }
 
-    override fun buildCaptureStep(): Step =
-        faceRequestFactory.buildCaptureRequest(prefs.faceNbOfFramesCaptured).run {
+    override suspend fun buildCaptureStep(): Step {
+        val config = configManager.getProjectConfiguration()
+        return faceRequestFactory.buildCaptureRequest(config.face!!.nbOfImagesToCapture).run {
             buildStep(CAPTURE, this)
         }
+    }
 
-    override fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: SubjectQuery): Step =
+    override fun buildStepMatch(
+        probeFaceSample: List<FaceCaptureSample>,
+        query: SubjectQuery
+    ): Step =
         faceRequestFactory.buildFaceMatchRequest(probeFaceSample, query).run {
             buildStep(MATCH, this)
         }
