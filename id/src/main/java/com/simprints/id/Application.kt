@@ -125,7 +125,6 @@ open class Application : CoreApplication() {
         factory { component.getFingerprintRecordLocalDataSource() }
         factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
-        factory { component.getRemoteConfigWrapper() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
         factory { component.getImageRepository() }
