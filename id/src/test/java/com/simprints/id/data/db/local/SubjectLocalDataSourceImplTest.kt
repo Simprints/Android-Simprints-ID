@@ -10,7 +10,7 @@ import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
 import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.data.db.subject.local.models.fromDbToDomain
 import com.simprints.id.data.db.subject.local.models.fromDomainToDb
-import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.core.exceptions.InvalidQueryToLoadRecordsException
 import com.simprints.id.testtools.SubjectsGeneratorUtils
 import com.simprints.id.testtools.SubjectsGeneratorUtils.getRandomPeople
 import com.simprints.id.testtools.TestApplication
