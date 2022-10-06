@@ -3,7 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.lyft.kronos.AndroidClockFactory
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
@@ -25,9 +24,7 @@ import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.enrolmentrecords.EnrolmentRecordRepository
 import com.simprints.id.enrolmentrecords.EnrolmentRecordRepositoryImpl
@@ -36,8 +33,6 @@ import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.ModuleRepositoryImpl
-import com.simprints.core.sharedinterfaces.ImageUrlProvider
-import com.simprints.id.network.ImageUrlProviderImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.EnrolmentHelperImpl
 import com.simprints.id.orchestrator.PersonCreationEventHelper
@@ -58,6 +53,7 @@ import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
@@ -93,15 +89,6 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
-
-    @Provides
-    open fun provideImageUrlProvider(
-        projectLocalDataSource: ProjectLocalDataSource,
-        loginManager: LoginManager
-    ): ImageUrlProvider = ImageUrlProviderImpl(
-        projectLocalDataSource,
-        loginManager
-    )
 
     @Provides
     @Singleton
@@ -140,7 +127,7 @@ open class AppModule {
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        idPreferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
@@ -156,17 +143,16 @@ open class AppModule {
             validatorFactory,
             VERSION_NAME,
             sessionDataCache,
-            idPreferencesManager.language,
-            idPreferencesManager.modalities.map { it.toMode() }
+            configManager,
         )
 
     @Provides
     fun provideModuleRepository(
-        preferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         subjectRepository: SubjectRepository,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository
     ): ModuleRepository = ModuleRepositoryImpl(
-        preferencesManager,
+        configManager,
         subjectRepository,
         eventDownSyncScopeRepository
     )
@@ -192,12 +178,12 @@ open class AppModule {
     open fun provideGuidFetchGuidHelper(
         downSyncHelper: EventDownSyncHelper,
         subjectRepository: SubjectRepository,
-        preferencesManager: IdPreferencesManager
+        configManager: ConfigManager
     ): FetchGuidHelper =
         FetchGuidHelperImpl(
             downSyncHelper,
             subjectRepository,
-            preferencesManager
+            configManager
         )
 
     @Provides

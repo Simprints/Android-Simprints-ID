@@ -7,6 +7,7 @@ import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.local.EventDatabaseFactory
 import com.simprints.eventsystem.event.local.EventLocalDataSource
@@ -20,6 +21,7 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.di.DependencyRule
@@ -35,7 +37,7 @@ class TestAppModule(
     private val loginInfoManagerRule: DependencyRule = RealRule,
     private val randomGeneratorRule: DependencyRule = RealRule,
     private val keystoreManagerRule: DependencyRule = RealRule,
-    private val sessionEventsManagerRule: DependencyRule = RealRule,
+    private val eventRepositoryRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
     private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
@@ -64,18 +66,18 @@ class TestAppModule(
         ctx: Context,
         eventLocalDataSource: EventLocalDataSource,
         eventRemoteDataSource: EventRemoteDataSource,
-        idPreferencesManager: IdPreferencesManager,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         timeHelper: TimeHelper,
         validatorFactory: SessionEventValidatorsFactory,
         sessionDataCache: SessionDataCache
-    ): com.simprints.eventsystem.event.EventRepository =
-        sessionEventsManagerRule.resolveDependency {
+    ): EventRepository =
+        eventRepositoryRule.resolveDependency {
             super.provideEventRepository(
                 ctx,
                 eventLocalDataSource,
                 eventRemoteDataSource,
-                idPreferencesManager,
+                configManager,
                 loginManager,
                 timeHelper,
                 validatorFactory,

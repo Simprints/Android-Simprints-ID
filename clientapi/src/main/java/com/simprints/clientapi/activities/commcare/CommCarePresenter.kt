@@ -14,6 +14,7 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.subject.SubjectRepository
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -35,12 +36,13 @@ class CommCarePresenter @AssistedInject constructor(
     private val subjectRepository: SubjectRepository,
     private val timeHelper: ClientApiTimeHelper,
     rootManager: SecurityManager,
+    configManager: ConfigManager,
     @Assisted private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : RequestPresenter(
     view = view,
     eventsManager = sessionEventsManager,
     rootManager = rootManager,
-    sharedPreferencesManager = sharedPreferencesManager,
+    configManager = configManager,
     sessionEventsManager = sessionEventsManager
 ), CommCareContract.Presenter {
 

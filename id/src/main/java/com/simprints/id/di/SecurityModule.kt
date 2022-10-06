@@ -9,10 +9,7 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.*
@@ -29,6 +26,7 @@ import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
@@ -46,7 +44,7 @@ open class SecurityModule {
     @Provides
     @Singleton
     open fun provideSignerManager(
-        projectRepository: ProjectRepository,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
@@ -55,9 +53,8 @@ open class SecurityModule {
         longConsentRepository: LongConsentRepository,
         eventRepository: EventRepository,
         simNetwork: SimNetwork,
-        remoteConfigWrapper: RemoteConfigWrapper
     ): SignerManager = SignerManagerImpl(
-        projectRepository,
+        configManager,
         loginManager,
         preferencesManager,
         eventSyncManager,
@@ -65,7 +62,6 @@ open class SecurityModule {
         securityStateScheduler,
         longConsentRepository,
         simNetwork,
-        remoteConfigWrapper
     )
 
     @Provides
@@ -79,18 +75,16 @@ open class SecurityModule {
         loginManager: LoginManager,
         projectSecretManager: ProjectSecretManager,
         secureDataManager: SecurityManager,
-        projectRepository: ProjectRepository,
+        configManager: ConfigManager,
         signerManager: SignerManager,
         longConsentRepository: LongConsentRepository,
-        preferencesManager: IdPreferencesManager,
     ): ProjectAuthenticator = ProjectAuthenticatorImpl(
         loginManager,
         projectSecretManager,
         secureDataManager,
-        projectRepository,
+        configManager,
         signerManager,
         longConsentRepository,
-        preferencesManager,
     )
 
     @Provides

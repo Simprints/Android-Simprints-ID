@@ -14,7 +14,7 @@ interface ModalityFlow {
 
     val steps: List<Step>
 
-    fun startFlow(appRequest: AppRequest)
+    suspend fun startFlow(appRequest: AppRequest)
 
     fun getNextStepToLaunch(): Step?
 

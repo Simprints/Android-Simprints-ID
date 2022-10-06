@@ -4,5 +4,5 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 
 interface ScannerFactory {
 
-    fun create(macAddress: String): ScannerWrapper
+    suspend fun create(macAddress: String): ScannerWrapper
 }

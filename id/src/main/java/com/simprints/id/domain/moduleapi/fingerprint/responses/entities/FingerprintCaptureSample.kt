@@ -3,11 +3,11 @@ package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 import android.os.Parcelable
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.fromModuleApiToDomain
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
-import com.simprints.id.data.db.subject.domain.fromModuleApiToDomain
+import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
+import com.simprints.id.domain.moduleapi.fingerprint.models.fromModuleApiToDomain
 import com.simprints.id.domain.moduleapi.images.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.images.fromModuleApiToDomain
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
@@ -19,7 +19,7 @@ import java.util.*
 
 @Parcelize
 open class FingerprintCaptureSample(
-    open val fingerIdentifier: FingerIdentifier,
+    open val fingerIdentifier: Finger,
     open val template: ByteArray,
     open val templateQualityScore: Int,
     val format: FingerprintTemplateFormat,

@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter
 import android.nfc.NfcAdapter
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.fingerprint.activities.alert.AlertContract
@@ -49,7 +48,6 @@ import com.simprints.fingerprint.scanner.data.FirmwareRepository
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
-import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisionsSerializer
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
@@ -126,8 +124,7 @@ object KoinInjector {
      * These are classes that are wrappers of ones that appear in the main app module
      */
     private fun Module.defineBuildersForFingerprintManagers() {
-        single { ScannerHardwareRevisionsSerializer(JsonHelper) }
-        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get(), get()) }
+        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
@@ -154,7 +151,7 @@ object KoinInjector {
 
         single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single { ScannerUiHelper() }
-        single { ScannerPairingManager(get(), get(), get(), get()) }
+        single { ScannerPairingManager(get(), get(), get(), get(), get()) }
         single { ConnectionHelper(get(), get()) }
         single { ScannerInitialSetupHelper(get(), get(), get(), get()) }
         single { CypressOtaHelper(get(), get()) }
@@ -208,7 +205,7 @@ object KoinInjector {
                 get(qualifier = named(Application.APPLICATION_COROUTINE_SCOPE))
             )
         }
-        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel {
             CollectFingerprintsViewModel(
                 get(),
@@ -226,7 +223,7 @@ object KoinInjector {
         viewModel { MatchingViewModel(get(), get(), get(), get(), get(),get(),get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
-        viewModel { OtaViewModel(get(), get(), get(), get(), get()) }
+        viewModel { OtaViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { OtaRecoveryViewModel(get()) }
     }
 

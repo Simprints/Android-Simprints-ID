@@ -3,10 +3,10 @@ package com.simprints.id.data.db.subject.domain
 import android.os.Parcelable
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.id.tools.extensions.toMode
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
@@ -27,7 +27,7 @@ data class Subject(
 
 fun Subject.fromSubjectToEnrolmentCreationEvent(
     now: Long,
-    modalities: List<Modality>,
+    modalities: List<GeneralConfiguration.Modality>,
     encoder: EncodingUtils
 ): EnrolmentRecordCreationEvent {
     return EnrolmentRecordCreationEvent(

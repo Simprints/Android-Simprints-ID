@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.activity.BaseSplitActivity
@@ -37,7 +36,7 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
     private lateinit var enrolLastBiometricsRequest: EnrolLastBiometricsRequest
 
     private val vm: EnrolLastBiometricsViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(EnrolLastBiometricsViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory)[EnrolLastBiometricsViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,14 +59,17 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
     }
 
     private fun observeViewState() {
-        vm.getViewStateLiveData().observe(this, Observer {
+        vm.getViewStateLiveData().observe(this) {
             if (it is ViewState.Success) {
                 Toast.makeText(this, getString(IDR.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
                 sendOkResult(it.newGuid)
             } else {
-                AlertActivityHelper.launchAlert(this@EnrolLastBiometricsActivity, AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED)
+                AlertActivityHelper.launchAlert(
+                    this@EnrolLastBiometricsActivity,
+                    AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED
+                )
             }
-        })
+        }
     }
 
 

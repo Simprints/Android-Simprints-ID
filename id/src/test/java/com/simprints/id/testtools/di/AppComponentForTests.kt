@@ -12,16 +12,16 @@ import com.simprints.id.activities.settings.SettingsActivityTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragmentTest
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionViewModelTest
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivityTest
-import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorkerTest
 import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
+import com.simprints.infra.config.DataStoreModule
+import com.simprints.infra.images.ImagesModule
+import com.simprints.infra.license.LicenseModule
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
-import com.simprints.infra.license.LicenseModule
-import com.simprints.infra.images.ImagesModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -43,7 +43,9 @@ import javax.inject.Singleton
         TestSecurityModule::class,
         RealmModule::class,
         LicenseModule::class,
-        ImagesModule::class
+        ImagesModule::class,
+        DataStoreModule::class,
+        TestConfigManagerModule::class
     ]
 )
 interface AppComponentForTests : AppComponent {
@@ -66,7 +68,6 @@ interface AppComponentForTests : AppComponent {
 
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(alertActivityTest: AlertActivityTest)
-    fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
     fun inject(moduleViewModelTest: ModuleSelectionViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(subjectsDownSyncCountWorkerTest: EventDownSyncCountWorkerTest)

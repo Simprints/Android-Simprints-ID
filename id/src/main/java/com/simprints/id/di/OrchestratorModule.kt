@@ -6,7 +6,6 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
@@ -25,6 +24,7 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import dagger.Module
 import dagger.Provides
@@ -46,16 +46,16 @@ class OrchestratorModule {
     @Provides
     fun provideFaceStepProcessor(
         faceRequestFactory: FaceRequestFactory,
-        preferenceManager: IdPreferencesManager
+        configManager: ConfigManager,
     ): FaceStepProcessor =
-        FaceStepProcessorImpl(faceRequestFactory, preferenceManager)
+        FaceStepProcessorImpl(faceRequestFactory, configManager)
 
     @Provides
     fun provideFingerprintStepProcessor(
         fingerprintRequestFactory: FingerprintRequestFactory,
-        preferenceManager: IdPreferencesManager
+        configManager: ConfigManager,
     ): FingerprintStepProcessor =
-        FingerprintStepProcessorImpl(fingerprintRequestFactory, preferenceManager)
+        FingerprintStepProcessorImpl(fingerprintRequestFactory, configManager)
 
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
@@ -87,25 +87,17 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
-        timeHelper: TimeHelper,
-        eventRepository: EventRepository,
-        preferenceManager: IdPreferencesManager,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         ctx: Context
     ): ModalityFlow =
-        ModalityFlowEnrolImpl(
+        ModalityFlowEnrol(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
-            timeHelper,
-            eventRepository,
-            preferenceManager.consentRequired,
-            preferenceManager.locationPermissionRequired,
-            preferenceManager.modalities,
-            loginManager.getSignedInProjectIdOrEmpty(),
-            ctx.deviceId,
-            preferenceManager.isEnrolmentPlus,
-            preferenceManager.matchGroup
+            configManager,
+            loginManager,
+            ctx.deviceId
         )
 
     @Provides
@@ -114,22 +106,16 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
-        timeHelper: TimeHelper,
-        eventRepository: EventRepository,
-        preferenceManager: IdPreferencesManager,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         ctx: Context
     ): ModalityFlow =
-        ModalityFlowVerifyImpl(
+        ModalityFlowVerify(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
-            timeHelper,
-            eventRepository,
-            preferenceManager.consentRequired,
-            preferenceManager.locationPermissionRequired,
-            preferenceManager.modalities,
-            loginManager.getSignedInProjectIdOrEmpty(),
+            configManager,
+            loginManager,
             ctx.deviceId
         )
 
@@ -139,23 +125,16 @@ class OrchestratorModule {
         fingerprintStepProcessor: FingerprintStepProcessor,
         faceStepProcessor: FaceStepProcessor,
         coreStepProcessor: CoreStepProcessor,
-        timeHelper: TimeHelper,
-        prefs: IdPreferencesManager,
-        eventRepository: EventRepository,
+        configManager: ConfigManager,
         loginManager: LoginManager,
         ctx: Context
     ): ModalityFlow =
-        ModalityFlowIdentifyImpl(
+        ModalityFlowIdentify(
             fingerprintStepProcessor,
             faceStepProcessor,
             coreStepProcessor,
-            prefs.matchGroup,
-            timeHelper,
-            eventRepository,
-            prefs.consentRequired,
-            prefs.locationPermissionRequired,
-            prefs.modalities,
-            loginManager.getSignedInProjectIdOrEmpty(),
+            configManager,
+            loginManager,
             ctx.deviceId
         )
 
@@ -208,15 +187,12 @@ class OrchestratorModule {
     fun provideAppResponseBuilderFactory(
         enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper,
-        preferenceManager: IdPreferencesManager,
+        configManager: ConfigManager,
         enrolResponseAdjudicationHelper: EnrolResponseAdjudicationHelper
     ): AppResponseFactory = AppResponseFactoryImpl(
         enrolmentHelper,
         timeHelper,
-        preferenceManager.isEnrolmentPlus,
-        preferenceManager.fingerprintConfidenceThresholds,
-        preferenceManager.faceConfidenceThresholds,
-        preferenceManager.returnIdCount,
+        configManager,
         enrolResponseAdjudicationHelper
     )
 
@@ -226,10 +202,7 @@ class OrchestratorModule {
     ): FlowProvider = orchestratorManagerImpl
 
     @Provides
-    fun provideEnrolAdjudicationActionHelper(prefs: IdPreferencesManager): EnrolResponseAdjudicationHelper =
-        EnrolResponseAdjudicationHelperImpl(
-            prefs.fingerprintConfidenceThresholds,
-            prefs.faceConfidenceThresholds
-        )
+    fun provideEnrolAdjudicationActionHelper(): EnrolResponseAdjudicationHelper =
+        EnrolResponseAdjudicationHelperImpl()
 
 }

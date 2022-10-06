@@ -2,9 +2,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
+import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -26,7 +24,6 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
@@ -35,6 +32,9 @@ import com.simprints.id.secure.models.SecurityState.Status
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -66,7 +66,7 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var subjectLocalDataSourceMock: SubjectLocalDataSource
 
     @MockK
-    lateinit var preferencesManagerMock: IdPreferencesManager
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var eventRepositoryMock: EventRepository
@@ -80,6 +80,10 @@ class CheckLoginFromIntentPresenterTest {
     @MockK
     lateinit var simNetworkUtilsMock: SimNetworkUtils
 
+    @MockK
+    lateinit var recentEventsPreferencesManagerMock: RecentEventsPreferencesManager
+
+    private val generalConfiguration = mockk<GeneralConfiguration>()
     private val loginManagerMock = mockk<LoginManager>(relaxed = true)
 
     @Before
@@ -96,6 +100,8 @@ class CheckLoginFromIntentPresenterTest {
             subjectLocalDataSource = subjectLocalDataSourceMock
             coEvery { subjectLocalDataSource.count(any()) } returns 0
 
+            recentEventsPreferencesManager = recentEventsPreferencesManagerMock
+
             simNetworkUtils = simNetworkUtilsMock
             every { simNetworkUtils.connectionsStates } returns emptyList()
 
@@ -103,8 +109,11 @@ class CheckLoginFromIntentPresenterTest {
                 every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
             }
             LanguageHelper.prefs = mockk(relaxed = true)
-            preferencesManager = preferencesManagerMock.apply {
-                every { language } returns "EN"
+            configManager = this@CheckLoginFromIntentPresenterTest.configManager.apply {
+                coEvery { getProjectConfiguration() } returns mockk(relaxed = true) {
+                    every { general } returns generalConfiguration
+                }
+                coEvery { getDeviceConfiguration() } returns mockk(relaxed = true)
             }
             eventRepository = eventRepositoryMock
             timeHelper = timeHelperMock
@@ -150,7 +159,7 @@ class CheckLoginFromIntentPresenterTest {
 
             presenter.setup()
 
-            coVerify { preferencesManagerMock.lastUserUsed = DEFAULT_USER_ID }
+            coVerify { recentEventsPreferencesManagerMock.lastUserUsed = DEFAULT_USER_ID }
         }
     }
 
@@ -303,8 +312,8 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
             coEvery { subjectLocalDataSourceMock.count(any()) } returns subjectCount
             coEvery { loginManagerMock.getSignedInProjectIdOrEmpty() } returns projectId
-            every { preferencesManagerMock.modalities } returns listOf(
-                Modality.FINGER,
+            every { generalConfiguration.modalities } returns listOf(
+                Modality.FINGERPRINT,
                 Modality.FACE
             )
 
@@ -325,7 +334,7 @@ class CheckLoginFromIntentPresenterTest {
                 GUID1,
                 DEFAULT_PROJECT_ID,
                 CREATED_AT,
-                listOf(FINGERPRINT, FACE),
+                listOf(Modality.FINGERPRINT, Modality.FACE),
                 appVersionNameArg,
                 libSimprintsVersionNameArg,
                 languageArg,

@@ -2,29 +2,26 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestDataModule
 import com.simprints.id.testtools.di.TestViewModelModule
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -39,11 +36,7 @@ class SyncInformationActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val appModule by lazy {
-        TestAppModule(
-            app,
-            dbManagerRule = DependencyRule.MockkRule,
-            sessionEventsLocalDbManagerRule = DependencyRule.MockkRule
-        )
+        TestAppModule(app)
     }
 
     private val dataModule by lazy {
@@ -56,11 +49,10 @@ class SyncInformationActivityTest {
     private val downSyncHelper: EventDownSyncHelper = mockk(relaxed = true)
     private val eventRepository: EventRepository = mockk(relaxed = true)
     private val subjectRepository: SubjectRepository = mockk(relaxed = true)
-    private val preferencesManager: IdPreferencesManager = mockk(relaxed = true)
     private val projectId: String = DEFAULT_PROJECT_ID
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
     private val imageRepository: ImageRepository = mockk(relaxed = true)
-    private val dispatcherProvider: DispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+    private val configManager = mockk<ConfigManager>()
     private val viewModelModule by lazy {
         TestViewModelModule(
             syncInformationViewModelFactorRule = DependencyRule.ReplaceRule {
@@ -68,17 +60,16 @@ class SyncInformationActivityTest {
                     downSyncHelper,
                     eventRepository,
                     subjectRepository,
-                    preferencesManager,
                     projectId,
                     eventDownSyncScopeRepository,
                     imageRepository,
-                    dispatcherProvider
+                    configManager,
+                    testCoroutineRule.testCoroutineDispatcher,
                 )
             }
         )
     }
 
-    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         UnitTestConfig(

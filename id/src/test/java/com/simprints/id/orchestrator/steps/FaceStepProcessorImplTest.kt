@@ -3,7 +3,6 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
@@ -14,9 +13,10 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.config.ConfigManager
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import io.mockk.*
-import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +28,13 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
-    @MockK lateinit var preferencesManagerMock: IdPreferencesManager
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { face } returns mockk {
+                every { nbOfImagesToCapture } returns 2
+            }
+        }
+    }
 
     private val faceRequestFactory: FaceRequestFactory = FaceRequestFactoryImpl()
     private lateinit var faceStepProcess: FaceStepProcessor
@@ -43,19 +49,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-        with(preferencesManagerMock) {
-            every { language } returns "en"
-            every { fingerprintsToCollect } returns listOf()
-            every { logoExists } returns true
-            every { organizationName } returns "some_org"
-            every { programName } returns "some_name"
-            every { faceNbOfFramesCaptured } returns 2
-        }
-
-        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, preferencesManagerMock)
-
-
+        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, configManager)
         mockFromModuleApiToDomainExt()
     }
 
@@ -75,14 +69,14 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessorShouldBuildTheRightStepForEnrol() {
+    fun stepProcessorShouldBuildTheRightStepForEnrol() = runTest {
         val step = faceStepProcess.buildCaptureStep()
 
         verifyFaceIntent<FaceCaptureRequest>(step, CAPTURE.value)
     }
 
     @Test
-    fun stepProcessorShouldBuildTheRightStepForIdentify() {
+    fun stepProcessorShouldBuildTheRightStepForIdentify() = runTest {
         val step = faceStepProcess.buildStepMatch(mockk(), mockk())
 
         verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)

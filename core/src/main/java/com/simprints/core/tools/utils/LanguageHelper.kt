@@ -7,6 +7,7 @@ import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import java.util.*
 
+// TODO refactor
 object LanguageHelper {
 
     const val SHARED_PREFS_LANGUAGE_KEY = "SelectedLanguage"

@@ -6,8 +6,4 @@ import dagger.hilt.components.SingletonComponent
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface EntryPointForDFMs {
-
-
-
-}
+interface EntryPointForDFMs
