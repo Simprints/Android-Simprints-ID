@@ -130,7 +130,6 @@ class DashboardActivity : BaseSplitActivity() {
 
             with(findItem(R.id.menuPrivacyNotice)) {
                 title = getString(IDR.string.menu_privacy_notice)
-                isVisible = settingsPreferencesManager.consentRequired
             }
         }
 
