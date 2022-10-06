@@ -1,6 +1,6 @@
 package com.simprints.face.controllers.core.flow
 
-import com.simprints.id.orchestrator.FlowProvider
+import com.simprints.core.domain.common.FlowProvider
 
 class MasterFlowManagerImpl(private val flowProvider: FlowProvider) : MasterFlowManager {
 
