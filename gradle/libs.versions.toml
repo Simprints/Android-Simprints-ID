@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "1.7.10"
+kotlin_version = "1.7.20"
 androidx_navigation_version = "2.5.2"
 kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.5.1"
@@ -9,8 +9,8 @@ espresso_version = "3.4.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.5.1"
 androidx_room_version = "2.4.3"
-androidx_camerax_version = "1.2.0-beta01"
-dagger_version = "2.43.2"
+androidx_camerax_version = "1.2.0-beta02"
+dagger_version = "2.44"
 work_version = "2.7.1"
 location_services_version = "20.0.0"
 safetynet_services_version = "18.0.1"
@@ -18,16 +18,16 @@ retrofit_version = "2.9.0"
 okttp_version = "4.10.0"
 fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.13.4"
-koin_version = "3.2.1"
+koin_version = "3.2.2"
 rootbeer_version = "0.1.0"
 mockito_version = "4.8.0"
 robolectric_version = "4.8.2"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
-fragment_version = "1.5.2"
+fragment_version = "1.5.3"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
-hilt_version = "2.43.2"
+hilt_version = "2.44"
 
 
 [libraries]
@@ -71,7 +71,7 @@ androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", ver
 androidX-navigation-dynamicfeatures = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "androidx_navigation_version" }
 
 #Annotation
-androidX-annotation-annotation = "androidx.annotation:annotation:1.4.0"
+androidX-annotation-annotation = "androidx.annotation:annotation:1.5.0"
 
 #sqlite
 androidX-sqlite = "androidx.sqlite:sqlite:2.2.0"
@@ -190,8 +190,8 @@ testing-Mockito-inline = { module = "org.mockito:mockito-inline", version.ref = 
 testing-Mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito_version" } #Required to use Mock in AndroidTests
 testing-Mockito-kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 #Testing-Mockk
-testing-Mockk-core = "io.mockk:mockk:1.12.8"
-testing-Mockk-android = "io.mockk:mockk-android:1.12.8"
+testing-Mockk-core = "io.mockk:mockk:1.13.2"
+testing-Mockk-android = "io.mockk:mockk-android:1.13.2"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }

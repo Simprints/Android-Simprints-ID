@@ -13,11 +13,18 @@ import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
+import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class OrchestratorViewModel(private val orchestrator: Orchestrator,
-                            private val runnableTaskDispatcher: RunnableTaskDispatcher,
-                            private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler) : ViewModel() {
+class OrchestratorViewModel(
+    private val orchestrator: Orchestrator,
+    private val runnableTaskDispatcher: RunnableTaskDispatcher,
+    private val scannerManager: ScannerManager,
+    private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
+    private val externalScope: CoroutineScope
+): ViewModel() {
 
     val nextActivityCall = MutableLiveData<ActivityCall>()
     val finishedResult = MutableLiveData<ActivityResult>()
@@ -86,4 +93,12 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
 
     private fun FinalResult.toActivityResult() = ActivityResult(resultCode, resultData)
 
+    override fun onCleared() {
+        super.onCleared()
+        externalScope.launch {
+            if (scannerManager.isScannerAvailable) {
+                scannerManager.scanner.disconnect()
+            }
+        }
+    }
 }

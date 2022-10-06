@@ -7,19 +7,22 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.databinding.ActivityErrorBinding
 import com.simprints.core.tools.activity.BaseSplitActivity
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 import splitties.views.backgroundColor
+import javax.inject.Inject
 
 class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
 
-    override val presenter: ErrorContract.Presenter by inject { parametersOf(this) }
+    @Inject
+    lateinit var presenterFactory: ClientApiComponent.ErrorPresenterFactory
+
+    override val presenter: ErrorContract.Presenter by lazy { presenterFactory.create(this) }
 
     private lateinit var clientApiAlertType: ClientApiAlert
     private lateinit var binding: ActivityErrorBinding

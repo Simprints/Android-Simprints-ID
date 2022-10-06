@@ -41,8 +41,11 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.images.ImageRepository
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class ViewModelModule {
 

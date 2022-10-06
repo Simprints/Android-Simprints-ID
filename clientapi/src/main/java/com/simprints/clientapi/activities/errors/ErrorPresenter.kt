@@ -2,10 +2,13 @@ package com.simprints.clientapi.activities.errors
 
 import com.simprints.clientapi.R
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class ErrorPresenter(val view: ErrorContract.View,
-                     private val sessionEventsManager: ClientApiSessionEventsManager)
-    : ErrorContract.Presenter {
+class ErrorPresenter @AssistedInject constructor(
+    @Assisted val view: ErrorContract.View,
+    private val sessionEventsManager: ClientApiSessionEventsManager
+) : ErrorContract.Presenter {
 
     override suspend fun start(clientApiAlert: ClientApiAlert) {
         setUpView(clientApiAlert)

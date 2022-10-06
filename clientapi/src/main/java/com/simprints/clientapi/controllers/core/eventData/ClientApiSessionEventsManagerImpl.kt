@@ -11,7 +11,6 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
-import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
@@ -20,10 +19,11 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCapt
 import com.simprints.id.orchestrator.cache.HotCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
-class ClientApiSessionEventsManagerImpl(
+class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
     private val hotCache: HotCache,
