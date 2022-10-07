@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.id.R
-import com.simprints.core.R as coreR
 import com.simprints.infra.resources.R as IDR
 
 //TODO: originally in the pro-guard. Do we really need it unobfuscated?
@@ -51,7 +50,7 @@ enum class AlertActivityViewModel(val type: Type,
 
     SAFETYNET_ERROR(
         type = Type.ConfigurationError(title = IDR.string.alert_try_again,
-            backgroundColor = coreR.color.simprints_grey,
+            backgroundColor = IDR.color.simprints_grey,
             mainDrawable = R.drawable.error_icon),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
@@ -121,7 +120,7 @@ enum class AlertActivityViewModel(val type: Type,
 
         @Keep
         class DataError(title: Int,
-                        backgroundColor: Int = coreR.color.simprints_grey,
+                        backgroundColor: Int = IDR.color.simprints_grey,
                         mainDrawable: Int = R.drawable.error_icon,
                         hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
@@ -129,14 +128,14 @@ enum class AlertActivityViewModel(val type: Type,
 
         @Keep
         class ConfigurationError(title: Int = IDR.string.configuration_error_title,
-                                 backgroundColor: Int = coreR.color.simprints_yellow,
+                                 backgroundColor: Int = IDR.color.simprints_yellow,
                                  mainDrawable: Int = R.drawable.error_icon,
                                  hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         @Keep
         class UnexpectedError(title: Int = IDR.string.error_occurred_title,
-                              backgroundColor: Int = coreR.color.simprints_red,
+                              backgroundColor: Int = IDR.color.simprints_red,
                               mainDrawable: Int = R.drawable.error_icon,
                               hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
