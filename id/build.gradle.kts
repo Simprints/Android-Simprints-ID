@@ -114,6 +114,7 @@ dependencies {
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrarealm"))
+    implementation(project(":infrarecentuseractivity"))
     implementation(project(":infrasecurity"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))

@@ -1,7 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.EventRepository
@@ -34,6 +33,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SES
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -52,7 +52,7 @@ class CheckLoginFromIntentPresenter(
     private var setupFailed: Boolean = false
 
     @Inject
-    lateinit var recentEventsPreferencesManager: RecentEventsPreferencesManager
+    lateinit var recentUserActivityManager: RecentUserActivityManager
 
     @Inject
     lateinit var eventRepository: EventRepository
@@ -173,8 +173,12 @@ class CheckLoginFromIntentPresenter(
             )
         }
 
-    private fun setLastUser() {
-        recentEventsPreferencesManager.lastUserUsed = appRequest.userId
+    private suspend fun setLastUser() {
+        recentUserActivityManager.updateRecentUserActivity {
+            it.apply {
+                it.lastUserUsed = appRequest.userId
+            }
+        }
     }
 
     override suspend fun start() {

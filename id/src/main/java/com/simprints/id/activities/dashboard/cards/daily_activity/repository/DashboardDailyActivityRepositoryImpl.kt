@@ -11,7 +11,7 @@ class DashboardDailyActivityRepositoryImpl(
     private val timeHelper: TimeHelper
 ) : DashboardDailyActivityRepository {
 
-    override fun getDailyActivity(): DashboardDailyActivityState {
+    override suspend fun getDailyActivity(): DashboardDailyActivityState {
         return clearOldActivityThenReturn {
             val enrolments = localDataSource.getEnrolmentsMadeToday()
             val identifications = localDataSource.getIdentificationsMadeToday()
@@ -25,7 +25,7 @@ class DashboardDailyActivityRepositoryImpl(
         }
     }
 
-    override fun updateDailyActivity(appResponse: AppResponse) {
+    override suspend fun updateDailyActivity(appResponse: AppResponse) {
         when (appResponse.type) {
             AppResponseType.ENROL -> computeNewEnrolment()
             AppResponseType.IDENTIFY -> computeNewIdentification()
@@ -38,25 +38,25 @@ class DashboardDailyActivityRepositoryImpl(
         }
     }
 
-    private fun computeNewEnrolment() = clearOldActivityThenReturn {
+    private suspend fun computeNewEnrolment() = clearOldActivityThenReturn {
         localDataSource.computeNewEnrolmentAndGet()
 
         localDataSource.setLastActivityTime(timeHelper.now())
     }
 
-    private fun computeNewIdentification() = clearOldActivityThenReturn {
+    private suspend fun computeNewIdentification() = clearOldActivityThenReturn {
         localDataSource.computeNewIdentificationAndGet()
 
         localDataSource.setLastActivityTime(timeHelper.now())
     }
 
-    private fun computeNewVerification() = clearOldActivityThenReturn {
+    private suspend fun computeNewVerification() = clearOldActivityThenReturn {
         localDataSource.computeNewVerificationAndGet()
 
         localDataSource.setLastActivityTime(timeHelper.now())
     }
 
-    private fun <T> clearOldActivityThenReturn(block: () -> T): T {
+    private suspend fun <T> clearOldActivityThenReturn(block: suspend () -> T): T {
         val today = timeHelper.todayInMillis()
         val tomorrow = timeHelper.tomorrowInMillis()
         val lastActivityTime = localDataSource.getLastActivityTime()

@@ -1,61 +1,55 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.data
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
-import io.mockk.MockKAnnotations
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import org.junit.Before
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class DailyActivityLocalDataSourceImplTest {
 
-    @MockK lateinit var mockPreferencesManager: RecentEventsPreferencesManager
-
-    private lateinit var localDataSource: DailyActivityLocalDataSourceImpl
-
-    @Before
-    fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-        configureMock()
-        localDataSource = DailyActivityLocalDataSourceImpl(mockPreferencesManager)
+    private val recentUserActivityManager = mockk<RecentUserActivityManager> {
+        coEvery { getRecentUserActivity() } returns RecentUserActivity(
+            "",
+            "",
+            "",
+            ENROLMENTS_COUNT,
+            IDENTIFICATIONS_COUNT,
+            VERIFICATIONS_COUNT,
+            LAST_ACTIVITY_TIME,
+        )
     }
 
+    private val localDataSource = DailyActivityLocalDataSourceImpl(recentUserActivityManager)
+
     @Test
-    fun shouldGetRecentEnrolments() {
+    fun shouldGetRecentEnrolments() = runTest {
         val enrolments = localDataSource.getEnrolmentsMadeToday()
 
         assertThat(enrolments).isEqualTo(ENROLMENTS_COUNT)
     }
 
     @Test
-    fun shouldGetRecentIdentifications() {
+    fun shouldGetRecentIdentifications() = runTest {
         val identifications = localDataSource.getIdentificationsMadeToday()
 
         assertThat(identifications).isEqualTo(IDENTIFICATIONS_COUNT)
     }
 
     @Test
-    fun shouldGetRecentVerifications() {
+    fun shouldGetRecentVerifications() = runTest {
         val verifications = localDataSource.getVerificationsMadeToday()
 
         assertThat(verifications).isEqualTo(VERIFICATIONS_COUNT)
     }
 
     @Test
-    fun shouldGetLastActivityTime() {
+    fun shouldGetLastActivityTime() = runTest {
         val lastActivityTime = localDataSource.getLastActivityTime()
 
         assertThat(lastActivityTime).isEqualTo(LAST_ACTIVITY_TIME)
-    }
-
-    private fun configureMock() {
-        with(mockPreferencesManager) {
-            every { lastActivityTime } returns LAST_ACTIVITY_TIME
-            every { enrolmentsToday } returns ENROLMENTS_COUNT
-            every { identificationsToday } returns IDENTIFICATIONS_COUNT
-            every { verificationsToday } returns VERIFICATIONS_COUNT
-        }
     }
 
     private companion object {
@@ -64,5 +58,4 @@ class DailyActivityLocalDataSourceImplTest {
         const val VERIFICATIONS_COUNT = 30
         const val LAST_ACTIVITY_TIME = 12345L
     }
-
 }
