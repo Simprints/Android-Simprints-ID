@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -19,6 +18,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Co
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.IdentificationConfiguration.PoolType
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.login.LoginManager
 
 class ModalityFlowEnrol(

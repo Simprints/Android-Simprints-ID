@@ -44,13 +44,12 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
 import com.simprints.id.Application
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
-import com.simprints.id.testtools.SubjectsGeneratorUtils
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.enrolment.records.domain.models.FingerIdentifier
+import com.simprints.infra.enrolment.records.domain.models.fromDomainToModuleApi
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.apiclient.SimApiClientImpl
@@ -66,6 +65,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
 class EventRemoteDataSourceImplAndroidTest {
@@ -307,7 +307,7 @@ class EventRemoteDataSourceImplAndroidTest {
     private fun MutableList<Event>.addFingerprintBiometricCaptureEvent() {
         FingerIdentifier.values().forEach { fingerIdentifier ->
             val fakeTemplate = EncodingUtilsImpl.byteArrayToBase64(
-                SubjectsGeneratorUtils.getRandomFingerprintSample().template
+                Random.nextBytes(64)
             )
 
             val fingerprint =
@@ -358,9 +358,7 @@ class EventRemoteDataSourceImplAndroidTest {
     }
 
     private fun MutableList<Event>.addFaceCaptureBiometricCaptureEvent() {
-        val template = EncodingUtilsImpl.byteArrayToBase64(
-            SubjectsGeneratorUtils.getRandomFaceSample().template
-        )
+        val template = EncodingUtilsImpl.byteArrayToBase64(Random.nextBytes(64))
 
         val face =
             FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(

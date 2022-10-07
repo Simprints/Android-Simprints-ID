@@ -88,6 +88,7 @@ dependencies {
 
     // Simprints
     implementation(project(":id"))
+    implementation(project(":infraenrolmentrecords"))
     implementation(project(":fingerprintmatcher"))
     implementation(project(":fingerprintscanner"))
     implementation(project(":fingerprintscannermock"))

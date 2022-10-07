@@ -11,16 +11,7 @@ import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourc
 import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
 import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.SubjectRepositoryImpl
-import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
-import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSourceImpl
-import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSource
-import com.simprints.id.enrolmentrecords.remote.EnrolmentRecordRemoteDataSourceImpl
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.realm.RealmWrapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
@@ -37,32 +28,6 @@ open class DataModule {
         loginManager: LoginManager,
         jsonHelper: JsonHelper
     ): EventRemoteDataSource = EventRemoteDataSourceImpl(loginManager, jsonHelper)
-
-    @Provides
-    open fun provideSubjectRepository(
-        subjectLocalDataSource: SubjectLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource
-    ): SubjectRepository = SubjectRepositoryImpl(
-        subjectLocalDataSource
-    )
-
-    @Provides
-    @Singleton
-    open fun providePersonLocalDataSource(
-        realmWrapper: RealmWrapper
-    ): SubjectLocalDataSource = SubjectLocalDataSourceImpl(
-        realmWrapper
-    )
-
-    @Provides
-    open fun provideFingerprintRecordLocalDataSource(
-        subjectLocalDataSource: SubjectLocalDataSource
-    ): FingerprintIdentityLocalDataSource = subjectLocalDataSource
-
-    @Provides
-    open fun provideFaceIdentityLocalDataSource(
-        subjectLocalDataSource: SubjectLocalDataSource
-    ): FaceIdentityLocalDataSource = subjectLocalDataSource
 
     @Provides
     open fun provideLongConsentLocalDataSource(
@@ -93,8 +58,4 @@ open class DataModule {
     @Singleton
     open fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
-
-    @Provides
-    open fun provideEnrolmentRecordRemoteDataSource(loginManager: LoginManager): EnrolmentRecordRemoteDataSource =
-        EnrolmentRecordRemoteDataSourceImpl(loginManager)
 }

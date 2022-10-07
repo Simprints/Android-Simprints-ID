@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
@@ -15,11 +16,8 @@ import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperation
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl
 import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
-import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -43,6 +41,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
@@ -159,8 +158,8 @@ open class SyncModule {
 
     @Provides
     open fun provideEventDownSyncHelper(
-        subjectRepository: SubjectRepository,
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
+        eventRepository: EventRepository,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         subjectFactory: SubjectFactory,
         configManager: ConfigManager,
@@ -168,7 +167,7 @@ open class SyncModule {
         dispatcher: DispatcherProvider
     ): EventDownSyncHelper =
         EventDownSyncHelperImpl(
-            subjectRepository,
+            enrolmentRecordManager,
             eventRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
@@ -198,8 +197,4 @@ open class SyncModule {
     @Provides
     open fun provideImageUpSyncScheduler(context: Context): ImageUpSyncScheduler =
         ImageUpSyncSchedulerImpl(context)
-
-    @Provides
-    fun provideEnrolmentRecordScheduler(context: Context): EnrolmentRecordScheduler =
-        EnrolmentRecordSchedulerImpl(context)
 }

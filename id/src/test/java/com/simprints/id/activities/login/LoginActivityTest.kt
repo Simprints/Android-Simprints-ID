@@ -18,7 +18,6 @@ import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
@@ -27,7 +26,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -35,7 +33,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LoginActivityTest {
@@ -59,12 +56,6 @@ class LoginActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    private val preferencesModule by lazy {
-        TestPreferencesModule(
-            settingsPreferencesManagerRule = DependencyRule.SpykRule
-        )
-    }
-
     private val module by lazy {
         TestAppModule(
             app,
@@ -75,11 +66,7 @@ class LoginActivityTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(
-            module,
-            preferencesModule,
-            viewModelModule = viewModelModule
-        ).fullSetup().inject(this)
+        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup().inject(this)
     }
 
     @Test

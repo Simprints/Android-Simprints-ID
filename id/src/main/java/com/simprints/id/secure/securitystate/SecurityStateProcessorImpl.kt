@@ -1,16 +1,14 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 
 class SecurityStateProcessorImpl(
     private val imageRepository: ImageRepository,
-    private val subjectRepository: SubjectRepository,
-    private val enrolmentRecordScheduler: EnrolmentRecordScheduler,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
     private val signerManager: SignerManager
 ) : SecurityStateProcessor {
 
@@ -19,7 +17,7 @@ class SecurityStateProcessorImpl(
             deleteLocalDataAndSignOut()
         if (securityState.mustUpSyncEnrolmentRecords != null) {
             Simber.i("subject ids ${securityState.mustUpSyncEnrolmentRecords.subjectIds.size}")
-            enrolmentRecordScheduler.upload(
+            enrolmentRecordManager.upload(
                 securityState.mustUpSyncEnrolmentRecords.id,
                 securityState.mustUpSyncEnrolmentRecords.subjectIds
             )
@@ -33,7 +31,7 @@ class SecurityStateProcessorImpl(
 
     private suspend fun deleteLocalData() {
         imageRepository.deleteStoredImages()
-        subjectRepository.deleteAll()
+        enrolmentRecordManager.deleteAll()
     }
 
     private suspend fun signOut() {

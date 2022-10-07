@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":id"))
     implementation(project(":moduleapi"))
     implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
     implementation(project(":infrarealm"))

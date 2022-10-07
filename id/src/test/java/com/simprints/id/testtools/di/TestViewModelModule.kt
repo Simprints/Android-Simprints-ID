@@ -13,14 +13,14 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.di.ViewModelModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestViewModelModule(
@@ -73,7 +73,7 @@ class TestViewModelModule(
     override fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
         eventRepository: EventRepository,
-        subjectRepository: SubjectRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
         loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
@@ -83,7 +83,7 @@ class TestViewModelModule(
             super.provideSyncInformationViewModelFactory(
                 downySyncHelper,
                 eventRepository,
-                subjectRepository,
+                enrolmentRecordManager,
                 loginManager,
                 eventDownSyncScopeRepository,
                 imageRepository,

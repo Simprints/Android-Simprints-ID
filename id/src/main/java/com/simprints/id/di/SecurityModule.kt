@@ -9,9 +9,6 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordScheduler
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
@@ -27,6 +24,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
@@ -105,11 +103,11 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateRemoteDataSource(
         loginManager: LoginManager,
-        settingsPreferencesManager: SettingsPreferencesManager,
+        configManager: ConfigManager,
         context: Context
     ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
         loginManager,
-        settingsPreferencesManager,
+        configManager,
         context.deviceId
     )
 
@@ -137,13 +135,11 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateProcessor(
         imageRepository: ImageRepository,
-        subjectRepository: SubjectRepository,
-        enrolmentRecordScheduler: EnrolmentRecordScheduler,
+        enrolmentRecordManager: EnrolmentRecordManager,
         signerManager: SignerManager
     ): SecurityStateProcessor = SecurityStateProcessorImpl(
         imageRepository,
-        subjectRepository,
-        enrolmentRecordScheduler,
+        enrolmentRecordManager,
         signerManager
     )
 

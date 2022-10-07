@@ -16,6 +16,7 @@ import com.simprints.id.di.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorkerTest
 import com.simprints.id.services.sync.images.ImageUpSyncWorkerTest
 import com.simprints.infra.config.DataStoreModule
+import com.simprints.infra.enrolment.records.EnrolmentRecordsModule
 import com.simprints.infra.images.ImagesModule
 import com.simprints.infra.license.LicenseModule
 import com.simprints.infra.login.LoginManagerModule
@@ -45,7 +46,8 @@ import javax.inject.Singleton
         LicenseModule::class,
         ImagesModule::class,
         DataStoreModule::class,
-        TestConfigManagerModule::class
+        TestConfigManagerModule::class,
+        EnrolmentRecordsModule::class,
     ]
 )
 interface AppComponentForTests : AppComponent {

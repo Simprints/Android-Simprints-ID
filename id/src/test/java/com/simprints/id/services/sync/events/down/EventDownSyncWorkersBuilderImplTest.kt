@@ -48,7 +48,8 @@ class EventDownSyncWorkersBuilderImplTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             SELECTED_MODULE,
-            listOf()
+            listOf(),
+            ""
         )
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration

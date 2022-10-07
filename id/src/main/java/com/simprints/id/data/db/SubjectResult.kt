@@ -1,9 +1,11 @@
 package com.simprints.id.data.db
 
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.infra.enrolment.records.domain.models.Subject
 
-data class SubjectFetchResult(val subject: Subject? = null,
-                              val subjectSource: SubjectSource
+
+data class SubjectFetchResult(
+    val subject: Subject? = null,
+    val subjectSource: SubjectSource
 ) {
 
     enum class SubjectSource {

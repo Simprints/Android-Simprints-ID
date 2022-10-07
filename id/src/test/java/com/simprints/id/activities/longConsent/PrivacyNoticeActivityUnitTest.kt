@@ -12,7 +12,6 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
@@ -45,7 +44,8 @@ class PrivacyNoticeActivityUnitTest {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
             LANGUAGE,
             listOf(),
-            listOf()
+            listOf(),
+            ""
         )
     }
 
@@ -62,24 +62,13 @@ class PrivacyNoticeActivityUnitTest {
     }
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
-    private val preferencesModule by lazy {
-        TestPreferencesModule(
-            settingsPreferencesManagerRule = DependencyRule.SpykRule
-        )
-    }
-
     private val module by lazy {
         TestAppModule(app)
     }
 
     @Before
     fun setUp() {
-        UnitTestConfig(
-            module,
-            preferencesModule,
-            viewModelModule = viewModelModule
-        ).fullSetup().inject(this)
+        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup().inject(this)
     }
 
     @Test
