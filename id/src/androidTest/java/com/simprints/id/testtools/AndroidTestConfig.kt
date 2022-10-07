@@ -9,7 +9,6 @@ import io.realm.Realm
 class AndroidTestConfig(
     private val appModule: TestAppModule? = null,
     private val dataModule: TestDataModule? = null,
-    private val preferencesModule: TestPreferencesModule? = null,
     private val securityModule: TestSecurityModule? = null,
     private val viewModelModule: TestViewModelModule? = null
 ) {
@@ -26,7 +25,6 @@ class AndroidTestConfig(
         .application(app)
         .appModule(appModule ?: TestAppModule(app))
         .dataModule(dataModule ?: TestDataModule())
-        .preferencesModule(preferencesModule ?: TestPreferencesModule())
         .securityModule(securityModule ?: TestSecurityModule())
         .viewModelModule(viewModelModule ?: TestViewModelModule())
 

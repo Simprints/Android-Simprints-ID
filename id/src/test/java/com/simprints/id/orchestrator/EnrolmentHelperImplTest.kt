@@ -1,15 +1,16 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.SubjectAction
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.mockUUID
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -25,10 +26,10 @@ class EnrolmentHelperImplTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var subjectRepository: SubjectRepository
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    lateinit var eventRepository: EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -40,7 +41,7 @@ class EnrolmentHelperImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        enrolmentHelper = EnrolmentHelperImpl(subjectRepository, eventRepository, timeHelper)
+        enrolmentHelper = EnrolmentHelperImpl(enrolmentRecordManager, eventRepository, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
         coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(personCreationEvent)
@@ -75,11 +76,11 @@ class EnrolmentHelperImplTest {
             enrolmentHelper.enrol(defaultSubject)
 
             coVerify(exactly = 1) {
-                subjectRepository.performActions(listOf(SubjectAction.Creation(defaultSubject)))
+                enrolmentRecordManager.performActions(listOf(SubjectAction.Creation(defaultSubject)))
             }
         }
     }
-    
+
     @Test
     fun `enrol should run correct actions`() = testCoroutineRule.runBlockingTest {
 
@@ -96,7 +97,7 @@ class EnrolmentHelperImplTest {
 
         coVerify { eventRepository.addOrUpdateEvent(expectedEnrolmentEvent) }
         coVerify(exactly = 1) {
-            subjectRepository.performActions(
+            enrolmentRecordManager.performActions(
                 listOf(
                     SubjectAction.Creation(
                         defaultSubject
@@ -104,11 +105,14 @@ class EnrolmentHelperImplTest {
                 )
             )
         }
-        coVerify(exactly = 0) { eventRepository.uploadEvents(projectId = DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ) }
+        coVerify(exactly = 0) {
+            eventRepository.uploadEvents(
+                projectId = DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = false
+            )
+        }
 
     }
 

@@ -4,19 +4,22 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.fingerprint.fromModuleApiToDomain
-import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
 
-class FingerprintDbManagerImpl(private val coreFingerprintIdentityLocalDataSource: FingerprintIdentityLocalDataSource) : FingerprintDbManager {
+class FingerprintDbManagerImpl(private val enrolmentRecordManager: EnrolmentRecordManager) :
+    FingerprintDbManager {
 
     override suspend fun loadPeople(query: Serializable): Flow<FingerprintIdentity> =
-            coreFingerprintIdentityLocalDataSource
-                .loadFingerprintIdentities(query)
-                .map {
-                    FingerprintIdentity(it.patientId, it.fingerprints.map { fingerprint -> fingerprint.fromCoreToDomain() })
-                }
+        enrolmentRecordManager
+            .loadFingerprintIdentities(query)
+            .map {
+                FingerprintIdentity(
+                    it.patientId,
+                    it.fingerprints.map { fingerprint -> fingerprint.fromCoreToDomain() })
+            }
 }
 
 fun FingerprintSample.fromCoreToDomain() =

@@ -8,18 +8,17 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.fromSubjectToEnrolmentCreationEvent
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.canCoSyncAllData
-import com.simprints.infra.config.domain.models.canCoSyncBiometricData
-import com.simprints.infra.config.domain.models.canCoSyncData
-import com.simprints.infra.config.domain.models.canSyncDataToSimprints
+import com.simprints.infra.config.domain.models.*
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -136,7 +135,7 @@ abstract class RequestPresenter(
 
     override suspend fun getEnrolmentCreationEventForSubject(
         subjectId: String,
-        subjectRepository: SubjectRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
         timeHelper: ClientApiTimeHelper,
         jsonHelper: JsonHelper
     ): String? {
@@ -145,7 +144,7 @@ abstract class RequestPresenter(
         if (!projectConfig.canCoSyncAllData() && !projectConfig.canCoSyncBiometricData()) return null
 
         val recordCreationEvent =
-            subjectRepository.load(
+            enrolmentRecordManager.load(
                 SubjectQuery(
                     projectId = getProjectIdFromRequest(),
                     subjectId = subjectId
@@ -176,4 +175,30 @@ abstract class RequestPresenter(
 
     @Keep
     private data class CoSyncEvents(val events: List<Event>)
+
+    private fun Subject.fromSubjectToEnrolmentCreationEvent(
+        now: Long,
+        modalities: List<GeneralConfiguration.Modality>,
+        encoder: EncodingUtils
+    ): EnrolmentRecordCreationEvent {
+        return EnrolmentRecordCreationEvent(
+            now,
+            subjectId,
+            projectId,
+            moduleId,
+            attendantId,
+            modalities.map { it.toMode() },
+            EnrolmentRecordCreationEvent.buildBiometricReferences(
+                fingerprintSamples,
+                faceSamples,
+                encoder
+            )
+        )
+    }
+
+    private fun GeneralConfiguration.Modality.toMode(): Modes =
+        when (this) {
+            GeneralConfiguration.Modality.FACE -> Modes.FACE
+            GeneralConfiguration.Modality.FINGERPRINT -> Modes.FINGERPRINT
+        }
 }

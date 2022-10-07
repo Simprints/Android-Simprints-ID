@@ -15,6 +15,7 @@ internal fun DeviceConfiguration.toProto(): ProtoDeviceConfiguration =
                 .addAllFingersToCollect(fingersToCollect.map { it.toProto() })
                 .build()
         )
+        .setLastInstructionId(lastInstructionId)
         .build()
 
 internal fun ProtoDeviceConfiguration.toDomain(): DeviceConfiguration =
@@ -22,4 +23,5 @@ internal fun ProtoDeviceConfiguration.toDomain(): DeviceConfiguration =
         language.language,
         moduleSelectedList,
         fingersToCollect.fingersToCollectList.map { it.toDomain() },
+        lastInstructionId
     )

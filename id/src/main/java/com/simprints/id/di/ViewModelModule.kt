@@ -26,7 +26,6 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.orchestrator.EnrolmentHelper
@@ -37,6 +36,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.images.ImageRepository
 import dagger.Module
@@ -94,7 +94,7 @@ open class ViewModelModule {
     open fun provideSyncInformationViewModelFactory(
         downySyncHelper: EventDownSyncHelper,
         eventRepository: EventRepository,
-        subjectRepository: SubjectRepository,
+        enrolmentRecordManager: EnrolmentRecordManager,
         loginManager: LoginManager,
         eventDownSyncScopeRepository: EventDownSyncScopeRepository,
         imageRepository: ImageRepository,
@@ -103,7 +103,7 @@ open class ViewModelModule {
         SyncInformationViewModelFactory(
             downySyncHelper,
             eventRepository,
-            subjectRepository,
+            enrolmentRecordManager,
             loginManager.getSignedInProjectIdOrEmpty(),
             eventDownSyncScopeRepository,
             imageRepository,

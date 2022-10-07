@@ -53,15 +53,19 @@ Following the guidelines above the end goal of SID should look roughly like:
 - featurelogin (com.simprints.feature.login)
 - featuresyncinfo (com.simprints.feature.syncinfo)
 - id
+- infraconfig (com.simprints.infra.config)
+- infraenrolmentrecords (com.simprints.infra.enrolment.records)
 - infraeventsystem (com.simprints.infra.eventsystem)
 - infrafacematcher_roc (com.simprints.infra.facematcher)
 - infrafingerprintmatcher (com.simprints.infra.fingerprintmatcher)
 - infrafingerprintscanner (com.simprints.infra.fingerprintscanner)
 - infrafingerprintscannermock (com.simprints.infra.fingerprintscannermock)
+- infraimages (com.simprints.infra.images)
+- infralicense (com.simprints.infra.license)
 - infralogging (com.simprints.infra.logging)
 - infralogin (com.simprints.infra.login)
-- infraconfig (com.simprints.infra.config)
 - infranetwork (com.simprints.infra.networking)
+- infrarealm (com.simprints.infra.realm)
 - infrasecurity (com.simprints.infra.security)
 
 *Note: There is no longer a core module. There should be no "catch all" module, because it will just become a graveyard / completely overused, like the previous ID module. Every module should have a clear singular purpose.* </br>

@@ -9,13 +9,13 @@ import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.
 import com.simprints.eventsystem.sampledata.*
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
-import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.syntax.assertThrows
@@ -44,7 +44,7 @@ class EventDownSyncHelperImplTest {
     private lateinit var eventDownSyncHelper: EventDownSyncHelper
 
     @MockK
-    private lateinit var subjectRepository: SubjectRepository
+    private lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
     private lateinit var eventRepository: EventRepository
@@ -69,7 +69,7 @@ class EventDownSyncHelperImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         eventDownSyncHelper = EventDownSyncHelperImpl(
-            subjectRepository,
+            enrolmentRecordManager,
             eventRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
@@ -152,7 +152,7 @@ class EventDownSyncHelperImplTest {
             eventDownSyncHelper.downSync(this, projectOp).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(
+                enrolmentRecordManager.performActions(
                     listOf(
                         Creation(
                             subjectFactory.buildSubjectFromCreationPayload(
@@ -173,7 +173,7 @@ class EventDownSyncHelperImplTest {
 
             eventDownSyncHelper.downSync(this, projectOp).consumeAsFlow().toList()
 
-            coVerify { subjectRepository.performActions(listOf(Deletion(event.payload.subjectId))) }
+            coVerify { enrolmentRecordManager.performActions(listOf(Deletion(event.payload.subjectId))) }
         }
     }
 
@@ -185,13 +185,14 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                listOf()
+                listOf(),
+                ""
             )
 
             eventDownSyncHelper.downSync(this, moduleOp).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(emptyList())
+                enrolmentRecordManager.performActions(emptyList())
             }
         }
     }
@@ -204,7 +205,8 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                listOf()
+                listOf(),
+                ""
             )
 
             val syncByModule2 = moduleOp.copy(
@@ -215,7 +217,7 @@ class EventDownSyncHelperImplTest {
             eventDownSyncHelper.downSync(this, syncByModule2).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(
+                enrolmentRecordManager.performActions(
                     listOf(
                         Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
                     )
@@ -232,13 +234,14 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID),
-                listOf()
+                listOf(),
+                ""
             )
 
             eventDownSyncHelper.downSync(this, moduleOp).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(
+                enrolmentRecordManager.performActions(
                     listOf(
                         Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId)
                     )
@@ -255,7 +258,8 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID_2),
-                listOf()
+                listOf(),
+                ""
             )
 
             val syncByModule2 = moduleOp.copy(
@@ -266,7 +270,7 @@ class EventDownSyncHelperImplTest {
             eventDownSyncHelper.downSync(this, syncByModule2).consumeAsFlow().toList()
 
             coVerify {
-                subjectRepository.performActions(
+                enrolmentRecordManager.performActions(
                     listOf(
                         Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
                     )

@@ -7,7 +7,6 @@ import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -15,6 +14,7 @@ import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestDataModule
 import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.di.DependencyRule
@@ -48,7 +48,7 @@ class SyncInformationActivityTest {
 
     private val downSyncHelper: EventDownSyncHelper = mockk(relaxed = true)
     private val eventRepository: EventRepository = mockk(relaxed = true)
-    private val subjectRepository: SubjectRepository = mockk(relaxed = true)
+    private val enrolmentRecordManager: EnrolmentRecordManager = mockk(relaxed = true)
     private val projectId: String = DEFAULT_PROJECT_ID
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
     private val imageRepository: ImageRepository = mockk(relaxed = true)
@@ -59,7 +59,7 @@ class SyncInformationActivityTest {
                 SyncInformationViewModelFactory(
                     downSyncHelper,
                     eventRepository,
-                    subjectRepository,
+                    enrolmentRecordManager,
                     projectId,
                     eventDownSyncScopeRepository,
                     imageRepository,
@@ -85,11 +85,11 @@ class SyncInformationActivityTest {
 
         val controller = createActivity<SyncInformationActivity>()
 
-        coVerify(exactly = 0) { subjectRepository.count(any()) }
+        coVerify(exactly = 0) { enrolmentRecordManager.count(any()) }
 
         controller.resume()
 
-        coVerify(exactly = 1) { subjectRepository.count(any()) }
+        coVerify(exactly = 1) { enrolmentRecordManager.count(any()) }
     }
 
     @Test
@@ -106,7 +106,7 @@ class SyncInformationActivityTest {
             controller.start()
         }
 
-        coVerify(exactly = times) { subjectRepository.count(any()) }
+        coVerify(exactly = times) { enrolmentRecordManager.count(any()) }
     }
 
     @Test
@@ -117,6 +117,6 @@ class SyncInformationActivityTest {
 
         controller.get().onOptionsItemSelected(RoboMenuItem(R.id.sync_redo))
 
-        coVerify(exactly = 1) { subjectRepository.count(any()) }
+        coVerify(exactly = 1) { enrolmentRecordManager.count(any()) }
     }
 }

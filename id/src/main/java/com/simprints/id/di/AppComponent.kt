@@ -35,11 +35,7 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.activities.setup.SetupActivity
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.FaceIdentityLocalDataSource
-import com.simprints.id.data.db.subject.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.enrolmentrecords.worker.EnrolmentRecordWorker
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.config.RemoteConfigWorker
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
@@ -56,6 +52,8 @@ import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.ConfigManagerModule
 import com.simprints.infra.config.DataStoreModule
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordsModule
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.ImagesModule
 import com.simprints.infra.license.LicenseModule
@@ -65,7 +63,6 @@ import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
-import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.security.SecurityManager
 import dagger.BindsInstance
 import dagger.Component
@@ -91,6 +88,7 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         RealmModule::class,
         ConfigManagerModule::class,
         DataStoreModule::class,
+        EnrolmentRecordsModule::class
     ]
 )
 @Singleton
@@ -159,14 +157,11 @@ interface AppComponent {
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(preferencesManager: IdPreferencesManager)
     fun inject(remoteConfigWorker: RemoteConfigWorker)
-    fun inject(enrolmentRecordWorker: EnrolmentRecordWorker)
     fun inject(storeUserLocationIntoCurrentSessionWorker: StoreUserLocationIntoCurrentSessionWorker)
 
     fun getSessionEventsManager(): EventRepository
     fun getTimeHelper(): TimeHelper
-    fun getPersonRepository(): SubjectRepository
-    fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
-    fun getFaceIdentityLocalDataSource(): FaceIdentityLocalDataSource
+    fun getEnrolmentRecordManager(): EnrolmentRecordManager
     fun getRecentEventsPreferencesManager(): RecentEventsPreferencesManager
     fun getPreferencesManager(): PreferencesManager
     fun getIdPreferencesManager(): IdPreferencesManager
@@ -176,5 +171,4 @@ interface AppComponent {
     fun getLoginManager(): LoginManager
     fun getConfigManager(): ConfigManager
     fun getSecurityManager(): SecurityManager
-    fun getRealmWrapper(): RealmWrapper
 }

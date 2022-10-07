@@ -9,6 +9,7 @@ message ProtoDeviceConfiguration {
     Language language = 1;
     repeated string module_selected = 2;
     FingersToCollect fingers_to_collect = 3;
+    string last_instruction_id = 4;
 
     message Language {
         string language = 1;
