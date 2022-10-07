@@ -11,11 +11,11 @@ include ':id',
     ':moduleapi',
     ':eventsystem',
     ':infraconfig',
+    ':infraenrolmentrecords',
+    ':infraimages',
+    ':infralicense',
     ':infralogging',
     ':infralogin',
     ':infranetwork',
     ':infrarealm',
-    ':infrasecurity',
-    ':infralicense',
-    ':infraimages'
-include ':infraenrolmentrecords'
+    ':infrasecurity'
