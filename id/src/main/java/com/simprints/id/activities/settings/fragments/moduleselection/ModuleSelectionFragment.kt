@@ -153,7 +153,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
         editText?.let {
             it.typeface = try {
-                ResourcesCompat.getFont(requireContext(), R.font.muli)
+                ResourcesCompat.getFont(requireContext(), IDR.font.muli)
             } catch (ex: Exception) {
                 Typeface.DEFAULT
             }
