@@ -27,7 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import com.simprints.resources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
