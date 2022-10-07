@@ -1,12 +1,13 @@
 package com.simprints.id.secure.securitystate.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.UpSyncEnrolmentRecords
 import com.simprints.id.secure.models.remote.ApiSecurityState
 import com.simprints.id.secure.models.remote.ApiUpSyncEnrolmentRecords
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -31,12 +32,17 @@ class SecurityStateRemoteDataSourceImplTest {
 
     private val loginManager = mockk<LoginManager>()
     private val remoteInterface = mockk<SecureApiInterface>()
-    private val settingsPreferencesManager = mockk<SettingsPreferencesManager> {
-        every { lastInstructionId } returns PREVIOUS_INSTRUCTION_ID
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(),
+            listOf(),
+            PREVIOUS_INSTRUCTION_ID
+        )
     }
     private val simApiClient = mockk<SimNetwork.SimApiClient<SecureApiInterface>>()
     private val securityStateRemoteDataSource =
-        SecurityStateRemoteDataSourceImpl(loginManager, settingsPreferencesManager, DEVICE_ID)
+        SecurityStateRemoteDataSourceImpl(loginManager, configManager, DEVICE_ID)
 
 
     @Before
@@ -60,7 +66,11 @@ class SecurityStateRemoteDataSourceImplTest {
                 DEVICE_ID,
                 PREVIOUS_INSTRUCTION_ID,
             )
-        } returns ApiSecurityState(DEVICE_ID, ApiSecurityState.Status.PROJECT_ENDED, ApiUpSyncEnrolmentRecords("id1", listOf("subject1")))
+        } returns ApiSecurityState(
+            DEVICE_ID,
+            ApiSecurityState.Status.PROJECT_ENDED,
+            ApiUpSyncEnrolmentRecords("id1", listOf("subject1"))
+        )
 
         val securityState = securityStateRemoteDataSource.getSecurityState()
 

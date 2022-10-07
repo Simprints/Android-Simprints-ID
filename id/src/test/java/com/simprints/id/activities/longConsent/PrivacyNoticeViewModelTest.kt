@@ -32,7 +32,8 @@ class PrivacyNoticeViewModelTest {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
             LANGUAGE,
             listOf(),
-            listOf()
+            listOf(),
+            ""
         )
     }
     private val privacyNoticeViewModel = PrivacyNoticeViewModel(

@@ -24,6 +24,7 @@ import com.simprints.id.Application
 import com.simprints.id.di.*
 import com.simprints.infra.config.ConfigManagerModule
 import com.simprints.infra.config.DataStoreModule
+import com.simprints.infra.enrolment.records.EnrolmentRecordsModule
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
@@ -53,7 +54,8 @@ import javax.inject.Singleton
         NetworkModule::class,
         ClientApiDispatcherModule::class,
         ConfigManagerModule::class,
-        DataStoreModule::class
+        DataStoreModule::class,
+        EnrolmentRecordsModule::class,
     ]
 )
 @Singleton

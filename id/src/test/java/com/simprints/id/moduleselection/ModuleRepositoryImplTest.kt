@@ -2,12 +2,12 @@ package com.simprints.id.moduleselection
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -22,12 +22,12 @@ class ModuleRepositoryImplTest {
         }
     }
     private val mockConfigManager: ConfigManager = mockk(relaxed = true)
-    private val mockSubjectRepository: SubjectRepository = mockk(relaxed = true)
+    private val enrolmentRecordManager: EnrolmentRecordManager = mockk(relaxed = true)
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
 
     private var repository = ModuleRepositoryImpl(
         mockConfigManager,
-        mockSubjectRepository,
+        enrolmentRecordManager,
         eventDownSyncScopeRepository
     )
 
@@ -38,7 +38,7 @@ class ModuleRepositoryImplTest {
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
         coEvery {
             mockConfigManager.getDeviceConfiguration()
-        } returns DeviceConfiguration("", listOf("b", "c"), listOf())
+        } returns DeviceConfiguration("", listOf("b", "c"), listOf(), "")
     }
 
     @Test
@@ -57,7 +57,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf()))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(),""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
         assertThat(updatedConfig.selectedModules.toString()).isEqualTo(selectedModuleNames.toString())
@@ -75,7 +75,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        coVerify { mockSubjectRepository.delete(any()) }
+        coVerify { enrolmentRecordManager.delete(any()) }
     }
 
     @Test

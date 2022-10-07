@@ -5,11 +5,11 @@ import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.toList
 
 class FetchGuidHelperImpl(
     private val downSyncHelper: EventDownSyncHelper,
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
     private val configManager: ConfigManager,
 ) : FetchGuidHelper {
 
@@ -70,7 +70,7 @@ class FetchGuidHelperImpl(
         subjectId: String
     ): SubjectFetchResult? {
         val subject =
-            subjectRepository.load(SubjectQuery(projectId = projectId, subjectId = subjectId))
+            enrolmentRecordManager.load(SubjectQuery(projectId = projectId, subjectId = subjectId))
                 .toList().firstOrNull()
         return subject?.let {
             SubjectFetchResult(subject, LOCAL)

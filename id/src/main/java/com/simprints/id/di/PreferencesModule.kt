@@ -10,10 +10,6 @@ import com.simprints.id.Application
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.data.prefs.IdPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
-import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
-import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
@@ -39,31 +35,18 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
-    fun provideScannerAttributesPreferencesManager(
-        prefs: ImprovedSharedPreferences
-    ): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
-
-    @Provides
-    @Singleton
-    open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences): SettingsPreferencesManager =
-        SettingsPreferencesManagerImpl(prefs)
-
-    @Provides
-    @Singleton
     fun providePreferencesManager(
-        settingsPreferencesManager: SettingsPreferencesManager,
         lastEventsPreferencesManager: RecentEventsPreferencesManager,
         app: Application
     ): PreferencesManager =
-        IdPreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+        IdPreferencesManagerImpl(lastEventsPreferencesManager, app)
 
     @Provides
     @Singleton
     open fun provideIdPreferencesManager(
-        settingsPreferencesManager: SettingsPreferencesManager,
         lastEventsPreferencesManager: RecentEventsPreferencesManager,
         app: Application
     ): IdPreferencesManager =
-        IdPreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+        IdPreferencesManagerImpl(lastEventsPreferencesManager, app)
 
 }

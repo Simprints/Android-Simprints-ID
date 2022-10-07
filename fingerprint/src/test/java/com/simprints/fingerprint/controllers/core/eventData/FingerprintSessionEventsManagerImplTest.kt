@@ -6,7 +6,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparis
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
-import com.simprints.id.data.db.subject.local.SubjectQuery
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import io.mockk.CapturingSlot
 import io.mockk.Runs
 import io.mockk.coEvery

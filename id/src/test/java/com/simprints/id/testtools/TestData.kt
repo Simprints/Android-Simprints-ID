@@ -4,12 +4,10 @@ import android.location.Location
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.eventsystem.sampledata.SampleDefaults
-import com.simprints.id.data.db.subject.domain.Subject
+import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import java.util.*
 import kotlin.random.Random
-
-
 
 object TestData {
 

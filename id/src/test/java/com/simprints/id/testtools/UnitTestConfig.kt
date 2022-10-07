@@ -12,7 +12,6 @@ import com.simprints.testtools.unit.BaseUnitTestConfig
 
 class UnitTestConfig(
     private val appModule: TestAppModule? = null,
-    private val preferencesModule: TestPreferencesModule? = null,
     private val dataModule: TestDataModule? = null,
     private val viewModelModule: TestViewModelModule? = null
 ) : BaseUnitTestConfig() {
@@ -69,7 +68,6 @@ class UnitTestConfig(
         testAppComponent = DaggerAppComponentForTests.builder()
             .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
-            .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .dataModule(dataModule ?: TestDataModule())
             .viewModelModule(viewModelModule ?: TestViewModelModule())
             .build()

@@ -4,17 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
 class SyncInformationViewModelFactory(
     private val downySyncHelper: EventDownSyncHelper,
     private val eventRepository: EventRepository,
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
     private val projectId: String,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
@@ -28,7 +28,7 @@ class SyncInformationViewModelFactory(
             SyncInformationViewModel(
                 downySyncHelper,
                 eventRepository,
-                subjectRepository,
+                enrolmentRecordManager,
                 projectId,
                 eventDownSyncScopeRepository,
                 imageRepository,

@@ -139,6 +139,24 @@ class DeviceConfigSharedPrefsMigrationTest {
         assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }
 
+    @Test
+    fun `should migrate the lastInstructionId`() = runTest {
+        every {
+            preferences.getString(
+                DeviceConfigSharedPrefsMigration.LAST_INSTRUCTION_ID_KEY,
+                ""
+            )
+        } returns "instruction"
+        val deviceConfiguration =
+            deviceConfigSharedPrefsMigration.migrate(ProtoDeviceConfiguration.getDefaultInstance())
+
+        val expectedDeviceConfiguration = ProtoDeviceConfiguration
+            .newBuilder()
+            .setLastInstructionId("instruction")
+            .build()
+        assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
+
     companion object {
         private const val LANGUAGE = "fr"
     }
