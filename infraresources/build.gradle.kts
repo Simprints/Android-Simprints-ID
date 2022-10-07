@@ -16,4 +16,7 @@ android {
 
 dependencies {
     implementation(libs.support.material)
+    implementation(libs.androidX.appcompat)
+    implementation(libs.androidX.ui.constraintlayout)
+    implementation(libs.androidX.ui.preference)
 }
