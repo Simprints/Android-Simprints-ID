@@ -21,7 +21,6 @@ import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRe
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.ScannerManager
@@ -46,7 +45,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-
 
 @RunWith(AndroidJUnit4::class)
 class ConnectScannerActivityAndroidTest : KoinTest {
@@ -73,8 +71,6 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         every { newTimer() } returns mockTimer
     }
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val recentEventsPreferencesManager: FingerprintPreferencesManager =
-        mockk(relaxed = true) {}
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns mockk {
@@ -104,7 +100,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
                 scannerManager,
                 timeHelper,
                 sessionEventsManager,
-                recentEventsPreferencesManager,
+                mockk(relaxed = true),
                 configManager,
                 nfcManager,
                 dispatcherProvider

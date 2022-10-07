@@ -97,6 +97,7 @@ dependencies {
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infraimages"))
+    implementation(project(":infrarecentuseractivity"))
 
     // Kotlin
     implementation(libs.kotlin.reflect)

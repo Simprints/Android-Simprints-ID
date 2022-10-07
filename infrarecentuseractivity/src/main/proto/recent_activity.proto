@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "com.simprints.infra.recent.user.activity";
+option java_multiple_files = true;
+
+message ProtoRecentUserActivity {
+    string last_scanner_version = 1;
+    string last_scanner_used = 2;
+    string last_user_used = 3;
+    int32 enrolments_today = 4;
+    int32 identifications_today = 5;
+    int32 verifications_today = 6;
+    int64 last_activity_time = 7;
+}

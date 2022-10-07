@@ -30,8 +30,6 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManagerI
 import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactory
 import com.simprints.fingerprint.controllers.core.network.FingerprintApiClientFactoryImpl
 import com.simprints.fingerprint.controllers.core.network.FingerprintFileDownloader
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -124,7 +122,6 @@ object KoinInjector {
      * These are classes that are wrappers of ones that appear in the main app module
      */
     private fun Module.defineBuildersForFingerprintManagers() {
-        single<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
         factory<FingerprintSessionEventsManager> { FingerprintSessionEventsManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
@@ -220,7 +217,7 @@ object KoinInjector {
                 get()
             )
         }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get(),get(),get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { NfcPairViewModel(get(), get()) }
         viewModel { SerialEntryPairViewModel(get(), get()) }
         viewModel { OtaViewModel(get(), get(), get(), get(), get(), get()) }

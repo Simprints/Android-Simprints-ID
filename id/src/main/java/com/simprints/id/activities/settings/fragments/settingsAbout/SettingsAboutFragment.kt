@@ -10,7 +10,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
@@ -23,6 +22,7 @@ import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import java.util.*
 import javax.inject.Inject
 
@@ -44,9 +44,6 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
                 getString(R.string.confirmation_logout_cancel), null
             ).create()
     }
-
-    @Inject
-    lateinit var recentEventsManager: RecentEventsPreferencesManager
 
     @Inject
     lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
@@ -73,16 +70,19 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         packageVersionName = requireActivity().packageVersionName
         deviceId = requireActivity().deviceId
 
+        loadPreferenceValuesAndBindThemToChangeListeners()
+
         settingsAboutViewModel.configuration.observe(this) {
-            loadPreferenceValuesAndBindThemToChangeListeners(it)
+            loadSyncAndSearchConfigurationPreference(it, getSyncAndSearchConfigurationPreference())
             enableSettingsBasedOnModalities(it, getScannerVersionPreference())
+        }
+        settingsAboutViewModel.recentUserActivity.observe(this) {
+            loadScannerVersionInPreference(getScannerVersionPreference(), it)
         }
     }
 
-    private fun loadPreferenceValuesAndBindThemToChangeListeners(config: ProjectConfiguration) {
-        loadSyncAndSearchConfigurationPreference(config, getSyncAndSearchConfigurationPreference())
+    private fun loadPreferenceValuesAndBindThemToChangeListeners() {
         loadAppVersionInPreference(getAppVersionPreference(), packageVersionName)
-        loadScannerVersionInPreference(getScannerVersionPreference())
         loadDeviceIdInPreference(getDeviceIdPreference(), deviceId)
         getLogoutPreference()?.setOnPreferenceClickListener {
             showConfirmationDialogForLogout()
@@ -182,8 +182,11 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         preference?.summary = packageVersionName
     }
 
-    private fun loadScannerVersionInPreference(preference: Preference?) {
-        preference?.summary = recentEventsManager.lastScannerVersion
+    private fun loadScannerVersionInPreference(
+        preference: Preference?,
+        recentUserActivity: RecentUserActivity
+    ) {
+        preference?.summary = recentUserActivity.lastScannerVersion
     }
 
     private fun loadDeviceIdInPreference(preference: Preference?, deviceId: String) {

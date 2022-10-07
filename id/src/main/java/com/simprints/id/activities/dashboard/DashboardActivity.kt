@@ -185,7 +185,7 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun loadDailyActivity() {
-        viewModel.getDailyActivity().let {
+        viewModel.dailyActivity.observe(this) {
             if (it.hasNoActivity()) {
                 dailyActivityBinding.dashboardDailyActivityCard.visibility = View.GONE
             } else {

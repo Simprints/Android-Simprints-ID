@@ -11,7 +11,6 @@ import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecove
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
@@ -22,6 +21,7 @@ import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
@@ -34,7 +34,7 @@ class OtaViewModel(
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
     private val dispatcherProvider: DispatcherProvider,
-    private val recentEventsPreferencesManager: FingerprintPreferencesManager,
+    private val recentUserActivityManager: RecentUserActivityManager,
     private val configManager: ConfigManager
 ) : ViewModel() {
 
@@ -82,7 +82,7 @@ class OtaViewModel(
     }
 
     private suspend fun targetVersions(availableOta: AvailableOta): String {
-        val scannerVersion = recentEventsPreferencesManager.lastScannerVersion
+        val scannerVersion = recentUserActivityManager.getRecentUserActivity().lastScannerVersion
         val availableFirmwareVersions = configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions
         return when (availableOta) {
             AvailableOta.CYPRESS -> availableFirmwareVersions?.get(scannerVersion)?.cypress ?: ""

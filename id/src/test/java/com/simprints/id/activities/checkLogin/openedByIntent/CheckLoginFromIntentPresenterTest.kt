@@ -2,7 +2,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -27,7 +27,6 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
-import com.simprints.id.secure.models.SecurityState.Status
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
@@ -36,10 +35,11 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -81,7 +81,7 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var simNetworkUtilsMock: SimNetworkUtils
 
     @MockK
-    lateinit var recentEventsPreferencesManagerMock: RecentEventsPreferencesManager
+    lateinit var recentUserActivityManager: RecentUserActivityManager
 
     private val generalConfiguration = mockk<GeneralConfiguration>()
     private val loginManagerMock = mockk<LoginManager>(relaxed = true)
@@ -100,7 +100,8 @@ class CheckLoginFromIntentPresenterTest {
             enrolmentRecordManager = this@CheckLoginFromIntentPresenterTest.enrolmentRecordManager
             coEvery { enrolmentRecordManager.count(any()) } returns 0
 
-            recentEventsPreferencesManager = recentEventsPreferencesManagerMock
+            recentUserActivityManager =
+                this@CheckLoginFromIntentPresenterTest.recentUserActivityManager
 
             simNetworkUtils = simNetworkUtilsMock
             every { simNetworkUtils.connectionsStates } returns emptyList()
@@ -154,11 +155,15 @@ class CheckLoginFromIntentPresenterTest {
                 DEFAULT_MODULE_ID,
                 DEFAULT_METADATA
             )
+            val updateConfigFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
+            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateConfigFn)) } returns mockk()
             every { view.parseRequest() } returns appRequest
 
             presenter.setup()
 
-            coVerify { recentEventsPreferencesManagerMock.lastUserUsed = DEFAULT_USER_ID }
+            val updatedActivity =
+                updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
         }
     }
 
