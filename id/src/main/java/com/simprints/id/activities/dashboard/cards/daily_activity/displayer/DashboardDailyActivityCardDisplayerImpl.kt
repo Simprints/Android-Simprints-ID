@@ -10,7 +10,7 @@ import com.simprints.core.tools.extentions.nand
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class DashboardDailyActivityCardDisplayerImpl(
     private val timeHelper: TimeHelper

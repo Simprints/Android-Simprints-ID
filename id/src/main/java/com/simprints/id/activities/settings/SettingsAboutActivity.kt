@@ -9,7 +9,7 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.databinding.SettingsToolbarBinding
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 
 class SettingsAboutActivity : BaseSplitActivity() {

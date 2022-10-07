@@ -17,7 +17,7 @@ import com.simprints.id.Application
 import com.simprints.id.databinding.ActivityFingerSelectionBinding
 import com.simprints.id.tools.extensions.showToast
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class FingerSelectionActivity : BaseSplitActivity() {
 

@@ -14,7 +14,7 @@ import com.simprints.id.activities.settings.fingerselection.FingerSelectionActiv
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.databinding.SettingsToolbarBinding
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class SettingsActivity : BaseSplitActivity() {
 

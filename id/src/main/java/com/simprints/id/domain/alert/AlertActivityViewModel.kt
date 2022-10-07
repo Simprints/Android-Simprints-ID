@@ -6,7 +6,7 @@ import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.core.R as coreR
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 //TODO: originally in the pro-guard. Do we really need it unobfuscated?
 @Keep

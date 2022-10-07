@@ -25,7 +25,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import java.util.*
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class SettingsAboutFragment : PreferenceFragmentCompat() {
 

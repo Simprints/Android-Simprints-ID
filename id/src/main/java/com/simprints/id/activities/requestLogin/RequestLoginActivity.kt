@@ -10,7 +10,7 @@ import com.simprints.id.databinding.ActivityFrontBinding
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 open class RequestLoginActivity : BaseSplitActivity() {
 

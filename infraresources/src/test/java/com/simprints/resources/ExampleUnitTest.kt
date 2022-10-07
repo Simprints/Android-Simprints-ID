@@ -1,4 +1,4 @@
-package com.simprints.infraresources
+package com.simprints.resources
 
 import org.junit.Test
 

@@ -23,7 +23,7 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
-import com.simprints.infraresources.R
+import com.simprints.infra.resources.R
 import javax.inject.Inject
 
 class AlertActivity : BaseSplitActivity(), AlertContract.View {
