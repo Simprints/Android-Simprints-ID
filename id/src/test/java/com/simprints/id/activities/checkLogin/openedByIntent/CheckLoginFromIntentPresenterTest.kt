@@ -27,6 +27,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.secure.models.SecurityState.Status.RUNNING
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.testtools.UnitTestConfig
@@ -38,11 +39,11 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -307,7 +308,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun presenter_signedIn_updateCurrentSession() {
-        runBlocking {
+        runTest {
             val subjectCount = 3
             val projectId = DEFAULT_PROJECT_ID
 
@@ -383,5 +384,55 @@ class CheckLoginFromIntentPresenterTest {
                 })
             }
         }
+    }
+
+    @Test
+    fun `isProjectIdStoredAndMatches should return false if signed in project id is empty`() {
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+        val match = presenter.isProjectIdStoredAndMatches()
+        assertThat(match).isFalse()
+    }
+
+    @Test
+    fun `isProjectIdStoredAndMatches should return true if signed in project id is not empty and match the request`() {
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        presenter.appRequest = AppVerifyRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
+            DEFAULT_METADATA,
+            GUID1
+        )
+        val match = presenter.isProjectIdStoredAndMatches()
+        assertThat(match).isTrue()
+    }
+
+    @Test
+    fun `isProjectIdStoredAndMatches should return throw an exception if signed in project id doesn't match the request`() {
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns "another project"
+        presenter.appRequest = AppVerifyRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
+            DEFAULT_METADATA,
+            GUID1
+        )
+        assertThrows<DifferentProjectIdSignedInException> { presenter.isProjectIdStoredAndMatches() }
+    }
+
+    @Test
+    fun `isUserIdStoredAndMatches should return true if the signed in user id is not empty`() {
+        every { loginManagerMock.getSignedInUserIdOrEmpty() } returns "user"
+
+        val match = presenter.isUserIdStoredAndMatches()
+        assertThat(match).isTrue()
+    }
+
+    @Test
+    fun `isUserIdStoredAndMatches should return false if the signed in user id is empty`() {
+        every { loginManagerMock.getSignedInUserIdOrEmpty() } returns ""
+
+        val match = presenter.isUserIdStoredAndMatches()
+        assertThat(match).isFalse()
     }
 }
