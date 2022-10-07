@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.recent.user.activity.ProtoRecentUserActivity
-import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_USER_KEY
-import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_SCANNER_USED_KEY
-import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_MAC_ADDRESS_KEY
-import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_ACTIVITY_DATE_KEY
 import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.ENROLMENTS_KEY
 import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.IDENTIFICATIONS_KEY
+import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_ACTIVITY_DATE_KEY
+import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_MAC_ADDRESS_KEY
+import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_SCANNER_USED_KEY
+import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.LAST_USER_KEY
 import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.VERIFICATIONS_KEY
 import io.mockk.every
 import io.mockk.mockk
@@ -68,5 +68,10 @@ class RecentUserActivitySharedPrefsMigrationTest {
         val migratedActivity =
             recentUserActivitySharedPrefsMigration.migrate(ProtoRecentUserActivity.getDefaultInstance())
         assertThat(migratedActivity).isEqualTo(expectedMigratedActivity)
+    }
+
+    @Test
+    fun `cleanUp should do nothing`() = runTest {
+        recentUserActivitySharedPrefsMigration.cleanUp()
     }
 }

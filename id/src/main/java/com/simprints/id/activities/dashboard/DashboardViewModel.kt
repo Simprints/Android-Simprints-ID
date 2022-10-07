@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,8 +27,7 @@ class DashboardViewModel(
     val syncToBFSIDAllowed = MutableLiveData<Boolean>()
     val dailyActivity = MutableLiveData<DashboardDailyActivityState>()
     var syncCardStateLiveData = syncCardStateRepository.syncCardStateLiveData
-
-    private val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
+    val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
 
 
     init {
@@ -37,10 +35,8 @@ class DashboardViewModel(
     }
 
     fun syncIfRequired() {
-        viewModelScope.launch { syncCardStateRepository.syncIfRequired() }
+        viewModelScope.launch(dispatcher) { syncCardStateRepository.syncIfRequired() }
     }
-
-    fun getProjectDetails(): LiveData<DashboardProjectState> = projectCardStateLiveData
 
     private fun load() {
         viewModelScope.launch(dispatcher) {
