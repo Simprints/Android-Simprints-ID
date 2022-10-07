@@ -9,7 +9,6 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.secure.*
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
@@ -104,11 +103,11 @@ open class SecurityModule {
     @Provides
     open fun provideSecurityStateRemoteDataSource(
         loginManager: LoginManager,
-        settingsPreferencesManager: SettingsPreferencesManager,
+        configManager: ConfigManager,
         context: Context
     ): SecurityStateRemoteDataSource = SecurityStateRemoteDataSourceImpl(
         loginManager,
-        settingsPreferencesManager,
+        configManager,
         context.deviceId
     )
 
