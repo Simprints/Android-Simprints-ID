@@ -122,11 +122,9 @@ open class Application : CoreApplication() {
         factory { component.getSessionEventsManager() }
         factory { component.getTimeHelper() }
         factory { component.getRecentEventsPreferencesManager() }
-        factory { component.getFingerprintRecordLocalDataSource() }
-        factory { component.getFaceIdentityLocalDataSource() }
         factory { component.getImprovedSharedPreferences() }
         factory { orchestratorComponent.getFlowManager() }
-        factory { component.getPersonRepository() }
+        factory { component.getEnrolmentRecordManager() }
         factory { component.getImageRepository() }
         factory { component.getLoginManager() }
         factory { component.getConfigManager() }

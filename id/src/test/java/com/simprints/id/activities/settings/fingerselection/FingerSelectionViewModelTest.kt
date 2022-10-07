@@ -253,7 +253,7 @@ class FingerSelectionViewModelTest {
         viewModel.savePreference()
 
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf()))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(),""))
         val expectedFingersToCollect = listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB,

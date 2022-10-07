@@ -55,6 +55,8 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
             if (!selectedModules.isNullOrEmpty()) {
                 proto.addAllModuleSelected(selectedModules.split("|"))
             }
+
+            proto.lastInstructionId = prefs.getString(LAST_INSTRUCTION_ID_KEY, "")
             proto.build()
         }
     }
@@ -80,5 +82,8 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
 
         @VisibleForTesting
         const val FINGERS_TO_COLLECT_OVERRIDDEN_KEY = "FingerprintsToCollect_isOverridden"
+
+        @VisibleForTesting
+        const val LAST_INSTRUCTION_ID_KEY = "LastInstructionId"
     }
 }

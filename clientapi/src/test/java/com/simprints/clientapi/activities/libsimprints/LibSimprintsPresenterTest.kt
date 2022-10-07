@@ -224,7 +224,7 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
             configManager
         ).handleEnrolResponse(EnrolResponse(registerId))
@@ -257,7 +257,7 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
             configManager
         ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
@@ -304,7 +304,7 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
             configManager
         ).apply {
@@ -344,7 +344,7 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
             configManager
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))

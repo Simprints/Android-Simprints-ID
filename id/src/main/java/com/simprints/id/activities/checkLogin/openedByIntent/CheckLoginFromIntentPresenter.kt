@@ -12,7 +12,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
@@ -26,6 +25,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.ignoreException
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -58,7 +58,7 @@ class CheckLoginFromIntentPresenter(
     lateinit var eventRepository: EventRepository
 
     @Inject
-    lateinit var subjectLocalDataSource: SubjectLocalDataSource
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @Inject
     lateinit var simNetworkUtils: SimNetworkUtils
@@ -308,7 +308,7 @@ class CheckLoginFromIntentPresenter(
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
         val payload = currentSessionEvent.payload
-        payload.databaseInfo.recordCount = subjectLocalDataSource.count()
+        payload.databaseInfo.recordCount = enrolmentRecordManager.count()
 
         eventRepository.addOrUpdateEvent(currentSessionEvent)
         Simber.d("[CHECK_LOGIN] Updated Database count in current session")

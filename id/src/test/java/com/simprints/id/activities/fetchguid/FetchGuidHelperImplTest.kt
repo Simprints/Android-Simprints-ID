@@ -1,7 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modality
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
@@ -11,19 +10,18 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +34,7 @@ class FetchGuidHelperImplTest {
     lateinit var downSyncHelper: EventDownSyncHelper
 
     @MockK
-    lateinit var subjectRepository: SubjectRepository
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -47,7 +45,7 @@ class FetchGuidHelperImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, subjectRepository, configManager)
+        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, enrolmentRecordManager, configManager)
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
@@ -62,7 +60,7 @@ class FetchGuidHelperImplTest {
     fun fetchGuid_shouldFetchLocalDbFirst() {
         runTest {
             coEvery {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -73,7 +71,7 @@ class FetchGuidHelperImplTest {
             fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
 
             coVerify {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -87,7 +85,7 @@ class FetchGuidHelperImplTest {
     fun fetchGuid_subjectPresentInLocalDb_shouldReturnIt() {
         runTest {
             coEvery {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -105,7 +103,7 @@ class FetchGuidHelperImplTest {
     fun fetchGuid_subjectNotPresentInLocalDb_shouldFetchRemotely() {
         runTest {
             coEvery {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -136,7 +134,7 @@ class FetchGuidHelperImplTest {
     fun fetchGuid_afterFetchingRemotely_shouldTryLoadingTheSubjectFromTheDb() {
         runTest {
             coEvery {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -148,7 +146,7 @@ class FetchGuidHelperImplTest {
             val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
 
             coVerify(exactly = 2) {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -163,7 +161,7 @@ class FetchGuidHelperImplTest {
     fun fetchGuid_afterFetchingRemotely_shouldReturnSubjectIfItWasFetched() {
         runTest {
             coEvery {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -175,7 +173,7 @@ class FetchGuidHelperImplTest {
             val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
 
             coVerify(exactly = 2) {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -190,7 +188,7 @@ class FetchGuidHelperImplTest {
     fun fetchGuid_anythingGoesWrong_shouldReturnNotFound() {
         runTest {
             coEvery {
-                subjectRepository.load(
+                enrolmentRecordManager.load(
                     SubjectQuery(
                         DEFAULT_PROJECT_ID,
                         GUID1
@@ -206,7 +204,7 @@ class FetchGuidHelperImplTest {
     @Test
     fun fetchGuid_downSyncFails_shouldReturnNotFound() = runTest {
         coEvery {
-            subjectRepository.load(
+            enrolmentRecordManager.load(
                 SubjectQuery(
                     DEFAULT_PROJECT_ID,
                     GUID1

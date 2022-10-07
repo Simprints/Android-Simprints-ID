@@ -64,6 +64,7 @@ definitions:
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew eventsystem:jacocoTestReport
                     - ./gradlew infraconfig:jacocoTestReport
+                    - ./gradlew infraenrolmentrecords:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
                     - ./gradlew infralogin:jacocoTestReport
                     - ./gradlew infranetwork:jacocoTestReport
@@ -75,6 +76,7 @@ definitions:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
                     - infraconfig/build/reports/**
+                    - infraenrolmentrecords/build/reports/**
                     - infralogging/build/reports/**
                     - infralogin/build/reports/**
                     - infranetwork/build/reports/**
@@ -178,6 +180,7 @@ definitions:
                     - ./gradlew :fingerprintscannermock:projectHealth
                     - ./gradlew :moduleapi:projectHealth
                     - ./gradlew infraconfig:projectHealth
+                    - ./gradlew infraenrolmentrecords:projectHealth
                     - ./gradlew :infralogging:projectHealth
                     - ./gradlew :infralogin:projectHealth
                     - ./gradlew :infranetwork:projectHealth

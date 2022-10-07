@@ -110,6 +110,7 @@ dependencies {
     api(project(":eventsystem"))
     api(project(":infralogin"))
     implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrarealm"))
