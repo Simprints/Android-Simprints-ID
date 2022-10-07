@@ -13,7 +13,7 @@ import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class PrivacyNoticeActivity : BaseSplitActivity() {
 

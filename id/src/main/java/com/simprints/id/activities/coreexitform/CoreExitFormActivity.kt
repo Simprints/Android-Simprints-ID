@@ -24,7 +24,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class CoreExitFormActivity : BaseSplitActivity() {
 

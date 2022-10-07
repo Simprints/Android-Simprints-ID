@@ -16,7 +16,7 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 

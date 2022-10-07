@@ -41,7 +41,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
 import kotlin.math.min
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class SetupActivity : BaseSplitActivity() {
 

@@ -19,7 +19,7 @@ import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 
 /**

@@ -30,7 +30,7 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import javax.inject.Inject
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     ModuleSelectionListener, ChipClickListener {

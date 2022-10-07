@@ -17,7 +17,7 @@ import com.simprints.id.databinding.ItemFingerSelectionBinding
 import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infraresources.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class FingerSelectionItemAdapter(
     private val itemTouchHelper: ItemTouchHelper,
