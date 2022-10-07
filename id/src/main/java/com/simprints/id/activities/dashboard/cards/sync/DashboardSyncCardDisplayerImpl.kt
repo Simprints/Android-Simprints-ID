@@ -115,12 +115,12 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
         withVisible(viewForCompleteState) {
             progressCardConnectingProgress().visibility = GONE
             withVisible(progressCardStateText()) {
-                setTextColor(context.getColorStateList(R.color.simprints_green_dark))
+                setTextColor(context.getColorStateList(IDR.color.simprints_green_dark))
                 text = context.getString(IDR.string.dashboard_sync_card_complete)
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(100, 100)
-                setProgressColor(getDefaultColor(R.color.simprints_green_dark, context), this)
+                setProgressColor(getDefaultColor(IDR.color.simprints_green_dark, context), this)
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }
@@ -134,7 +134,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
-                setProgressColor(getDefaultColor(R.color.colorPrimaryDark, context), this)
+                setProgressColor(getDefaultColor(IDR.color.colorPrimaryDark, context), this)
             }
 
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
@@ -158,7 +158,7 @@ class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSync
             }
             withVisible(progressCardSyncProgress()) {
                 setSyncProgress(syncCardState.progress, syncCardState.total)
-                setProgressColor(getDefaultColor(R.color.colorPrimaryDark, context), this)
+                setProgressColor(getDefaultColor(IDR.color.colorPrimaryDark, context), this)
             }
             displayLastSyncTime(syncCardState.lastTimeSyncSucceed, lastSyncText())
         }

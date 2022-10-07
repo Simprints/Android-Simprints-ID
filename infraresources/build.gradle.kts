@@ -15,5 +15,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.support.material)
 }

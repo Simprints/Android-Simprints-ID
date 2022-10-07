@@ -116,7 +116,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
             context,
             DividerItemDecoration.VERTICAL
         ).apply {
-            val colour = ContextCompat.getColor(context, R.color.simprints_light_grey)
+            val colour = ContextCompat.getColor(context, IDR.color.simprints_light_grey)
             setDrawable(ColorDrawable(colour))
         }
         rvModules?.addItemDecoration(dividerItemDecoration)
