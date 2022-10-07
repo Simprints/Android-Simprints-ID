@@ -3,8 +3,6 @@ package com.simprints.infra.enrolment.records.domain.models
 import android.os.Parcelable
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.config.domain.models.GeneralConfiguration
 import kotlinx.parcelize.Parcelize
 import java.util.*
 
