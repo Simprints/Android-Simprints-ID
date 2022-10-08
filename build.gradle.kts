@@ -24,7 +24,7 @@ buildscript {
 
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
-        classpath("org.ow2.asm:asm:9.3")
+        classpath("org.ow2.asm:asm:9.4")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.13.1")
         classpath("org.gradle:test-retry-gradle-plugin:1.4.0")
 
