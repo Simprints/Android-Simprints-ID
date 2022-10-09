@@ -17,7 +17,7 @@ import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SE
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
