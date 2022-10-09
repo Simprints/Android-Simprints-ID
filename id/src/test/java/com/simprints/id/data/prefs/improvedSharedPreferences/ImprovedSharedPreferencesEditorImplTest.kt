@@ -3,7 +3,7 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 import android.content.SharedPreferences
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifyAll

@@ -21,7 +21,7 @@ import com.simprints.clientapi.requestFactories.*
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking

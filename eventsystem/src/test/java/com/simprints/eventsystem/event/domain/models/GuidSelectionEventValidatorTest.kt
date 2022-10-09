@@ -6,7 +6,7 @@
 //import com.simprints.eventsystem.event.domain.events.callback.IdentificationCallbackEvent
 //import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
 //import com.simprints.id.tools.time.TimeHelperImpl
-//import io.kotlintest.shouldThrow
+//import io.kotest.assertions.throwables.shouldThrow
 //import org.junit.Test
 //import java.util.*
 // TOFIX
