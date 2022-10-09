@@ -8,6 +8,7 @@ import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Comp
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
@@ -132,7 +133,10 @@ class ConnectScannerViewModelTest : KoinTest {
     fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
         setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
-
+        var scannerConnectionEvent :ScannerConnectionEvent? =null
+        every { sessionEventsManager.addEventInBackground(any()) } answers {
+            scannerConnectionEvent = args[0] as ScannerConnectionEvent
+        }
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerProgressObserver = viewModel.progress.testObserver()
 
@@ -144,7 +148,7 @@ class ConnectScannerViewModelTest : KoinTest {
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
-        verify(exactly = 1) { sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(any()) }
+        assertThat(scannerConnectionEvent?.scannerInfo?.hardwareVersion).isEqualTo(VERO_1_VERSION.firmware.stm)
     }
 
     @Test
@@ -152,6 +156,12 @@ class ConnectScannerViewModelTest : KoinTest {
         setupBluetooth(numberOfPairedScanners = 1)
         every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
 
+        var scannerConnectionEvent :ScannerConnectionEvent? =null
+        every { sessionEventsManager.addEventInBackground(any()) } answers {
+            if(args[0] is ScannerConnectionEvent) {
+                scannerConnectionEvent = args[0] as ScannerConnectionEvent
+            }
+        }
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerProgressObserver = viewModel.progress.testObserver()
 
@@ -163,7 +173,7 @@ class ConnectScannerViewModelTest : KoinTest {
         verify { preferencesManager.lastScannerUsed = any() }
         verify { preferencesManager.lastScannerVersion = any() }
         verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
-        verify(exactly = 0) { sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(any()) }
+        assertThat(scannerConnectionEvent?.scannerInfo?.hardwareVersion).isEqualTo(VERO_2_VERSION.hardwareVersion)
     }
 
     @Test
