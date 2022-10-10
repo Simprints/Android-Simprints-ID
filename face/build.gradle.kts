@@ -58,20 +58,6 @@ repositories {
 }
 
 dependencies {
-    // https://issuetracker.google.com/issues/132906456
-    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
-    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
-    // The following line includes the base module classes.jar into the final one.
-    // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly(
-        fileTree(
-            mapOf(
-                "include" to listOf("**/*.jar"),
-                "dir" to "../id/build/intermediates/app_classes/"
-            )
-        )
-    )
-
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
@@ -105,6 +91,9 @@ dependencies {
     implementation(libs.androidX.cameraX.core){
         exclude("androidx.exifinterface")
     }
+
+    // Firebase
+    //implementation("com.google.firebase:firebase-perf-ktx:20.1.1")
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
