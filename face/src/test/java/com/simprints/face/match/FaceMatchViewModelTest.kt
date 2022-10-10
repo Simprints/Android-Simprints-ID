@@ -3,6 +3,7 @@ package com.simprints.face.match
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator
+import com.simprints.face.FixtureGenerator.generateSequenceN
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.Matcher
@@ -14,7 +15,6 @@ import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
-import com.simprints.face.generateSequenceN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
