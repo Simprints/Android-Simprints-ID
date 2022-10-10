@@ -15,6 +15,4 @@ class DummyBluetoothAdapter : ComponentBluetoothAdapter {
 
     override fun getBondedDevices(): Set<ComponentBluetoothDevice> =
         throw UnsupportedOperationException("DummyBluetoothAdapter::getBondedDevices")
-
-    override fun enable(): Boolean = true
 }
