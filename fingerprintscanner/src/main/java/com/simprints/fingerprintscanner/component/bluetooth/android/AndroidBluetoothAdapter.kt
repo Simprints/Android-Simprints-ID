@@ -27,7 +27,4 @@ class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : Componen
             adapter!!.bondedDevices
                     .map { AndroidBluetoothDevice(it) }
                     .toSet()
-
-    @SuppressLint("MissingPermission")
-    override fun enable(): Boolean = adapter!!.enable()
 }
