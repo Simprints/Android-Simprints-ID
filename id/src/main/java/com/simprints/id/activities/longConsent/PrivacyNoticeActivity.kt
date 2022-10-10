@@ -6,12 +6,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.databinding.ActivityPrivacyNoticeBinding
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
-import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
