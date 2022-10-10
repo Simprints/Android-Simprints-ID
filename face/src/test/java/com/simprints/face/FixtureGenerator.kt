@@ -36,4 +36,6 @@ object FixtureGenerator {
             Random.nextBytes(20),
             FaceDetection.TemplateFormat.MOCK
         )
+
+    fun <T : Any> generateSequenceN(n: Int, f: () -> T) = generateSequence(f).take(n)
 }
