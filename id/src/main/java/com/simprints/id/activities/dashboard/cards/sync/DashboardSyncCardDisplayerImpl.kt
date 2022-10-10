@@ -15,10 +15,10 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.tools.extensions.textColor
-import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import splitties.systemservices.layoutInflater
