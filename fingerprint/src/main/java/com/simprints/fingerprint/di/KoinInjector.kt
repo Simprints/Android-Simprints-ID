@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.di
 
-import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context.BLUETOOTH_SERVICE
 import android.nfc.NfcAdapter
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
@@ -152,7 +153,11 @@ object KoinInjector {
         factory { FirmwareRepository(get(), get(), get()) }
         factory { FirmwareFileUpdateScheduler(androidContext(), get()) }
 
-        single<ComponentBluetoothAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
+        single<ComponentBluetoothAdapter> {
+            val bluetoothManager =
+                androidContext().getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+            AndroidBluetoothAdapter(bluetoothManager.adapter)
+        }
         single { ScannerUiHelper() }
         single { ScannerPairingManager(get(), get(), get(), get()) }
         single { ConnectionHelper(get(), get()) }
