@@ -2,7 +2,7 @@ package com.simprints.fingerprint.scanner.data.local
 
 import android.content.Context
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
-import com.simprints.id.tools.utils.FileUtil
+import com.simprints.core.tools.utils.FileUtil
 import com.simprints.infra.logging.Simber
 import java.io.File
 

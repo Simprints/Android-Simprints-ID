@@ -66,7 +66,6 @@ dependencies {
     implementation(project(":eventsystem"))
     implementation(project(":infraresources"))
     implementation(project(":infralicense"))
-    implementation(project(":infralicense"))
     implementation(project(":infraimages"))
 
     implementation(libs.cameraView){

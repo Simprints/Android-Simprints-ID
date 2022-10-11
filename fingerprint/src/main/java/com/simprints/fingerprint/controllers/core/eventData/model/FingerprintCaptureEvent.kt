@@ -4,10 +4,11 @@ import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
-import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.infra.config.domain.models.Finger
+import kotlin.Int
+import kotlin.Long
+import kotlin.String
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
@@ -76,13 +77,6 @@ fun FingerprintCaptureEvent.Result.fromDomainToCore() = when (this) {
     FingerprintCaptureEvent.Result.SKIPPED -> ResultCore.SKIPPED
     FingerprintCaptureEvent.Result.FAILURE_TO_ACQUIRE -> ResultCore.FAILURE_TO_ACQUIRE
 }
-
-fun Fingerprint.fromDomainToCore() = FingerprintCaptureSample(
-    fingerId.fromDomainToCore(),
-    templateBytes,
-    qualityScore,
-    format
-)
 
 fun FingerIdentifier.fromDomainToCore(): Finger = when (this) {
     FingerIdentifier.RIGHT_5TH_FINGER -> Finger.RIGHT_5TH_FINGER

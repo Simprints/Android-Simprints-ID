@@ -32,8 +32,8 @@ import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
 import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.extensions.hasPermission
-import com.simprints.id.tools.extensions.requestPermissionsIfRequired
+import com.simprints.core.tools.extentions.hasPermission
+import com.simprints.core.tools.extentions.requestPermissionsIfRequired
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.launch
