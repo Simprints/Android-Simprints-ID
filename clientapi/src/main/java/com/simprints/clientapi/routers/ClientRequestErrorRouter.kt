@@ -2,10 +2,10 @@ package com.simprints.clientapi.routers
 
 import android.app.Activity
 import android.content.Intent
+import com.simprints.clientapi.InternalConstants
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.ErrorActivity
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
-import com.simprints.id.tools.InternalConstants
 
 object ClientRequestErrorRouter {
 

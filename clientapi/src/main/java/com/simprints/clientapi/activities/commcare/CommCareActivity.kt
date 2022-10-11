@@ -8,7 +8,6 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buil
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
-import com.simprints.id.Application
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -48,11 +47,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     }
 
     override val guidSelectionNotifier = CommCareGuidSelectionNotifier(this)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun returnRegistration(
         guid: String,

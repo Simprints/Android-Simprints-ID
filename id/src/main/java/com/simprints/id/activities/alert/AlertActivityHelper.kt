@@ -2,10 +2,10 @@ package com.simprints.id.activities.alert
 
 import android.app.Activity
 import android.content.Intent
+import com.simprints.clientapi.InternalConstants
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.tools.InternalConstants
 
 object AlertActivityHelper {
 

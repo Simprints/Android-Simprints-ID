@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.dynamic-feature")
+    id("com.android.library")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
@@ -34,22 +34,7 @@ android {
 }
 
 dependencies {
-    // https://issuetracker.google.com/issues/132906456
-    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
-    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
-    // The following line includes the base module classes.jar into the final one.
-    // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly(
-        fileTree(
-            mapOf(
-                "include" to listOf("**/*.jar"),
-                "dir" to "../id/build/intermediates/app_classes/"
-            )
-        )
-    )
-
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":id"))
     implementation(project(":moduleapi"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
@@ -57,6 +42,9 @@ dependencies {
     implementation(project(":infrasecurity"))
     implementation(project(":infrarealm"))
     implementation(project(":infranetwork"))
+    implementation(project(":core"))
+    implementation(project(":eventsystem"))
+
     implementation(libs.libsimprints)
 
     // DI

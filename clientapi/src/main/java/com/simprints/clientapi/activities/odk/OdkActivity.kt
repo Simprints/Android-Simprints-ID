@@ -1,7 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
 import android.content.Intent
-import android.os.Bundle
 import com.simprints.clientapi.ClientApiComponent
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.odk.OdkAction.*
@@ -14,7 +13,6 @@ import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
-import com.simprints.id.Application
 import javax.inject.Inject
 
 class OdkActivity : RequestActivity(), OdkContract.View {
@@ -81,11 +79,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override val verifyExtractor: VerifyExtractor
         get() = OdkVerifyExtractor(intent, acceptableExtras)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun returnRegistration(
         registrationId: String,
