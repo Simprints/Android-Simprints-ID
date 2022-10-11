@@ -35,6 +35,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+
     implementation(project(":moduleapi"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
@@ -44,6 +45,7 @@ dependencies {
     implementation(project(":infranetwork"))
     implementation(project(":core"))
     implementation(project(":eventsystem"))
+    implementation(project(":infraresources"))
 
     implementation(libs.libsimprints)
 
@@ -56,6 +58,7 @@ dependencies {
     implementation(libs.androidX.security)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.lifecycle.scope)
+    implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.support.material)
 
     // Splitties
@@ -66,28 +69,21 @@ dependencies {
 
     // Unit Tests
     testImplementation(project(":testtools"))
-    testImplementation(libs.libsimprints)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.coroutines.test)
-    testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.androidX.core)
-    testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.koTest.kotlin)
-
 
     testImplementation(libs.testing.espresso.intents)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.androidX.runner)
-    androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
-    androidTestImplementation(libs.testing.androidX.orchestrator)
 
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.espresso.core)
