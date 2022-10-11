@@ -7,5 +7,5 @@ import com.simprints.moduleapi.app.requests.IAppRequest
 
 fun IAppRequest.toIntent(action: String): Intent = Intent(action).apply {
     putExtra(IAppRequest.BUNDLE_KEY, this@toIntent)
-    setPackage(BuildConfig.APPLICATION_ID)
+    setPackage(BuildConfig.LIBRARY_PACKAGE_NAME)
 }
