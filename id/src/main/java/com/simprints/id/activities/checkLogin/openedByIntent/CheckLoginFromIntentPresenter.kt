@@ -24,8 +24,8 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.tools.ignoreException
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS

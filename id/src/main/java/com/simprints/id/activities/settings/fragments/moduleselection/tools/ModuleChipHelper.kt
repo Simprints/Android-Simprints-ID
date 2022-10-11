@@ -9,6 +9,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.simprints.id.R
+import com.simprints.infra.resources.R as IDR
 import com.simprints.id.moduleselection.model.Module
 import splitties.resources.dimen
 
@@ -43,8 +44,8 @@ class ModuleChipHelper(private val context: Context, private val listener: ChipC
 
     private fun createChipDrawable(): ChipDrawable {
         return ChipDrawable.createFromResource(context, R.xml.module_selection_chip).apply {
-            setTextAppearanceResource(R.style.SimprintsStyle_TextView_Chip)
-            val cornerSize = context.dimen(R.dimen.chip_corner_size_module_selection).toFloat()
+            setTextAppearanceResource(IDR.style.SimprintsStyle_TextView_Chip)
+            val cornerSize = context.dimen(IDR.dimen.chip_corner_size_module_selection).toFloat()
             shapeAppearanceModel =
                 ShapeAppearanceModel.builder().setAllCorners(CornerFamily.CUT, cornerSize).build()
         }

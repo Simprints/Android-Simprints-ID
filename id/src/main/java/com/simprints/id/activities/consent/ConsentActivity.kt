@@ -21,7 +21,7 @@ import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type
 import com.simprints.id.Application
-import com.simprints.id.R
+import com.simprints.infra.resources.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.databinding.ActivityConsentBinding
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest

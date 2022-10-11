@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.core.tools.exceptions
 
 import com.simprints.infra.logging.Simber
 

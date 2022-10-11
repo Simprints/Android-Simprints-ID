@@ -34,6 +34,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class DashboardActivity : BaseSplitActivity() {
 
@@ -76,7 +77,7 @@ class DashboardActivity : BaseSplitActivity() {
         component.inject(this)
 
         setContentView(binding.root)
-        title = getString(R.string.dashboard_label)
+        title = getString(IDR.string.dashboard_label)
 
         setupActionBar()
         viewModel = ViewModelProvider(this, viewModelFactory)[DashboardViewModel::class.java]
@@ -87,7 +88,7 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun setupActionBar() {
-        binding.dashboardToolbar.title = getString(R.string.dashboard_label)
+        binding.dashboardToolbar.title = getString(IDR.string.dashboard_label)
         setSupportActionBar(binding.dashboardToolbar)
         supportActionBar?.elevation = 4F
 
@@ -125,10 +126,10 @@ class DashboardActivity : BaseSplitActivity() {
             findItem(R.id.debug)?.isVisible = BuildConfig.DEBUG_MODE
 
             findItem(R.id.menuSettings).title =
-                getString(R.string.menu_settings)
+                getString(IDR.string.menu_settings)
 
             with(findItem(R.id.menuPrivacyNotice)) {
-                title = getString(R.string.menu_privacy_notice)
+                title = getString(IDR.string.menu_privacy_notice)
             }
         }
 

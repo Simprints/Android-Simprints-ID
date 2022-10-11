@@ -14,6 +14,7 @@ import com.simprints.id.activities.settings.fingerselection.FingerSelectionActiv
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.databinding.SettingsToolbarBinding
+import com.simprints.infra.resources.R as IDR
 
 class SettingsActivity : BaseSplitActivity() {
 
@@ -32,7 +33,7 @@ class SettingsActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        title = getString(R.string.title_activity_settings)
+        title = getString(IDR.string.title_activity_settings)
 
         setupActionBar()
 
@@ -42,7 +43,7 @@ class SettingsActivity : BaseSplitActivity() {
     }
 
     private fun setupActionBar() {
-        binding.settingsToolbar.title = getString(R.string.settings_title)
+        binding.settingsToolbar.title = getString(IDR.string.settings_title)
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

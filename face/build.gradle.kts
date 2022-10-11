@@ -1,7 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    id("com.android.dynamic-feature")
+    id("com.android.library")
     id("kotlin-android")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
@@ -58,25 +58,14 @@ repositories {
 }
 
 dependencies {
-    // https://issuetracker.google.com/issues/132906456
-    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
-    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
-    // The following line includes the base module classes.jar into the final one.
-    // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly(
-        fileTree(
-            mapOf(
-                "include" to listOf("**/*.jar"),
-                "dir" to "../id/build/intermediates/app_classes/"
-            )
-        )
-    )
-
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":id"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
+    implementation(project(":core"))
+    implementation(project(":eventsystem"))
+    implementation(project(":infraresources"))
+    implementation(project(":infralicense"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
 
@@ -84,7 +73,11 @@ dependencies {
         exclude("androidx.exifinterface")
     }
     implementation(libs.circleImageView)
+    
+    implementation(libs.androidX.navigation.fragment)
+    implementation(libs.androidX.navigation.ui)
 
+    implementation(libs.playcore.core.ktx)
 
     // Fragment
     implementation(libs.androidX.ui.fragment)
@@ -98,6 +91,9 @@ dependencies {
     implementation(libs.androidX.cameraX.core){
         exclude("androidx.exifinterface")
     }
+
+    // Firebase
+    //implementation("com.google.firebase:firebase-perf-ktx:20.1.1")
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)

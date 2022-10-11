@@ -10,14 +10,14 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.KoinTestRule
 import com.simprints.face.R
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import io.mockk.mockk
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
@@ -26,13 +26,13 @@ class PreparationFragmentTest {
     private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)
 
-    @Before
-    fun setUp() {
-        loadKoinModules(module(override = true) {
-            single { faceTimeHelper }
-            single { faceSessionEventsManager }
-        })
+    private val testModule = module {
+        single { faceTimeHelper }
+        single { faceSessionEventsManager }
     }
+
+    @get:Rule
+    val koinTestRule = KoinTestRule(modules = listOf(testModule))
 
     @Test
     fun testNavigationFromPreparationToLiveFeedBackFragment() {
