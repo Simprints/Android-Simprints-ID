@@ -8,6 +8,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.databinding.SettingsToolbarBinding
+import com.simprints.infra.resources.R as IDR
 
 
 class ModuleSelectionActivity : BaseSplitActivity() {
@@ -22,7 +23,7 @@ class ModuleSelectionActivity : BaseSplitActivity() {
         setContentView(binding.root)
         configureToolbar()
         moduleSelectionFragment = ModuleSelectionFragment()
-        title = getString(R.string.preference_select_modules_title)
+        title = getString(IDR.string.preference_select_modules_title)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, moduleSelectionFragment)

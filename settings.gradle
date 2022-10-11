@@ -19,4 +19,5 @@ include ':id',
     ':infranetwork',
     ':infrarealm',
     ':infrarecentuseractivity',
+    ':infraresources',
     ':infrasecurity'

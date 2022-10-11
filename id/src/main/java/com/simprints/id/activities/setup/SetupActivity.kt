@@ -17,7 +17,6 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
@@ -42,6 +41,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
 import kotlin.math.min
+import com.simprints.infra.resources.R as IDR
 
 class SetupActivity : BaseSplitActivity() {
 
@@ -79,8 +79,8 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun getRequiredModules() = setupRequest.modalitiesRequired.map {
         when (it) {
-            Modality.FINGERPRINT -> getString(R.string.module_feature_finger)
-            Modality.FACE -> getString(R.string.module_feature_face)
+            Modality.FINGERPRINT -> getString(IDR.string.module_feature_finger)
+            Modality.FACE -> getString(IDR.string.module_feature_face)
         }
     }
 
@@ -178,7 +178,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun updateUiForDownloadStarting() {
         with(binding.modalityDownloadText) {
-            text = getString(R.string.modality_starting_download)
+            text = getString(IDR.string.modality_starting_download)
             isVisible = true
         }
         with(binding.modalityDownloadProgressBar) {
@@ -206,7 +206,7 @@ class SetupActivity : BaseSplitActivity() {
         }
         with(binding.modalityDownloadText) {
             isVisible = true
-            text = getString(R.string.modality_downloading).format("$downloadProgress%")
+            text = getString(IDR.string.modality_downloading).format("$downloadProgress%")
         }
         binding.setupLogo.isVisible = false
     }
@@ -220,7 +220,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun updateUiForDownloadTakingLonger() {
         with(binding.modalityDownloadText) {
-            text = getString(R.string.modality_download_taking_longer)
+            text = getString(IDR.string.modality_download_taking_longer)
             isVisible = true
         }
         with(binding.modalityDownloadProgressBar) {
@@ -261,7 +261,7 @@ class SetupActivity : BaseSplitActivity() {
 
     private fun updateUiForModalitiesInstalling() {
         with(binding.modalityDownloadText) {
-            text = getString(R.string.modality_installing)
+            text = getString(IDR.string.modality_installing)
             isVisible = true
         }
         with(binding.modalityDownloadProgressBar) {

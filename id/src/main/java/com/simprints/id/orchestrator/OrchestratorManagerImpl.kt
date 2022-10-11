@@ -3,6 +3,8 @@ package com.simprints.id.orchestrator
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
+import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowProvider.FlowType.*
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
@@ -13,7 +15,6 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.orchestrator.FlowProvider.FlowType.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory

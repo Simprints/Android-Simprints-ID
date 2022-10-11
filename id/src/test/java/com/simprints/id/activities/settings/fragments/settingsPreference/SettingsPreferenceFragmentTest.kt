@@ -20,6 +20,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
@@ -74,16 +75,16 @@ class SettingsPreferenceFragmentTest {
     fun `should display the correct preferences`() {
         launchFragment<SettingsPreferenceFragment>().onFragment { fragment ->
             val generalCategoryPref =
-                fragment.findPreference<Preference>(fragment.getString(R.string.preferences_general_key))
-            assertThat(generalCategoryPref?.title).isEqualTo(fragment.getString(R.string.settings_general))
+                fragment.findPreference<Preference>(fragment.getString(IDR.string.preferences_general_key))
+            assertThat(generalCategoryPref?.title).isEqualTo(fragment.getString(IDR.string.settings_general))
 
             val appDetailsCategoryPref =
-                fragment.findPreference<Preference>(fragment.getString(R.string.preferences_app_details_key))
-            assertThat(appDetailsCategoryPref?.title).isEqualTo(fragment.getString(R.string.settings_app_details))
+                fragment.findPreference<Preference>(fragment.getString(IDR.string.preferences_app_details_key))
+            assertThat(appDetailsCategoryPref?.title).isEqualTo(fragment.getString(IDR.string.settings_app_details))
 
             val languagePref =
                 fragment.findPreference<ListPreference>(fragment.getString(R.string.preference_select_language_key))
-            assertThat(languagePref?.title).isEqualTo(fragment.getString(R.string.preference_select_language_title))
+            assertThat(languagePref?.title).isEqualTo(fragment.getString(IDR.string.preference_select_language_title))
             assertThat(languagePref?.entries).isEqualTo(arrayOf("French", "English"))
             assertThat(languagePref?.entryValues).isEqualTo(arrayOf("fr", "en"))
             assertThat(languagePref?.value).isEqualTo("fr")
@@ -91,12 +92,12 @@ class SettingsPreferenceFragmentTest {
 
             val syncInfoPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_sync_info_key))
-            assertThat(syncInfoPref?.title).isEqualTo(fragment.getString(R.string.preference_sync_information_title))
-            assertThat(syncInfoPref?.summary).isEqualTo(fragment.getString(R.string.preference_summary_sync_information))
+            assertThat(syncInfoPref?.title).isEqualTo(fragment.getString(IDR.string.preference_sync_information_title))
+            assertThat(syncInfoPref?.summary).isEqualTo(fragment.getString(IDR.string.preference_summary_sync_information))
 
             val aboutPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_app_details_key))
-            assertThat(aboutPref?.title).isEqualTo(fragment.getString(R.string.preference_app_details_title))
+            assertThat(aboutPref?.title).isEqualTo(fragment.getString(IDR.string.preference_app_details_title))
         }
     }
 
@@ -107,8 +108,8 @@ class SettingsPreferenceFragmentTest {
         launchFragment<SettingsPreferenceFragment>().onFragment { fragment ->
             val scannerPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_select_fingers_key))
-            assertThat(scannerPref?.summary).isEqualTo(fragment.getString(R.string.preference_summary_settings_fingers))
-            assertThat(scannerPref?.title).isEqualTo(fragment.getString(R.string.preference_select_fingers_title))
+            assertThat(scannerPref?.summary).isEqualTo(fragment.getString(IDR.string.preference_summary_settings_fingers))
+            assertThat(scannerPref?.title).isEqualTo(fragment.getString(IDR.string.preference_select_fingers_title))
             assertThat(scannerPref?.isEnabled).isTrue()
         }
     }

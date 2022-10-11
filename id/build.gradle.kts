@@ -86,7 +86,8 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":face", ":clientapi"))
+    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":clientapi"))
+
     lint {
         warning += setOf("InvalidPackage")
     }
@@ -118,6 +119,7 @@ dependencies {
     implementation(project(":infrasecurity"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
+    implementation(project(":infraresources"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
