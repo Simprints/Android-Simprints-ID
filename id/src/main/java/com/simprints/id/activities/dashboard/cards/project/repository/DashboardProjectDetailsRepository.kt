@@ -1,22 +1,23 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 
 class DashboardProjectDetailsRepository(
     private val configManager: ConfigManager,
     private val loginManager: LoginManager,
-    private val recentEventsPreferencesManager: RecentEventsPreferencesManager
+    private val recentUserActivityManager: RecentUserActivityManager
 ) {
 
     suspend fun getProjectDetails(): DashboardProjectState {
         val projectId = loginManager.getSignedInProjectIdOrEmpty()
         val cachedProject = configManager.getProject(projectId)
+        val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
 
-        val lastUser = recentEventsPreferencesManager.lastUserUsed
-        val lastScanner = recentEventsPreferencesManager.lastScannerUsed
+        val lastUser = recentUserActivity.lastUserUsed
+        val lastScanner = recentUserActivity.lastScannerUsed
 
         return DashboardProjectState(cachedProject.name, lastUser, lastScanner)
     }

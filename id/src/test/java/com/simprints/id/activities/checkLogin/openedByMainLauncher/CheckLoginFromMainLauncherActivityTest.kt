@@ -10,7 +10,6 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
-import com.simprints.testtools.common.di.DependencyRule.MockkRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
@@ -33,12 +32,7 @@ class CheckLoginFromMainLauncherActivityTest {
 
     val loginManager: LoginManager = mockk()
 
-    private val module by lazy {
-        TestAppModule(
-            app,
-            secureDataManagerRule = MockkRule
-        )
-    }
+    private val module by lazy { TestAppModule(app) }
 
     @Before
     fun setUp() {

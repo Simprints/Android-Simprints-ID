@@ -3,7 +3,6 @@ package com.simprints.id.di
 import android.content.SharedPreferences
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import com.simprints.id.Application
@@ -35,18 +34,12 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
-    fun providePreferencesManager(
-        lastEventsPreferencesManager: RecentEventsPreferencesManager,
-        app: Application
-    ): PreferencesManager =
-        IdPreferencesManagerImpl(lastEventsPreferencesManager, app)
+    fun providePreferencesManager(app: Application): PreferencesManager =
+        IdPreferencesManagerImpl(app)
 
     @Provides
     @Singleton
-    open fun provideIdPreferencesManager(
-        lastEventsPreferencesManager: RecentEventsPreferencesManager,
-        app: Application
-    ): IdPreferencesManager =
-        IdPreferencesManagerImpl(lastEventsPreferencesManager, app)
+    open fun provideIdPreferencesManager(app: Application): IdPreferencesManager =
+        IdPreferencesManagerImpl(app)
 
 }

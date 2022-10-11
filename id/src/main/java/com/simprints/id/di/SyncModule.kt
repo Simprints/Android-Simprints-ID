@@ -178,7 +178,7 @@ open class SyncModule {
 
     @Provides
     open fun provideEventUpSyncHelper(
-        eventRepository: com.simprints.eventsystem.event.EventRepository,
+        eventRepository: EventRepository,
         eventUpSyncScopeRepo: EventUpSyncScopeRepository,
         timerHelper: TimeHelper,
         configManager: ConfigManager

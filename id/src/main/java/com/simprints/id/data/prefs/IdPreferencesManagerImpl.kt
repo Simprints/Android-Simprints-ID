@@ -2,15 +2,10 @@ package com.simprints.id.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
 import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 
-class IdPreferencesManagerImpl(
-    lastEvents: RecentEventsPreferencesManager,
-    context: Context
-) : IdPreferencesManager,
-    RecentEventsPreferencesManager by lastEvents {
+class IdPreferencesManagerImpl(context: Context) : IdPreferencesManager {
 
     val prefs: SharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 

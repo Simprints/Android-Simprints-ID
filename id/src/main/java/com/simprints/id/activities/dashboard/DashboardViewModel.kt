@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,9 +25,9 @@ class DashboardViewModel(
 
     val consentRequiredLiveData = MutableLiveData<Boolean>()
     val syncToBFSIDAllowed = MutableLiveData<Boolean>()
+    val dailyActivity = MutableLiveData<DashboardDailyActivityState>()
     var syncCardStateLiveData = syncCardStateRepository.syncCardStateLiveData
-
-    private val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
+    val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
 
 
     init {
@@ -36,17 +35,14 @@ class DashboardViewModel(
     }
 
     fun syncIfRequired() {
-        viewModelScope.launch { syncCardStateRepository.syncIfRequired() }
+        viewModelScope.launch(dispatcher) { syncCardStateRepository.syncIfRequired() }
     }
-
-    fun getProjectDetails(): LiveData<DashboardProjectState> = projectCardStateLiveData
-
-    fun getDailyActivity(): DashboardDailyActivityState = dailyActivityRepository.getDailyActivity()
 
     private fun load() {
         viewModelScope.launch(dispatcher) {
             val projectDetails = projectDetailsRepository.getProjectDetails()
             val configuration = configManager.getProjectConfiguration()
+            dailyActivity.postValue(dailyActivityRepository.getDailyActivity())
             projectCardStateLiveData.postValue(projectDetails)
             consentRequiredLiveData.postValue(configuration.consent.collectConsent)
             syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())

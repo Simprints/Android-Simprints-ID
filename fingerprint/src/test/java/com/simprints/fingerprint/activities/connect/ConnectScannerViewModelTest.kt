@@ -8,7 +8,6 @@ import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Comp
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
@@ -31,9 +30,12 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.config.domain.models.FingerprintConfiguration.VeroGeneration.VERO_1
 import com.simprints.infra.config.domain.models.FingerprintConfiguration.VeroGeneration.VERO_2
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,8 +53,7 @@ class ConnectScannerViewModelTest : KoinTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val recentEventsPreferencesManager: FingerprintPreferencesManager =
-        mockk(relaxed = true)
+    private val recentUserActivityManager = mockk<RecentUserActivityManager>(relaxed = true)
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
@@ -85,7 +86,7 @@ class ConnectScannerViewModelTest : KoinTest {
                 scannerManager,
                 mockk(relaxed = true),
                 sessionEventsManager,
-                recentEventsPreferencesManager,
+                recentUserActivityManager,
                 configManager,
                 nfcManager,
                 mockDispatcher
@@ -142,50 +143,64 @@ class ConnectScannerViewModelTest : KoinTest {
     }
 
     @Test
-    fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
-        setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+    fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() =
+        runTest {
+            setupBluetooth(numberOfPairedScanners = 1)
+            coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+            val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
+            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
 
-        val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
-        val scannerProgressObserver = viewModel.progress.testObserver()
+            val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
+            val scannerProgressObserver = viewModel.progress.testObserver()
 
-        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
-        viewModel.start()
+            viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+            viewModel.start()
 
-        scannerConnectedObserver.assertEventReceivedWithContent(true)
-        assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 1) // 1 at the start
-        verify { recentEventsPreferencesManager.lastScannerUsed = any() }
-        verify { recentEventsPreferencesManager.lastScannerVersion = any() }
-        verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
-        verify(exactly = 1) {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                any()
-            )
+            scannerConnectedObserver.assertEventReceivedWithContent(true)
+            assertThat(scannerProgressObserver.observedValues.size).isEqualTo(
+                ConnectScannerViewModel.NUMBER_OF_STEPS + 1
+            ) // 1 at the start
+            verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
+            verify(exactly = 1) {
+                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
+                    any()
+                )
+            }
+            val updatedActivity =
+                updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+            assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
+            assertThat(updatedActivity.lastScannerVersion).isEqualTo("E-1")
         }
-    }
 
     @Test
-    fun startVero2_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() {
-        setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
+    fun startVero2_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() =
+        runTest {
+            setupBluetooth(numberOfPairedScanners = 1)
+            coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
+            val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
+            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
 
-        val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
-        val scannerProgressObserver = viewModel.progress.testObserver()
+            val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
+            val scannerProgressObserver = viewModel.progress.testObserver()
 
-        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
-        viewModel.start()
+            viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+            viewModel.start()
 
-        scannerConnectedObserver.assertEventReceivedWithContent(true)
-        assertThat(scannerProgressObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.NUMBER_OF_STEPS + 1) // 1 at the start
-        verify { recentEventsPreferencesManager.lastScannerUsed = any() }
-        verify { recentEventsPreferencesManager.lastScannerVersion = any() }
-        verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
-        verify(exactly = 0) {
-            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                any()
-            )
+            scannerConnectedObserver.assertEventReceivedWithContent(true)
+            assertThat(scannerProgressObserver.observedValues.size).isEqualTo(
+                ConnectScannerViewModel.NUMBER_OF_STEPS + 1
+            ) // 1 at the start
+            verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
+            verify(exactly = 0) {
+                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
+                    any()
+                )
+            }
+            val updatedActivity =
+                updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+            assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
+            assertThat(updatedActivity.lastScannerVersion).isEqualTo("E-1")
         }
-    }
 
     @Test
     fun start_noScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {

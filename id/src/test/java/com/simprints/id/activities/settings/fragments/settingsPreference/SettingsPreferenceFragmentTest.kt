@@ -7,7 +7,6 @@ import androidx.preference.Preference
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.R
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -34,7 +33,6 @@ class SettingsPreferenceFragmentTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    private val recentEventsPreferencesManager = mockk<RecentEventsPreferencesManager>()
     private val generalConfiguration = mockk<GeneralConfiguration>()
     private val viewModel = mockk<SettingsPreferenceViewModel>()
     private val settingsPreferenceViewModelFactory = mockk<SettingsPreferenceViewModelFactory>()
@@ -47,14 +45,7 @@ class SettingsPreferenceFragmentTest {
         )
     }
 
-    private val module by lazy {
-        TestAppModule(
-            app,
-            recentEventsPreferencesManagerRule = DependencyRule.ReplaceRule {
-                recentEventsPreferencesManager
-            }
-        )
-    }
+    private val module by lazy { TestAppModule(app) }
 
     @Before
     fun setup() {

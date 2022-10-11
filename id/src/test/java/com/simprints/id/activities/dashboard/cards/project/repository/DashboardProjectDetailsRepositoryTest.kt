@@ -1,9 +1,10 @@
 package com.simprints.id.activities.dashboard.cards.project.repository
 
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -16,7 +17,7 @@ import org.junit.Test
 class DashboardProjectDetailsRepositoryTest {
 
     private val mockLoginManager = mockk<LoginManager>()
-    private val mockPreferencesManager = mockk<RecentEventsPreferencesManager>()
+    private val recentUserActivityManager = mockk<RecentUserActivityManager>()
     private val mockProject = mockk<Project>()
 
     private lateinit var repository: DashboardProjectDetailsRepository
@@ -24,8 +25,15 @@ class DashboardProjectDetailsRepositoryTest {
     @Before
     fun setUp() {
         every { mockLoginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
-        every { mockPreferencesManager.lastUserUsed } returns "Some User"
-        every { mockPreferencesManager.lastScannerUsed } returns "SP1234"
+        coEvery { recentUserActivityManager.getRecentUserActivity() } returns RecentUserActivity(
+            "",
+            "SP1234",
+            "Some User",
+            0,
+            0,
+            0,
+            0
+        )
         every { mockProject.name } returns "Mock Project"
     }
 
@@ -38,7 +46,7 @@ class DashboardProjectDetailsRepositoryTest {
         repository = DashboardProjectDetailsRepository(
             mockConfigManager,
             mockLoginManager,
-            mockPreferencesManager
+            recentUserActivityManager
         )
 
         repository.getProjectDetails()

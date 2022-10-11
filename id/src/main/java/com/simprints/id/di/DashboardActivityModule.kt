@@ -1,8 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
 import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSourceImpl
@@ -22,6 +20,7 @@ import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
@@ -39,11 +38,11 @@ open class DashboardActivityModule {
     open fun provideProjectDetailsRepository(
         configManager: ConfigManager,
         loginManager: LoginManager,
-        preferencesManager: PreferencesManager
+        recentUserActivityManager: RecentUserActivityManager
     ): DashboardProjectDetailsRepository = DashboardProjectDetailsRepository(
         configManager,
         loginManager,
-        preferencesManager
+        recentUserActivityManager
     )
 
     @Provides
@@ -72,8 +71,8 @@ open class DashboardActivityModule {
 
     @Provides
     open fun provideDailyActivityLocalDataSource(
-        preferencesManager: RecentEventsPreferencesManager
-    ): DailyActivityLocalDataSource = DailyActivityLocalDataSourceImpl(preferencesManager)
+        recentUserActivityManager: RecentUserActivityManager
+    ): DailyActivityLocalDataSource = DailyActivityLocalDataSourceImpl(recentUserActivityManager)
 
     @Provides
     open fun provideDashboardDailyActivityCardDisplayer(
