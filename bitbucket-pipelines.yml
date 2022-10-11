@@ -69,6 +69,7 @@ definitions:
                     - ./gradlew infralogin:jacocoTestReport
                     - ./gradlew infranetwork:jacocoTestReport
                     - ./gradlew infrarealm:jacocoTestReport
+                    - ./gradlew infrarecentuseractivity:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
                     - ./gradlew infralicense:jacocoTestReport
                     - ./gradlew infraimages:jacocoTestReport
@@ -82,6 +83,7 @@ definitions:
                     - infralogin/build/reports/**
                     - infranetwork/build/reports/**
                     - infrarealm/build/reports/**
+                    - infrarecentuseractivity/build/reports/**
                     - infrasecurity/build/reports/**
                     - infralicense/build/reports/**
                     - infraimages/build/reports/**
@@ -187,6 +189,7 @@ definitions:
                     - ./gradlew :infralogin:projectHealth
                     - ./gradlew :infranetwork:projectHealth
                     - ./gradlew :infrarealm:projectHealth
+                    - ./gradlew :infrarecentuseractivity:projectHealth
                     - ./gradlew :infrasecurity:projectHealth
 
         ######################################################################

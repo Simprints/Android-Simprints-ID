@@ -161,7 +161,7 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun observeForProjectDetails() {
-        viewModel.getProjectDetails().observe(this) {
+        viewModel.projectCardStateLiveData.observe(this) {
             projectDetailsCardDisplayer.displayProjectDetails(it)
         }
     }
@@ -186,7 +186,7 @@ class DashboardActivity : BaseSplitActivity() {
     }
 
     private fun loadDailyActivity() {
-        viewModel.getDailyActivity().let {
+        viewModel.dailyActivity.observe(this) {
             if (it.hasNoActivity()) {
                 dailyActivityBinding.dashboardDailyActivityCard.visibility = View.GONE
             } else {

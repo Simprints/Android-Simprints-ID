@@ -4,6 +4,6 @@ import com.simprints.id.activities.dashboard.cards.daily_activity.model.Dashboar
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 
 interface DashboardDailyActivityRepository {
-    fun getDailyActivity(): DashboardDailyActivityState
-    fun updateDailyActivity(appResponse: AppResponse)
+    suspend fun getDailyActivity(): DashboardDailyActivityState
+    suspend fun updateDailyActivity(appResponse: AppResponse)
 }

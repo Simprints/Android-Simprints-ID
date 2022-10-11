@@ -7,7 +7,6 @@ import androidx.preference.Preference
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.id.R
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -19,6 +18,7 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.every
 import io.mockk.mockk
@@ -41,7 +41,6 @@ class SettingsAboutFragmentTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    private val recentEventsPreferencesManager = mockk<RecentEventsPreferencesManager>()
     private val projectConfiguration = mockk<ProjectConfiguration>()
     private val viewModel = mockk<SettingsAboutViewModel>()
     private val settingsAboutViewModelFactory = mockk<SettingsAboutViewModelFactory>()
@@ -54,14 +53,7 @@ class SettingsAboutFragmentTest {
         )
     }
 
-    private val module by lazy {
-        TestAppModule(
-            app,
-            recentEventsPreferencesManagerRule = DependencyRule.ReplaceRule {
-                recentEventsPreferencesManager
-            }
-        )
-    }
+    private val module by lazy { TestAppModule(app) }
 
     @Before
     fun setup() {
@@ -82,7 +74,21 @@ class SettingsAboutFragmentTest {
                 secondArg<Observer<ProjectConfiguration>>().onChanged(projectConfiguration)
             }
         }
-        every { recentEventsPreferencesManager.lastScannerVersion } returns SCANNER_VERSION
+        every { viewModel.recentUserActivity } returns mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<RecentUserActivity>>().onChanged(
+                    RecentUserActivity(
+                        SCANNER_VERSION,
+                        "",
+                        "",
+                        0,
+                        0,
+                        0,
+                        0
+                    )
+                )
+            }
+        }
     }
 
     @Test

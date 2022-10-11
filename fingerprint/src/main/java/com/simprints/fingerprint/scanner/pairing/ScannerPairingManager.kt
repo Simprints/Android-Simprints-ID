@@ -3,7 +3,6 @@ package com.simprints.fingerprint.scanner.pairing
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
@@ -11,13 +10,14 @@ import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 
 /**
  * Helper class for handling MAC addresses and pairing programmatically.
  */
 class ScannerPairingManager(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
-    private val recentEventsPreferencesManager: FingerprintPreferencesManager,
+    private val recentUserActivityManager: RecentUserActivityManager,
     private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
     private val serialNumberConverter: SerialNumberConverter,
     private val configManager: ConfigManager
@@ -61,8 +61,8 @@ class ScannerPairingManager(
             )
         ) ?: false
 
-    private fun deduceScannerFromLastScannerUsed(pairedScanners: List<String>): String {
-        val lastSerialNumberUsed = recentEventsPreferencesManager.lastScannerUsed
+    private suspend fun deduceScannerFromLastScannerUsed(pairedScanners: List<String>): String {
+        val lastSerialNumberUsed = recentUserActivityManager.getRecentUserActivity().lastScannerUsed
         if (isScannerSerialNumber(lastSerialNumberUsed)) {
             val lastAddressUsed =
                 serialNumberConverter.convertSerialNumberToMacAddress(lastSerialNumberUsed)

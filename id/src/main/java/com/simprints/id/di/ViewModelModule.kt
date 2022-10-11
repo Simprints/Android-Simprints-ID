@@ -37,8 +37,9 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.login.LoginManager
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
@@ -142,9 +143,14 @@ open class ViewModelModule {
     @Provides
     open fun provideSettingsAboutViewModelFactory(
         configManager: ConfigManager,
-        signerManager: SignerManager
+        signerManager: SignerManager,
+        recentUserActivityManager: RecentUserActivityManager
     ): SettingsAboutViewModelFactory {
-        return SettingsAboutViewModelFactory(configManager, signerManager)
+        return SettingsAboutViewModelFactory(
+            configManager,
+            signerManager,
+            recentUserActivityManager
+        )
     }
 
     @Provides
