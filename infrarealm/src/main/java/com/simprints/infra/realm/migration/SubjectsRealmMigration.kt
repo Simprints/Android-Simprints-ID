@@ -250,6 +250,23 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             .findAll()
             .deleteAllFromRealm()
 
+        realm.where(PeopleSchemaV7.FINGERPRINT_TABLE)
+            .findAll().forEach { fingerprint ->
+                fingerprint.setString(
+                    PeopleSchemaV7.FINGERPRINT_FIELD_ID,
+                    UUID.randomUUID().toString()
+                )
+            }
+
+        realm.where(PeopleSchemaV7.FACE_TABLE)
+            .findAll().forEach { face ->
+                face.setString(
+                    PeopleSchemaV7.FACE_FIELD_ID,
+                    UUID.randomUUID().toString()
+                )
+            }
+
+
         // Remove temp column and set primary key on deduplicated tables
         realm.schema.get(PeopleSchemaV7.FACE_TABLE)
             ?.removeField(SubjectsSchemaV12.TMP_HAS_PARENT)
