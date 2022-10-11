@@ -12,7 +12,7 @@
         android:background="@color/simprints_off_white"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        tools:context="com.simprints.id.com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
+        tools:context="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
         tools:showIn="@layout/activity_collect_fingerprints">
 
         <View

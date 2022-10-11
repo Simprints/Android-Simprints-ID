@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import com.simprints.core.tools.extentions.requestPermissionsIfRequired
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -19,7 +20,6 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
-import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import com.simprints.infra.logging.Simber
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -91,7 +91,13 @@ class ConnectScannerActivity : FingerprintActivity() {
 
     private fun finishWithError() {
         setResultAndFinish(ResultCode.ALERT, Intent().apply {
-            putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(FingerprintAlert.UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.CLOSE))
+            putExtra(
+                AlertTaskResult.BUNDLE_KEY,
+                AlertTaskResult(
+                    FingerprintAlert.UNEXPECTED_ERROR,
+                    AlertTaskResult.CloseButtonAction.CLOSE
+                )
+            )
         })
     }
 

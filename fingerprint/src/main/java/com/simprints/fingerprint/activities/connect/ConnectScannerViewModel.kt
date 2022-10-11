@@ -50,7 +50,7 @@ class ConnectScannerViewModel(
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
 
     init {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             configuration = configManager.getProjectConfiguration().fingerprint!!
         }
     }

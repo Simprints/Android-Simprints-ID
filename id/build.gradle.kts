@@ -86,8 +86,6 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures.addAll(mutableSetOf(":fingerprint"))
-
     lint {
         warning += setOf("InvalidPackage")
     }

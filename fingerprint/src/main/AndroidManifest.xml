@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.fingerprint">
-
-    <dist:module dist:title="@string/module_feature_finger">
-        <dist:fusing dist:include="true" />
-        <dist:delivery>
-            <dist:on-demand />
-        </dist:delivery>
-    </dist:module>
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -20,7 +12,9 @@
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="31" />
 
-    <application tools:ignore="GoogleAppIndexingWarning">
+    <application
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:launchMode="singleTop"
