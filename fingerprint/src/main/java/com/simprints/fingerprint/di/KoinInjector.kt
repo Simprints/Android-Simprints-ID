@@ -58,14 +58,11 @@ import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
-import com.simprints.id.Application
-import com.simprints.id.di.AppComponent
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -137,10 +134,7 @@ object KoinInjector {
 
         factory { BatteryLevelChecker(androidContext()) }
         factory { FirmwareLocalDataSource(androidContext()) }
-        factory { androidContext().applicationContext as Application }
 
-        factory { get<Application>().component }
-        factory { get<AppComponent>().getLoginManager() }
         factory { FingerprintFileDownloader(get(), get(), get()) }
         factory { FirmwareRemoteDataSource(get(), get()) }
         factory { FirmwareRepository(get(), get(), get()) }
@@ -199,7 +193,7 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(qualifier = named(Application.APPLICATION_COROUTINE_SCOPE))
+                get()
             )
         }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get(), get()) }
@@ -213,7 +207,7 @@ object KoinInjector {
                 get(),
                 get(),
                 get(),
-                get(qualifier = named(Application.APPLICATION_COROUTINE_SCOPE)),
+                get(),
                 get()
             )
         }
