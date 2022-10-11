@@ -7,15 +7,16 @@ import android.widget.Button
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.viewpager2.widget.ViewPager2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -39,9 +40,7 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
-import com.simprints.fingerprint.testtools.FullAndroidTestConfigRule
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.id.Application
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -58,15 +57,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest : KoinTest {
-
-    @get:Rule
-    var androidTestConfigRule = FullAndroidTestConfigRule()
 
     private lateinit var scenario: ActivityScenario<CollectFingerprintsActivity>
 
@@ -147,13 +142,16 @@ class CollectFingerprintsActivityTest : KoinTest {
             isShowingSplashScreen = false
         )
 
+
+    @get:Rule
+    val koinTestRule = KoinTestRule(modules = listOf(module {
+        factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
+        viewModel { vm }
+    }))
+
     @Before
     fun setUp() {
         every { scannerManager.scanner } returns scanner
-        loadKoinModules(module() {
-            factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
-            viewModel { vm }
-        })
     }
 
     @Test
@@ -430,7 +428,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
             it.setClassName(
-                ApplicationProvider.getApplicationContext<Application>().packageName,
+                InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
                 CollectFingerprintsActivity::class.qualifiedName!!
             )
             it.putExtra(CollectFingerprintsTaskRequest.BUNDLE_KEY, this)

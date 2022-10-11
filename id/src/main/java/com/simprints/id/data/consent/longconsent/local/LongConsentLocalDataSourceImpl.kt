@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent.longconsent.local
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.id.tools.utils.FileUtil
+import com.simprints.core.tools.utils.FileUtil
 import com.simprints.infra.login.LoginManager
 import java.io.BufferedReader
 import java.io.File
