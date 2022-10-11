@@ -21,7 +21,7 @@ import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
+import com.simprints.clientapi.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse

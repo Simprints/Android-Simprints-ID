@@ -31,7 +31,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
-import com.simprints.id.tools.InternalConstants
+import com.simprints.clientapi.InternalConstants
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
@@ -234,7 +234,7 @@ class SetupActivity : BaseSplitActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             MODALITIES_DOWNLOAD_REQUEST_CODE -> handleModalityDownloadResult(resultCode)
-            InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
+            com.simprints.clientapi.InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
         }
     }
 

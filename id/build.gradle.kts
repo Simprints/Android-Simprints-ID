@@ -86,7 +86,7 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":clientapi"))
+    dynamicFeatures.addAll(mutableSetOf(":fingerprint"))
 
     lint {
         warning += setOf("InvalidPackage")
@@ -110,6 +110,7 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     api(project(":infralogin"))
+    implementation(project(":clientapi"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
