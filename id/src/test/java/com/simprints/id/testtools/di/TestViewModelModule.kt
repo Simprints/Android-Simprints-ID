@@ -21,6 +21,7 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.di.DependencyRule
 
 class TestViewModelModule(
@@ -102,10 +103,15 @@ class TestViewModelModule(
 
     override fun provideSettingsAboutViewModelFactory(
         configManager: ConfigManager,
-        signerManager: SignerManager
+        signerManager: SignerManager,
+        recentUserActivityManager: RecentUserActivityManager
     ): SettingsAboutViewModelFactory =
         settingAboutModelFactoryRule.resolveDependency {
-            super.provideSettingsAboutViewModelFactory(configManager, signerManager)
+            super.provideSettingsAboutViewModelFactory(
+                configManager,
+                signerManager,
+                recentUserActivityManager
+            )
         }
 
     override fun provideSettingsPreferenceViewModelFactory(configManager: ConfigManager): SettingsPreferenceViewModelFactory =

@@ -18,7 +18,6 @@ import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnapshotEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
@@ -33,6 +32,7 @@ import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -40,7 +40,7 @@ class ConnectScannerViewModel(
     private val scannerManager: ScannerManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val recentEventsPreferencesManager: FingerprintPreferencesManager,
+    private val recentUserActivityManager: RecentUserActivityManager,
     private val configManager: ConfigManager,
     private val nfcManager: NfcManager,
     private val dispatcherProvider: DispatcherProvider
@@ -192,7 +192,7 @@ class ConnectScannerViewModel(
     }
 
 
-    private fun manageVeroErrors(e: Throwable) {
+    private suspend fun manageVeroErrors(e: Throwable) {
         Simber.d(e)
         scannerConnected.postEvent(false)
         launchAlertOrScannerIssueOrShowDialog(e)
@@ -205,7 +205,7 @@ class ConnectScannerViewModel(
         }
     }
 
-    private fun launchAlertOrScannerIssueOrShowDialog(e: Throwable) {
+    private suspend fun launchAlertOrScannerIssueOrShowDialog(e: Throwable) {
         when (e) {
             is BluetoothNotEnabledException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.BluetoothOff)
@@ -243,10 +243,13 @@ class ConnectScannerViewModel(
         }
     }
 
-    private fun setLastConnectedScannerInfo() {
-        recentEventsPreferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
-        recentEventsPreferencesManager.lastScannerVersion =
-            scannerManager.scanner.versionInformation().hardwareVersion
+    private suspend fun setLastConnectedScannerInfo() {
+        recentUserActivityManager.updateRecentUserActivity {
+            it.apply {
+                it.lastScannerUsed = scannerManager.currentScannerId ?: ""
+                it.lastScannerVersion = scannerManager.scanner.versionInformation().hardwareVersion
+            }
+        }
     }
 
     private fun handleSetupFinished() {

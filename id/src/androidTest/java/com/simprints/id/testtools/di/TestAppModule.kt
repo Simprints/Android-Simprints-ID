@@ -3,8 +3,6 @@
 package com.simprints.id.testtools.di
 
 import android.content.Context
-import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.EventSystemApplication
@@ -28,27 +26,11 @@ import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 class TestAppModule(
     app: Application,
-    private val remoteDbManagerRule: DependencyRule = RealRule,
-    private val dbManagerRule: DependencyRule = RealRule,
-    private val secureDataManagerRule: DependencyRule = RealRule,
-    private val loginInfoManagerRule: DependencyRule = RealRule,
-    private val randomGeneratorRule: DependencyRule = RealRule,
-    private val keystoreManagerRule: DependencyRule = RealRule,
     private val eventRepositoryRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-    private val sessionEventsRemoteDbManagerRule: DependencyRule = RealRule,
     private val simNetworkUtilsRule: DependencyRule = RealRule,
-    private val longConsentManagerRule: DependencyRule = RealRule,
-    private val secureApiInterfaceRule: DependencyRule = RealRule,
-    private val syncStatusDatabaseRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
-    private val recentEventsPreferencesManagerRule: DependencyRule = RealRule,
-    private val remoteProjectInfoProviderRule: DependencyRule = RealRule,
     private val locationManagerRule: DependencyRule = RealRule,
-    private val baseUrlProviderRule: DependencyRule = RealRule,
-    private val encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule {
-        app.getSharedPreferences("test", 0)
-    },
     private val cameraHelperRule: DependencyRule = RealRule,
     private val qrPreviewBuilderRule: DependencyRule = RealRule,
     private val qrCodeDetectorRule: DependencyRule = RealRule,
@@ -102,12 +84,6 @@ class TestAppModule(
         connectivityHelper: ConnectivityHelper
     ): DeviceManager = deviceManagerRule.resolveDependency {
         super.provideDeviceManager(connectivityHelper)
-    }
-
-    override fun provideRecentEventsPreferencesManager(
-        prefs: ImprovedSharedPreferences
-    ): RecentEventsPreferencesManager = recentEventsPreferencesManagerRule.resolveDependency {
-        super.provideRecentEventsPreferencesManager(prefs)
     }
 
     override fun provideCameraHelper(

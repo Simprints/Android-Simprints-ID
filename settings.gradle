@@ -18,5 +18,6 @@ include ':id',
     ':infralogin',
     ':infranetwork',
     ':infrarealm',
-    ':infrasecurity',
-    ':infraresources'
+    ':infrarecentuseractivity',
+    ':infraresources',
+    ':infrasecurity'

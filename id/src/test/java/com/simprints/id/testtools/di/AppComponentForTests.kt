@@ -23,6 +23,8 @@ import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
+import com.simprints.infra.recent.user.activity.RecentUserActivityDataStoreModule
+import com.simprints.infra.recent.user.activity.RecentUserActivityModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -48,6 +50,8 @@ import javax.inject.Singleton
         DataStoreModule::class,
         TestConfigManagerModule::class,
         EnrolmentRecordsModule::class,
+        RecentUserActivityModule::class,
+        RecentUserActivityDataStoreModule::class,
     ]
 )
 interface AppComponentForTests : AppComponent {

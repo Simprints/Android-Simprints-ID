@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
@@ -63,6 +62,9 @@ import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
+import com.simprints.infra.recent.user.activity.RecentUserActivityDataStoreModule
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityModule
 import com.simprints.infra.security.SecurityManager
 import dagger.BindsInstance
 import dagger.Component
@@ -88,7 +90,9 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         RealmModule::class,
         ConfigManagerModule::class,
         DataStoreModule::class,
-        EnrolmentRecordsModule::class
+        EnrolmentRecordsModule::class,
+        RecentUserActivityModule::class,
+        RecentUserActivityDataStoreModule::class,
     ]
 )
 @Singleton
@@ -162,7 +166,6 @@ interface AppComponent {
     fun getSessionEventsManager(): EventRepository
     fun getTimeHelper(): TimeHelper
     fun getEnrolmentRecordManager(): EnrolmentRecordManager
-    fun getRecentEventsPreferencesManager(): RecentEventsPreferencesManager
     fun getPreferencesManager(): PreferencesManager
     fun getIdPreferencesManager(): IdPreferencesManager
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
@@ -171,4 +174,5 @@ interface AppComponent {
     fun getLoginManager(): LoginManager
     fun getConfigManager(): ConfigManager
     fun getSecurityManager(): SecurityManager
+    fun getRecentUserActivityManager(): RecentUserActivityManager
 }
