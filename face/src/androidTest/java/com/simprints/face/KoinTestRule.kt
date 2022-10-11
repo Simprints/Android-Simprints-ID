@@ -13,7 +13,6 @@ class KoinTestRule(
 ) : TestWatcher() {
 
     override fun starting(description: Description) {
-        //FirebaseApp.initializeApp(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
         startKoin {
             androidContext(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
             modules(modules)
