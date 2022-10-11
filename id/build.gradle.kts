@@ -169,7 +169,6 @@ dependencies {
     implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.androidX.lifecycle.scope)
     implementation(libs.androidX.ui.constraintlayout)
-    api(libs.androidX.navigation.dynamicfeatures)
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.androidX.cameraX.core)
     implementation(libs.koin.core)
