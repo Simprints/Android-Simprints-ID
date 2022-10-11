@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities.odk
 
 import android.content.Intent
-import com.simprints.clientapi.ClientApiComponent
+import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
@@ -65,7 +65,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         get() = buildOdkAction(intent.action)
 
     @Inject
-    lateinit var presenterFactory: ClientApiComponent.OdkPresenterFactory
+    lateinit var presenterFactory: ClientApiModule.OdkPresenterFactory
 
     override val presenter: OdkContract.Presenter by lazy { presenterFactory.create(this, action) }
 
