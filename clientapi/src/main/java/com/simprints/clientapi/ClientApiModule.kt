@@ -30,7 +30,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(ActivityComponent::class)
-interface ClientApiComponent {
+interface ClientApiModule {
 
     @AssistedFactory
     interface CommCarePresenterFactory {
@@ -64,11 +64,7 @@ interface ClientApiComponent {
         ): ErrorPresenter
     }
 
-}
 
-@Module
-@InstallIn(ActivityComponent::class)
-interface ClientApiModule {
     @Binds
     fun bindClientApiSessionEventsManager(impl: ClientApiSessionEventsManagerImpl): ClientApiSessionEventsManager
 
@@ -77,6 +73,7 @@ interface ClientApiModule {
 
     @Binds
     fun bindClientApiTimeHelper(impl: ClientApiTimeHelperImpl): ClientApiTimeHelper
+
 }
 
 @Module
