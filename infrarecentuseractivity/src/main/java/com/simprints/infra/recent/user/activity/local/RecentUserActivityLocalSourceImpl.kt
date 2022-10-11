@@ -7,18 +7,18 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 internal class RecentUserActivityLocalSourceImpl @Inject constructor(
-    private val projectDataStore: DataStore<ProtoRecentUserActivity>,
+    private val recentUserActivityDataStore: DataStore<ProtoRecentUserActivity>,
 ) : RecentUserActivityLocalSource {
 
     override suspend fun getRecentUserActivity(): RecentUserActivity =
-        projectDataStore.data.first().toDomain()
+        recentUserActivityDataStore.data.first().toDomain()
 
     override suspend fun updateRecentUserActivity(update: suspend (t: RecentUserActivity) -> RecentUserActivity): RecentUserActivity =
-        projectDataStore
+        recentUserActivityDataStore
             .updateData { update(it.toDomain()).toProto() }
             .toDomain()
 
     override suspend fun clearRecentActivity() {
-        projectDataStore.updateData { it.toBuilder().clear().build() }
+        recentUserActivityDataStore.updateData { it.toBuilder().clear().build() }
     }
 }
