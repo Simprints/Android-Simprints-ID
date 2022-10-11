@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository

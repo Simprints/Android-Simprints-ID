@@ -25,6 +25,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import java.util.*
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class SettingsAboutFragment : PreferenceFragmentCompat() {
 
@@ -32,16 +33,16 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private lateinit var deviceId: String
     private val confirmationDialogForLogout: AlertDialog by lazy {
         AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.confirmation_logout_title))
-            .setMessage(getString(R.string.confirmation_logout_message))
+            .setTitle(getString(IDR.string.confirmation_logout_title))
+            .setMessage(getString(IDR.string.confirmation_logout_message))
             .setPositiveButton(
-                getString(R.string.logout)
+                getString(IDR.string.logout)
             ) { _, _ ->
                 settingsAboutViewModel.logout()
                 finishSettings()
             }
             .setNegativeButton(
-                getString(R.string.confirmation_logout_cancel), null
+                getString(IDR.string.confirmation_logout_cancel), null
             ).create()
     }
 
@@ -106,12 +107,12 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     }
 
     private fun setTextInLayout() {
-        getAppVersionPreference()?.title = getString(R.string.preference_app_version_title)
-        getDeviceIdPreference()?.title = getString(R.string.preference_device_id_title)
-        getScannerVersionPreference()?.title = getString(R.string.preference_scanner_version_title)
+        getAppVersionPreference()?.title = getString(IDR.string.preference_app_version_title)
+        getDeviceIdPreference()?.title = getString(IDR.string.preference_device_id_title)
+        getScannerVersionPreference()?.title = getString(IDR.string.preference_scanner_version_title)
         getSyncAndSearchConfigurationPreference()?.title =
-            getString(R.string.preference_sync_and_search_title)
-        getLogoutPreference()?.title = getString(R.string.preference_logout_title)
+            getString(IDR.string.preference_sync_and_search_title)
+        getLogoutPreference()?.title = getString(IDR.string.preference_logout_title)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

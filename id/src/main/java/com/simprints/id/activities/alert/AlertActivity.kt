@@ -14,7 +14,6 @@ import androidx.core.content.res.ResourcesCompat
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.databinding.ActivityAlertBinding
@@ -24,6 +23,7 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.infra.resources.R
 import javax.inject.Inject
 
 class AlertActivity : BaseSplitActivity(), AlertContract.View {

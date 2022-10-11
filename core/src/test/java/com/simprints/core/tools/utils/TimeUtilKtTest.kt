@@ -1,6 +1,7 @@
-package com.simprints.id.tools.utils
+package com.simprints.core.tools.utils
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import org.junit.Test
 
 class TimeUtilKtTest {

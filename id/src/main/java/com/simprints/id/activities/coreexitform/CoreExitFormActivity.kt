@@ -7,6 +7,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
@@ -19,11 +20,11 @@ import com.simprints.id.databinding.ActivityCoreExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.extensions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
-import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class CoreExitFormActivity : BaseSplitActivity() {
 
@@ -62,17 +63,17 @@ class CoreExitFormActivity : BaseSplitActivity() {
 
     private fun setTextInLayout() {
         binding.apply {
-            whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
-            rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-            rbDataConcerns.text = getString(R.string.refusal_data_concerns)
-            rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-            rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-            rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-            rbTooYoung.text = getString(R.string.refusal_too_young)
-            rbOther.text = getString(R.string.refusal_other)
-            exitFormText.hint = getString(R.string.hint_other_reason)
-            btSubmitExitForm.text = getString(R.string.button_submit)
-            btGoBack.text = getString(R.string.exit_form_capture_face)
+            whySkipBiometricsText.text = getString(IDR.string.why_did_you_skip_biometrics)
+            rbReligiousConcerns.text = getString(IDR.string.refusal_religious_concerns)
+            rbDataConcerns.text = getString(IDR.string.refusal_data_concerns)
+            rbDoesNotHavePermission.text = getString(IDR.string.refusal_does_not_have_permission)
+            rbAppNotWorking.text = getString(IDR.string.refusal_app_not_working)
+            rbPersonNotPresent.text = getString(IDR.string.refusal_person_not_present)
+            rbTooYoung.text = getString(IDR.string.refusal_too_young)
+            rbOther.text = getString(IDR.string.refusal_other)
+            exitFormText.hint = getString(IDR.string.hint_other_reason)
+            btSubmitExitForm.text = getString(IDR.string.button_submit)
+            btGoBack.text = getString(IDR.string.exit_form_capture_face)
         }
     }
 
@@ -183,9 +184,9 @@ class CoreExitFormActivity : BaseSplitActivity() {
 
     override fun onBackPressed() {
         if (binding.btSubmitExitForm.isEnabled) {
-            showToast(R.string.refusal_toast_submit)
+            showToast(IDR.string.refusal_toast_submit)
         } else {
-            showToast(R.string.refusal_toast_select_option_submit)
+            showToast(IDR.string.refusal_toast_select_option_submit)
         }
     }
 

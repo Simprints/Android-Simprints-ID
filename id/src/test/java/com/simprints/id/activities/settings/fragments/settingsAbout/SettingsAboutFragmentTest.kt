@@ -27,6 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
@@ -105,21 +106,21 @@ class SettingsAboutFragmentTest {
             val syncPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_sync_and_search_key))
             assertThat(syncPref?.summary).isEqualTo("Module Sync - Project Search")
-            assertThat(syncPref?.title).isEqualTo(fragment.getString(R.string.preference_sync_and_search_title))
+            assertThat(syncPref?.title).isEqualTo(fragment.getString(IDR.string.preference_sync_and_search_title))
 
             val appVersionPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_app_version_key))
             assertThat(appVersionPref?.summary).isEqualTo(VERSION)
-            assertThat(appVersionPref?.title).isEqualTo(fragment.getString(R.string.preference_app_version_title))
+            assertThat(appVersionPref?.title).isEqualTo(fragment.getString(IDR.string.preference_app_version_title))
 
             val deviceIdPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_device_id_key))
             assertThat(deviceIdPref?.summary).isEqualTo(DEVICE_ID)
-            assertThat(deviceIdPref?.title).isEqualTo(fragment.getString(R.string.preference_device_id_title))
+            assertThat(deviceIdPref?.title).isEqualTo(fragment.getString(IDR.string.preference_device_id_title))
 
             val logOutPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_logout_key))
-            assertThat(logOutPref?.title).isEqualTo(fragment.getString(R.string.preference_logout_title))
+            assertThat(logOutPref?.title).isEqualTo(fragment.getString(IDR.string.preference_logout_title))
         }
     }
 
@@ -133,7 +134,7 @@ class SettingsAboutFragmentTest {
             val scannerPref =
                 fragment.findPreference<Preference>(fragment.getString(R.string.preference_scanner_version_key))
             assertThat(scannerPref?.summary).isEqualTo(SCANNER_VERSION)
-            assertThat(scannerPref?.title).isEqualTo(fragment.getString(R.string.preference_scanner_version_title))
+            assertThat(scannerPref?.title).isEqualTo(fragment.getString(IDR.string.preference_scanner_version_title))
             assertThat(scannerPref?.isEnabled).isTrue()
         }
     }

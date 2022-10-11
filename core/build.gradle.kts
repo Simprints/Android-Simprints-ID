@@ -32,6 +32,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":moduleapi"))
     api(project(":infranetwork"))
+    implementation(project(":infralogging"))
 
     api(libs.androidX.appcompat)
     implementation(libs.androidX.lifecycle.java8)

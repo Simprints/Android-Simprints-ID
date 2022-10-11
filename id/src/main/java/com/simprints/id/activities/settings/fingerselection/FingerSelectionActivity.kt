@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.databinding.ActivityFingerSelectionBinding
 import com.simprints.id.tools.extensions.showToast
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class FingerSelectionActivity : BaseSplitActivity() {
 
@@ -66,12 +66,12 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
     private val settingsSaveConfirmationDialog by lazy {
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.finger_selection_confirm_dialog_text))
-            .setPositiveButton(getString(R.string.finger_selection_confirm_dialog_yes)) { _, _ ->
+            .setTitle(getString(IDR.string.finger_selection_confirm_dialog_text))
+            .setPositiveButton(getString(IDR.string.finger_selection_confirm_dialog_yes)) { _, _ ->
                 viewModel.savePreference()
                 super.onBackPressed()
             }
-            .setNegativeButton(getString(R.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
+            .setNegativeButton(getString(IDR.string.finger_selection_confirm_dialog_no)) { _, _ -> super.onBackPressed() }
             .setCancelable(false)
             .create()
     }
@@ -99,14 +99,14 @@ class FingerSelectionActivity : BaseSplitActivity() {
     private fun configureToolbar() {
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.finger_selection_activity_title)
+        supportActionBar?.title = getString(IDR.string.finger_selection_activity_title)
     }
 
     private fun initTextInLayout() {
-        binding.addFingerButton.text = getString(R.string.finger_selection_add_finger)
-        binding.resetButton.text = getString(R.string.finger_selection_reset)
-        binding.fingerLabelTextView.text = getString(R.string.finger_selection_finger_label)
-        binding.quantityLabelTextView.text = getString(R.string.finger_selection_quantity_label)
+        binding.addFingerButton.text = getString(IDR.string.finger_selection_add_finger)
+        binding.resetButton.text = getString(IDR.string.finger_selection_reset)
+        binding.fingerLabelTextView.text = getString(IDR.string.finger_selection_finger_label)
+        binding.quantityLabelTextView.text = getString(IDR.string.finger_selection_quantity_label)
     }
 
     private fun initRecyclerView() {
@@ -157,7 +157,7 @@ class FingerSelectionActivity : BaseSplitActivity() {
             if (viewModel.canSavePreference()) {
                 settingsSaveConfirmationDialog.show()
             } else {
-                showToast(R.string.finger_selection_invalid)
+                showToast(IDR.string.finger_selection_invalid)
             }
         } else {
             super.onBackPressed()

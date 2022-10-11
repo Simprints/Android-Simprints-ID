@@ -73,6 +73,7 @@ definitions:
                     - ./gradlew infrasecurity:jacocoTestReport
                     - ./gradlew infralicense:jacocoTestReport
                     - ./gradlew infraimages:jacocoTestReport
+                    - ./gradlew infraresources:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - eventsystem/build/reports/**
@@ -86,6 +87,7 @@ definitions:
                     - infrasecurity/build/reports/**
                     - infralicense/build/reports/**
                     - infraimages/build/reports/**
+                    - infraresources/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.

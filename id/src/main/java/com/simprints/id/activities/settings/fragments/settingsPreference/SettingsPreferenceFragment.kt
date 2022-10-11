@@ -16,6 +16,7 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
@@ -77,23 +78,23 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun setTextInLayout() {
-        getPreferenceForGeneralCategory()?.title = getString(R.string.settings_general)
-        getPreferenceForAppDetailsCategory()?.title = getString(R.string.settings_app_details)
+        getPreferenceForGeneralCategory()?.title = getString(IDR.string.settings_general)
+        getPreferenceForAppDetailsCategory()?.title = getString(IDR.string.settings_app_details)
     }
 
     private fun initTextInLayout() {
-        getPreferenceForLanguage()?.title = getString(R.string.preference_select_language_title)
+        getPreferenceForLanguage()?.title = getString(IDR.string.preference_select_language_title)
         getPreferenceForDefaultFingers()?.apply {
-            title = getString(R.string.preference_select_fingers_title)
-            summary = getString(R.string.preference_summary_settings_fingers)
+            title = getString(IDR.string.preference_select_fingers_title)
+            summary = getString(IDR.string.preference_summary_settings_fingers)
         }
 
         getPreferenceForSyncInformation()?.apply {
-            title = getString(R.string.preference_sync_information_title)
-            summary = getString(R.string.preference_summary_sync_information)
+            title = getString(IDR.string.preference_sync_information_title)
+            summary = getString(IDR.string.preference_summary_sync_information)
         }
 
-        getPreferenceForAbout()?.title = getString(R.string.preference_app_details_title)
+        getPreferenceForAbout()?.title = getString(IDR.string.preference_app_details_title)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -112,10 +113,16 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun getPreferenceForGeneralCategory(): Preference? =
-        findPreference(getString(R.string.preferences_general_key))
+        findPreference(getString(IDR.string.preferences_general_key))
+
+    private fun getKeyForGeneralPreferenceCategory() =
+        getString(IDR.string.preferences_general_key)
 
     private fun getPreferenceForAppDetailsCategory(): Preference? =
-        findPreference(getString(R.string.preferences_app_details_key))
+        findPreference(getString(IDR.string.preferences_app_details_key))
+
+    private fun getKeyForAppDetailsPreferenceCategory() =
+        getString(IDR.string.preferences_app_details_key)
 
     private fun getPreferenceForLanguage(): ListPreference? =
         findPreference(getString(R.string.preference_select_language_key))

@@ -1,7 +1,7 @@
 package com.simprints.id.di
 
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
-import com.simprints.id.orchestrator.FlowProvider
+import com.simprints.core.domain.common.FlowProvider
 import dagger.Subcomponent
 import javax.inject.Scope
 
