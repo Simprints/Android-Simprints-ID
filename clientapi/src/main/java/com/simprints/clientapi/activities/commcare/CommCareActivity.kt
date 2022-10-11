@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.commcare
 
 import android.content.Intent
 import android.os.Bundle
-import com.simprints.clientapi.ClientApiComponent
+import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buildCommCareAction
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -40,7 +40,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         get() = buildCommCareAction(intent.action)
 
     @Inject
-    lateinit var presenterFactory: ClientApiComponent.CommCarePresenterFactory
+    lateinit var presenterFactory: ClientApiModule.CommCarePresenterFactory
 
     override val presenter: CommCareContract.Presenter by lazy {
         presenterFactory.create(this, action)

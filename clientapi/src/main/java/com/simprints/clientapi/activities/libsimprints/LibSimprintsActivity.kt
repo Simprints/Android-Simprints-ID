@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import android.content.Intent
-import com.simprints.clientapi.ClientApiComponent
+import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Companion.buildLibSimprintsAction
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -16,7 +16,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         get() = buildLibSimprintsAction(intent.action)
 
     @Inject
-    lateinit var libSimprintsPresenterFactory: ClientApiComponent.LibSimprintsPresenterFactory
+    lateinit var libSimprintsPresenterFactory: ClientApiModule.LibSimprintsPresenterFactory
 
     override val presenter: LibSimprintsContract.Presenter by lazy {
         libSimprintsPresenterFactory.create(this, action)
