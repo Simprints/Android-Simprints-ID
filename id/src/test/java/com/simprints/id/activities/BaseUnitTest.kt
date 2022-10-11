@@ -15,7 +15,6 @@ open class BaseUnitTest {
     private val module by lazy {
         TestAppModule(
             app,
-            dbManagerRule = MockkRule,
             sessionEventsLocalDbManagerRule = MockkRule
         )
     }

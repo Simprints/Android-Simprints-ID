@@ -3,8 +3,6 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.lyft.kronos.AndroidClockFactory
-import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
@@ -24,7 +22,6 @@ import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.moduleselection.ModuleRepository
@@ -70,11 +67,6 @@ open class AppModule {
     @Provides
     @Singleton
     fun provideContext(app: Application): Context = app
-
-    @Provides
-    @Singleton
-    open fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager =
-        RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
     open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =

@@ -59,7 +59,6 @@ class LoginActivityTest {
     private val module by lazy {
         TestAppModule(
             app,
-            dbManagerRule = DependencyRule.MockkRule,
             sessionEventsLocalDbManagerRule = DependencyRule.MockkRule
         )
     }

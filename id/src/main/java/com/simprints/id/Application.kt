@@ -121,7 +121,6 @@ open class Application : CoreApplication() {
         factory { component.getPreferencesManager() }
         factory { component.getSessionEventsManager() }
         factory { component.getTimeHelper() }
-        factory { component.getRecentEventsPreferencesManager() }
         factory { component.getImprovedSharedPreferences() }
         factory { orchestratorComponent.getFlowManager() }
         factory { component.getEnrolmentRecordManager() }
@@ -131,6 +130,7 @@ open class Application : CoreApplication() {
         factory { component.getLicenseRepository() }
         factory { component.getIdPreferencesManager() }
         factory { component.getSecurityManager() }
+        factory { component.getRecentUserActivityManager() }
     }
 
     override fun onTerminate() {

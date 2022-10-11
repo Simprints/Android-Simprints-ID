@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.scanner.pairing
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
@@ -10,6 +9,8 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAd
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.every
@@ -32,7 +33,10 @@ class ScannerPairingManagerTest {
         every { convertSerialNumberToMacAddress(eq(incorrectSerial)) } returns incorrectAddress
         every { convertSerialNumberToMacAddress(eq(someOtherSerial)) } returns someOtherAddress
     }
-    private val recentEventsPreferencesManager = mockk<FingerprintPreferencesManager>()
+    private val recentUserActivity = mockk<RecentUserActivity>()
+    private val recentUserActivityManager = mockk<RecentUserActivityManager> {
+        coEvery { getRecentUserActivity() } returns recentUserActivity
+    }
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
@@ -41,7 +45,7 @@ class ScannerPairingManagerTest {
     }
     private val scannerPairingManager = ScannerPairingManager(
         bluetoothAdapterMock,
-        recentEventsPreferencesManager,
+        recentUserActivityManager,
         scannerGenerationDeterminerMock,
         serialNumberConverterMock,
         configManager
@@ -141,7 +145,7 @@ class ScannerPairingManagerTest {
                 correctGeneration,
                 incorrectGeneration
             )
-            every { recentEventsPreferencesManager.lastScannerUsed } returns correctSerial
+            every { recentUserActivity.lastScannerUsed } returns correctSerial
 
             assertThat(scannerPairingManager.getPairedScannerAddressToUse()).isEqualTo(
                 correctAddress
@@ -159,7 +163,7 @@ class ScannerPairingManagerTest {
             correctGeneration,
             incorrectGeneration
         )
-        every { recentEventsPreferencesManager.lastScannerUsed } returns ""
+        every { recentUserActivity.lastScannerUsed } returns ""
 
         assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
     }
@@ -176,7 +180,7 @@ class ScannerPairingManagerTest {
                 correctGeneration,
                 incorrectGeneration
             )
-            every { recentEventsPreferencesManager.lastScannerUsed } returns someOtherSerial
+            every { recentUserActivity.lastScannerUsed } returns someOtherSerial
 
             assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
         }

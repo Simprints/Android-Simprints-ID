@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.*
@@ -15,6 +14,8 @@ import com.simprints.fingerprint.testtools.*
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
@@ -49,10 +50,17 @@ class OtaViewModelTest {
 
     private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
-    private val recentEventsPreferencesManager: FingerprintPreferencesManager =
-        mockk(relaxed = true) {
-            every { lastScannerVersion } returns HARDWARE_VERSION
-        }
+    private val recentUserActivityManager = mockk<RecentUserActivityManager> {
+        coEvery { getRecentUserActivity() } returns RecentUserActivity(
+            HARDWARE_VERSION,
+            "",
+            "",
+            0,
+            0,
+            0,
+            0
+        )
+    }
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns mockk {
@@ -74,7 +82,7 @@ class OtaViewModelTest {
         sessionEventsManagerMock,
         timeHelperMock,
         dispatcherProvider,
-        recentEventsPreferencesManager,
+        recentUserActivityManager,
         configManager
     )
 
