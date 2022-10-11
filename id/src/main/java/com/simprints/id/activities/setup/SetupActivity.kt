@@ -14,7 +14,10 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
+import com.simprints.clientapi.InternalConstants
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.hasPermission
+import com.simprints.core.tools.extentions.requestPermissionsIfRequired
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
@@ -31,9 +34,6 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.id.services.location.StoreUserLocationIntoCurrentSessionWorker
-import com.simprints.clientapi.InternalConstants
-import com.simprints.core.tools.extentions.hasPermission
-import com.simprints.core.tools.extentions.requestPermissionsIfRequired
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.launch
@@ -234,7 +234,7 @@ class SetupActivity : BaseSplitActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             MODALITIES_DOWNLOAD_REQUEST_CODE -> handleModalityDownloadResult(resultCode)
-            com.simprints.clientapi.InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
+            InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
         }
     }
 
