@@ -14,7 +14,7 @@ import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
-import com.simprints.id.tools.extensions.onLayoutChange
+import com.simprints.core.tools.extentions.onLayoutChange
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import splitties.systemservices.inputMethodManager

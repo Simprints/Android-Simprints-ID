@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.data.local
 import android.content.Context
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
-import com.simprints.id.tools.utils.FileUtil
+import com.simprints.core.tools.utils.FileUtil
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
@@ -84,7 +84,7 @@ class FirmwareLocalDataSourceTest {
         every { fileUtil.createFile(cypressDir, firmwareVersion) } returns mockkFirmwareFile
 
         //when
-        val result = firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)
+        firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)
         //Then throws
 
     }

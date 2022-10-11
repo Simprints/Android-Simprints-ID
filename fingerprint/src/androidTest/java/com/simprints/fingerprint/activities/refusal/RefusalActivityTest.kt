@@ -3,7 +3,6 @@ package com.simprints.fingerprint.activities.refusal
 import android.app.Instrumentation
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
@@ -11,27 +10,37 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
+import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.typeText
-import com.simprints.id.Application
+import io.mockk.mockk
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class RefusalActivityTest {
 
+
+    @get:Rule
+    val koinTestRule = KoinTestRule(modules = listOf(module {
+        single { mockk<FingerprintSessionEventsManager>(relaxed = true) }
+        single { mockk<FingerprintTimeHelper>(relaxed = true) }
+    }))
+
     @Before
     fun setUp() {
-        acquireFingerprintKoinModules()
         Intents.init()
     }
 
@@ -90,8 +99,10 @@ class RefusalActivityTest {
         onView(withId(R.id.refusalText)).perform(typeText(refusalReasonText))
         onView(withId(R.id.btSubmitRefusalForm)).perform(click())
 
-        verifyIntentReturned(scenario.result, RefusalTaskResult.Action.SUBMIT,
-            RefusalFormReason.REFUSED_RELIGION, refusalReasonText, ResultCode.REFUSED)
+        verifyIntentReturned(
+            scenario.result, RefusalTaskResult.Action.SUBMIT,
+            RefusalFormReason.REFUSED_RELIGION, refusalReasonText, ResultCode.REFUSED
+        )
     }
 
     @Test
@@ -100,34 +111,41 @@ class RefusalActivityTest {
 
         onView(withId(R.id.btScanFingerprints)).perform(click())
 
-        verifyIntentReturned(scenario.result, RefusalTaskResult.Action.SCAN_FINGERPRINTS,
-            RefusalFormReason.OTHER, "", ResultCode.OK)
+        verifyIntentReturned(
+            scenario.result, RefusalTaskResult.Action.SCAN_FINGERPRINTS,
+            RefusalFormReason.OTHER, "", ResultCode.OK
+        )
     }
 
     private fun launchRefusalActivity(): ActivityScenario<RefusalActivity> =
         ActivityScenario.launch(Intent().apply {
-            setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, RefusalActivity::class.qualifiedName!!)
+            setClassName(
+                InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
+                RefusalActivity::class.qualifiedName!!
+            )
         })
 
-    private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
-                                     action: RefusalTaskResult.Action,
-                                     refusalReason: RefusalFormReason,
-                                     refusalReasonText: String,
-                                     expectedResultCode: ResultCode) {
-        Truth.assertThat(result.resultCode).isEqualTo(expectedResultCode.value)
+    private fun verifyIntentReturned(
+        result: Instrumentation.ActivityResult,
+        action: RefusalTaskResult.Action,
+        refusalReason: RefusalFormReason,
+        refusalReasonText: String,
+        expectedResultCode: ResultCode
+    ) {
+        assertThat(result.resultCode).isEqualTo(expectedResultCode.value)
 
         result.resultData.setExtrasClassLoader(RefusalTaskResult::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<RefusalTaskResult>(RefusalTaskResult.BUNDLE_KEY)
+        val response =
+            result.resultData.getParcelableExtra<RefusalTaskResult>(RefusalTaskResult.BUNDLE_KEY)
 
-        Truth.assertThat(response).isInstanceOf(RefusalTaskResult::class.java)
-        Truth.assertThat(response?.action).isEqualTo(action)
-        Truth.assertThat(response?.answer?.reason).isEqualTo(refusalReason)
-        Truth.assertThat(response?.answer?.optionalText).isEqualTo(refusalReasonText)
+        assertThat(response).isInstanceOf(RefusalTaskResult::class.java)
+        assertThat(response?.action).isEqualTo(action)
+        assertThat(response?.answer?.reason).isEqualTo(refusalReason)
+        assertThat(response?.answer?.optionalText).isEqualTo(refusalReasonText)
     }
 
     @After
     fun tearDown() {
         Intents.release()
-        releaseFingerprintKoinModules()
     }
 }

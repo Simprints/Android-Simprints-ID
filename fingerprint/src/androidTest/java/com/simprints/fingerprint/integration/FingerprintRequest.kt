@@ -1,11 +1,7 @@
 package com.simprints.fingerprint.integration
 
 import android.content.Intent
-import androidx.test.core.app.ApplicationProvider
-import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.id.Application
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
+import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
@@ -21,43 +17,19 @@ fun createFingerprintCaptureRequestIntent(
         DEFAULT_FINGERS_TO_CAPTURE
 ): Intent = Intent()
     .setClassName(
-        ApplicationProvider.getApplicationContext<Application>().packageName,
-        FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME
+        InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
+        "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     )
     .putExtra(
         IFingerprintRequest.BUNDLE_KEY,
         TestFingerprintCaptureRequest(fingerprintsToCapture)
     )
 
-fun createFingerprintMatchRequestIntent(
-    probeFingerprints: List<Fingerprint>,
-    queryForCandidates: Serializable
-): Intent = Intent()
-    .setClassName(
-        ApplicationProvider.getApplicationContext<Application>().packageName,
-        FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME
-    )
-    .putExtra(
-        IFingerprintRequest.BUNDLE_KEY,
-        TestFingerprintMatchRequest(
-            probeFingerprints.map { it.fromDomainToModuleApi() },
-            queryForCandidates
-        )
-    )
 
 val DEFAULT_FINGERS_TO_CAPTURE = listOf(
     IFingerIdentifier.LEFT_THUMB,
     IFingerIdentifier.LEFT_INDEX_FINGER
 )
-
-private fun Fingerprint.fromDomainToModuleApi() =
-    IFingerprintSampleImpl(
-        fingerId.fromDomainToModuleApi(),
-        templateBytes,
-        qualityScore,
-        IFingerprintTemplateFormat.ISO_19794_2,
-        null
-    )
 
 @Parcelize
 private class IFingerprintSampleImpl(

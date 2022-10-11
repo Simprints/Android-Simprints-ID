@@ -2,8 +2,6 @@ package com.simprints.fingerprint.controllers.core.network
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.data.FirmwareTestData
-import com.simprints.id.data.file.FileUrl
-import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
