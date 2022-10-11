@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.dynamic-feature")
+    id("com.android.library")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
@@ -28,12 +28,12 @@ android {
 
     buildTypes {
         getByName("release") {
-            proguardFiles("proguard-rules-dynamic-features.pro")
+            proguardFiles("proguard-rules.pro")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "1440L")
         }
 
         getByName("staging") {
-            proguardFiles("proguard-rules-dynamic-features.pro")
+            proguardFiles("proguard-rules.pro")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 
@@ -70,24 +70,11 @@ repositories {
 }
 
 dependencies {
-    // https://issuetracker.google.com/issues/132906456
-    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
-    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
-    // The following line includes the base module classes.jar into the final one.
-    // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly(
-        fileTree(
-            mapOf(
-                "include" to listOf("**/*.jar"),
-                "dir" to "../id/build/intermediates/app_classes/"
-            )
-        )
-    )
-
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Simprints
-    implementation(project(":id"))
+    implementation(project(":core"))
+    implementation(project(":eventsystem"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":fingerprintmatcher"))
     implementation(project(":fingerprintscanner"))
@@ -116,12 +103,9 @@ dependencies {
     implementation(libs.androidX.navigation.ui)
     implementation(libs.workManager.work)
 
-    // RxJava
-
-
-
     // Splitties
     implementation(libs.splitties.core)
+
     // Koin
     implementation(libs.koin.core)
     implementation(libs.koin.android)

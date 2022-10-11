@@ -17,7 +17,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.databinding.ActivityQrCaptureBinding
-import com.simprints.id.tools.extensions.hasPermission
+import com.simprints.core.tools.extentions.hasPermission
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
