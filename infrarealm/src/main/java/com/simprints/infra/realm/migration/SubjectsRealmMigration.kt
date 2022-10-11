@@ -250,6 +250,27 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             .findAll()
             .deleteAllFromRealm()
 
+        // In some projects there are duplicate records that are not orphans. Reason is still unclear
+        // but probably two subjects point to the same sample id which is inserted twice in the table
+        // For such cases we scan the two tables for duplicate ids and change them before making id
+        // the primary key
+        realm.where(PeopleSchemaV7.FINGERPRINT_TABLE).findAll().forEach { sample ->
+            val count = realm.where(PeopleSchemaV7.FINGERPRINT_TABLE)
+                .equalTo(PeopleSchemaV7.FINGERPRINT_FIELD_ID, sample.getString(PeopleSchemaV7.FINGERPRINT_FIELD_ID))
+                .count()
+            if (count > 1) {
+                sample.setString(PeopleSchemaV7.FINGERPRINT_FIELD_ID, UUID.randomUUID().toString())
+            }
+        }
+        realm.where(PeopleSchemaV7.FACE_TABLE).findAll().forEach { sample ->
+            val count = realm.where(PeopleSchemaV7.FACE_TABLE)
+                .equalTo(PeopleSchemaV7.FACE_FIELD_ID, sample.getString(PeopleSchemaV7.FACE_FIELD_ID))
+                .count()
+            if (count > 1) {
+                sample.setString(PeopleSchemaV7.FACE_FIELD_ID, UUID.randomUUID().toString())
+            }
+        }
+
         // Remove temp column and set primary key on deduplicated tables
         realm.schema.get(PeopleSchemaV7.FACE_TABLE)
             ?.removeField(SubjectsSchemaV12.TMP_HAS_PARENT)
