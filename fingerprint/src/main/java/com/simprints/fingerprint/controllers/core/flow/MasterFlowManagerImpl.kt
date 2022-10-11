@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.flow
 
-import com.simprints.id.orchestrator.FlowProvider
-import com.simprints.id.orchestrator.FlowProvider.FlowType.*
+import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowProvider.FlowType.*
 
 class MasterFlowManagerImpl(private val flowProvider: FlowProvider) : MasterFlowManager {
 

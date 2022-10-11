@@ -9,15 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.extentions.showToast
+import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentExitFormBinding
-import com.simprints.id.tools.textWatcherOnChange
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import com.simprints.id.R as IDR
+import com.simprints.infra.resources.R as IDR
 
 class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 

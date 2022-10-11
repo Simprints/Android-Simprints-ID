@@ -20,6 +20,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class EnrolLastBiometricsActivity : BaseSplitActivity() {
 
@@ -60,11 +61,7 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
     private fun observeViewState() {
         vm.getViewStateLiveData().observe(this) {
             if (it is ViewState.Success) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.enrol_last_biometrics_success),
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, getString(IDR.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
                 sendOkResult(it.newGuid)
             } else {
                 AlertActivityHelper.launchAlert(

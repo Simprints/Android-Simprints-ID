@@ -6,6 +6,7 @@ import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -14,7 +15,6 @@ import com.simprints.face.controllers.core.events.model.FaceAlertType
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentErrorBinding
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
-import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 

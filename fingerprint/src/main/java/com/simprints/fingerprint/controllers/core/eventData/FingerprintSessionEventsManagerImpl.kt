@@ -4,7 +4,7 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import com.simprints.id.tools.ignoreException
+import com.simprints.core.tools.exceptions.ignoreException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterIsInstance

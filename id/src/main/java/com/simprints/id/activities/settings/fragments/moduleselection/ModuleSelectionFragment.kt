@@ -30,18 +30,19 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     ModuleSelectionListener, ChipClickListener {
 
     private val confirmModuleSelectionDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.confirm_module_selection_title))
+            .setTitle(getString(IDR.string.confirm_module_selection_title))
             .setMessage(getModulesSelectedTextForDialog())
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.confirm_module_selection_yes))
+            .setPositiveButton(getString(IDR.string.confirm_module_selection_yes))
             { _, _ -> handleModulesConfirmClick() }
-            .setNegativeButton(getString(R.string.confirm_module_selection_cancel))
+            .setNegativeButton(getString(IDR.string.confirm_module_selection_cancel))
             { _, _ -> handleModuleSelectionCancelClick() }
             .create()
     }
@@ -79,9 +80,9 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     private fun configureTextViews() {
         binding.apply {
-            txtSelectedModules.text = getString(R.string.selected_modules)
-            txtNoModulesSelected.text = getString(R.string.no_modules_selected)
-            txtNoResults.text = getString(R.string.no_results)
+            txtSelectedModules.text = getString(IDR.string.selected_modules)
+            txtNoModulesSelected.text = getString(IDR.string.no_modules_selected)
+            txtNoResults.text = getString(IDR.string.no_results)
         }
     }
 
@@ -115,7 +116,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
             context,
             DividerItemDecoration.VERTICAL
         ).apply {
-            val colour = ContextCompat.getColor(context, R.color.simprints_light_grey)
+            val colour = ContextCompat.getColor(context, IDR.color.simprints_light_grey)
             setDrawable(ColorDrawable(colour))
         }
         rvModules?.addItemDecoration(dividerItemDecoration)
@@ -139,8 +140,8 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     private fun configureSearchView() {
         configureSearchViewEditText()
-        binding.searchView.queryHint = getString(R.string.hint_search_modules)
-        val queryListener = ModuleSelectionQueryListener(modulesToSelect.getUnselected())
+        binding.searchView.queryHint = getString(IDR.string.hint_search_modules)
+        val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         binding.searchView.setOnQueryTextListener(queryListener)
         observeSearchResults(queryListener)
     }
@@ -152,7 +153,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
         editText?.let {
             it.typeface = try {
-                ResourcesCompat.getFont(requireContext(), R.font.muli)
+                ResourcesCompat.getFont(requireContext(), IDR.font.muli)
             } catch (ex: Exception) {
                 Typeface.DEFAULT
             }
@@ -217,7 +218,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     private fun notifyNoModulesSelected() {
-        activity?.showToast(R.string.settings_no_modules_toast)
+        activity?.showToast(IDR.string.settings_no_modules_toast)
     }
 
     fun showModuleSelectionDialogIfNecessary() {
@@ -256,7 +257,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             requireContext(),
-            String.format(getString(R.string.settings_too_many_modules_toast), maxAllowed),
+            String.format(getString(IDR.string.settings_too_many_modules_toast), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }
