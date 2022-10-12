@@ -50,7 +50,7 @@ androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx
 androidX-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
-androidX-lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
+androidX-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
@@ -71,7 +71,6 @@ androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
 androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx_navigation_version" }
-androidX-navigation-dynamicfeatures = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "androidx_navigation_version" }
 
 #Annotation
 androidX-annotation-annotation = "androidx.annotation:annotation:1.5.0"

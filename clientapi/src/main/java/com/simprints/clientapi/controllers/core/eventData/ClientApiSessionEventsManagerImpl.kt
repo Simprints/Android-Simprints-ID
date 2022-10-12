@@ -4,6 +4,7 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
@@ -12,28 +13,27 @@ import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEve
 import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.canCoSyncAllData
 import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val coreEventRepository: EventRepository,
     private val timeHelper: ClientApiTimeHelper,
-    private val hotCache: HotCache,
+    private val workflowCacheClearer: WorkflowCacheClearer,
     private val configManager: ConfigManager,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
         // Clear cached steps before creating a new session
-        hotCache.clearSteps()
+        workflowCacheClearer.clearSteps()
         coreEventRepository.createSession()
 
         inBackground(dispatcher) {

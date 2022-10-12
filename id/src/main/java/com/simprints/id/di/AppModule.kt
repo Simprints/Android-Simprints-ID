@@ -3,6 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.lyft.kronos.AndroidClockFactory
+import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
@@ -205,6 +206,12 @@ open class AppModule {
         @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
     ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
+
+    @Provides
+    fun provWorkflowCacheClearer(
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
+        stepEncoder: StepEncoder
+    ): WorkflowCacheClearer = HotCacheImpl(sharedPrefs, stepEncoder)
 
     @Provides
     fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
