@@ -12,10 +12,11 @@ import com.simprints.fingerprintscanner.v2.scanner.create
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerFactoryImpl(
+class ScannerFactoryImpl @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val configManager: ConfigManager,
     private val scannerUiHelper: ScannerUiHelper,
@@ -47,12 +48,12 @@ class ScannerFactoryImpl(
         }
     }
 
-    fun createScannerV1(macAddress: String): ScannerWrapper =
+    private fun createScannerV1(macAddress: String): ScannerWrapper =
         ScannerWrapperV1(
             ScannerV1(macAddress, bluetoothAdapter)
         )
 
-    fun createScannerV2(macAddress: String): ScannerWrapper =
+    private fun createScannerV2(macAddress: String): ScannerWrapper =
         ScannerWrapperV2(
             ScannerV2.create(),
             scannerUiHelper,

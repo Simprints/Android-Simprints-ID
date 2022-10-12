@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import javax.inject.Inject
 
-class BatteryLevelChecker(val context: Context) {
+class BatteryLevelChecker @Inject constructor(val context: Context) {
 
     fun isLowBattery(): Boolean {
         val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { filter ->

@@ -16,12 +16,15 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class OrchestratorViewModel(
+@HiltViewModel
+class OrchestratorViewModel @Inject constructor(
     private val orchestrator: Orchestrator,
     private val runnableTaskDispatcher: RunnableTaskDispatcher,
     private val scannerManager: ScannerManager,

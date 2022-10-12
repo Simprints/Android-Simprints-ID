@@ -11,11 +11,12 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAd
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import javax.inject.Inject
 
 /**
  * Helper class for handling MAC addresses and pairing programmatically.
  */
-class ScannerPairingManager(
+class ScannerPairingManager @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
