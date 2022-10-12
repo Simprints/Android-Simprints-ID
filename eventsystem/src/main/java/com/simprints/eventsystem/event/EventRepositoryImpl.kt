@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.*
 
-open class EventRepositoryImpl @AssistedInject constructor(
+internal open class EventRepositoryImpl @AssistedInject constructor(
     @Assisted("deviceId") private val deviceId: String,
     @Assisted("appVersionName") private val appVersionName: String,
     @Assisted("libSimprintsVersionName") override val libSimprintsVersionName: String,

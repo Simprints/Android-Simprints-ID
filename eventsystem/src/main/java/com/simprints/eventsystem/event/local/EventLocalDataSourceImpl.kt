@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-open class EventLocalDataSourceImpl @Inject constructor(
+internal open class EventLocalDataSourceImpl @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
     private val readingDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val writingContext: CoroutineContext = readingDispatcher + NonCancellable

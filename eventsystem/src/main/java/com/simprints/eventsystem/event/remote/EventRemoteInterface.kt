@@ -7,7 +7,7 @@ import retrofit2.http.*
 
 
 @JvmSuppressWildcards
-interface EventRemoteInterface : SimRemoteInterface {
+internal interface EventRemoteInterface : SimRemoteInterface {
 
     @GET("projects/{projectId}/events/count")
     suspend fun countEvents(
