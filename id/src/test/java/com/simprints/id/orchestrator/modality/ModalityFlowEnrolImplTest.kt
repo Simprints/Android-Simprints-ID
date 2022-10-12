@@ -9,7 +9,6 @@ import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
-import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.SETUP_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
@@ -33,13 +32,13 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 class ModalityFlowEnrolImplTest {
 
     companion object {
-        const val NUMBER_STEPS_FACE = 4
-        const val NUMBER_STEPS_FINGER = 4
-        const val NUMBER_STEPS_FACE_AND_FINGER = 6
+        const val NUMBER_STEPS_FACE = 3
+        const val NUMBER_STEPS_FINGER = 3
+        const val NUMBER_STEPS_FACE_AND_FINGER = 5
 
-        const val NUMBER_STEPS_FACE_WITHOUT_CONSENT = 3
-        const val NUMBER_STEPS_FINGER_WITHOUT_CONSENT = 3
-        const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 5
+        const val NUMBER_STEPS_FACE_WITHOUT_CONSENT = 2
+        const val NUMBER_STEPS_FINGER_WITHOUT_CONSENT = 2
+        const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 4
         const val PROJECT_ID = "projectId"
     }
 
@@ -63,9 +62,6 @@ class ModalityFlowEnrolImplTest {
     @MockK
     lateinit var consentStepMock: Step
 
-    @MockK
-    lateinit var setupStepMock: Step
-
     private val generalConfiguration = mockk<GeneralConfiguration>()
     private val consentConfiguration = mockk<ConsentConfiguration>()
     private val configManager = mockk<ConfigManager> {
@@ -88,14 +84,12 @@ class ModalityFlowEnrolImplTest {
         every { fingerprintStepMock.activityName } returns FINGERPRINT_ACTIVITY_NAME
         every { faceStepMock.activityName } returns FACE_ACTIVITY_NAME
         every { consentStepMock.activityName } returns CONSENT_ACTIVITY_NAME
-        every { setupStepMock.activityName } returns SETUP_ACTIVITY_NAME
 
         coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentStepMock
-        every { coreStepProcessor.buildStepSetup(any(), any()) } returns setupStepMock
     }
 
     @Test
@@ -149,11 +143,10 @@ class ModalityFlowEnrolImplTest {
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
-            assertThat(get(2).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
-            assertThat(get(3).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
-            assertThat(get(4).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
+            assertThat(get(3).activityName).isEqualTo(FACE_ACTIVITY_NAME)
         }
     }
 
@@ -166,11 +159,10 @@ class ModalityFlowEnrolImplTest {
         coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
-            assertThat(get(2).activityName).isEqualTo(FACE_ACTIVITY_NAME)
-            assertThat(get(3).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
-            assertThat(get(4).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
+            assertThat(get(3).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -184,10 +176,9 @@ class ModalityFlowEnrolImplTest {
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
-            assertThat(get(2).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
-            assertThat(get(3).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(FACE_ACTIVITY_NAME)
         }
     }
 
@@ -200,10 +191,9 @@ class ModalityFlowEnrolImplTest {
         coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
 
         with(modalityFlowEnrol.steps) {
-            assertThat(get(0).activityName).isEqualTo(SETUP_ACTIVITY_NAME)
-            assertThat(get(1).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
-            assertThat(get(2).activityName).isEqualTo(FACE_ACTIVITY_NAME)
-            assertThat(get(3).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(0).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+            assertThat(get(1).activityName).isEqualTo(FACE_ACTIVITY_NAME)
+            assertThat(get(2).activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
         }
     }
 

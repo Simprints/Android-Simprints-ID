@@ -24,7 +24,6 @@ import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSele
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutViewModelFactory
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModelFactory
 import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
-import com.simprints.id.activities.setup.SetupViewModelFactory
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.moduleselection.ModuleRepository
@@ -43,7 +42,6 @@ import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 // TODO: Remove after hilt migration
 @DisableInstallInCheck
@@ -128,12 +126,6 @@ open class ViewModelModule {
         timeHelper: TimeHelper,
         configManager: ConfigManager
     ) = EnrolLastBiometricsViewModelFactory(enrolmentHelper, timeHelper, configManager)
-
-    @ExperimentalCoroutinesApi
-    @Provides
-    open fun provideSetupViewModelFactory(
-        deviceManager: DeviceManager
-    ) = SetupViewModelFactory(deviceManager)
 
     @Provides
     open fun provideSettingsPreferenceViewModelFactory(configManager: ConfigManager): SettingsPreferenceViewModelFactory {

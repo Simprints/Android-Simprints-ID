@@ -43,8 +43,6 @@ dependencies {
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.jackson.core)
 
-    implementation(libs.playcore.core)
-
     implementation(libs.kronos.kronos)
 
     // Hilt

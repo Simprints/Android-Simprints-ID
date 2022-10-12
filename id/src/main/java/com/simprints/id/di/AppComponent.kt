@@ -30,7 +30,6 @@ import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSele
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
-import com.simprints.id.activities.setup.SetupActivity
 import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.secure.ProjectAuthenticatorImpl
 import com.simprints.id.services.config.RemoteConfigWorker
@@ -145,7 +144,6 @@ interface AppComponent {
     fun inject(eventStartSyncWorker: EventStartSyncReporterWorker)
     fun inject(qrCaptureActivity: QrCaptureActivity)
     fun inject(enrolLastBiometricsActivity: EnrolLastBiometricsActivity)
-    fun inject(setupActivity: SetupActivity)
     fun inject(securityStateWorker: SecurityStateWorker)
     fun inject(eventUpSyncUploaderWorker: EventUpSyncUploaderWorker)
     fun inject(preferencesManager: IdPreferencesManager)
