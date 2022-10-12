@@ -9,8 +9,9 @@ import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.io.IOException
+import javax.inject.Inject
 
-class NfcManager(private val nfcAdapter: ComponentNfcAdapter) {
+class NfcManager @Inject constructor(private val nfcAdapter: ComponentNfcAdapter) {
 
     val channelTags: Channel<ComponentNfcTag> = Channel()
 

@@ -16,7 +16,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -30,8 +29,6 @@ import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenA
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.flow.Action
-import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
@@ -56,12 +53,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class CollectFingerprintsActivityTest : KoinTest {
+class CollectFingerprintsActivityTest {
 
     private lateinit var scenario: ActivityScenario<CollectFingerprintsActivity>
 
@@ -143,11 +137,11 @@ class CollectFingerprintsActivityTest : KoinTest {
         )
 
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(modules = listOf(module {
-        factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
-        viewModel { vm }
-    }))
+//    @get:Rule
+//    val koinTestRule = KoinTestRule(modules = listOf(module {
+//        factory<MasterFlowManager> { mockk { every { getCurrentAction() } returns Action.IDENTIFY } }
+//        viewModel { vm }
+//    }))
 
     @Before
     fun setUp() {

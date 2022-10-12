@@ -16,6 +16,7 @@ import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.*
+import javax.inject.Inject
 
 /**
  * This is a helper class used to establish bluetooth socket connection, between the android
@@ -25,9 +26,10 @@ import java.util.*
  *         disconnecting from the bluetooth socket.
  * @param dispatcher  a [DispatcherProvider] for specifying which context a coroutine should run
  */
-class ConnectionHelper(
+class ConnectionHelper @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
-    private val dispatcher: DispatcherProvider) {
+    private val dispatcher: DispatcherProvider
+) {
 
     private var socket: ComponentBluetoothSocket? = null
 
@@ -46,12 +48,19 @@ class ConnectionHelper(
      * @throws BluetoothNotEnabledException if bluetooth is not turned on
      * @throws BluetoothNotSupportedException if bluetooth is not supported on this device (e.g. an emulator)
      */
-    fun connectScanner(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<Unit> =
+    fun connectScanner(
+        scanner: Scanner,
+        macAddress: String,
+        maxRetries: Long = CONNECT_MAX_RETRIES
+    ): Flow<Unit> =
         establishConnectedSocket(macAddress, maxRetries).map { socket ->
             connectScannerObjectWithSocket(scanner, socket)
         }
 
-    private fun establishConnectedSocket(macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES): Flow<ComponentBluetoothSocket> =
+    private fun establishConnectedSocket(
+        macAddress: String,
+        maxRetries: Long = CONNECT_MAX_RETRIES
+    ): Flow<ComponentBluetoothSocket> =
         getPairedDevice(macAddress)
             .map(::initiateAndReturnSocketConnection)
             .retry(maxRetries)
@@ -83,7 +92,10 @@ class ConnectionHelper(
     }
 
 
-    private suspend fun connectScannerObjectWithSocket(scanner: Scanner, socket: ComponentBluetoothSocket) {
+    private suspend fun connectScannerObjectWithSocket(
+        scanner: Scanner,
+        socket: ComponentBluetoothSocket
+    ) {
         Simber.d("Socket connected. Setting up scanner...")
         scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
     }
@@ -93,7 +105,11 @@ class ConnectionHelper(
         socket?.close()
     }
 
-    suspend fun reconnect(scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES) {
+    suspend fun reconnect(
+        scanner: Scanner,
+        macAddress: String,
+        maxRetries: Long = CONNECT_MAX_RETRIES
+    ) {
         disconnectScanner(scanner)
         delay(RECONNECT_DELAY_MS)
         connectScanner(scanner, macAddress, maxRetries).collect()

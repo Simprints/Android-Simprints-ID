@@ -7,6 +7,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -36,10 +37,13 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 import kotlin.concurrent.schedule
 import kotlin.math.min
 
+@HiltViewModel
 class CollectFingerprintsViewModel(
     private val scannerManager: ScannerManager,
     private val configManager: ConfigManager,
@@ -52,6 +56,30 @@ class CollectFingerprintsViewModel(
     private val externalScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
+
+    @Inject
+    constructor(
+        scannerManager: ScannerManager,
+        configManager: ConfigManager,
+        imageManager: FingerprintImageManager,
+        timeHelper: FingerprintTimeHelper,
+        sessionEventsManager: FingerprintSessionEventsManager,
+        fingerPriorityDeterminer: FingerPriorityDeterminer,
+        startingStateDeterminer: StartingStateDeterminer,
+        externalScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ) : this(
+        scannerManager,
+        configManager,
+        imageManager,
+        timeHelper,
+        sessionEventsManager,
+        fingerPriorityDeterminer,
+        startingStateDeterminer,
+        EncodingUtilsImpl,
+        externalScope,
+        dispatcherProvider
+    )
 
     lateinit var configuration: FingerprintConfiguration
 

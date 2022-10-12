@@ -12,32 +12,26 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.typeText
-import io.mockk.mockk
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class RefusalActivityTest {
 
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(modules = listOf(module {
-        single { mockk<FingerprintSessionEventsManager>(relaxed = true) }
-        single { mockk<FingerprintTimeHelper>(relaxed = true) }
-    }))
+//    @get:Rule
+//    val koinTestRule = KoinTestRule(modules = listOf(module {
+//        single { mockk<FingerprintSessionEventsManager>(relaxed = true) }
+//        single { mockk<FingerprintTimeHelper>(relaxed = true) }
+//    }))
 
     @Before
     fun setUp() {

@@ -24,17 +24,19 @@ import com.simprints.fingerprintmatcher.domain.TemplateFormat
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
 import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 import com.simprints.fingerprintmatcher.domain.MatchResult as MatcherMatchResult
 
-
-class MatchingViewModel(
+@HiltViewModel
+class MatchingViewModel @Inject constructor(
     private val fingerprintMatcher: FingerprintMatcher,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,

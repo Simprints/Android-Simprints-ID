@@ -7,9 +7,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.integration.createFingerprintCaptureRequestIntent
@@ -22,6 +20,10 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import dagger.hilt.android.testing.BindValue
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,14 +33,12 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
-import org.koin.test.KoinTest
+import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
+@Config(application = HiltTestApplication::class)
 @MediumTest
-class OrchestratorActivityAndroidTest : KoinTest {
+class OrchestratorActivityAndroidTest {
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
     private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
@@ -51,7 +51,9 @@ class OrchestratorActivityAndroidTest : KoinTest {
             mockk(relaxed = true)
         )
     )
-    private val orchestratorViewModel = spyk(
+
+    @BindValue @JvmField
+    val orchestratorViewModel = spyk(
         OrchestratorViewModel(
             orchestratorMock,
             mockk(relaxed = true),
@@ -64,13 +66,11 @@ class OrchestratorActivityAndroidTest : KoinTest {
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
     @get:Rule
-    val koinTestRule = KoinTestRule(modules = listOf(module {
-        factory { orchestratorMock }
-        viewModel { orchestratorViewModel }
-    }))
+    var hiltRule = HiltAndroidRule(this)
 
     @Before
     fun setUp() {
+        hiltRule.inject()
         Intents.init()
     }
 

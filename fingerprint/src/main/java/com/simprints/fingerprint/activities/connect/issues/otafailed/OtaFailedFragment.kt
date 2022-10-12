@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -17,8 +18,8 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentOtaFailedBinding
 import com.simprints.fingerprint.tools.livedata.postEvent
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 
@@ -26,21 +27,35 @@ import com.simprints.infra.resources.R as IDR
  * This fragment is show when an Over The Air update fails,
  * have a look at the readme for more details - /connect/README.md
  */
+@AndroidEntryPoint
 class OtaFailedFragment : FingerprintFragment() {
 
     private val args by navArgs<OtaFailedFragmentArgs>()
-    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
     private val binding by viewBinding(FragmentOtaFailedBinding::bind)
-    private val timeHelper: FingerprintTimeHelper by inject()
-    private val sessionManager: FingerprintSessionEventsManager by inject()
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+
+    @Inject
+    lateinit var timeHelper: FingerprintTimeHelper
+    @Inject
+    lateinit var sessionManager: FingerprintSessionEventsManager
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_ota_failed, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout(args.fetchOtaResult)
 
-        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.OtaFailed))
+        sessionManager.addEventInBackground(
+            AlertScreenEventWithScannerIssue(
+                timeHelper.now(),
+                ConnectScannerIssue.OtaFailed
+            )
+        )
 
         connectScannerViewModel.setBackButtonToExitWithError()
         binding.continueButton.setOnClickListener {

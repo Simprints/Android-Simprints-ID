@@ -33,14 +33,10 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.test.KoinTest
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-class CollectFingerprintsViewModelTest : KoinTest {
-
-    @get:Rule
-    var unitTestConfigRule = FullUnitTestConfigRule()
+class CollectFingerprintsViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

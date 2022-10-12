@@ -10,7 +10,10 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.*
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.testtools.*
+import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
+import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -28,9 +31,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class OtaViewModelTest {
-
-    @get:Rule
-    var unitTestConfigRule = FullUnitTestConfigRule()
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -88,7 +88,6 @@ class OtaViewModelTest {
 
     @Before
     fun setup() {
-
         every { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
         every { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
         every { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()

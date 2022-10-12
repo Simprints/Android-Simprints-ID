@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
+import javax.inject.Inject
 
 
 private typealias Un20Step = FlowCollector<Un20OtaStep>
@@ -29,10 +30,13 @@ private typealias Un20Step = FlowCollector<Un20OtaStep>
  * @param connectionHelper  for connection operations on the scanner
  * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
  */
-class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
-                    private val firmwareLocalDataSource: FirmwareLocalDataSource) {
+class Un20OtaHelper @Inject constructor(
+    private val connectionHelper: ConnectionHelper,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource
+) {
 
     private var newFirmwareVersion: Un20ExtendedAppVersion? = null
+
     /**
      * This function is responsible for performing Un20 firmware updates on Vero 2 Scanner, and
      * emits a sequence of each step [Un20OtaStep] being processed.
@@ -42,7 +46,11 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
      * @param scanner the connected scanner expected to be in root mode
      * @param macAddress the scanner's mac address
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<Un20OtaStep> = flow {
+    fun performOtaSteps(
+        scanner: Scanner,
+        macAddress: String,
+        firmwareVersion: String
+    ): Flow<Un20OtaStep> = flow {
         enterMainMode(scanner)
         turnOnUn20BeforeTransfer(scanner)
         transferFirmwareBytes(scanner, firmwareVersion)
@@ -65,9 +73,9 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
         scanner.turnUn20OnAndAwaitStateChangeEvent().await()
     }
 
-    private suspend fun Un20Step.transferFirmwareBytes(scanner: Scanner ,firmwareVersion: String) {
+    private suspend fun Un20Step.transferFirmwareBytes(scanner: Scanner, firmwareVersion: String) {
         emit(Un20OtaStep.CommencingTransfer)
-        scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes( firmwareVersion))
+        scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes(firmwareVersion))
             .map { Un20OtaStep.TransferInProgress(it) }
             .asFlow()
             .collect { emit(it) }
@@ -89,12 +97,18 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
         scanner.turnUn20OnAndAwaitStateChangeEvent().await()
     }
 
-    private suspend fun Un20Step.validateRunningFirmwareVersion(scanner: Scanner, firmwareVersion: String) {
+    private suspend fun Un20Step.validateRunningFirmwareVersion(
+        scanner: Scanner,
+        firmwareVersion: String
+    ) {
         emit(Un20OtaStep.ValidatingNewFirmwareVersion)
         validateUn20FirmwareVersion(scanner, firmwareVersion)
     }
 
-    private suspend fun Un20Step.reconnectScannerAfterValidating(scanner: Scanner, macAddress: String) {
+    private suspend fun Un20Step.reconnectScannerAfterValidating(
+        scanner: Scanner,
+        macAddress: String
+    ) {
         emit(Un20OtaStep.ReconnectingAfterValidating)
         connectionHelper.reconnect(scanner, macAddress)
         delayForOneSecond()
@@ -122,7 +136,8 @@ class Un20OtaHelper(private val connectionHelper: ConnectionHelper,
                 val oldVersion = it.toScannerVersion()
                 val newVersion = oldVersion.updatedWithUn20Version(newFirmwareVersion)
                 scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
-            } ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
+            }
+                ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
         }.await()
 
     private fun ScannerVersion.updatedWithUn20Version(un20Firmware: Un20ExtendedAppVersion) =

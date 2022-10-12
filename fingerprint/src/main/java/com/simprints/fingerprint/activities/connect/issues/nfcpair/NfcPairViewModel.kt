@@ -8,9 +8,12 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
+import javax.inject.Inject
 
-class NfcPairViewModel(
+@HiltViewModel
+class NfcPairViewModel @Inject constructor(
     private val nfcManager: NfcManager,
     private val scannerPairingManager: ScannerPairingManager
 ) : ViewModel() {

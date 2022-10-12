@@ -6,8 +6,11 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.livedata.postEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class SerialEntryPairViewModel(
+@HiltViewModel
+class SerialEntryPairViewModel @Inject constructor(
     private val scannerPairingManager: ScannerPairingManager,
     private val serialNumberConverter: SerialNumberConverter
 ) : ViewModel() {

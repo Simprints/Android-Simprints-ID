@@ -3,7 +3,9 @@ package com.simprints.fingerprint.activities.connect.main
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.databinding.FragmentReconnectBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ReconnectFragment : ConnectFragment(R.layout.fragment_reconnect) {
     private val binding by viewBinding(FragmentReconnectBinding::bind)
 

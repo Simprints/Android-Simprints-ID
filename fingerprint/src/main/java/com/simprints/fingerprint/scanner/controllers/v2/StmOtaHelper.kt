@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
+import javax.inject.Inject
 
 
 private typealias StmStep = FlowCollector<StmOtaStep>
@@ -27,11 +28,12 @@ private typealias StmStep = FlowCollector<StmOtaStep>
  * @param connectionHelper  for connection operations on the scanner
  * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
  */
-class StmOtaHelper(private val connectionHelper: ConnectionHelper,
-                   private val firmwareLocalDataSource: FirmwareLocalDataSource) {
+class StmOtaHelper @Inject constructor(
+    private val connectionHelper: ConnectionHelper,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource
+) {
 
     private var newFirmwareVersion: StmExtendedFirmwareVersion? = null
-
 
 
     /**
@@ -43,7 +45,11 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
      * @param scanner the connected scanner expected to be in root mode
      * @param macAddress the scanner's mac address
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<StmOtaStep> = flow {
+    fun performOtaSteps(
+        scanner: Scanner,
+        macAddress: String,
+        firmwareVersion: String
+    ): Flow<StmOtaStep> = flow {
         // enter stm ota mode, which
         // will trigger scanner restart
         enterStmOtaMode(scanner)
@@ -53,14 +59,14 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
         reEnterStmOtaMode(scanner)
         // transfer bytes which will trigger a
         // restart after transfer is successful
-        transferFirmwareBytes(scanner,firmwareVersion)
+        transferFirmwareBytes(scanner, firmwareVersion)
         // reconnect with scanner after transfer,
         // because connection will be lost
         reconnectAfterTransfer(scanner, macAddress)
         // enter main-mode to check firmware version
         enterMainMode(scanner)
         // validate running firmware version
-        validateRunningFirmwareVersion(scanner,firmwareVersion)
+        validateRunningFirmwareVersion(scanner, firmwareVersion)
         // reconnect with scanner to enter root mode
         reconnectAfterValidatingVersion(scanner, macAddress)
         // update firmware version
@@ -72,7 +78,10 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
         scanner.enterStmOtaMode().onErrorComplete().await()
     }
 
-    private suspend fun StmStep.reconnectAfterEnteringStmOtaMode(scanner: Scanner, macAddress: String) {
+    private suspend fun StmStep.reconnectAfterEnteringStmOtaMode(
+        scanner: Scanner,
+        macAddress: String
+    ) {
         emit(StmOtaStep.ReconnectingAfterEnteringOtaMode)
         connectionHelper.reconnect(scanner, macAddress)
         delayForOneSecond()
@@ -105,12 +114,18 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
         delayForOneSecond()
     }
 
-    private suspend fun StmStep.validateRunningFirmwareVersion(scanner: Scanner, firmwareVersion: String) {
+    private suspend fun StmStep.validateRunningFirmwareVersion(
+        scanner: Scanner,
+        firmwareVersion: String
+    ) {
         emit(StmOtaStep.ValidatingNewFirmwareVersion)
-        validateStmFirmwareVersion(scanner,firmwareVersion)
+        validateStmFirmwareVersion(scanner, firmwareVersion)
     }
 
-    private suspend fun StmStep.reconnectAfterValidatingVersion(scanner: Scanner, macAddress: String) {
+    private suspend fun StmStep.reconnectAfterValidatingVersion(
+        scanner: Scanner,
+        macAddress: String
+    ) {
         emit(StmOtaStep.ReconnectingAfterValidating)
         connectionHelper.reconnect(scanner, macAddress)
         delayForOneSecond()
@@ -121,7 +136,7 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
         updateUnifiedVersionInformation(scanner)
     }
 
-    private suspend fun validateStmFirmwareVersion(scanner: Scanner,firmwareVersion: String) =
+    private suspend fun validateStmFirmwareVersion(scanner: Scanner, firmwareVersion: String) =
         scanner.getStmFirmwareVersion().flatMapCompletable {
             val actualFirmwareVersion = it.versionAsString
             if (firmwareVersion != actualFirmwareVersion) {
@@ -138,7 +153,8 @@ class StmOtaHelper(private val connectionHelper: ConnectionHelper,
                 val oldVersion = it.toScannerVersion()
                 val newVersion = oldVersion.updatedWithStmVersion(newFirmwareVersion)
                 scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
-            } ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
+            }
+                ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
         }.await()
 
     private fun ScannerVersion.updatedWithStmVersion(stmFirmware: StmExtendedFirmwareVersion) =
