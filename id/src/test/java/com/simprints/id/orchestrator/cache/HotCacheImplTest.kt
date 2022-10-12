@@ -18,12 +18,11 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.AutoCloseKoinTest
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class HotCacheImplTest : AutoCloseKoinTest() {
+class HotCacheImplTest {
 
     private val hotCache by lazy {
         val context = ApplicationProvider.getApplicationContext<Application>()
@@ -37,7 +36,8 @@ class HotCacheImplTest : AutoCloseKoinTest() {
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,
-            DEFAULT_METADATA)
+            DEFAULT_METADATA
+        )
 
         hotCache.appRequest = appRequest
         assertThat(hotCache.appRequest).isEqualTo(appRequest)
@@ -63,7 +63,8 @@ class HotCacheImplTest : AutoCloseKoinTest() {
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,
-            DEFAULT_METADATA)
+            DEFAULT_METADATA
+        )
 
         hotCache.appRequest = appRequest
         assertThat(hotCache.appRequest).isEqualTo(appRequest)
@@ -75,7 +76,8 @@ class HotCacheImplTest : AutoCloseKoinTest() {
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,
-            DEFAULT_METADATA)
+            DEFAULT_METADATA
+        )
 
         hotCache.appRequest = appRequest
         assertThat(hotCache.appRequest).isEqualTo(appRequest)

@@ -18,7 +18,6 @@ retrofit_version = "2.9.0"
 okttp_version = "4.10.0"
 fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.13.4"
-koin_version = "3.2.2"
 rootbeer_version = "0.1.0"
 mockito_version = "4.8.0"
 robolectric_version = "4.8.2"
@@ -130,10 +129,6 @@ rxJava2-tasks = "io.ashdavies.rx:rx-tasks:2.2.0"
 #Fuzzywuzzy
 fuzzywuzzy-core = { module = "me.xdrop:fuzzywuzzy", version.ref = "fuzzywuzzy_version" }
 
-#Koin
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin_version" }
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin_version" }
-
 #Rootbeer
 rootbeer-core = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeer_version" }
 
@@ -182,8 +177,6 @@ testing-retrofit = { module = "com.squareup.retrofit2:retrofit-mock", version.re
 testing-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okttp_version" }
 testing-coroutines_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin_coroutine_version" }
 
-testing-koin = { module = "io.insert-koin:koin-test", version.ref = "koin_version" }
-testing-koin_junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin_version" }
 testing-live_data = "com.jraska.livedata:testing-ktx:1.2.0"
 testing-fragment_testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragment_version" }
 testing-navigation_testing = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
