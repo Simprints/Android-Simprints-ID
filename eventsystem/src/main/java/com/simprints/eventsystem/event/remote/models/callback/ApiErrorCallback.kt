@@ -1,7 +1,6 @@
 package com.simprints.eventsystem.event.remote.models.callback
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
 import com.simprints.eventsystem.event.remote.models.callback.ApiErrorCallback.ApiReason
