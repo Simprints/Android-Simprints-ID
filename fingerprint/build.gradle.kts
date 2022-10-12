@@ -110,7 +110,6 @@ dependencies {
     // DI
     implementation(libs.hilt)
     implementation(libs.hilt.work)
-    implementation("com.google.ar:core:1.30.0")
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 
