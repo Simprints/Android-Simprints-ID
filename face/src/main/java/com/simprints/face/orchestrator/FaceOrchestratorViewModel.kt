@@ -18,8 +18,11 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class FaceOrchestratorViewModel : ViewModel() {
+@HiltViewModel
+class FaceOrchestratorViewModel @Inject constructor() : ViewModel() {
     val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> =
         MutableLiveData()
     val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> =
@@ -32,8 +35,7 @@ class FaceOrchestratorViewModel : ViewModel() {
     val errorEvent: MutableLiveData<LiveDataEventWithContent<ErrorType>> = MutableLiveData()
 
     fun start(iFaceRequest: IFaceRequest) {
-        val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
-        when (request) {
+        when (val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)) {
             is FaceConfigurationRequest -> startConfiguration.send(request)
             is FaceCaptureRequest -> startCapture.send(request)
             is FaceMatchRequest -> startMatching.send(request)
@@ -74,7 +76,11 @@ class FaceOrchestratorViewModel : ViewModel() {
         errorEvent.send(ErrorType.LICENSE_INVALID)
     }
 
-    fun configurationFinished(isSuccess: Boolean, errorCode: String? = null, estimatedOutage: Long? = null) {
+    fun configurationFinished(
+        isSuccess: Boolean,
+        errorCode: String? = null,
+        estimatedOutage: Long? = null
+    ) {
         if (isSuccess) {
             flowFinished.send(
                 DomainToFaceResponse.fromDomainToFaceResponse(

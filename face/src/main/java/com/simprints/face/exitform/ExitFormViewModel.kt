@@ -12,11 +12,14 @@ import com.simprints.face.controllers.core.events.model.RefusalEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ExitFormViewModel(
+@HiltViewModel
+class ExitFormViewModel @Inject constructor(
     private val mainVM: FaceCaptureViewModel,
     private val faceSessionEventsManager: FaceSessionEventsManager,
-   private val timeHelper: FaceTimeHelper
+    private val timeHelper: FaceTimeHelper
 ) : ViewModel() {
     var reason: RefusalAnswer? = null
     var exitFormStartTime: Long = 0
@@ -82,14 +85,14 @@ class ExitFormViewModel(
     }
 
     private fun logExitFormEvent(reason: RefusalAnswer, exitFormText: String) {
-            faceSessionEventsManager.addEventInBackground(
-                RefusalEvent(
-                    startTime = exitFormStartTime,
-                    endTime = timeHelper.now(),
-                    reason = reason,
-                    otherText = exitFormText
-                )
+        faceSessionEventsManager.addEventInBackground(
+            RefusalEvent(
+                startTime = exitFormStartTime,
+                endTime = timeHelper.now(),
+                reason = reason,
+                otherText = exitFormText
             )
+        )
     }
 
     fun handleBackButton() {

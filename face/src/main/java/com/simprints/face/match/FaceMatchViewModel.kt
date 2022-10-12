@@ -22,18 +22,22 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.match.rankone.RankOneFaceMatcher
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.io.Serializable
+import javax.inject.Inject
 
-class FaceMatchViewModel(
+@HiltViewModel
+class FaceMatchViewModel @Inject constructor(
     private val masterFlowManager: MasterFlowManager,
     private val faceDbManager: FaceDbManager,
     private val faceMatcher: FaceMatcher,
     private val faceSessionEventsManager: FaceSessionEventsManager,
-    private val faceTimeHelper: FaceTimeHelper) : ViewModel() {
+    private val faceTimeHelper: FaceTimeHelper
+) : ViewModel() {
     companion object {
         const val returnCount = 10
         const val veryGoodMatchThreshold = 50.0
