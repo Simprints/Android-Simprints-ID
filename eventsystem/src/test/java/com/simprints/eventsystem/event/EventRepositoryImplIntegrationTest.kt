@@ -72,12 +72,12 @@ class EventRepositoryImplIntegrationTest {
         eventRepo = EventRepositoryImpl(
             "",
             "",
+            "",
             loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
-            "",
             sessionDataCache,
             mockk()
         )

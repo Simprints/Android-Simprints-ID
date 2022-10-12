@@ -88,12 +88,12 @@ class EventRepositoryImplTest {
         eventRepo = EventRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
+            LIB_VERSION_NAME,
             loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
-            LIB_VERSION_NAME,
             sessionDataCache,
             configManager,
         )
