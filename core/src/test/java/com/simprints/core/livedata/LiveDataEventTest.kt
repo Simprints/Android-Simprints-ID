@@ -3,18 +3,18 @@ package com.simprints.core.livedata
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-internal class LiveDataEventTest {
+class LiveDataEventTest {
 
     @Test
     fun liveDataShouldGetIfNotHandled() {
-        var x = LiveDataEvent()
+        val x = LiveDataEvent()
         assertThat(x.hasBeenHandled).isFalse()
         assertThat(x == x.getIfNotHandled()).isTrue()
     }
 
     @Test
     fun liveDataShouldNotGetIfAlreadyHandled() {
-        var x = LiveDataEvent()
+        val x = LiveDataEvent()
         x.getIfNotHandled()
         assertThat(x.hasBeenHandled).isTrue()
         assertThat(null == x.getIfNotHandled()).isTrue()
@@ -22,7 +22,7 @@ internal class LiveDataEventTest {
 
     @Test
     fun liveDataShouldConsistentlyNotGetIfAlreadyHandled() {
-        var x = LiveDataEvent()
+        val x = LiveDataEvent()
         x.getIfNotHandled()
 
         assertThat(x.hasBeenHandled).isTrue()
