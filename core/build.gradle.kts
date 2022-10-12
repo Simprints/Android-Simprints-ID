@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("kotlin-parcelize")
+    kotlin("kapt")
 }
 
 apply {
@@ -31,7 +32,6 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":moduleapi"))
-    api(project(":infranetwork"))
     implementation(project(":infralogging"))
 
     api(libs.androidX.appcompat)
@@ -44,6 +44,12 @@ dependencies {
     implementation(libs.jackson.core)
 
     implementation(libs.playcore.core)
+
+    implementation(libs.kronos.kronos)
+
+    // Hilt
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.junit)
