@@ -1,4 +1,4 @@
-package com.simprints.uicomponents.imageTools
+package com.simprints.face.imageTools
 
 import android.graphics.Rect
 import com.simprints.face.models.Size

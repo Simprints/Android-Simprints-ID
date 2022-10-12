@@ -10,11 +10,14 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseVendor
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ConfigurationViewModel(
+@HiltViewModel
+class ConfigurationViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {

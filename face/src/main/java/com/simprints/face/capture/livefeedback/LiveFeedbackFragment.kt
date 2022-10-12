@@ -5,6 +5,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.frame.Frame
 import com.otaliastudios.cameraview.frame.FrameProcessor
@@ -16,9 +17,7 @@ import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.Size
 import com.simprints.infra.logging.Simber
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * This is the class presented as the user is capturing theface, they are presented with this fragment, which displays
@@ -26,9 +25,10 @@ import org.koin.core.parameter.parametersOf
  * It also displays the capture process of the face and then sends this result to
  * [com.simprints.face.capture.confirmation.ConfirmationFragment]
  */
-class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProcessor {
-    private val mainVm: FaceCaptureViewModel by sharedViewModel()
-    private val vm: LiveFeedbackFragmentViewModel by viewModel { parametersOf(mainVm) }
+@AndroidEntryPoint
+class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FrameProcessor {
+    private val mainVm: FaceCaptureViewModel by viewModels()
+    private val vm: LiveFeedbackFragmentViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
 
@@ -51,12 +51,13 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
     }
 
     private fun bindViewModel() {
-        vm.currentDetection.observe(viewLifecycleOwner, {
+        vm.currentDetection.observe(viewLifecycleOwner) {
             renderCurrentDetection(it)
 //            renderDebugInfo(it.face)
-        })
+        }
 
-        vm.capturingState.observe(viewLifecycleOwner, {
+        vm.capturingState.observe(viewLifecycleOwner) {
+            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
             when (it) {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
                     renderCapturingNotStarted()
@@ -65,7 +66,7 @@ class LiveFeedbackFragment: Fragment(R.layout.fragment_live_feedback), FrameProc
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED ->
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
             }
-        })
+        }
     }
 
     /**

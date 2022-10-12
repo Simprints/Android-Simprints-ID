@@ -16,9 +16,12 @@ import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.*
 import com.simprints.infra.config.ConfigManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
+@HiltViewModel
 class LiveFeedbackFragmentViewModel(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
@@ -28,6 +31,25 @@ class LiveFeedbackFragmentViewModel(
     private val faceTimeHelper: FaceTimeHelper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
+
+    @Inject
+    constructor(
+        mainVM: FaceCaptureViewModel,
+        faceDetector: FaceDetector,
+        frameProcessor: FrameProcessor,
+        configManager: ConfigManager,
+        faceSessionEventsManager: FaceSessionEventsManager,
+        faceTimeHelper: FaceTimeHelper,
+    ) : this(
+        mainVM,
+        faceDetector,
+        frameProcessor,
+        configManager,
+        faceSessionEventsManager,
+        faceTimeHelper,
+        Dispatchers.IO
+    )
+
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),

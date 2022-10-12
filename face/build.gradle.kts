@@ -4,8 +4,10 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("kotlin-parcelize")
+    kotlin("kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("org.sonarqube")
+    id("dagger.hilt.android.plugin")
 }
 
 apply {
@@ -32,7 +34,7 @@ android {
     ndkVersion =   gradleLocalProperties(rootDir).getProperty("ndk.Version")
         ?: System.getenv("ndk.Version")
     defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.simprints.face.CustomTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
@@ -78,12 +80,14 @@ dependencies {
 
     implementation(libs.playcore.core.ktx)
 
+    // DI
+    implementation(libs.hilt)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.kapt)
+    kapt(libs.hilt.compiler)
+
     // Fragment
     implementation(libs.androidX.ui.fragment)
-
-    // Koin
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
 
     // Android X
     implementation(libs.androidX.ui.constraintlayout)
@@ -109,9 +113,6 @@ dependencies {
     androidTestImplementation(libs.testing.androidX.uiAutomator)
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
-
-    // Koin
-    androidTestImplementation(libs.testing.koin)
 
     // ######################################################
     //                      Unit test
@@ -139,6 +140,17 @@ dependencies {
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.robolectric.core)
+
+    // ######################################################
+    //                      Android test
+    // ######################################################
+
+    //Hilt
+    androidTestImplementation(libs.hilt.testing)
+    kaptAndroidTest(libs.hilt)
+
+    // Roboelectic
+    androidTestImplementation(libs.testing.robolectric.core)
 }
 
 configurations {
