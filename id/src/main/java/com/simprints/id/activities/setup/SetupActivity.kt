@@ -14,7 +14,7 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION
-import com.simprints.clientapi.InternalConstants
+import com.simprints.clientapi.Constants
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.requestPermissionsIfRequired
@@ -234,7 +234,7 @@ class SetupActivity : BaseSplitActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             MODALITIES_DOWNLOAD_REQUEST_CODE -> handleModalityDownloadResult(resultCode)
-            InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
+            Constants.RequestIntents.ALERT_ACTIVITY_REQUEST -> handleAlertResponse(data)
         }
     }
 
