@@ -3,8 +3,9 @@ package com.simprints.eventsystem
 import com.simprints.core.CoreApplication
 import com.simprints.eventsystem.event.domain.models.Event
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
-class EventSystemApplication: CoreApplication() {
+class EventSystemApplication @Inject constructor(): CoreApplication() {
 
     // If multiple threads access a linked hash map concurrently,
     // and at least one of the threads modifies the map structurally,

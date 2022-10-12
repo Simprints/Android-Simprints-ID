@@ -5,12 +5,10 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
+import javax.inject.Inject
 
-interface EventDatabaseFactory {
-    fun build(): EventRoomDatabase
-}
 
-class DbEventDatabaseFactoryImpl(
+class DbEventDatabaseFactoryImpl @Inject constructor(
     val ctx: Context,
     private val secureLocalDbKeyProvider: SecurityManager
 ) : EventDatabaseFactory {
