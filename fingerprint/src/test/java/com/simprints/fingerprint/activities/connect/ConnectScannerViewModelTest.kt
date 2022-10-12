@@ -20,7 +20,6 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
@@ -39,12 +38,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.test.KoinTest
 
-class ConnectScannerViewModelTest : KoinTest {
-
-    @get:Rule
-    var unitTestConfigRule = FullUnitTestConfigRule()
+class ConnectScannerViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

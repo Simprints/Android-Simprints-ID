@@ -1,26 +1,22 @@
 package com.simprints.fingerprint.activities.refusal
 
 import android.annotation.SuppressLint
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.OTHER
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_DATA_CONCERNS
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_NOT_PRESENT
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_PERMISSION
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_RELIGION
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED_YOUNG
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.SCANNER_NOT_WORKING
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.runBlocking
 
-class RefusalPresenter(
-    private val view: RefusalContract.View,
+class RefusalPresenter @AssistedInject constructor(
+    @Assisted private val view: RefusalContract.View,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper
 ) : RefusalContract.Presenter {
@@ -94,11 +90,14 @@ class RefusalPresenter(
     private fun addRefusalEventInSession(refusalReason: RefusalFormReason, refusalText: String) {
         runBlocking {
             try {
-                sessionEventsManager.addEvent(RefusalEvent(
-                    refusalStartTime,
-                    timeHelper.now(),
-                    RefusalAnswer.fromRefusalFormReason(refusalReason),
-                    refusalText))
+                sessionEventsManager.addEvent(
+                    RefusalEvent(
+                        refusalStartTime,
+                        timeHelper.now(),
+                        RefusalAnswer.fromRefusalFormReason(refusalReason),
+                        refusalText
+                    )
+                )
             } catch (t: Throwable) {
                 Simber.e(t)
             }
@@ -111,7 +110,9 @@ class RefusalPresenter(
             ResultCode.REFUSED.value,
             RefusalTaskResult(
                 RefusalTaskResult.Action.SUBMIT,
-                RefusalTaskResult.Answer(reason, refusalText)))
+                RefusalTaskResult.Answer(reason, refusalText)
+            )
+        )
     }
 
     private fun logAsMalfunctionInCrashReportIfAppNotWorking(refusalText: String) {
@@ -122,9 +123,12 @@ class RefusalPresenter(
 
     override fun handleScanFingerprintsClick() {
         logMessageForCrashReport("Scan fingerprints button clicked")
-        view.setResultAndFinish(ResultCode.OK.value,
+        view.setResultAndFinish(
+            ResultCode.OK.value,
             RefusalTaskResult(
-                RefusalTaskResult.Action.SCAN_FINGERPRINTS, RefusalTaskResult.Answer()))
+                RefusalTaskResult.Action.SCAN_FINGERPRINTS, RefusalTaskResult.Answer()
+            )
+        )
     }
 
     override fun handleLayoutChange() {

@@ -1,20 +1,25 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
+import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import com.simprints.core.tools.exceptions.ignoreException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
-class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepository,
-                                          private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+class FingerprintSessionEventsManagerImpl(
+    private val eventRepository: EventRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) :
     FingerprintSessionEventsManager {
+
+    @Inject
+    constructor(eventRepository: EventRepository) : this(eventRepository, Dispatchers.IO)
 
     override fun addEventInBackground(event: Event) {
         inBackground(dispatcher) {
@@ -36,8 +41,12 @@ class FingerprintSessionEventsManagerImpl(private val eventRepository: EventRepo
         runBlocking {
             ignoreException {
                 val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-                val scannerConnectivityEvents = eventRepository.getEventsFromSession(currentSession.id).filterIsInstance<ScannerConnectionEvent>()
-                scannerConnectivityEvents.collect { it.scannerInfo.hardwareVersion = hardwareVersion }
+                val scannerConnectivityEvents =
+                    eventRepository.getEventsFromSession(currentSession.id)
+                        .filterIsInstance<ScannerConnectionEvent>()
+                scannerConnectivityEvents.collect {
+                    it.scannerInfo.hardwareVersion = hardwareVersion
+                }
             }
         }
     }

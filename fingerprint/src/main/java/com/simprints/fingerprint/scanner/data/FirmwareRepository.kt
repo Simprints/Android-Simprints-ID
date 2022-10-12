@@ -6,9 +6,10 @@ import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 
 
-class FirmwareRepository(
+class FirmwareRepository @Inject constructor(
     private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val configManager: ConfigManager

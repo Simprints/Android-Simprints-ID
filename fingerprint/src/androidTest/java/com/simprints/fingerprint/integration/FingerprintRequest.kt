@@ -2,6 +2,7 @@ package com.simprints.fingerprint.integration
 
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
@@ -18,7 +19,7 @@ fun createFingerprintCaptureRequestIntent(
 ): Intent = Intent()
     .setClassName(
         InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
-        "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
+        OrchestratorActivity::class.qualifiedName!!
     )
     .putExtra(
         IFingerprintRequest.BUNDLE_KEY,

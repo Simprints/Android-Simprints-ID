@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -28,25 +29,31 @@ import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NfcPairFragment : FingerprintFragment() {
 
-    private val viewModel: NfcPairViewModel by viewModel()
-    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    private val viewModel: NfcPairViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
     private val binding by viewBinding(FragmentNfcPairBinding::bind)
 
-    private val nfcManager: NfcManager by inject()
-    private val scannerPairingManager: ScannerPairingManager by inject()
-    private val serialNumberConverter: SerialNumberConverter by inject()
-    private val sessionManager: FingerprintSessionEventsManager by inject()
-    private val recentUserActivityManager: RecentUserActivityManager by inject()
-    private val timeHelper: FingerprintTimeHelper by inject()
+    @Inject
+    lateinit var nfcManager: NfcManager
+    @Inject
+    lateinit var scannerPairingManager: ScannerPairingManager
+    @Inject
+    lateinit var serialNumberConverter: SerialNumberConverter
+    @Inject
+    lateinit var sessionManager: FingerprintSessionEventsManager
+    @Inject
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+    @Inject
+    lateinit var timeHelper: FingerprintTimeHelper
 
     private val bluetoothPairStateChangeReceiver =
         scannerPairingManager.bluetoothPairStateChangeReceiver(

@@ -6,8 +6,9 @@ import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
+import javax.inject.Inject
 
-class FingerprintFileDownloader(
+class FingerprintFileDownloader @Inject constructor(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
     private val loginManager: LoginManager,
     private val dispatcherProvider: DispatcherProvider

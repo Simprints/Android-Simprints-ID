@@ -2,17 +2,19 @@ package com.simprints.fingerprint.activities.orchestrator
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class OrchestratorActivity : FingerprintActivity() {
 
-    private val viewModel: OrchestratorViewModel by viewModel()
+    private val viewModel: OrchestratorViewModel by viewModels()
 
     private val nextActivityCallObserver = Observer<OrchestratorViewModel.ActivityCall> {
         startActivityForResult(it.createIntent(this), it.requestCode)
@@ -26,9 +28,11 @@ class OrchestratorActivity : FingerprintActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
-            ?: throw InvalidRequestForFingerprintException("No IFingerprintRequest found for OrchestratorActivity")
-        val fingerprintRequest = FingerprintToDomainRequest.fromFingerprintToDomainRequest(iFingerprintRequest)
+        val iFingerprintRequest: IFingerprintRequest =
+            this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
+                ?: throw InvalidRequestForFingerprintException("No IFingerprintRequest found for OrchestratorActivity")
+        val fingerprintRequest =
+            FingerprintToDomainRequest.fromFingerprintToDomainRequest(iFingerprintRequest)
 
         viewModel.start(fingerprintRequest)
     }

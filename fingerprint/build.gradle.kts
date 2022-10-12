@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
+    id("dagger.hilt.android.plugin")
 }
 
 apply {
@@ -22,7 +23,7 @@ configurations {
 }
 android {
     defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.simprints.fingerprint.CustomTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
@@ -106,9 +107,12 @@ dependencies {
     // Splitties
     implementation(libs.splitties.core)
 
-    // Koin
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
+    // DI
+    implementation(libs.hilt)
+    implementation(libs.hilt.work)
+    implementation("com.google.ar:core:1.30.0")
+    kapt(libs.hilt.kapt)
+    kapt(libs.hilt.compiler)
 
     // ######################################################
     //                      Unit test
@@ -134,10 +138,8 @@ dependencies {
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
 
-    // Koin
-    testImplementation(libs.testing.koin)
-    testImplementation(libs.testing.live.data)
 
+    testImplementation(libs.testing.live.data)
 
     // Robolectric
     testImplementation(libs.testing.robolectric.core)
@@ -152,9 +154,6 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
         exclude("io.mockk")
     }
-
-    // Koin
-    androidTestImplementation(libs.testing.koin)
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
@@ -173,9 +172,15 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
 
+    //Hilt
+    androidTestImplementation(libs.hilt.testing)
+    kaptAndroidTest(libs.hilt)
 
     // Truth
     androidTestImplementation(libs.testing.truth)
+
+    // Robolectric
+    androidTestImplementation(libs.testing.robolectric.core)
 }
 
 configurations {

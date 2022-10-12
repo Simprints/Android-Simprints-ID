@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
@@ -19,11 +20,12 @@ import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBa
 import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.databinding.FragmentFingerBinding
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FingerFragment : FingerprintFragment() {
 
-    private val vm: CollectFingerprintsViewModel by sharedViewModel()
+    private val vm: CollectFingerprintsViewModel by viewModels()
     private val binding by viewBinding(FragmentFingerBinding::bind)
 
     private lateinit var fingerId: FingerIdentifier
