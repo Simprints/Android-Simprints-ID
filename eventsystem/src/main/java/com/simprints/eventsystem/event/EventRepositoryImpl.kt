@@ -28,6 +28,8 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
@@ -37,15 +39,15 @@ import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.*
 
-open class EventRepositoryImpl(
-    private val deviceId: String,
-    private val appVersionName: String,
+open class EventRepositoryImpl @AssistedInject constructor(
+    @Assisted("deviceId") private val deviceId: String,
+    @Assisted("appVersionName") private val appVersionName: String,
+    @Assisted("libSimprintsVersionName") override val libSimprintsVersionName: String,
     private val loginManager: LoginManager,
     private val eventLocalDataSource: EventLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
-    override val libSimprintsVersionName: String,
     private val sessionDataCache: SessionDataCache,
     private val configManager: ConfigManager
 ) : EventRepository {
