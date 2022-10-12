@@ -14,21 +14,8 @@ class RankOneInitializer : SdkInitializer {
      * @return true if initializing was successful, false otherwise
      */
     override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
-//        try {
-//            loadNdkLibraries(activity)
-//        } catch (t: Throwable) {
-//            Simber.e(t)
-//            return false
-//        }
         roc.roc_preinitialize_android(activity)
         val initResult = roc.roc_embedded_initialize(license)
         return initResult == roc_embedded_error.ROC_SUCCESS
     }
-
-//    private fun loadNdkLibraries(ctx: Context) {
-//        SplitInstallHelper.loadLibrary(ctx, "yuv")
-//        SplitInstallHelper.loadLibrary(ctx, "yuvjni")
-//        SplitInstallHelper.loadLibrary(ctx, "roc_embedded")
-//        SplitInstallHelper.loadLibrary(ctx, "_roc_embedded")
-//    }
 }
