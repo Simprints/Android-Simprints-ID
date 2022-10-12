@@ -12,8 +12,6 @@ import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.local.SessionDataCache
-import com.simprints.eventsystem.event.local.SessionDataCacheImpl
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.Application
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
@@ -63,10 +61,6 @@ open class AppModule {
     @Provides
     @Singleton
     fun provideContext(app: Application): Context = app
-
-    @Provides
-    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
-        SessionDataCacheImpl(app)
 
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()

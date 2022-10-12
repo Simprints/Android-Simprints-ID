@@ -4,6 +4,7 @@ import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.EventSystemModule
+import com.simprints.eventsystem.EventSystemProvider
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
@@ -94,7 +95,8 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         EnrolmentRecordsModule::class,
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
-        EventSystemModule::class
+        EventSystemModule::class,
+        EventSystemProvider::class
     ]
 )
 @Singleton
