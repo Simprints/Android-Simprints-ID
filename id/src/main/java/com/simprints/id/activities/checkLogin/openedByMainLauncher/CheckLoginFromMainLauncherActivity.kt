@@ -11,6 +11,7 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.infra.resources.R as IDR
 import kotlinx.coroutines.launch
 
 // App launched when user open SimprintsID using the Home button
@@ -22,7 +23,7 @@ open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginF
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
         setContentView(R.layout.splash_screen)
-        title = getString(R.string.title_activity_front)
+        title = getString(IDR.string.title_activity_front)
 
         val component = (application as Application).component
         component.inject(this)

@@ -11,7 +11,6 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity
@@ -24,6 +23,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
+import com.simprints.infra.resources.R as IDR
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
@@ -43,7 +43,7 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
 
         val component = (application as Application).component
         component.inject(this)
-        title = getString(R.string.title_activity_front)
+        title = getString(IDR.string.title_activity_front)
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         lifecycleScope.launchWhenCreated {
