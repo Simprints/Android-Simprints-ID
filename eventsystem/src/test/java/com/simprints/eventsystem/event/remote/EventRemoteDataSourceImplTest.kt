@@ -43,10 +43,10 @@ class EventRemoteDataSourceImplTest {
     lateinit var loginManager: LoginManager
 
     @MockK
-    lateinit var simApiClient: SimNetwork.SimApiClient<EventRemoteInterface>
+    private lateinit var simApiClient: SimNetwork.SimApiClient<EventRemoteInterface>
 
     @MockK
-    lateinit var eventRemoteInterface: EventRemoteInterface
+    private lateinit var eventRemoteInterface: EventRemoteInterface
 
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private val query = ApiRemoteEventQuery(
