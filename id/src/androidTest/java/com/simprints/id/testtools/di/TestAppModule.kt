@@ -17,7 +17,6 @@ class TestAppModule(
     app: Application,
     private val eventRepositoryRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-    private val simNetworkUtilsRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val locationManagerRule: DependencyRule = RealRule,
     private val cameraHelperRule: DependencyRule = RealRule,

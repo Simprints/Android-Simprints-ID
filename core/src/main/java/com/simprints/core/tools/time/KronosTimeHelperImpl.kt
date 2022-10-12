@@ -1,8 +1,7 @@
-package com.simprints.id.tools.time
+package com.simprints.core.tools.time
 
 import android.text.format.DateUtils.*
 import com.lyft.kronos.KronosClock
-import com.simprints.core.tools.time.TimeHelper
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit

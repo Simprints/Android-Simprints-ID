@@ -2,7 +2,19 @@ package com.simprints.id.testtools.di
 
 import android.content.Context
 import android.content.SharedPreferences
+<<<<<<<
 import com.simprints.core.tools.utils.SimNetworkUtils
+=======
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.EventSystemApplication
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
+import com.simprints.eventsystem.event.local.EventDatabaseFactory
+import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.event.local.SessionDataCache
+import com.simprints.eventsystem.event.local.SessionDataCacheImpl
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+>>>>>>>
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.di.AppModule
@@ -19,7 +31,6 @@ class TestAppModule(
     val app: Application,
     private val eventRepositoryRule: DependencyRule = RealRule,
     private val sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-    private val simNetworkUtilsRule: DependencyRule = RealRule,
     private val deviceManagerRule: DependencyRule = RealRule,
     private val locationManagerRule: DependencyRule = RealRule,
     private val cameraHelperRule: DependencyRule = RealRule,
@@ -40,9 +51,21 @@ class TestAppModule(
         }
     }
 
+<<<<<<<
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
+=======
+    override fun provideSessionEventsLocalDbManager(
+        factory: EventDatabaseFactory
+    ): EventLocalDataSource =
+        sessionEventsLocalDbManagerRule.resolveDependency {
+            super.provideSessionEventsLocalDbManager(
+                factory
+            )
+        }
+
+>>>>>>>
     override fun provideLocationManager(ctx: Context): LocationManager =
         locationManagerRule.resolveDependency {
             super.provideLocationManager(ctx)

@@ -4,8 +4,9 @@ import com.simprints.fingerprintmatcher.algorithms.simafis.SimAfisMatcher
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity
 import com.simprints.fingerprintmatcher.domain.MatchResult
 import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
+import javax.inject.Inject
 
-internal class FingerprintMatcherImpl(
+internal class FingerprintMatcherImpl @Inject constructor(
     private val simAfisMatcher: SimAfisMatcher
 ) : FingerprintMatcher {
 
@@ -16,7 +17,7 @@ internal class FingerprintMatcherImpl(
         crossFingerComparison: Boolean
     ): List<MatchResult> =
         when (matchingAlgorithm) {
-            MatchingAlgorithm.SIM_AFIS -> simAfisMatch(probe, candidates,crossFingerComparison)
+            MatchingAlgorithm.SIM_AFIS -> simAfisMatch(probe, candidates, crossFingerComparison)
         }
 
     private fun simAfisMatch(
@@ -24,6 +25,6 @@ internal class FingerprintMatcherImpl(
         candidates: List<FingerprintIdentity>,
         crossFingerComparison: Boolean
     ): List<MatchResult> {
-        return simAfisMatcher.match(probe, candidates,crossFingerComparison)
+        return simAfisMatcher.match(probe, candidates, crossFingerComparison)
     }
 }

@@ -6,7 +6,6 @@ import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
 import com.simprints.id.orchestrator.steps.core.requests.*
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 
 class CoreStepProcessorImpl : CoreStepProcessor {
 
@@ -14,30 +13,14 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         const val CONSENT_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
         const val FETCH_GUID_ACTIVITY_NAME =
             "com.simprints.id.activities.fetchguid.FetchGuidActivity"
-        const val SETUP_ACTIVITY_NAME = "com.simprints.id.activities.setup.SetupActivity"
         const val GUID_SELECTION_ACTIVITY_NAME =
             "com.simprints.id.activities.guidselection.GuidSelectionActivity"
         const val LAST_BIOMETRICS_CORE_ACTIVITY_NAME =
             "com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity"
     }
 
-    override fun buildStepSetup(
-        modalities: List<Modality>,
-        permissions: List<SetupPermission>
-    ): Step = buildSetupStep(modalities, permissions)
-
     override fun buildStepConsent(consentType: ConsentType) =
         buildConsentStep(consentType)
-
-
-    private fun buildSetupStep(modalities: List<Modality>, permissions: List<SetupPermission>) =
-        Step(
-            requestCode = SETUP.value,
-            activityName = SETUP_ACTIVITY_NAME,
-            bundleKey = CORE_STEP_BUNDLE,
-            request = SetupRequest(modalities, permissions),
-            status = Step.Status.NOT_STARTED
-        )
 
     private fun buildConsentStep(consentType: ConsentType) = Step(
         requestCode = CONSENT.value,

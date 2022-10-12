@@ -113,36 +113,6 @@ class AlertActivityTest {
     }
 
     @Test
-    fun fingerprintModalityDownloadCancelled_theRightAlertShouldAppear() {
-        every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
-        launchAlertActivity(AlertActRequest(AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED))
-        ensureAlertScreenLaunched(
-            AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED,
-            "fingerprint feature"
-        )
-    }
-
-    @Test
-    fun faceModalityDownloadCancelled_theRightAlertShouldAppear() {
-        every { generalConfiguration.modalities } returns listOf(Modality.FACE)
-        launchAlertActivity(AlertActRequest(AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED))
-        ensureAlertScreenLaunched(
-            AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED,
-            "face feature"
-        )
-    }
-
-    @Test
-    fun bothModalitiesModalityDownloadCancelled_theRightAlertShouldAppear() {
-        every { generalConfiguration.modalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
-        launchAlertActivity(AlertActRequest(AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED))
-        ensureAlertScreenLaunched(
-            AlertActivityViewModel.MODALITY_DOWNLOAD_CANCELLED,
-            "fingerprint and face features"
-        )
-    }
-
-    @Test
     fun fingerprintEnrolLastBiometricsFailed_theRightAlertShouldAppear() {
         every { generalConfiguration.modalities } returns listOf(Modality.FINGERPRINT)
         launchAlertActivity(AlertActRequest(AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED))
