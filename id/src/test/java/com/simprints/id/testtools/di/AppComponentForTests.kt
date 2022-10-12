@@ -1,5 +1,7 @@
 package com.simprints.id.testtools.di
 
+import com.simprints.eventsystem.EventSystemModule
+import com.simprints.eventsystem.EventSystemProvider
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
@@ -52,6 +54,8 @@ import javax.inject.Singleton
         EnrolmentRecordsModule::class,
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
+        EventSystemProvider::class,
+        EventSystemModule::class
     ]
 )
 interface AppComponentForTests : AppComponent {
