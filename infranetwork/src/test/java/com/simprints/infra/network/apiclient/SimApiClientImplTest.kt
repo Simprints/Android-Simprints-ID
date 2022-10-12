@@ -3,10 +3,7 @@ package com.simprints.infra.network.apiclient
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.FakeRetrofitInterface
-import com.simprints.infra.network.exceptions.ApiError
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.network.exceptions.NetworkConnectionException
-import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.network.exceptions.*
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -60,7 +57,6 @@ class SimApiClientImplTest {
             response.setBody(backendMaintenanceErrorBody)
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
-
 
             val exception = assertThrows<BackendMaintenanceException> {
                 simApiClientImpl.executeCall { it.get() }
@@ -133,6 +129,24 @@ class SimApiClientImplTest {
             val response = MockResponse()
             response.setResponseCode(503)
             response.setBody(jacksonObjectMapper().writeValueAsString(ApiError("001")))
+            mockWebServer.enqueue(response)
+            mockWebServer.enqueue(response)
+
+            val exception = assertThrows<SyncCloudIntegrationException> {
+                simApiClientImpl.executeCall { it.get() }
+            }
+            assertThat(exception.cause).isInstanceOf(HttpException::class.java)
+            assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNotNull()
+            assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNotNull()
+        }
+
+    @Test
+    fun `should throw a sync cloud integration exception when the response code is 503 with empty body and retry`() =
+        runTest(
+            StandardTestDispatcher()
+        ) {
+            val response = MockResponse()
+            response.setResponseCode(503)
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
