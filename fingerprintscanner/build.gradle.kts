@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    kotlin("kapt")
 }
 
 apply {
@@ -33,7 +34,9 @@ dependencies {
     implementation(libs.kotlin.coroutine.rx2.adapter)
     implementation(project(":infralogging"))
 
-    // Logging
+    // Hilt
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     // RxJava
     api(libs.rxJava2.core)
