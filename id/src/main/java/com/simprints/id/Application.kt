@@ -14,14 +14,6 @@ import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.core.module.Module
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 
 @HiltAndroidApp
 open class Application : CoreApplication() {
@@ -81,7 +73,6 @@ open class Application : CoreApplication() {
         createComponent()
         handleUndeliverableExceptionInRxJava()
         createApplicationCoroutineScope()
-        initKoin()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceId)
     }
@@ -102,43 +93,5 @@ open class Application : CoreApplication() {
             Simber.d("Undeliverable exception received", exceptionToPrint)
             exceptionToPrint.printStackTrace()
         }
-    }
-
-    private fun initKoin() {
-        startKoin {
-            androidLogger()
-            androidContext(this@Application)
-            loadKoinModules(listOf(module {
-                this.defineBuildersForCoreManagers()
-                single(qualifier = named(APPLICATION_COROUTINE_SCOPE)) {
-                    applicationScope
-                }
-            }))
-        }
-    }
-
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { component.getPreferencesManager() }
-        factory { component.getSessionEventsManager() }
-        factory { component.getTimeHelper() }
-        factory { component.getImprovedSharedPreferences() }
-        factory { orchestratorComponent.getFlowManager() }
-        factory { component.getEnrolmentRecordManager() }
-        factory { component.getImageRepository() }
-        factory { component.getLoginManager() }
-        factory { component.getConfigManager() }
-        factory { component.getLicenseRepository() }
-        factory { component.getIdPreferencesManager() }
-        factory { component.getSecurityManager() }
-        factory { component.getRecentUserActivityManager() }
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        stopKoin()
-    }
-
-    companion object {
-        const val APPLICATION_COROUTINE_SCOPE = "application_coroutine_scope"
     }
 }
