@@ -6,11 +6,12 @@ import com.simprints.fingerprint.BuildConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Schedules the [FirmwareFileUpdateWorker] as necessary.
  */
-class FirmwareFileUpdateScheduler(
+class FirmwareFileUpdateScheduler @Inject constructor(
     private val context: Context,
     private val configManager: ConfigManager
 ) {

@@ -9,9 +9,9 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.infra.resources.R as CR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -22,35 +22,52 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.databinding.FragmentBluetoothOffBinding
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import com.simprints.infra.resources.R as CR
 
+@AndroidEntryPoint
 class BluetoothOffFragment : FingerprintFragment() {
 
-    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
-    private val bluetoothAdapter: ComponentBluetoothAdapter by inject()
-    private val sessionManager: FingerprintSessionEventsManager by inject()
-    private val timeHelper: FingerprintTimeHelper by inject()
+    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    @Inject
+    lateinit var bluetoothAdapter: ComponentBluetoothAdapter
+    @Inject
+    lateinit var sessionManager: FingerprintSessionEventsManager
+    @Inject
+    lateinit var timeHelper: FingerprintTimeHelper
     private val binding by viewBinding(FragmentBluetoothOffBinding::bind)
 
     private val bluetoothOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == ComponentBluetoothAdapter.ACTION_STATE_CHANGED) {
-                when (intent.getIntExtra(ComponentBluetoothAdapter.EXTRA_STATE, ComponentBluetoothAdapter.ERROR)) {
+                when (intent.getIntExtra(
+                    ComponentBluetoothAdapter.EXTRA_STATE,
+                    ComponentBluetoothAdapter.ERROR
+                )) {
                     ComponentBluetoothAdapter.STATE_ON -> handleBluetoothEnabled()
                 }
             }
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_bluetooth_off, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
-        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.BluetoothOff))
+        sessionManager.addEventInBackground(
+            AlertScreenEventWithScannerIssue(
+                timeHelper.now(),
+                ConnectScannerIssue.BluetoothOff
+            )
+        )
 
         binding.turnOnBluetoothButton.setOnClickListener {
             if (bluetoothAdapter.isEnabled()) {
@@ -68,7 +85,10 @@ class BluetoothOffFragment : FingerprintFragment() {
 
     override fun onStart() {
         super.onStart()
-        activity?.registerReceiver(bluetoothOnReceiver, IntentFilter(ComponentBluetoothAdapter.ACTION_STATE_CHANGED))
+        activity?.registerReceiver(
+            bluetoothOnReceiver,
+            IntentFilter(ComponentBluetoothAdapter.ACTION_STATE_CHANGED)
+        )
     }
 
     override fun onStop() {
@@ -98,7 +118,12 @@ class BluetoothOffFragment : FingerprintFragment() {
             turnOnBluetoothButton.visibility = View.VISIBLE
             turnOnBluetoothButton.isEnabled = false
             turnOnBluetoothButton.text = getString(R.string.bluetooth_on)
-            turnOnBluetoothButton.setBackgroundColor(resources.getColor(CR.color.simprints_green, null))
+            turnOnBluetoothButton.setBackgroundColor(
+                resources.getColor(
+                    CR.color.simprints_green,
+                    null
+                )
+            )
         }
         Handler().postDelayed({ retryConnectAndFinishFragment() }, FINISHED_TIME_DELAY_MS)
     }

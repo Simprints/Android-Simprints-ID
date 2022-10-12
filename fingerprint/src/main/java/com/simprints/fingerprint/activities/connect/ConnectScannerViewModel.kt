@@ -33,10 +33,13 @@ import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCAN
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ConnectScannerViewModel(
+@HiltViewModel
+class ConnectScannerViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,

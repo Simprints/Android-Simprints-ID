@@ -14,12 +14,13 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
+import javax.inject.Inject
 
 /**
  * For handling the initial setup to the scanner upon connection, such as retrieving and checking
  * the firmware version and battery level, and determining whether OTA is necessary.
  */
-class ScannerInitialSetupHelper(
+class ScannerInitialSetupHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
     private val configManager: ConfigManager,

@@ -26,7 +26,7 @@ class ScannerUiHelper {
         }
 
     companion object {
-        val QUALITY = listOf<IntRange>(
+        val QUALITY = listOf(
             0 until 40,
             40 until 60,
             60 until 75,

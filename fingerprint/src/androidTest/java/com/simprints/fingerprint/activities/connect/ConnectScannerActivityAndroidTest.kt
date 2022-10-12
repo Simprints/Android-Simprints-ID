@@ -14,7 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
@@ -39,12 +38,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class ConnectScannerActivityAndroidTest : KoinTest {
+class ConnectScannerActivityAndroidTest {
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
@@ -94,12 +90,12 @@ class ConnectScannerActivityAndroidTest : KoinTest {
         connectMode = ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT
     }
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(modules = listOf(module {
-        viewModel { viewModelMock }
-        single { mockk<FingerprintSessionEventsManager>(relaxed = true) }
-        single { mockk<FingerprintTimeHelper>(relaxed = true) }
-    }))
+//    @get:Rule
+//    val koinTestRule = KoinTestRule(modules = listOf(module {
+//        viewModel { viewModelMock }
+//        single { mockk<FingerprintSessionEventsManager>(relaxed = true) }
+//        single { mockk<FingerprintTimeHelper>(relaxed = true) }
+//    }))
 
     @Before
     fun setUp() {

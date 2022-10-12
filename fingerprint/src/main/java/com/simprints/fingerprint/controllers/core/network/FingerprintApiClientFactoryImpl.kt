@@ -2,9 +2,10 @@ package com.simprints.fingerprint.controllers.core.network
 
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimRemoteInterface
+import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class FingerprintApiClientFactoryImpl(
+class FingerprintApiClientFactoryImpl @Inject constructor(
     private val loginManager: LoginManager,
 ) : FingerprintApiClientFactory {
 

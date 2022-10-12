@@ -3,7 +3,9 @@ package com.simprints.fingerprint.activities.connect.main
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.databinding.FragmentInitialConnectBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class InitialConnectFragment : ConnectFragment(R.layout.fragment_initial_connect) {
     val binding by viewBinding(FragmentInitialConnectBinding::bind)
 

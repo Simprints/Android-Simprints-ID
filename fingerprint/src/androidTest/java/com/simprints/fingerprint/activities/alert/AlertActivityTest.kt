@@ -21,7 +21,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
-import com.simprints.fingerprint.KoinTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
@@ -29,28 +28,24 @@ import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class AlertActivityTest : KoinTest {
+class AlertActivityTest {
 
     private val sessionEventManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(modules = listOf(module {
-        single { sessionEventManagerMock }
-        single { mockk<FingerprintTimeHelper>(relaxed = true) }
-    }))
+//    @get:Rule
+//    val koinTestRule = KoinTestRule(modules = listOf(module {
+//        single { sessionEventManagerMock }
+//        single { mockk<FingerprintTimeHelper>(relaxed = true) }
+//    }))
 
     @Before
     fun setUp() {
