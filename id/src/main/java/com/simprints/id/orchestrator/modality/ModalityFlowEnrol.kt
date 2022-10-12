@@ -40,7 +40,6 @@ class ModalityFlowEnrol(
 
     override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppEnrolRequest)
-        addSetupStep()
         addModalityConfigurationSteps()
         addCoreConsentStepIfRequired(ENROL)
         addModalitiesStepsList()

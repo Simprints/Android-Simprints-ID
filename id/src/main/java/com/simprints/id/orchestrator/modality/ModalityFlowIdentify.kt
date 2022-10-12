@@ -40,7 +40,6 @@ class ModalityFlowIdentify(
 
     override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppIdentifyRequest)
-        addSetupStep()
         addModalityConfigurationSteps()
         addCoreConsentStepIfRequired(ConsentType.IDENTIFY)
         addModalitiesStepsList()
