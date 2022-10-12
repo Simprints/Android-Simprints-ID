@@ -8,7 +8,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
 import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
@@ -50,10 +49,6 @@ abstract class ModalityFlowBaseImpl(
         steps.addAll(buildModalityConfigurationSteps(projectConfiguration.general.modalities))
     }
 
-    protected suspend fun addSetupStep() {
-        steps.add(buildSetupStep())
-    }
-
     protected suspend fun addModalitiesStepsList() {
         val projectConfiguration = configManager.getProjectConfiguration()
         steps.addAll(
@@ -73,23 +68,6 @@ abstract class ModalityFlowBaseImpl(
                 loginManager.signedInProjectId,
                 deviceId
             )
-        }
-    }
-
-    private suspend fun buildSetupStep(): Step {
-        val projectConfiguration = configManager.getProjectConfiguration()
-        return coreStepProcessor.buildStepSetup(
-            projectConfiguration.general.modalities,
-            getPermissions()
-        )
-    }
-
-    private suspend fun getPermissions(): List<SetupPermission> {
-        val projectConfiguration = configManager.getProjectConfiguration()
-        return if (projectConfiguration.general.collectLocation) {
-            listOf(SetupPermission.LOCATION)
-        } else {
-            emptyList()
         }
     }
 

@@ -1,7 +1,6 @@
 package com.simprints.id
 
 import android.content.Context
-import com.google.android.play.core.splitcompat.SplitCompat
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.di.*
@@ -29,7 +28,6 @@ open class Application : CoreApplication() {
         LanguageHelper.init(base)
         val ctx = LanguageHelper.getLanguageConfigurationContext(base)
         super.attachBaseContext(ctx)
-        SplitCompat.install(this)
     }
 
     open fun createComponent() {

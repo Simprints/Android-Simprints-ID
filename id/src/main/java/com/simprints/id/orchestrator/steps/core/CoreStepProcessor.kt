@@ -3,15 +3,8 @@ package com.simprints.id.orchestrator.steps.core
 import android.content.Intent
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.orchestrator.steps.core.requests.SetupPermission
-import com.simprints.infra.config.domain.models.GeneralConfiguration
 
 interface CoreStepProcessor {
-
-    fun buildStepSetup(
-        modalities: List<GeneralConfiguration.Modality>,
-        permissions: List<SetupPermission>
-    ): Step
 
     fun buildStepConsent(consentType: ConsentType): Step
 
