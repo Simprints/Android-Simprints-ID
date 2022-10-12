@@ -23,7 +23,7 @@ import kotlinx.coroutines.channels.produce
 import java.io.InputStream
 import javax.inject.Inject
 
-class EventRemoteDataSourceImpl @Inject constructor(
+internal class EventRemoteDataSourceImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val jsonHelper: JsonHelper
 ) : EventRemoteDataSource {

@@ -34,28 +34,28 @@ import kotlin.coroutines.CoroutineContext
 abstract class EventSystemModule {
 
     @Binds
-    abstract fun bindSessionDataCache(impl: SessionDataCacheImpl): SessionDataCache
+    internal abstract fun bindSessionDataCache(impl: SessionDataCacheImpl): SessionDataCache
 
     @Binds
     abstract fun bindSessionEventValidatorsFactory(impl: SessionEventValidatorsFactoryImpl): SessionEventValidatorsFactory
 
     @Binds
-    abstract fun bindEventRemoteDataSource(impl: EventRemoteDataSourceImpl): EventRemoteDataSource
+    internal abstract fun bindEventRemoteDataSource(impl: EventRemoteDataSourceImpl): EventRemoteDataSource
 
     @Binds
-    abstract fun bindEventDatabaseFactory(impl: DbEventDatabaseFactoryImpl): EventDatabaseFactory
+    internal abstract fun bindEventDatabaseFactory(impl: DbEventDatabaseFactoryImpl): EventDatabaseFactory
 
     @Binds
-    abstract fun bindEventLocalDataSource(impl: EventLocalDataSourceImpl): EventLocalDataSource
+    internal abstract fun bindEventLocalDataSource(impl: EventLocalDataSourceImpl): EventLocalDataSource
 
     @Binds
-    abstract fun bindEventUpSyncScopeRepository(impl: EventUpSyncScopeRepositoryImpl): EventUpSyncScopeRepository
+    internal abstract fun bindEventUpSyncScopeRepository(impl: EventUpSyncScopeRepositoryImpl): EventUpSyncScopeRepository
 
     @Binds
-    abstract fun bindEventDownSyncScopeRepository(impl: EventDownSyncScopeRepositoryImpl): EventDownSyncScopeRepository
+    internal abstract fun bindEventDownSyncScopeRepository(impl: EventDownSyncScopeRepositoryImpl): EventDownSyncScopeRepository
 
     @AssistedFactory
-    interface EventRepositoryFactory {
+    internal interface EventRepositoryFactory {
         fun create(
             @Assisted("deviceId") deviceId: String,
             @Assisted("appVersionName") appVersionName: String,
@@ -80,7 +80,7 @@ class EventSystemProvider {
 
     @Provides
     @Singleton
-    fun provideEventRepository(
+    internal fun provideEventRepository(
         ctx: Context,
         factory: EventSystemModule.EventRepositoryFactory
     ): EventRepository = factory.create(ctx.deviceId, ctx.packageVersionName, VERSION_NAME)

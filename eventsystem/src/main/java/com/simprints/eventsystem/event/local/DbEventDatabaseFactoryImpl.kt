@@ -8,7 +8,7 @@ import net.sqlcipher.database.SupportFactory
 import javax.inject.Inject
 
 
-class DbEventDatabaseFactoryImpl @Inject constructor(
+internal class DbEventDatabaseFactoryImpl @Inject constructor(
     val ctx: Context,
     private val secureLocalDbKeyProvider: SecurityManager
 ) : EventDatabaseFactory {
