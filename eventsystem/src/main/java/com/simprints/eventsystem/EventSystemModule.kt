@@ -1,6 +1,9 @@
 package com.simprints.eventsystem
 
 import android.content.Context
+import androidx.multidex.BuildConfig.VERSION_NAME
+import com.simprints.core.tools.extentions.deviceId
+import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.EventRepositoryImpl
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
@@ -8,12 +11,6 @@ import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsF
 import com.simprints.eventsystem.event.local.*
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
-import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.extensions.deviceId
-import com.simprints.infra.login.extensions.packageVersionName
-import com.simprints.infra.login.network.SimApiClientFactory
-import com.simprints.infra.login.network.SimApiClientFactoryImpl
-import com.simprints.infra.network.SimNetwork
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -60,7 +57,7 @@ abstract class EventSystemModule {
 
 @Module
 @InstallIn(ActivityComponent::class)
-class EventSystemDispatcherModule {
+class EventSystemProvider {
 
     @Provides
     @Singleton
@@ -72,15 +69,10 @@ class EventSystemDispatcherModule {
         provideIODispatcher() + NonCancellable
 
     @Provides
-    internal fun provideSimApiClientFactory(
+    @Singleton
+    fun provideEventRepository(
         ctx: Context,
-    ): EventRepository = EventRepositoryImpl(
-        ctx.deviceId,
-
-        VERSION_NAME,
-        ctx,
-        ctx.packageVersionName,
-        remoteDbManager
-    )
+        factory: EventSystemModule.EventRepositoryFactory
+    ): EventRepository = factory.create(ctx.deviceId, ctx.packageVersionName, VERSION_NAME)
 
 }
