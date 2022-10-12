@@ -28,7 +28,8 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
-import com.simprints.fingerprintmatcher.FingerprintMatcher
+import com.simprints.fingerprintmatcher.FingerprintMatcherModule
+import com.simprints.fingerprintmatcher.JNILibAfisModule
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Binds
@@ -39,7 +40,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import javax.inject.Singleton
 
-@Module(includes = [FingerprintDependenciesModule::class])
+@Module(
+    includes = [
+        FingerprintDependenciesModule::class,
+        FingerprintMatcherModule::class,
+        JNILibAfisModule::class,
+    ]
+)
 @InstallIn(ActivityComponent::class)
 abstract class FingerprintModule {
 
@@ -100,12 +107,4 @@ object FingerprintDispatcherModule {
     @Provides
     @Singleton
     fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
-}
-
-@Module
-@InstallIn(ActivityComponent::class)
-object FingerprintMatcherModule {
-
-    @Provides
-    fun provideFingerprintMatcher(): FingerprintMatcher = FingerprintMatcher.create()
 }

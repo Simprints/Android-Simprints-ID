@@ -2,14 +2,9 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -39,7 +34,7 @@ import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.time.KronosTimeHelperImpl
+import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
@@ -49,7 +44,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -65,9 +59,6 @@ open class AppModule {
     @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
 
-    @Provides
-    @Singleton
-    open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
@@ -79,6 +70,47 @@ open class AppModule {
             minWaitTimeBetweenSyncMs = TimeUnit.MINUTES.toMillis(30),
             cacheExpirationMs = TimeUnit.MINUTES.toMillis(30)
         )
+    )
+
+
+    @Provides
+    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
+        SessionEventValidatorsFactoryImpl()
+
+    @Provides
+    open fun provideDbEventDatabaseFactory(
+        ctx: Context,
+        secureDataManager: SecurityManager,
+    ): EventDatabaseFactory = DbEventDatabaseFactoryImpl(ctx, secureDataManager)
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventsLocalDbManager(
+        factory: EventDatabaseFactory
+    ): EventLocalDataSource = EventLocalDataSourceImpl(factory)
+
+    @Provides
+    @Singleton
+    open fun provideEventRepository(
+        ctx: Context,
+        eventLocalDataSource: EventLocalDataSource,
+        eventRemoteDataSource: EventRemoteDataSource,
+        configManager: ConfigManager,
+        loginManager: LoginManager,
+        timeHelper: TimeHelper,
+        validatorFactory: SessionEventValidatorsFactory,
+        sessionDataCache: SessionDataCache
+    ): EventRepository = EventRepositoryImpl(
+        ctx.deviceId,
+        ctx.packageVersionName,
+        loginManager,
+        eventLocalDataSource,
+        eventRemoteDataSource,
+        timeHelper,
+        validatorFactory,
+        VERSION_NAME,
+        sessionDataCache,
+        configManager,
     )
 
     @Provides
@@ -176,9 +208,6 @@ open class AppModule {
         eventRepository: EventRepository, timeHelper: TimeHelper, encodingUtils: EncodingUtils
     ): PersonCreationEventHelper =
         PersonCreationEventHelperImpl(eventRepository, timeHelper, encodingUtils)
-
-    @Provides
-    open fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
 
 }
 

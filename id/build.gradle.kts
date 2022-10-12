@@ -147,7 +147,6 @@ dependencies {
     kapt(libs.dagger.compiler)
 
     implementation(libs.fuzzywuzzy.core)
-    implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
 
 //    implementation(libs.hilt)
@@ -169,8 +168,6 @@ dependencies {
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.androidX.cameraX.core)
-    implementation(libs.playcore.core)
-    implementation(libs.playcore.core.ktx)
     implementation(libs.androidX.sqlite)
     implementation(libs.sqlCipher.core)
 

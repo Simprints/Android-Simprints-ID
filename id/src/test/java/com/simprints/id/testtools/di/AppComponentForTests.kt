@@ -1,5 +1,6 @@
 package com.simprints.id.testtools.di
 
+import com.simprints.core.CoreModule
 import com.simprints.eventsystem.EventSystemModule
 import com.simprints.eventsystem.EventSystemProvider
 import com.simprints.id.Application
@@ -36,7 +37,6 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         PreferencesModule::class,
-        SerializerModule::class,
         DataModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
@@ -54,6 +54,7 @@ import javax.inject.Singleton
         EnrolmentRecordsModule::class,
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
+        CoreModule::class,
         EventSystemProvider::class,
         EventSystemModule::class
     ]
@@ -69,7 +70,6 @@ interface AppComponentForTests : AppComponent {
         fun dataModule(dataModule: DataModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
-        fun serializerModule(serializerModule: SerializerModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder
         fun viewModelModule(viewModelModule: ViewModelModule): Builder
 

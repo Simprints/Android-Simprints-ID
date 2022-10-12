@@ -5,7 +5,6 @@ import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.databinding.ActivityFrontBinding
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -33,7 +32,7 @@ open class RequestLoginActivity : BaseSplitActivity() {
 
     private fun setTextInLayout() {
         binding.libSimprintsVersionTextView.text = getString(IDR.string.libsimprints_label)
-        binding.simprintsIdVersionTextView.text = getString(R.string.simprints_label)
+        binding.simprintsIdVersionTextView.text = getString(IDR.string.simprints_label)
         binding.requestLogin.text = getString(IDR.string.requestLogin_message)
         binding.tvDeviceId.text = getString(IDR.string.device_id, app.deviceId)
     }

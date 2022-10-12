@@ -182,20 +182,4 @@ class ErrorResponseExtKtTest {
 
         assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
     }
-
-    @Test
-    fun libSimprintsResultCode_SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD_mapCorrectly() {
-        val errorResponseReason = ErrorResponse.Reason.SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
-        val libSimprintsreason = Constants.SIMPRINTS_SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD
-
-        assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
-    }
-
-    @Test
-    fun libSimprintsResultCode_SETUP_MODALITY_DOWNLOAD_CANCELLED_mapCorrectly() {
-        val errorResponseReason = ErrorResponse.Reason.SETUP_MODALITY_DOWNLOAD_CANCELLED
-        val libSimprintsreason = Constants.SIMPRINTS_SETUP_MODALITY_DOWNLOAD_CANCELLED
-
-        assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
-    }
 }

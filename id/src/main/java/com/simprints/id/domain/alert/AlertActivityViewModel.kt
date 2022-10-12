@@ -72,24 +72,6 @@ enum class AlertActivityViewModel(val type: Type,
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = IDR.string.enrol_last_biometrics_alert_message
-    ),
-
-    OFFLINE_DURING_MODALITY_INSTALL(
-        type = Type.DataError(
-            title = IDR.string.modality_installation_offline_title,
-            hintDrawable = R.drawable.error_hint_wifi
-        ),
-        leftButton = ButtonAction.WifiSettingsWithFinish,
-        rightButton = ButtonAction.None,
-        message = IDR.string.modality_installation_offline
-    ),
-    MODALITY_DOWNLOAD_CANCELLED(
-        type = Type.DataError(
-            title = IDR.string.feature_not_downloaded_title
-        ),
-        leftButton = ButtonAction.TryAgain,
-        rightButton = ButtonAction.None,
-        message = IDR.string.feature_not_downloaded
     );
 
     companion object {
@@ -102,8 +84,6 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                 AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
-                AlertType.OFFLINE_DURING_SETUP -> OFFLINE_DURING_MODALITY_INSTALL
-                AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> MODALITY_DOWNLOAD_CANCELLED
             }
     }
 
