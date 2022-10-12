@@ -3,14 +3,14 @@ package com.simprints.infra.login
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.tools.extentions.deviceId
+import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.AttestationManagerImpl
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.LoginInfoManagerImpl
-import com.simprints.infra.login.extensions.deviceId
-import com.simprints.infra.login.extensions.packageVersionName
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.network.SimApiClientFactoryImpl
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
