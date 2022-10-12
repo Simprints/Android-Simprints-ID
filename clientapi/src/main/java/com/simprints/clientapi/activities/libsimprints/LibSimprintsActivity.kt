@@ -1,15 +1,13 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import android.content.Intent
-import android.os.Bundle
-import com.simprints.clientapi.ClientApiComponent
+import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Companion.buildLibSimprintsAction
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
 import com.simprints.libsimprints.*
-import com.simprints.id.Application
 import javax.inject.Inject
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
@@ -18,18 +16,13 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         get() = buildLibSimprintsAction(intent.action)
 
     @Inject
-    lateinit var libSimprintsPresenterFactory: ClientApiComponent.LibSimprintsPresenterFactory
+    lateinit var libSimprintsPresenterFactory: ClientApiModule.LibSimprintsPresenterFactory
 
     override val presenter: LibSimprintsContract.Presenter by lazy {
         libSimprintsPresenterFactory.create(this, action)
     }
 
     override val guidSelectionNotifier = DefaultGuidSelectionNotifier(this)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        ClientApiComponent.getComponent(applicationContext as Application).inject(this)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun returnRegistration(
         registration: Registration,

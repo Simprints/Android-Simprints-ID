@@ -86,8 +86,6 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures.addAll(mutableSetOf(":clientapi"))
-
     lint {
         warning += setOf("InvalidPackage")
     }
@@ -110,6 +108,7 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     api(project(":infralogin"))
+    implementation(project(":clientapi"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
@@ -166,12 +165,10 @@ dependencies {
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.lifecycle.ktx)
-    implementation(libs.androidX.lifecycle.livedata)
+    implementation(libs.androidX.lifecycle.livedata.ktx)
     implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.androidX.lifecycle.scope)
     implementation(libs.androidX.ui.constraintlayout)
-    api(libs.androidX.navigation.dynamicfeatures)
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.androidX.cameraX.core)
     implementation(libs.koin.core)
