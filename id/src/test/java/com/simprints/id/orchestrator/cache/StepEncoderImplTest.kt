@@ -19,10 +19,8 @@ import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -104,11 +102,6 @@ class StepEncoderImplTest {
                 faceCaptureResponse as FaceCaptureResponse
             )
         }
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
     }
 
     private fun buildStep(request: Step.Request, result: Step.Result): Step = Step(

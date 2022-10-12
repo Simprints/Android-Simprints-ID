@@ -15,7 +15,6 @@ dependencyAnalysis {
                     // them, and DFMs can't implement the same lib but autonomousapps does not
                     // recognize this transitive property
                     'org.jetbrains.kotlin:kotlin-stdlib',
-                    'org.koin:koin-android-viewmodel',
                     'androidx.navigation:navigation-dynamic-features-fragment',
                     'io.realm:realm-android-kotlin-extensions',
                     'io.realm:realm-annotations',

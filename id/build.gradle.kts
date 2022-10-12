@@ -142,8 +142,6 @@ dependencies {
 
 
     // Service Location & DI
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
     kapt(libs.dagger.compiler)
@@ -171,8 +169,6 @@ dependencies {
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.androidX.cameraX.core)
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
     implementation(libs.playcore.core)
     implementation(libs.playcore.core.ktx)
     implementation(libs.androidX.sqlite)
@@ -206,8 +202,6 @@ dependencies {
     testImplementation(libs.testing.koTest.kotlin)
 
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.koin)
-    testImplementation(libs.testing.koin.junit4)
 
     testImplementation(libs.testing.mockwebserver)
     testImplementation(libs.testing.work)
